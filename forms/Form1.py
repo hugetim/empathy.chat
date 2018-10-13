@@ -18,11 +18,11 @@ class Form1(Form1Template):
       new_row = app_tables.requests.add_row(name=anvil.users.get_user(), start_time=datetime.datetime.now())
       self.status.text = "Status: Requesting empathy. Awaiting an offer..."
     else:
-      oldest_offer = app_tables.offers.search(tables.order_by("start_time", ascending=True))[:1]
-      make_match(anvil.users.get_user(),oldest_offer[0]['name'])
+      oldest_offer = list(app_tables.offers.search(tables.order_by("start_time", ascending=True))[:1])
+      self.make_match(self,anvil.users.get_user(),oldest_offer[0]['name'])
       
-def make_match(requester, offerer):
-  self.status.text = "Making match with ", requester, " and ", offerer
+  def make_match(self,requester, offerer):
+    self.status.text = "Making match with " + requester + " and " + offerer
 
 
 
