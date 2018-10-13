@@ -1,0 +1,6 @@
+allow_embedding: false
+package_name: Material Design 1
+name: Material Design 1
+startup_form: Form1
+runtime_options: {version: 1, server_version: python2-sandbox}
+services: []
