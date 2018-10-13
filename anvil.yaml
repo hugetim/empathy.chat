@@ -1,6 +1,15 @@
 allow_embedding: false
-package_name: Material Design 1
-name: Material Design 1
+package_name: EmpathyExchange
+name: Empathy Exchange
 startup_form: Form1
+renamed: true
 runtime_options: {version: 1, server_version: python2-sandbox}
-services: []
+services:
+- source: /runtime/services/anvil/users.yml
+  client_config: {require_secure_passwords: true, use_email: true, allow_remember_me: false,
+    allow_signup: true, enable_automatically: true, confirm_email: true, remember_me_days: 30,
+    use_google: false, use_facebook: false}
+  server_config: {user_table: 16111}
+- source: /runtime/services/tables.yml
+  client_config: {}
+  server_config: {auto_create_missing_columns: false}
