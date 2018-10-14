@@ -1,4 +1,5 @@
 from anvil import *
+import anvil.server
 import anvil.tables as tables
 from anvil.tables import app_tables
 import anvil.users
@@ -15,11 +16,11 @@ class Form1(Form1Template):
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if app_tables.offers.get() == None:
-      new_row = app_tables.requests.add_row(name=anvil.users.get_user(), start_time=datetime.datetime.now())
+      new_row = app_tables.requests.add_row(name=anvil.users.get_user().get_id(), start_time=datetime.datetime.now())
       self.status.text = "Status: Requesting empathy. Awaiting an offer..."
     else:
       oldest_offer = list(app_tables.offers.search(tables.order_by("start_time", ascending=True))[:1])
-      self.make_match(self,anvil.users.get_user(),oldest_offer[0]['name'])
+      self.make_match(anvil.users.get_user().get_id(),oldest_offer[0]['name'])
       
   def make_match(self,requester, offerer):
     self.status.text = "Making match with " + requester + " and " + offerer
