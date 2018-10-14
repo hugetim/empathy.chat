@@ -16,3 +16,12 @@ import anvil.server
 #   return 42
 #
 
+@anvil.server.callable
+def add_request(user_id):
+    if app_tables.matches.get() == None:
+      new_row = app_tables.matches.add_row(request_id=anvil.users.get_user().get_id())
+    else:
+      #make match or add a new request row
+      pass
+      #top_row = list(app_tables.offers.search(tables.order_by("start_time", ascending=True))[:1])[0]
+      #self.make_match(anvil.users.get_user().get_id(),oldest_offer[0]['name'])
