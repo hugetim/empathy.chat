@@ -25,6 +25,12 @@ class Form1(Form1Template):
   def make_match(self,requester, offerer):
     self.status.text = "Making match with " + requester + " and " + offerer
 
+  def timer_1_tick(self, **event_args):
+    """This method is called Every [interval] seconds"""
+    pass
+
+
+
 
 
 

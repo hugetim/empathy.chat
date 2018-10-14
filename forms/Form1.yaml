@@ -33,3 +33,7 @@ components:
     icon: ''}
   name: label_1
   layout_properties: {slot: title}
+- type: Timer
+  properties: {}
+  name: timer_1
+  event_bindings: {tick: timer_1_tick}
