@@ -1,7 +1,7 @@
 container:
   type: HtmlTemplate
   properties: {html: '@theme:standard-page.html'}
-  event_bindings: {hide: form_hide}
+  event_bindings: {hide: form_hide, show: form_show}
 components:
 - type: ColumnPanel
   properties: {col_widths: '{}'}
