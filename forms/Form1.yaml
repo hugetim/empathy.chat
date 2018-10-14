@@ -1,6 +1,7 @@
 container:
   type: HtmlTemplate
   properties: {html: '@theme:standard-page.html'}
+  event_bindings: {hide: form_hide}
 components:
 - type: ColumnPanel
   properties: {col_widths: '{}'}
@@ -29,6 +30,7 @@ components:
       background: '', bold: false, underline: false, icon: 'fa:gratipay'}
     name: offer_button
     layout_properties: {grid_position: 'SLDCYX,ULRRWT'}
+    event_bindings: {click: offer_button_click}
 - type: FlowPanel
   properties: {}
   name: navbar_links
