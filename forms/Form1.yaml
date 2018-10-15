@@ -16,18 +16,20 @@ components:
     name: status
     layout_properties: {grid_position: 'SJFXWR,KCXZLM'}
   - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Request Empathy, font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:child'}
+    properties: {role: null, align: center, tooltip: 'Someone to listen non-judgmentally,
+        connect to your feelings and needs', border: '', enabled: true, foreground: '',
+      visible: true, text: Request Empathy, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: 'fa:child'}
     name: request_button
     layout_properties: {grid_position: 'RZEGBP,KZGDHR'}
     event_bindings: {click: request_button_click, show: request_button_show}
   - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Offer Empathy, font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:gratipay'}
+    properties: {role: null, align: center, tooltip: 'Offer to hold a space, speaking
+        only to offer empathy guesses', border: '', enabled: true, foreground: '',
+      visible: true, text: Offer Empathy, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: 'fa:gratipay'}
     name: offer_button
     layout_properties: {grid_position: 'SLDCYX,ULRRWT'}
     event_bindings: {click: offer_button_click}
