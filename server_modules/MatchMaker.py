@@ -82,9 +82,11 @@ def add_offer_row(user_id):
   return new_row
 
 def create_jitsi(match):
+  numchars = 7
+  charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   random.seed()
-  randint = random.randint(1,1000000000)
-  code = "empathy" + str(randint)
+  randcode = "".join([random.choice(charset) for i in range(numchars)])
+  code = "empathy" + randcode
   match['jitsi_code'] = code
   return code
 
