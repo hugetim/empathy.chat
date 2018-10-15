@@ -10,10 +10,15 @@ class Form1(Form1Template):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    user_status = anvil.server.call('get_status',anvil.users.get_user().get_id())
-    self.set_form_status(user_status)
+    
     while not anvil.users.login_with_form():
       pass
+    user = anvil.users.get_user()
+    user_status = anvil.server.call('get_status',user.get_id())
+    self.set_form_status(user_status)
+    # initialize new users
+    if anvil.server.call('get_trust_level',user.get_id()) == None:
+      user.update(trust_level=0) 
 
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -69,6 +74,7 @@ class Form1(Form1Template):
        self.cancel_button.visible = False
        self.request_button.visible = True
        self.offer_button.visible = True
+
 
 
 

@@ -22,7 +22,7 @@ components:
       background: '', bold: false, underline: false, icon: 'fa:child'}
     name: request_button
     layout_properties: {grid_position: 'RZEGBP,KZGDHR'}
-    event_bindings: {click: request_button_click}
+    event_bindings: {click: request_button_click, show: request_button_show}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Offer Empathy, font_size: null, font: '',
