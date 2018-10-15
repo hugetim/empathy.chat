@@ -59,13 +59,13 @@ def get_status(user_id):
     match_o = app_tables.matching.get(offer_id=user_id)
     if match_o == None:
       return None
-    elif match_o[request_id] == None:
+    elif match_o['request_id'] == None:
         return "offering"
-    else
+    else:
       return "matched"
-  elif match_r[offer_id] == None:
+  elif match_r['offer_id'] == None:
     return "requesting"
-  else
+  else:
     return "matched"
     
       
