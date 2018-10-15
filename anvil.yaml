@@ -16,3 +16,6 @@ services:
 - source: /runtime/services/google.yml
   client_config: {}
   server_config: {}
+- source: /runtime/services/anvil/email.yml
+  client_config: {}
+  server_config: {}
