@@ -154,16 +154,16 @@ def create_jitsi(match):
   match['jitsi_code'] = code
   return code
 
-def complete(user_id):
-  match = app_tables.matching.get(request_id=user_id)
-  if match == None:
-    match = app_tables.matching.get(offer_id=user_id)
-  app_tables.matches.add_row(request_id=match['request_id'],
-                             request_time=match['request_time'],
-                             offer_id=match['offer_id'],
-                             offer_time=match['offer_time'],
-                             jitsi_code=code)
-  match.delete()
+#def complete(user_id):
+#  match = app_tables.matching.get(request_id=user_id)
+#  if match == None:
+#    match = app_tables.matching.get(offer_id=user_id)
+#  app_tables.matches.add_row(request_id=match['request_id'],
+#                             request_time=match['request_time'],
+#                             offer_id=match['offer_id'],
+#                             offer_time=match['offer_time'],
+#                             jitsi_code=code)
+#  match.delete()
 
 @anvil.server.callable
 def get_trust_level(user_id):
