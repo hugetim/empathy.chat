@@ -22,6 +22,7 @@ import datetime
 #
 
 @anvil.server.callable
+@anvil.tables.in_transaction
 def add_request(user_id):
     if app_tables.matching.get() == None:
       add_request_row(user_id)
@@ -39,6 +40,7 @@ def add_request(user_id):
         return create_jitsi(earliest_offer)
 
 @anvil.server.callable
+@anvil.tables.in_transaction
 def add_offer(user_id):
     if app_tables.matching.get() == None:
       add_offer_row(user_id)
@@ -56,6 +58,7 @@ def add_offer(user_id):
         return create_jitsi(earliest_request)
 
 @anvil.server.callable
+@anvil.tables.in_transaction
 def get_code(user_id):
   match_r = app_tables.matching.get(request_id=user_id)
   if match_r == None:
@@ -66,6 +69,7 @@ def get_code(user_id):
     return match_r['jitsi_code']
   
 @anvil.server.callable
+@anvil.tables.in_transaction
 def get_status(user_id):
   match_r = app_tables.matching.get(request_id=user_id)
   if match_r == None:
@@ -82,6 +86,7 @@ def get_status(user_id):
     return "matched"
 
 @anvil.server.callable
+@anvil.tables.in_transaction
 def cancel(user_id):
   match_r = app_tables.matching.get(request_id=user_id)
   if match_r != None:
@@ -95,8 +100,41 @@ def cancel(user_id):
       match_o['offer_time'] = None
       match_o['jitsi_code'] = None
     
-      
-      
+@anvil.server.callable
+@anvil.tables.in_transaction
+def match_commenced(user_id):
+  '''Upon first commence, copy row over. Upon second, delete "matching" row.'''
+  match_r = app_tables.matching.get(request_id=user_id)
+  if match_r == None:
+    match_o = app_tables.matching.get(offer_id=user_id)
+    if match_o == None:
+      return None
+    elif match_o['request_id'] == None:
+        return "offering"
+    else:
+      matches = app_tables.matches.get(jitsi_code=match_o['jitsi_code'])
+      if matches == None:
+        copy_to_matches(match_o)
+      else:
+        match_o.delete()
+      return "matched"
+  elif match_r['offer_id'] == None:
+    return "requesting"
+  else:
+    matches = app_tables.matches.get(jitsi_code=match_r['jitsi_code'])
+    if matches == None:
+      copy_to_matches(match_r)
+    else:
+      match_r.delete()
+    return "matched"      
+
+def copy_to_matches(matching):
+    matched = app_tables.matches.add_row(request_id = matching['request_id'],
+                                         request_time = matching['request_time'],
+                                         offer_id = matching['offer_id'],
+                                         offer_time = matching['offer_time'],
+                                         jitsi_code = matching['jitsi_code'])
+  
 def add_request_row(user_id):
   new_row = app_tables.matching.add_row(request_id=anvil.users.get_user().get_id(), 
                                         request_time=datetime.datetime.now())
