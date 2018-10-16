@@ -70,7 +70,22 @@ def get_status(user_id):
     return "requesting"
   else:
     return "matched"
+
+@anvil.server.callable
+def cancel(user_id):
+  match_r = app_tables.matching.get(request_id=user_id)
+  if match_r != None:
+    match_r['request_id'] = None
+    match_r['request_time'] = None
+    match_r['jitsi_code'] = None
+  else:
+    match_o = app_tables.matching.get(offer_id=user_id)
+    if match_o != None:
+      match_o['offer_id'] = None
+      match_o['offer_time'] = None
+      match_o['jitsi_code'] = None
     
+      
       
 def add_request_row(user_id):
   new_row = app_tables.matching.add_row(request_id=anvil.users.get_user().get_id(), 
