@@ -40,6 +40,7 @@ components:
       background: '', bold: false, underline: false, icon: 'fa:check'}
     name: complete_button
     layout_properties: {grid_position: 'KBXCXK,CUSTZW'}
+    event_bindings: {click: complete_button_click}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: Cancel, font_size: null, font: '', spacing_above: small,
@@ -60,6 +61,6 @@ components:
   name: label_1
   layout_properties: {slot: title}
 - type: Timer
-  properties: {}
+  properties: {interval: 5}
   name: timer_1
   event_bindings: {tick: timer_1_tick}

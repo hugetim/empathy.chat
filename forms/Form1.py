@@ -9,7 +9,7 @@ import datetime
 
 class Form1(Form1Template):
   current_status = None
-  user
+  user = None
   match_start = None
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -23,7 +23,7 @@ class Form1(Form1Template):
     self.current_status = anvil.server.call('get_status',self.user.get_id())
     self.set_form_status(self.current_status)
     # initialize new users
-    if anvil.server.call('get_trust_level',user.get_id()) == None:
+    if anvil.server.call('get_trust_level',self.user.get_id()) == None:
       self.user.update(trust_level=0) 
 
   def request_button_click(self, **event_args):
@@ -48,7 +48,7 @@ class Form1(Form1Template):
     
 
   def timer_1_tick(self, **event_args):
-    """This method is called Every [interval] seconds"""
+    """This method is called Every 5 seconds"""
     if self.current_status in ["requesting", "offering"]:
       new_status = anvil.server.call('get_status',self.user.get_id())
       if new_status == "matched":
@@ -62,9 +62,12 @@ class Form1(Form1Template):
     elif self.current_status == "matched":
       new_status = anvil.server.call('get_status',self.user.get_id())
       timer = datetime.datetime.now() - self.match_start
-      if timer.seconds > 120: ####################################3333
-      self.current_status = new_status
-      self.set_form_status(self.current_status)
+      print timer.seconds
+      if new_status=="matched" and timer.seconds > 10:
+        new_status = "empathy"
+      if new_status != "matched":
+        self.current_status = new_status
+        self.set_form_status(self.current_status)
       
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -84,7 +87,7 @@ class Form1(Form1Template):
        self.request_button.visible = False
        self.offer_button.visible = False
      elif user_status == "matched":
-       code = anvil.server.call('get_code',anvil.users.get_user().get_id())
+       jitsi_code = anvil.server.call('get_code',self.user.get_id())
        self.status.text = "Use Jitsi " + jitsi_code
        self.match_start = datetime.datetime.now()
        self.complete_button.visible=False
@@ -102,6 +105,12 @@ class Form1(Form1Template):
        self.cancel_button.visible = False
        self.request_button.visible = True
        self.offer_button.visible = True
+
+  def complete_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.current_status = None
+    self.set_form_status(self.current_status)
+
 
   
 

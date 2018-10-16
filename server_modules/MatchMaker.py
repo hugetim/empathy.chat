@@ -56,6 +56,16 @@ def add_offer(user_id):
         return create_jitsi(earliest_request)
 
 @anvil.server.callable
+def get_code(user_id):
+  match_r = app_tables.matching.get(request_id=user_id)
+  if match_r == None:
+    match_o = app_tables.matching.get(offer_id=user_id)
+    if match_o != None:
+      return match_o['jitsi_code']
+  else:
+    return match_r['jitsi_code']
+  
+@anvil.server.callable
 def get_status(user_id):
   match_r = app_tables.matching.get(request_id=user_id)
   if match_r == None:
