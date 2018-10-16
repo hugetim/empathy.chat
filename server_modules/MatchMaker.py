@@ -36,7 +36,7 @@ def add_request(user_id):
         offers.sort(key = lambda row: row['offer_time'])
         earliest_offer = offers[0]
         earliest_offer['request_id'] = user_id
-        earliest_offer['request_time'] = datetime.datetime.now()
+        earliest_offer['request_time'] = datetime.datetime.utcnow()
         return create_jitsi(earliest_offer)
 
 @anvil.server.callable
@@ -54,7 +54,7 @@ def add_offer(user_id):
         requests.sort(key = lambda row: row['request_time'])
         earliest_request = requests[0]
         earliest_request['offer_id'] = user_id
-        earliest_request['offer_time'] = datetime.datetime.now()
+        earliest_request['offer_time'] = datetime.datetime.utcnow()
         return create_jitsi(earliest_request)
 
 @anvil.server.callable
@@ -87,6 +87,19 @@ def get_status(user_id):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
+def get_match_start(user_id):
+  match_r = app_tables.matching.get(request_id=user_id)
+  if match_r == None:
+    match_o = app_tables.matching.get(offer_id=user_id)
+    if match_o == None:
+      return None
+    else:
+      return max(match_o['request_time'], match_o['offer_time'])
+  else:
+    return max(match_r['request_time'], match_r['offer_time']) 
+      
+@anvil.server.callable
+@anvil.tables.in_transaction
 def cancel(user_id):
   match_r = app_tables.matching.get(request_id=user_id)
   if match_r != None:
@@ -103,31 +116,49 @@ def cancel(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(user_id):
-  '''Upon first commence, copy row over. Upon second, delete "matching" row.'''
+  '''Upon first commence, copy row over and delete "matching" row.'''
   match_r = app_tables.matching.get(request_id=user_id)
   if match_r == None:
     match_o = app_tables.matching.get(offer_id=user_id)
     if match_o == None:
       return None
     elif match_o['request_id'] == None:
-        return "offering"
+      return "offering"
     else:
       matches = app_tables.matches.get(jitsi_code=match_o['jitsi_code'])
       if matches == None:
         copy_to_matches(match_o)
-      else:
-        match_o.delete()
-      return "matched"
+      return "empathy"
   elif match_r['offer_id'] == None:
     return "requesting"
   else:
     matches = app_tables.matches.get(jitsi_code=match_r['jitsi_code'])
     if matches == None:
       copy_to_matches(match_r)
-    else:
-      match_r.delete()
-    return "matched"      
+    return "empathy"      
 
+@anvil.server.callable
+@anvil.tables.in_transaction
+def match_complete(user_id):
+  '''Upon first complete, delete "matching" row.'''
+  match_r = app_tables.matching.get(request_id=user_id)
+  if match_r == None:
+    match_o = app_tables.matching.get(offer_id=user_id)
+    if match_o == None:
+      # outcome for second complete, from other user in the match
+      pass
+    else:
+      assert match_o['request_id'] != None
+      matches = app_tables.matches.get(jitsi_code=match_o['jitsi_code'])
+      assert matches != None
+      match_o.delete()
+  else:
+    assert match_r['offer_id'] != None
+    matches = app_tables.matches.get(jitsi_code=match_r['jitsi_code'])
+    assert matches != None
+    match_r.delete()
+  return None
+  
 def copy_to_matches(matching):
     matched = app_tables.matches.add_row(request_id = matching['request_id'],
                                          request_time = matching['request_time'],
@@ -137,12 +168,12 @@ def copy_to_matches(matching):
   
 def add_request_row(user_id):
   new_row = app_tables.matching.add_row(request_id=anvil.users.get_user().get_id(), 
-                                        request_time=datetime.datetime.now())
+                                        request_time=datetime.datetime.utcnow())
   return new_row
 
 def add_offer_row(user_id):
   new_row = app_tables.matching.add_row(offer_id=anvil.users.get_user().get_id(), 
-                                        offer_time=datetime.datetime.now())
+                                        offer_time=datetime.datetime.utcnow())
   return new_row
 
 def create_jitsi(match):
