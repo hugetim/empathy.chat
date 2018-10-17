@@ -44,7 +44,7 @@ class Form1(Form1Template):
             anvil.server.call('match_complete',self.user_id)
     self.set_form_status(self.current_status)
     # initialize new users
-    anvil.server.call('get_trust_level',self.user_id
+    anvil.server.call('get_trust_level',self.user_id)
 
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
