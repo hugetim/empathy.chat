@@ -50,20 +50,19 @@ class Form1(Form1Template):
     """This method is called when the button is clicked"""
     jitsi_code = anvil.server.call('add_request',self.user_id)
     if jitsi_code == None:
-      self.status.text = "Status: Requesting empathy. Awaiting an offer..."
-      self.set_form_status("requesting")
+      self.current_status = "requesting"
     else:
-      self.set_form_status("matched")
+      self.current_status = "matched"
+    self.set_form_status(self.current_status)
 
   def offer_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     jitsi_code = anvil.server.call('add_offer',self.user_id)
     if jitsi_code == None:
-      self.status.text = "Status: Offering empathy. Awaiting a request..."
-      self.set_form_status("offering")
+      self.current_status = "offering"
     else:
-      self.match_start = datetime.datetime.utcnow()
-      self.set_form_status("matched") 
+      self.current_status = "matched"
+    self.set_form_status(self.current_status) 
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
@@ -134,8 +133,8 @@ class Form1(Form1Template):
       new_status = anvil.server.call('match_commenced', self.user_id)
       if new_status != "empathy":
         assert new_status != "matched"
-        self.user_status = new_status
-        set_form_status(self, self.user_status)
+        self.current_status = new_status
+        set_form_status(self, self.current_status)
     else:
       self.status.text = "Choose an option:"
       self.set_jitsi_link("")
