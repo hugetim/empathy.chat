@@ -72,7 +72,7 @@ class Form1(Form1Template):
         ready = confirm("A match is available. Are you ready?")
         if ready:
           self.current_status = new_status
-          self.match_start = datetime.datetime.utcnow()
+          self.match_start = datetime.datetime.now()
         else:
           self.current_status = None
           anvil.server.call('cancel',self.user_id)
