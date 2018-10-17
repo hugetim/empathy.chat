@@ -199,4 +199,7 @@ def create_jitsi(match):
 @anvil.server.callable
 def get_trust_level(user_id):
   user = app_tables.users.get_by_id(user_id)
+  trust = user['trust_level']
+  if trust == None:
+    user.update(trust_level=0)
   return user['trust_level']

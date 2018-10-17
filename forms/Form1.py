@@ -10,7 +10,7 @@ import datetime
 class Form1(Form1Template):
   seconds_to_cancel = 90
   current_status = None
-  user = None
+  user_id = None
   match_start = None  
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -20,7 +20,8 @@ class Form1(Form1Template):
     
     while not anvil.users.login_with_form():
       pass
-    self.user = anvil.users.get_user()
+    user = anvil.users.get_user()
+    self.user_id = user.get_id()
     self.current_status = anvil.server.call('get_status',self.user.get_id())
     if self.current_status == "matched":
       self.match_start = anvil.server.call('get_match_start', 
@@ -43,8 +44,7 @@ class Form1(Form1Template):
             anvil.server.call('match_complete',self.user.get_id())
     self.set_form_status(self.current_status)
     # initialize new users
-    if anvil.server.call('get_trust_level',self.user.get_id()) == None:
-      self.user.update(trust_level=0) 
+    anvil.server.call('get_trust_level',self.user.get_id())
 
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
