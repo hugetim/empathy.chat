@@ -106,12 +106,16 @@ def cancel(user_id):
     match_r['request_id'] = None
     match_r['request_time'] = None
     match_r['jitsi_code'] = None
+    if match_r['offer_id'] == None:
+      match_r.delete()
   else:
     match_o = app_tables.matching.get(offer_id=user_id)
     if match_o != None:
       match_o['offer_id'] = None
       match_o['offer_time'] = None
       match_o['jitsi_code'] = None
+      if match_o['request_id'] == None:
+        match_o.delete()
     
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -181,7 +185,7 @@ def create_jitsi(match):
   charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   random.seed()
   randcode = "".join([random.choice(charset) for i in range(numchars)])
-  code = "empathy" + randcode
+  code = "empathy_" + randcode
   match['jitsi_code'] = code
   return code
 

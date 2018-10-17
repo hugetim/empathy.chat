@@ -52,6 +52,7 @@ class Form1(Form1Template):
     if jitsi_code == None:
       self.current_status = "requesting"
     else:
+      self.match_start = datetime.datetime.now()
       self.current_status = "matched"
     self.set_form_status(self.current_status)
 
@@ -61,6 +62,7 @@ class Form1(Form1Template):
     if jitsi_code == None:
       self.current_status = "offering"
     else:
+      self.match_start = datetime.datetime.now()
       self.current_status = "matched"
     self.set_form_status(self.current_status) 
 
@@ -81,11 +83,17 @@ class Form1(Form1Template):
       new_status = anvil.server.call('get_status',self.user_id)
       timer = datetime.datetime.now(self.match_start.tzinfo) - self.match_start
       print timer.seconds
-      if new_status=="matched" and timer.seconds > self.seconds_to_cancel:
-        new_status = "empathy"
-      if new_status != "matched":
+      if new_status=="matched":
+        if timer.seconds > self.seconds_to_cancel:
+          new_status = "empathy"
+      else:
+        if new_status == "requesting":
+          alert("The empathy offer was canceled.")
+        if new_status == "offering":
+          alert("The empathy request was canceled.")
         self.current_status = new_status
         self.set_form_status(self.current_status)
+        
       
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
