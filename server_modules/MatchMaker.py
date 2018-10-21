@@ -116,7 +116,23 @@ def cancel(user_id):
       match_o['jitsi_code'] = None
       if match_o['request_id'] == None:
         match_o.delete()
-    
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def cancel_other(user_id):
+  '''Upon failure of other to confirm match'''
+  match_r = app_tables.matching.get(request_id=user_id)
+  if match_r != None:
+    match_r['offer_id'] = None
+    match_r['offer_time'] = None
+    match_r['jitsi_code'] = None
+  else:
+    match_o = app_tables.matching.get(offer_id=user_id)
+    if match_o != None:
+      match_o['request_id'] = None
+      match_o['request_time'] = None
+      match_o['jitsi_code'] = None      
+        
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(user_id):

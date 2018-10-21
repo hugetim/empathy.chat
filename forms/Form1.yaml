@@ -9,6 +9,13 @@ components:
   layout_properties: {slot: default}
   components:
   - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
+    name: timer_label
+    layout_properties: {grid_position: 'NSMOXX,CMCWXW'}
+  - type: Label
     properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
       visible: true, text: 'Choose an option:', font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
@@ -72,3 +79,7 @@ components:
   properties: {interval: 5}
   name: timer_1
   event_bindings: {tick: timer_1_tick}
+- name: timer_2
+  type: Timer
+  properties: {interval: 1}
+  event_bindings: {tick: timer_2_tick}
