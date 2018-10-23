@@ -8,11 +8,11 @@ import anvil.users
 import datetime
 
 class Form1(Form1Template):
-  seconds_to_cancel = 90
+  confirm_seconds = 60
   current_status = None
   user_id = None
   match_start = None 
-  time_left = None
+  seconds_left = None
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
@@ -33,6 +33,7 @@ class Form1(Form1Template):
                                                 self.user_id)
       else:
         timer = datetime.datetime.now(self.match_start.tzinfo) - self.match_start
+        self.seconds_left = timer.seconds
         print timer.seconds
         if timer.seconds > self.seconds_to_cancel:
           ongoing = confirm("Is your empathy session, begun "
@@ -72,14 +73,7 @@ class Form1(Form1Template):
     if self.current_status in ["requesting", "offering"]:
       new_status = anvil.server.call('get_status',self.user_id)
       if new_status == "matched":
-        ready = confirm("A match is available. Are you ready?")
-        if ready:
-          self.current_status = new_status
-          self.match_start = datetime.datetime.now()
-        else:
-          self.current_status = None
-          anvil.server.call('cancel',self.user_id)
-        self.set_form_status(self.current_status)
+        open_form('ConfirmMatch', self.confirm_seconds, self.user_id)
     elif self.current_status == "matched":
       new_status = anvil.server.call('get_status',self.user_id)
       timer = datetime.datetime.now(self.match_start.tzinfo) - self.match_start
@@ -95,13 +89,10 @@ class Form1(Form1Template):
         self.current_status = new_status
         self.set_form_status(self.current_status)
 
-def timer_2_tick(self, **event_args):
+  def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
-    if self.current_status == "matched":
-      timer = datetime.datetime.now(self.match_start.tzinfo) - self.match_start
     pass
-
-      
+  
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.current_status = None
@@ -168,6 +159,9 @@ def timer_2_tick(self, **event_args):
       self.jitsi_link.text = self.jitsi_link.url
       self.jitsi_link.visible = True
     
+
+
+
 
 
 
