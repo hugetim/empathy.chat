@@ -160,31 +160,32 @@ def match_commenced(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_complete(user_id):
-  '''Upon first complete, delete "matching" row.'''
-  match_r = app_tables.matching.get(request_id=user_id)
-  if match_r == None:
-    match_o = app_tables.matching.get(offer_id=user_id)
-    if match_o == None:
-      # outcome for second complete, from other user in the match
-      pass
-    else:
-      assert match_o['request_id'] != None
-      matches = app_tables.matches.get(jitsi_code=match_o['jitsi_code'])
-      assert matches != None
-      match_o.delete()
-  else:
-    assert match_r['offer_id'] != None
-    matches = app_tables.matches.get(jitsi_code=match_r['jitsi_code'])
-    assert matches != None
-    match_r.delete()
-  return None
+  '''Set appropriate complete time in matches table.'''
+  #match_r = app_tables.matching.get(request_id=user_id)
+  #if match_r == None:
+  #  match_o = app_tables.matching.get(offer_id=user_id)
+  #  if match_o == None:
+  #    # outcome for second complete, from other user in the match
+  #    pass
+  #  else:
+  #    assert match_o['request_id'] != None
+  #    matches = app_tables.matches.get(jitsi_code=match_o['jitsi_code'])
+  #    assert matches != None
+  #    match_o.delete()
+  #else:
+  #  assert match_r['offer_id'] != None
+  #  matches = app_tables.matches.get(jitsi_code=match_r['jitsi_code'])
+  #  assert matches != None
+  #  match_r.delete()
+  #return None
   
-def copy_to_matches(matching):
-    matched = app_tables.matches.add_row(request_id = matching['request_id'],
-                                         request_time = matching['request_time'],
-                                         offer_id = matching['offer_id'],
-                                         offer_time = matching['offer_time'],
-                                         jitsi_code = matching['jitsi_code'])
+def copy_to_matches(matching): 
+  matched = app_tables.matches.add_row(request_id = matching['request_id'],
+                                       request_time = matching['request_time'],
+                                       offer_id = matching['offer_id'],
+                                       offer_time = matching['offer_time'],
+                                       jitsi_code = matching['jitsi_code'],
+                                       start_time = datetime.datetime.utcnow())
   
 def add_request_row(user_id):
   new_row = app_tables.matching.add_row(request_id=anvil.users.get_user().get_id(), 

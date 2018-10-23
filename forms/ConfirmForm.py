@@ -6,16 +6,17 @@ import anvil.tables as tables
 from anvil.tables import app_tables
 import anvil.users
 
-class ConfirmMatch(ConfirmMatchTemplate):
+class ConfirmForm(ConfirmFormTemplate):
   seconds_left
   user_id
-  def __init__(self, seconds_left, user_id, **properties):
+  def __init__(self, seconds_left, user_id, title="", **properties):
     # You must call self.init_components() before doing anything else in this function
-    
-    # Any code you write here will run when the form opens.
     self.init_components(**properties)
+    # Any code you write here will run when the form opens.
+    if title:
+      self.self.label_1.text = title
     self.seconds_left = seconds_left
-    self.timer_label.text = self.seconds_left " seconds left to confirm."
+    self.timer_label.text = "You have " + self.seconds_left + " seconds left to confirm."
     self.user_id = user_id
 
   def button_yes_click(self, **event_args):
@@ -29,13 +30,13 @@ class ConfirmMatch(ConfirmMatchTemplate):
   def timer_1_tick(self, **event_args):
     """This method is called Every 1 seconds"""
     self.seconds_left -= 1
-    self.timer_label.text = "You have " self.seconds_left " seconds left to confirm."
+    self.timer_label.text = "You have " + self.seconds_left + " seconds left to confirm."
     if self.seconds_left == 0:
       self.return_back(False)
   
-  def return_back(confirmed):
+  def return_back(self, confirmed):
     if confirmed:
-      ############################################
+      # retains "matched" status, "empathy" upon Form1 init
       open_form('Form1')
     else:
       anvil.server.call('cancel',self.user_id)

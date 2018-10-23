@@ -73,7 +73,8 @@ class Form1(Form1Template):
     if self.current_status in ["requesting", "offering"]:
       new_status = anvil.server.call('get_status',self.user_id)
       if new_status == "matched":
-        open_form('ConfirmMatch', self.confirm_seconds, self.user_id)
+        open_form('ConfirmForm', self.confirm_seconds, self.user_id,
+                  "A match is available. Are you ready?")
     elif self.current_status == "matched":
       new_status = anvil.server.call('get_status',self.user_id)
       timer = datetime.datetime.now(self.match_start.tzinfo) - self.match_start
@@ -87,7 +88,7 @@ class Form1(Form1Template):
         if new_status == "offering":
           alert("The empathy request was canceled.")
         self.current_status = new_status
-        self.set_form_status(self.current_status)
+      self.set_form_status(self.current_status)
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
