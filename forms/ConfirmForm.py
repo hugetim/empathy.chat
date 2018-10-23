@@ -36,7 +36,7 @@ class ConfirmForm(ConfirmFormTemplate):
   
   def return_back(self, confirmed):
     if confirmed:
-      # retains "matched" status, "empathy" upon Form1 init
+      anvil.server.call('match_commenced',self.user_id)
       open_form('Form1')
     else:
       anvil.server.call('cancel',self.user_id)
