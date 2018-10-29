@@ -6,6 +6,7 @@ import anvil.tables as tables
 from anvil.tables import app_tables
 import anvil.users
 import datetime
+from TimerForm import TimerForm
 
 class Form1(Form1Template):
   buffer_seconds = 5
@@ -69,25 +70,22 @@ class Form1(Form1Template):
         #    anvil.server.call('match_complete',self.user_id)
     self.set_form_status(self.current_status)
     
-
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    jitsi_code = anvil.server.call('add_request',self.user_id)
-    if jitsi_code == None:
-      self.current_status = "requesting"
+    if self.drop_down_1.selected_value=="Not ready to offer empathy first":
+      jitsi_code = anvil.server.call('add_request',self.user_id)
+      if jitsi_code == None:
+        self.current_status = "requesting"
+      else:
+        self.current_status = "matched"
+        self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
     else:
-      self.current_status = "matched"
-      self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
-    self.set_form_status(self.current_status)
-
-  def offer_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    jitsi_code = anvil.server.call('add_offer',self.user_id)
-    if jitsi_code == None:
-      self.current_status = "offering"
-    else:
-      self.current_status = "matched"
-      self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
+      jitsi_code = anvil.server.call('add_offer',self.user_id)
+      if jitsi_code == None:
+        self.current_status = "offering"
+      else:
+        self.current_status = "matched"
+        self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
     self.set_form_status(self.current_status) 
 
   def timer_1_tick(self, **event_args):
@@ -125,7 +123,7 @@ class Form1(Form1Template):
     
   def set_form_status(self, user_status):
     if user_status == "requesting":
-      self.status.text = "Status: Requesting empathy. Awaiting an offer..."
+      self.status.text = "Status: Requesting to receive empathy first. Awaiting an offer..."
       self.set_jitsi_link("")
       self.complete_button.visible  =False
       self.cancel_button.visible = True
@@ -133,7 +131,7 @@ class Form1(Form1Template):
       self.offer_button.visible = False
       self.seconds_left = self.confirm_wait_seconds
     elif user_status == "offering":
-      self.status.text = "Status: Offering empathy. Awaiting a request..."
+      self.status.text = "Status: Requesting an empathy exchange. Awaiting a match..."
       self.set_jitsi_link("")
       self.complete_button.visible = False
       self.cancel_button.visible = True
@@ -185,8 +183,29 @@ class Form1(Form1Template):
       self.jitsi_link.visible = True
     
   def confirm_match(self):
-    open_form('ConfirmForm', self.seconds_left, self.user_id,
-              "A match is available. Are you ready?")
+    assert self.current_status=="pinged"
+    f = TimerForm(self.seconds_left, self.user_id, self.current_status)
+    out = alert(content=f,
+                title="A match is available. Are you ready?",
+                large=True,
+                dismissible=False)
+    if out=="Yes":
+      anvil.server.call('match_commenced',self.user_id)
+      self.current_status = "empathy"
+    elif out=="No":
+      anvil.server.call('cancel',self.user_id)
+      self.current_status = None
+    elif out=="timer elapsed":
+      anvil.server.call('cancel',self.user_id)
+      self.current_status = None
+      alert("A match was found, but the time available for you to confirm has elapsed.")
+    else
+      assert out in [None,"requesting","offering"]
+      self.current_status = out
+    self.set_form_status(self.current_status)
+    
+    #open_form('ConfirmForm', self.seconds_left, self.user_id,
+    #          "A match is available. Are you ready?")
 
 
 
