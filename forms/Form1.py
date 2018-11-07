@@ -73,19 +73,19 @@ class Form1(Form1Template):
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if self.drop_down_1.selected_value=="Not ready to offer empathy first":
-      jitsi_code = anvil.server.call('add_request',self.user_id)
-      if jitsi_code == None:
-        self.current_status = "requesting"
-      else:
-        self.current_status = "matched"
-        self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
+      request_type = 'request'
+      non_m_status = "requesting"
     else:
-      jitsi_code = anvil.server.call('add_offer',self.user_id)
-      if jitsi_code == None:
-        self.current_status = "offering"
-      else:
-        self.current_status = "matched"
-        self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
+      request_type = 'offer'
+      non_m_status = "offering"
+    jitsi_code, last_confirm_time = anvil.server.call('add_request',
+                                                      self.user_id,
+                                                      request_type)
+    if jitsi_code == None:
+      self.current_status = non_m_status
+    else:
+      self.current_status = "matched"
+      self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
     self.set_form_status(self.current_status) 
 
   def timer_1_tick(self, **event_args):
@@ -199,7 +199,7 @@ class Form1(Form1Template):
       anvil.server.call('cancel',self.user_id)
       self.current_status = None
       alert("A match was found, but the time available for you to confirm has elapsed.")
-    else
+    else:
       assert out in [None,"requesting","offering"]
       self.current_status = out
     self.set_form_status(self.current_status)
