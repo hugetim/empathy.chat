@@ -78,36 +78,58 @@ class Form1(Form1Template):
     else:
       request_type = 'offer'
       non_m_status = "offering"
-    jitsi_code, last_confirm_time = anvil.server.call('add_request',
+    jitsi_code, last_confirmed = anvil.server.call('add_request',
                                                       self.user_id,
                                                       request_type)
     if jitsi_code == None:
       self.current_status = non_m_status
     else:
-      self.current_status = "matched"
-      self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
+      timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
+      if timer.seconds > self.confirm_match_seconds:
+        self.current_status = "matched"
+        self.seconds_left = self.confirm_match_seconds + self.buffer_seconds
+      else:
+        self.current_status = "empathy"
     self.set_form_status(self.current_status) 
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     if self.current_status in ["requesting", "offering"]:
       new_status = anvil.server.call('get_status',self.user_id)
-      if new_status == "matched":
+      if new_status == "pinged":
+        self.current_status = new_status
         self.seconds_left = self.confirm_match_seconds
         self.confirm_match()
-      elif self.current_status == "matched":
-        pass
+      elif new_status == "empathy":
+        self.current_status = new_status
+        self.set_form_status(self.current_status)
+    elif self.current_status == "matched":
       new_status = anvil.server.call('get_status',self.user_id)
       if new_status == "requesting":
         alert("The empathy offer was canceled.")
-      if new_status == "offering":
+        self.current_status = new_status
+        self.set_form_status(self.current_status)
+      elif new_status == "offering":
         alert("The empathy request was canceled.")
-      self.current_status = new_status
-      self.set_form_status(self.current_status)
+        self.current_status = new_status
+        self.set_form_status(self.current_status)
+      elif new_status == "empathy":
+        self.current_status = new_status
+        self.set_form_status(self.current_status)
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
-    pass
+    if self.current_status in ["requesting", "offering"]:
+      self.seconds_left -= 1
+      if seconds_left==0:
+        self.confirm_wait()
+    elif self.current_status == "matched":
+      self.seconds_left -= 1
+      self.timer_label = ("A match has been found and they have up to " 
+                          + self.seconds_left + " seconds to confirm.")
+      if self.seconds_left==0:
+        anvil.server.call('cancel_other',self.user_id)
+    
   
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -198,7 +220,9 @@ class Form1(Form1Template):
     elif out=="timer elapsed":
       anvil.server.call('cancel',self.user_id)
       self.current_status = None
-      alert("A match was found, but the time available for you to confirm has elapsed.")
+      alert("A match was found, but the time available for you to confirm "
+            + "has elapsed.",
+           dismissible=False)
     else:
       assert out in [None,"requesting","offering"]
       self.current_status = out
@@ -207,7 +231,32 @@ class Form1(Form1Template):
     #open_form('ConfirmForm', self.seconds_left, self.user_id,
     #          "A match is available. Are you ready?")
 
-
+  def confirm_wait(self):
+    assert self.current_status in ["requesting", "offering"]
+    f = TimerForm(self.confirm_wait_seconds, self.user_id, self.current_status)
+    out = alert(content=f,
+                title="Continue waiting for a match?",
+                large=True,
+                dismissible=False)
+    if out=="Yes":
+      anvil.server.call('confirm_wait',self.user_id)
+      seconds_left = self.confirm_wait_seconds
+    elif out=="No":
+      anvil.server.call('cancel',self.user_id)
+      self.current_status = None
+    elif out=="timer elapsed":
+      anvil.server.call('cancel',self.user_id)
+      self.current_status = None
+      alert("Request canceled due to failure to confirm within "
+            + self.confirm_wait_seconds + " seconds.",
+            dismissible=False)
+    else:
+      assert out in ["pinged","empathy"]
+      self.current_status = out
+      if out=="pinged":
+        self.seconds_left = self.confirm_match_seconds
+        self.confirm_match()
+    self.set_form_status(self.current_status)
 
 
 

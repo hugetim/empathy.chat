@@ -49,7 +49,7 @@ components:
       foreground: ''
       items: [Willing to offer empathy first, Not ready to offer empathy first]
       visible: true
-      font_size: null
+      font_size: 12
       font: ''
       spacing_above: small
       spacing_below: small

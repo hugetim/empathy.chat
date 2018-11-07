@@ -41,13 +41,13 @@ class TimerForm(TimerFormTemplate):
     if self.seconds_left == 0:
       self.raise_event("x-close-alert", value="timer elapsed")
 
-  def return_back(self, confirmed):
-    if confirmed:
-      anvil.server.call('match_commenced',self.user_id)
-      open_form('Form1')
-    else:
-      anvil.server.call('cancel',self.user_id)
-      open_form('Form1')  
+  #def return_back(self, confirmed):
+  #  if confirmed:
+  #    anvil.server.call('match_commenced',self.user_id)
+  #    open_form('Form1')
+  #  else:
+  #    anvil.server.call('cancel',self.user_id)
+  #    open_form('Form1')  
   
 
 
