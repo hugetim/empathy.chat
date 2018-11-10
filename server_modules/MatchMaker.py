@@ -79,7 +79,7 @@ def get_status(user_id):
   assumes 2-person matches only
   '''
   assert anvil.server.session('user_id')==user_id
-  #user = anvil.server.session('user')
+  user = anvil.server.session('user')
   current_row = anvil.server.session('current_row')
   status = None
   match_start = None
@@ -103,7 +103,25 @@ def get_status(user_id):
         status = "empathy"
         match_start = row['match_commence']
   return status, match_start
-  
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def get_code(user_id):
+  '''returns jitsi_code or None'''
+  assert anvil.server.session('user_id')==user_id
+  user = anvil.server.session('user')
+  current_row = anvil.server.session('current_row')
+  code = None
+  if current_row:
+    code = current_row['jitsi_code']
+  else:
+    current_matches = app_tables.matches.search(users=user, complete=False)
+    for row in old_matches:
+      i = row['users'].index(user)
+      if row['complete'][i]==True:
+        code = row['jitsi_code']
+  return code
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def add_request(user_id, request_type):
@@ -139,30 +157,6 @@ def add_request(user_id, request_type):
         earliest_request['offer_time'] = datetime.datetime.utcnow()
         return create_jitsi(earliest_request)
 
-@anvil.server.callable
-@anvil.tables.in_transaction
-def get_code(user_id):
-  match_r = app_tables.matching.get(request_id=user_id)
-  if match_r == None:
-    match_o = app_tables.matching.get(offer_id=user_id)
-    if match_o != None:
-      return match_o['jitsi_code']
-  else:
-    return match_r['jitsi_code']
-
-@anvil.server.callable
-@anvil.tables.in_transaction
-def get_match_start(user_id):
-  match_r = app_tables.matching.get(request_id=user_id)
-  if match_r == None:
-    match_o = app_tables.matching.get(offer_id=user_id)
-    if match_o == None:
-      return None
-    else:
-      return max(match_o['request_time'], match_o['offer_time'])
-  else:
-    return max(match_r['request_time'], match_r['offer_time']) 
-      
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel(user_id):
