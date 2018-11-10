@@ -27,39 +27,22 @@ class Form1(Form1Template):
       pass
     self.user_id = anvil.users.get_user().get_id()
     # initialize new users
-    self.trust_level = anvil.server.call('get_trust_level',self.user_id)
-    self.current_status = anvil.server.call('prune_matching',self.user_id)
+    t, s, match_start = anvil.server.call('prune_matching',self.user_id)
+    self.trust_level = t
+    self.current_status = s
     if self.current_status == "matched":
-      match_start = anvil.server.call('get_match_start', 
-                                           self.user_id)
-      if match_start == None:
-        # matching data table indicates no longer matched
-        self.current_status = anvil.server.call('get_status',
-                                                self.user_id)
-      else:
-        timer = datetime.datetime.now(match_start.tzinfo) - match_start
-        self.seconds_left = self.confirm_match_seconds + self.buffer_seconds - timer.seconds
-        print timer.seconds
+      timer = datetime.datetime.now(match_start.tzinfo) - match_start
+      self.seconds_left = self.confirm_match_seconds + self.buffer_seconds - timer.seconds
     elif self.current_status == "pinged":
-      match_start = anvil.server.call('get_match_start', 
-                                           self.user_id)
-      if match_start == None:
-        # matching data table indicates no longer matched
-        self.current_status = anvil.server.call('get_status',
-                                                self.user_id)
-      else:
-        timer = datetime.datetime.now(match_start.tzinfo) - match_start
-        self.seconds_left = self.confirm_match_seconds - timer.seconds
-        self.confirm_match()
-    
-    ## separate if statement allows for status upgrade from initial "matched"
-    if self.current_status == "empathy":
-      match_start = anvil.server.call('get_match_start', 
-                                           self.user_id)
+      timer = datetime.datetime.now(match_start.tzinfo) - match_start
+      self.seconds_left = self.confirm_match_seconds - timer.seconds
+      self.confirm_match()
+    elif self.current_status == "empathy":
       timer = datetime.datetime.now(match_start.tzinfo) - match_start
       if timer.seconds > self.assume_empathy_complete_s:
         self.current_status = None
         anvil.server.call('match_complete',self.user_id)
+        ## Stub code for asking whether recent match still ongoing
         #ongoing = confirm("Is your empathy session, begun "
         #                  + str(timer.seconds/60)
         #                  + " minutes ago, still ongoing?")

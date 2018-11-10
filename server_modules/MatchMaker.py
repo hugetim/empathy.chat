@@ -23,8 +23,42 @@ import datetime
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def add_request(user_id):
-    if app_tables.matching.get() == None:
+def prune_requests(user_id):
+  '''
+  Assumed to run upon initializing Form1
+  returns trust_level, current_status, match_start (or None)
+  prunes old requests/offers
+  updates last_confirmed if currently requesting/offering
+  '''
+  timeout = datetime.timedelta(seconds=60*30)
+  # Prune unmatched requests, including from this user
+  cutoff = datetime.datetime.utcnow() - timeout
+  old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
+                    if r['last_confirmed'] > cutoff)
+  for row in old_requests:
+    row['current'] = False
+  # Return after confirming wait
+  trust_level = get_trust_level(user_id)
+  current_status, match_start = get_status(user_id)
+  if current_status in ('requesting', 'offering'):
+    confirm_wait(user_id)
+  return trust_level, current_status, match_start
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def confirm_wait(user_id):
+  '''updates last_confirmed for current (unmatched) request'''
+  user = app_tables.users.get_by_id(user_id)
+  current_row = app_tables.requests.get(user=user, current=True)
+  assert current_row['match_id']==None
+  current_row['last_confirmed'] = datetime.datetime.utcnow()
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def add_request(user_id, request_type):
+  zaphod_row = (app_tables.people.get(name="Zaphod Beeblebrox")
+               or app_tables.people.add_row(name="Zaphod Beeblebrox", age=42))
+    if app_tables.matching.get() == None: #empty table
       add_request_row(user_id)
     else:
       offers = [row for row in app_tables.matching.search()
@@ -38,10 +72,7 @@ def add_request(user_id):
         earliest_offer['request_id'] = user_id
         earliest_offer['request_time'] = datetime.datetime.utcnow()
         return create_jitsi(earliest_offer)
-
-@anvil.server.callable
-@anvil.tables.in_transaction
-def add_offer(user_id):
+# add_offer(user_id):
     if app_tables.matching.get() == None:
       add_offer_row(user_id)
     else:
@@ -71,6 +102,9 @@ def get_code(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_status(user_id):
+  '''
+  returns current_status, match_start (or None)
+  '''
   match_r = app_tables.matching.get(request_id=user_id)
   if match_r == None:
     match_o = app_tables.matching.get(offer_id=user_id)
