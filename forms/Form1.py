@@ -12,7 +12,6 @@ class Form1(Form1Template):
   buffer_seconds = 5
   confirm_match_seconds = 60
   confirm_wait_seconds = 60*15
-  assume_empathy_complete_s = 60*60*8
   current_status = None
   user_id = None
   seconds_left = None
@@ -37,12 +36,8 @@ class Form1(Form1Template):
       timer = datetime.datetime.now(match_start.tzinfo) - match_start
       self.seconds_left = self.confirm_match_seconds - timer.seconds
       self.confirm_match()
-    elif self.current_status == "empathy":
-      timer = datetime.datetime.now(match_start.tzinfo) - match_start
-      if timer.seconds > self.assume_empathy_complete_s:
-        self.current_status = None
-        anvil.server.call('match_complete',self.user_id)
-        ## Stub code for asking whether recent match still ongoing
+        ## Old code for asking whether recent match still ongoing
+        # conditional on status "empathy"
         #ongoing = confirm("Is your empathy session, begun "
         #                  + str(timer.seconds/60)
         #                  + " minutes ago, still ongoing?")
@@ -56,16 +51,14 @@ class Form1(Form1Template):
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if self.drop_down_1.selected_value=="Not ready to offer empathy first":
-      request_type = 'request'
-      non_m_status = "requesting"
+      request_type = 'requesting'
     else:
-      request_type = 'offer'
-      non_m_status = "offering"
+      request_type = 'offering'
     jitsi_code, last_confirmed = anvil.server.call('add_request',
-                                                      self.user_id,
-                                                      request_type)
+                                                   self.user_id,
+                                                   request_type)
     if jitsi_code == None:
-      self.current_status = non_m_status
+      self.current_status = request_type
     else:
       timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
       if timer.seconds > self.confirm_match_seconds:

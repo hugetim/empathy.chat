@@ -30,19 +30,37 @@ def prune_requests(user_id):
   prunes old requests/offers
   updates last_confirmed if currently requesting/offering
   '''
-  timeout = datetime.timedelta(seconds=60*30)
+  timeout = datetime.timedelta(minutes=30) 
+  assume_complete = datetime.timedelta(hours=4) 
   # Prune unmatched requests, including from this user
-  cutoff = datetime.datetime.utcnow() - timeout
+  cutoff_r = datetime.datetime.utcnow() - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
-                    if r['last_confirmed'] > cutoff)
+                    if r['last_confirmed'] > cutoff_r)
   for row in old_requests:
     row['current'] = False
+  # Complete old matches for this user
+  cutoff_m = datetime.datetime.utcnow() - assume_complete
+  old_matches = (m for m in app_tables.matches.search(users=user, complete=False)
+                   if m['match_commence'] > cutoff)
+  for row in old_matches:
+    i = row['users'].index(user)
+    row['complete'][i] = True
   # Return after confirming wait
   trust_level = get_trust_level(user_id)
+  initialize_session(user_id)
   current_status, match_start = get_status(user_id)
   if current_status in ('requesting', 'offering'):
     confirm_wait(user_id)
   return trust_level, current_status, match_start
+
+@anvil.tables.in_transaction
+def initialize_session(user_id):
+  '''initialize session state: user_id, user, and current_row'''
+  anvil.server.session('user_id') = user_id
+  user = app_tables.users.get_by_id(user_id)
+  anvil.server.session('user') = user
+  current_row = app_tables.requests.get(user=user, current=True)
+  anvil.server.session('current_row') = current_row
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -53,6 +71,39 @@ def confirm_wait(user_id):
   assert current_row['match_id']==None
   current_row['last_confirmed'] = datetime.datetime.utcnow()
 
+@anvil.server.callable
+@anvil.tables.in_transaction
+def get_status(user_id):
+  '''
+  returns current_status, match_start (or None)
+  assumes 2-person matches only
+  '''
+  assert anvil.server.session('user_id')==user_id
+  #user = anvil.server.session('user')
+  current_row = anvil.server.session('current_row')
+  status = None
+  match_start = None
+  if current_row:
+    if current_row['match_id']:
+      matched_request_starts = (s['start'] for s
+                                in app_tables.requests.search(match_id=current_row['match_id'],
+                                                              tables.order_by('start', ascending=False)))
+      match_start = matched_request_starts[0]
+      if match_starts==current_row['start']:
+        status = "matched"
+      else:
+        status = "pinged"
+    else:
+      status = current_row['type']
+  else:
+    current_matches = app_tables.matches.search(users=user, complete=False)
+    for row in old_matches:
+      i = row['users'].index(user)
+      if row['complete'][i]==True:
+        status = "empathy"
+        match_start = row['match_commence']
+  return status, match_start
+  
 @anvil.server.callable
 @anvil.tables.in_transaction
 def add_request(user_id, request_type):
@@ -98,26 +149,6 @@ def get_code(user_id):
       return match_o['jitsi_code']
   else:
     return match_r['jitsi_code']
-  
-@anvil.server.callable
-@anvil.tables.in_transaction
-def get_status(user_id):
-  '''
-  returns current_status, match_start (or None)
-  '''
-  match_r = app_tables.matching.get(request_id=user_id)
-  if match_r == None:
-    match_o = app_tables.matching.get(offer_id=user_id)
-    if match_o == None:
-      return None
-    elif match_o['request_id'] == None:
-        return "offering"
-    else:
-      return "matched"
-  elif match_r['offer_id'] == None:
-    return "requesting"
-  else:
-    return "matched"
 
 @anvil.server.callable
 @anvil.tables.in_transaction
