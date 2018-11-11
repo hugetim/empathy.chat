@@ -7,6 +7,7 @@ import anvil.users
 import anvil.server
 import random
 import datetime
+import uuid
 
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
@@ -85,16 +86,16 @@ def get_status(user_id):
   match_start = None
   if current_row and current_row['current']==True: #uses short-circuiting to avoid error
     if current_row['match_id']:
-      matched_request_starts = (s['start'] for s
+      matched_request_starts = (r['start'] for r
                                 in app_tables.requests.search(match_id=current_row['match_id'],
                                                               tables.order_by('start', ascending=False)))
       match_start = matched_request_starts[0]
-      if match_starts==current_row['start']:
+      if match_start==current_row['start']:
         status = "matched"
       else:
         status = "pinged"
     else:
-      status = current_row['type']
+      status = current_row['request_type']
   else:
     current_matches = app_tables.matches.search(users=user, complete=False)
     for row in current_matches:
@@ -171,8 +172,42 @@ def cancel_other(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(user_id):
-  '''Upon first commence, copy row over and delete "matching" row.'''
-  # return status?
+  '''
+  Upon first commence, copy row over and delete "matching" row.
+  Should not cause error if already commenced
+  '''
+  # return status, match_start? 
+  assert anvil.server.session('user_id')==user_id
+  user = anvil.server.session('user')
+  current_row = anvil.server.session('current_row')
+  status = None
+  match_start = None
+  if current_row and current_row['current']==True: #uses short-circuiting to avoid error
+    if current_row['match_id']:
+      matched_requests = (r for r
+                            in app_tables.requests.search(match_id=current_row['match_id'],
+                                                          tables.order_by('start', ascending=True)))
+      match_start = datetime.datetime.utcnow()
+      new_match = app_tables.matches.add_row(users=[],
+                                             match_id=current_row['match_id'],
+                                             jitsi_code=current_row['jitsi_code'],
+                                             match_commence=match_start,
+                                             complete=[])
+      for row in matched_requests:
+        new_match['users'].append(row['user'])
+        new_match['complete'].append(False)
+      status = "empathy"
+      ########################################################################################restart here
+    else:
+      status = current_row['request_type']
+  else:
+    current_matches = app_tables.matches.search(users=user, complete=False)
+    for row in current_matches:
+      i = row['users'].index(user)
+      if row['complete'][i]==True:
+        status = "empathy"
+        match_start = row['match_commence']
+  return status, match_start
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -185,36 +220,34 @@ def match_complete(user_id):
     i = row['users'].index(user)
     row['complete'][i] = True
   
-def copy_to_matches(matching): 
-  matched = app_tables.matches.add_row(request_id = matching['request_id'],
-                                       request_time = matching['request_time'],
-                                       offer_id = matching['offer_id'],
-                                       offer_time = matching['offer_time'],
-                                       jitsi_code = matching['jitsi_code'],
-                                       start_time = datetime.datetime.utcnow())
-  
-def add_request_row(user_id):
-  new_row = app_tables.matching.add_row(request_id=anvil.users.get_user().get_id(), 
-                                        request_time=datetime.datetime.utcnow())
+def add_request_row(user_id, request_type):
+  assert anvil.server.session('user_id')==user_id
+  user = anvil.server.session('user')
+  now = datetime.datetime.utcnow()
+  new_row = app_tables.requests.add_row(user=user,
+                                        current=True,
+                                        request_type=request_type,
+                                        start_time=now,
+                                        last_confirmed=now)
   return new_row
 
-def add_offer_row(user_id):
-  new_row = app_tables.matching.add_row(offer_id=anvil.users.get_user().get_id(), 
-                                        offer_time=datetime.datetime.utcnow())
-  return new_row
-
-def create_jitsi(match):
-  numchars = 7
+def create_jitsi():
+  numchars = 5
   charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   random.seed()
   randcode = "".join([random.choice(charset) for i in range(numchars)])
   code = "empathy_" + randcode
-  match['jitsi_code'] = code
+  #match['jitsi_code'] = code
   return code
+
+def create_match_id():
+  match_id = uuid.uuid4()
+  return match_id.int
 
 @anvil.server.callable
 def get_trust_level(user_id):
-  user = app_tables.users.get_by_id(user_id)
+  assert anvil.server.session('user_id')==user_id
+  user = anvil.server.session('user')
   trust = user['trust_level']
   if trust == None:
     user.update(trust_level=0)
