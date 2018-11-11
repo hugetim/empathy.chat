@@ -83,7 +83,7 @@ def get_status(user_id):
   current_row = anvil.server.session('current_row')
   status = None
   match_start = None
-  if current_row:
+  if current_row and current_row['current']==True: #uses short-circuiting to avoid error
     if current_row['match_id']:
       matched_request_starts = (s['start'] for s
                                 in app_tables.requests.search(match_id=current_row['match_id'],
@@ -97,7 +97,7 @@ def get_status(user_id):
       status = current_row['type']
   else:
     current_matches = app_tables.matches.search(users=user, complete=False)
-    for row in old_matches:
+    for row in current_matches:
       i = row['users'].index(user)
       if row['complete'][i]==True:
         status = "empathy"
@@ -160,83 +160,30 @@ def add_request(user_id, request_type):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel(user_id):
-  match_r = app_tables.matching.get(request_id=user_id)
-  if match_r != None:
-    match_r['request_id'] = None
-    match_r['request_time'] = None
-    match_r['jitsi_code'] = None
-    if match_r['offer_id'] == None:
-      match_r.delete()
-  else:
-    match_o = app_tables.matching.get(offer_id=user_id)
-    if match_o != None:
-      match_o['offer_id'] = None
-      match_o['offer_time'] = None
-      match_o['jitsi_code'] = None
-      if match_o['request_id'] == None:
-        match_o.delete()
+
 
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_other(user_id):
   '''Upon failure of other to confirm match'''
-  match_r = app_tables.matching.get(request_id=user_id)
-  if match_r != None:
-    match_r['offer_id'] = None
-    match_r['offer_time'] = None
-    match_r['jitsi_code'] = None
-  else:
-    match_o = app_tables.matching.get(offer_id=user_id)
-    if match_o != None:
-      match_o['request_id'] = None
-      match_o['request_time'] = None
-      match_o['jitsi_code'] = None      
+  
         
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(user_id):
   '''Upon first commence, copy row over and delete "matching" row.'''
-  match_r = app_tables.matching.get(request_id=user_id)
-  if match_r == None:
-    match_o = app_tables.matching.get(offer_id=user_id)
-    if match_o == None:
-      return None
-    elif match_o['request_id'] == None:
-      return "offering"
-    else:
-      matches = app_tables.matches.get(jitsi_code=match_o['jitsi_code'])
-      if matches == None:
-        copy_to_matches(match_o)
-      return "empathy"
-  elif match_r['offer_id'] == None:
-    return "requesting"
-  else:
-    matches = app_tables.matches.get(jitsi_code=match_r['jitsi_code'])
-    if matches == None:
-      copy_to_matches(match_r)
-    return "empathy"      
+  # return status?
 
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_complete(user_id):
-  '''Set appropriate complete time in matches table.'''
-  #match_r = app_tables.matching.get(request_id=user_id)
-  #if match_r == None:
-  #  match_o = app_tables.matching.get(offer_id=user_id)
-  #  if match_o == None:
-  #    # outcome for second complete, from other user in the match
-  #    pass
-  #  else:
-  #    assert match_o['request_id'] != None
-  #    matches = app_tables.matches.get(jitsi_code=match_o['jitsi_code'])
-  #    assert matches != None
-  #    match_o.delete()
-  #else:
-  #  assert match_r['offer_id'] != None
-  #  matches = app_tables.matches.get(jitsi_code=match_r['jitsi_code'])
-  #  assert matches != None
-  #  match_r.delete()
-  #return None
+  '''Switch 'complete' to true in matches table for user.'''
+  assert anvil.server.session('user_id')==user_id
+  user = anvil.server.session('user')
+  current_matches = app_tables.matches.search(users=user, complete=False)
+  for row in current_matches:
+    i = row['users'].index(user)
+    row['complete'][i] = True
   
 def copy_to_matches(matching): 
   matched = app_tables.matches.add_row(request_id = matching['request_id'],
