@@ -21,7 +21,7 @@ components:
       font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: true, underline: false, icon: ''}
     name: status
-    layout_properties: {grid_position: 'SJFXWR,KCXZLM'}
+    layout_properties: {grid_position: 'SJFXWR,DLPFBM'}
   - type: Link
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
       visible: false, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
@@ -39,6 +39,10 @@ components:
     name: request_button
     layout_properties: {grid_position: 'RZEGBP,KZGDHR'}
     event_bindings: {click: request_button_click, show: request_button_show}
+  - type: Spacer
+    properties: {height: 32}
+    name: spacer_1
+    layout_properties: {grid_position: 'WHERFK,ONFRJL'}
   - type: DropDown
     properties:
       role: null
@@ -49,7 +53,7 @@ components:
       foreground: ''
       items: [Willing to offer empathy first, Not ready to offer empathy first]
       visible: true
-      font_size: null
+      font_size: 14
       font: ''
       spacing_above: small
       spacing_below: small
@@ -59,6 +63,10 @@ components:
       underline: false
     name: drop_down_1
     layout_properties: {grid_position: 'WHERFK,VIDAAS'}
+  - type: Spacer
+    properties: {height: 32}
+    name: spacer_2
+    layout_properties: {grid_position: 'WHERFK,BRLNJG'}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: Empathy Exchange Complete, font_size: null,

@@ -71,7 +71,7 @@ class Form1(Form1Template):
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     if self.current_status in ["requesting", "offering"]:
-      new_status = anvil.server.call('get_status',self.user_id)
+      new_status = anvil.server.call_s('get_status',self.user_id)
       if new_status == "pinged":
         self.current_status = new_status
         self.seconds_left = self.confirm_match_seconds
@@ -80,7 +80,7 @@ class Form1(Form1Template):
         self.current_status = new_status
         self.set_form_status(self.current_status)
     elif self.current_status == "matched":
-      new_status = anvil.server.call('get_status',self.user_id)
+      new_status = anvil.server.call_s('get_status',self.user_id)
       if new_status == "requesting":
         alert("The empathy offer was canceled.")
         self.current_status = new_status
@@ -97,7 +97,7 @@ class Form1(Form1Template):
     """This method is called Every 1 seconds"""
     if self.current_status in ["requesting", "offering"]:
       self.seconds_left -= 1
-      if seconds_left==0:
+      if self.seconds_left==0:
         self.confirm_wait()
     elif self.current_status == "matched":
       self.seconds_left -= 1
@@ -127,6 +127,8 @@ class Form1(Form1Template):
       self.complete_button.visible  =False
       self.cancel_button.visible = True
       self.request_button.visible = False
+      self.drop_down_1.enabled = False
+      self.drop_down_1.foreground = "gray" 
       self.seconds_left = self.confirm_wait_seconds
     elif user_status == "offering":
       self.status.text = "Status: Requesting an empathy exchange. Awaiting a match..."
@@ -135,6 +137,8 @@ class Form1(Form1Template):
       self.complete_button.visible = False
       self.cancel_button.visible = True
       self.request_button.visible = False
+      self.drop_down_1.enabled = False
+      self.drop_down_1.foreground = "gray"
       self.seconds_left = self.confirm_wait_seconds
     elif user_status == "matched":
       self.timer_label = ("A match has been found and they have up to " 
@@ -147,6 +151,8 @@ class Form1(Form1Template):
       self.complete_button.visible = False
       self.cancel_button.visible = False
       self.request_button.visible = False
+      self.drop_down_1.enabled = False
+      self.drop_down_1.foreground = "gray"
     elif user_status == "empathy":
       self.timer_label.visible = False
       self.status.text = "You have a confirmed match. Use Jitsi to meet: "
@@ -156,19 +162,23 @@ class Form1(Form1Template):
       self.complete_button.visible = True
       self.cancel_button.visible = False
       self.request_button.visible = False
+      self.drop_down_1.enabled = False
+      self.drop_down_1.foreground = "gray"
       new_status = anvil.server.call('match_commenced', self.user_id)
       if new_status != "empathy":
         assert new_status != "matched"
         self.current_status = new_status
         self.set_form_status(self.current_status)
     else:
-      self.status.text = "Choose an option:"
+      self.status.text = "Request a match when ready:"
       self.status.bold = True
       self.set_jitsi_link("")
       self.timer_label.visible = False
       self.complete_button.visible = False
       self.cancel_button.visible = False
       self.request_button.visible = True
+      self.drop_down_1.enabled = True
+      self.drop_down_1.foreground = "black"
     
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":

@@ -8,6 +8,7 @@ import anvil.server
 import random
 import datetime
 import uuid
+import anvil.tz
 
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
@@ -36,15 +37,15 @@ def prune(user_id):
   initialize_session(user_id)
   user = anvil.server.session['user']
   # Prune unmatched requests, including from this user
-  cutoff_r = datetime.datetime.utcnow() - timeout
+  cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
                     if r['last_confirmed'] > cutoff_r)
   for row in old_requests:
     row['current'] = False
   # Complete old matches for this user
-  cutoff_m = datetime.datetime.utcnow() - assume_complete
+  cutoff_m = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_complete
   old_matches = (m for m in app_tables.matches.search(users=[user], complete=[0])
-                   if m['match_commence'] > cutoff)
+                   if m['match_commence'] > cutoff_m)
   for row in old_matches:
     i = row['users'].index(user)
     row['complete'][i] = 1
@@ -73,7 +74,7 @@ def confirm_wait_private(user_id):
   user = app_tables.users.get_by_id(user_id)
   current_row = anvil.server.session['current_row']
   assert current_row['match_id']==None
-  current_row['last_confirmed'] = datetime.datetime.utcnow()
+  current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -92,8 +93,8 @@ def get_status_private(user_id):
   match_start = None
   if current_row and current_row['current']==True: #uses short-circuiting to avoid error
     if current_row['match_id']:
-      matched_request_starts = (r['start'] for r
-                                in app_tables.requests.search(match_id=current_row['match_id']))
+      matched_request_starts = [r['start'] for r
+                                in app_tables.requests.search(match_id=current_row['match_id'])]
       match_start = matched_request_starts.max()
       if match_start==current_row['start']:
         status = "matched"
@@ -137,13 +138,13 @@ def add_request(user_id, request_type):
   jitsi_code = None
   last_confirmed = None
   if request_type=="offering":
-    requests = app_tables.requests.search(current=True,
-                                          match_id=None)
+    requests = [r for r in app_tables.requests.search(current=True,
+                                                      match_id=None)]
   else: 
     assert request_type=="requesting"
-    requests = app_tables.requests.search(current=True,
-                                          request_type="offering",
-                                          match_id=None)    
+    requests = [r for r in app_tables.requests.search(current=True,
+                                                      request_type="offering",
+                                                      match_id=None)]    
   # if no match, add new row, else add request info
   current_row = add_request_row(user_id, request_type)
   anvil.server.session['current_row'] = current_row
@@ -151,7 +152,7 @@ def add_request(user_id, request_type):
     jitsi_code = new_jitsi_code()
     current_row['match_id'] = new_match_id()
     current_row['jitsi_code'] = jitsi_code
-    earliest_request = requests.min(key=lambda row : row['start'])
+    earliest_request = requests.min(key=lambda row: row['start'])
     earliest_request['match_id'] = current_row['match_id']
     earliest_request['jitsi_code'] = jitsi_code
     last_confirmed = earliest_request['last_confirmed']
@@ -215,7 +216,7 @@ def match_commenced(user_id):
   if current_row and current_row['current']==True: #uses short-circuiting to avoid error
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
-      match_start = datetime.datetime.utcnow()
+      match_start = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
       new_match = app_tables.matches.add_row(users=[],
                                              match_id=current_row['match_id'],
                                              jitsi_code=current_row['jitsi_code'],
@@ -250,11 +251,11 @@ def match_complete(user_id):
 def add_request_row(user_id, request_type):
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
-  now = datetime.datetime.utcnow()
+  now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
   new_row = app_tables.requests.add_row(user=user,
                                         current=True,
                                         request_type=request_type,
-                                        start_time=now,
+                                        start=now,
                                         last_confirmed=now)
   return new_row
 

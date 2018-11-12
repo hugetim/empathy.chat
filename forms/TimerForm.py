@@ -30,7 +30,7 @@ class TimerForm(TimerFormTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 10 seconds"""
-    new_status = anvil.server.call('get_status',self.user_id)
+    new_status = anvil.server.call_s('get_status',self.user_id)
     if new_status != self.current_status:
       self.raise_event("x-close-alert", value=new_status)
 
