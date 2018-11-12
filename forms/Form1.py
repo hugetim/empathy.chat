@@ -20,8 +20,6 @@ class Form1(Form1Template):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
 
-    # Any code you write here will run when the form opens.
-    
     while not anvil.users.login_with_form():
       pass
     self.user_id = anvil.users.get_user().get_id()

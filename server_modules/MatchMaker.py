@@ -48,7 +48,9 @@ def prune(user_id):
                    if m['match_commence'] < cutoff_m)
   for row in old_matches:
     i = row['users'].index(user)
-    row['complete'][i] = 1
+    temp = row['complete']
+    temp[i] = 1
+    row['complete'] = temp
   # Return after confirming wait
   trust_level = get_trust_level(user_id) 
   current_status, match_start = get_status_private(user_id)
@@ -227,8 +229,6 @@ def match_commenced(user_id):
                                              complete=[])
       for row in matched_requests:
         new_match['users'] += [row['user']]
-        print new_match['request_types']
-        print row['request_type']
         new_match['request_types'] += [row['request_type']]
         new_match['complete'] += [0]
         row['current'] = False
@@ -255,7 +255,9 @@ def match_complete(user_id):
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
-    row['complete'][i] = 1
+    temp = row['complete']
+    temp[i] = 1
+    row['complete'] = temp
   
 def add_request_row(user_id, request_type):
   assert anvil.server.session['user_id']==user_id
