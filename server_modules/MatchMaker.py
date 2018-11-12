@@ -61,8 +61,6 @@ def initialize_session(user_id):
   anvil.server.session['user_id'] = user_id
   user = app_tables.users.get_by_id(user_id)
   anvil.server.session['user'] = user
-  current_row = app_tables.requests.get(user=user, current=True)
-  anvil.server.session['current_row'] = current_row
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -72,7 +70,7 @@ def confirm_wait(user_id):
 def confirm_wait_private(user_id):
   '''updates last_confirmed for current (unmatched) request'''
   user = app_tables.users.get_by_id(user_id)
-  current_row = anvil.server.session['current_row']
+  current_row = app_tables.requests.get(user=user, current=True)
   assert current_row['match_id']==None
   current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
@@ -88,14 +86,14 @@ def get_status_private(user_id):
   '''
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
-  current_row = anvil.server.session['current_row']
+  current_row = app_tables.requests.get(user=user, current=True)
   status = None
   match_start = None
   if current_row and current_row['current']==True: #uses short-circuiting to avoid error
     if current_row['match_id']:
       matched_request_starts = [r['start'] for r
                                 in app_tables.requests.search(match_id=current_row['match_id'])]
-      match_start = matched_request_starts.max()
+      match_start = max(matched_request_starts)
       if match_start==current_row['start']:
         status = "matched"
       else:
@@ -117,7 +115,7 @@ def get_code(user_id):
   '''returns jitsi_code, request_type (or Nones)'''
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
-  current_row = anvil.server.session['current_row']
+  current_row = app_tables.requests.get(user=user, current=True)
   code = None
   if current_row:
     code = current_row['jitsi_code']
@@ -150,12 +148,11 @@ def add_request(user_id, request_type):
                                                       match_id=None)]    
   # if no match, add new row, else add request info
   current_row = add_request_row(user_id, request_type)
-  anvil.server.session['current_row'] = current_row
   if requests:
     jitsi_code = new_jitsi_code()
     current_row['match_id'] = new_match_id()
     current_row['jitsi_code'] = jitsi_code
-    earliest_request = requests.min(key=lambda row: row['start'])
+    earliest_request = min(requests, key=lambda row: row['start'])
     earliest_request['match_id'] = current_row['match_id']
     earliest_request['jitsi_code'] = jitsi_code
     last_confirmed = earliest_request['last_confirmed']
@@ -170,9 +167,7 @@ def cancel(user_id):
   '''
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
-  current_row = anvil.server.session['current_row']
-  status = None
-  match_start = None
+  current_row = app_tables.requests.get(user=user, current=True)
   if current_row and current_row['current']==True: #uses short-circuiting to avoid error
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
@@ -185,15 +180,13 @@ def cancel(user_id):
 @anvil.tables.in_transaction
 def cancel_other(user_id):
   '''
+  return new_status
   Upon failure of other to confirm match
   Remove request and cancel match (if applicable)
-  Returns None
   '''
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
-  current_row = anvil.server.session['current_row']
-  status = None
-  match_start = None
+  current_row = app_tables.requests.get(user=user, current=True)
   if current_row and current_row['current']==True: #uses short-circuiting to avoid error
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
@@ -202,6 +195,7 @@ def cancel_other(user_id):
         row['jitsi_code'] = None
         if row['user'] != user:
           row['current'] = False
+      return current_row['request_type']
         
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -214,9 +208,11 @@ def match_commenced(user_id):
   # return status, match_start? 
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
-  current_row = anvil.server.session['current_row']
+  current_row = app_tables.requests.get(user=user, current=True)
   status = None
   match_start = None
+  jitsi_code = None
+  request_type = None
   if current_row and current_row['current']==True: #uses short-circuiting to avoid error
     request_type = current_row['request_type']
     if current_row['match_id']:
@@ -230,9 +226,12 @@ def match_commenced(user_id):
                                              match_commence=match_start,
                                              complete=[])
       for row in matched_requests:
-        new_match['users'].append(row['user'])
-        new_match['request_types'].append(row['request_type'])
-        new_match['complete'].append(0)
+        new_match['users'] += [row['user']]
+        print new_match['request_types']
+        print row['request_type']
+        new_match['request_types'] += [row['request_type']]
+        new_match['complete'] += [0]
+        row['current'] = False
       status = "empathy"
     else:
       status = request_type

@@ -32,10 +32,16 @@ class Form1(Form1Template):
     if self.current_status == "matched":
       timer = datetime.datetime.now(match_start.tzinfo) - match_start
       self.seconds_left = self.confirm_match_seconds + self.buffer_seconds - timer.seconds
+      if self.seconds_left<=0:
+        self.current_status = anvil.server.call('cancel_other',self.user_id)
     elif self.current_status == "pinged":
       timer = datetime.datetime.now(match_start.tzinfo) - match_start
       self.seconds_left = self.confirm_match_seconds - timer.seconds
-      self.confirm_match()
+      if self.seconds_left<=0:
+        anvil.server.call('cancel',self.user_id)
+        self.current_status = None
+      else:
+        self.confirm_match()
         ## Old code for asking whether recent match still ongoing
         # conditional on status "empathy"
         #ongoing = confirm("Is your empathy session, begun "
@@ -101,14 +107,15 @@ class Form1(Form1Template):
     """This method is called Every 1 seconds"""
     if self.current_status in ["requesting", "offering"]:
       self.seconds_left -= 1
-      if self.seconds_left==0:
+      if self.seconds_left<=0:
         self.confirm_wait()
     elif self.current_status == "matched":
       self.seconds_left -= 1
-      self.timer_label = ("A match has been found and they have up to " 
-                          + str(self.seconds_left) + " seconds to confirm.")
-      if self.seconds_left==0:
-        anvil.server.call('cancel_other',self.user_id)
+      self.timer_label.text = ("A match has been found and they have up to " 
+                               + str(self.seconds_left) + " seconds to confirm.")
+      if self.seconds_left<=0:
+        self.current_status = anvil.server.call('cancel_other',self.user_id)
+        self.set_form_status(self.current_status)
     
   
   def cancel_button_click(self, **event_args):
@@ -141,8 +148,8 @@ class Form1(Form1Template):
         assert user_status in ["matched", "empathy"]
         self.cancel_button.visible = False        
         if user_status=="matched":
-          self.timer_label = ("A match has been found and they have up to " 
-                              + str(self.seconds_left) + " seconds to confirm.")
+          self.timer_label.text = ("A match has been found and they have up to " 
+                                   + str(self.seconds_left) + " seconds to confirm.")
           self.timer_label.visible = True
           self.status.text = "A match should be ready soon. Set up Jitsi at: "
           self.status.bold = False
