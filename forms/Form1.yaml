@@ -49,7 +49,7 @@ components:
       foreground: ''
       items: [Willing to offer empathy first, Not ready to offer empathy first]
       visible: true
-      font_size: 12
+      font_size: null
       font: ''
       spacing_above: small
       spacing_below: small
@@ -58,7 +58,7 @@ components:
       bold: false
       underline: false
     name: drop_down_1
-    layout_properties: {grid_position: 'RZEGBP,ZDCFUB'}
+    layout_properties: {grid_position: 'WHERFK,VIDAAS'}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: Empathy Exchange Complete, font_size: null,

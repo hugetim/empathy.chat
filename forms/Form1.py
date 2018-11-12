@@ -26,7 +26,7 @@ class Form1(Form1Template):
       pass
     self.user_id = anvil.users.get_user().get_id()
     # initialize new users
-    t, s, match_start = anvil.server.call('prune_matching',self.user_id)
+    t, s, match_start = anvil.server.call('prune',self.user_id)
     self.trust_level = t
     self.current_status = s
     if self.current_status == "matched":
@@ -122,40 +122,40 @@ class Form1(Form1Template):
   def set_form_status(self, user_status):
     if user_status == "requesting":
       self.status.text = "Status: Requesting to receive empathy first. Awaiting an offer..."
+      self.status.bold = False
       self.set_jitsi_link("")
       self.complete_button.visible  =False
       self.cancel_button.visible = True
       self.request_button.visible = False
-      self.offer_button.visible = False
       self.seconds_left = self.confirm_wait_seconds
     elif user_status == "offering":
       self.status.text = "Status: Requesting an empathy exchange. Awaiting a match..."
+      self.status.bold = False
       self.set_jitsi_link("")
       self.complete_button.visible = False
       self.cancel_button.visible = True
       self.request_button.visible = False
-      self.offer_button.visible = False
       self.seconds_left = self.confirm_wait_seconds
     elif user_status == "matched":
       self.timer_label = ("A match has been found and they have up to " 
                           + self.seconds_left + " seconds to confirm.")
       self.status.text = "A match should be ready soon. Set up Jitsi at: "
+      self.status.bold = False
       jitsi_code = anvil.server.call('get_code', self.user_id)
       self.set_jitsi_link(jitsi_code)
       self.timer_label.visible = True
       self.complete_button.visible = False
       self.cancel_button.visible = False
       self.request_button.visible = False
-      self.offer_button.visible = False
     elif user_status == "empathy":
       self.timer_label.visible = False
       self.status.text = "You have a confirmed match. Use Jitsi to meet: "
+      self.status.bold = True
       jitsi_code = anvil.server.call('get_code', self.user_id)
       self.set_jitsi_link(jitsi_code)
       self.complete_button.visible = True
       self.cancel_button.visible = False
       self.request_button.visible = False
-      self.offer_button.visible = False
       new_status = anvil.server.call('match_commenced', self.user_id)
       if new_status != "empathy":
         assert new_status != "matched"
@@ -163,12 +163,12 @@ class Form1(Form1Template):
         self.set_form_status(self.current_status)
     else:
       self.status.text = "Choose an option:"
+      self.status.bold = True
       self.set_jitsi_link("")
       self.timer_label.visible = False
       self.complete_button.visible = False
       self.cancel_button.visible = False
       self.request_button.visible = True
-      self.offer_button.visible = True
     
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":

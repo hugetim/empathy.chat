@@ -7,8 +7,8 @@ from anvil.tables import app_tables
 import anvil.users
 
 class TimerForm(TimerFormTemplate):
-  seconds_left
-  user_id
+  seconds_left = None
+  user_id = None
   def __init__(self, seconds_left, user_id, current_status, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
