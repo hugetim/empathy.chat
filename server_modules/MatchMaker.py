@@ -100,7 +100,7 @@ def get_status(user_id):
     current_matches = app_tables.matches.search(users=user, complete=False)
     for row in current_matches:
       i = row['users'].index(user)
-      if row['complete'][i]==True:
+      if row['complete'][i]==False:
         status = "empathy"
         match_start = row['match_commence']
   return status, match_start
@@ -161,13 +161,48 @@ def add_request(user_id, request_type):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel(user_id):
-
-
+  '''
+  Remove request and cancel match (if applicable)
+  Returns None
+  '''
+  assert anvil.server.session('user_id')==user_id
+  user = anvil.server.session('user')
+  current_row = anvil.server.session('current_row')
+  status = None
+  match_start = None
+  if current_row and current_row['current']==True: #uses short-circuiting to avoid error
+    if current_row['match_id']:
+      matched_requests = (r for r
+                            in app_tables.requests.search(match_id=current_row['match_id'],
+                                                          tables.order_by('start', ascending=True)))
+      for row in matched_requests:
+        row['match_id'] = None
+        row['jitsi_code'] = None
+    current_row['current'] = False
+  
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_other(user_id):
-  '''Upon failure of other to confirm match'''
-  
+  '''
+  Upon failure of other to confirm match
+  Remove request and cancel match (if applicable)
+  Returns None
+  '''
+  assert anvil.server.session('user_id')==user_id
+  user = anvil.server.session('user')
+  current_row = anvil.server.session('current_row')
+  status = None
+  match_start = None
+  if current_row and current_row['current']==True: #uses short-circuiting to avoid error
+    if current_row['match_id']:
+      matched_requests = (r for r
+                            in app_tables.requests.search(match_id=current_row['match_id'],
+                                                          tables.order_by('start', ascending=True)))
+      for row in matched_requests:
+        row['match_id'] = None
+        row['jitsi_code'] = None
+        if row['user'] != user:
+          row['current'] = False
         
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -197,14 +232,13 @@ def match_commenced(user_id):
         new_match['users'].append(row['user'])
         new_match['complete'].append(False)
       status = "empathy"
-      ########################################################################################restart here
     else:
       status = current_row['request_type']
   else:
     current_matches = app_tables.matches.search(users=user, complete=False)
     for row in current_matches:
       i = row['users'].index(user)
-      if row['complete'][i]==True:
+      if row['complete'][i]==False:
         status = "empathy"
         match_start = row['match_commence']
   return status, match_start
