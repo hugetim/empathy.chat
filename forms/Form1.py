@@ -11,7 +11,7 @@ from TimerForm import TimerForm
 class Form1(Form1Template):
   buffer_seconds = 5
   confirm_match_seconds = 60
-  confirm_wait_seconds = 15 #60*15 # should be half of MatchMaker.prune.timeout
+  confirm_wait_seconds = 60*15 # should be half of MatchMaker.prune.timeout
   current_status = None
   user_id = None
   seconds_left = None
