@@ -23,7 +23,7 @@ class Form1(Form1Template):
     while not anvil.users.login_with_form():
       pass
     self.user_id = anvil.users.get_user().get_id()
-    # initialize new users
+    # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
     t, s, match_start = anvil.server.call('prune',self.user_id)
     self.trust_level = t
     self.current_status = s
