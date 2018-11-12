@@ -6,7 +6,7 @@ import anvil.tables as tables
 from anvil.tables import app_tables
 import anvil.users
 
-class TimerForm(TimerFormTemplate):
+class TimerForm_old(TimerForm_oldTemplate):
   seconds_left = None
   user_id = None
   def __init__(self, seconds_left, user_id, current_status, **properties):
@@ -16,29 +16,28 @@ class TimerForm(TimerFormTemplate):
     #if title:
     #  self.self.label_1.text = title
     self.seconds_left = seconds_left
-    self.timer_label.text = str(self.seconds_left) + " seconds left to confirm."
+    self.timer_label.text = "You have " + str(self.seconds_left) + " seconds left to confirm."
     self.user_id = user_id
     self.current_status = current_status
 
-  #def button_yes_click(self, **event_args):
-  #  """This method is called when the button is clicked"""
-  #  self.raise_event("x-close-alert", value="Yes")
+  def button_yes_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.raise_event("x-close-alert", value="Yes")
 
-  #def button_no_click(self, **event_args):
-  #  """This method is called when the button is clicked"""
-  #  self.raise_event("x-close-alert", value="No")
+  def button_no_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.raise_event("x-close-alert", value="No")
 
   def timer_1_tick(self, **event_args):
-    """This method is called Every 5 seconds"""
-    new_status, match_start = anvil.server.call_s('get_status',self.user_id)
+    """This method is called Every 10 seconds"""
+    new_status = anvil.server.call_s('get_status',self.user_id)
     if new_status != self.current_status:
-      print new_status
       self.raise_event("x-close-alert", value=new_status)
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
     self.seconds_left -= 1
-    self.timer_label.text = str(self.seconds_left) + " seconds left to confirm."
+    self.timer_label.text = "You have " + str(self.seconds_left) + " seconds left to confirm."
     if self.seconds_left == 0:
       self.raise_event("x-close-alert", value="timer elapsed")
 

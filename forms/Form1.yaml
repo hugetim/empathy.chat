@@ -49,7 +49,7 @@ components:
     - type: DropDown
       properties:
         role: null
-        align: full
+        align: center
         tooltip: ''
         border: ''
         enabled: true

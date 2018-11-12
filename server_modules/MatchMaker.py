@@ -32,20 +32,20 @@ def prune(user_id):
   prunes old requests/offers
   updates last_confirmed if currently requesting/offering
   '''
-  timeout = datetime.timedelta(minutes=30) 
+  timeout = datetime.timedelta(minutes=30) # should be double Form1.confirm_wait_seconds
   assume_complete = datetime.timedelta(hours=4) 
   initialize_session(user_id)
   user = anvil.server.session['user']
   # Prune unmatched requests, including from this user
   cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
-                    if r['last_confirmed'] > cutoff_r)
+                    if r['last_confirmed'] < cutoff_r)
   for row in old_requests:
     row['current'] = False
   # Complete old matches for this user
   cutoff_m = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_complete
   old_matches = (m for m in app_tables.matches.search(users=[user], complete=[0])
-                   if m['match_commence'] > cutoff_m)
+                   if m['match_commence'] < cutoff_m)
   for row in old_matches:
     i = row['users'].index(user)
     row['complete'][i] = 1
@@ -114,27 +114,30 @@ def get_status_private(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_code(user_id):
-  '''returns jitsi_code or None'''
+  '''returns jitsi_code, request_type (or Nones)'''
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
   current_row = anvil.server.session['current_row']
   code = None
   if current_row:
     code = current_row['jitsi_code']
+    request_type = current_row['request_type']
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in old_matches:
       i = row['users'].index(user)
       if row['complete'][i]==True:
         code = row['jitsi_code']
-  return code
+        request_type = row['request_types'][i]
+  return code, request_type
 
 @anvil.server.callable
 @anvil.tables.in_transaction
 def add_request(user_id, request_type):
   '''
-  return jitsi_code, last_confirmed (None if)
+  return jitsi_code, last_confirmed (both None if no immediate match)
   '''
+  assert anvil.server.session['user_id']==user_id
   jitsi_code = None
   last_confirmed = None
   if request_type=="offering":
@@ -204,6 +207,7 @@ def cancel_other(user_id):
 @anvil.tables.in_transaction
 def match_commenced(user_id):
   '''
+  return status, match_start, jitsi_code, request_type
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   '''
@@ -214,20 +218,24 @@ def match_commenced(user_id):
   status = None
   match_start = None
   if current_row and current_row['current']==True: #uses short-circuiting to avoid error
+    request_type = current_row['request_type']
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
       match_start = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+      jitsi_code = current_row['jitsi_code']
       new_match = app_tables.matches.add_row(users=[],
+                                             request_types=[],
                                              match_id=current_row['match_id'],
-                                             jitsi_code=current_row['jitsi_code'],
+                                             jitsi_code=jitsi_code,
                                              match_commence=match_start,
                                              complete=[])
       for row in matched_requests:
         new_match['users'].append(row['user'])
+        new_match['request_types'].append(row['request_type'])
         new_match['complete'].append(0)
       status = "empathy"
     else:
-      status = current_row['request_type']
+      status = request_type
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:
@@ -235,7 +243,9 @@ def match_commenced(user_id):
       if row['complete'][i]==0:
         status = "empathy"
         match_start = row['match_commence']
-  return status, match_start
+        jitsi_code = row['jitsi_code']
+        request_type = row['request_types'][i]
+  return status, match_start, jitsi_code, request_type
 
 @anvil.server.callable
 @anvil.tables.in_transaction
