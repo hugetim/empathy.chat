@@ -8,81 +8,80 @@ components:
   name: content_panel
   layout_properties: {slot: default}
   components:
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
-      spacing_below: small, italic: false, background: '', bold: false, underline: false,
-      icon: ''}
-    name: timer_label
-    layout_properties: {grid_position: 'NSMOXX,CMCWXW'}
-  - type: Label
-    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Request an empathy match when ready:', font_size: null,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: true, underline: false, icon: ''}
-    name: status
-    layout_properties: {grid_position: 'SJFXWR,DLPFBM'}
-  - type: Link
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: false, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
-      spacing_above: small, icon_align: left, col_widths: '', spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: ''}
-    name: jitsi_link
-    layout_properties: {grid_position: 'SJFXWR,ULZKUU'}
-    event_bindings: {click: link_1_click}
-  - type: Button
-    properties: {role: null, align: center, tooltip: 'Someone to listen non-judgmentally,
-        connect to your feelings and needs', border: '', enabled: true, foreground: '',
-      visible: true, text: Request Match, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:child'}
-    name: request_button
-    layout_properties: {grid_position: 'RZEGBP,KZGDHR'}
-    event_bindings: {click: request_button_click, show: request_button_show}
-  - type: Spacer
-    properties: {height: 32}
-    name: spacer_1
-    layout_properties: {grid_position: 'WHERFK,ONFRJL'}
-  - type: DropDown
-    properties:
-      role: null
-      align: full
-      tooltip: ''
-      border: ''
-      enabled: true
-      foreground: ''
-      items: [Willing to offer empathy first, Not ready to offer empathy first]
-      visible: true
-      font_size: 14
-      font: ''
-      spacing_above: small
-      spacing_below: small
-      italic: false
-      background: ''
-      bold: false
-      underline: false
-    name: drop_down_1
-    layout_properties: {grid_position: 'WHERFK,VIDAAS'}
-  - type: Spacer
-    properties: {height: 32}
-    name: spacer_2
-    layout_properties: {grid_position: 'WHERFK,BRLNJG'}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: false, text: Empathy Exchange Complete, font_size: null,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:check'}
-    name: complete_button
-    layout_properties: {grid_position: 'KBXCXK,CUSTZW'}
-    event_bindings: {click: complete_button_click}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: false, text: Cancel, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:times'}
-    name: cancel_button
-    layout_properties: {grid_position: 'XTXVXH,JSDQMB'}
-    event_bindings: {click: cancel_button_click}
+  - type: ColumnPanel
+    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+      wrap_on: mobile, col_spacing: small, spacing_above: small, col_widths: '{}',
+      spacing_below: small, background: ''}
+    name: column_panel_1
+    layout_properties: {grid_position: 'EAXFOC,XASBIQ'}
+    components:
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: false, text: '', font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: timer_label
+      layout_properties: {grid_position: 'IXHFGT,OKKLAO'}
+    - type: Label
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+        visible: true, text: 'Request an empathy match when ready:', font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: true, underline: false, icon: ''}
+      name: status
+      layout_properties: {grid_position: 'DIHYXQ,YNHHSV'}
+    - type: Link
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: false, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+        spacing_above: small, icon_align: left, col_widths: '', spacing_below: small,
+        italic: false, background: '', bold: false, underline: false, icon: ''}
+      name: jitsi_link
+      layout_properties: {grid_position: 'DIHYXQ,PZIZAG'}
+      event_bindings: {click: link_1_click}
+    - type: Button
+      properties: {role: null, align: center, tooltip: 'Someone to listen non-judgmentally,
+          connect to your feelings and needs', border: '', enabled: true, foreground: '',
+        visible: true, text: Request Match, font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: 'fa:child'}
+      name: request_button
+      layout_properties: {grid_position: 'TZSOLR,DDSARY'}
+      event_bindings: {click: request_button_click, show: request_button_show}
+    - type: DropDown
+      properties:
+        role: null
+        align: full
+        tooltip: ''
+        border: ''
+        enabled: true
+        foreground: ''
+        items: [Willing to offer empathy first, Not ready to offer empathy first]
+        visible: true
+        font_size: 14
+        font: ''
+        spacing_above: small
+        spacing_below: small
+        italic: false
+        background: ''
+        bold: false
+        underline: false
+      name: drop_down_1
+      layout_properties: {grid_position: 'YJHLRQ,LMOQHT', full_width_row: false}
+    - type: Button
+      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: false, text: Empathy Exchange Complete, font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:check'}
+      name: complete_button
+      layout_properties: {grid_position: 'EYYASQ,HRKTLP'}
+      event_bindings: {click: complete_button_click}
+    - type: Button
+      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: false, text: Cancel, font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: 'fa:times'}
+      name: cancel_button
+      layout_properties: {grid_position: 'TWMITY,RJADLH'}
+      event_bindings: {click: cancel_button_click}
 - type: FlowPanel
   properties: {}
   name: navbar_links
