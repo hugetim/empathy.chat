@@ -95,7 +95,7 @@ class Form1(Form1Template):
         alert("The empathy request was canceled.")
         self.current_status = new_status
         self.set_form_status(self.current_status)
-      elif new_status == ["empathy",None]:
+      elif new_status in ["empathy", None]:
         self.current_status = new_status
         self.set_form_status(self.current_status)
       elif new_status != self.current_status:
@@ -115,7 +115,6 @@ class Form1(Form1Template):
         self.current_status = anvil.server.call('cancel_other',self.user_id)
         self.set_form_status(self.current_status)
     
-  
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.current_status = None

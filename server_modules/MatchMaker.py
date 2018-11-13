@@ -91,7 +91,7 @@ def get_status_private(user_id):
   current_row = app_tables.requests.get(user=user, current=True)
   status = None
   match_start = None
-  if current_row and current_row['current']==True: #uses short-circuiting to avoid error
+  if current_row:
     if current_row['match_id']:
       matched_request_starts = [r['start'] for r
                                 in app_tables.requests.search(match_id=current_row['match_id'])]
@@ -170,7 +170,7 @@ def cancel(user_id):
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
   current_row = app_tables.requests.get(user=user, current=True)
-  if current_row and current_row['current']==True: #uses short-circuiting to avoid error
+  if current_row:
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
       for row in matched_requests:
@@ -189,7 +189,7 @@ def cancel_other(user_id):
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
   current_row = app_tables.requests.get(user=user, current=True)
-  if current_row and current_row['current']==True: #uses short-circuiting to avoid error
+  if current_row:
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
       for row in matched_requests:
@@ -215,7 +215,7 @@ def match_commenced(user_id):
   match_start = None
   jitsi_code = None
   request_type = None
-  if current_row and current_row['current']==True: #uses short-circuiting to avoid error
+  if current_row:
     request_type = current_row['request_type']
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
