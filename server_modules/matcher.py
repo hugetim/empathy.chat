@@ -34,7 +34,7 @@ def prune(user_id):
   '''
   timeout = datetime.timedelta(minutes=30) # should be double Form1.confirm_wait_seconds
   assume_complete = datetime.timedelta(hours=4) 
-  initialize_session(user_id)
+  _initialize_session(user_id)
   user = anvil.server.session['user']
   # Prune unmatched requests, including from this user
   cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
@@ -53,35 +53,40 @@ def prune(user_id):
     row['complete'] = temp
   # Return after confirming wait
   trust_level = get_trust_level(user_id) 
-  current_status, match_start = get_status_private(user_id)
+  current_status, match_start = _get_status(user_id)
   if current_status in ('requesting', 'offering'):
-    confirm_wait_private(user_id)
+    _confirm_wait(user_id)
   return trust_level, current_status, match_start
 
-def initialize_session(user_id):
+
+def _initialize_session(user_id):
   '''initialize session state: user_id, user, and current_row'''
   anvil.server.session['user_id'] = user_id
   user = app_tables.users.get_by_id(user_id)
   anvil.server.session['user'] = user
 
+  
 @anvil.server.callable
 @anvil.tables.in_transaction
 def confirm_wait(user_id):
-  confirm_wait_private(user_id)
+  _confirm_wait(user_id)
   
-def confirm_wait_private(user_id):
+  
+def _confirm_wait(user_id):
   '''updates last_confirmed for current (unmatched) request'''
   user = app_tables.users.get_by_id(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   assert current_row['match_id']==None
   current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
+  
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_status(user_id):
-  return get_status_private(user_id)
+  return _get_status(user_id)
 
-def get_status_private(user_id):
+
+def _get_status(user_id):
   '''
   returns current_status, match_start (or None)
   assumes 2-person matches only
@@ -111,6 +116,7 @@ def get_status_private(user_id):
         match_start = row['match_commence']
   return status, match_start
 
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_code(user_id):
@@ -130,6 +136,7 @@ def get_code(user_id):
         code = row['jitsi_code']
         request_type = row['request_types'][i]
   return code, request_type
+
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -160,6 +167,7 @@ def add_request(user_id, request_type):
     last_confirmed = earliest_request['last_confirmed']
   return jitsi_code, last_confirmed
 
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel(user_id):
@@ -177,7 +185,8 @@ def cancel(user_id):
         row['match_id'] = None
         row['jitsi_code'] = None
     current_row['current'] = False
-  
+
+    
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_other(user_id):
@@ -198,7 +207,8 @@ def cancel_other(user_id):
         if row['user'] != user:
           row['current'] = False
       return current_row['request_type']
-        
+
+    
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(user_id):
@@ -246,6 +256,7 @@ def match_commenced(user_id):
         request_type = row['request_types'][i]
   return status, match_start, jitsi_code, request_type
 
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_complete(user_id):
@@ -258,7 +269,8 @@ def match_complete(user_id):
     temp = row['complete']
     temp[i] = 1
     row['complete'] = temp
-  
+
+    
 def add_request_row(user_id, request_type):
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
@@ -270,6 +282,7 @@ def add_request_row(user_id, request_type):
                                         last_confirmed=now)
   return new_row
 
+
 def new_jitsi_code():
   numchars = 5
   charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -279,9 +292,11 @@ def new_jitsi_code():
   #match['jitsi_code'] = code
   return code
 
+
 def new_match_id():
   match_id = uuid.uuid4()
   return match_id.int
+
 
 @anvil.server.callable
 def get_trust_level(user_id):
