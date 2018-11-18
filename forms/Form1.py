@@ -19,9 +19,7 @@ class Form1(Form1Template):
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
-
-    while not anvil.users.login_with_form():
-      pass
+    
     self.user_id = anvil.users.get_user().get_id()
     # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
     t, s, match_start = anvil.server.call('prune',self.user_id)
@@ -253,6 +251,7 @@ class Form1(Form1Template):
   def logout_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     anvil.users.logout()
+    self.set_form_status(None)
     self.user_id = None
-    anvil.users.login_with_form()
+    open_form('LoginForm')
 
