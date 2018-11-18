@@ -9,42 +9,40 @@ components:
   layout_properties: {slot: default}
   components:
   - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: small, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
-    name: column_panel_1
-    layout_properties: {grid_position: 'EAXFOC,XASBIQ'}
+    properties: {role: card, col_widths: '{}'}
+    name: card_1
+    layout_properties: {grid_position: 'APRVOR,LSQCPI'}
     components:
     - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: false, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: timer_label
-      layout_properties: {grid_position: 'IXHFGT,OKKLAO'}
-    - type: Label
-      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
         visible: true, text: 'Request an empathy match when ready:', font_size: null,
         font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: true, underline: false, icon: ''}
       name: status
-      layout_properties: {grid_position: 'DIHYXQ,YNHHSV'}
+      layout_properties: {grid_position: 'YOJCEM,HURPQL'}
     - type: Link
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: false, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
         spacing_above: small, icon_align: left, col_widths: '', spacing_below: small,
         italic: false, background: '', bold: false, underline: false, icon: ''}
       name: jitsi_link
-      layout_properties: {grid_position: 'DIHYXQ,PZIZAG'}
+      layout_properties: {grid_position: 'YOJCEM,GBBSEH'}
       event_bindings: {click: link_1_click}
-    - type: Button
-      properties: {role: null, align: center, tooltip: 'Someone to listen non-judgmentally,
-          connect to your feelings and needs', border: '', enabled: true, foreground: '',
-        visible: true, text: Request Match, font_size: null, font: '', spacing_above: small,
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: false, text: '', font_size: null, font: '', spacing_above: small,
         icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:child'}
+        underline: false, icon: ''}
+      name: timer_label
+      layout_properties: {grid_position: 'HHXUVE,NPWRYW'}
+    - type: Button
+      properties: {role: primary-color, align: center, tooltip: 'Someone to listen
+          non-judgmentally, connect to your feelings and needs', border: '', enabled: true,
+        foreground: '', visible: true, text: Request Match, font_size: null, font: '',
+        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:child'}
       name: request_button
-      layout_properties: {grid_position: 'TZSOLR,DDSARY'}
+      layout_properties: {grid_position: 'KPBDKY,QGKVUW'}
       event_bindings: {click: request_button_click, show: request_button_show}
     - type: DropDown
       properties:
@@ -65,22 +63,22 @@ components:
         bold: false
         underline: false
       name: drop_down_1
-      layout_properties: {grid_position: 'YJHLRQ,LMOQHT', full_width_row: false}
+      layout_properties: {grid_position: 'ZUWHSQ,ICVLVM', full_width_row: false}
     - type: Button
-      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
         foreground: '', visible: false, text: Empathy Exchange Complete, font_size: null,
         font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:check'}
       name: complete_button
-      layout_properties: {grid_position: 'EYYASQ,HRKTLP'}
+      layout_properties: {grid_position: 'NLWDED,PWPLEY'}
       event_bindings: {click: complete_button_click}
     - type: Button
-      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: false, text: Cancel, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:times'}
+      properties: {role: secondary-color, align: center, tooltip: '', border: '',
+        enabled: true, foreground: '', visible: false, text: Cancel, font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:times'}
       name: cancel_button
-      layout_properties: {grid_position: 'TWMITY,RJADLH'}
+      layout_properties: {grid_position: 'TZDHKG,MGNYKZ'}
       event_bindings: {click: cancel_button_click}
 - type: FlowPanel
   properties: {}
@@ -101,3 +99,16 @@ components:
   type: Timer
   properties: {interval: 1}
   event_bindings: {tick: timer_2_tick}
+- type: ColumnPanel
+  properties: {col_widths: '{}'}
+  name: column_panel_1
+  layout_properties: {slot: left-nav}
+  components:
+  - type: Button
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Log out, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: logout_button
+    layout_properties: {grid_position: 'JWPQNT,ZCSJJE'}
+    event_bindings: {click: logout_button_click}

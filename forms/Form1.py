@@ -250,3 +250,9 @@ class Form1(Form1Template):
       assert request_type=="offering"
       self.drop_down_1.selected_value = "Willing to offer empathy first"
       
+  def logout_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    anvil.users.logout()
+    self.user_id = None
+    anvil.users.login_with_form()
+
