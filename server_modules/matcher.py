@@ -52,11 +52,11 @@ def prune(user_id):
     temp[i] = 1
     row['complete'] = temp
   # Return after confirming wait
-  trust_level = get_trust_level(user_id) 
+  trust_level, request_em, match_em = get_user_info(user_id) 
   current_status, match_start = _get_status(user_id)
   if current_status in ('requesting', 'offering'):
     _confirm_wait(user_id)
-  return trust_level, current_status, match_start
+  return trust_level, request_em, match_em, current_status, match_start
 
 
 def _initialize_session(user_id):
@@ -299,10 +299,26 @@ def new_match_id():
 
 
 @anvil.server.callable
-def get_trust_level(user_id):
+def get_user_info(user_id):
+  '''Return user info, initializing it for new users'''
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
   trust = user['trust_level']
   if trust == None:
     user.update(trust_level=0)
-  return user['trust_level']
+    assert user['request_em']==False
+    assert user['match_em']==False
+  return user['trust_level'], user['request_em'], user['match_em']
+
+
+@anvil.server.callable
+def set_match_em(match_em_checked):
+  user = anvil.server.session['user']
+  user['match_em'] = match_em_checked
+  
+
+@anvil.server.callable
+def set_request_em(request_em_checked):
+  user = anvil.server.session['user']
+  user['request_em'] = request_em_checked
+  

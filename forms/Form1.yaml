@@ -64,6 +64,14 @@ components:
         underline: false
       name: drop_down_1
       layout_properties: {grid_position: 'ZUWHSQ,ICVLVM', full_width_row: false}
+    - type: CheckBox
+      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: false, text: Notify me by email when a match is found,
+        font_size: 14, font: '', spacing_above: small, spacing_below: small, italic: false,
+        background: '', bold: false, checked: false, underline: false}
+      name: match_em_check_box
+      layout_properties: {grid_position: 'TAANZK,ZBGCQJ'}
+      event_bindings: {change: match_em_check_box_change}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
         foreground: '', visible: false, text: Empathy Exchange Complete, font_size: null,
@@ -112,3 +120,22 @@ components:
     name: logout_button
     layout_properties: {grid_position: 'JWPQNT,ZCSJJE'}
     event_bindings: {click: logout_button_click}
+  - type: Spacer
+    properties: {height: 32}
+    name: spacer_1
+    layout_properties: {grid_position: 'IVHFNT,KBCLDF'}
+  - type: Label
+    properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: Settings, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: label_3
+    layout_properties: {grid_position: 'QALKNV,SDPIEU'}
+  - type: CheckBox
+    properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Notify me of empathy requests by email,
+      font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
+      background: '', bold: false, checked: false, underline: false}
+    name: request_em_check_box
+    layout_properties: {grid_position: 'SUWGUP,XXYHSU'}
+    event_bindings: {change: request_em_check_box_change}

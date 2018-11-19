@@ -22,8 +22,10 @@ class Form1(Form1Template):
     
     self.user_id = anvil.users.get_user().get_id()
     # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
-    t, s, match_start = anvil.server.call('prune',self.user_id)
+    t, r, m, s, match_start = anvil.server.call('prune',self.user_id)
     self.trust_level = t
+    self.request_em_check_box.checked = r
+    self.match_em_check_box.checked = m
     self.current_status = s
     if self.current_status == "matched":
       timer = datetime.datetime.now(match_start.tzinfo) - match_start
@@ -124,6 +126,8 @@ class Form1(Form1Template):
     self.current_status = None
     anvil.server.call('match_complete',self.user_id)
     self.set_form_status(self.current_status)
+
+    
     
   def set_form_status(self, user_status):
     if user_status:
@@ -139,6 +143,7 @@ class Form1(Form1Template):
         self.cancel_button.visible = True
         self.set_drop_down(user_status)
         self.seconds_left = self.confirm_wait_seconds
+        self.match_em_check_box.visible = True
       else:
         assert user_status in ["matched", "empathy"]
         self.cancel_button.visible = False        
@@ -165,6 +170,7 @@ class Form1(Form1Template):
           self.complete_button.visible = True
         self.set_jitsi_link(jitsi_code)     
         self.set_drop_down(request_type)
+        self.match_em_check_box.visible = False
     else:
       self.status.text = "Request a match when ready:"
       self.status.bold = True
@@ -175,6 +181,7 @@ class Form1(Form1Template):
       self.request_button.visible = True
       self.drop_down_1.enabled = True
       self.drop_down_1.foreground = "black"
+      self.match_em_check_box.visible = False
     
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
@@ -254,4 +261,14 @@ class Form1(Form1Template):
     self.set_form_status(None)
     self.user_id = None
     open_form('LoginForm')
+
+  def match_em_check_box_change(self, **event_args):
+    """This method is called when this checkbox is checked or unchecked"""
+    anvil.server.call('set_match_em', self.match_em_check_box.checked)
+
+  def request_em_check_box_change(self, **event_args):
+    """This method is called when this checkbox is checked or unchecked"""
+    anvil.server.call('set_request_em', self.request_em_check_box.checked)
+
+
 
