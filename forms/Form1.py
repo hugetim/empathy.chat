@@ -62,10 +62,13 @@ class Form1(Form1Template):
                                                                 self.user_id,
                                                                 request_type)
     if jitsi_code == None:
-      self.current_status = request_type
       if num_emailed > 0:
-        alert(str(num_emailed) + ' others have been sent '
-              + 'notification emails about your request.')
+        n = Notification(str(num_emailed) + ' others have been sent '
+                         + 'notification emails about your request.',
+                         title='Email notifications sent',
+                         timeout=10)
+        n.show()
+      self.current_status = request_type
     else:
       timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
       if timer.seconds > self.confirm_match_seconds:
@@ -133,7 +136,6 @@ class Form1(Form1Template):
     self.set_form_status(self.current_status)
 
     
-    
   def set_form_status(self, user_status):
     if user_status:
       self.request_button.visible = False
@@ -141,7 +143,9 @@ class Form1(Form1Template):
       self.drop_down_1.foreground = "gray"
       if user_status in ["requesting","offering"]:
         self.status.text = ("Status: Requesting an empathy exchange. "
-                            + "Awaiting a match...")
+                            + "(Note: Your request will be cancelled after "
+                            + "30 minutes of inactivity. After 15 minutes, a dialog "
+                            + "will appear allowing you to refresh your request.)")
         self.status.bold = False
         self.set_jitsi_link("")
         self.complete_button.visible = False

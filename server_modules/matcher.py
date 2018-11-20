@@ -330,12 +330,18 @@ def match_email():
   user = anvil.server.session['user']
   anvil.google.mail.send(to = user['email'],
                          subject = "Empathy Swap - Match available",
-                         text = 'This is the email notification '
-                              + 'you requested by checking the box: '
-                              + '"Notify me by email when a match is found." '
-                              + 'Return to http://tinyurl.com/nvcempathy (which '
-                              + 'redirects to https://minty-sarcastic-telephone.anvil.app)'
-                              + 'now to be connected for your empathy exchange.')
+                         text = 
+'''Dear Empathy Swap user,
+    
+An empathy match has been found. 
+                                                      
+Return to https://minty-sarcastic-telephone.anvil.app now to be connected for your empathy exchange.
+                           
+Thanks!
+Tim
+
+p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this box is unchecked when requesting empathy.
+''')
   
 def request_emails(request_type):
   '''email all users with request_em_check_box checked who logged in recently'''
@@ -348,18 +354,20 @@ def request_emails(request_type):
     request_type_text = 'an empathy exchange.'
   cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
-                       if u['last_login'] > cutoff_e and u!=user]
+                       if u['last_login'] > cutoff_e ] #and u!=user
   for email_address in emails:
     anvil.google.mail.send(to = email_address,
                            subject = "Empathy Swap - Request active",
-                           text = 'Someone has requested '
-                                + request_type_text 
-                                + ' This is the email notification '
-                                + 'you requested by checking the box: '
-                                + '"Notify me of empathy requests by email." '
-                                + 'Return to http://tinyurl.com/nvcempathy (which '
-                                + 'redirects to https://minty-sarcastic-telephone.anvil.app)'
-                                + 'now to be connected for an empathy exchange--if you '
-                                + 'are first to click "REQUEST EMPATHY"--or change '
-                                + 'this setting to stop receiving these emails.')
+                           text = 
+'''Dear Empathy Swap user,
+    
+Someone has requested ''' + request_type_text + '''
+                                                      
+Return to https://minty-sarcastic-telephone.anvil.app now and request empathy to be connected (if you are first to do so).
+                           
+Thanks!
+Tim
+
+p.s. You are receiving this email because you checked the box: "Notify me of empathy requests by email." To stop receiving these emails, return to the link above and change the setting.
+''')                      
   return len(emails)
