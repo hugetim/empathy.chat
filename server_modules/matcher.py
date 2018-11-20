@@ -155,7 +155,6 @@ def add_request(user_id, request_type):
     requests = [r for r in app_tables.requests.search(current=True,
                                                       request_type="offering",
                                                       match_id=None)]    
-  # if no match, add new row, else add request info
   current_row = add_request_row(user_id, request_type)
   if requests:
     jitsi_code = new_jitsi_code()
@@ -165,6 +164,8 @@ def add_request(user_id, request_type):
     earliest_request['match_id'] = current_row['match_id']
     earliest_request['jitsi_code'] = jitsi_code
     last_confirmed = earliest_request['last_confirmed']
+  else:
+    request_emails(request_type)
   return jitsi_code, last_confirmed
 
 
@@ -321,4 +322,19 @@ def set_match_em(match_em_checked):
 def set_request_em(request_em_checked):
   user = anvil.server.session['user']
   user['request_em'] = request_em_checked
+  
+
+@anvil.server.callable
+def match_email():
+  user = anvil.server.session['user']
+  google.mail.send(to = user['email'],
+                   subject = "Empathy match available",
+                   text = 'This is the email notification '
+                        + 'you requested by checking the box: '
+                        + '"Notify me by email when a match is found." '
+                        + 'Return to http://tinyurl.com/nvcempathy (which '
+                        + 'redirects to https://minty-sarcastic-telephone.anvil.app)'
+                        + 'now to be connected for your empathy exchange.')
+  
+def request_emails():
   

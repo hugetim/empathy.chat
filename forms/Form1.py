@@ -77,6 +77,8 @@ class Form1(Form1Template):
     if self.current_status in ["requesting", "offering"]:
       new_status, match_start = anvil.server.call_s('get_status',self.user_id)
       if new_status == "pinged":
+        if self.match_em_check_box.checked:
+          anvil.server.call('match_email')
         self.current_status = new_status
         self.seconds_left = self.confirm_match_seconds
         self.confirm_match()
