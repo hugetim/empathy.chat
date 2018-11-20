@@ -142,11 +142,12 @@ def get_code(user_id):
 @anvil.tables.in_transaction
 def add_request(user_id, request_type):
   '''
-  return jitsi_code, last_confirmed (both None if no immediate match)
+  return jitsi_code, last_confirmed (both None if no immediate match), num_emailed
   '''
   assert anvil.server.session['user_id']==user_id
   jitsi_code = None
   last_confirmed = None
+  num_emailed = 0
   if request_type=="offering":
     requests = [r for r in app_tables.requests.search(current=True,
                                                       match_id=None)]
@@ -165,8 +166,8 @@ def add_request(user_id, request_type):
     earliest_request['jitsi_code'] = jitsi_code
     last_confirmed = earliest_request['last_confirmed']
   else:
-    request_emails(request_type)
-  return jitsi_code, last_confirmed
+    num_emailed = request_emails(request_type)
+  return jitsi_code, last_confirmed, num_emailed
 
 
 @anvil.server.callable
@@ -327,14 +328,38 @@ def set_request_em(request_em_checked):
 @anvil.server.callable
 def match_email():
   user = anvil.server.session['user']
-  google.mail.send(to = user['email'],
-                   subject = "Empathy match available",
-                   text = 'This is the email notification '
-                        + 'you requested by checking the box: '
-                        + '"Notify me by email when a match is found." '
-                        + 'Return to http://tinyurl.com/nvcempathy (which '
-                        + 'redirects to https://minty-sarcastic-telephone.anvil.app)'
-                        + 'now to be connected for your empathy exchange.')
+  anvil.google.mail.send(to = user['email'],
+                         subject = "Empathy Swap - Match available",
+                         text = 'This is the email notification '
+                              + 'you requested by checking the box: '
+                              + '"Notify me by email when a match is found." '
+                              + 'Return to http://tinyurl.com/nvcempathy (which '
+                              + 'redirects to https://minty-sarcastic-telephone.anvil.app)'
+                              + 'now to be connected for your empathy exchange.')
   
-def request_emails():
-  
+def request_emails(request_type):
+  '''email all users with request_em_check_box checked who logged in recently'''
+  assume_inactive = datetime.timedelta(days=60) #30 day persistent login + 30 days
+  user = anvil.server.session['user']
+  if request_type=="requesting":
+    request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
+  else:
+    assert request_type=="offering"
+    request_type_text = 'an empathy exchange.'
+  cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
+  emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
+                       if u['last_login'] > cutoff_e and u!=user]
+  for email_address in emails:
+    anvil.google.mail.send(to = email_address,
+                           subject = "Empathy Swap - Request active",
+                           text = 'Someone has requested '
+                                + request_type_text 
+                                + ' This is the email notification '
+                                + 'you requested by checking the box: '
+                                + '"Notify me of empathy requests by email." '
+                                + 'Return to http://tinyurl.com/nvcempathy (which '
+                                + 'redirects to https://minty-sarcastic-telephone.anvil.app)'
+                                + 'now to be connected for an empathy exchange--if you '
+                                + 'are first to click "REQUEST EMPATHY"--or change '
+                                + 'this setting to stop receiving these emails.')
+  return len(emails)

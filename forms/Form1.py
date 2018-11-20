@@ -58,11 +58,14 @@ class Form1(Form1Template):
       request_type = 'requesting'
     else:
       request_type = 'offering'
-    jitsi_code, last_confirmed = anvil.server.call('add_request',
-                                                   self.user_id,
-                                                   request_type)
+    jitsi_code, last_confirmed, num_emailed = anvil.server.call('add_request',
+                                                                self.user_id,
+                                                                request_type)
     if jitsi_code == None:
       self.current_status = request_type
+      if num_emailed > 0:
+        alert(str(num_emailed) + ' others have been sent '
+              + 'notification emails about your request.')
     else:
       timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
       if timer.seconds > self.confirm_match_seconds:
