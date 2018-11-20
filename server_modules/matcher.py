@@ -354,7 +354,7 @@ def request_emails(request_type):
     request_type_text = 'an empathy exchange.'
   cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
-                       if u['last_login'] > cutoff_e ] #and u!=user
+                       if u['last_login'] > cutoff_e and u!=user]
   for email_address in emails:
     anvil.google.mail.send(to = email_address,
                            subject = "Empathy Swap - Request active",

@@ -63,10 +63,16 @@ class Form1(Form1Template):
                                                                 request_type)
     if jitsi_code == None:
       if num_emailed > 0:
-        n = Notification(str(num_emailed) + ' others have been sent '
-                         + 'notification emails about your request.',
-                         title='Email notifications sent',
-                         timeout=10)
+        if num_emailed==1:
+          n = Notification('Someone has been sent a '
+                           + 'notification email about your request.',
+                           title='Email notification sent',
+                           timeout=10)
+        else:
+          n = Notification(str(num_emailed) + ' others have been sent '
+                           + 'notification emails about your request.',
+                           title='Email notifications sent',
+                           timeout=10)
         n.show()
       self.current_status = request_type
     else:
