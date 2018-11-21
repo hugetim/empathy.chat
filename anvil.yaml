@@ -15,7 +15,7 @@ services:
   server_config: {auto_create_missing_columns: false}
 - source: /runtime/services/google.yml
   client_config: {}
-  server_config: {delegation_refresh_token: 1/dGGj8lZ52AY-LhUImeNsSp9mJWtBDWMLEG3yfq_27Cw}
+  server_config: {delegation_refresh_token: 1/5YswYz1JJfCtd1ll5J7N2XCxSF9z5By2jf1m5SJ9Gbs5-F_Wa1rGu_jrj1SmZA9-}
 - source: /runtime/services/anvil/email.yml
   client_config: {}
   server_config: {test_mode: false}
