@@ -1,6 +1,6 @@
-import anvil.email
 import anvil.google.auth, anvil.google.drive, anvil.google.mail
 from anvil.google.drive import app_files
+import anvil.email
 import anvil.tables as tables
 from anvil.tables import app_tables
 import anvil.users
@@ -9,6 +9,8 @@ import random
 import datetime
 import uuid
 import anvil.tz
+import parameters as p
+import re
 
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
@@ -32,7 +34,7 @@ def prune(user_id):
   prunes old requests/offers
   updates last_confirmed if currently requesting/offering
   '''
-  timeout = datetime.timedelta(minutes=30) # should be double Form1.confirm_wait_seconds
+  timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS)
   assume_complete = datetime.timedelta(hours=4) 
   _initialize_session(user_id)
   user = anvil.server.session['user']
@@ -52,11 +54,19 @@ def prune(user_id):
     temp[i] = 1
     row['complete'] = temp
   # Return after confirming wait
-  trust_level, request_em, match_em = get_user_info(user_id) 
+  trust_level, request_em, match_em = get_user_info(user_id)
+  email_in_list = None
+  if trust_level==0:
+    email_in_list = _email_in_list(user['email'])
+    if email_in_list:
+      trust_level = 1
+      user['trust_level'] = trust_level
+    else:
+      user['enabled'] = False
   current_status, match_start = _get_status(user_id)
   if current_status in ('requesting', 'offering'):
     _confirm_wait(user_id)
-  return trust_level, request_em, match_em, current_status, match_start
+  return trust_level, request_em, match_em, current_status, match_start, email_in_list
 
 
 def _initialize_session(user_id):
@@ -64,6 +74,20 @@ def _initialize_session(user_id):
   anvil.server.session['user_id'] = user_id
   user = app_tables.users.get_by_id(user_id)
   anvil.server.session['user'] = user
+
+  
+def _email_in_list(email):
+  sheet = app_files._2018_integration_program['Sheet1']
+  for row in sheet.rows:
+    if _emails_equal(email, row['email']):
+      return True
+  return False
+      
+def _emails_equal(a, b):
+  emre = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
+  amatch = emre.search(a)
+  bmatch = emre.search(b)
+  return amatch.group(1)==bmatch.group(1) and amatch.group(2).lower()==bmatch.group(2).lower()
 
   
 @anvil.server.callable
