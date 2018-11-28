@@ -138,11 +138,6 @@ def _get_status(user_id):
       if row['complete'][i]==0:
         status = "empathy"
         match_start = row['match_commence']
-  tallies =	{
-    "requesting": 0,
-    "offering": 0,
-    "request_em": 0
-  }
   tallies = _get_tallies(user)
   return status, match_start, tallies
 
@@ -154,6 +149,9 @@ def get_tallies():
 
 
 def _get_tallies(user):
+  tallies =	dict(requesting = 0,
+                 offering = 0,
+                 request_em = 0)
   active_users = [user]
   for row in app_tables.requests.search(current=True, match_id=None):
     if row['user']!=user:
@@ -164,6 +162,7 @@ def _get_tallies(user):
   request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
                       if u['last_login'] > cutoff_e and u not in active_users]
   tallies['request_em'] = len(request_em_list)
+  return tallies
   
   
 @anvil.server.callable

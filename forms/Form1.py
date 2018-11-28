@@ -14,7 +14,9 @@ class Form1(Form1Template):
   user_id = None
   seconds_left = None
   trust_level = 0
-  tallies = {}
+  tallies =	dict(requesting = 0,
+                 offering = 0,
+                 request_em = 0)
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
@@ -212,18 +214,60 @@ class Form1(Form1Template):
 
   def update_tally_label(self):
     temp = ""
-    if self.tallies['requesting'] > 0:
-      temp = (str(self.tallies['requesting'] + self.tallies['offering'])
-              + ' current requests for an empathy exchange, '
-              + str(self.tallies['requesting'])
-              + ' of which are not ready to offer empathy first.')
-    elif self.tallies['offering'] > 0:
-      temp = (str(self.tallies['offering'])
-              + ' current requests for an empathy exchange, '
-              + str(self.tallies['requesting'])
-              + ' all willing to offer empathy first.')                             
+    if self.tallies['requesting'] > 1:
+      if self.tallies['offering'] > 0:
+        temp = (str(self.tallies['requesting'] + self.tallies['offering'])
+                + ' current requests for an empathy exchange, '
+                + 'some of which are requesting a partner willing to offer empathy first.')
+      else:
+        assert self.tallies['offering']==0
+        temp = (str(self.tallies['requesting'])
+                + ' current requests for an empathy exchange, '
+                + 'all of which are requesting a partner willing to offer empathy first.')
+    elif self.tallies['requesting']==1:
+      if self.tallies['offering'] > 0:
+        temp = (str(self.tallies['requesting'] + self.tallies['offering'])
+                + ' current requests for an empathy exchange. '
+                + 'One is requesting a partner willing to offer empathy first.')
+      else:
+        assert self.tallies['offering']==0
+        temp = (str(self.tallies['requesting'])
+                + ' current request for an empathy exchange, '
+                + 'requesting a partner willing to offer empathy first.')
+    else:
+      assert self.tallies['requesting']==0
+      if self.tallies['offering'] > 1:
+        temp = (str(self.tallies['offering'])
+                + ' current requests for an empathy exchange, '
+                + 'all of which are willing to offer empathy first.') 
+      elif self.tallies['offering']==1:
+        temp = (str(self.tallies['offering'])
+                + ' current request for an empathy exchange '
+                + 'by someone willing to offer empathy first.')
+      else:
+        assert self.tallies['offering']==0
+    if self.tallies['offering']==0:
+      if self.tallies['requesting'] > 0:
+        if self.tallies['request_em'] > 1:
+          temp += (str(self.tallies['request_em'])
+                   + ' others are currently receiving email notifications '
+                   + 'about each request for empathy.')
+        elif self.tallies['request_em']==1:
+          temp += (str(self.tallies['request_em'])
+                   + ' other person is currently receiving email notifications '
+                   + 'about each request for empathy.')
+      else:
+        if self.tallies['request_em'] > 1:
+          temp += (str(self.tallies['request_em'])
+                   + ' people are currently receiving email notifications '
+                   + 'about each request for empathy.')
+        elif self.tallies['request_em']==1:
+          temp += (str(self.tallies['request_em'])
+                   + ' person is currently receiving email notifications '
+                   + 'about each request for empathy.')
     self.tally_label.text = temp
-    self.tally_label.visible = True
+    if len(temp) > 0:
+      self.tally_label.visible = True
       
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
@@ -314,6 +358,8 @@ class Form1(Form1Template):
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     anvil.server.call('set_request_em', self.request_em_check_box.checked)
+
+
 
 
 
