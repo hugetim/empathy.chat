@@ -23,10 +23,10 @@ class Form1(Form1Template):
     
     self.user_id = anvil.users.get_user().get_id()
     # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
-    t, r, m, s, match_start, n, e = anvil.server.call('prune',self.user_id)
+    t, r, m, s, ref_time, n, alt_avail, e = anvil.server.call('prune',self.user_id)
     if e==False:
       alert('Your email address is not approved to use this app. '
-            + 'Contact empathyroom@gmail.com if you believe this message is in error.')
+            + 'Contact empathyroom@gmail.com for help.')
       self.logout_user()
     self.trust_level = t
     self.request_em_check_box.checked = r
@@ -34,13 +34,19 @@ class Form1(Form1Template):
     self.tallies = n
     self.current_status = s
     if self.current_status == "matched":
-      timer = datetime.datetime.now(match_start.tzinfo) - match_start
-      self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS - timer.seconds
+      timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
+      if alt_avail:
+        self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS - timer.seconds
+      else:
+        self.seconds_left = p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
       if self.seconds_left<=0:
         self.current_status = anvil.server.call('cancel_other',self.user_id)
     elif self.current_status == "pinged":
-      timer = datetime.datetime.now(match_start.tzinfo) - match_start
-      self.seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
+      if alt_avail:
+        timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
+        self.seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
+      else:
+        self.seconds_left = p.CONFIRM_WAIT_SECONDS
       if self.seconds_left<=0:
         anvil.server.call('cancel',self.user_id)
         self.current_status = None
@@ -93,12 +99,13 @@ class Form1(Form1Template):
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     if self.current_status in ["requesting", "offering"]:
-      new_status, match_start, n = anvil.server.call_s('get_status',self.user_id)
+      new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
       if new_status == "pinged":
         if self.match_em_check_box.checked:
           anvil.server.call('match_email')
         self.current_status = new_status
-        self.seconds_left = p.CONFIRM_MATCH_SECONDS
+        if alt_avail:
+          self.seconds_left = p.CONFIRM_MATCH_SECONDS
         self.confirm_match()
       elif new_status in ["empathy", None]:
         self.current_status = new_status
@@ -107,7 +114,7 @@ class Form1(Form1Template):
       elif new_status != self.current_status:
         print new_status
     elif self.current_status == "matched":
-      new_status, match_start, n = anvil.server.call_s('get_status',self.user_id)
+      new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
       if new_status == "requesting":
         alert("The empathy offer was canceled.")
         self.current_status = new_status
@@ -122,6 +129,12 @@ class Form1(Form1Template):
         self.set_form_status(self.current_status)
       elif new_status != self.current_status:
         print new_status
+      else:
+        timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
+        if alt_avail:
+          self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS - timer.seconds
+        else:
+          self.seconds_left = p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
     elif self.current_status == None:
       self.tallies = anvil.server.call_s('get_tallies')
       self.update_tally_label()
@@ -162,8 +175,11 @@ class Form1(Form1Template):
       if user_status in ["requesting","offering"]:
         self.status.text = ("Status: Requesting an empathy exchange. "
                             + "(Note: Your request will be cancelled after "
-                            + "30 minutes of inactivity. After 15 minutes, a dialog "
-                            + "will appear allowing you to refresh your request.)")
+                            + str(2*p.CONFIRM_WAIT_SECONDS/60)
+                            + " minutes of inactivity. After "
+                            + str(p.CONFIRM_WAIT_SECONDS/60)
+                            + " minutes, a dialog will appear allowing "
+                            + "you to refresh your request.)")
         self.status.bold = False
         self.set_jitsi_link("")
         self.complete_button.visible = False

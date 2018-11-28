@@ -30,10 +30,16 @@ class TimerForm(TimerFormTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
-    new_status, match_start, n = anvil.server.call_s('get_status',self.user_id)
+    new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
     if new_status != self.current_status:
       print new_status
       self.raise_event("x-close-alert", value=new_status)
+    else:
+      timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
+      if alt_avail:
+        self.seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
+      else:
+        self.seconds_left = p.CONFIRM_WAIT_SECONDS - timer.seconds
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""

@@ -30,9 +30,10 @@ import re
 def prune(user_id):
   '''
   Assumed to run upon initializing Form1
-  returns trust_level, current_status, match_start (or None)
+  returns trust_level, request_em, match_em, current_status, ref_time (or None),
+          tallies, alt_avail, email_in_list
   prunes old requests/offers
-  updates last_confirmed if currently requesting/offering
+  updates last_confirmed if currently requesting/offering/pinged
   '''
   timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS)
   assume_complete = datetime.timedelta(hours=4) 
@@ -63,10 +64,10 @@ def prune(user_id):
       user['trust_level'] = trust_level
     else:
       user['enabled'] = False
-  current_status, match_start, tallies = _get_status(user_id)
-  if current_status in ('requesting', 'offering'):
+  current_status, ref_time, tallies, alt_avail = _get_status(user_id)
+  if current_status in ('requesting', 'offering', 'pinged'):
     _confirm_wait(user_id)
-  return trust_level, request_em, match_em, current_status, match_start, tallies, email_in_list
+  return trust_level, request_em, match_em, current_status, ref_time, tallies, alt_avail, email_in_list
 
 
 def _initialize_session(user_id):
@@ -112,14 +113,19 @@ def get_status(user_id):
 
 def _get_status(user_id):
   '''
-  returns current_status, match_start (or None), tallies
+  returns current_status, ref_time (or None), tallies, alt_avail
+  alt_avail: Boolean, whether another match is available
+    for user (if "matched") or match (if "pinged"), (else) None
+  ref_time: match_start or other's last_confirmed (if "matched" and not alt_avail)
   assumes 2-person matches only
   '''
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
+  tallies = _get_tallies(user)
   current_row = app_tables.requests.get(user=user, current=True)
   status = None
-  match_start = None
+  ref_time = None
+  alt_avail = None
   if current_row:
     if current_row['match_id']:
       matched_request_starts = [r['start'] for r
@@ -127,8 +133,43 @@ def _get_status(user_id):
       match_start = max(matched_request_starts)
       if match_start==current_row['start']:
         status = "matched"
+        request_type = current_row['request_type']
+        if request_type=="offering":
+          altrequests = [r for r in app_tables.requests.search(current=True,
+                                                               match_id=None)]
+        else: 
+          assert request_type=="requesting"
+          altrequests = [r for r in app_tables.requests.search(current=True,
+                                                               request_type="offering",
+                                                               match_id=None)]    
+        alt_avail = len(altrequests) > 0
+        if alt_avail:
+          ref_time = match_start
+        else:
+          last_confirmeds = [r['last_confirmed'] for r
+                             in app_tables.requests.search(match_id=current_row['match_id'])
+                             if r['user']!=user]
+          ref_time = last_confirmeds[0]
       else:
         status = "pinged"
+        request_types = [r['request_type'] for r
+                         in app_tables.requests.search(match_id=current_row['match_id'])
+                         if r['user']!=user]
+        assert len(request_types)==1
+        request_type = request_types[0]
+        if request_type=="offering":
+          altrequests = [r for r in app_tables.requests.search(current=True,
+                                                               match_id=None)]
+        else: 
+          assert request_type=="requesting"
+          altrequests = [r for r in app_tables.requests.search(current=True,
+                                                               request_type="offering",
+                                                               match_id=None)]    
+        alt_avail = len(altrequests) > 0
+        if alt_avail:
+          ref_time = match_start
+        else:
+          ref_time = current_row['last_confirmed']
     else:
       status = current_row['request_type']
   else:
@@ -137,9 +178,8 @@ def _get_status(user_id):
       i = row['users'].index(user)
       if row['complete'][i]==0:
         status = "empathy"
-        match_start = row['match_commence']
-  tallies = _get_tallies(user)
-  return status, match_start, tallies
+        ref_time = row['match_commence'] 
+  return status, ref_time, tallies, alt_avail
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -160,7 +200,7 @@ def _get_tallies(user):
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS) 
   cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
   request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
-                      if u['last_login'] > cutoff_e and u not in active_users]
+                       if u['last_login'] > cutoff_e and u not in active_users]
   tallies['request_em'] = len(request_em_list)
   return tallies
   
