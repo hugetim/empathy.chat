@@ -14,13 +14,14 @@ class Form1(Form1Template):
   user_id = None
   seconds_left = None
   trust_level = 0
+  tallies = {}
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
     self.user_id = anvil.users.get_user().get_id()
     # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
-    t, r, m, s, match_start, e = anvil.server.call('prune',self.user_id)
+    t, r, m, s, match_start, n, e = anvil.server.call('prune',self.user_id)
     if e==False:
       alert('Your email address is not approved to use this app. '
             + 'Contact empathyroom@gmail.com if you believe this message is in error.')
@@ -28,6 +29,7 @@ class Form1(Form1Template):
     self.trust_level = t
     self.request_em_check_box.checked = r
     self.match_em_check_box.checked = m
+    self.tallies = n
     self.current_status = s
     if self.current_status == "matched":
       timer = datetime.datetime.now(match_start.tzinfo) - match_start
@@ -89,7 +91,7 @@ class Form1(Form1Template):
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     if self.current_status in ["requesting", "offering"]:
-      new_status, match_start = anvil.server.call_s('get_status',self.user_id)
+      new_status, match_start, n = anvil.server.call_s('get_status',self.user_id)
       if new_status == "pinged":
         if self.match_em_check_box.checked:
           anvil.server.call('match_email')
@@ -98,11 +100,12 @@ class Form1(Form1Template):
         self.confirm_match()
       elif new_status in ["empathy", None]:
         self.current_status = new_status
+        self.tallies = n
         self.set_form_status(self.current_status)
       elif new_status != self.current_status:
         print new_status
     elif self.current_status == "matched":
-      new_status, match_start = anvil.server.call_s('get_status',self.user_id)
+      new_status, match_start, n = anvil.server.call_s('get_status',self.user_id)
       if new_status == "requesting":
         alert("The empathy offer was canceled.")
         self.current_status = new_status
@@ -113,9 +116,13 @@ class Form1(Form1Template):
         self.set_form_status(self.current_status)
       elif new_status in ["empathy", None]:
         self.current_status = new_status
+        self.tallies = n
         self.set_form_status(self.current_status)
       elif new_status != self.current_status:
         print new_status
+    elif self.current_status == None:
+      self.tallies = anvil.server.call_s('get_tallies')
+      self.update_tally_label()
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
@@ -149,6 +156,7 @@ class Form1(Form1Template):
       self.request_button.visible = False
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
+      self.tally_label.visible = False
       if user_status in ["requesting","offering"]:
         self.status.text = ("Status: Requesting an empathy exchange. "
                             + "(Note: Your request will be cancelled after "
@@ -199,7 +207,24 @@ class Form1(Form1Template):
       self.drop_down_1.enabled = True
       self.drop_down_1.foreground = "black"
       self.match_em_check_box.visible = False
-    
+      self.update_tally_label()
+      
+
+  def update_tally_label(self):
+    temp = ""
+    if self.tallies['requesting'] > 0:
+      temp = (str(self.tallies['requesting'] + self.tallies['offering'])
+              + ' current requests for an empathy exchange, '
+              + str(self.tallies['requesting'])
+              + ' of which are not ready to offer empathy first.')
+    elif self.tallies['offering'] > 0:
+      temp = (str(self.tallies['offering'])
+              + ' current requests for an empathy exchange, '
+              + str(self.tallies['requesting'])
+              + ' all willing to offer empathy first.')                             
+    self.tally_label.text = temp
+    self.tally_label.visible = True
+      
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
       self.jitsi_link.visible = False

@@ -63,10 +63,10 @@ def prune(user_id):
       user['trust_level'] = trust_level
     else:
       user['enabled'] = False
-  current_status, match_start = _get_status(user_id)
+  current_status, match_start, tallies = _get_status(user_id)
   if current_status in ('requesting', 'offering'):
     _confirm_wait(user_id)
-  return trust_level, request_em, match_em, current_status, match_start, email_in_list
+  return trust_level, request_em, match_em, current_status, match_start, tallies, email_in_list
 
 
 def _initialize_session(user_id):
@@ -112,7 +112,7 @@ def get_status(user_id):
 
 def _get_status(user_id):
   '''
-  returns current_status, match_start (or None)
+  returns current_status, match_start (or None), tallies
   assumes 2-person matches only
   '''
   assert anvil.server.session['user_id']==user_id
@@ -138,9 +138,34 @@ def _get_status(user_id):
       if row['complete'][i]==0:
         status = "empathy"
         match_start = row['match_commence']
-  return status, match_start
+  tallies =	{
+    "requesting": 0,
+    "offering": 0,
+    "request_em": 0
+  }
+  tallies = _get_tallies(user)
+  return status, match_start, tallies
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def get_tallies():
+  user = anvil.server.session['user']
+  return _get_tallies(user)
 
 
+def _get_tallies(user):
+  active_users = [user]
+  for row in app_tables.requests.search(current=True, match_id=None):
+    if row['user']!=user:
+      tallies[row['request_type']] += 1
+      active_users.append(row['user'])
+  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS) 
+  cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
+  request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
+                      if u['last_login'] > cutoff_e and u not in active_users]
+  tallies['request_em'] = len(request_em_list)
+  
+  
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_code(user_id):
@@ -369,7 +394,7 @@ p.s. You are receiving this email because you checked the box: "Notify me by ema
   
 def request_emails(request_type):
   '''email all users with request_em_check_box checked who logged in recently'''
-  assume_inactive = datetime.timedelta(days=60) #30 day persistent login + 30 days
+  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS) 
   user = anvil.server.session['user']
   if request_type=="requesting":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'

@@ -15,3 +15,4 @@ import anvil.users
 BUFFER_SECONDS = 5
 CONFIRM_MATCH_SECONDS = 60
 CONFIRM_WAIT_SECONDS = 60*10 
+ASSUME_INACTIVE_DAYS = 60 #30 day persistent login + 30 days

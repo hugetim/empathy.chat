@@ -14,6 +14,13 @@ components:
     layout_properties: {grid_position: 'APRVOR,LSQCPI'}
     components:
     - type: Label
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+        visible: false, text: '', font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: true, background: '', bold: false,
+        underline: false, icon: ''}
+      name: tally_label
+      layout_properties: {grid_position: 'GVWQIY,XXZKPT'}
+    - type: Label
       properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
         visible: true, text: 'Request an empathy match when ready:', font_size: null,
         font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
@@ -21,7 +28,7 @@ components:
       name: status
       layout_properties: {grid_position: 'YOJCEM,HURPQL'}
     - type: Link
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
         visible: false, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
         spacing_above: small, icon_align: left, col_widths: '', spacing_below: small,
         italic: false, background: '', bold: false, underline: false, icon: ''}
@@ -29,7 +36,7 @@ components:
       layout_properties: {grid_position: 'HTGYJJ,AYFFWJ'}
       event_bindings: {click: link_1_click}
     - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
         visible: false, text: '', font_size: null, font: '', spacing_above: small,
         icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
         underline: false, icon: ''}
