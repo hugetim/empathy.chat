@@ -5,6 +5,7 @@ import anvil.server
 import anvil.tables as tables
 from anvil.tables import app_tables
 import anvil.users
+import parameters as p
 
 class TimerForm(TimerFormTemplate):
   seconds_left = None
@@ -36,10 +37,19 @@ class TimerForm(TimerFormTemplate):
       self.raise_event("x-close-alert", value=new_status)
     else:
       timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
-      if alt_avail:
-        self.seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
-      else:
-        self.seconds_left = p.CONFIRM_WAIT_SECONDS - timer.seconds
+      if self.current_status=="pinged":
+        seconds_left = self.seconds_left
+        if alt_avail:
+          self.seconds_left = min(p.CONFIRM_MATCH_SECONDS - timer.seconds, seconds_left)
+        else:
+          self.seconds_left = max(p.CONFIRM_WAIT_SECONDS - timer.seconds, seconds_left)
+        if self.seconds_left > seconds_left + p.BUFFER_SECONDS:
+          Notification("You are now the only match available, so you have more time to respond.",
+                       title="Time added").show()
+        elif self.seconds_left < seconds_left - p.BUFFER_SECONDS:
+          Notification("Another person is now available to take your place if you are not able"
+                       + " to respond within two minutes.",
+                       title="Prompt response needed").show()
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""

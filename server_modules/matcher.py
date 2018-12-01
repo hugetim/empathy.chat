@@ -279,11 +279,38 @@ def cancel(user_id):
     
 @anvil.server.callable
 @anvil.tables.in_transaction
+def cancel_match(user_id):
+  '''
+  cancel match (if applicable)--but not remove request
+  Returns updated status
+  '''
+  assert anvil.server.session['user_id']==user_id
+  user = anvil.server.session['user']
+  current_row = app_tables.requests.get(user=user, current=True)
+  if current_row:
+    if current_row['match_id']:
+      matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
+      for row in matched_requests:
+        row['match_id'] = None
+        row['jitsi_code'] = None
+    current_row['cancelled_matched'] += 1
+    return current_row['request_type']
+  else:
+    current_matches = app_tables.matches.search(users=[user], complete=[0])
+    for row in current_matches:
+      i = row['users'].index(user)
+      if row['complete'][i]==0:
+        return "empathy"
+    return None
+    
+    
+@anvil.server.callable
+@anvil.tables.in_transaction
 def cancel_other(user_id):
   '''
   return new_status
   Upon failure of other to confirm match
-  Remove request and cancel match (if applicable)
+  cancel match (if applicable)--but not remove request
   '''
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
@@ -295,8 +322,16 @@ def cancel_other(user_id):
         row['match_id'] = None
         row['jitsi_code'] = None
         if row['user'] != user:
-          row['current'] = False
-      return current_row['request_type']
+          row['cancelled_matches'] += 1
+          #row['current'] = False
+    return current_row['request_type']
+  else:
+    current_matches = app_tables.matches.search(users=[user], complete=[0])
+    for row in current_matches:
+      i = row['users'].index(user)
+      if row['complete'][i]==0:
+        return "empathy"
+    return None
 
     
 @anvil.server.callable
@@ -369,7 +404,9 @@ def add_request_row(user_id, request_type):
                                         current=True,
                                         request_type=request_type,
                                         start=now,
-                                        last_confirmed=now)
+                                        last_confirmed=now,
+                                        cancelled_matches=0
+                                       )
   return new_row
 
 
