@@ -1,5 +1,5 @@
 allow_embedding: false
-package_name: EmpathyRoom
+package_name: EmpathyExchange
 name: Empathy Room
 startup_form: LoginForm
 renamed: true
