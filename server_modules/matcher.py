@@ -236,6 +236,7 @@ def add_request(user_id, request_type):
   jitsi_code = None
   last_confirmed = None
   num_emailed = 0
+  alt_avail = None
   if request_type=="offering":
     requests = [r for r in app_tables.requests.search(current=True,
                                                       match_id=None)]
@@ -249,13 +250,16 @@ def add_request(user_id, request_type):
     jitsi_code = new_jitsi_code()
     current_row['match_id'] = new_match_id()
     current_row['jitsi_code'] = jitsi_code
-    earliest_request = min(requests, key=lambda row: row['start'])
+    cms = [r['cancelled_matches'] for r in requests]
+    eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
+    earliest_request = min(eligible_requests, key=lambda row: row['start'])
     earliest_request['match_id'] = current_row['match_id']
     earliest_request['jitsi_code'] = jitsi_code
     last_confirmed = earliest_request['last_confirmed']
+    alt_avail = len(requests) > 1
   else:
     num_emailed = request_emails(request_type)
-  return jitsi_code, last_confirmed, num_emailed
+  return jitsi_code, last_confirmed, num_emailed, alt_avail
 
 
 @anvil.server.callable

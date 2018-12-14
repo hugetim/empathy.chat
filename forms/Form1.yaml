@@ -95,6 +95,13 @@ components:
       name: cancel_button
       layout_properties: {grid_position: 'TZDHKG,MGNYKZ'}
       event_bindings: {click: cancel_button_click}
+    - type: Label
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+        visible: false, text: '', font_size: 12, font: '', spacing_above: small, icon_align: left,
+        spacing_below: small, italic: true, background: '', bold: false, underline: false,
+        icon: ''}
+      name: note_label
+      layout_properties: {grid_position: 'WOLXYM,FPKEGW'}
 - type: FlowPanel
   properties: {}
   name: navbar_links

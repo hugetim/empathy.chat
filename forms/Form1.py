@@ -59,9 +59,9 @@ class Form1(Form1Template):
       request_type = 'requesting'
     else:
       request_type = 'offering'
-    jitsi_code, last_confirmed, num_emailed = anvil.server.call('add_request',
-                                                                self.user_id,
-                                                                request_type)
+    jitsi_code, last_confirmed, num_emailed, alt_avail = anvil.server.call('add_request',
+                                                                           self.user_id,
+                                                                           request_type)
     if jitsi_code == None:
       if num_emailed > 0:
         if num_emailed==1:
@@ -78,9 +78,12 @@ class Form1(Form1Template):
       self.current_status = request_type
     else:
       timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
-      if timer.seconds > p.CONFIRM_MATCH_SECONDS:
+      if timer.seconds > p.BUFFER_SECONDS:
         self.current_status = "matched"
-        self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS
+        if alt_avail:
+          self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS
+        else:
+          self.seconds_left = p.CONFIRM_WAIT_SECONDS - timer + p.BUFFER_SECONDS
       else:
         self.current_status = "empathy"
     self.set_form_status(self.current_status) 
@@ -165,13 +168,14 @@ class Form1(Form1Template):
       self.drop_down_1.foreground = "gray"
       self.tally_label.visible = False
       if user_status in ["requesting","offering"]:
-        self.status.text = ("Status: Requesting an empathy exchange. "
-                            + "(Note: Your request will be cancelled after "
-                            + str(2*p.CONFIRM_WAIT_SECONDS/60)
-                            + " minutes of inactivity. After "
-                            + str(p.CONFIRM_WAIT_SECONDS/60)
-                            + " minutes, a dialog will appear allowing "
-                            + "you to refresh your request.)")
+        self.status.text = ("Status: Requesting an empathy exchange. ")
+        self.note_label.text = ("(Note: Your request will be cancelled after "
+                                + str(2*p.CONFIRM_WAIT_SECONDS/60)
+                                + " minutes of inactivity. After "
+                                + str(p.CONFIRM_WAIT_SECONDS/60)
+                                + " minutes, a dialog will appear allowing "
+                                + "you to refresh your request.)")
+        self.note_label.visible = True
         self.status.bold = False
         self.set_jitsi_link("")
         self.complete_button.visible = False
@@ -181,7 +185,8 @@ class Form1(Form1Template):
         self.match_em_check_box.visible = True
       else:
         assert user_status in ["matched", "empathy"]
-        self.cancel_button.visible = False        
+        self.cancel_button.visible = False    
+        self.note_label.visible = False
         if user_status=="matched":
           self.timer_label.text = ("A match has been found and they have up to " 
                                    + str(self.seconds_left) + " seconds to confirm.")
@@ -209,6 +214,7 @@ class Form1(Form1Template):
     else:
       self.status.text = "Request a match when ready:"
       self.status.bold = True
+      self.note_label.visible = False
       self.set_jitsi_link("")
       self.timer_label.visible = False
       self.complete_button.visible = False
