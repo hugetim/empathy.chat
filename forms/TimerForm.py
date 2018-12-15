@@ -61,7 +61,7 @@ class TimerForm(TimerFormTemplate):
     self.seconds_left -= 1
     self.timer_label.text = str(self.seconds_left) + " seconds left to confirm."
     if self.seconds_left <= 0:
-      if alt_avail==True:
+      if self.alt_avail==True:
         self.raise_event("x-close-alert", value="alt timer elapsed")
       else:
         self.raise_event("x-close-alert", value="timer elapsed")

@@ -172,6 +172,7 @@ def _get_status(user_id):
           ref_time = current_row['last_confirmed']
     else:
       status = current_row['request_type']
+      ref_time = current_row['last_confirmed']
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:

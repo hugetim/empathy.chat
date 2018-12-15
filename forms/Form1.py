@@ -113,11 +113,11 @@ class Form1(Form1Template):
     elif self.current_status == "matched":
       new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
       if new_status == "requesting":
-        alert("The empathy offer was canceled.")
+        alert("The empathy offer was cancelled.")
         self.current_status = new_status
         self.set_form_status(self.current_status)
       elif new_status == "offering":
-        alert("The empathy request was canceled.")
+        alert("The empathy request was cancelled.")
         self.current_status = new_status
         self.set_form_status(self.current_status)
       elif new_status in ["empathy", None]:
@@ -312,8 +312,8 @@ class Form1(Form1Template):
     elif out=="timer elapsed":
       anvil.server.call('cancel',self.user_id)
       self.current_status = None
-      alert("Request canceled due to failure to confirm within "
-            + str(p.CONFIRM_WAIT_SECONDS) + " seconds.",
+      alert("Request cancelled due to "
+            + str(p.CONFIRM_WAIT_SECONDS) + " seconds of inactivity.",
             dismissible=False)
       self.set_form_status(self.current_status)
     else:
