@@ -126,18 +126,6 @@ components:
   name: column_panel_1
   layout_properties: {slot: left-nav}
   components:
-  - type: Button
-    properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Log out, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: logout_button
-    layout_properties: {grid_position: 'JWPQNT,ZCSJJE'}
-    event_bindings: {click: logout_button_click}
-  - type: Spacer
-    properties: {height: 32}
-    name: spacer_1
-    layout_properties: {grid_position: 'IVHFNT,KBCLDF'}
   - type: Label
     properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
       visible: true, text: Settings, font_size: null, font: '', spacing_above: small,
@@ -153,3 +141,26 @@ components:
     name: request_em_check_box
     layout_properties: {grid_position: 'SUWGUP,XXYHSU'}
     event_bindings: {change: request_em_check_box_change}
+  - type: Spacer
+    properties: {height: 32}
+    name: spacer_1
+    layout_properties: {grid_position: 'XPPKQQ,PZHGFH'}
+  - type: Button
+    properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Log out, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: logout_button
+    layout_properties: {grid_position: 'ASDYYZ,SAIRCP'}
+    event_bindings: {click: logout_button_click}
+  - type: Label
+    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'Version 0.4.0, last updated 12/15/2018', font_size: 10,
+      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: ''}
+    name: version_label
+    layout_properties: {grid_position: 'JRIBJY,ZMULGU'}
+- type: Spacer
+  properties: {height: 32}
+  name: spacer_1_copy
+  layout_properties: {grid_position: 'XPPKQQ,PZHGFH'}
