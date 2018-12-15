@@ -10,6 +10,7 @@ import parameters as p
 class TimerForm(TimerFormTemplate):
   seconds_left = None
   user_id = None
+  alt_avail = None
   def __init__(self, seconds_left, user_id, current_status, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
@@ -32,7 +33,10 @@ class TimerForm(TimerFormTemplate):
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
+    self.alt_avail = alt_avail
     if new_status != self.current_status:
+      if alt_avail==True:
+        new_status = "alt " + new_status
       print new_status
       self.raise_event("x-close-alert", value=new_status)
     else:
@@ -55,8 +59,11 @@ class TimerForm(TimerFormTemplate):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
     self.seconds_left -= 1
     self.timer_label.text = str(self.seconds_left) + " seconds left to confirm."
-    if self.seconds_left == 0:
-      self.raise_event("x-close-alert", value="timer elapsed")
+    if self.seconds_left <= 0:
+      if alt_avail==True:
+        self.raise_event("x-close-alert", value="alt timer elapsed")
+      else:
+        self.raise_event("x-close-alert", value="timer elapsed")
 
   #def return_back(self, confirmed):
   #  if confirmed:
