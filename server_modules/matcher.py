@@ -261,7 +261,41 @@ def add_request(user_id, request_type):
   else:
     num_emailed = request_emails(request_type)
   return jitsi_code, last_confirmed, num_emailed, alt_avail
-
+      
+    
+def _create_match(exclude_user=None):
+  'attempt to create a match from existing requests'
+  # find top request in queue
+  all_requests = [r for r in app_tables.requests.search(current=True,
+                                                        match_id=None)
+                    if r['user']!=exclude_user]
+  if all_requests:
+    all_cms = [r['cancelled_matches'] for r in all_requests]
+    all_eligible_requests = [r for r in all_requests if r['cancelled_matches']==min(all_cms)]
+    current_row = min(all_eligible_requests, key=lambda row: row['start'])
+    
+  request_type = current_row['request_type']
+  user = current_row['user']
+  if request_type=="offering":
+    requests = [r for r in app_tables.requests.search(current=True,
+                                                      match_id=None)
+                  if r['user'] not in [user, exclude_user]]
+  else: 
+    assert request_type=="requesting"
+    requests = [r for r in app_tables.requests.search(current=True,
+                                                      request_type="offering",
+                                                      match_id=None)
+                  if r['user'] not in [user, exclude_user]]
+  if requests:
+    jitsi_code = new_jitsi_code()
+    current_row['match_id'] = new_match_id()
+    current_row['jitsi_code'] = jitsi_code
+    cms = [r['cancelled_matches'] for r in requests]
+    eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
+    earliest_request = min(eligible_requests, key=lambda row: row['start'])
+    earliest_request['match_id'] = current_row['match_id']
+    earliest_request['jitsi_code'] = jitsi_code
+    
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -274,12 +308,13 @@ def cancel(user_id):
   user = anvil.server.session['user']
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
+    current_row['current'] = False
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
       for row in matched_requests:
         row['match_id'] = None
         row['jitsi_code'] = None
-    current_row['current'] = False
+      _create_match()
 
     
 @anvil.server.callable
@@ -298,6 +333,7 @@ def cancel_match(user_id):
       for row in matched_requests:
         row['match_id'] = None
         row['jitsi_code'] = None
+      _create_match(user)
     current_row['cancelled_matched'] += 1
     return current_row['request_type']
   else:
@@ -329,6 +365,7 @@ def cancel_other(user_id):
         if row['user'] != user:
           row['cancelled_matches'] += 1
           #row['current'] = False
+          _create_match(row['user'])
     return current_row['request_type']
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
