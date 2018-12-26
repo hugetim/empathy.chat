@@ -25,6 +25,16 @@ import re
 #   return 42
 #
 
+def _prune_requests():
+  'Prune unmatched requests'
+  timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS)
+  cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
+  old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
+                    if r['last_confirmed'] < cutoff_r)
+  for row in old_requests:
+    row['current'] = False
+
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def prune(user_id):
@@ -35,16 +45,11 @@ def prune(user_id):
   prunes old requests/offers
   updates last_confirmed if currently requesting/offering/pinged
   '''
-  timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS)
   assume_complete = datetime.timedelta(hours=4) 
   _initialize_session(user_id)
   user = anvil.server.session['user']
   # Prune unmatched requests, including from this user
-  cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
-  old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
-                    if r['last_confirmed'] < cutoff_r)
-  for row in old_requests:
-    row['current'] = False
+  _prune_requests()
   # Complete old matches for this user
   cutoff_m = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_complete
   old_matches = (m for m in app_tables.matches.search(users=[user], complete=[0])
@@ -108,6 +113,7 @@ def _confirm_wait(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_status(user_id):
+  _prune_requests()
   return _get_status(user_id)
 
 
@@ -185,6 +191,7 @@ def _get_status(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_tallies():
+  _prune_requests()
   user = anvil.server.session['user']
   return _get_tallies(user)
 

@@ -44,13 +44,14 @@ class Form1(Form1Template):
     elif self.current_status == "pinged":
       timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
       if alt_avail and timer.seconds <= p.CONFIRM_MATCH_SECONDS:
+        self.seconds_left = p.CONFIRM_WAIT_SECONDS
         self.current_status = anvil.server.call('cancel_match',self.user_id)
       else:
         self.seconds_left = p.CONFIRM_WAIT_SECONDS
         if alt_avail:     
           seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
         else:
-          seconds_left = p.CONFIRM_WAIT_SECONDS       
+          seconds_left = self.seconds_left       
         self.confirm_match(seconds_left)
     self.set_form_status(self.current_status)
     
@@ -150,7 +151,7 @@ class Form1(Form1Template):
       if self.seconds_left<=0:
         self.current_status = anvil.server.call('cancel_other',self.user_id)
         self.set_form_status(self.current_status)
-    
+
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.current_status = None
@@ -176,7 +177,11 @@ class Form1(Form1Template):
                                 + " minutes of inactivity. After "
                                 + str(p.CONFIRM_WAIT_SECONDS/60)
                                 + " minutes, a dialog will appear allowing "
-                                + "you to refresh your request.)")
+                                + "you to refresh your request. "
+                                + "Also, you will only have "
+                                + str(p.CONFIRM_MATCH_SECONDS)
+                                + " seconds to confirm a match if someone "
+                                + "else is available to take your place.)")
         self.note_label.visible = True
         self.status.bold = False
         self.set_jitsi_link("")
@@ -349,7 +354,7 @@ class Form1(Form1Template):
     elif out=="alt timer elapsed":
       self.current_status = anvil.server.call('cancel_match',self.user_id)
       alert("A match was found, but the time available for you to confirm ("
-            + str(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
+            + str(p.CONFIRM_MATCH_SECONDS) + " seconds) elapsed.",
             dismissible=False)
     else:
       print out
@@ -380,6 +385,9 @@ class Form1(Form1Template):
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     anvil.server.call('set_request_em', self.request_em_check_box.checked)
+
+
+
 
 
 
