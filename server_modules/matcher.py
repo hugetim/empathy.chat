@@ -27,7 +27,7 @@ import re
 
 def _prune_requests():
   'Prune unmatched requests'
-  timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS)
+  timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
   cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
                     if r['last_confirmed'] < cutoff_r)
