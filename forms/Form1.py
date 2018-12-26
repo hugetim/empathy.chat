@@ -13,6 +13,7 @@ class Form1(Form1Template):
   current_status = None
   user_id = None
   seconds_left = None
+  confirming_wait = False
   trust_level = 0
   tallies =	dict(requesting = 0,
                  offering = 0,
@@ -23,6 +24,7 @@ class Form1(Form1Template):
     
     self.user_id = anvil.users.get_user().get_id()
     # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
+    self.confirming_wait = False
     t, r, m, s, ref_time, n, alt_avail, e = anvil.server.call('prune',self.user_id)
     if e==False:
       alert('Your email address is not approved to use this app. '
@@ -38,21 +40,23 @@ class Form1(Form1Template):
       if alt_avail:
         self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS - timer.seconds
       else:
-        self.seconds_left = p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
+        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
       if self.seconds_left<=0:
         self.current_status = anvil.server.call('cancel_other',self.user_id)
     elif self.current_status == "pinged":
       timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
-      if alt_avail and timer.seconds <= p.CONFIRM_MATCH_SECONDS:
-        self.seconds_left = p.CONFIRM_WAIT_SECONDS
+      if alt_avail and timer.seconds > p.CONFIRM_MATCH_SECONDS:
+        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
         self.current_status = anvil.server.call('cancel_match',self.user_id)
       else:
-        self.seconds_left = p.CONFIRM_WAIT_SECONDS
+        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
         if alt_avail:     
           seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
         else:
           seconds_left = self.seconds_left       
         self.confirm_match(seconds_left)
+    elif self.current_status in ["requesting", "offering"]:
+      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
     self.set_form_status(self.current_status)
     
   def request_button_click(self, **event_args):
@@ -78,6 +82,7 @@ class Form1(Form1Template):
                            timeout=10)
         n.show()
       self.current_status = request_type
+      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
     else:
       timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
       if timer.seconds > p.BUFFER_SECONDS:
@@ -85,11 +90,23 @@ class Form1(Form1Template):
         if alt_avail:
           self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS
         else:
-          self.seconds_left = p.CONFIRM_WAIT_SECONDS - timer + p.BUFFER_SECONDS
+          self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds + p.BUFFER_SECONDS
       else:
         self.current_status = "empathy"
     self.set_form_status(self.current_status) 
 
+  def cancel_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.current_status = None
+    anvil.server.call('cancel',self.user_id)
+    self.set_form_status(self.current_status)
+
+  def complete_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.current_status = None
+    anvil.server.call('match_complete',self.user_id)
+    self.set_form_status(self.current_status)    
+    
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     if self.current_status in ["requesting", "offering"]:
@@ -102,7 +119,7 @@ class Form1(Form1Template):
           seconds_left = p.CONFIRM_MATCH_SECONDS
         else:
           timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
-          seconds_left = p.CONFIRM_WAIT_SECONDS - timer
+          seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
         self.confirm_match(seconds_left)
       elif new_status in ["empathy", None]:
         self.current_status = new_status
@@ -113,13 +130,14 @@ class Form1(Form1Template):
         self.set_form_status(self.current_status)
     elif self.current_status == "matched":
       new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
-      if new_status == "requesting":
-        alert("The empathy offer was cancelled.")
+      if new_status in ["requesting", "offering"]:
+        if new_status=="requesting":
+          alert("The empathy offer was cancelled.")
+        else:
+          alert("The empathy request was cancelled.")
         self.current_status = new_status
-        self.set_form_status(self.current_status)
-      elif new_status == "offering":
-        alert("The empathy request was cancelled.")
-        self.current_status = new_status
+        timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
+        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
         self.set_form_status(self.current_status)
       elif new_status in ["empathy", None]:
         self.current_status = new_status
@@ -132,7 +150,7 @@ class Form1(Form1Template):
         if alt_avail:
           self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS - timer.seconds
         else:
-          self.seconds_left = p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
+          self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
     elif self.current_status == None:
       self.tallies = anvil.server.call_s('get_tallies')
       self.update_tally_label()
@@ -141,8 +159,7 @@ class Form1(Form1Template):
     """This method is called Every 1 seconds"""
     if self.current_status in ["requesting", "offering"]:
       self.seconds_left -= 1
-      if self.seconds_left<=0:
-        self.seconds_left = p.CONFIRM_WAIT_SECONDS
+      if self.seconds_left<=p.CONFIRM_WAIT_SECONDS & self.confirming_wait==False:
         self.confirm_wait()
     elif self.current_status == "matched":
       self.seconds_left -= 1
@@ -152,25 +169,77 @@ class Form1(Form1Template):
         self.current_status = anvil.server.call('cancel_other',self.user_id)
         self.set_form_status(self.current_status)
 
-  def cancel_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    self.current_status = None
-    anvil.server.call('cancel',self.user_id)
-    self.set_form_status(self.current_status)
+  def confirm_wait(self):
+    assert self.current_status in ["requesting", "offering"]
+    self.confirming_wait = True
+    f = TimerForm(p.CONFIRM_WAIT_SECONDS, self.user_id, self.current_status)
+    out = confirm(content=f,
+                  title="Continue waiting for a match?",
+                  large=False,
+                  dismissible=False)
+    if out==True:
+      anvil.server.call('confirm_wait',self.user_id)
+      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
+      self.set_form_status(self.current_status)
+    elif out==False:
+      anvil.server.call('cancel',self.user_id)
+      self.current_status = None
+      self.set_form_status(self.current_status)
+    elif out=="timer elapsed":
+      anvil.server.call('cancel',self.user_id)
+      self.current_status = None
+      alert("Request cancelled due to "
+            + str(2*p.CONFIRM_WAIT_SECONDS) + " seconds of inactivity.",
+            dismissible=False)
+      self.set_form_status(self.current_status)
+    else:
+      print out
+      assert out in ["pinged","alt pinged","empathy"]
+      self.current_status = out
+      if out=="alt pinged":
+        self.current_status = "pinged"
+        alt_avail = True
+      if out in ["pinged","alt pinged"]:
+        if self.match_em_check_box.checked:
+          anvil.server.call('match_email')
+        if alt_avail:
+          seconds_left = p.CONFIRM_MATCH_SECONDS
+        else:
+          seconds_left = self.seconds_left
+        self.confirm_match(seconds_left)
+      if self.current_status not in ["requesting", "offering"]:
+        self.set_form_status(self.current_status)
+    self.confirming_wait = False
 
-  def complete_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    self.current_status = None
-    anvil.server.call('match_complete',self.user_id)
-    self.set_form_status(self.current_status)
-  
+  def confirm_match(self, seconds):
+    assert self.current_status=="pinged"
+    f = TimerForm(seconds, self.user_id, self.current_status)
+    out = confirm(content=f,
+                  title="A match is available. Are you ready?",
+                  large=False,
+                  dismissible=False)
+    if out==True:
+      self.current_status = "empathy"
+    elif out==False or out=="timer elapsed":
+      anvil.server.call('cancel',self.user_id)
+      self.current_status = None
+    elif out=="alt timer elapsed":
+      self.current_status = anvil.server.call('cancel_match',self.user_id)
+      alert("A match was found, but the time available for you to confirm ("
+            + str(p.CONFIRM_MATCH_SECONDS) + " seconds) elapsed.",
+            dismissible=False)
+    else:
+      print out
+      assert out in [None, "requesting", "offering"]
+      self.current_status = out          
+        
   def set_form_status(self, user_status):
     if user_status:
       self.request_button.visible = False
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
       self.tally_label.visible = False
-      if user_status in ["requesting","offering"]:
+      if user_status in ["requesting", "offering"]:
         self.status.text = ("Status: Requesting an empathy exchange. ")
         self.note_label.text = ("(Note: Your request will be cancelled after "
                                 + str(2*p.CONFIRM_WAIT_SECONDS/60)
@@ -188,7 +257,7 @@ class Form1(Form1Template):
         self.complete_button.visible = False
         self.cancel_button.visible = True
         self.set_drop_down(user_status)
-        self.seconds_left = p.CONFIRM_WAIT_SECONDS
+        #self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
         self.match_em_check_box.visible = True
       else:
         assert user_status in ["matched", "empathy"]
@@ -297,69 +366,7 @@ class Form1(Form1Template):
     else:
       self.jitsi_link.url = "https://meet.jit.si/" + jitsi_code
       self.jitsi_link.text = self.jitsi_link.url
-      self.jitsi_link.visible = True
-    
-  def confirm_wait(self):
-    assert self.current_status in ["requesting", "offering"]
-    f = TimerForm(p.CONFIRM_WAIT_SECONDS, self.user_id, self.current_status)
-    out = confirm(content=f,
-                  title="Continue waiting for a match?",
-                  large=False,
-                  dismissible=False)
-    if out==True:
-      anvil.server.call('confirm_wait',self.user_id)
-      #seconds_left reset by set_form_status() below
-      self.set_form_status(self.current_status)
-    elif out==False:
-      anvil.server.call('cancel',self.user_id)
-      self.current_status = None
-      self.set_form_status(self.current_status)
-    elif out=="timer elapsed":
-      anvil.server.call('cancel',self.user_id)
-      self.current_status = None
-      alert("Request cancelled due to "
-            + str(p.CONFIRM_WAIT_SECONDS) + " seconds of inactivity.",
-            dismissible=False)
-      self.set_form_status(self.current_status)
-    else:
-      print out
-      assert out in ["pinged","alt pinged","empathy"]
-      self.current_status = out
-      if out=="alt pinged":
-        self.current_status = "pinged"
-        alt_avail = True
-      if out in ["pinged","alt pinged"]:
-        if self.match_em_check_box.checked:
-          anvil.server.call('match_email')
-        if alt_avail:
-          seconds_left = p.CONFIRM_MATCH_SECONDS
-        else:
-          seconds_left = self.seconds_left
-        self.confirm_match(seconds_left)
-      if self.current_status not in ["requesting", "offering"]:
-        self.set_form_status(self.current_status)
-
-  def confirm_match(self, seconds):
-    assert self.current_status=="pinged"
-    f = TimerForm(seconds, self.user_id, self.current_status)
-    out = confirm(content=f,
-                  title="A match is available. Are you ready?",
-                  large=False,
-                  dismissible=False)
-    if out==True:
-      self.current_status = "empathy"
-    elif out==False or out=="timer elapsed":
-      anvil.server.call('cancel',self.user_id)
-      self.current_status = None
-    elif out=="alt timer elapsed":
-      self.current_status = anvil.server.call('cancel_match',self.user_id)
-      alert("A match was found, but the time available for you to confirm ("
-            + str(p.CONFIRM_MATCH_SECONDS) + " seconds) elapsed.",
-            dismissible=False)
-    else:
-      print out
-      assert out in [None,"requesting","offering"]
-      self.current_status = out      
+      self.jitsi_link.visible = True  
         
   def set_drop_down(self, request_type):
     if request_type=="requesting":
