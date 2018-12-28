@@ -9,7 +9,7 @@ import datetime
 from TimerForm import TimerForm
 import parameters as p
 
-class Form1(Form1Template):
+class MatchForm(MatchFormTemplate):
   current_status = None
   user_id = None
   seconds_left = None
