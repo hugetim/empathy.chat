@@ -261,7 +261,6 @@ class MatchForm(MatchFormTemplate):
         self.match_em_check_box.visible = True
       else:
         assert user_status in ["matched", "empathy"]
-        self.cancel_button.visible = False    
         self.note_label.visible = False
         if user_status=="matched":
           self.timer_label.text = ("A match has been found and they have up to " 
@@ -270,6 +269,7 @@ class MatchForm(MatchFormTemplate):
           self.status.text = "A match should be ready soon. Set up Jitsi at: "
           self.status.bold = False
           jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
+          self.cancel_button.visible = True
           self.complete_button.visible = False
         else:
           assert user_status=="empathy"
@@ -283,6 +283,7 @@ class MatchForm(MatchFormTemplate):
             return self.set_form_status(self.current_status)
           self.status.text = "You have a confirmed match. Use Jitsi to meet: "
           self.status.bold = True
+          self.cancel_button.visible = False 
           self.complete_button.visible = True
         self.set_jitsi_link(jitsi_code)     
         self.set_drop_down(request_type)
