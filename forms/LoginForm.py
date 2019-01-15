@@ -16,4 +16,4 @@ class LoginForm (LoginFormTemplate):
     # Do the code here to show this blank form.
     while not anvil.users.get_user():
       anvil.users.login_with_form()
-    open_form('Form1')
+    open_form('MatchForm')
