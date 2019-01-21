@@ -80,6 +80,7 @@ def _initialize_session(user_id):
   anvil.server.session['user_id'] = user_id
   user = app_tables.users.get_by_id(user_id)
   anvil.server.session['user'] = user
+  anvil.server.session['test_record'] = None
 
   
 def _email_in_list(email):
