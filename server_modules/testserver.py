@@ -58,7 +58,8 @@ def test_clear():
       user.delete()
     for request in row['test_requests']:
       request.delete()                              
-    row.delete()                    
+    row.delete()
+  anvil.server.session['test_record'] = None
     
 
 @anvil.server.callable
