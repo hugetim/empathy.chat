@@ -32,7 +32,7 @@ class MatchForm(MatchFormTemplate):
       self.logout_user()
     self.trust_level = t
     if self.trust_level >= 10:
-      self.test_column_panel.visible = True
+      self.test_mode.visible = True
     self.request_em_check_box.checked = r
     self.match_em_check_box.checked = m
     self.tallies = n
@@ -395,6 +395,11 @@ class MatchForm(MatchFormTemplate):
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     anvil.server.call('set_request_em', self.request_em_check_box.checked)
+
+  def test_mode_change(self, **event_args):
+    """This method is called when this checkbox is checked or unchecked"""
+    self.test_column_panel.visible = self.test_mode.checked
+
 
 
 
