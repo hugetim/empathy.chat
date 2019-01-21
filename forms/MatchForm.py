@@ -406,6 +406,7 @@ class MatchForm(MatchFormTemplate):
     if email:
       anvil.server.call('test_add_user', email)
       self.test_adduser_email.text = ""
+      self.refresh_data_bindings()
     else:
       alert("Email address required to add user.")
 
@@ -421,6 +422,10 @@ class MatchForm(MatchFormTemplate):
   def test_clear_click(self, **event_args):
     """This method is called when the button is clicked"""
     anvil.server.call('test_clear')
+    self.refresh_data_bindings()
+    
+  def test_requestuser_drop_down_refresh(self):
+    return anvil.server.call('test_get_user_list')
 
 
 

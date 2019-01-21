@@ -58,4 +58,13 @@ def test_clear():
       user.delete()
     for request in row['test_requests']:
       request.delete()                              
-    row.delete()                                 
+    row.delete()                    
+    
+
+@anvil.server.callable
+def test_get_user_list():
+  users = app_tables.users.search()
+  to_return = []
+  for user in users:
+    to_return += [(user['email'], user.get_id())]
+  return to_return
