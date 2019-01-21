@@ -53,9 +53,9 @@ def create_tests_record():
 @anvil.tables.in_transaction
 def test_clear():
   test_records = app_tables.test_data.search()
-  for row in test_records:
-    for user in test_records['test_users']:
+  for row in test_records:  
+    for user in row['test_users']:
       user.delete()
-    for request in test_records['test_requests']:
+    for request in row['test_requests']:
       request.delete()                              
-                                     
+    row.delete()                                 
