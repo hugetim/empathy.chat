@@ -1,22 +1,16 @@
-allow_embedding: false
-package_name: empathy_room
-name: Empathy Room
-startup_form: LoginForm
-renamed: true
-runtime_options: {version: 1, server_version: python2-sandbox}
-metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico'}
+dependencies: []
 services:
 - source: /runtime/services/anvil/users.yml
   client_config: {use_microsoft: false, require_secure_passwords: true, use_email: true,
     allow_remember_me: true, allow_signup: true, remember_me_seq: 1, enable_automatically: true,
     confirm_email: true, remember_me_days: 30, use_google: true, use_facebook: false}
-  server_config: {user_table: 16111}
+  server_config: {user_table: 18972}
 - source: /runtime/services/tables.yml
   client_config: {}
-  server_config: {auto_create_missing_columns: false}
+  server_config: {}
 - source: /runtime/services/anvil/email.yml
   client_config: {}
-  server_config: {test_mode: false}
+  server_config: {}
 - source: /runtime/services/google.yml
   client_config:
     app_files:
@@ -70,4 +64,11 @@ services:
         vnd.oasis.opendocument.spreadsheet: 'https://docs.google.com/spreadsheets/export?id=1B83uzQS6mIdNiws1cv2DUm0A0oAnZbEaun97KepEurg&exportFormat=ods'}
       thumbnailLink: https://docs.google.com/feeds/vt?gd=true&id=1B83uzQS6mIdNiws1cv2DUm0A0oAnZbEaun97KepEurg&v=3&s=AMedNnoAAAAAW_ywGdRho6kNNvyipwMzn2Z3MHtZUGeY&sz=s220
       ownerNames: [Tim Huegerich]
-  server_config: {delegation_refresh_token: 1/N0H-b0gLLeU4SdsatVQ-jwHXZZSYNEVPQRaanj8sTNWOPKci9ppIt9EsbzQ-IH1V}
+  server_config: {}
+package_name: empathy_room
+allow_embedding: false
+name: Clone of Empathy Room
+runtime_options: {version: 1, server_version: python2-sandbox}
+metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico'}
+startup_form: LoginForm
+renamed: true
