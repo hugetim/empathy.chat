@@ -31,7 +31,7 @@ class MatchForm(MatchFormTemplate):
             + 'Contact empathyroom@gmail.com for help.')
       self.logout_user()
     self.trust_level = t
-    if self.trust_level >= 10:
+    if self.trust_level >= p.TEST_TRUST_LEVEL:
       self.test_mode.visible = True
     self.request_em_check_box.checked = r
     self.match_em_check_box.checked = m
