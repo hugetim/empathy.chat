@@ -7,9 +7,10 @@ import anvil.users
 import anvil.server
 import datetime
 
+
 @anvil.server.callable
 @anvil.tables.in_transaction
-def add_user(em, level = 1, r_em = False, m_em = False):
+def test_add_user(em, level = 1, r_em = False, m_em = False):
   new_user = app_tables.users.add_row(email=em,
                                       enabled=True,
                                       trust_level=level,
@@ -18,9 +19,10 @@ def add_user(em, level = 1, r_em = False, m_em = False):
                                      )
   return new_user.get_id()
 
+
 @anvil.server.callable
 @anvil.tables.in_transaction
-def add_request(user_id, request_type = "offering"):
+def test_add_request(user_id, request_type = "offering"):
   user = app_tables.users.get_by_id(user_id)
   now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
   new_row = app_tables.requests.add_row(user=user,

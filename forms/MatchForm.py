@@ -400,6 +400,23 @@ class MatchForm(MatchFormTemplate):
     """This method is called when this checkbox is checked or unchecked"""
     self.test_column_panel.visible = self.test_mode.checked
 
+  def test_adduser_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    email = self.test_adduser_email.text
+    if email:
+      anvil.server.call('test_add_user', email)
+    else:
+      alert("Email address required to add user.")
+
+  def test_request_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    user = self.test_requestuser_drop_down.selected_value
+    requesttype = self.test_requesttype_drop_down.selected_value
+    if user and requesttype:
+      anvil.server.call('test_add_request', user, requesttype)
+    else:
+      alert("User and request type required to add request.")
+
 
 
 

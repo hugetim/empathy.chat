@@ -179,22 +179,23 @@ components:
         border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
         font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
         background: '', bold: false, underline: false}
-      name: add_user_email
+      name: test_adduser_email
       layout_properties: {grid_position: 'XIMKVT,GIUAGF'}
     - type: Button
       properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
         foreground: '', visible: true, text: Add User, font_size: null, font: '',
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
-      name: add_user_button
+      name: test_adduser_button
       layout_properties: {grid_position: 'GAQHCB,CXXGFC'}
+      event_bindings: {click: test_adduser_button_click}
     - type: Spacer
       properties: {height: 32}
       name: spacer_2
       layout_properties: {grid_position: 'KTZPEC,HQHEML'}
     - type: DropDown
       properties: {}
-      name: usertest_drop_down
+      name: test_requestuser_drop_down
       layout_properties: {grid_position: 'YGFMUC,ZKTFTS'}
     - type: DropDown
       properties:
@@ -214,8 +215,16 @@ components:
         background: ''
         bold: false
         underline: false
-      name: drop_down_2
+      name: test_requesttype_drop_down
       layout_properties: {grid_position: 'POPIZV,ZIUYFE'}
+    - type: Button
+      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: true, text: Add Request, font_size: null, font: '',
+        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
+      name: test_request_button
+      layout_properties: {grid_position: 'MDYDAL,UHDJZK'}
+      event_bindings: {click: test_request_button_click}
 - type: Spacer
   properties: {height: 32}
   name: spacer_1_copy
