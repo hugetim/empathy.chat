@@ -418,6 +418,11 @@ class MatchForm(MatchFormTemplate):
     else:
       alert("User and request type required to add request.")
 
+  def test_clear_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    anvil.server.call('test_clear')
+
+
 
 
 

@@ -46,6 +46,16 @@ def test_add_request(user_id, request_type = "offering"):
 def create_tests_record():
   return app_tables.test_data.add_row(test_users = [],
                                       test_requests = []
-                                     ) 
-                                      
+                                     )
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def test_clear():
+  test_records = app_tables.test_data.search()
+  for row in test_records:
+    for user in test_records['test_users']:
+      user.delete()
+    for request in test_records['test_requests']:
+      request.delete()                              
                                      
