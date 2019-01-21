@@ -282,27 +282,27 @@ def _create_match(exclude_user=None):
     all_eligible_requests = [r for r in all_requests if r['cancelled_matches']==min(all_cms)]
     current_row = min(all_eligible_requests, key=lambda row: row['start'])
     
-  request_type = current_row['request_type']
-  user = current_row['user']
-  if request_type=="offering":
-    requests = [r for r in app_tables.requests.search(current=True,
-                                                      match_id=None)
-                  if r['user'] not in [user, exclude_user]]
-  else: 
-    assert request_type=="requesting"
-    requests = [r for r in app_tables.requests.search(current=True,
-                                                      request_type="offering",
-                                                      match_id=None)
-                  if r['user'] not in [user, exclude_user]]
-  if requests:
-    jitsi_code = new_jitsi_code()
-    current_row['match_id'] = new_match_id()
-    current_row['jitsi_code'] = jitsi_code
-    cms = [r['cancelled_matches'] for r in requests]
-    eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
-    earliest_request = min(eligible_requests, key=lambda row: row['start'])
-    earliest_request['match_id'] = current_row['match_id']
-    earliest_request['jitsi_code'] = jitsi_code
+    request_type = current_row['request_type']
+    user = current_row['user']
+    if request_type=="offering":
+      requests = [r for r in app_tables.requests.search(current=True,
+                                                        match_id=None)
+                    if r['user'] not in [user, exclude_user]]
+    else: 
+      assert request_type=="requesting"
+      requests = [r for r in app_tables.requests.search(current=True,
+                                                        request_type="offering",
+                                                        match_id=None)
+                    if r['user'] not in [user, exclude_user]]
+    if requests:
+      jitsi_code = new_jitsi_code()
+      current_row['match_id'] = new_match_id()
+      current_row['jitsi_code'] = jitsi_code
+      cms = [r['cancelled_matches'] for r in requests]
+      eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
+      earliest_request = min(eligible_requests, key=lambda row: row['start'])
+      earliest_request['match_id'] = current_row['match_id']
+      earliest_request['jitsi_code'] = jitsi_code
     
 
 @anvil.server.callable
