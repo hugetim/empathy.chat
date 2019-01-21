@@ -67,7 +67,7 @@ services:
   server_config: {}
 package_name: empathy_room
 allow_embedding: false
-name: Clone of Empathy Room
+name: Empathy Room test
 runtime_options: {version: 1, server_version: python2-sandbox}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico'}
 startup_form: LoginForm

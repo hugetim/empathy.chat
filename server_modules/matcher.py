@@ -241,7 +241,7 @@ def add_request(user_id, request_type):
   '''
   return jitsi_code, last_confirmed (both None if no immediate match), num_emailed
   '''
-  assert anvil.server.session['user_id']==user_id
+  #assert anvil.server.session['user_id']==user_id
   jitsi_code = None
   last_confirmed = None
   num_emailed = 0
