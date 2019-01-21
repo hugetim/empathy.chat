@@ -198,8 +198,7 @@ components:
       properties: {}
       name: test_requestuser_drop_down
       layout_properties: {grid_position: 'YGFMUC,ZKTFTS'}
-      data_bindings:
-      - {property: items, code: self.test_requestuser_drop_down_refresh()}
+      data_bindings: []
     - type: DropDown
       properties:
         role: null
