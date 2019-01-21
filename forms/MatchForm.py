@@ -174,7 +174,7 @@ class MatchForm(MatchFormTemplate):
   def confirm_wait(self):
     assert self.current_status in ["requesting", "offering"]
     self.confirming_wait = True
-    f = TimerForm(p.CONFIRM_WAIT_SECONDS, self.user_id, self.current_status)
+    f = TimerForm(self.seconds_left, self.user_id, self.current_status)
     out = confirm(content=f,
                   title="Continue waiting for a match?",
                   large=False,
@@ -187,7 +187,7 @@ class MatchForm(MatchFormTemplate):
       anvil.server.call('cancel',self.user_id)
       self.current_status = None
       self.set_form_status(self.current_status)
-    elif out=="timer elapsed":
+    elif out=="timer elapsed" or out==None:
       anvil.server.call('cancel',self.user_id)
       self.current_status = None
       alert("Request cancelled due to "
