@@ -405,6 +405,7 @@ class MatchForm(MatchFormTemplate):
     email = self.test_adduser_email.text
     if email:
       anvil.server.call('test_add_user', email)
+      self.test_adduser_email.text = ""
     else:
       alert("Email address required to add user.")
 
