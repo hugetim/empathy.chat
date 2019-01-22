@@ -180,7 +180,8 @@ class MatchForm(MatchFormTemplate):
     assert self.current_status in ["requesting", "offering"]
     self.confirming_wait = True
     now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-    self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - (now - self.last_confirmed) 
+    timer = now - self.last_confirmed
+    self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds 
     f = TimerForm(self.seconds_left, self.user_id, self.current_status)
     out = confirm(content=f,
                   title="Continue waiting for a match?",
@@ -244,7 +245,8 @@ class MatchForm(MatchFormTemplate):
       self.current_status = out
     if out in ["alt timer elapsed", "requesting", "offering"]:
       now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - (now - self.last_confirmed)
+      timer = now - self.last_confirmed
+      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
         
   def set_form_status(self, user_status):
     if user_status:
