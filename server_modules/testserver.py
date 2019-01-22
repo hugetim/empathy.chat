@@ -65,11 +65,13 @@ def test_add_request(user_id, request_type = "offering"):
   current_row = new_row
   if requests:
     jitsi_code = matcher.new_jitsi_code()
+    current_row['ping_start'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
     current_row['match_id'] = matcher.new_match_id()
     current_row['jitsi_code'] = jitsi_code
     cms = [r['cancelled_matches'] for r in requests]
     eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
     earliest_request = min(eligible_requests, key=lambda row: row['start'])
+    earliest_request['ping_start'] = current_row['ping_start']
     earliest_request['match_id'] = current_row['match_id']
     earliest_request['jitsi_code'] = jitsi_code
     last_confirmed = earliest_request['last_confirmed']
