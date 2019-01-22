@@ -70,7 +70,7 @@ def prune(user_id):
     else:
       user['enabled'] = False
   current_status, ref_time, tallies, alt_avail = _get_status(user_id)
-  if current_status in ('requesting', 'offering', 'pinged'):
+  if current_status in ('requesting', 'offering', 'pinged','matched'):
     _confirm_wait(user_id)
   return trust_level, request_em, match_em, current_status, ref_time, tallies, alt_avail, email_in_list
 

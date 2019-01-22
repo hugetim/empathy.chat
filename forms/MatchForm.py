@@ -269,6 +269,7 @@ class MatchForm(MatchFormTemplate):
         self.note_label.visible = True
         self.status.bold = False
         self.set_jitsi_link("")
+        self.timer_label.visible = False
         self.complete_button.visible = False
         self.cancel_button.visible = True
         self.set_drop_down(user_status)
@@ -373,6 +374,8 @@ class MatchForm(MatchFormTemplate):
     self.tally_label.text = temp
     if len(temp) > 0:
       self.tally_label.visible = True
+    else:
+      self.tally_label.visible = False
       
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
