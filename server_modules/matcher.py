@@ -26,12 +26,17 @@ import re
 #
 
 def _prune_requests():
-  'Prune unmatched requests'
+  'Prune definitely outdated requests, unmatched then matched'
   timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
   cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
                     if r['last_confirmed'] < cutoff_r)
   for row in old_requests:
+    row['current'] = False
+  
+  old_ping_requests = (r for r in app_tables.requests.search(current=True)
+                       if (r['ping_start'] < cutoff_r and match_id != None))
+  for row in old_ping_requests:
     row['current'] = False
 
 
@@ -48,9 +53,9 @@ def prune(user_id):
   assume_complete = datetime.timedelta(hours=4) 
   _initialize_session(user_id)
   user = anvil.server.session['user']
-  # Prune unmatched requests, including from this user
+  # Prune requests, including from this user
   _prune_requests()
-  # Complete old matches for this user
+  # Complete old commenced matches for this user
   cutoff_m = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_complete
   old_matches = (m for m in app_tables.matches.search(users=[user], complete=[0])
                    if m['match_commence'] < cutoff_m)
@@ -150,7 +155,7 @@ def _get_status(user_id):
                                                                match_id=None)]    
         alt_avail = len(altrequests) > 0
         if alt_avail:
-          ref_time = match_start
+          ref_time = current_row['ping_start']
         else:
           last_confirmeds = [r['last_confirmed'] for r
                              in app_tables.requests.search(match_id=current_row['match_id'])
@@ -173,7 +178,7 @@ def _get_status(user_id):
                                                                match_id=None)]    
         alt_avail = len(altrequests) > 0
         if alt_avail:
-          ref_time = match_start
+          ref_time = current_row['ping_start']
         else:
           ref_time = current_row['last_confirmed']
     else:
@@ -256,11 +261,13 @@ def add_request(user_id, request_type):
   current_row = add_request_row(user_id, request_type)
   if requests:
     jitsi_code = new_jitsi_code()
+    current_row['ping_start'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
     current_row['match_id'] = new_match_id()
     current_row['jitsi_code'] = jitsi_code
     cms = [r['cancelled_matches'] for r in requests]
     eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
     earliest_request = min(eligible_requests, key=lambda row: row['start'])
+    earliest_request['ping_start'] = current_row['ping_start'] 
     earliest_request['match_id'] = current_row['match_id']
     earliest_request['jitsi_code'] = jitsi_code
     last_confirmed = earliest_request['last_confirmed']
@@ -295,11 +302,13 @@ def _create_match(exclude_user=None):
                     if r['user'] not in [user, exclude_user]]
     if requests:
       jitsi_code = new_jitsi_code()
+      current_row['ping_start'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
       current_row['match_id'] = new_match_id()
       current_row['jitsi_code'] = jitsi_code
       cms = [r['cancelled_matches'] for r in requests]
       eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
       earliest_request = min(eligible_requests, key=lambda row: row['start'])
+      earliest_request['ping_start'] = current_row['ping_start'] 
       earliest_request['match_id'] = current_row['match_id']
       earliest_request['jitsi_code'] = jitsi_code
     
@@ -319,6 +328,7 @@ def cancel(user_id):
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
       for row in matched_requests:
+        row['ping_start'] = None
         row['match_id'] = None
         row['jitsi_code'] = None
       _create_match()
@@ -338,6 +348,7 @@ def cancel_match(user_id):
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
       for row in matched_requests:
+        row['ping_start'] = None
         row['match_id'] = None
         row['jitsi_code'] = None
       _create_match(user)
@@ -367,6 +378,7 @@ def cancel_other(user_id):
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'])
       for row in matched_requests:
+        row['ping_start'] = None
         row['match_id'] = None
         row['jitsi_code'] = None
         if row['user'] != user:
