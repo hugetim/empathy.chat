@@ -207,6 +207,7 @@ class MatchForm(MatchFormTemplate):
       print out
       assert out in ["pinged","alt pinged","empathy"]
       self.current_status = out
+      alt_avail = False
       if out=="alt pinged":
         self.current_status = "pinged"
         alt_avail = True
