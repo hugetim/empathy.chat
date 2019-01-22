@@ -384,7 +384,7 @@ def cancel_other(user_id):
         if row['user'] != user:
           row['cancelled_matches'] += 1
           #row['current'] = False
-          _create_match(row['user'])
+      _create_match(row['user'])
     return current_row['request_type']
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
