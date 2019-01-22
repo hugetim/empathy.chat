@@ -35,7 +35,7 @@ def _prune_requests():
     row['current'] = False
   
   old_ping_requests = (r for r in app_tables.requests.search(current=True)
-                       if (r['ping_start'] < cutoff_r and match_id != None))
+                       if (match_id != None and r['ping_start'] < cutoff_r))
   for row in old_ping_requests:
     row['current'] = False
 
