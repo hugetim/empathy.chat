@@ -104,10 +104,9 @@ def confirm_wait(user_id):
   
   
 def _confirm_wait(user_id):
-  '''updates last_confirmed for current (unmatched) request'''
+  '''updates last_confirmed for current request'''
   user = app_tables.users.get_by_id(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
-  assert current_row['match_id']==None
   current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
   
