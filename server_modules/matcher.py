@@ -280,6 +280,7 @@ def add_request(user_id, request_type):
 def _create_match(exclude_user=None):
   'attempt to create a match from existing requests'
   # find top request in queue
+  print("running create match")
   all_requests = [r for r in app_tables.requests.search(current=True,
                                                         match_id=None)
                     if r['user']!=exclude_user]
