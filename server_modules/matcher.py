@@ -386,17 +386,7 @@ def cancel_other(user_id):
           row['cancelled_matches'] += 1
           #row['current'] = False
       _create_match()
-      current_status, ref_time, tallies, alt_avail = _get_status(user_id)
-      return current_status
-    return current_row['request_type']
-  else:
-    current_matches = app_tables.matches.search(users=[user], complete=[0])
-    for row in current_matches:
-      i = row['users'].index(user)
-      if row['complete'][i]==0:
-        return "empathy"
-    return None
-
+  return _get_status(user_id)
     
 @anvil.server.callable
 @anvil.tables.in_transaction

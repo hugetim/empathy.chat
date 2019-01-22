@@ -48,7 +48,7 @@ class MatchForm(MatchFormTemplate):
       else:
         self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
       if self.seconds_left<=0:
-        self.current_status = anvil.server.call('cancel_other',self.user_id)
+        self.current_status, ref_time, self.tallies, alt_avail = anvil.server.call('cancel_other',self.user_id)
     elif self.current_status == "pinged":
       timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
       if alt_avail and timer.seconds > p.CONFIRM_MATCH_SECONDS:
@@ -172,7 +172,7 @@ class MatchForm(MatchFormTemplate):
       self.timer_label.text = ("A match has been found and they have up to " 
                                + str(self.seconds_left) + " seconds to confirm.")
       if self.seconds_left<=0:
-        self.current_status = anvil.server.call('cancel_other',self.user_id)
+        self.current_status, ref_time, self.tallies, alt_avail = anvil.server.call('cancel_other',self.user_id)
         now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
         timer = now - self.last_confirmed
         self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
