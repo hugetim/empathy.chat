@@ -116,7 +116,7 @@ class MatchForm(MatchFormTemplate):
     
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
-    if self.current_status in ["requesting", "offering"]:
+    if self.current_status in ["requesting", "offering"] and self.confirming_wait==False:
       new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
       if new_status == "pinged":
         if self.match_em_check_box.checked:
@@ -159,7 +159,6 @@ class MatchForm(MatchFormTemplate):
         else:
           self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
     elif self.current_status == None:
-      self.tallies = anvil.server.call_s('get_tallies')
       self.update_tally_label()
 
   def timer_2_tick(self, **event_args):
@@ -174,6 +173,9 @@ class MatchForm(MatchFormTemplate):
                                + str(self.seconds_left) + " seconds to confirm.")
       if self.seconds_left<=0:
         self.current_status = anvil.server.call('cancel_other',self.user_id)
+        now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+        timer = now - self.last_confirmed
+        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
         self.set_form_status(self.current_status)
 
   def confirm_wait(self):
@@ -320,6 +322,7 @@ class MatchForm(MatchFormTemplate):
       self.update_tally_label()
       
   def update_tally_label(self):
+    self.tallies = anvil.server.call_s('get_tallies')
     temp = ""
     if self.tallies['requesting'] > 1:
       if self.tallies['offering'] > 0:
