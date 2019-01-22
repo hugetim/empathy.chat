@@ -8,10 +8,12 @@ import anvil.users
 import datetime
 from TimerForm import TimerForm
 import parameters as p
+import anvil.tz
 
 class MatchForm(MatchFormTemplate):
   current_status = None
   user_id = None
+  last_confirmed = None
   seconds_left = None
   confirming_wait = False
   trust_level = 0
@@ -37,6 +39,8 @@ class MatchForm(MatchFormTemplate):
     self.match_em_check_box.checked = m
     self.tallies = n
     self.current_status = s
+    tzinfo=anvil.tz.tzutc()
+    self.last_confirmed = datetime.datetime.utcnow.replace(tzinfo=anvil.tz.tzutc())  
     if self.current_status == "matched":
       timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
       if alt_avail:
@@ -95,6 +99,7 @@ class MatchForm(MatchFormTemplate):
           self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds + p.BUFFER_SECONDS
       else:
         self.current_status = "empathy"
+    self.last_confirmed = datetime.datetime.utcnow.replace(tzinfo=anvil.tz.tzutc())
     self.set_form_status(self.current_status) 
 
   def cancel_button_click(self, **event_args):
@@ -161,7 +166,7 @@ class MatchForm(MatchFormTemplate):
     """This method is called Every 1 seconds"""
     if self.current_status in ["requesting", "offering"]:
       self.seconds_left -= 1
-      if self.seconds_left<=p.CONFIRM_WAIT_SECONDS & self.confirming_wait==False:
+      if self.seconds_left<=p.CONFIRM_WAIT_SECONDS and self.confirming_wait==False:
         self.confirm_wait()
     elif self.current_status == "matched":
       self.seconds_left -= 1
@@ -174,6 +179,8 @@ class MatchForm(MatchFormTemplate):
   def confirm_wait(self):
     assert self.current_status in ["requesting", "offering"]
     self.confirming_wait = True
+    now = datetime.datetime.utcnow.replace(tzinfo=anvil.tz.tzutc())
+    self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - (now - self.last_confirmed) 
     f = TimerForm(self.seconds_left, self.user_id, self.current_status)
     out = confirm(content=f,
                   title="Continue waiting for a match?",
@@ -182,6 +189,7 @@ class MatchForm(MatchFormTemplate):
     if out==True:
       anvil.server.call('confirm_wait',self.user_id)
       self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
+      self.last_confirmed = datetime.datetime.utcnow.replace(tzinfo=anvil.tz.tzutc())
       self.set_form_status(self.current_status)
     elif out==False:
       anvil.server.call('cancel',self.user_id)
@@ -233,7 +241,10 @@ class MatchForm(MatchFormTemplate):
     else:
       print out
       assert out in [None, "requesting", "offering"]
-      self.current_status = out          
+      self.current_status = out
+    if out in ["alt timer elapsed", "requesting", "offering"]:
+      now = datetime.datetime.utcnow.replace(tzinfo=anvil.tz.tzutc())
+      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - (now - self.last_confirmed)
         
   def set_form_status(self, user_status):
     if user_status:
