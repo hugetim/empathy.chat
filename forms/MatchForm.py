@@ -11,60 +11,75 @@ import parameters as p
 import anvil.tz
 
 class MatchForm(MatchFormTemplate):
-  current_status = None
   user_id = None
-  last_confirmed = None
-  seconds_left = None
-  confirming_wait = False
   trust_level = 0
-  tallies =	dict(requesting = 0,
-                 offering = 0,
+  tallies =    dict(receive_first = 0,
+                 will_offer_first = 0,
                  request_em = 0)
+  status = None
+  last_confirmed = None # or other_last_confirmed, whichever is earlier
+  ping_start = None
+
+
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
-    
+
     self.user_id = anvil.users.get_user().get_id()
     # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
     self.confirming_wait = False
-    t, r, m, s, ref_time, n, alt_avail, e = anvil.server.call('prune',self.user_id)
+    tl, re, me, tallies, rt, s, lc, ps, e = anvil.server.call('prune',self.user_id)
     if e==False:
       alert('Your email address is not approved to use this app. '
             + 'Contact empathyroom@gmail.com for help.')
       self.logout_user()
-    self.trust_level = t
+    self.trust_level = tl
     if self.trust_level >= p.TEST_TRUST_LEVEL:
       self.test_mode.visible = True
-    self.request_em_check_box.checked = r
-    self.match_em_check_box.checked = m
-    self.tallies = n
-    self.current_status = s
-    tzinfo=anvil.tz.tzutc()
-    self.last_confirmed = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())  
-    if self.current_status == "matched":
-      timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
-      if alt_avail:
-        self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS - timer.seconds
-      else:
-        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
-      if self.seconds_left<=0:
-        self.current_status, ref_time, self.tallies, alt_avail = anvil.server.call('cancel_other',self.user_id)
-    elif self.current_status == "pinged":
-      timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
-      if alt_avail and timer.seconds > p.CONFIRM_MATCH_SECONDS:
-        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
-        self.current_status = anvil.server.call('cancel_match',self.user_id)
-      else:
-        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
-        if alt_avail:     
-          seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
-        else:
-          seconds_left = self.seconds_left       
-        self.confirm_match(seconds_left)
-    elif self.current_status in ["requesting", "offering"]:
-      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
-    self.set_form_status(self.current_status)
-    
+    self.request_em_check_box.checked = re
+    self.match_em_check_box.checked = me
+    self.tallies = tallies
+    self.self.drop_down_1.selected_value = rt
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
+    self.reset_status()
+### old "pinging" code: prune should ensure this is not the case, changing status accordingly
+# if self.seconds_left<=0:
+#   self.current_status, ref_time, self.tallies, alt_avail = anvil.server.call('cancel_other',self.user_id)
+
+### old "pinged" code: should never be after prune-change to matched, requesting, or none
+       #   timer = datetime.datetime.now(ref_time.tzinfo) - ref_tim
+          # if alt_avail and timer.seconds > p.CONFIRM_MATCH_SECONDS:
+          #   self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
+          #   self.current_status = anvil.server.call('cancel_match',self.user_id)
+          # else:
+          #   self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
+          #   if alt_avail:
+          #     seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
+          #   else:
+          #     seconds_left = self.seconds_left
+          #   self.confirm_match(seconds_left)
+
+  def seconds_left():
+    'derive seconds_left from status, last_confirmed, and ping_start'
+    now = datetime.datetime.now(ref_time.tzinfo)
+    if self.status in ["pinging-mult", "pinging-one", "pinged-mult", "pinged-one"]:
+      min_confirm_match = p.CONFIRM_MATCH_SECONDS - (now - self.ping_start).seconds
+      if self.status=="pinging-mult":
+        return min_confirm_match + p.BUFFER_SECONDS
+      elif self.status=="pinged-mult":
+        return min_confirm_match
+    wait_time = p.CONFIRM_WAIT_SECONDS - (now - self.last_confirmed).seconds
+    if self.status=="pinging-one":
+      return max(min_confirm_match, joint_wait_time) + p.BUFFER_SECONDS
+    elif self.status=="pinged-one":
+      return max(min_confirm_match, joint_wait_time)
+    elif self.status in ["requesting", "requesting-confirm"]:
+      return wait_time
+    else:
+      print("MatchForm.seconds_left(): " + self.status)
+
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if self.drop_down_1.selected_value=="Not ready to offer empathy first":
@@ -100,7 +115,7 @@ class MatchForm(MatchFormTemplate):
       else:
         self.current_status = "empathy"
     self.last_confirmed = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-    self.set_form_status(self.current_status) 
+    self.set_form_status(self.current_status)
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -112,8 +127,8 @@ class MatchForm(MatchFormTemplate):
     """This method is called when the button is clicked"""
     self.current_status = None
     anvil.server.call('match_complete',self.user_id)
-    self.set_form_status(self.current_status)    
-    
+    self.set_form_status(self.current_status)
+
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     if self.current_status in ["requesting", "offering"] and self.confirming_wait==False:
@@ -169,7 +184,7 @@ class MatchForm(MatchFormTemplate):
         self.confirm_wait()
     elif self.current_status == "matched":
       self.seconds_left -= 1
-      self.timer_label.text = ("A match has been found and they have up to " 
+      self.timer_label.text = ("A match has been found and they have up to "
                                + str(self.seconds_left) + " seconds to confirm.")
       if self.seconds_left<=0:
         self.current_status, ref_time, self.tallies, alt_avail = anvil.server.call('cancel_other',self.user_id)
@@ -183,7 +198,7 @@ class MatchForm(MatchFormTemplate):
     self.confirming_wait = True
     now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
     timer = now - self.last_confirmed
-    self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds 
+    self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
     f = TimerForm(self.seconds_left, self.user_id, self.current_status)
     out = confirm(content=f,
                   title="Continue waiting for a match?",
@@ -250,7 +265,7 @@ class MatchForm(MatchFormTemplate):
       now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
       timer = now - self.last_confirmed
       self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
-        
+
   def set_form_status(self, user_status):
     if user_status:
       self.request_button.visible = False
@@ -282,7 +297,7 @@ class MatchForm(MatchFormTemplate):
         assert user_status in ["matched", "empathy"]
         self.note_label.visible = False
         if user_status=="matched":
-          self.timer_label.text = ("A match has been found and they have up to " 
+          self.timer_label.text = ("A match has been found and they have up to "
                                    + str(self.seconds_left) + " seconds to confirm.")
           self.timer_label.visible = True
           self.status.text = "A match should be ready soon. Set up Jitsi at: "
@@ -293,7 +308,7 @@ class MatchForm(MatchFormTemplate):
         else:
           assert user_status=="empathy"
           self.timer_label.visible = False
-          (new_status, match_start,  
+          (new_status, match_start,
            jitsi_code, request_type) = anvil.server.call('match_commenced',
                                                          self.user_id)
           if new_status != "empathy":
@@ -302,9 +317,9 @@ class MatchForm(MatchFormTemplate):
             return self.set_form_status(self.current_status)
           self.status.text = "You have a confirmed match. Use Jitsi to meet: "
           self.status.bold = True
-          self.cancel_button.visible = False 
+          self.cancel_button.visible = False
           self.complete_button.visible = True
-        self.set_jitsi_link(jitsi_code)     
+        self.set_jitsi_link(jitsi_code)
         self.set_drop_down(request_type)
         self.match_em_check_box.visible = False
     else:
@@ -320,7 +335,7 @@ class MatchForm(MatchFormTemplate):
       self.drop_down_1.foreground = "black"
       self.match_em_check_box.visible = False
       self.update_tally_label()
-      
+
   def update_tally_label(self):
     self.tallies = anvil.server.call_s('get_tallies')
     temp = ""
@@ -349,7 +364,7 @@ class MatchForm(MatchFormTemplate):
       if self.tallies['offering'] > 1:
         temp = (str(self.tallies['offering'])
                 + ' current requests for an empathy exchange, '
-                + 'all of which are willing to offer empathy first.') 
+                + 'all of which are willing to offer empathy first.')
       elif self.tallies['offering']==1:
         temp = (str(self.tallies['offering'])
                 + ' current request for an empathy exchange '
@@ -380,7 +395,7 @@ class MatchForm(MatchFormTemplate):
       self.tally_label.visible = True
     else:
       self.tally_label.visible = False
-      
+
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
       self.jitsi_link.visible = False
@@ -389,25 +404,25 @@ class MatchForm(MatchFormTemplate):
     else:
       self.jitsi_link.url = "https://meet.jit.si/" + jitsi_code
       self.jitsi_link.text = self.jitsi_link.url
-      self.jitsi_link.visible = True  
-        
+      self.jitsi_link.visible = True
+
   def set_drop_down(self, request_type):
     if request_type=="requesting":
       self.drop_down_1.selected_value = "Not ready to offer empathy first"
     else:
       assert request_type=="offering"
       self.drop_down_1.selected_value = "Willing to offer empathy first"
- 
+
   def logout_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.logout_user()
 
-  def logout_user(self):  
+  def logout_user(self):
     anvil.users.logout()
     self.set_form_status(None)
     self.user_id = None
     open_form('LoginForm')
-       
+
   def match_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     anvil.server.call('set_match_em', self.match_em_check_box.checked)
@@ -445,17 +460,7 @@ class MatchForm(MatchFormTemplate):
     """This method is called when the button is clicked"""
     anvil.server.call('test_clear')
     self.test_requestuser_drop_down_refresh()
-    
+
   def test_requestuser_drop_down_refresh(self):
     out = anvil.server.call('test_get_user_list')
     self.test_requestuser_drop_down.items = out
-
-
-
-
-
-
-
-
-
-
