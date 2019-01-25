@@ -256,10 +256,7 @@ class MatchForm(MatchFormTemplate):
           (new_status, match_start,
            jitsi_code, request_type) = anvil.server.call('match_commenced',
                                                          self.user_id)
-          if new_status != "empathy":
-            assert new_status != "matched"
-            self.current_status = new_status
-            return self.set_form_status(self.current_status)
+          assert new_status=="matched"
           self.status.text = "You have a confirmed match. Use Jitsi to meet: "
           self.status.bold = True
           self.cancel_button.visible = False
