@@ -20,7 +20,6 @@ class MatchForm(MatchFormTemplate):
   last_confirmed = None # this or other_last_confirmed, whichever is earlier
   ping_start = None
 
-
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
@@ -44,22 +43,6 @@ class MatchForm(MatchFormTemplate):
     self.last_confirmed = lc
     self.ping_start = ps
     self.reset_status()
-### old "pinging" code: prune should ensure this is not the case, changing status accordingly
-# if self.seconds_left<=0:
-#   self.current_status, ref_time, self.tallies, alt_avail = anvil.server.call('cancel_other',self.user_id)
-
-### old "pinged" code: should never be after prune-change to matched, requesting, or none
-       #   timer = datetime.datetime.now(ref_time.tzinfo) - ref_tim
-          # if alt_avail and timer.seconds > p.CONFIRM_MATCH_SECONDS:
-          #   self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
-          #   self.current_status = anvil.server.call('cancel_match',self.user_id)
-          # else:
-          #   self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
-          #   if alt_avail:
-          #     seconds_left = p.CONFIRM_MATCH_SECONDS - timer.seconds
-          #   else:
-          #     seconds_left = self.seconds_left
-          #   self.confirm_match(seconds_left)
 
   def seconds_left():
     'derive seconds_left from status, last_confirmed, and ping_start'
@@ -92,10 +75,6 @@ class MatchForm(MatchFormTemplate):
     if self.status=="requesting" and num_emailed > 0:
       self.emailed_notification(num_emailed).show()
     self.reset_status()
-    ## This logic should be handled server-side
-    #  timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
-    #  if timer.seconds <= p.BUFFER_SECONDS:
-    #    self.current_status = "empathy"
 
   def emailed_notification(self, num):
     'assumes num>0, returns Notification'
