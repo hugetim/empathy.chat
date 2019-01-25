@@ -13,7 +13,7 @@ import anvil.tz
 class MatchForm(MatchFormTemplate):
   user_id = None
   trust_level = 0
-  tallies =    dict(receive_first = 0,
+  tallies = dict(receive_first = 0,
                  will_offer_first = 0,
                  request_em = 0)
   status = None
@@ -89,7 +89,7 @@ class MatchForm(MatchFormTemplate):
     self.status = s
     self.last_confirmed = lc
     self.ping_start = ps
-    if s == None and num_emailed > 0:
+    if self.status=="requesting" and num_emailed > 0:
       self.emailed_notification(num_emailed).show()
     self.reset_status()
     ## This logic should be handled server-side
@@ -123,49 +123,31 @@ class MatchForm(MatchFormTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
-    if self.current_status in ["requesting", "offering"] and self.confirming_wait==False:
-      new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
-      if new_status == "pinged":
-        if self.match_em_check_box.checked:
-          anvil.server.call('match_email')
-        self.current_status = new_status
-        if alt_avail:
-          seconds_left = p.CONFIRM_MATCH_SECONDS
-        else:
-          timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
-          seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
-        self.confirm_match(seconds_left)
-      elif new_status in ["empathy", None]:
-        self.current_status = new_status
-        self.tallies = n
-      elif new_status != self.current_status:
-        print new_status
-      if self.current_status not in ["requesting", "offering"]:
-        self.set_form_status(self.current_status)
-    elif self.current_status == "matched":
-      new_status, ref_time, n, alt_avail = anvil.server.call_s('get_status',self.user_id)
-      if new_status in ["requesting", "offering"]:
-        if new_status=="requesting":
-          alert("The empathy offer was cancelled.")
-        else:
-          alert("The empathy request was cancelled.")
-        self.current_status = new_status
-        timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
-        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
-        self.set_form_status(self.current_status)
-      elif new_status in ["empathy", None]:
-        self.current_status = new_status
-        self.tallies = n
-        self.set_form_status(self.current_status)
-      elif new_status != self.current_status:
-        print new_status
+    if self.status=="requesting":
+      s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
+      self.status = s
+      self.last_confirmed = lc
+      self.ping_start = ps
+      if self.status=="requesting":
+        self.seconds_left = self.seconds_left()
       else:
-        timer = datetime.datetime.now(ref_time.tzinfo) - ref_time
-        if alt_avail:
-          self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS - timer.seconds
-        else:
-          self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS + p.BUFFER_SECONDS - timer.seconds
-    elif self.current_status == None:
+        if self.status in ["pinged-one", "pinged-mult"]:
+          if self.match_em_check_box.checked:
+            anvil.server.call('match_email')
+        self.reset_status()
+    elif self.status in ["pinging-one", "pinging-mult"]:
+      s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
+      self.status = s
+      self.last_confirmed = lc
+      self.ping_start = ps
+      if self.status in ["pinging-one", "pinging-mult"]:
+        self.seconds_left = self.seconds_left()
+      else:
+        if self.status=="requesting":
+          alert("The other empathy request was cancelled.")
+        self.reset_status()
+    elif self.status == None:
+      self.tallies = anvil.server.call_s('get_tallies')
       self.update_tally_label()
 
   def timer_2_tick(self, **event_args):
@@ -207,11 +189,14 @@ class MatchForm(MatchFormTemplate):
       print out
       assert out in ["pinged-one","pinged-mult","matched"]
       self.status = out
-      if out in ["pinged","pinged-mult"]:
-        if self.match_em_check_box.checked:
-          anvil.server.call('match_email')
-        ###### Fully set pinged state, as in timer_1
-        self.confirm_match(self.seconds_left())
+      if out in ["pinged-one","pinged-mult"]:
+        s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
+        self.status = s
+        self.last_confirmed = lc
+        self.ping_start = ps
+        if self.status in ["pinged-one", "pinged-mult"]:
+          if self.match_em_check_box.checked:
+            anvil.server.call('match_email')
     self.reset_status()
 
   def confirm_match(self, seconds):
@@ -312,7 +297,6 @@ class MatchForm(MatchFormTemplate):
       self.update_tally_label()
 
   def update_tally_label(self):
-    self.tallies = anvil.server.call_s('get_tallies')
     temp = ""
     if self.tallies['requesting'] > 1:
       if self.tallies['offering'] > 0:
