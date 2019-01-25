@@ -110,9 +110,6 @@ class MatchForm(MatchFormTemplate):
       if self.status=="requesting":
         self.seconds_left = self.seconds_left()
       else:
-        if self.status in ["pinged-one", "pinged-mult"]:
-          if self.match_em_check_box.checked:
-            anvil.server.call('match_email')
         self.reset_status()
     elif self.status in ["pinging-one", "pinging-mult"]:
       s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
@@ -173,14 +170,13 @@ class MatchForm(MatchFormTemplate):
         self.status = s
         self.last_confirmed = lc
         self.ping_start = ps
-        if self.status in ["pinged-one", "pinged-mult"]:
-          if self.match_em_check_box.checked:
-            anvil.server.call('match_email')
       else:
         self.status = out #i.e. "matched", given above assert
     self.reset_status()
 
   def confirm_match(self):
+    if self.match_em_check_box.checked:
+      anvil.server.call('match_email')
     f = TimerForm(self.seconds_left, self.user_id, self.status)
     out = confirm(content=f,
                   title="A match is available. Are you ready?",
