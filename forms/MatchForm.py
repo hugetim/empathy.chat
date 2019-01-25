@@ -176,19 +176,19 @@ class MatchForm(MatchFormTemplate):
                   large=False,
                   dismissible=False)
     if out==True:
-      self.status = "requesting"
       self.last_confirmed = anvil.server.call('confirm_wait',self.user_id)
+      self.status = "requesting"
     elif out in [False, "timer elapsed", None]:
-      self.status = None
+
       self.tallies = anvil.server.call('cancel',self.user_id)
       if out in ["timer elapsed", None]:
         alert("Request cancelled due to "
               + str(p.WAIT_SECONDS) + " seconds of inactivity.",
               dismissible=False)
+      self.status = None
     else:
       print out
       assert out in ["pinged-one","pinged-mult","matched"]
-      self.status = out
       if out in ["pinged-one","pinged-mult"]:
         s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
         self.status = s
@@ -197,33 +197,40 @@ class MatchForm(MatchFormTemplate):
         if self.status in ["pinged-one", "pinged-mult"]:
           if self.match_em_check_box.checked:
             anvil.server.call('match_email')
+      else:
+        self.status = out #i.e. "matched", given above assert
     self.reset_status()
 
-  def confirm_match(self, seconds):
-    assert self.current_status=="pinged"
-    f = TimerForm(seconds, self.user_id, self.current_status)
+  def confirm_match(self):
+    f = TimerForm(self.seconds_left, self.user_id, self.status)
     out = confirm(content=f,
                   title="A match is available. Are you ready?",
                   large=False,
                   dismissible=False)
     if out==True:
-      self.current_status = "empathy"
-    elif out==False or out=="timer elapsed":
-      anvil.server.call('cancel',self.user_id)
-      self.current_status = None
+      self.status = "matched"
+    elif out in [False, "timer elapsed"]:
+      self.tallies = anvil.server.call('cancel',self.user_id)
+      self.status = None
     elif out=="alt timer elapsed":
-      self.current_status = anvil.server.call('cancel_match',self.user_id)
+      s, lc, ps, self.tallies = anvil.server.call('cancel_match',self.user_id)
       alert("A match was found, but the time available for you to confirm ("
             + str(p.CONFIRM_MATCH_SECONDS) + " seconds) elapsed.",
             dismissible=False)
+      self.status = s
+      self.last_confirmed = lc
+      self.ping_start = ps
+    elif out==None:
+      self.tallies = anvil.server.call_s('get_tallies')
+      self.status = None
     else:
       print out
-      assert out in [None, "requesting", "offering"]
-      self.current_status = out
-    if out in ["alt timer elapsed", "requesting", "offering"]:
-      now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-      timer = now - self.last_confirmed
-      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
+      assert out in ["requesting", "requesting-confirm"]
+      s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
+      self.status = s
+      self.last_confirmed = lc
+      self.ping_start = ps
+    self.reset_status()
 
   def reset_status(self):
     if self.status:
@@ -255,6 +262,8 @@ class MatchForm(MatchFormTemplate):
         if self.status=="requesting-confirm":
           return self.confirm_wait()
       else:
+        if self.status in ["pinged-one", "pinged-mult"]:
+          return self.confirm_match()
         assert self.status in ["pinging-one", "pinging-mult", "matched"]
         self.note_label.visible = False
         if self.status in ["pinging-one", "pinging-mult"]:
