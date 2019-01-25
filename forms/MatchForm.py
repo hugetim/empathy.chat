@@ -111,15 +111,15 @@ class MatchForm(MatchFormTemplate):
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.current_status = None
-    anvil.server.call('cancel',self.user_id)
-    self.set_form_status(self.current_status)
+    self.status = None
+    self.tallies = anvil.server.call('cancel',self.user_id)
+    self.reset_status()
 
   def complete_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.current_status = None
-    anvil.server.call('match_complete',self.user_id)
-    self.set_form_status(self.current_status)
+    self.status = None
+    self.tallies = anvil.server.call('match_complete',self.user_id)
+    self.reset_status()
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
@@ -403,7 +403,8 @@ class MatchForm(MatchFormTemplate):
 
   def logout_user(self):
     anvil.users.logout()
-    self.set_form_status(None)
+    self.status = None
+    self.reset_status()
     self.user_id = None
     open_form('LoginForm')
 
