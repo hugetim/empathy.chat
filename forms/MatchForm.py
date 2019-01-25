@@ -70,7 +70,7 @@ class MatchForm(MatchFormTemplate):
         return min_confirm_match + p.BUFFER_SECONDS
       elif self.status=="pinged-mult":
         return min_confirm_match
-    wait_time = p.CONFIRM_WAIT_SECONDS - (now - self.last_confirmed).seconds
+    wait_time = p.WAIT_SECONDS - (now - self.last_confirmed).seconds
     if self.status=="pinging-one":
       return max(min_confirm_match, joint_wait_time) + p.BUFFER_SECONDS
     elif self.status=="pinged-one":
@@ -170,67 +170,49 @@ class MatchForm(MatchFormTemplate):
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
-    if self.current_status in ["requesting", "offering"]:
+    if self.status=="requesting":
       self.seconds_left -= 1
-      if self.seconds_left<=p.CONFIRM_WAIT_SECONDS and self.confirming_wait==False:
-        self.confirm_wait()
-    elif self.current_status == "matched":
+      if self.seconds_left <= p.CONFIRM_WAIT_SECONDS:
+        self.status = "requesting-confirm"
+        self.reset_status()
+    elif self.status in ["pinging-one", "pinging-mult"]:
       self.seconds_left -= 1
       self.timer_label.text = ("A match has been found and they have up to "
                                + str(self.seconds_left) + " seconds to confirm.")
       if self.seconds_left<=0:
-        self.current_status, ref_time, self.tallies, alt_avail = anvil.server.call('cancel_other',self.user_id)
-        now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-        timer = now - self.last_confirmed
-        self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
-        self.set_form_status(self.current_status)
+        self.status = "pinging-pending" # in case server call takes more than a second
+        s, lc, ps, self.tallies = anvil.server.call('cancel_other',self.user_id)
+        self.status = s
+        self.last_confirmed = lc
+        self.ping_start = ps
+        self.reset_status()
 
   def confirm_wait(self):
-    assert self.current_status in ["requesting", "offering"]
-    self.confirming_wait = True
-    now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-    timer = now - self.last_confirmed
-    self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
-    f = TimerForm(self.seconds_left, self.user_id, self.current_status)
+    f = TimerForm(self.seconds_left, self.user_id, self.status)
     out = confirm(content=f,
                   title="Continue waiting for a match?",
                   large=False,
                   dismissible=False)
     if out==True:
-      anvil.server.call('confirm_wait',self.user_id)
-      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
-      self.last_confirmed = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-      self.set_form_status(self.current_status)
-    elif out==False:
-      anvil.server.call('cancel',self.user_id)
-      self.current_status = None
-      self.set_form_status(self.current_status)
-    elif out=="timer elapsed" or out==None:
-      anvil.server.call('cancel',self.user_id)
-      self.current_status = None
-      alert("Request cancelled due to "
-            + str(2*p.CONFIRM_WAIT_SECONDS) + " seconds of inactivity.",
-            dismissible=False)
-      self.set_form_status(self.current_status)
+      self.status = "requesting"
+      self.last_confirmed = anvil.server.call('confirm_wait',self.user_id)
+    elif out in [False, "timer elapsed", None]:
+      self.status = None
+      self.tallies = anvil.server.call('cancel',self.user_id)
+      if out in ["timer elapsed", None]:
+        alert("Request cancelled due to "
+              + str(p.WAIT_SECONDS) + " seconds of inactivity.",
+              dismissible=False)
     else:
       print out
-      assert out in ["pinged","alt pinged","empathy"]
-      self.current_status = out
-      alt_avail = False
-      if out=="alt pinged":
-        self.current_status = "pinged"
-        alt_avail = True
-      if out in ["pinged","alt pinged"]:
+      assert out in ["pinged-one","pinged-mult","matched"]
+      self.status = out
+      if out in ["pinged","pinged-mult"]:
         if self.match_em_check_box.checked:
           anvil.server.call('match_email')
-        if alt_avail:
-          seconds_left = p.CONFIRM_MATCH_SECONDS
-        else:
-          seconds_left = self.seconds_left
-        self.confirm_match(seconds_left)
-      if self.current_status not in ["requesting", "offering"]:
-        self.set_form_status(self.current_status)
-    self.confirming_wait = False
+        ###### Fully set pinged state, as in timer_1
+        self.confirm_match(self.seconds_left())
+    self.reset_status()
 
   def confirm_match(self, seconds):
     assert self.current_status=="pinged"
@@ -285,6 +267,8 @@ class MatchForm(MatchFormTemplate):
         self.complete_button.visible = False
         self.cancel_button.visible = True
         self.match_em_check_box.visible = True
+        if self.status=="requesting-confirm":
+          return self.confirm_wait()
       else:
         assert self.status in ["pinging-one", "pinging-mult", "matched"]
         self.note_label.visible = False
