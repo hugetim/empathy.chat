@@ -17,7 +17,7 @@ class MatchForm(MatchFormTemplate):
                  will_offer_first = 0,
                  request_em = 0)
   status = None
-  last_confirmed = None # or other_last_confirmed, whichever is earlier
+  last_confirmed = None # this or other_last_confirmed, whichever is earlier
   ping_start = None
 
 
@@ -82,40 +82,32 @@ class MatchForm(MatchFormTemplate):
 
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    if self.drop_down_1.selected_value=="Not ready to offer empathy first":
-      request_type = 'requesting'
+    request_type = self.drop_down_1.selected_value
+    jitsi_code, s, lc, ps, num_emailed = anvil.server.call('add_request',
+                                                           self.user_id,
+                                                           request_type)
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
+    if s == None and num_emailed > 0:
+      self.emailed_notification(num_emailed).show()
+    self.reset_status()
+    ## This logic should be handled server-side
+    #  timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
+    #  if timer.seconds <= p.BUFFER_SECONDS:
+    #    self.current_status = "empathy"
+
+  def emailed_notification(self, num):
+    'assumes num>0, returns Notification'
+    if num_emailed==1:
+      message = ('Someone has been sent a '
+                 + 'notification email about your request.')
     else:
-      request_type = 'offering'
-    jitsi_code, last_confirmed, num_emailed, alt_avail = anvil.server.call('add_request',
-                                                                           self.user_id,
-                                                                           request_type)
-    if jitsi_code == None:
-      if num_emailed > 0:
-        if num_emailed==1:
-          n = Notification('Someone has been sent a '
-                           + 'notification email about your request.',
-                           title='Email notification sent',
-                           timeout=10)
-        else:
-          n = Notification(str(num_emailed) + ' others have been sent '
-                           + 'notification emails about your request.',
-                           title='Email notifications sent',
-                           timeout=10)
-        n.show()
-      self.current_status = request_type
-      self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
-    else:
-      timer = datetime.datetime.now(last_confirmed.tzinfo) - last_confirmed
-      if timer.seconds > p.BUFFER_SECONDS:
-        self.current_status = "matched"
-        if alt_avail:
-          self.seconds_left = p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS
-        else:
-          self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds + p.BUFFER_SECONDS
-      else:
-        self.current_status = "empathy"
-    self.last_confirmed = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-    self.set_form_status(self.current_status)
+      message = (str(num_emailed) + ' others have been sent '
+                 + 'notification emails about your request.')
+    return Notification(message,
+                        title='Email notifications sent',
+                        timeout=10)
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -266,13 +258,15 @@ class MatchForm(MatchFormTemplate):
       timer = now - self.last_confirmed
       self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS - timer.seconds
 
-  def set_form_status(self, user_status):
-    if user_status:
+  def reset_status(self):
+    if self.status:
+      if self.status != "matched":
+        self.seconds_left = self.seconds_left()
       self.request_button.visible = False
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
       self.tally_label.visible = False
-      if user_status in ["requesting", "offering"]:
+      if self.status in ["requesting", "requesting-confirm"]:
         self.status.text = ("Status: Requesting an empathy exchange. ")
         self.note_label.text = ("(Note: Your request will be cancelled after "
                                 + str(2*p.CONFIRM_WAIT_SECONDS/60)
@@ -290,13 +284,11 @@ class MatchForm(MatchFormTemplate):
         self.timer_label.visible = False
         self.complete_button.visible = False
         self.cancel_button.visible = True
-        self.set_drop_down(user_status)
-        #self.seconds_left = 2*p.CONFIRM_WAIT_SECONDS
         self.match_em_check_box.visible = True
       else:
-        assert user_status in ["matched", "empathy"]
+        assert self.status in ["pinging-one", "pinging-mult", "matched"]
         self.note_label.visible = False
-        if user_status=="matched":
+        if self.status in ["pinging-one", "pinging-mult"]:
           self.timer_label.text = ("A match has been found and they have up to "
                                    + str(self.seconds_left) + " seconds to confirm.")
           self.timer_label.visible = True
@@ -306,7 +298,7 @@ class MatchForm(MatchFormTemplate):
           self.cancel_button.visible = True
           self.complete_button.visible = False
         else:
-          assert user_status=="empathy"
+          assert self.status=="matched"
           self.timer_label.visible = False
           (new_status, match_start,
            jitsi_code, request_type) = anvil.server.call('match_commenced',
@@ -320,7 +312,6 @@ class MatchForm(MatchFormTemplate):
           self.cancel_button.visible = False
           self.complete_button.visible = True
         self.set_jitsi_link(jitsi_code)
-        self.set_drop_down(request_type)
         self.match_em_check_box.visible = False
     else:
       self.status.text = "Request a match when ready:"
@@ -405,13 +396,6 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_link.url = "https://meet.jit.si/" + jitsi_code
       self.jitsi_link.text = self.jitsi_link.url
       self.jitsi_link.visible = True
-
-  def set_drop_down(self, request_type):
-    if request_type=="requesting":
-      self.drop_down_1.selected_value = "Not ready to offer empathy first"
-    else:
-      assert request_type=="offering"
-      self.drop_down_1.selected_value = "Willing to offer empathy first"
 
   def logout_button_click(self, **event_args):
     """This method is called when the button is clicked"""
