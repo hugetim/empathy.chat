@@ -7,6 +7,7 @@ from anvil.tables import app_tables
 import anvil.users
 import parameters as p
 import datetime
+import helper as h
 
 class TimerForm(TimerFormTemplate):
   user_id = None
@@ -37,7 +38,7 @@ class TimerForm(TimerFormTemplate):
     if (self.status in ["pinged-one", "pinged-mult"]
         and new_status in ["pinged-one", "pinged-mult"]):
       old_seconds_left = self.seconds_left
-      self.seconds_left = seconds_left(new_status, lc, ps)
+      self.seconds_left = h.seconds_left(new_status, lc, ps)
       if self.seconds_left > old_seconds_left + p.BUFFER_SECONDS:
         Notification("You are now the only match available, so you have more time to respond.",
                      title="Time added").show()

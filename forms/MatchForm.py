@@ -9,6 +9,7 @@ import datetime
 from TimerForm import TimerForm
 import parameters as p
 import anvil.tz
+import helper as h
 
 class MatchForm(MatchFormTemplate):
   user_id = None
@@ -46,22 +47,7 @@ class MatchForm(MatchFormTemplate):
 
   def seconds_left():
     'derive seconds_left from status, last_confirmed, and ping_start'
-    now = datetime.datetime.now(ref_time.tzinfo)
-    if self.status in ["pinging-mult", "pinging-one", "pinged-mult", "pinged-one"]:
-      min_confirm_match = p.CONFIRM_MATCH_SECONDS - (now - self.ping_start).seconds
-      if self.status=="pinging-mult":
-        return min_confirm_match + p.BUFFER_SECONDS
-      elif self.status=="pinged-mult":
-        return min_confirm_match
-    wait_time = p.WAIT_SECONDS - (now - self.last_confirmed).seconds
-    if self.status=="pinging-one":
-      return max(min_confirm_match, joint_wait_time) + p.BUFFER_SECONDS
-    elif self.status=="pinged-one":
-      return max(min_confirm_match, joint_wait_time)
-    elif self.status in ["requesting", "requesting-confirm"]:
-      return wait_time
-    else:
-      print("MatchForm.seconds_left(): " + self.status)
+    return h.seconds_left(self.status, self.last_confirmed, self.ping_start)
 
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
