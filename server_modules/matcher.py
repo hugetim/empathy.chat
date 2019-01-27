@@ -27,13 +27,13 @@ import re
 
 def _prune_requests():
   'Prune definitely outdated requests, unmatched then matched'
-  timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
+  timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
   cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
                     if r['last_confirmed'] < cutoff_r)
   for row in old_requests:
     row['current'] = False
-  
+
   old_ping_requests = (r for r in app_tables.requests.search(current=True)
                        if (r['match_id'] != None and r['ping_start'] < cutoff_r))
   for row in old_ping_requests:
@@ -50,7 +50,7 @@ def prune(user_id):
   prunes old requests/offers
   updates last_confirmed if currently requesting/offering/pinged
   '''
-  assume_complete = datetime.timedelta(hours=4) 
+  assume_complete = datetime.timedelta(hours=4)
   _initialize_session(user_id)
   user = anvil.server.session['user']
   # Prune requests, including from this user
@@ -87,34 +87,35 @@ def _initialize_session(user_id):
   anvil.server.session['user'] = user
   anvil.server.session['test_record'] = None
 
-  
+
 def _email_in_list(email):
   sheet = app_files._2018_integration_program['Sheet1']
   for row in sheet.rows:
     if _emails_equal(email, row['email']):
       return True
   return False
-      
+
+
 def _emails_equal(a, b):
   emre = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
   amatch = emre.search(a)
   bmatch = emre.search(b)
   return amatch.group(1)==bmatch.group(1) and amatch.group(2).lower()==bmatch.group(2).lower()
 
-  
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def confirm_wait(user_id):
   _confirm_wait(user_id)
-  
-  
+
+
 def _confirm_wait(user_id):
   '''updates last_confirmed for current request'''
   user = app_tables.users.get_by_id(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
-  
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_status(user_id):
@@ -148,11 +149,11 @@ def _get_status(user_id):
         if request_type=="offering":
           altrequests = [r for r in app_tables.requests.search(current=True,
                                                                match_id=None)]
-        else: 
+        else:
           assert request_type=="requesting"
           altrequests = [r for r in app_tables.requests.search(current=True,
                                                                request_type="offering",
-                                                               match_id=None)]    
+                                                               match_id=None)]
         alt_avail = len(altrequests) > 0
         if alt_avail:
           ref_time = current_row['ping_start']
@@ -171,11 +172,11 @@ def _get_status(user_id):
         if request_type=="offering":
           altrequests = [r for r in app_tables.requests.search(current=True,
                                                                match_id=None)]
-        else: 
+        else:
           assert request_type=="requesting"
           altrequests = [r for r in app_tables.requests.search(current=True,
                                                                request_type="offering",
-                                                               match_id=None)]    
+                                                               match_id=None)]
         alt_avail = len(altrequests) > 0
         if alt_avail:
           ref_time = current_row['ping_start']
@@ -190,8 +191,9 @@ def _get_status(user_id):
       i = row['users'].index(user)
       if row['complete'][i]==0:
         status = "empathy"
-        ref_time = row['match_commence'] 
+        ref_time = row['match_commence']
   return status, ref_time, tallies, alt_avail
+
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -210,14 +212,14 @@ def _get_tallies(user):
     if row['user']!=user:
       tallies[row['request_type']] += 1
       active_users.append(row['user'])
-  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS) 
+  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
   request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
                        if u['last_login'] > cutoff_e and u not in active_users]
   tallies['request_em'] = len(request_em_list)
   return tallies
-  
-  
+
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_code(user_id):
@@ -253,11 +255,11 @@ def add_request(user_id, request_type):
   if request_type=="offering":
     requests = [r for r in app_tables.requests.search(current=True,
                                                       match_id=None)]
-  else: 
+  else:
     assert request_type=="requesting"
     requests = [r for r in app_tables.requests.search(current=True,
                                                       request_type="offering",
-                                                      match_id=None)]    
+                                                      match_id=None)]
   current_row = add_request_row(user_id, request_type)
   if requests:
     jitsi_code = new_jitsi_code()
@@ -267,7 +269,7 @@ def add_request(user_id, request_type):
     cms = [r['cancelled_matches'] for r in requests]
     eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
     earliest_request = min(eligible_requests, key=lambda row: row['start'])
-    earliest_request['ping_start'] = current_row['ping_start'] 
+    earliest_request['ping_start'] = current_row['ping_start']
     earliest_request['match_id'] = current_row['match_id']
     earliest_request['jitsi_code'] = jitsi_code
     last_confirmed = earliest_request['last_confirmed']
@@ -275,8 +277,8 @@ def add_request(user_id, request_type):
   else:
     num_emailed = request_emails(request_type)
   return jitsi_code, last_confirmed, num_emailed, alt_avail
-      
-    
+
+
 def _create_match(exclude_user=None):
   'attempt to create a match from existing requests'
   # find top request in queue
@@ -288,14 +290,14 @@ def _create_match(exclude_user=None):
     all_cms = [r['cancelled_matches'] for r in all_requests]
     all_eligible_requests = [r for r in all_requests if r['cancelled_matches']==min(all_cms)]
     current_row = min(all_eligible_requests, key=lambda row: row['start'])
-    
+
     request_type = current_row['request_type']
     user = current_row['user']
     if request_type=="offering":
       requests = [r for r in app_tables.requests.search(current=True,
                                                         match_id=None)
                     if r['user'] not in [user, exclude_user]]
-    else: 
+    else:
       assert request_type=="requesting"
       requests = [r for r in app_tables.requests.search(current=True,
                                                         request_type="offering",
@@ -309,10 +311,10 @@ def _create_match(exclude_user=None):
       cms = [r['cancelled_matches'] for r in requests]
       eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
       earliest_request = min(eligible_requests, key=lambda row: row['start'])
-      earliest_request['ping_start'] = current_row['ping_start'] 
+      earliest_request['ping_start'] = current_row['ping_start']
       earliest_request['match_id'] = current_row['match_id']
       earliest_request['jitsi_code'] = jitsi_code
-    
+
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -334,7 +336,7 @@ def cancel(user_id):
         row['jitsi_code'] = None
       _create_match()
 
-    
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_match(user_id):
@@ -362,8 +364,8 @@ def cancel_match(user_id):
       if row['complete'][i]==0:
         return "empathy"
     return None
-    
-    
+
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_other(user_id):
@@ -387,7 +389,8 @@ def cancel_other(user_id):
           #row['current'] = False
       _create_match()
   return _get_status(user_id)
-    
+
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(user_id):
@@ -396,7 +399,7 @@ def match_commenced(user_id):
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   '''
-  # return status, match_start? 
+  # return status, match_start?
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
   current_row = app_tables.requests.get(user=user, current=True)
@@ -449,7 +452,7 @@ def match_complete(user_id):
     temp[i] = 1
     row['complete'] = temp
 
-    
+
 def add_request_row(user_id, request_type):
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
@@ -496,35 +499,36 @@ def get_user_info(user_id):
 def set_match_em(match_em_checked):
   user = anvil.server.session['user']
   user['match_em'] = match_em_checked
-  
+
 
 @anvil.server.callable
 def set_request_em(request_em_checked):
   user = anvil.server.session['user']
   user['request_em'] = request_em_checked
-  
+
 
 @anvil.server.callable
 def match_email():
   user = anvil.server.session['user']
   anvil.google.mail.send(to = user['email'],
                          subject = "Empathy Swap - Match available",
-                         text = 
+                         text =
 '''Dear Empathy Swap user,
-    
-An empathy match has been found. 
-                                                      
+
+An empathy match has been found.
+
 Return to https://minty-sarcastic-telephone.anvil.app now to be connected for your empathy exchange.
-                           
+
 Thanks!
 Tim
 
 p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this box is unchecked when requesting empathy.
 ''')
-  
+
+
 def request_emails(request_type):
   '''email all users with request_em_check_box checked who logged in recently'''
-  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS) 
+  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   user = anvil.server.session['user']
   if request_type=="requesting":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
@@ -537,16 +541,16 @@ def request_emails(request_type):
   for email_address in emails:
     anvil.google.mail.send(to = email_address,
                            subject = "Empathy Swap - Request active",
-                           text = 
+                           text =
 '''Dear Empathy Swap user,
-    
+
 Someone has requested ''' + request_type_text + '''
-                                                      
+
 Return to https://minty-sarcastic-telephone.anvil.app now and request empathy to be connected (if you are first to do so).
-                           
+
 Thanks!
 Tim
 
 p.s. You are receiving this email because you checked the box: "Notify me of empathy requests by email." To stop receiving these emails, return to the link above and change the setting.
-''')                      
+''')
   return len(emails)
