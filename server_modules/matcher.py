@@ -76,7 +76,7 @@ def prune(user_id):
       user['enabled'] = False
   current_status, ref_time, tallies, alt_avail = _get_status(user_id)
   if current_status in ('requesting', 'offering', 'pinged','matched'):
-    _confirm_wait(user_id)
+    lc = _confirm_wait(user_id)
   return trust_level, request_em, match_em, current_status, ref_time, tallies, alt_avail, email_in_list
 
 
@@ -106,14 +106,21 @@ def _emails_equal(a, b):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def confirm_wait(user_id):
-  _confirm_wait(user_id)
+  '''updates last_confirmed for current request, returns last_confirmed'''
+  return _confirm_wait(user_id)
 
 
 def _confirm_wait(user_id):
-  '''updates last_confirmed for current request'''
+  '''updates last_confirmed for current request, returns last_confirmed'''
   user = app_tables.users.get_by_id(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+  if current_row['match_id']:
+    matched_requests = app_tables.requests.search(match_id=current_row['match_id'], current=True)
+    for row in matched_requests:
+      if row['user'] != user:
+        return min(row['last_confirmed'], current_row['last_confirmed'])
+  return current_row['last_confirmed']
 
 
 @anvil.server.callable
