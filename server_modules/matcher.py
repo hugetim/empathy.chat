@@ -321,10 +321,12 @@ def _create_match(exclude_user=None):
 def cancel(user_id):
   '''
   Remove request and cancel match (if applicable)
-  Returns None
+  Returns tallies
   '''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  if anvil.server.session['user_id']==user_id:
+    user = anvil.server.session['user']
+  else:
+    user = app_tables.users.get_by_id(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     current_row['current'] = False
@@ -335,6 +337,7 @@ def cancel(user_id):
         row['match_id'] = None
         row['jitsi_code'] = None
       _create_match()
+  return _get_tallies(user)
 
 
 @anvil.server.callable
@@ -344,8 +347,10 @@ def cancel_match(user_id):
   cancel match (if applicable)--but not remove request
   Returns updated status
   '''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  if anvil.server.session['user_id']==user_id:
+    user = anvil.server.session['user']
+  else:
+    user = app_tables.users.get_by_id(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -356,26 +361,28 @@ def cancel_match(user_id):
         row['jitsi_code'] = None
       _create_match(user)
     current_row['cancelled_matched'] += 1
-    return current_row['request_type']
+    return _get_status(user)
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:
       i = row['users'].index(user)
       if row['complete'][i]==0:
-        return "empathy"
-    return None
+        return "empathy", None, None, _get_tallies(user)
+    return None, None, None, _get_tallies(user)
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_other(user_id):
   '''
-  return new_status
+  return new status
   Upon failure of other to confirm match
   cancel match (if applicable)--but not remove request
   '''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  if anvil.server.session['user_id']==user_id:
+    user = anvil.server.session['user']
+  else:
+    user = app_tables.users.get_by_id(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -442,15 +449,18 @@ def match_commenced(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_complete(user_id):
-  '''Switch 'complete' to true in matches table for user.'''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  '''Switch 'complete' to true in matches table for user, return tallies.'''
+  if anvil.server.session['user_id']==user_id:
+    user = anvil.server.session['user']
+  else:
+    user = app_tables.users.get_by_id(user_id)
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
     temp = row['complete']
     temp[i] = 1
     row['complete'] = temp
+  return _get_tallies(user)
 
 
 def add_request_row(user_id, request_type):
