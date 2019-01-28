@@ -5,6 +5,7 @@ import anvil.users
 import parameters as p
 import helper as h
 
+
 class TimerForm(TimerFormTemplate):
   user_id = None
   status = None
@@ -30,7 +31,7 @@ class TimerForm(TimerFormTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
-    new_status, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
+    new_status, lc, ps, tallies = anvil.server.call_s('get_status',self.user_id)
     if (self.status in ["pinged-one", "pinged-mult"]
         and new_status in ["pinged-one", "pinged-mult"]):
       old_seconds_left = self.seconds_left

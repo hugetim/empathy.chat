@@ -2,7 +2,8 @@ import datetime
 import parameters as p
 import anvil.tz
 
-def seconds_left(status, last_confirmed, ping_start=None)
+
+def seconds_left(status, last_confirmed, ping_start=None):
     now = datetime.datetime.now(last_confirmed.tzinfo)
     if status in ["pinging-mult", "pinging-one", "pinged-mult", "pinged-one"]:
       assert ping_start.tzinfo==last_confirmed.tzinfo

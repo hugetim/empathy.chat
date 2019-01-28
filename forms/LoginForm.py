@@ -4,7 +4,8 @@ import anvil.google.auth
 import anvil.server
 import anvil.users
 
-class LoginForm (LoginFormTemplate):
+
+class LoginForm(LoginFormTemplate):
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)

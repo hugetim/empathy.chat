@@ -13,18 +13,6 @@ import parameters as p
 import re
 import helper as h
 
-# This is a server module. It runs on the Anvil server,
-# rather than in the user's browser.
-#
-# To allow anvil.server.call() to call functions here, we mark
-# them with @anvil.server.callable.
-# Here is an example - you can replace it with your own:
-#
-# @anvil.server.callable
-# def say_hello(name):
-#   print("Hello, " + name + "!")
-#   return 42
-#
 
 def _prune_requests():
   """Prune definitely outdated requests, unmatched then matched"""
@@ -36,7 +24,7 @@ def _prune_requests():
     row['current'] = False
 
   old_ping_requests = (r for r in app_tables.requests.search(current=True)
-                       if (r['match_id'] != None and r['ping_start'] < cutoff_r))
+                       if (r['match_id'] is not None and r['ping_start'] < cutoff_r))
   for row in old_ping_requests:
     row['current'] = False
 
@@ -76,7 +64,7 @@ def prune(user_id):
     else:
       user['enabled'] = False
   current_status, ref_time, tallies, alt_avail = _get_status(user_id)
-  if current_status in ('requesting', 'offering', 'pinged','matched'):
+  if current_status in ('requesting', 'offering', 'pinged', 'matched'):
     lc = _confirm_wait(user_id)
   return trust_level, request_em, match_em, current_status, ref_time, tallies, alt_avail, email_in_list
 
@@ -105,10 +93,10 @@ def _email_in_list(email):
 
 
 def _emails_equal(a, b):
-  emre = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
-  amatch = emre.search(a)
-  bmatch = emre.search(b)
-  return amatch.group(1)==bmatch.group(1) and amatch.group(2).lower()==bmatch.group(2).lower()
+  em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
+  a_match = em_re.search(a)
+  b_match = em_re.search(b)
+  return a_match.group(1)==b_match.group(1) and a_match.group(2).lower()==b_match.group(2).lower()
 
 
 @anvil.server.callable
@@ -153,8 +141,8 @@ def _get_status(user_id):
   if current_row:
     if current_row['match_id']:
       matched_request_confirms = [r['last_confirmed'] for r
-                                in app_tables.requests.search(match_id=current_row['match_id'],
-                                                              current=True)]
+                                  in app_tables.requests.search(match_id=current_row['match_id'],
+                                                                current=True)]
       last_confirmed = min(matched_request_confirms)
       ping_start = current_row['ping_start']
       assert last_confirmed < ping_start
@@ -219,9 +207,9 @@ def get_tallies():
 
 
 def _get_tallies(user):
-  tallies =	dict(requesting = 0,
-                 offering = 0,
-                 request_em = 0)
+  tallies =	dict(requesting=0,
+                 offering=0,
+                 request_em=0)
   active_users = [user]
   for row in app_tables.requests.search(current=True, match_id=None):
     if row['user']!=user:
@@ -230,7 +218,7 @@ def _get_tallies(user):
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
   request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
-                       if u['last_login'] > cutoff_e and u not in active_users]
+                     if u['last_login'] > cutoff_e and u not in active_users]
   tallies['request_em'] = len(request_em_list)
   return tallies
 
@@ -249,7 +237,7 @@ def get_code(user_id):
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in old_matches:
       i = row['users'].index(user)
-      if row['complete'][i]==True:
+      if row['complete'][i]==1:
         code = row['jitsi_code']
         request_type = row['request_types'][i]
   return code, request_type
@@ -261,7 +249,7 @@ def add_request(user_id, request_type):
   """
   return jitsi_code, last_confirmed (both None if no immediate match), num_emailed
   """
-  #assert anvil.server.session['user_id']==user_id
+  # assert anvil.server.session['user_id']==user_id
   jitsi_code = None
   last_confirmed = None
   num_emailed = 0
@@ -400,7 +388,7 @@ def cancel_other(user_id):
         if row['user'] != user:
           excluded_users += [row['user']]
           row['cancelled_matches'] += 1
-          #row['current'] = False
+          # row['current'] = False
       _create_match(excluded_users)
   return _get_status(user_id)
 
@@ -480,12 +468,12 @@ def add_request_row(user_id, request_type):
 
 
 def new_jitsi_code():
-  numchars = 5
+  num_chars = 5
   charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   random.seed()
-  randcode = "".join([random.choice(charset) for i in range(numchars)])
-  code = "empathy_" + randcode
-  #match['jitsi_code'] = code
+  rand_code = "".join([random.choice(charset) for i in range(num_chars)])
+  code = "empathy_" + rand_code
+  # match['jitsi_code'] = code
   return code
 
 
@@ -499,7 +487,7 @@ def get_user_info(user_id):
   """Return user info, initializing it for new users"""
   user = _get_user(user_id)
   trust = user['trust_level']
-  if trust == None:
+  if trust is None:
     user.update(trust_level=0)
     assert user['request_em']==False
     assert user['match_em']==False
@@ -521,9 +509,9 @@ def set_request_em(request_em_checked):
 @anvil.server.callable
 def match_email():
   user = anvil.server.session['user']
-  anvil.google.mail.send(to = user['email'],
-                         subject = "Empathy Swap - Match available",
-                         text =
+  anvil.google.mail.send(to=user['email'],
+                         subject="Empathy Swap - Match available",
+                         text=
 '''Dear Empathy Swap user,
 
 An empathy match has been found.
@@ -550,9 +538,9 @@ def request_emails(request_type):
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
                        if u['last_login'] > cutoff_e and u!=user]
   for email_address in emails:
-    anvil.google.mail.send(to = email_address,
-                           subject = "Empathy Swap - Request active",
-                           text =
+    anvil.google.mail.send(to=email_address,
+                           subject="Empathy Swap - Request active",
+                           text=
 '''Dear Empathy Swap user,
 
 Someone has requested ''' + request_type_text + '''

@@ -12,7 +12,7 @@ import datetime
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def test_add_user(em, level = 1, r_em = False, m_em = False):
+def test_add_user(em, level=1, r_em=False, m_em=False):
   assert anvil.server.session['user']['trust_level'] >= p.TEST_TRUST_LEVEL
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
