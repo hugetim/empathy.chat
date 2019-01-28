@@ -1,12 +1,8 @@
 from anvil import *
 import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
 import anvil.server
-import anvil.tables as tables
-from anvil.tables import app_tables
 import anvil.users
 import parameters as p
-import datetime
 import helper as h
 
 class TimerForm(TimerFormTemplate):
