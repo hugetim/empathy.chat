@@ -147,7 +147,7 @@ class MatchForm(MatchFormTemplate):
               dismissible=False)
       self.status = None
     else:
-      print out
+      print (out)
       assert out in ["pinged-one","pinged-mult","matched"]
       if out in ["pinged-one","pinged-mult"]:
         s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
@@ -183,7 +183,7 @@ class MatchForm(MatchFormTemplate):
       self.tallies = anvil.server.call_s('get_tallies')
       self.status = None
     else:
-      print out
+      print (out)
       assert out in ["requesting", "requesting-confirm"]
       s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
       self.status = s

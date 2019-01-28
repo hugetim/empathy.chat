@@ -45,7 +45,7 @@ class TimerForm(TimerFormTemplate):
                      title="Prompt response needed").show()
       self.status = new_status
     elif new_status != self.status:
-      print new_status
+      print (new_status)
       self.raise_event("x-close-alert", value=new_status)
 
   def timer_2_tick(self, **event_args):
