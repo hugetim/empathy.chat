@@ -11,6 +11,7 @@ import uuid
 import anvil.tz
 import parameters as p
 import re
+import helper as h
 
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
@@ -141,69 +142,72 @@ def _get_status(user_id):
   """
   returns current_status, last_confirmed, ping_start, tallies
   last_confirmed: min of this or other's last_confirmed
+  ping_start: ping_start or, for "matched", match_commence
   assumes 2-person matches only
   """
   user = _get_user(user_id)
-  tallies = _get_tallies(user)
   current_row = app_tables.requests.get(user=user, current=True)
   status = None
-  ref_time = None
-  alt_avail = None
+  last_confirmed = None
+  ping_start = None
   if current_row:
     if current_row['match_id']:
-      matched_request_starts = [r['start'] for r
-                                in app_tables.requests.search(match_id=current_row['match_id'])]
-      match_start = max(matched_request_starts)
-      if match_start==current_row['start']:
-        status = "matched"
+      matched_request_confirms = [r['last_confirmed'] for r
+                                in app_tables.requests.search(match_id=current_row['match_id'],
+                                                              current=True)]
+      last_confirmed = min(matched_request_confirms)
+      ping_start = current_row['ping_start']
+      assert last_confirmed < ping_start
+      if last_confirmed > current_row['last_confirmed']:
+        status = "pinging"
         request_type = current_row['request_type']
         if request_type=="offering":
-          altrequests = [r for r in app_tables.requests.search(current=True,
+          alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                match_id=None)]
         else:
           assert request_type=="requesting"
-          altrequests = [r for r in app_tables.requests.search(current=True,
+          alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                request_type="offering",
                                                                match_id=None)]
-        alt_avail = len(altrequests) > 0
+        alt_avail = len(alt_requests) > 0
         if alt_avail:
-          ref_time = current_row['ping_start']
+          status += "-mult"
         else:
-          last_confirmeds = [r['last_confirmed'] for r
-                             in app_tables.requests.search(match_id=current_row['match_id'])
-                             if r['user']!=user]
-          ref_time = last_confirmeds[0]
+          status += "-one"
       else:
         status = "pinged"
         request_types = [r['request_type'] for r
-                         in app_tables.requests.search(match_id=current_row['match_id'])
+                         in app_tables.requests.search(match_id=current_row['match_id'],
+                                                       current=True)
                          if r['user']!=user]
         assert len(request_types)==1
         request_type = request_types[0]
         if request_type=="offering":
-          altrequests = [r for r in app_tables.requests.search(current=True,
+          alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                match_id=None)]
         else:
           assert request_type=="requesting"
-          altrequests = [r for r in app_tables.requests.search(current=True,
+          alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                request_type="offering",
                                                                match_id=None)]
-        alt_avail = len(altrequests) > 0
+        alt_avail = len(alt_requests) > 0
         if alt_avail:
-          ref_time = current_row['ping_start']
+          status += "-mult"
         else:
-          ref_time = current_row['last_confirmed']
+          status += "-one"
     else:
-      status = current_row['request_type']
-      ref_time = current_row['last_confirmed']
+      status = "requesting"
+      last_confirmed = current_row['last_confirmed']
+      if h.seconds_left(status, last_confirmed) <= p.CONFIRM_WAIT_SECONDS:
+        status += "-confirm"
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:
       i = row['users'].index(user)
       if row['complete'][i]==0:
-        status = "empathy"
-        ref_time = row['match_commence']
-  return status, ref_time, tallies, alt_avail
+        status = "matched"
+        ping_start = row['match_commence']
+  return status, last_confirmed, ping_start, _get_tallies(user)
 
 
 @anvil.server.callable

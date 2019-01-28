@@ -2,7 +2,7 @@ import datetime
 import parameters as p
 import anvil.tz
 
-def seconds_left(status, last_confirmed, ping_start)
+def seconds_left(status, last_confirmed, ping_start=None)
     now = datetime.datetime.now(ref_time.tzinfo)
     if status in ["pinging-mult", "pinging-one", "pinged-mult", "pinged-one"]:
       min_confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).seconds
