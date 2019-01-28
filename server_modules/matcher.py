@@ -132,10 +132,8 @@ def get_status(user_id):
 
 def _get_status(user_id):
   """
-  returns current_status, ref_time (or None), tallies, alt_avail
-  alt_avail: Boolean, whether another match is available
-    for user (if "matched") or match (if "pinged"), (else) None
-  ref_time: match_start or other's last_confirmed (if "matched" and not alt_avail)
+  returns current_status, last_confirmed, ping_start, tallies
+  last_confirmed: min of this or other's last_confirmed
   assumes 2-person matches only
   """
   assert anvil.server.session['user_id']==user_id
