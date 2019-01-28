@@ -26,7 +26,7 @@ import re
 #
 
 def _prune_requests():
-  'Prune definitely outdated requests, unmatched then matched'
+  """Prune definitely outdated requests, unmatched then matched"""
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
   cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
@@ -43,13 +43,13 @@ def _prune_requests():
 @anvil.server.callable
 @anvil.tables.in_transaction
 def prune(user_id):
-  '''
+  """
   Assumed to run upon initializing Form1
   returns trust_level, request_em, match_em, current_status, ref_time (or None),
           tallies, alt_avail, email_in_list
   prunes old requests/offers
   updates last_confirmed if currently requesting/offering/pinged
-  '''
+  """
   assume_complete = datetime.timedelta(hours=4)
   _initialize_session(user_id)
   user = anvil.server.session['user']
@@ -81,7 +81,7 @@ def prune(user_id):
 
 
 def _initialize_session(user_id):
-  '''initialize session state: user_id, user, and current_row'''
+  """initialize session state: user_id, user, and current_row"""
   anvil.server.session['user_id'] = user_id
   user = app_tables.users.get_by_id(user_id)
   anvil.server.session['user'] = user
@@ -106,12 +106,12 @@ def _emails_equal(a, b):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def confirm_wait(user_id):
-  '''updates last_confirmed for current request, returns last_confirmed'''
+  """updates last_confirmed for current request, returns last_confirmed"""
   return _confirm_wait(user_id)
 
 
 def _confirm_wait(user_id):
-  '''updates last_confirmed for current request, returns last_confirmed'''
+  """updates last_confirmed for current request, returns last_confirmed"""
   user = app_tables.users.get_by_id(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
@@ -131,13 +131,13 @@ def get_status(user_id):
 
 
 def _get_status(user_id):
-  '''
+  """
   returns current_status, ref_time (or None), tallies, alt_avail
   alt_avail: Boolean, whether another match is available
     for user (if "matched") or match (if "pinged"), (else) None
   ref_time: match_start or other's last_confirmed (if "matched" and not alt_avail)
   assumes 2-person matches only
-  '''
+  """
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
   tallies = _get_tallies(user)
@@ -230,7 +230,7 @@ def _get_tallies(user):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_code(user_id):
-  '''returns jitsi_code, request_type (or Nones)'''
+  """returns jitsi_code, request_type (or Nones)"""
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
   current_row = app_tables.requests.get(user=user, current=True)
@@ -251,9 +251,9 @@ def get_code(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def add_request(user_id, request_type):
-  '''
+  """
   return jitsi_code, last_confirmed (both None if no immediate match), num_emailed
-  '''
+  """
   #assert anvil.server.session['user_id']==user_id
   jitsi_code = None
   last_confirmed = None
@@ -287,7 +287,7 @@ def add_request(user_id, request_type):
 
 
 def _create_match(exclude_user=None):
-  'attempt to create a match from existing requests'
+  """attempt to create a match from existing requests"""
   # find top request in queue
   print("running create match")
   all_requests = [r for r in app_tables.requests.search(current=True,
@@ -326,10 +326,10 @@ def _create_match(exclude_user=None):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel(user_id):
-  '''
+  """
   Remove request and cancel match (if applicable)
   Returns tallies
-  '''
+  """
   if anvil.server.session['user_id']==user_id:
     user = anvil.server.session['user']
   else:
@@ -350,10 +350,10 @@ def cancel(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_match(user_id):
-  '''
+  """
   cancel match (if applicable)--but not remove request
   Returns updated status
-  '''
+  """
   if anvil.server.session['user_id']==user_id:
     user = anvil.server.session['user']
   else:
@@ -381,11 +381,11 @@ def cancel_match(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_other(user_id):
-  '''
+  """
   return new status
   Upon failure of other to confirm match
   cancel match (if applicable)--but not remove request
-  '''
+  """
   if anvil.server.session['user_id']==user_id:
     user = anvil.server.session['user']
   else:
@@ -408,11 +408,11 @@ def cancel_other(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(user_id):
-  '''
+  """
   return status, match_start, jitsi_code, request_type
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
-  '''
+  """
   # return status, match_start?
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
@@ -456,7 +456,7 @@ def match_commenced(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_complete(user_id):
-  '''Switch 'complete' to true in matches table for user, return tallies.'''
+  """Switch 'complete' to true in matches table for user, return tallies."""
   if anvil.server.session['user_id']==user_id:
     user = anvil.server.session['user']
   else:
@@ -501,7 +501,7 @@ def new_match_id():
 
 @anvil.server.callable
 def get_user_info(user_id):
-  '''Return user info, initializing it for new users'''
+  """Return user info, initializing it for new users"""
   assert anvil.server.session['user_id']==user_id
   user = anvil.server.session['user']
   trust = user['trust_level']
@@ -544,7 +544,7 @@ p.s. You are receiving this email because you checked the box: "Notify me by ema
 
 
 def request_emails(request_type):
-  '''email all users with request_em_check_box checked who logged in recently'''
+  """email all users with request_em_check_box checked who logged in recently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   user = anvil.server.session['user']
   if request_type=="requesting":
