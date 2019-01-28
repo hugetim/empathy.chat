@@ -88,6 +88,13 @@ def _initialize_session(user_id):
   anvil.server.session['test_record'] = None
 
 
+def _get_user(user_id):
+  if anvil.server.session['user_id']==user_id:
+    return anvil.server.session['user']
+  else:
+    return app_tables.users.get_by_id(user_id)
+
+
 def _email_in_list(email):
   sheet = app_files._2018_integration_program['Sheet1']
   for row in sheet.rows:
@@ -112,7 +119,7 @@ def confirm_wait(user_id):
 
 def _confirm_wait(user_id):
   """updates last_confirmed for current request, returns last_confirmed"""
-  user = app_tables.users.get_by_id(user_id)
+  user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
   if current_row['match_id']:
@@ -136,8 +143,7 @@ def _get_status(user_id):
   last_confirmed: min of this or other's last_confirmed
   assumes 2-person matches only
   """
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  user = _get_user(user_id)
   tallies = _get_tallies(user)
   current_row = app_tables.requests.get(user=user, current=True)
   status = None
@@ -229,8 +235,7 @@ def _get_tallies(user):
 @anvil.tables.in_transaction
 def get_code(user_id):
   """returns jitsi_code, request_type (or Nones)"""
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   code = None
   if current_row:
@@ -328,10 +333,7 @@ def cancel(user_id):
   Remove request and cancel match (if applicable)
   Returns tallies
   """
-  if anvil.server.session['user_id']==user_id:
-    user = anvil.server.session['user']
-  else:
-    user = app_tables.users.get_by_id(user_id)
+  user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     current_row['current'] = False
@@ -352,10 +354,7 @@ def cancel_match(user_id):
   cancel match (if applicable)--but not remove request
   Returns updated status
   """
-  if anvil.server.session['user_id']==user_id:
-    user = anvil.server.session['user']
-  else:
-    user = app_tables.users.get_by_id(user_id)
+  user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -384,10 +383,7 @@ def cancel_other(user_id):
   Upon failure of other to confirm match
   cancel match (if applicable)--but not remove request
   """
-  if anvil.server.session['user_id']==user_id:
-    user = anvil.server.session['user']
-  else:
-    user = app_tables.users.get_by_id(user_id)
+  user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -414,8 +410,7 @@ def match_commenced(user_id):
   Should not cause error if already commenced
   """
   # return status, match_start?
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   status = None
   match_start = None
@@ -457,10 +452,7 @@ def match_commenced(user_id):
 @anvil.tables.in_transaction
 def match_complete(user_id):
   """Switch 'complete' to true in matches table for user, return tallies."""
-  if anvil.server.session['user_id']==user_id:
-    user = anvil.server.session['user']
-  else:
-    user = app_tables.users.get_by_id(user_id)
+  user = _get_user(user_id)
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
@@ -471,8 +463,7 @@ def match_complete(user_id):
 
 
 def add_request_row(user_id, request_type):
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  user = _get_user(user_id)
   now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
   new_row = app_tables.requests.add_row(user=user,
                                         current=True,
@@ -502,8 +493,7 @@ def new_match_id():
 @anvil.server.callable
 def get_user_info(user_id):
   """Return user info, initializing it for new users"""
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
+  user = _get_user(user_id)
   trust = user['trust_level']
   if trust == None:
     user.update(trust_level=0)
