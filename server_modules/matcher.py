@@ -74,7 +74,16 @@ def prune(user_id):
     else:
       user['enabled'] = False
   status, lc, ps, tallies = _get_status(user)
-  if current_status in ('requesting', 'requesting-confirm', 'pinged-one', 'pinged-mult',
+  if status in ('pinged-one', 'pinged-mult', 'pinging-one', 'pinging-mult'):
+    seconds_left = h.seconds_left(status, lc, ps)
+    if status == 'pinged-mult' and seconds_left <= 0:
+      status, lc, ps, tallies = _cancel_match(user)
+    elif status in ('pinged-one', 'pinged-mult'):
+      _match_commenced(user)
+      status, lc, ps, tallies = _get_status(user)
+    elif status in ('pinging-one', 'pinging-mult') and seconds_left <= 0:
+      status, lc, ps, tallies = _cancel_other(user)
+  if status in ('requesting', 'requesting-confirm', 'pinged-one', 'pinged-mult',
                         'pinging-one', 'pinging-mult'):
     lc = _confirm_wait(user)
     request_type = _get_request_type(user)
@@ -346,14 +355,7 @@ def cancel(user_id):
   return _get_tallies(user)
 
 
-@anvil.server.callable
-@anvil.tables.in_transaction
-def cancel_match(user_id):
-  """
-  cancel match (if applicable)--but not remove request
-  Returns updated status
-  """
-  user = _get_user(user_id)
+def _cancel_match(user):
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -380,13 +382,16 @@ def cancel_match(user_id):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def cancel_other(user_id):
+def cancel_match(user_id):
   """
-  return new status
-  Upon failure of other to confirm match
   cancel match (if applicable)--but not remove request
+  Returns updated status
   """
   user = _get_user(user_id)
+  return _cancel_match(user)
+
+
+def _cancel_other(user):
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -406,6 +411,18 @@ def cancel_other(user_id):
       _create_matches(excluded_users)
       _create_match(user)
   return _get_status(user)
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def cancel_other(user_id):
+  """
+  return new status
+  Upon failure of other to confirm match
+  cancel match (if applicable)--but not remove request
+  """
+  user = _get_user(user_id)
+  return _cancel_other(user)
 
 
 @anvil.server.callable
