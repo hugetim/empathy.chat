@@ -378,6 +378,7 @@ def cancel_match(user_id):
       if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
         current_row['current'] = False
       _create_matches([user])
+      _create_match(user)
     return _get_status(user)
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
@@ -414,6 +415,7 @@ def cancel_other(user_id):
       if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
         current_row['current'] = False
       _create_matches(excluded_users)
+      _create_match(user)
   return _get_status(user_id)
 
 
