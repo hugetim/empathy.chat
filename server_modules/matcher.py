@@ -286,7 +286,37 @@ def add_request(user_id, request_type):
   return jitsi_code, last_confirmed, num_emailed, alt_avail
 
 
-def _create_match(excluded_users=[]):
+def _create_match(user, excluded_users=[]):
+  """attempt to create a match for user"""
+  current_row = app_tables.requests.get(user=user, current=True)
+  request_type = current_row['request_type']
+  if request_type == "offering":
+    requests = [r for r in app_tables.requests.search(current=True,
+                                                      match_id=None)
+                if r['user'] not in [user] + excluded_users]
+  else:
+    assert request_type == "requesting"
+    requests = [r for r in app_tables.requests.search(current=True,
+                                                      request_type="offering",
+                                                      match_id=None)
+                if r['user'] not in [user] + excluded_users]
+  if requests:
+    current_row['ping_start'] = _now()
+    current_row['match_id'] = new_match_id()
+    current_row['jitsi_code'] = new_jitsi_code()
+    cms = [r['cancelled_matches'] for r in requests]
+    eligible_requests = [r for r in requests if r['cancelled_matches'] == min(cms)]
+    earliest_request = min(eligible_requests, key=lambda row: row['start'])
+    earliest_request['ping_start'] = current_row['ping_start']
+    earliest_request['match_id'] = current_row['match_id']
+    earliest_request['jitsi_code'] = current_row['jitsi_code']
+    lc = min(current_row['last_confirmed'],
+             earliest_request['last_confirmed'])
+    if (current_row['ping_start'] - lc).seconds <= p.BUFFER_SECONDS:
+      _match_commenced(user)
+
+
+def _create_matches(excluded_users=[]):
   """attempt to create a match from existing requests, iterate"""
   # find top request in queue
   all_requests = [r for r in app_tables.requests.search(current=True,
@@ -296,35 +326,11 @@ def _create_match(excluded_users=[]):
     all_cms = [r['cancelled_matches'] for r in all_requests]
     all_eligible_requests = [r for r in all_requests if r['cancelled_matches']==min(all_cms)]
     current_row = min(all_eligible_requests, key=lambda row: row['start'])
-
-    request_type = current_row['request_type']
     user = current_row['user']
-    if request_type=="offering":
-      requests = [r for r in app_tables.requests.search(current=True,
-                                                        match_id=None)
-                    if r['user'] not in [user] + excluded_users]
-    else:
-      assert request_type=="requesting"
-      requests = [r for r in app_tables.requests.search(current=True,
-                                                        request_type="offering",
-                                                        match_id=None)
-                    if r['user'] not in [user] + excluded_users]
-    if requests:
-      jitsi_code = new_jitsi_code()
-      current_row['ping_start'] = _now()
-      current_row['match_id'] = new_match_id()
-      current_row['jitsi_code'] = jitsi_code
-      cms = [r['cancelled_matches'] for r in requests]
-      eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
-      earliest_request = min(eligible_requests, key=lambda row: row['start'])
-      earliest_request['ping_start'] = current_row['ping_start']
-      earliest_request['match_id'] = current_row['match_id']
-      earliest_request['jitsi_code'] = jitsi_code
-      lc = min(current_row['last_confirmed'],
-               earliest_request['last_confirmed'])
-      if (current_row['ping_start'] - lc).seconds <= p.BUFFER_SECONDS:
-        _match_commenced(user)
-    _create_match(excluded_users + [user])
+    # attempt to create a match for top request
+    _create_match(user, excluded_users)
+    # attempt to create matches for remaining requests
+    _create_matches(excluded_users + [user])
 
 
 @anvil.server.callable
@@ -345,7 +351,7 @@ def cancel(user_id):
         row['ping_start'] = None
         row['match_id'] = None
         row['jitsi_code'] = None
-      _create_match()
+      _create_matches()
   return _get_tallies(user)
 
 
@@ -369,7 +375,7 @@ def cancel_match(user_id):
       current_row['cancelled_matched'] += 1
       if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
         current_row['current'] = False
-      _create_match([user])
+      _create_matches([user])
     return _get_status(user)
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
@@ -405,7 +411,7 @@ def cancel_other(user_id):
           # row['current'] = False
       if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
         current_row['current'] = False
-      _create_match(excluded_users)
+      _create_matches(excluded_users)
   return _get_status(user_id)
 
 
