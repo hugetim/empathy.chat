@@ -162,6 +162,7 @@ def _get_status(user):
   status = None
   last_confirmed = None
   ping_start = None
+  tallies = _get_tallies(user)
   if current_row:
     if current_row['match_id']:
       matched_request_confirms = [r['last_confirmed'] for r
@@ -219,7 +220,7 @@ def _get_status(user):
       if row['complete'][i]==0:
         status = "matched"
         ping_start = row['match_commence']
-  return status, last_confirmed, ping_start, _get_tallies(user)
+  return status, last_confirmed, ping_start, tallies
 
 
 @anvil.server.callable

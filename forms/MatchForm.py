@@ -75,12 +75,16 @@ class MatchForm(MatchFormTemplate):
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.status = None
+    self.last_confirmed = None
+    self.ping_start = None
     self.tallies = anvil.server.call('cancel',self.user_id)
     self.reset_status()
 
   def complete_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.status = None
+    self.last_confirmed = None
+    self.ping_start = None
     self.tallies = anvil.server.call('match_complete',self.user_id)
     self.reset_status()
 
@@ -96,6 +100,7 @@ class MatchForm(MatchFormTemplate):
       else:
         self.reset_status()
     elif self.status in ["pinging-one", "pinging-mult"]:
+      self.status = "pinging-pending" # in case server call takes more than a second
       s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
       self.status = s
       self.last_confirmed = lc
@@ -146,6 +151,8 @@ class MatchForm(MatchFormTemplate):
               + str(p.WAIT_SECONDS) + " seconds of inactivity.",
               dismissible=False)
       self.status = None
+      self.last_confirmed = None
+      self.ping_start = None
     else:
       print (out)
       assert out in ["pinged-one","pinged-mult","matched"]
@@ -174,6 +181,8 @@ class MatchForm(MatchFormTemplate):
     elif out in [False, "timer elapsed"]:
       self.tallies = anvil.server.call('cancel',self.user_id)
       self.status = None
+      self.last_confirmed = None
+      self.ping_start = None
     elif out=="alt timer elapsed":
       s, lc, ps, self.tallies = anvil.server.call('cancel_match',self.user_id)
       alert("A match was found, but the time available for you to confirm ("
@@ -185,6 +194,8 @@ class MatchForm(MatchFormTemplate):
     elif out is None:
       self.tallies = anvil.server.call_s('get_tallies')
       self.status = None
+      self.last_confirmed = None
+      self.ping_start = None
     else:
       print (out)
       assert out in ["requesting", "requesting-confirm"]
@@ -337,6 +348,8 @@ class MatchForm(MatchFormTemplate):
   def logout_user(self):
     anvil.users.logout()
     self.status = None
+    self.last_confirmed = None
+    self.ping_start = None
     self.reset_status()
     self.user_id = None
     open_form('LoginForm')
