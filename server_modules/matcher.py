@@ -248,44 +248,6 @@ def get_code(user_id):
   return code, request_type
 
 
-@anvil.server.callable
-@anvil.tables.in_transaction
-def add_request(user_id, request_type):
-  """
-  return jitsi_code, last_confirmed (both None if no immediate match), num_emailed
-  """
-  # assert anvil.server.session['user_id']==user_id
-  jitsi_code = None
-  last_confirmed = None
-  num_emailed = 0
-  alt_avail = None
-  if request_type=="offering":
-    requests = [r for r in app_tables.requests.search(current=True,
-                                                      match_id=None)]
-  else:
-    assert request_type=="requesting"
-    requests = [r for r in app_tables.requests.search(current=True,
-                                                      request_type="offering",
-                                                      match_id=None)]
-  current_row = add_request_row(user_id, request_type)
-  if requests:
-    jitsi_code = new_jitsi_code()
-    current_row['ping_start'] = _now()
-    current_row['match_id'] = new_match_id()
-    current_row['jitsi_code'] = jitsi_code
-    cms = [r['cancelled_matches'] for r in requests]
-    eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
-    earliest_request = min(eligible_requests, key=lambda row: row['start'])
-    earliest_request['ping_start'] = current_row['ping_start']
-    earliest_request['match_id'] = current_row['match_id']
-    earliest_request['jitsi_code'] = jitsi_code
-    last_confirmed = earliest_request['last_confirmed']
-    alt_avail = len(requests) > 1
-  else:
-    num_emailed = request_emails(request_type)
-  return jitsi_code, last_confirmed, num_emailed, alt_avail
-
-
 def _create_match(user, excluded=()):
   """attempt to create a match for user"""
   excluded_users = list(excluded)
@@ -333,6 +295,23 @@ def _create_matches(excluded=()):
     _create_match(user, excluded_users)
     # attempt to create matches for remaining requests
     _create_matches(excluded_users + [user])
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def add_request(user_id, request_type):
+  """
+  return status, last_confirmed, ping_start, num_emailed
+  """
+  # assert anvil.server.session['user_id']==user_id
+  num_emailed = 0
+  user = _get_user(user_id)
+  current_row = _add_request_row(user, request_type)
+  _create_matches()
+  status, last_confirmed, ping_start, tallies = _get_status(user_id)
+  if status == "requesting":
+    num_emailed = request_emails(request_type)
+  return status, last_confirmed, ping_start, num_emailed
 
 
 @anvil.server.callable
@@ -490,8 +469,7 @@ def match_complete(user_id):
   return _get_tallies(user)
 
 
-def add_request_row(user_id, request_type):
-  user = _get_user(user_id)
+def _add_request_row(user, request_type):
   now = _now()
   new_row = app_tables.requests.add_row(user=user,
                                         current=True,

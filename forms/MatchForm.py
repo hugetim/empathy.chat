@@ -50,9 +50,9 @@ class MatchForm(MatchFormTemplate):
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     request_type = self.drop_down_1.selected_value
-    jitsi_code, s, lc, ps, num_emailed = anvil.server.call('add_request',
-                                                           self.user_id,
-                                                           request_type)
+    s, lc, ps, num_emailed = anvil.server.call('add_request',
+                                               self.user_id,
+                                               request_type)
     self.status = s
     self.last_confirmed = lc
     self.ping_start = ps
