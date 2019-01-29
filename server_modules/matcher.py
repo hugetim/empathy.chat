@@ -355,10 +355,10 @@ def cancel_match(user_id):
         row['ping_start'] = None
         row['match_id'] = None
         row['jitsi_code'] = None
+      current_row['cancelled_matched'] += 1
       if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
         current_row['current'] = False
-      _create_match([user])
-    current_row['cancelled_matched'] += 1
+      _create_match([user]) 
     return _get_status(user)
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
