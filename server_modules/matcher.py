@@ -67,7 +67,7 @@ def prune(user_id):
   # Return after confirming wait
   trust_level, request_em, match_em = get_user_info(user_id)
   email_in_list = None
-  if trust_level==0:
+  if trust_level == 0:
     email_in_list = _email_in_list(user['email'])
     if email_in_list:
       trust_level = 1
@@ -101,7 +101,7 @@ def _initialize_session(user_id):
 
 
 def _get_user(user_id):
-  if anvil.server.session['user_id']==user_id:
+  if anvil.server.session['user_id'] == user_id:
     return anvil.server.session['user']
   else:
     return app_tables.users.get_by_id(user_id)
@@ -119,7 +119,7 @@ def _emails_equal(a, b):
   em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
   a_match = em_re.search(a)
   b_match = em_re.search(b)
-  return a_match.group(1)==b_match.group(1) and a_match.group(2).lower()==b_match.group(2).lower()
+  return a_match.group(1) == b_match.group(1) and a_match.group(2).lower() == b_match.group(2).lower()
 
 
 @anvil.server.callable
@@ -172,11 +172,11 @@ def _get_status(user):
       if last_confirmed > current_row['last_confirmed']:
         status = "pinging"
         request_type = current_row['request_type']
-        if request_type=="will_offer_first":
+        if request_type == "will_offer_first":
           alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                match_id=None)]
         else:
-          assert request_type=="receive_first"
+          assert request_type == "receive_first"
           alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                request_type="will_offer_first",
                                                                match_id=None)]
@@ -190,14 +190,14 @@ def _get_status(user):
         request_types = [r['request_type'] for r
                          in app_tables.requests.search(match_id=current_row['match_id'],
                                                        current=True)
-                         if r['user']!=user]
-        assert len(request_types)==1
+                         if r['user'] != user]
+        assert len(request_types) == 1
         request_type = request_types[0]
-        if request_type=="will_offer_first":
+        if request_type == "will_offer_first":
           alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                match_id=None)]
         else:
-          assert request_type=="receive_first"
+          assert request_type == "receive_first"
           alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                request_type="will_offer_first",
                                                                match_id=None)]
@@ -215,7 +215,7 @@ def _get_status(user):
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:
       i = row['users'].index(user)
-      if row['complete'][i]==0:
+      if row['complete'][i] == 0:
         status = "matched"
         ping_start = row['match_commence']
   return status, last_confirmed, ping_start, tallies
@@ -235,7 +235,7 @@ def _get_tallies(user):
                  request_em=0)
   active_users = [user]
   for row in app_tables.requests.search(current=True, match_id=None):
-    if row['user']!=user:
+    if row['user'] != user:
       tallies[row['request_type']] += 1
       active_users.append(row['user'])
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
@@ -253,6 +253,7 @@ def get_code(user_id):
   user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   code = None
+  request_type = None
   if current_row:
     code = current_row['jitsi_code']
     request_type = current_row['request_type']
@@ -260,7 +261,7 @@ def get_code(user_id):
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in old_matches:
       i = row['users'].index(user)
-      if row['complete'][i]==1:
+      if row['complete'][i] == 1:
         code = row['jitsi_code']
         request_type = row['request_types'][i]
   return code, request_type
@@ -306,7 +307,7 @@ def _create_matches(excluded=()):
                     if r['user'] not in excluded_users]
   if all_requests:
     all_cms = [r['cancelled_matches'] for r in all_requests]
-    all_eligible_requests = [r for r in all_requests if r['cancelled_matches']==min(all_cms)]
+    all_eligible_requests = [r for r in all_requests if r['cancelled_matches'] == min(all_cms)]
     current_row = min(all_eligible_requests, key=lambda row: row['start'])
     user = current_row['user']
     # attempt to create a match for top request
@@ -503,8 +504,8 @@ def get_user_info(user_id):
   trust = user['trust_level']
   if trust is None:
     user.update(trust_level=0)
-    assert user['request_em']==False
-    assert user['match_em']==False
+    assert user['request_em'] == False
+    assert user['match_em'] == False
   return user['trust_level'], user['request_em'], user['match_em']
 
 
@@ -543,14 +544,14 @@ def _request_emails(request_type):
   """email all users with request_em_check_box checked who logged in recently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   user = anvil.server.session['user']
-  if request_type=="receive_first":
+  if request_type == "receive_first":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
   else:
-    assert request_type=="will_offer_first"
+    assert request_type == "will_offer_first"
     request_type_text = 'an empathy exchange.'
   cutoff_e = _now() - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
-                       if u['last_login'] > cutoff_e and u!=user]
+                       if u['last_login'] > cutoff_e and u != user]
   for email_address in emails:
     anvil.google.mail.send(to=email_address,
                            subject="Empathy Swap - Request active",

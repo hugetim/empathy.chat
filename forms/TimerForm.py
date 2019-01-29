@@ -10,6 +10,7 @@ class TimerForm(TimerFormTemplate):
   user_id = None
   status = None
   seconds_left = None
+
   def __init__(self, seconds_left, user_id, current_status, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
