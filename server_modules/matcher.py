@@ -355,6 +355,8 @@ def cancel_match(user_id):
         row['ping_start'] = None
         row['match_id'] = None
         row['jitsi_code'] = None
+      if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
+        current_row['current'] = False
       _create_match([user])
     current_row['cancelled_matched'] += 1
     return _get_status(user)
@@ -389,6 +391,8 @@ def cancel_other(user_id):
           excluded_users += [row['user']]
           row['cancelled_matches'] += 1
           # row['current'] = False
+      if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
+        current_row['current'] = False
       _create_match(excluded_users)
   return _get_status(user_id)
 
