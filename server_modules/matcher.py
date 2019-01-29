@@ -286,8 +286,9 @@ def add_request(user_id, request_type):
   return jitsi_code, last_confirmed, num_emailed, alt_avail
 
 
-def _create_match(user, excluded_users=[]):
+def _create_match(user, excluded=()):
   """attempt to create a match for user"""
+  excluded_users = list(excluded)
   current_row = app_tables.requests.get(user=user, current=True)
   request_type = current_row['request_type']
   if request_type == "offering":
@@ -316,8 +317,9 @@ def _create_match(user, excluded_users=[]):
       _match_commenced(user)
 
 
-def _create_matches(excluded_users=[]):
+def _create_matches(excluded=()):
   """attempt to create a match from existing requests, iterate"""
+  excluded_users = list(excluded)
   # find top request in queue
   all_requests = [r for r in app_tables.requests.search(current=True,
                                                         match_id=None)
