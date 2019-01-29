@@ -21,14 +21,6 @@ class TimerForm(TimerFormTemplate):
     self.user_id = user_id
     self.status = current_status
 
-  #def button_yes_click(self, **event_args):
-  #  """This method is called when the button is clicked"""
-  #  self.raise_event("x-close-alert", value="Yes")
-
-  #def button_no_click(self, **event_args):
-  #  """This method is called when the button is clicked"""
-  #  self.raise_event("x-close-alert", value="No")
-
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     new_status, lc, ps, tallies = anvil.server.call_s('get_status',self.user_id)
@@ -57,11 +49,3 @@ class TimerForm(TimerFormTemplate):
         self.raise_event("x-close-alert", value="alt timer elapsed")
       else:
         self.raise_event("x-close-alert", value="timer elapsed")
-
-  #def return_back(self, confirmed):
-  #  if confirmed:
-  #    anvil.server.call('match_commenced',self.user_id)
-  #    open_form('Form1')
-  #  else:
-  #    anvil.server.call('cancel',self.user_id)
-  #    open_form('Form1')
