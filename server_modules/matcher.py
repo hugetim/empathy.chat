@@ -320,6 +320,10 @@ def _create_match(excluded_users=[]):
       earliest_request['ping_start'] = current_row['ping_start']
       earliest_request['match_id'] = current_row['match_id']
       earliest_request['jitsi_code'] = jitsi_code
+      lc = min(current_row['last_confirmed'],
+               earliest_request['last_confirmed'])
+      if (current_row['ping_start'] - lc).seconds <= p.BUFFER_SECONDS:
+        _match_commenced(user)
     _create_match(excluded_users + [user])
 
 
@@ -415,6 +419,15 @@ def match_commenced(user_id):
   """
   # return status, match_start?
   user = _get_user(user_id)
+  return _match_commenced(user)
+
+
+def _match_commenced(user):
+  """
+  return status, match_start, jitsi_code, request_type
+  Upon first commence, copy row over and delete "matching" row.
+  Should not cause error if already commenced
+  """
   current_row = app_tables.requests.get(user=user, current=True)
   status = None
   match_start = None
