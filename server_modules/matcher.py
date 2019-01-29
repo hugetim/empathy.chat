@@ -68,9 +68,9 @@ def prune(user_id):
       user['trust_level'] = trust_level
     else:
       user['enabled'] = False
-  current_status, ref_time, tallies, alt_avail = _get_status(user_id)
+  current_status, ref_time, tallies, alt_avail = _get_status(user)
   if current_status in ('requesting', 'offering', 'pinged', 'matched'):
-    lc = _confirm_wait(user_id)
+    lc = _confirm_wait(user)
   return trust_level, request_em, match_em, current_status, ref_time, tallies, alt_avail, email_in_list
 
 
@@ -108,12 +108,12 @@ def _emails_equal(a, b):
 @anvil.tables.in_transaction
 def confirm_wait(user_id):
   """updates last_confirmed for current request, returns last_confirmed"""
-  return _confirm_wait(user_id)
-
-
-def _confirm_wait(user_id):
-  """updates last_confirmed for current request, returns last_confirmed"""
   user = _get_user(user_id)
+  return _confirm_wait(user)
+
+
+def _confirm_wait(user):
+  """updates last_confirmed for current request, returns last_confirmed"""
   current_row = app_tables.requests.get(user=user, current=True)
   current_row['last_confirmed'] = _now()
   if current_row['match_id']:
@@ -128,17 +128,17 @@ def _confirm_wait(user_id):
 @anvil.tables.in_transaction
 def get_status(user_id):
   _prune_requests()
-  return _get_status(user_id)
+  user = _get_user(user_id)
+  return _get_status(user)
 
 
-def _get_status(user_id):
+def _get_status(user):
   """
   returns current_status, last_confirmed, ping_start, tallies
   last_confirmed: min of this or other's last_confirmed
   ping_start: ping_start or, for "matched", match_commence
   assumes 2-person matches only
   """
-  user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   status = None
   last_confirmed = None
@@ -265,8 +265,8 @@ def _create_match(user, excluded=()):
                 if r['user'] not in [user] + excluded_users]
   if requests:
     current_row['ping_start'] = _now()
-    current_row['match_id'] = new_match_id()
-    current_row['jitsi_code'] = new_jitsi_code()
+    current_row['match_id'] = _new_match_id()
+    current_row['jitsi_code'] = _new_jitsi_code()
     cms = [r['cancelled_matches'] for r in requests]
     eligible_requests = [r for r in requests if r['cancelled_matches'] == min(cms)]
     earliest_request = min(eligible_requests, key=lambda row: row['start'])
@@ -308,9 +308,9 @@ def add_request(user_id, request_type):
   user = _get_user(user_id)
   current_row = _add_request_row(user, request_type)
   _create_matches()
-  status, last_confirmed, ping_start, tallies = _get_status(user_id)
+  status, last_confirmed, ping_start, tallies = _get_status(user)
   if status == "requesting":
-    num_emailed = request_emails(request_type)
+    num_emailed = _request_emails(request_type)
   return status, last_confirmed, ping_start, num_emailed
 
 
@@ -395,7 +395,7 @@ def cancel_other(user_id):
         current_row['current'] = False
       _create_matches(excluded_users)
       _create_match(user)
-  return _get_status(user_id)
+  return _get_status(user)
 
 
 @anvil.server.callable
@@ -481,7 +481,7 @@ def _add_request_row(user, request_type):
   return new_row
 
 
-def new_jitsi_code():
+def _new_jitsi_code():
   num_chars = 5
   charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   random.seed()
@@ -491,7 +491,7 @@ def new_jitsi_code():
   return code
 
 
-def new_match_id():
+def _new_match_id():
   match_id = uuid.uuid4()
   return match_id.int
 
@@ -539,7 +539,7 @@ p.s. You are receiving this email because you checked the box: "Notify me by ema
 ''')
 
 
-def request_emails(request_type):
+def _request_emails(request_type):
   """email all users with request_em_check_box checked who logged in recently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   user = anvil.server.session['user']
