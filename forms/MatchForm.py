@@ -263,40 +263,40 @@ class MatchForm(MatchFormTemplate):
 
   def update_tally_label(self):
     temp = ""
-    if self.tallies['requesting'] > 1:
-      if self.tallies['offering'] > 0:
-        temp = (str(self.tallies['requesting'] + self.tallies['offering'])
+    if self.tallies['receive_first'] > 1:
+      if self.tallies['will_offer_first'] > 0:
+        temp = (str(self.tallies['receive_first'] + self.tallies['will_offer_first'])
                 + ' current requests for an empathy exchange, '
                 + 'some of which are requesting a partner willing to offer empathy first.')
       else:
-        assert self.tallies['offering']==0
-        temp = (str(self.tallies['requesting'])
+        assert self.tallies['will_offer_first']==0
+        temp = (str(self.tallies['receive_first'])
                 + ' current requests for an empathy exchange, '
                 + 'all of which are requesting a partner willing to offer empathy first.')
-    elif self.tallies['requesting']==1:
-      if self.tallies['offering'] > 0:
-        temp = (str(self.tallies['requesting'] + self.tallies['offering'])
+    elif self.tallies['receive_first']==1:
+      if self.tallies['will_offer_first'] > 0:
+        temp = (str(self.tallies['receive_first'] + self.tallies['will_offer_first'])
                 + ' current requests for an empathy exchange. '
                 + 'One is requesting a partner willing to offer empathy first.')
       else:
-        assert self.tallies['offering']==0
-        temp = (str(self.tallies['requesting'])
+        assert self.tallies['will_offer_first']==0
+        temp = (str(self.tallies['receive_first'])
                 + ' current request for an empathy exchange, '
                 + 'requesting a partner willing to offer empathy first.')
     else:
-      assert self.tallies['requesting']==0
-      if self.tallies['offering'] > 1:
-        temp = (str(self.tallies['offering'])
+      assert self.tallies['receive_first']==0
+      if self.tallies['will_offer_first'] > 1:
+        temp = (str(self.tallies['will_offer_first'])
                 + ' current requests for an empathy exchange, '
                 + 'all of which are willing to offer empathy first.')
-      elif self.tallies['offering']==1:
-        temp = (str(self.tallies['offering'])
+      elif self.tallies['will_offer_first']==1:
+        temp = (str(self.tallies['will_offer_first'])
                 + ' current request for an empathy exchange '
                 + 'by someone willing to offer empathy first.')
       else:
-        assert self.tallies['offering']==0
-    if self.tallies['offering']==0:
-      if self.tallies['requesting'] > 0:
+        assert self.tallies['will_offer_first']==0
+    if self.tallies['will_offer_first']==0:
+      if self.tallies['receive_first'] > 0:
         if self.tallies['request_em'] > 1:
           temp += (str(self.tallies['request_em'])
                    + ' others are currently receiving email notifications '

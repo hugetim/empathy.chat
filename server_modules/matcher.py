@@ -47,7 +47,7 @@ def prune(user_id):
   returns trust_level, request_em, match_em, current_status, ref_time (or None),
           tallies, alt_avail, email_in_list
   prunes old requests/offers
-  updates last_confirmed if currently requesting/offering/pinged
+  updates last_confirmed if currently requesting/ping
   """
   assume_complete = datetime.timedelta(hours=4)
   _initialize_session(user_id)
@@ -79,7 +79,7 @@ def prune(user_id):
     lc = _confirm_wait(user)
     request_type = _get_request_type(user)
   else:
-    request_type = "offering"
+    request_type = "will_offer_first"
   return trust_level, request_em, match_em, request_type, status, lc, ps, tallies, email_in_list
 
 
@@ -163,13 +163,13 @@ def _get_status(user):
       if last_confirmed > current_row['last_confirmed']:
         status = "pinging"
         request_type = current_row['request_type']
-        if request_type=="offering":
+        if request_type=="will_offer_first":
           alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                match_id=None)]
         else:
-          assert request_type=="requesting"
+          assert request_type=="receive_first"
           alt_requests = [r for r in app_tables.requests.search(current=True,
-                                                               request_type="offering",
+                                                               request_type="will_offer_first",
                                                                match_id=None)]
         alt_avail = len(alt_requests) > 0
         if alt_avail:
@@ -184,13 +184,13 @@ def _get_status(user):
                          if r['user']!=user]
         assert len(request_types)==1
         request_type = request_types[0]
-        if request_type=="offering":
+        if request_type=="will_offer_first":
           alt_requests = [r for r in app_tables.requests.search(current=True,
                                                                match_id=None)]
         else:
-          assert request_type=="requesting"
+          assert request_type=="receive_first"
           alt_requests = [r for r in app_tables.requests.search(current=True,
-                                                               request_type="offering",
+                                                               request_type="will_offer_first",
                                                                match_id=None)]
         alt_avail = len(alt_requests) > 0
         if alt_avail:
@@ -221,8 +221,8 @@ def get_tallies():
 
 
 def _get_tallies(user):
-  tallies =	dict(requesting=0,
-                 offering=0,
+  tallies =	dict(receive_first=0,
+                 will_offer_first=0,
                  request_em=0)
   active_users = [user]
   for row in app_tables.requests.search(current=True, match_id=None):
@@ -262,14 +262,14 @@ def _create_match(user, excluded=()):
   excluded_users = list(excluded)
   current_row = app_tables.requests.get(user=user, current=True)
   request_type = current_row['request_type']
-  if request_type == "offering":
+  if request_type == "will_offer_first":
     requests = [r for r in app_tables.requests.search(current=True,
                                                       match_id=None)
                 if r['user'] not in [user] + excluded_users]
   else:
-    assert request_type == "requesting"
+    assert request_type == "receive_first"
     requests = [r for r in app_tables.requests.search(current=True,
-                                                      request_type="offering",
+                                                      request_type="will_offer_first",
                                                       match_id=None)
                 if r['user'] not in [user] + excluded_users]
   if requests:
@@ -553,10 +553,10 @@ def _request_emails(request_type):
   """email all users with request_em_check_box checked who logged in recently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   user = anvil.server.session['user']
-  if request_type=="requesting":
+  if request_type=="receive_first":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
   else:
-    assert request_type=="offering"
+    assert request_type=="will_offer_first"
     request_type_text = 'an empathy exchange.'
   cutoff_e = _now() - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)

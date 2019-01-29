@@ -29,7 +29,7 @@ def test_add_user(em, level=1, r_em=False, m_em=False):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def test_add_request(user_id, request_type = "offering"):
+def test_add_request(user_id, request_type = "will_offer_first"):
   assert anvil.server.session['user']['trust_level'] >= p.TEST_TRUST_LEVEL
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
@@ -46,13 +46,13 @@ def test_add_request(user_id, request_type = "offering"):
   last_confirmed = None
   num_emailed = 0
   alt_avail = None
-  if request_type=="offering":
+  if request_type=="will_offer_first":
     requests = [r for r in app_tables.requests.search(current=True,
                                                       match_id=None)]
   else: 
-    assert request_type=="requesting"
+    assert request_type=="receive_first"
     requests = [r for r in app_tables.requests.search(current=True,
-                                                      request_type="offering",
+                                                      request_type="will_offer_first",
                                                       match_id=None)]    
   now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
   new_row = app_tables.requests.add_row(user=user,
