@@ -84,8 +84,9 @@ def prune(user_id):
     elif status in ('pinging-one', 'pinging-mult') and seconds_left <= 0:
       status, lc, ps, tallies = _cancel_other(user)
   if status in ('requesting', 'requesting-confirm', 'pinged-one', 'pinged-mult',
-                        'pinging-one', 'pinging-mult'):
-    lc = _confirm_wait(user)
+                'pinging-one', 'pinging-mult'):
+    _confirm_wait(user)
+    status, lc, ps, tallies = _get_status(user)
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
