@@ -14,10 +14,15 @@ import re
 import helper as h
 
 
+def _now():
+  """return utcnow"""
+  return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+
+
 def _prune_requests():
   """Prune definitely outdated requests, unmatched then matched"""
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
-  cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
+  cutoff_r = _now() - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
                     if r['last_confirmed'] < cutoff_r)
   for row in old_requests:
@@ -45,7 +50,7 @@ def prune(user_id):
   # Prune requests, including from this user
   _prune_requests()
   # Complete old commenced matches for this user
-  cutoff_m = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_complete
+  cutoff_m = _now() - assume_complete
   old_matches = (m for m in app_tables.matches.search(users=[user], complete=[0])
                    if m['match_commence'] < cutoff_m)
   for row in old_matches:
@@ -110,7 +115,7 @@ def _confirm_wait(user_id):
   """updates last_confirmed for current request, returns last_confirmed"""
   user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
-  current_row['last_confirmed'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+  current_row['last_confirmed'] = _now()
   if current_row['match_id']:
     matched_requests = app_tables.requests.search(match_id=current_row['match_id'], current=True)
     for row in matched_requests:
@@ -216,7 +221,7 @@ def _get_tallies(user):
       tallies[row['request_type']] += 1
       active_users.append(row['user'])
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
-  cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
+  cutoff_e = _now() - assume_inactive
   request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
                      if u['last_login'] > cutoff_e and u not in active_users]
   tallies['request_em'] = len(request_em_list)
@@ -265,7 +270,7 @@ def add_request(user_id, request_type):
   current_row = add_request_row(user_id, request_type)
   if requests:
     jitsi_code = new_jitsi_code()
-    current_row['ping_start'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+    current_row['ping_start'] = _now()
     current_row['match_id'] = new_match_id()
     current_row['jitsi_code'] = jitsi_code
     cms = [r['cancelled_matches'] for r in requests]
@@ -284,7 +289,6 @@ def add_request(user_id, request_type):
 def _create_match(excluded_users=[]):
   """attempt to create a match from existing requests, iterate"""
   # find top request in queue
-  print("running create match")
   all_requests = [r for r in app_tables.requests.search(current=True,
                                                         match_id=None)
                     if r['user'] not in excluded_users]
@@ -307,7 +311,7 @@ def _create_match(excluded_users=[]):
                     if r['user'] not in [user] + excluded_users]
     if requests:
       jitsi_code = new_jitsi_code()
-      current_row['ping_start'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+      current_row['ping_start'] = _now()
       current_row['match_id'] = new_match_id()
       current_row['jitsi_code'] = jitsi_code
       cms = [r['cancelled_matches'] for r in requests]
@@ -316,6 +320,7 @@ def _create_match(excluded_users=[]):
       earliest_request['ping_start'] = current_row['ping_start']
       earliest_request['match_id'] = current_row['match_id']
       earliest_request['jitsi_code'] = jitsi_code
+    _create_match(excluded_users + [user])
 
 
 @anvil.server.callable
@@ -420,7 +425,7 @@ def match_commenced(user_id):
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
                                                     current=True)
-      match_start = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+      match_start = _now()
       jitsi_code = current_row['jitsi_code']
       new_match = app_tables.matches.add_row(users=[],
                                              request_types=[],
@@ -464,7 +469,7 @@ def match_complete(user_id):
 
 def add_request_row(user_id, request_type):
   user = _get_user(user_id)
-  now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+  now = _now()
   new_row = app_tables.requests.add_row(user=user,
                                         current=True,
                                         request_type=request_type,
@@ -542,7 +547,7 @@ def request_emails(request_type):
   else:
     assert request_type=="offering"
     request_type_text = 'an empathy exchange.'
-  cutoff_e = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - assume_inactive
+  cutoff_e = _now() - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
                        if u['last_login'] > cutoff_e and u!=user]
   for email_address in emails:
