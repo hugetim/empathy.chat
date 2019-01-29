@@ -371,14 +371,7 @@ def _cancel_match(user):
         current_row['current'] = False
       _create_matches([user])
       _create_match(user)
-    return _get_status(user)
-  else:
-    current_matches = app_tables.matches.search(users=[user], complete=[0])
-    for row in current_matches:
-      i = row['users'].index(user)
-      if row['complete'][i]==0:
-        return "empathy", None, None, _get_tallies(user)
-    return None, None, None, _get_tallies(user)
+  return _get_status(user)
 
 
 @anvil.server.callable
@@ -430,37 +423,28 @@ def cancel_other(user_id):
 @anvil.tables.in_transaction
 def match_commenced(user_id):
   """
-  return status, match_start, jitsi_code, request_type
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
-  # return status, match_start?
   user = _get_user(user_id)
   return _match_commenced(user)
 
 
 def _match_commenced(user):
   """
-  return status, match_start, jitsi_code, request_type
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
   current_row = app_tables.requests.get(user=user, current=True)
-  status = None
-  match_start = None
-  jitsi_code = None
-  request_type = None
   if current_row:
-    request_type = current_row['request_type']
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
                                                     current=True)
       match_start = _now()
-      jitsi_code = current_row['jitsi_code']
       new_match = app_tables.matches.add_row(users=[],
                                              request_types=[],
                                              match_id=current_row['match_id'],
-                                             jitsi_code=jitsi_code,
+                                             jitsi_code=current_row['jitsi_code'],
                                              match_commence=match_start,
                                              complete=[])
       for row in matched_requests:
@@ -468,19 +452,6 @@ def _match_commenced(user):
         new_match['request_types'] += [row['request_type']]
         new_match['complete'] += [0]
         row['current'] = False
-      status = "empathy"
-    else:
-      status = request_type
-  else:
-    current_matches = app_tables.matches.search(users=[user], complete=[0])
-    for row in current_matches:
-      i = row['users'].index(user)
-      if row['complete'][i]==0:
-        status = "empathy"
-        match_start = row['match_commence']
-        jitsi_code = row['jitsi_code']
-        request_type = row['request_types'][i]
-  return status, match_start, jitsi_code, request_type
 
 
 @anvil.server.callable

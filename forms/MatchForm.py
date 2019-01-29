@@ -155,8 +155,10 @@ class MatchForm(MatchFormTemplate):
         self.last_confirmed = lc
         self.ping_start = ps
       else:
-        self.status = out #i.e. "matched", given above assert
-    self.reset_status()
+        self.status = out
+        assert self.status == "matched"
+        anvil.server.call('match_commenced', self.user_id)
+  self.reset_status()
 
   def confirm_match(self):
     if self.match_em_check_box.checked:
@@ -168,6 +170,7 @@ class MatchForm(MatchFormTemplate):
                   dismissible=False)
     if out==True:
       self.status = "matched"
+      anvil.server.call('match_commenced', self.user_id)
     elif out in [False, "timer elapsed"]:
       self.tallies = anvil.server.call('cancel',self.user_id)
       self.status = None
@@ -237,10 +240,7 @@ class MatchForm(MatchFormTemplate):
         else:
           assert self.status=="matched"
           self.timer_label.visible = False
-          (new_status, match_start,
-           jitsi_code, request_type) = anvil.server.call('match_commenced',
-                                                         self.user_id)
-          assert new_status=="matched"
+          jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
           self.status.text = "You have a confirmed match. Use Jitsi to meet: "
           self.status.bold = True
           self.cancel_button.visible = False
