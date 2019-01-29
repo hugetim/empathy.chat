@@ -26,7 +26,7 @@ class MatchForm(MatchFormTemplate):
     self.user_id = anvil.users.get_user().get_id()
     # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
     self.confirming_wait = False
-    tl, re, me, tallies, rt, s, lc, ps, e = anvil.server.call('prune',self.user_id)
+    tl, re, me, rt, s, lc, ps, tallies, e = anvil.server.call('prune',self.user_id)
     if e==False:
       alert('Your email address is not approved to use this app. '
             + 'Contact empathyroom@gmail.com for help.')

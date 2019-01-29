@@ -27,11 +27,16 @@ def _prune_requests():
                     if r['last_confirmed'] < cutoff_r)
   for row in old_requests:
     row['current'] = False
-
+  # below (matched separately) ensures that no ping requests left hanging by cancelling only one
   old_ping_requests = (r for r in app_tables.requests.search(current=True)
                        if (r['match_id'] is not None and r['ping_start'] < cutoff_r))
   for row in old_ping_requests:
     row['current'] = False
+
+
+def _get_request_type(user):
+  current_row = app_tables.requests.get(user=user, current=True)
+  return current_row['request_type']
 
 
 @anvil.server.callable
@@ -68,10 +73,14 @@ def prune(user_id):
       user['trust_level'] = trust_level
     else:
       user['enabled'] = False
-  current_status, ref_time, tallies, alt_avail = _get_status(user)
-  if current_status in ('requesting', 'offering', 'pinged', 'matched'):
+  status, lc, ps, tallies = _get_status(user)
+  if current_status in ('requesting', 'requesting-confirm', 'pinged-one', 'pinged-mult',
+                        'pinging-one', 'pinging-mult'):
     lc = _confirm_wait(user)
-  return trust_level, request_em, match_em, current_status, ref_time, tallies, alt_avail, email_in_list
+    request_type = _get_request_type(user)
+  else:
+    request_type = "offering"
+  return trust_level, request_em, match_em, request_type, status, lc, ps, tallies, email_in_list
 
 
 def _initialize_session(user_id):
