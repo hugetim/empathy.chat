@@ -303,10 +303,11 @@ def add_request(user_id, request_type):
   """
   return status, last_confirmed, ping_start, num_emailed
   """
-  # assert anvil.server.session['user_id']==user_id
   num_emailed = 0
   user = _get_user(user_id)
-  current_row = _add_request_row(user, request_type)
+  status, last_confirmed, ping_start, tallies = _get_status(user)
+  assert status == None
+  _add_request_row(user, request_type)
   _create_matches()
   status, last_confirmed, ping_start, tallies = _get_status(user)
   if status == "requesting":
