@@ -36,7 +36,8 @@ def _prune_requests():
 
 def _get_request_type(user):
   current_row = app_tables.requests.get(user=user, current=True)
-  return current_row['request_type']
+  if current_row:
+    return current_row['request_type']
 
 
 @anvil.server.callable
@@ -79,14 +80,12 @@ def prune(user_id):
     if status == 'pinged-mult' and seconds_left <= 0:
       status, lc, ps, tallies = _cancel_match(user)
     elif status in ('pinged-one', 'pinged-mult'):
-      _match_commenced(user)
-      status, lc, ps, tallies = _get_status(user)
+      status, lc, ps, tallies = _match_commenced(user)
     elif status in ('pinging-one', 'pinging-mult') and seconds_left <= 0:
       status, lc, ps, tallies = _cancel_other(user)
   if status in ('requesting', 'requesting-confirm', 'pinged-one', 'pinged-mult',
                 'pinging-one', 'pinging-mult'):
-    _confirm_wait(user)
-    status, lc, ps, tallies = _get_status(user)
+    status, lc, ps, tallies = _confirm_wait(user)
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
@@ -126,13 +125,13 @@ def _emails_equal(a, b):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def confirm_wait(user_id):
-  """updates last_confirmed for current request, returns last_confirmed"""
+  """updates last_confirmed for current request, returns _get_status(user)"""
   user = _get_user(user_id)
   return _confirm_wait(user)
 
 
 def _confirm_wait(user):
-  """updates last_confirmed for current request, returns last_confirmed"""
+  """updates last_confirmed for current request, returns _get_status(user)"""
   current_row = app_tables.requests.get(user=user, current=True)
   current_row['last_confirmed'] = _now()
   if current_row['match_id']:
@@ -140,13 +139,12 @@ def _confirm_wait(user):
     for row in matched_requests:
       if row['user'] != user:
         return min(row['last_confirmed'], current_row['last_confirmed'])
-  return current_row['last_confirmed']
+  return _get_status(user)
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_status(user_id):
-  _prune_requests()
   user = _get_user(user_id)
   return _get_status(user)
 
@@ -424,6 +422,7 @@ def cancel_other(user_id):
 @anvil.tables.in_transaction
 def match_commenced(user_id):
   """
+  Returns _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
@@ -433,6 +432,7 @@ def match_commenced(user_id):
 
 def _match_commenced(user):
   """
+  Returns _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
@@ -453,7 +453,7 @@ def _match_commenced(user):
         new_match['request_types'] += [row['request_type']]
         new_match['complete'] += [0]
         row['current'] = False
-
+  return _get_status(user)
 
 @anvil.server.callable
 @anvil.tables.in_transaction

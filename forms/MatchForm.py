@@ -141,8 +141,10 @@ class MatchForm(MatchFormTemplate):
                   large=False,
                   dismissible=False)
     if out==True:
-      self.last_confirmed = anvil.server.call('confirm_wait',self.user_id)
-      self.status = "requesting"
+      s, lc, ps, self.tallies = anvil.server.call('confirm_wait',self.user_id)
+      self.status = s
+      self.last_confirmed = lc
+      self.ping_start = ps
     elif out in [False, "timer elapsed", None]:
 
       self.tallies = anvil.server.call('cancel',self.user_id)
@@ -162,9 +164,11 @@ class MatchForm(MatchFormTemplate):
         self.last_confirmed = lc
         self.ping_start = ps
       else:
-        self.status = out
-        assert self.status == "matched"
-        anvil.server.call('match_commenced', self.user_id)
+        assert out == "matched"
+        s, lc, ps, self.tallies = anvil.server.call('match_commenced', self.user_id)
+        self.status = s
+        self.last_confirmed = lc
+        self.ping_start = ps
   self.reset_status()
 
   def confirm_match(self):
@@ -177,7 +181,10 @@ class MatchForm(MatchFormTemplate):
                   dismissible=False)
     if out==True:
       self.status = "matched"
-      anvil.server.call('match_commenced', self.user_id)
+      s, lc, ps, self.tallies = anvil.server.call('match_commenced', self.user_id)
+      self.status = s
+      self.last_confirmed = lc
+      self.ping_start = ps
     elif out in [False, "timer elapsed"]:
       self.tallies = anvil.server.call('cancel',self.user_id)
       self.status = None
