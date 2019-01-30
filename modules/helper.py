@@ -6,7 +6,7 @@ import anvil.tz
 def seconds_left(status, last_confirmed, ping_start=None):
     now = datetime.datetime.now(last_confirmed.tzinfo)
     if status in ["pinging-mult", "pinging-one", "pinged-mult", "pinged-one"]:
-      assert ping_start.tzinfo == last_confirmed.tzinfo
+      #assert ping_start.tzinfo == last_confirmed.tzinfo
       min_confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).seconds
       if status == "pinging-mult":
         return min_confirm_match + p.BUFFER_SECONDS

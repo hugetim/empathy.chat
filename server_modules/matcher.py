@@ -259,7 +259,7 @@ def get_code(user_id):
     request_type = current_row['request_type']
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
-    for row in old_matches:
+    for row in current_matches:
       i = row['users'].index(user)
       if row['complete'][i] == 1:
         code = row['jitsi_code']
