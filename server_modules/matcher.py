@@ -47,22 +47,22 @@ def prune(user_id):
   Assumed to run upon initializing Form1
   returns trust_level, request_em, match_em, current_status, ref_time (or None),
           tallies, alt_avail, email_in_list
-  prunes old requests/offers
+  prunes old requests/offers/matches
   updates last_confirmed if currently requesting/ping
   """
-  assume_complete = datetime.timedelta(hours=4)
+  assume_complete = datetime.timedelta(hours=18)
   _initialize_session(user_id)
   user = anvil.server.session['user']
   # Prune requests, including from this user
   _prune_requests()
-  # Complete old commenced matches for this user
+  # Complete old commenced matches for all users
   cutoff_m = _now() - assume_complete
-  old_matches = (m for m in app_tables.matches.search(users=[user], complete=[0])
-                   if m['match_commence'] < cutoff_m)
+  old_matches = (m for m in app_tables.matches.search(complete=[0])
+                 if m['match_commence'] < cutoff_m)
   for row in old_matches:
-    i = row['users'].index(user)
     temp = row['complete']
-    temp[i] = 1
+    for i in range(len(temp))
+      temp[i] = 1
     row['complete'] = temp
   # Return after confirming wait
   trust_level, request_em, match_em = get_user_info(user_id)
