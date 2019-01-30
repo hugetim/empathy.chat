@@ -191,11 +191,12 @@ class MatchForm(MatchFormTemplate):
       self.status = None
       self.last_confirmed = None
       self.ping_start = None
+      if out == "timer elapsed":
+        alert("A match was found, but the time available for you to confirm ("
+              + str(p.CONFIRM_MATCH_SECONDS) + " seconds) elapsed.",
+              dismissible=False)
     elif out == "alt timer elapsed":
       s, lc, ps, self.tallies = anvil.server.call('cancel_match',self.user_id)
-      alert("A match was found, but the time available for you to confirm ("
-            + str(p.CONFIRM_MATCH_SECONDS) + " seconds) elapsed.",
-            dismissible=False)
       self.status = s
       self.last_confirmed = lc
       self.ping_start = ps
@@ -409,4 +410,3 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
-
