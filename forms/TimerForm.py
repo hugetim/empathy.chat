@@ -8,7 +8,7 @@ import helper as h
 
 class TimerForm(TimerFormTemplate):
   user_id = None
-  ustatus = None
+  status = None
   seconds_left = None
 
   def __init__(self, seconds_left, user_id, current_status, **properties):
@@ -20,12 +20,12 @@ class TimerForm(TimerFormTemplate):
     self.seconds_left = seconds_left
     self.timer_label.text = str(self.seconds_left) + " seconds left to confirm."
     self.user_id = user_id
-    self.ustatus = current_status
+    self.status = current_status
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5 seconds"""
     new_status, lc, ps, tallies = anvil.server.call_s('get_status',self.user_id)
-    if (self.ustatus in ["pinged-one", "pinged-mult"]
+    if (self.status in ["pinged-one", "pinged-mult"]
         and new_status in ["pinged-one", "pinged-mult"]):
       old_seconds_left = self.seconds_left
       self.seconds_left = h.seconds_left(new_status, lc, ps)
@@ -36,8 +36,8 @@ class TimerForm(TimerFormTemplate):
         Notification("Another person is now available to take your place if you are not able"
                      + " to respond within two minutes.",
                      title="Prompt response needed").show()
-      self.ustatus = new_status
-    elif new_status != self.ustatus:
+      self.status = new_status
+    elif new_status != self.status:
       print (new_status)
       self.raise_event("x-close-alert", value=new_status)
 
@@ -46,7 +46,7 @@ class TimerForm(TimerFormTemplate):
     self.seconds_left -= 1
     self.timer_label.text = str(self.seconds_left) + " seconds left to confirm."
     if self.seconds_left <= 0:
-      if self.ustatus in ["pinged-mult", "pinging-mult"]:
+      if self.status in ["pinged-mult", "pinging-mult"]:
         self.raise_event("x-close-alert", value="alt timer elapsed")
       else:
         self.raise_event("x-close-alert", value="timer elapsed")

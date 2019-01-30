@@ -223,7 +223,7 @@ class MatchForm(MatchFormTemplate):
       self.drop_down_1.foreground = "gray"
       self.tally_label.visible = False
       if self.ustatus in ["requesting", "requesting-confirm"]:
-        self.ustatus.text = "Status: Requesting an empathy exchange. "
+        self.status.text = "Status: Requesting an empathy exchange. "
         self.note_label.text = ("(Note: Your request will be cancelled after "
                                 + str(2*p.CONFIRM_WAIT_SECONDS/60)
                                 + " minutes of inactivity. After "
@@ -235,7 +235,7 @@ class MatchForm(MatchFormTemplate):
                                 + " seconds to confirm a match if someone "
                                 + "else is available to take your place.)")
         self.note_label.visible = True
-        self.ustatus.bold = False
+        self.status.bold = False
         self.set_jitsi_link("")
         self.timer_label.visible = False
         self.complete_button.visible = False
@@ -252,8 +252,8 @@ class MatchForm(MatchFormTemplate):
           self.timer_label.text = ("A match has been found and they have up to "
                                    + str(self.seconds) + " seconds to confirm.")
           self.timer_label.visible = True
-          self.ustatus.text = "A match should be ready soon. Set up Jitsi at: "
-          self.ustatus.bold = False
+          self.status.text = "A match should be ready soon. Set up Jitsi at: "
+          self.status.bold = False
           jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
           self.cancel_button.visible = True
           self.complete_button.visible = False
@@ -261,15 +261,15 @@ class MatchForm(MatchFormTemplate):
           assert self.ustatus == "matched"
           self.timer_label.visible = False
           jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
-          self.ustatus.text = "You have a confirmed match. Use Jitsi to meet: "
-          self.ustatus.bold = True
+          self.status.text = "You have a confirmed match. Use Jitsi to meet: "
+          self.status.bold = True
           self.cancel_button.visible = False
           self.complete_button.visible = True
         self.set_jitsi_link(jitsi_code)
         self.match_em_check_box.visible = False
     else:
-      self.ustatus.text = "Request a match when ready:"
-      self.ustatus.bold = True
+      self.status.text = "Request a match when ready:"
+      self.status.bold = True
       self.note_label.visible = False
       self.set_jitsi_link("")
       self.timer_label.visible = False
