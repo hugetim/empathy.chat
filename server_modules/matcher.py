@@ -61,7 +61,7 @@ def prune(user_id):
                  if m['match_commence'] < cutoff_m)
   for row in old_matches:
     temp = row['complete']
-    for i in range(len(temp))
+    for i in range(len(temp)):
       temp[i] = 1
     row['complete'] = temp
   # Return after confirming wait
