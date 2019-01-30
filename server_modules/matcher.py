@@ -322,8 +322,15 @@ def add_request(user_id, request_type):
   """
   return status, last_confirmed, ping_start, num_emailed
   """
-  num_emailed = 0
   user = _get_user(user_id)
+  return _add_request(user, request_type)
+
+
+def _add_request(user, request_type):
+  """
+  return status, last_confirmed, ping_start, num_emailed
+  """
+  num_emailed = 0
   status, last_confirmed, ping_start, tallies = _get_status(user)
   assert status == None
   _add_request_row(user, request_type)
