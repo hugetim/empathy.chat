@@ -134,11 +134,6 @@ def _confirm_wait(user):
   """updates last_confirmed for current request, returns _get_status(user)"""
   current_row = app_tables.requests.get(user=user, current=True)
   current_row['last_confirmed'] = _now()
-  if current_row['match_id']:
-    matched_requests = app_tables.requests.search(match_id=current_row['match_id'], current=True)
-    for row in matched_requests:
-      if row['user'] != user:
-        return min(row['last_confirmed'], current_row['last_confirmed'])
   return _get_status(user)
 
 
