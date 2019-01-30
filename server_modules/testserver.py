@@ -12,7 +12,7 @@ import datetime
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def test_add_user(em, level = 1, r_em = False, m_em = False):
+def test_add_user(em, level=1, r_em=False, m_em=False):
   assert anvil.server.session['user']['trust_level'] >= p.TEST_TRUST_LEVEL
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
@@ -29,56 +29,14 @@ def test_add_user(em, level = 1, r_em = False, m_em = False):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def test_add_request(user_id, request_type = "offering"):
+def test_add_request(user_id, request_type = "will_offer_first"):
   assert anvil.server.session['user']['trust_level'] >= p.TEST_TRUST_LEVEL
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
   user = app_tables.users.get_by_id(user_id)
-  #now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-  #new_row = app_tables.requests.add_row(user=user,
-  #                                      current=True,
-  #                                      request_type=request_type,
-  #                                      start=now,
-  #                                      last_confirmed=now,
-  #                                      cancelled_matches=0
-  #                                     )
-  jitsi_code = None
-  last_confirmed = None
-  num_emailed = 0
-  alt_avail = None
-  if request_type=="offering":
-    requests = [r for r in app_tables.requests.search(current=True,
-                                                      match_id=None)]
-  else: 
-    assert request_type=="requesting"
-    requests = [r for r in app_tables.requests.search(current=True,
-                                                      request_type="offering",
-                                                      match_id=None)]    
-  now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-  new_row = app_tables.requests.add_row(user=user,
-                                        current=True,
-                                        request_type=request_type,
-                                        start=now,
-                                        last_confirmed=now,
-                                        cancelled_matches=0
-                                       )
-  current_row = new_row
-  if requests:
-    jitsi_code = matcher.new_jitsi_code()
-    current_row['ping_start'] = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-    current_row['match_id'] = matcher.new_match_id()
-    current_row['jitsi_code'] = jitsi_code
-    cms = [r['cancelled_matches'] for r in requests]
-    eligible_requests = [r for r in requests if r['cancelled_matches']==min(cms)]
-    earliest_request = min(eligible_requests, key=lambda row: row['start'])
-    earliest_request['ping_start'] = current_row['ping_start']
-    earliest_request['match_id'] = current_row['match_id']
-    earliest_request['jitsi_code'] = jitsi_code
-    last_confirmed = earliest_request['last_confirmed']
-    alt_avail = len(requests) > 1
-  #else:
-  #  num_emailed = request_emails(request_type)
-  #####
+  matcher.add_request(user_id, request_type)
+  new_row = app_tables.requests.get(user=user, current=True)
+  assert new_row # fails if match commenced instantly
   test_requests = anvil.server.session['test_record']['test_requests']
   anvil.server.session['test_record']['test_requests'] = test_requests + [new_row]
   return new_row
