@@ -207,7 +207,7 @@ components:
         border: ''
         enabled: true
         foreground: ''
-        items: [offering, requesting]
+        items: [will_offer_first, receive_first]
         visible: true
         font_size: null
         font: ''
