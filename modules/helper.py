@@ -4,15 +4,15 @@ import anvil.tz
 
 
 def seconds_left(status, last_confirmed, ping_start=None):
-    now = datetime.datetime.now(last_confirmed.tzinfo)
+    now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
     if status in ["pinging-mult", "pinging-one", "pinged-mult", "pinged-one"]:
-      #assert ping_start.tzinfo == last_confirmed.tzinfo
       min_confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).seconds
       if status == "pinging-mult":
         return min_confirm_match + p.BUFFER_SECONDS
       elif status == "pinged-mult":
         return min_confirm_match
-    joint_wait_time = p.WAIT_SECONDS - (now - last_confirmed).seconds
+    if status in ["pinging-one", "pinged-one", "requesting", "requesting-confirm"]:
+      joint_wait_time = p.WAIT_SECONDS - (now - last_confirmed).seconds
     if status == "pinging-one":
       return max(min_confirm_match, joint_wait_time) + p.BUFFER_SECONDS
     elif status == "pinged-one":
