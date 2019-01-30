@@ -53,14 +53,18 @@ def create_tests_record():
 def test_clear():
   assert anvil.server.session['user']['trust_level'] >= p.TEST_TRUST_LEVEL
   test_records = app_tables.test_data.search()
-  for row in test_records:  
+  test_matches = {}
+  for row in test_records:
     for user in row['test_users']:
       user.delete()
     for request in row['test_requests']:
-      request.delete()                              
+      test_matches.add(app_tables.matches.get(match_id=request['match_id'])
+      request.delete()
     row.delete()
+    for match in test_matches:
+      match.delete()
   anvil.server.session['test_record'] = None
-    
+
 
 @anvil.server.callable
 def test_get_user_list():
