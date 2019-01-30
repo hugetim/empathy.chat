@@ -268,8 +268,8 @@ class MatchForm(MatchFormTemplate):
         self.set_jitsi_link(jitsi_code)
         self.match_em_check_box.visible = False
     else:
-      self.ustatus.text = "Request a match when ready:"
-      self.ustatus.bold = True
+      self.status.text = "Request a match when ready:"
+      self.status.bold = True
       self.note_label.visible = False
       self.set_jitsi_link("")
       self.timer_label.visible = False
