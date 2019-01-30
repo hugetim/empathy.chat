@@ -58,7 +58,7 @@ def test_clear():
     for user in row['test_users']:
       user.delete()
     for request in row['test_requests']:
-      test_matches.add(app_tables.matches.get(match_id=request['match_id'])
+      test_matches.add(app_tables.matches.get(match_id=request['match_id']))
       request.delete()
     row.delete()
     for match in test_matches:
