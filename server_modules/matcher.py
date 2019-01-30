@@ -169,7 +169,7 @@ def _get_status(user):
       last_confirmed = min(matched_request_confirms)
       ping_start = current_row['ping_start']
       assert last_confirmed < ping_start
-      if last_confirmed > current_row['last_confirmed']:
+      if current_row['last_confirmed'] > last_confirmed:
         status = "pinging"
         request_type = current_row['request_type']
         if request_type == "will_offer_first":
