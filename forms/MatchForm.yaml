@@ -113,7 +113,7 @@ components:
   name: label_1
   layout_properties: {slot: title}
 - type: Timer
-  properties: {interval: 5}
+  properties: {interval: 5.07}
   name: timer_1
   event_bindings: {tick: timer_1_tick}
 - name: timer_2

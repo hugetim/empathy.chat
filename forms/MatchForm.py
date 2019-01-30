@@ -91,7 +91,7 @@ class MatchForm(MatchFormTemplate):
     self.reset_status()
 
   def timer_1_tick(self, **event_args):
-    """This method is called Every 5 seconds"""
+    """This method is called Every 5.07 seconds"""
     if self.status == "requesting":
       s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
       self.status = s
@@ -124,11 +124,11 @@ class MatchForm(MatchFormTemplate):
       if self.seconds <= p.CONFIRM_WAIT_SECONDS:
         self.status = "requesting-confirm"
         self.reset_status()
-    elif self.status in ["pinging-one", "pinging-mult"]:
+    elif self.status in ["pinging-one", "pinging-mult", "pinging-pending"]:
       self.seconds -= 1
       self.timer_label.text = ("A match has been found and they have up to "
                                + str(self.seconds) + " seconds to confirm.")
-      if self.seconds <= 0:
+      if self.status != "pinging-pending" and self.seconds <= 0:
         self.status = "pinging-pending" # in case server call takes more than a second
         s, lc, ps, self.tallies = anvil.server.call('cancel_other',self.user_id)
         self.status = s
