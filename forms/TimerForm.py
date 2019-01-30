@@ -23,7 +23,7 @@ class TimerForm(TimerFormTemplate):
     self.status = current_status
 
   def timer_1_tick(self, **event_args):
-    """This method is called Every 5 seconds"""
+    """This method is called Every 5.07 seconds"""
     new_status, lc, ps, tallies = anvil.server.call_s('get_status',self.user_id)
     if (self.status in ["pinged-one", "pinged-mult"]
         and new_status in ["pinged-one", "pinged-mult"]):

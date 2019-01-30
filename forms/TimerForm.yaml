@@ -15,7 +15,7 @@ components:
     name: timer_label
     layout_properties: {grid_position: 'UCULWQ,XTXJBH'}
 - type: Timer
-  properties: {interval: 5}
+  properties: {interval: 5.07}
   name: timer_1
   event_bindings: {tick: timer_1_tick}
 - type: Timer
