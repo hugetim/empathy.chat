@@ -267,31 +267,32 @@ def _create_match(user, excluded=()):
   """attempt to create a match for user"""
   excluded_users = list(excluded)
   current_row = app_tables.requests.get(user=user, current=True)
-  request_type = current_row['request_type']
-  if request_type == "will_offer_first":
-    requests = [r for r in app_tables.requests.search(current=True,
-                                                      match_id=None)
-                if r['user'] not in [user] + excluded_users]
-  else:
-    assert request_type == "receive_first"
-    requests = [r for r in app_tables.requests.search(current=True,
-                                                      request_type="will_offer_first",
-                                                      match_id=None)
-                if r['user'] not in [user] + excluded_users]
-  if requests:
-    current_row['ping_start'] = _now()
-    current_row['match_id'] = _new_match_id()
-    current_row['jitsi_code'] = _new_jitsi_code()
-    cms = [r['cancelled_matches'] for r in requests]
-    eligible_requests = [r for r in requests if r['cancelled_matches'] == min(cms)]
-    earliest_request = min(eligible_requests, key=lambda row: row['start'])
-    earliest_request['ping_start'] = current_row['ping_start']
-    earliest_request['match_id'] = current_row['match_id']
-    earliest_request['jitsi_code'] = current_row['jitsi_code']
-    lc = min(current_row['last_confirmed'],
-             earliest_request['last_confirmed'])
-    if (current_row['ping_start'] - lc).seconds <= p.BUFFER_SECONDS:
-      _match_commenced(user)
+  if current_row:
+    request_type = current_row['request_type']
+    if request_type == "will_offer_first":
+      requests = [r for r in app_tables.requests.search(current=True,
+                                                        match_id=None)
+                  if r['user'] not in [user] + excluded_users]
+    else:
+      assert request_type == "receive_first"
+      requests = [r for r in app_tables.requests.search(current=True,
+                                                        request_type="will_offer_first",
+                                                        match_id=None)
+                  if r['user'] not in [user] + excluded_users]
+    if requests:
+      current_row['ping_start'] = _now()
+      current_row['match_id'] = _new_match_id()
+      current_row['jitsi_code'] = _new_jitsi_code()
+      cms = [r['cancelled_matches'] for r in requests]
+      eligible_requests = [r for r in requests if r['cancelled_matches'] == min(cms)]
+      earliest_request = min(eligible_requests, key=lambda row: row['start'])
+      earliest_request['ping_start'] = current_row['ping_start']
+      earliest_request['match_id'] = current_row['match_id']
+      earliest_request['jitsi_code'] = current_row['jitsi_code']
+      lc = min(current_row['last_confirmed'],
+               earliest_request['last_confirmed'])
+      if (current_row['ping_start'] - lc).seconds <= p.BUFFER_SECONDS:
+        _match_commenced(user)
 
 
 def _create_matches(excluded=()):
