@@ -62,7 +62,8 @@ def test_clear():
       request.delete()
     row.delete()
     for match in test_matches:
-      match.delete()
+      if match is not None:
+        match.delete()
   anvil.server.session['test_record'] = None
 
 
