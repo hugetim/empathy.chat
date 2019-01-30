@@ -25,7 +25,7 @@ components:
         visible: true, text: 'Request an empathy match when ready:', font_size: null,
         font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: true, underline: false, icon: ''}
-      name: status
+      name: status_label
       layout_properties: {grid_position: 'YOJCEM,HURPQL'}
     - type: Link
       properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
