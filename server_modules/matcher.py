@@ -375,7 +375,7 @@ def _cancel_match(user):
         row['jitsi_code'] = None
         if h.seconds_left("requesting", row['last_confirmed']) <= 0:
           row['current'] = False
-      current_row['cancelled_matched'] += 1
+      current_row['cancelled_matches'] += 1
       _create_matches([user])
       _create_match(user)
   return _get_status(user)
