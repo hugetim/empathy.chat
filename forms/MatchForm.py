@@ -14,7 +14,7 @@ class MatchForm(MatchFormTemplate):
   tallies = dict(receive_first = 0,
                  will_offer_first = 0,
                  request_em = 0)
-  status = None
+  ustatus = None
   last_confirmed = None # this or other_last_confirmed, whichever is earlier
   ping_start = None
   seconds = None
@@ -26,6 +26,8 @@ class MatchForm(MatchFormTemplate):
     self.user_id = anvil.users.get_user().get_id()
     # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
     self.confirming_wait = False
+    self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
+                              ("Not ready to offer empathy first","receive_first"))
     tl, re, me, rt, s, lc, ps, tallies, e = anvil.server.call('prune',self.user_id)
     if e == False:
       alert('Your email address is not approved to use this app. '
@@ -37,15 +39,15 @@ class MatchForm(MatchFormTemplate):
     self.request_em_check_box.checked = re
     self.match_em_check_box.checked = me
     self.tallies = tallies
-    self.self.drop_down_1.selected_value = rt
-    self.status = s
+    self.drop_down_1.selected_value = rt
+    self.ustatus = s
     self.last_confirmed = lc
     self.ping_start = ps
     self.reset_status()
 
   def seconds_left(self):
     """derive seconds_left from status, last_confirmed, and ping_start"""
-    return h.seconds_left(self.status, self.last_confirmed, self.ping_start)
+    return h.seconds_left(self.ustatus, self.last_confirmed, self.ping_start)
 
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -53,10 +55,10 @@ class MatchForm(MatchFormTemplate):
     s, lc, ps, num_emailed = anvil.server.call('add_request',
                                                self.user_id,
                                                request_type)
-    self.status = s
+    self.ustatus = s
     self.last_confirmed = lc
     self.ping_start = ps
-    if self.status == "requesting" and num_emailed > 0:
+    if self.ustatus == "requesting" and num_emailed > 0:
       self.emailed_notification(num_emailed).show()
     self.reset_status()
 
@@ -74,7 +76,7 @@ class MatchForm(MatchFormTemplate):
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.status = None
+    self.ustatus = None
     self.last_confirmed = None
     self.ping_start = None
     self.tallies = anvil.server.call('cancel',self.user_id)
@@ -169,7 +171,7 @@ class MatchForm(MatchFormTemplate):
         self.status = s
         self.last_confirmed = lc
         self.ping_start = ps
-  self.reset_status()
+    self.reset_status()
 
   def confirm_match(self):
     if self.match_em_check_box.checked:
