@@ -389,10 +389,10 @@ class MatchForm(MatchFormTemplate):
 
   def test_request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    user = self.test_requestuser_drop_down.selected_value
+    user_id = self.test_requestuser_drop_down.selected_value
     requesttype = self.test_requesttype_drop_down.selected_value
-    if user and requesttype:
-      anvil.server.call('test_add_request', user, requesttype)
+    if user_id and requesttype:
+      anvil.server.call('test_add_request', user_id, requesttype)
     else:
       alert("User and request type required to add request.")
 
@@ -404,3 +404,10 @@ class MatchForm(MatchFormTemplate):
   def test_requestuser_drop_down_refresh(self):
     out = anvil.server.call('test_get_user_list')
     self.test_requestuser_drop_down.items = out
+
+  def test_other_action_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    action = self.test_other_action_drop_down.selected_value
+    user_id = self.test_requestuser_drop_down.selected_value
+    anvil.server.call(action, user_id)
+
