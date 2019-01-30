@@ -257,6 +257,7 @@ def get_code(user_id):
     for row in current_matches:
       i = row['users'].index(user)
       if row['complete'][i] == 0:
+        assert code == None # assumes only one uncompleted for this user
         code = row['jitsi_code']
         request_type = row['request_types'][i]
   return code, request_type
