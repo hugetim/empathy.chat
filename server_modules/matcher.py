@@ -342,6 +342,7 @@ def _add_request(user, request_type):
 def cancel(user_id):
   """
   Remove request and cancel match (if applicable)
+  Cancel any expired requests part of a cancelled match
   Returns tallies
   """
   user = _get_user(user_id)
@@ -355,6 +356,8 @@ def cancel(user_id):
         row['ping_start'] = None
         row['match_id'] = None
         row['jitsi_code'] = None
+        if h.seconds_left("requesting", row['last_confirmed']) <= 0:
+          row['current'] = False
       _create_matches()
   return _get_tallies(user)
 
@@ -369,9 +372,9 @@ def _cancel_match(user):
         row['ping_start'] = None
         row['match_id'] = None
         row['jitsi_code'] = None
+        if h.seconds_left("requesting", row['last_confirmed']) <= 0:
+          row['current'] = False
       current_row['cancelled_matched'] += 1
-      if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
-        current_row['current'] = False
       _create_matches([user])
       _create_match(user)
   return _get_status(user)
@@ -382,6 +385,7 @@ def _cancel_match(user):
 def cancel_match(user_id):
   """
   cancel match (if applicable)--but not remove request
+  Cancel any expired requests part of a cancelled match
   Returns updated status
   """
   user = _get_user(user_id)
@@ -403,10 +407,11 @@ def _cancel_other(user):
           excluded_users += [row['user']]
           row['cancelled_matches'] += 1
           # row['current'] = False
-      if h.seconds_left("requesting", current_row['last_confirmed']) <= 0:
-        current_row['current'] = False
+        if h.seconds_left("requesting", row['last_confirmed']) <= 0:
+          row['current'] = False
       _create_matches(excluded_users)
-      _create_match(user)
+      for other_user in excluded_users:
+        _create_match(other_user)
   return _get_status(user)
 
 
@@ -417,6 +422,7 @@ def cancel_other(user_id):
   return new status
   Upon failure of other to confirm match
   cancel match (if applicable)--but not remove request
+  Cancel any expired requests part of a cancelled match
   """
   user = _get_user(user_id)
   return _cancel_other(user)
