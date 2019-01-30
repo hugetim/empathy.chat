@@ -20,19 +20,9 @@ def _now():
 
 
 def _prune_requests():
-<<<<<<< HEAD
-  """Prune definitely outdated requests, unmatched then matched"""
-  timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
-  cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
-||||||| merged common ancestors
-  'Prune definitely outdated requests, unmatched then matched'
-  timeout = datetime.timedelta(seconds=2*p.CONFIRM_WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
-  cutoff_r = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc()) - timeout
-=======
   """Prune definitely outdated requests, unmatched then matched"""
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
   cutoff_r = _now() - timeout
->>>>>>> refactor-state
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
                     if r['last_confirmed'] < cutoff_r)
   for row in old_requests:
@@ -58,19 +48,9 @@ def prune(user_id):
   returns trust_level, request_em, match_em, current_status, ref_time (or None),
           tallies, alt_avail, email_in_list
   prunes old requests/offers
-<<<<<<< HEAD
-  updates last_confirmed if currently requesting/offering/pinged
-  """
-  assume_complete = datetime.timedelta(hours=4) 
-||||||| merged common ancestors
-  updates last_confirmed if currently requesting/offering/pinged
-  '''
-  assume_complete = datetime.timedelta(hours=4) 
-=======
   updates last_confirmed if currently requesting/ping
   """
   assume_complete = datetime.timedelta(hours=4)
->>>>>>> refactor-state
   _initialize_session(user_id)
   user = anvil.server.session['user']
   # Prune requests, including from this user
@@ -145,21 +125,6 @@ def _emails_equal(a, b):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def confirm_wait(user_id):
-<<<<<<< HEAD
-  _confirm_wait(user_id)
-  
-  
-def _confirm_wait(user_id):
-  """updates last_confirmed for current request"""
-  user = app_tables.users.get_by_id(user_id)
-||||||| merged common ancestors
-  _confirm_wait(user_id)
-  
-  
-def _confirm_wait(user_id):
-  '''updates last_confirmed for current request'''
-  user = app_tables.users.get_by_id(user_id)
-=======
   """updates last_confirmed for current request, returns _get_status(user)"""
   user = _get_user(user_id)
   return _confirm_wait(user)
@@ -167,7 +132,6 @@ def _confirm_wait(user_id):
 
 def _confirm_wait(user):
   """updates last_confirmed for current request, returns _get_status(user)"""
->>>>>>> refactor-state
   current_row = app_tables.requests.get(user=user, current=True)
   current_row['last_confirmed'] = _now()
   if current_row['match_id']:
@@ -185,41 +149,13 @@ def get_status(user_id):
   return _get_status(user)
 
 
-<<<<<<< HEAD
-def _get_status(user_id):
-  """
-  returns current_status, ref_time (or None), tallies, alt_avail
-  alt_avail: Boolean, whether another match is available
-    for user (if "matched") or match (if "pinged"), (else) None
-  ref_time: match_start or other's last_confirmed (if "matched" and not alt_avail)
-||||||| merged common ancestors
-def _get_status(user_id):
-  '''
-  returns current_status, ref_time (or None), tallies, alt_avail
-  alt_avail: Boolean, whether another match is available
-    for user (if "matched") or match (if "pinged"), (else) None
-  ref_time: match_start or other's last_confirmed (if "matched" and not alt_avail)
-=======
 def _get_status(user):
   """
   returns current_status, last_confirmed, ping_start, tallies
   last_confirmed: min of this or other's last_confirmed
   ping_start: ping_start or, for "matched", match_commence
->>>>>>> refactor-state
   assumes 2-person matches only
-<<<<<<< HEAD
   """
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-  tallies = _get_tallies(user)
-||||||| merged common ancestors
-  '''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-  tallies = _get_tallies(user)
-=======
-  """
->>>>>>> refactor-state
   current_row = app_tables.requests.get(user=user, current=True)
   status = None
   last_confirmed = None
@@ -313,18 +249,8 @@ def _get_tallies(user):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_code(user_id):
-<<<<<<< HEAD
-  """returns jitsi_code, request_type (or Nones)"""
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-||||||| merged common ancestors
-  '''returns jitsi_code, request_type (or Nones)'''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-=======
   """returns jitsi_code, request_type (or Nones)"""
   user = _get_user(user_id)
->>>>>>> refactor-state
   current_row = app_tables.requests.get(user=user, current=True)
   code = None
   request_type = None
@@ -341,40 +267,12 @@ def get_code(user_id):
   return code, request_type
 
 
-<<<<<<< HEAD
-@anvil.server.callable
-@anvil.tables.in_transaction
-def add_request(user_id, request_type):
-  """
-  return jitsi_code, last_confirmed (both None if no immediate match), num_emailed
-  """
-  #assert anvil.server.session['user_id']==user_id
-  jitsi_code = None
-  last_confirmed = None
-  num_emailed = 0
-  alt_avail = None
-  if request_type=="offering":
-||||||| merged common ancestors
-@anvil.server.callable
-@anvil.tables.in_transaction
-def add_request(user_id, request_type):
-  '''
-  return jitsi_code, last_confirmed (both None if no immediate match), num_emailed
-  '''
-  #assert anvil.server.session['user_id']==user_id
-  jitsi_code = None
-  last_confirmed = None
-  num_emailed = 0
-  alt_avail = None
-  if request_type=="offering":
-=======
 def _create_match(user, excluded=()):
   """attempt to create a match for user"""
   excluded_users = list(excluded)
   current_row = app_tables.requests.get(user=user, current=True)
   request_type = current_row['request_type']
   if request_type == "will_offer_first":
->>>>>>> refactor-state
     requests = [r for r in app_tables.requests.search(current=True,
                                                       match_id=None)
                 if r['user'] not in [user] + excluded_users]
@@ -393,29 +291,6 @@ def _create_match(user, excluded=()):
     earliest_request = min(eligible_requests, key=lambda row: row['start'])
     earliest_request['ping_start'] = current_row['ping_start']
     earliest_request['match_id'] = current_row['match_id']
-<<<<<<< HEAD
-    earliest_request['jitsi_code'] = jitsi_code
-    last_confirmed = earliest_request['last_confirmed']
-    alt_avail = len(requests) > 1
-  else:
-    num_emailed = request_emails(request_type)
-  return jitsi_code, last_confirmed, num_emailed, alt_avail
-      
-    
-def _create_match(exclude_user=None):
-  """attempt to create a match from existing requests"""
-||||||| merged common ancestors
-    earliest_request['jitsi_code'] = jitsi_code
-    last_confirmed = earliest_request['last_confirmed']
-    alt_avail = len(requests) > 1
-  else:
-    num_emailed = request_emails(request_type)
-  return jitsi_code, last_confirmed, num_emailed, alt_avail
-      
-    
-def _create_match(exclude_user=None):
-  'attempt to create a match from existing requests'
-=======
     earliest_request['jitsi_code'] = current_row['jitsi_code']
     lc = min(current_row['last_confirmed'],
              earliest_request['last_confirmed'])
@@ -426,7 +301,6 @@ def _create_match(exclude_user=None):
 def _create_matches(excluded=()):
   """attempt to create a match from existing requests, iterate"""
   excluded_users = list(excluded)
->>>>>>> refactor-state
   # find top request in queue
   all_requests = [r for r in app_tables.requests.search(current=True,
                                                         match_id=None)
@@ -465,21 +339,9 @@ def add_request(user_id, request_type):
 def cancel(user_id):
   """
   Remove request and cancel match (if applicable)
-<<<<<<< HEAD
-  Returns None
-  """
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-||||||| merged common ancestors
-  Returns None
-  '''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-=======
   Returns tallies
   """
   user = _get_user(user_id)
->>>>>>> refactor-state
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     current_row['current'] = False
@@ -493,32 +355,8 @@ def cancel(user_id):
       _create_matches()
   return _get_tallies(user)
 
-<<<<<<< HEAD
-    
-@anvil.server.callable
-@anvil.tables.in_transaction
-def cancel_match(user_id):
-  """
-  cancel match (if applicable)--but not remove request
-  Returns updated status
-  """
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-||||||| merged common ancestors
-    
-@anvil.server.callable
-@anvil.tables.in_transaction
-def cancel_match(user_id):
-  '''
-  cancel match (if applicable)--but not remove request
-  Returns updated status
-  '''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-=======
 
 def _cancel_match(user):
->>>>>>> refactor-state
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -538,30 +376,9 @@ def _cancel_match(user):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-<<<<<<< HEAD
-def cancel_other(user_id):
-  """
-  return new_status
-  Upon failure of other to confirm match
-||||||| merged common ancestors
-def cancel_other(user_id):
-  '''
-  return new_status
-  Upon failure of other to confirm match
-=======
 def cancel_match(user_id):
   """
->>>>>>> refactor-state
   cancel match (if applicable)--but not remove request
-<<<<<<< HEAD
-  """
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-||||||| merged common ancestors
-  '''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-=======
   Returns updated status
   """
   user = _get_user(user_id)
@@ -569,7 +386,6 @@ def cancel_match(user_id):
 
 
 def _cancel_other(user):
->>>>>>> refactor-state
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -606,29 +422,10 @@ def cancel_other(user_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(user_id):
-<<<<<<< HEAD
-  """
-  return status, match_start, jitsi_code, request_type
-||||||| merged common ancestors
-  '''
-  return status, match_start, jitsi_code, request_type
-=======
   """
   Returns _get_status(user)
->>>>>>> refactor-state
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
-<<<<<<< HEAD
-  """
-  # return status, match_start? 
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-||||||| merged common ancestors
-  '''
-  # return status, match_start? 
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-=======
   """
   user = _get_user(user_id)
   return _match_commenced(user)
@@ -640,7 +437,6 @@ def _match_commenced(user):
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
->>>>>>> refactor-state
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
@@ -663,18 +459,8 @@ def _match_commenced(user):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_complete(user_id):
-<<<<<<< HEAD
-  """Switch 'complete' to true in matches table for user."""
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-||||||| merged common ancestors
-  '''Switch 'complete' to true in matches table for user.'''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-=======
   """Switch 'complete' to true in matches table for user, return tallies."""
   user = _get_user(user_id)
->>>>>>> refactor-state
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
@@ -713,18 +499,8 @@ def _new_match_id():
 
 @anvil.server.callable
 def get_user_info(user_id):
-<<<<<<< HEAD
-  """Return user info, initializing it for new users"""
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-||||||| merged common ancestors
-  '''Return user info, initializing it for new users'''
-  assert anvil.server.session['user_id']==user_id
-  user = anvil.server.session['user']
-=======
   """Return user info, initializing it for new users"""
   user = _get_user(user_id)
->>>>>>> refactor-state
   trust = user['trust_level']
   if trust is None:
     user.update(trust_level=0)
@@ -762,23 +538,11 @@ Tim
 
 p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this box is unchecked when requesting empathy.
 ''')
-<<<<<<< HEAD
-  
-def request_emails(request_type):
-  """email all users with request_em_check_box checked who logged in recently"""
-  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS) 
-||||||| merged common ancestors
-  
-def request_emails(request_type):
-  '''email all users with request_em_check_box checked who logged in recently'''
-  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS) 
-=======
 
 
 def _request_emails(request_type):
   """email all users with request_em_check_box checked who logged in recently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
->>>>>>> refactor-state
   user = anvil.server.session['user']
   if request_type == "receive_first":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
