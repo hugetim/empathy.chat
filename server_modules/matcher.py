@@ -83,7 +83,7 @@ def prune(user_id):
       status, lc, ps, tallies = _match_commenced(user)
     elif status in ('pinging-one', 'pinging-mult') and seconds_left <= 0:
       status, lc, ps, tallies = _cancel_other(user)
-  if status in ('requesting', 'requesting-confirm', 'pinged-one', 'pinged-mult',
+  if status in ('requesting', 'pinged-one', 'pinged-mult',
                 'pinging-one', 'pinging-mult'):
     status, lc, ps, tallies = _confirm_wait(user)
     request_type = _get_request_type(user)
@@ -204,8 +204,6 @@ def _get_status(user):
     else:
       status = "requesting"
       last_confirmed = current_row['last_confirmed']
-      if h.seconds_left(status, last_confirmed) <= p.CONFIRM_WAIT_SECONDS:
-        status += "-confirm"
   else:
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:

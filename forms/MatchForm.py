@@ -110,7 +110,7 @@ class MatchForm(MatchFormTemplate):
       if self.status in ["pinging-one", "pinging-mult"]:
         self.seconds = self.seconds_left()
       else:
-        if self.status in ["requesting", "requesting-confirm"]:
+        if self.status == "requesting":
           alert("The other empathy request was cancelled.")
         self.reset_status()
     elif self.status is None:
@@ -121,8 +121,16 @@ class MatchForm(MatchFormTemplate):
     """This method is called Every 1 seconds"""
     if self.status == "requesting":
       self.seconds -= 1
-      if self.seconds <= p.CONFIRM_WAIT_SECONDS:
-        self.status = "requesting-confirm"
+      self.timer_label.text = ("Your request will expire in "
+                               + str(self.seconds) + " seconds.")
+      if self.seconds <= 0:
+        self.tallies = anvil.server.call('cancel', self.user_id)
+        alert("Request cancelled due to "
+              + str(p.WAIT_SECONDS) + " seconds of inactivity.",
+              dismissible=False)
+        self.status = None
+        self.last_confirmed = None
+        self.ping_start = None
         self.reset_status()
     elif self.status in ["pinging-one", "pinging-mult", "pinging-pending"]:
       self.seconds -= 1
@@ -137,39 +145,10 @@ class MatchForm(MatchFormTemplate):
         self.reset_status()
 
   def confirm_wait(self):
-    f = TimerForm(self.seconds, self.user_id, self.status)
-    out = confirm(content=f,
-                  title="Continue waiting for a match?",
-                  large=False,
-                  dismissible=False)
-    if out == True:
-      s, lc, ps, self.tallies = anvil.server.call('confirm_wait',self.user_id)
-      self.status = s
-      self.last_confirmed = lc
-      self.ping_start = ps
-    elif out in [False, "timer elapsed", None]:
-      self.tallies = anvil.server.call('cancel',self.user_id)
-      if out in ["timer elapsed", None]:
-        alert("Request cancelled due to "
-              + str(p.WAIT_SECONDS) + " seconds of inactivity.",
-              dismissible=False)
-      self.status = None
-      self.last_confirmed = None
-      self.ping_start = None
-    else:
-      print (out)
-      assert out in ["pinged-one","pinged-mult","matched"]
-      if out in ["pinged-one","pinged-mult"]:
-        s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
-        self.status = s
-        self.last_confirmed = lc
-        self.ping_start = ps
-      else:
-        assert out == "matched"
-        s, lc, ps, self.tallies = anvil.server.call('match_commenced', self.user_id)
-        self.status = s
-        self.last_confirmed = lc
-        self.ping_start = ps
+    s, lc, ps, self.tallies = anvil.server.call('confirm_wait',self.user_id)
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
     self.reset_status()
 
   def confirm_match(self):
@@ -207,7 +186,7 @@ class MatchForm(MatchFormTemplate):
       self.ping_start = None
     else:
       print (out)
-      assert out in ["requesting", "requesting-confirm"]
+      assert out == "requesting"
       s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
       self.status = s
       self.last_confirmed = lc
@@ -222,27 +201,21 @@ class MatchForm(MatchFormTemplate):
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
       self.tally_label.visible = False
-      if self.status in ["requesting", "requesting-confirm"]:
+      if self.status == "requesting":
         self.status_label.text = "Status: Requesting an empathy exchange. "
-        self.note_label.text = ("(Note: Your request will be cancelled after "
-                                + str(2*p.CONFIRM_WAIT_SECONDS/60)
-                                + " minutes of inactivity. After "
-                                + str(p.CONFIRM_WAIT_SECONDS/60)
-                                + " minutes, a dialog will appear allowing "
-                                + "you to refresh your request. "
-                                + "Also, you will only have "
+        self.note_label.text = ("(Note: When a match becomes available, "
+                                + "you will have "
                                 + str(p.CONFIRM_MATCH_SECONDS)
-                                + " seconds to confirm a match if someone "
-                                + "else is available to take your place.)")
+                                + " seconds to confirm the match.)")
         self.note_label.visible = True
         self.status_label.bold = False
         self.set_jitsi_link("")
-        self.timer_label.visible = False
+        self.timer_label.text = ("Your request will expire in "
+                                 + str(self.seconds) + " seconds.")
+        self.timer_label.visible = True
         self.complete_button.visible = False
         self.cancel_button.visible = True
         self.match_em_check_box.visible = True
-        if self.status == "requesting-confirm":
-          return self.confirm_wait()
       else:
         if self.status in ["pinged-one", "pinged-mult"]:
           return self.confirm_match()

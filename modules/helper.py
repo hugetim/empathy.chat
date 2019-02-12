@@ -11,13 +11,13 @@ def seconds_left(status, last_confirmed, ping_start=None):
         return min_confirm_match + p.BUFFER_SECONDS
       elif status == "pinged-mult":
         return min_confirm_match
-    if status in ["pinging-one", "pinged-one", "requesting", "requesting-confirm"]:
+    if status in ["pinging-one", "pinged-one", "requesting"]:
       joint_wait_time = p.WAIT_SECONDS - (now - last_confirmed).seconds
     if status == "pinging-one":
       return max(min_confirm_match, joint_wait_time) + p.BUFFER_SECONDS
     elif status == "pinged-one":
       return max(min_confirm_match, joint_wait_time)
-    elif status in ["requesting", "requesting-confirm"]:
+    elif status in ["requesting"]:
       return joint_wait_time
     else:
       print("helper.seconds_left(s,lc,ps): " + status)
