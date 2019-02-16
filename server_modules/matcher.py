@@ -315,6 +315,7 @@ def _cancel(user):
         row['jitsi_code'] = None
         if h.seconds_left("requesting", row['last_confirmed']) <= 0:
           row['current'] = False
+      current_row['cancelled_matches'] += 1
       _create_matches()
   return _get_tallies(user)
 
@@ -331,43 +332,12 @@ def cancel(user_id):
   return _cancel(user)
 
 
-def _cancel_match(user):
-  current_row = app_tables.requests.get(user=user, current=True)
-  if current_row:
-    if current_row['match_id']:
-      matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
-                                                    current=True)
-      for row in matched_requests:
-        row['ping_start'] = None
-        row['match_id'] = None
-        row['jitsi_code'] = None
-        if h.seconds_left("requesting", row['last_confirmed']) <= 0:
-          row['current'] = False
-      current_row['cancelled_matches'] += 1
-      _create_matches([user])
-      _create_match(user)
-  return _get_status(user)
-
-
-@anvil.server.callable
-@anvil.tables.in_transaction
-def cancel_match(user_id):
-  """
-  cancel match (if applicable)--but not remove request
-  Cancel any expired requests part of a cancelled match
-  Returns updated status
-  """
-  user = _get_user(user_id)
-  return _cancel_match(user)
-
-
 def _cancel_other(user):
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
       matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
                                                     current=True)
-      excluded_users = []
       for row in matched_requests:
         row['ping_start'] = None
         row['match_id'] = None
@@ -375,12 +345,10 @@ def _cancel_other(user):
         if row['user'] != user:
           excluded_users += [row['user']]
           row['cancelled_matches'] += 1
-          # row['current'] = False
+          row['current'] = False
         if h.seconds_left("requesting", row['last_confirmed']) <= 0:
           row['current'] = False
-      _create_matches(excluded_users)
-      for other_user in excluded_users:
-        _create_match(other_user)
+      _create_matches()
   return _get_status(user)
 
 
@@ -390,8 +358,8 @@ def cancel_other(user_id):
   """
   return new status
   Upon failure of other to confirm match
-  cancel match (if applicable)--but not remove request
-  Cancel any expired requests part of a cancelled match
+  cancel match (if applicable)--and cancel their request
+  Cancel any other expired requests part of a cancelled match
   """
   user = _get_user(user_id)
   return _cancel_other(user)
