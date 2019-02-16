@@ -101,13 +101,13 @@ class MatchForm(MatchFormTemplate):
         self.seconds = self.seconds_left()
       else:
         self.reset_status()
-    elif self.status in ["pinging-one", "pinging-mult"]:
+    elif self.status == "pinging":
       self.status = "pinging-pending" # in case server call takes more than a second
       s, lc, ps, self.tallies = anvil.server.call_s('get_status',self.user_id)
       self.status = s
       self.last_confirmed = lc
       self.ping_start = ps
-      if self.status in ["pinging-one", "pinging-mult"]:
+      if self.status == "pinging":
         self.seconds = self.seconds_left()
       else:
         if self.status == "requesting":
@@ -132,7 +132,7 @@ class MatchForm(MatchFormTemplate):
         self.last_confirmed = None
         self.ping_start = None
         self.reset_status()
-    elif self.status in ["pinging-one", "pinging-mult", "pinging-pending"]:
+    elif self.status in ["pinging", "pinging-pending"]:
       self.seconds -= 1
       self.timer_label.text = ("A match has been found and they have up to "
                                + str(self.seconds) + " seconds to confirm.")
@@ -174,11 +174,6 @@ class MatchForm(MatchFormTemplate):
         alert("A match was found, but the time available for you to confirm ("
               + str(p.CONFIRM_MATCH_SECONDS) + " seconds) elapsed.",
               dismissible=False)
-    elif out == "alt timer elapsed":
-      s, lc, ps, self.tallies = anvil.server.call('cancel_match',self.user_id)
-      self.status = s
-      self.last_confirmed = lc
-      self.ping_start = ps
     elif out is None:
       self.tallies = anvil.server.call_s('get_tallies')
       self.status = None
@@ -217,11 +212,11 @@ class MatchForm(MatchFormTemplate):
         self.cancel_button.visible = True
         self.match_em_check_box.visible = True
       else:
-        if self.status in ["pinged-one", "pinged-mult"]:
+        if self.status == "pinged":
           return self.confirm_match()
-        assert self.status in ["pinging-one", "pinging-mult", "matched"]
+        assert self.status in ["pinging", "matched"]
         self.note_label.visible = False
-        if self.status in ["pinging-one", "pinging-mult"]:
+        if self.status == "pinging":
           self.timer_label.text = ("A match has been found and they have up to "
                                    + str(self.seconds) + " seconds to confirm.")
           self.timer_label.visible = True

@@ -75,16 +75,15 @@ def prune(user_id):
     else:
       user['enabled'] = False
   status, lc, ps, tallies = _get_status(user)
-  if status in ('pinged-one', 'pinged-mult', 'pinging-one', 'pinging-mult'):
+  if status in ('pinged', 'pinging'):
     seconds_left = h.seconds_left(status, lc, ps)
-    if status == 'pinged-mult' and seconds_left <= 0:
-      status, lc, ps, tallies = _cancel_match(user)
-    elif status in ('pinged-one', 'pinged-mult'):
+    if status == 'pinged' and seconds_left <= 0:
+      status, lc, ps, tallies = _cancel(user)
+    elif status == 'pinged':
       status, lc, ps, tallies = _match_commenced(user)
-    elif status in ('pinging-one', 'pinging-mult') and seconds_left <= 0:
+    elif status == 'pinging' and seconds_left <= 0:
       status, lc, ps, tallies = _cancel_other(user)
-  if status in ('requesting', 'pinged-one', 'pinged-mult',
-                'pinging-one', 'pinging-mult'):
+  if status in ('requesting', 'pinged', 'pinging'):
     status, lc, ps, tallies = _confirm_wait(user)
     request_type = _get_request_type(user)
   else:
@@ -166,41 +165,8 @@ def _get_status(user):
       assert last_confirmed < ping_start
       if current_row['last_confirmed'] > last_confirmed:
         status = "pinging"
-        request_type = current_row['request_type']
-        if request_type == "will_offer_first":
-          alt_requests = [r for r in app_tables.requests.search(current=True,
-                                                               match_id=None)]
-        else:
-          assert request_type == "receive_first"
-          alt_requests = [r for r in app_tables.requests.search(current=True,
-                                                               request_type="will_offer_first",
-                                                               match_id=None)]
-        alt_avail = len(alt_requests) > 0
-        if alt_avail:
-          status += "-mult"
-        else:
-          status += "-one"
       else:
         status = "pinged"
-        request_types = [r['request_type'] for r
-                         in app_tables.requests.search(match_id=current_row['match_id'],
-                                                       current=True)
-                         if r['user'] != user]
-        assert len(request_types) == 1
-        request_type = request_types[0]
-        if request_type == "will_offer_first":
-          alt_requests = [r for r in app_tables.requests.search(current=True,
-                                                               match_id=None)]
-        else:
-          assert request_type == "receive_first"
-          alt_requests = [r for r in app_tables.requests.search(current=True,
-                                                               request_type="will_offer_first",
-                                                               match_id=None)]
-        alt_avail = len(alt_requests) > 0
-        if alt_avail:
-          status += "-mult"
-        else:
-          status += "-one"
     else:
       status = "requesting"
       last_confirmed = current_row['last_confirmed']
@@ -336,15 +302,7 @@ def _add_request(user, request_type):
   return status, last_confirmed, ping_start, num_emailed
 
 
-@anvil.server.callable
-@anvil.tables.in_transaction
-def cancel(user_id):
-  """
-  Remove request and cancel match (if applicable)
-  Cancel any expired requests part of a cancelled match
-  Returns tallies
-  """
-  user = _get_user(user_id)
+def _cancel(user):
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     current_row['current'] = False
@@ -359,6 +317,18 @@ def cancel(user_id):
           row['current'] = False
       _create_matches()
   return _get_tallies(user)
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def cancel(user_id):
+  """
+  Remove request and cancel match (if applicable)
+  Cancel any expired requests part of a cancelled match
+  Returns tallies
+  """
+  user = _get_user(user_id)
+  return _cancel(user)
 
 
 def _cancel_match(user):
