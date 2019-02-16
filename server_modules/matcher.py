@@ -343,7 +343,6 @@ def _cancel_other(user):
         row['match_id'] = None
         row['jitsi_code'] = None
         if row['user'] != user:
-          excluded_users += [row['user']]
           row['cancelled_matches'] += 1
           row['current'] = False
         if h.seconds_left("requesting", row['last_confirmed']) <= 0:
