@@ -74,6 +74,10 @@ class MatchForm(MatchFormTemplate):
                         title='Email notifications sent',
                         timeout=10)
 
+  def renew_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.confirm_wait()
+  
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.status = None
@@ -209,6 +213,7 @@ class MatchForm(MatchFormTemplate):
                                  + str(self.seconds) + " seconds.")
         self.timer_label.visible = True
         self.complete_button.visible = False
+        self.renew_button.visible = True
         self.cancel_button.visible = True
         self.match_em_check_box.visible = True
       else:
@@ -223,6 +228,7 @@ class MatchForm(MatchFormTemplate):
           self.status_label.text = "A match should be ready soon. Set up Jitsi at: "
           self.status_label.bold = False
           jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
+          self.renew_button.visible = True
           self.cancel_button.visible = True
           self.complete_button.visible = False
         else:
@@ -231,6 +237,7 @@ class MatchForm(MatchFormTemplate):
           jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
           self.status_label.text = "You have a confirmed match. Use Jitsi to meet: "
           self.status_label.bold = True
+          self.renew_button.visible = False
           self.cancel_button.visible = False
           self.complete_button.visible = True
         self.set_jitsi_link(jitsi_code)
@@ -242,6 +249,7 @@ class MatchForm(MatchFormTemplate):
       self.set_jitsi_link("")
       self.timer_label.visible = False
       self.complete_button.visible = False
+      self.renew_button.visible = False
       self.cancel_button.visible = False
       self.request_button.visible = True
       self.drop_down_1.enabled = True
@@ -378,3 +386,4 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
+

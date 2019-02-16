@@ -50,6 +50,14 @@ components:
       name: request_button
       layout_properties: {grid_position: 'KPBDKY,QGKVUW'}
       event_bindings: {click: request_button_click, show: request_button_show}
+    - type: Button
+      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: false, text: RENEW REQUEST, font_size: 12, font: '',
+        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:refresh'}
+      name: renew_button
+      layout_properties: {grid_position: 'CJEHPC,DKFLGA'}
+      event_bindings: {click: renew_button_click}
     - type: DropDown
       properties:
         role: null
