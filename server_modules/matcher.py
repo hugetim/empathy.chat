@@ -434,6 +434,7 @@ def _match_commenced(user):
         row['current'] = False
   return _get_status(user)
 
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_complete(user_id):
