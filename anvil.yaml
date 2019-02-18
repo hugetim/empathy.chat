@@ -1,6 +1,6 @@
 allow_embedding: false
 package_name: empathy_room
-name: Empathy Room test
+name: Empathy Spot test
 startup_form: LoginForm
 renamed: true
 runtime_options: {version: 1, server_version: python2-sandbox}

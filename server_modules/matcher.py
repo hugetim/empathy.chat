@@ -471,9 +471,9 @@ def set_request_em(request_em_checked):
 def match_email():
   user = anvil.server.session['user']
   anvil.google.mail.send(to=user['email'],
-                         subject="Empathy Swap - Match available",
+                         subject="Empathy Spot - Match available",
                          text=
-'''Dear Empathy Swap user,
+'''Dear Empathy Spot user,
 
 An empathy match has been found.
 
@@ -500,9 +500,9 @@ def _request_emails(request_type):
                        if u['last_login'] > cutoff_e and u != user]
   for email_address in emails:
     anvil.google.mail.send(to=email_address,
-                           subject="Empathy Swap - Request active",
+                           subject="Empathy Spot - Request active",
                            text=
-'''Dear Empathy Swap user,
+'''Dear Empathy Spot user,
 
 Someone has requested ''' + request_type_text + '''
 
@@ -511,6 +511,6 @@ Return to https://minty-sarcastic-telephone.anvil.app now and request empathy to
 Thanks!
 Tim
 
-p.s. You are receiving this email because you checked the box: "Notify me of empathy requests by email." To stop receiving these emails, return to the link above and change the setting.
+p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change the setting.
 ''')
   return len(emails)

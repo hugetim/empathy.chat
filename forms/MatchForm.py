@@ -31,7 +31,7 @@ class MatchForm(MatchFormTemplate):
     tl, re, me, rt, s, lc, ps, tallies, e = anvil.server.call('prune',self.user_id)
     if e == False:
       alert('Your email address is not approved to use this app. '
-            + 'Contact empathyroom@gmail.com for help.')
+            + 'Contact empathyspot@gmail.com for help.')
       self.logout_user()
     self.trust_level = tl
     if self.trust_level >= p.TEST_TRUST_LEVEL:
