@@ -482,7 +482,7 @@ Return to https://minty-sarcastic-telephone.anvil.app now to be connected for yo
 Thanks!
 Tim
 
-p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this box is unchecked when requesting empathy.
+p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
 ''')
 
 
@@ -511,6 +511,6 @@ Return to https://minty-sarcastic-telephone.anvil.app now and request empathy to
 Thanks!
 Tim
 
-p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change the setting.
+p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change this setting.
 ''')
   return len(emails)
