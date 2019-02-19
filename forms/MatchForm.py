@@ -245,7 +245,7 @@ class MatchForm(MatchFormTemplate):
           self.set_jitsi_link(jitsi_code)
         self.match_em_check_box.visible = False
     else:
-      self.status_label.text = "Request a match when ready:"
+      self.status_label.text = "Request an empathy match when ready:"
       self.status_label.bold = True
       self.note_label.visible = False
       self.set_jitsi_link("")
