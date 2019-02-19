@@ -140,8 +140,8 @@ class MatchForm(MatchFormTemplate):
         self.reset_status()
     elif self.status in ["pinging", "pinging-pending"]:
       self.seconds -= 1
-      self.timer_label.text = ("A match has been found and they have up to "
-                               + str(self.seconds) + " seconds to confirm.")
+      self.status_label.text = ("Potential match available. They have "
+                                + str(self.seconds) + " seconds to confirm.")
       if self.status != "pinging-pending" and self.seconds <= 0:
         self.status = "pinging-pending" # in case server call takes more than a second
         s, lc, ps, self.tallies = anvil.server.call('cancel_other',self.user_id)
@@ -224,12 +224,12 @@ class MatchForm(MatchFormTemplate):
         assert self.status in ["pinging", "matched"]
         self.note_label.visible = False
         if self.status == "pinging":
-          self.timer_label.text = ("A match has been found and they have up to "
+          self.status_label.text = ("Potential match available. They have "
                                    + str(self.seconds) + " seconds to confirm.")
-          self.timer_label.visible = True
-          self.status_label.text = "A match should be ready soon. Set up Jitsi at: "
+          #                         + "Set up Jitsi at: ")
+          self.timer_label.visible = False
           self.status_label.bold = False
-          jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
+          #jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
           self.renew_button.visible = True
           self.cancel_button.visible = True
           self.complete_button.visible = False
@@ -242,7 +242,7 @@ class MatchForm(MatchFormTemplate):
           self.renew_button.visible = False
           self.cancel_button.visible = False
           self.complete_button.visible = True
-        self.set_jitsi_link(jitsi_code)
+          self.set_jitsi_link(jitsi_code)
         self.match_em_check_box.visible = False
     else:
       self.status_label.text = "Request a match when ready:"
