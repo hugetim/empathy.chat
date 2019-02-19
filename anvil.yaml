@@ -1,6 +1,6 @@
 allow_embedding: false
 package_name: empathy_room
-name: Empathy Spot test
+name: Empathy Spot
 startup_form: LoginForm
 renamed: true
 runtime_options: {version: 1, server_version: python2-sandbox}
@@ -10,7 +10,7 @@ services:
   client_config: {use_microsoft: false, require_secure_passwords: true, use_email: true,
     allow_remember_me: true, allow_signup: true, remember_me_seq: 1, enable_automatically: true,
     confirm_email: true, remember_me_days: 30, use_google: true, use_facebook: false}
-  server_config: {user_table: 18972}
+  server_config: {user_table: 16111}
 - source: /runtime/services/tables.yml
   client_config: {}
   server_config: {auto_create_missing_columns: false}

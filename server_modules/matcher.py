@@ -450,8 +450,8 @@ def get_user_info(user_id):
   trust = user['trust_level']
   if trust is None:
     user.update(trust_level=0)
-    assert user['request_em'] == False
-    assert user['match_em'] == False
+    user['request_em'] = False
+    user['match_em'] = False
   return user['trust_level'], user['request_em'], user['match_em']
 
 
