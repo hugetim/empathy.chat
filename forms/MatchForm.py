@@ -203,7 +203,7 @@ class MatchForm(MatchFormTemplate):
       self.drop_down_1.foreground = "gray"
       self.tally_label.visible = False
       if self.status == "requesting":
-        self.status_label.text = "Status: Requesting an empathy exchange. "
+        self.status_label.text = "Status: Requesting an empathy exchange."
         self.note_label.text = ("(Note: When a match becomes available, "
                                 + "you will have "
                                 + str(p.CONFIRM_MATCH_SECONDS)
@@ -224,7 +224,7 @@ class MatchForm(MatchFormTemplate):
         assert self.status in ["pinging", "matched"]
         self.note_label.visible = False
         if self.status == "pinging":
-          self.status_label.text = ("Potential match available. They have "
+          self.status_label.text = ("Status: Potential match available. They have "
                                    + str(self.seconds) + " seconds to confirm.")
           #                         + "Set up Jitsi at: ")
           self.timer_label.visible = False
@@ -237,7 +237,7 @@ class MatchForm(MatchFormTemplate):
           assert self.status == "matched"
           self.timer_label.visible = False
           jitsi_code, request_type = anvil.server.call('get_code', self.user_id)
-          self.status_label.text = "You have a confirmed match. Use Jitsi to meet: "
+          self.status_label.text = "Status: You have a confirmed match. Use Jitsi to meet: "
           self.status_label.bold = True
           self.renew_button.visible = False
           self.cancel_button.visible = False
