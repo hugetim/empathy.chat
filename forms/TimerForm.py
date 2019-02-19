@@ -13,7 +13,7 @@ class TimerForm(TimerFormTemplate):
   status = None
   seconds_left = None
 
-  def __init__(self, seconds_left, user_id, current_status, **properties):
+  def __init__(self, seconds_left, current_status, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     # Any code you write here will run when the form opens.
@@ -21,12 +21,11 @@ class TimerForm(TimerFormTemplate):
     #  self.self.label_1.text = title
     self.seconds_left = seconds_left
     self.timer_label.text = str(self.seconds_left) + " seconds left to confirm."
-    self.user_id = user_id
     self.status = current_status
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5.07 seconds"""
-    new_status, lc, ps, tallies = anvil.server.call_s('get_status',self.user_id)
+    new_status, lc, ps, tallies = anvil.server.call_s('get_status')
     if (self.status == "pinged" and new_status == "pinged"):
       self.seconds_left = h.seconds_left(new_status, lc, ps)
       self.status = new_status

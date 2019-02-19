@@ -42,7 +42,7 @@ def _get_request_type(user):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def prune(user_id):
+def prune():
   """
   Assumed to run upon initializing Form1
   returns trust_level, request_em, match_em, current_status, ref_time (or None),
@@ -51,7 +51,7 @@ def prune(user_id):
   updates last_confirmed if currently requesting/ping
   """
   assume_complete = datetime.timedelta(hours=18)
-  _initialize_session(user_id)
+  _initialize_session()
   user = anvil.server.session['user']
   # Prune requests, including from this user
   _prune_requests()
@@ -65,7 +65,7 @@ def prune(user_id):
       temp[i] = 1
     row['complete'] = temp
   # Return after confirming wait
-  trust_level, request_em, match_em = get_user_info(user_id)
+  trust_level, request_em, match_em = _get_user_info()
   email_in_list = None
   if trust_level == 0:
     email_in_list = _email_in_list(user['email'])
@@ -91,18 +91,21 @@ def prune(user_id):
   return trust_level, request_em, match_em, request_type, status, lc, ps, tallies, email_in_list
 
 
-def _initialize_session(user_id):
+def _initialize_session():
   """initialize session state: user_id, user, and current_row"""
+  user_id = anvil.users.get_user().get_id()
   anvil.server.session['user_id'] = user_id
   user = app_tables.users.get_by_id(user_id)
   anvil.server.session['user'] = user
+  anvil.server.session['trust_level'] = user['trust_level']
   anvil.server.session['test_record'] = None
 
 
 def _get_user(user_id):
-  if anvil.server.session['user_id'] == user_id:
+  if user_id == "" or anvil.server.session['user_id'] == user_id:
     return anvil.server.session['user']
   else:
+    assert anvil.server.session['trust_level'] >= p.TEST_TRUST_LEVEL
     return app_tables.users.get_by_id(user_id)
 
 
@@ -123,7 +126,7 @@ def _emails_equal(a, b):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def confirm_wait(user_id):
+def confirm_wait(user_id=""):
   """updates last_confirmed for current request, returns _get_status(user)"""
   user = _get_user(user_id)
   return _confirm_wait(user)
@@ -138,7 +141,7 @@ def _confirm_wait(user):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def get_status(user_id):
+def get_status(user_id=""):
   user = _get_user(user_id)
   return _get_status(user)
 
@@ -207,7 +210,7 @@ def _get_tallies(user):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def get_code(user_id):
+def get_code(user_id=""):
   """returns jitsi_code, request_type (or Nones)"""
   user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
@@ -279,7 +282,7 @@ def _create_matches(excluded=()):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def add_request(user_id, request_type):
+def add_request(request_type, user_id=""):
   """
   return status, last_confirmed, ping_start, num_emailed
   """
@@ -322,7 +325,7 @@ def _cancel(user):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def cancel(user_id):
+def cancel(user_id=""):
   """
   Remove request and cancel match (if applicable)
   Cancel any expired requests part of a cancelled match
@@ -353,7 +356,7 @@ def _cancel_other(user):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def cancel_other(user_id):
+def cancel_other(user_id=""):
   """
   return new status
   Upon failure of other to confirm match
@@ -366,7 +369,7 @@ def cancel_other(user_id):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def match_commenced(user_id):
+def match_commenced(user_id=""):
   """
   Returns _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
@@ -404,7 +407,7 @@ def _match_commenced(user):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def match_complete(user_id):
+def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return tallies."""
   user = _get_user(user_id)
   current_matches = app_tables.matches.search(users=[user], complete=[0])
@@ -443,8 +446,7 @@ def _new_match_id():
   return match_id.int
 
 
-@anvil.server.callable
-def get_user_info(user_id):
+def _get_user_info(user_id=""):
   """Return user info, initializing it for new users"""
   user = _get_user(user_id)
   trust = user['trust_level']
