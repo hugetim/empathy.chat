@@ -123,7 +123,7 @@ class MatchForm(MatchFormTemplate):
     """This method is called Every 1 seconds"""
     if self.status == "requesting":
       self.seconds -= 1
-      self.timer_label.text = ("Your request will expire in: "
+      self.timer_label.text = ("Your request will expire in:  "
                                + h.seconds_to_digital(self.seconds) )
       if self.seconds <= 0:
         self.tallies = anvil.server.call('cancel')
@@ -137,7 +137,7 @@ class MatchForm(MatchFormTemplate):
     elif self.status in ["pinging", "pinging-pending"]:
       self.seconds -= 1
       self.status_label.text = ("Potential match available. Time left for them "
-                                + "to confirm: "
+                                + "to confirm:  "
                                 + h.seconds_to_digital(self.seconds))
       if self.status != "pinging-pending" and self.seconds <= 0:
         self.status = "pinging-pending" # in case server call takes more than a second
@@ -208,7 +208,7 @@ class MatchForm(MatchFormTemplate):
         self.note_label.visible = True
         self.status_label.bold = False
         self.set_jitsi_link("")
-        self.timer_label.text = ("Your request will expire in: "
+        self.timer_label.text = ("Your request will expire in:  "
                                  + h.seconds_to_digital(self.seconds) )
         self.timer_label.visible = True
         self.complete_button.visible = False
@@ -222,7 +222,7 @@ class MatchForm(MatchFormTemplate):
         self.note_label.visible = False
         if self.status == "pinging":
           self.status_label.text = ("Potential match available. Time left for them "
-                                    + "to confirm: "
+                                    + "to confirm:  "
                                     + h.seconds_to_digital(self.seconds))
           #                         + "Set up Jitsi at: ")
           self.timer_label.visible = False

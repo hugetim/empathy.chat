@@ -20,7 +20,7 @@ class TimerForm(TimerFormTemplate):
     #if title:
     #  self.self.label_1.text = title
     self.seconds_left = seconds_left
-    self.timer_label.text = ("Time left to confirm: "
+    self.timer_label.text = ("Time left to confirm:  "
                              + h.seconds_to_digital(self.seconds_left))
     self.status = current_status
 
@@ -37,7 +37,7 @@ class TimerForm(TimerFormTemplate):
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
     self.seconds_left -= 1
-    self.timer_label.text = ("Time left to confirm: "
+    self.timer_label.text = ("Time left to confirm:  "
                              + h.seconds_to_digital(self.seconds_left))
     if self.seconds_left <= 0:
       self.raise_event("x-close-alert", value="timer elapsed")
