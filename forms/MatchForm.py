@@ -221,9 +221,9 @@ class MatchForm(MatchFormTemplate):
         assert self.status in ["pinging", "matched"]
         self.note_label.visible = False
         if self.status == "pinging":
-        self.status_label.text = ("Potential match available. Time left for them "
-                                  + "to confirm: "
-                                  + h.seconds_to_digital(self.seconds))
+          self.status_label.text = ("Potential match available. Time left for them "
+                                    + "to confirm: "
+                                    + h.seconds_to_digital(self.seconds))
           #                         + "Set up Jitsi at: ")
           self.timer_label.visible = False
           self.status_label.bold = False
