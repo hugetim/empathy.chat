@@ -135,7 +135,8 @@ def confirm_wait(user_id=""):
 def _confirm_wait(user):
   """updates last_confirmed for current request, returns _get_status(user)"""
   current_row = app_tables.requests.get(user=user, current=True)
-  current_row['last_confirmed'] = _now()
+  if current_row:
+    current_row['last_confirmed'] = _now()
   return _get_status(user)
 
 
@@ -458,15 +459,19 @@ def _get_user_info(user_id=""):
 
 
 @anvil.server.callable
+@anvil.tables.in_transaction
 def set_match_em(match_em_checked):
   user = anvil.server.session['user']
   user['match_em'] = match_em_checked
+  _confirm_wait(user)
 
 
 @anvil.server.callable
+@anvil.tables.in_transaction
 def set_request_em(request_em_checked):
   user = anvil.server.session['user']
   user['request_em'] = request_em_checked
+  _confirm_wait(user)
 
 
 @anvil.server.callable
