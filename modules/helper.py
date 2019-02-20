@@ -24,7 +24,7 @@ def seconds_to_digital(seconds):
   minutes = math.floor(seconds / 60)
   seconds = int(seconds - minutes * 60)
   hours = math.floor(minutes / 60)
-  minutes -= hours * 60
+  minutes = int(minutes - hours * 60)
   output = ""
   minute_str = str(minutes)
   if hours > 0:
@@ -43,7 +43,7 @@ def seconds_to_words(seconds):
   minutes = math.floor(seconds / 60)
   seconds = int(seconds - minutes * 60)
   hours = math.floor(minutes / 60)
-  minutes -= hours * 60
+  minutes = int(minutes - hours * 60)
   if seconds == 1:
     second_str = "1 second"
   else:
