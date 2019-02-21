@@ -28,14 +28,13 @@ class MatchForm(MatchFormTemplate):
     self.confirming_wait = False
     self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
                               ("Not ready to offer empathy first","receive_first"))
-    tl, re, me, rt, s, lc, ps, tallies, e = anvil.server.call('prune')
+    tm, re, me, rt, s, lc, ps, tallies, e = anvil.server.call('prune')
     if e == False:
       alert('Your email address is not approved to use this app. '
             + 'Contact empathyspot@gmail.com for help.')
       self.logout_user()
     self.trust_level = tl
-    if self.trust_level >= p.TEST_TRUST_LEVEL:
-      self.test_mode.visible = True
+    self.test_mode.visible = tm
     self.request_em_check_box.checked = re
     self.match_em_check_box.checked = me
     self.tallies = tallies

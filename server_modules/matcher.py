@@ -14,6 +14,9 @@ import re
 import helper as h
 
 
+TEST_TRUST_LEVEL = 10
+
+
 def _now():
   """return utcnow"""
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
@@ -74,6 +77,7 @@ def prune():
       user['trust_level'] = trust_level
     else:
       user['enabled'] = False
+  test_mode = trust_level >= TEST_TRUST_LEVEL
   status, lc, ps, tallies = _get_status(user)
   if status in ('pinged', 'pinging'):
     seconds_left = h.seconds_left(status, lc, ps)
@@ -88,7 +92,7 @@ def prune():
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
-  return trust_level, request_em, match_em, request_type, status, lc, ps, tallies, email_in_list
+  return test_mode, request_em, match_em, request_type, status, lc, ps, tallies, email_in_list
 
 
 def _initialize_session():
@@ -105,7 +109,7 @@ def _get_user(user_id):
   if user_id == "" or anvil.server.session['user_id'] == user_id:
     return anvil.server.session['user']
   else:
-    assert anvil.server.session['trust_level'] >= p.TEST_TRUST_LEVEL
+    assert anvil.server.session['trust_level'] >= TEST_TRUST_LEVEL
     return app_tables.users.get_by_id(user_id)
 
 
