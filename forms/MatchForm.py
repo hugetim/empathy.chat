@@ -56,9 +56,9 @@ class MatchForm(MatchFormTemplate):
     self.status = s
     self.last_confirmed = lc
     self.ping_start = ps
+    self.reset_status()
     if self.status == "requesting" and num_emailed > 0:
       self.emailed_notification(num_emailed).show()
-    self.reset_status()
 
   def emailed_notification(self, num):
     """assumes num>0, returns Notification"""
