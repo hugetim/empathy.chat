@@ -23,7 +23,7 @@ class MatchForm(MatchFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
 
-    # 'prune' initializes new users to trust level 0 (via 'get_trust_level')
+    # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
     self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
                               ("Not ready to offer empathy first","receive_first"))

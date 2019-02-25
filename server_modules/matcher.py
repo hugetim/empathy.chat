@@ -42,6 +42,13 @@ def _get_request_type(user):
   if current_row:
     return current_row['request_type']
 
+  
+def _is_visible(user2, user1=None):
+  '''Is user2 visible to user1?'''
+  if user1 == None:
+    user1 = anvil.server.session['user']
+  return user2['trust_level'] > 0 and user1['trust_level'] > 0
+  
 
 @anvil.server.callable
 @anvil.tables.in_transaction
