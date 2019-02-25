@@ -11,7 +11,6 @@ import helper as h
 
 
 class MatchForm(MatchFormTemplate):
-  trust_level = 0
   tallies = dict(receive_first = 0,
                  will_offer_first = 0,
                  request_em = 0)
@@ -33,7 +32,6 @@ class MatchForm(MatchFormTemplate):
       alert('Your email address is not approved to use this app. '
             + 'Contact empathyspot@gmail.com for help.')
       self.logout_user()
-    self.trust_level = tl
     self.test_mode.visible = tm
     self.request_em_check_box.checked = re
     self.match_em_check_box.checked = me
@@ -335,7 +333,6 @@ class MatchForm(MatchFormTemplate):
     self.last_confirmed = None
     self.ping_start = None
     self.reset_status()
-    self.trust_level = 0
     open_form('LoginForm')
 
   def match_em_check_box_change(self, **event_args):
