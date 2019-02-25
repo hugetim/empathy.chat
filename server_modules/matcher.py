@@ -216,13 +216,16 @@ def _get_tallies(user):
                  request_em=0)
   active_users = [user]
   for row in app_tables.requests.search(current=True, match_id=None):
-    if row['user'] != user:
+    user2 = row['user']
+    if user2 != user and _is_visible(user2, user):
       tallies[row['request_type']] += 1
-      active_users.append(row['user'])
+      active_users.append(user2)
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   cutoff_e = _now() - assume_inactive
   request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
-                     if u['last_login'] > cutoff_e and u not in active_users]
+                     if (u['last_login'] > cutoff_e 
+                         and u not in active_users
+                         and _is_visible(u, user))]
   tallies['request_em'] = len(request_em_list)
   return tallies
 
@@ -258,13 +261,15 @@ def _create_match(user, excluded=()):
     if request_type == "will_offer_first":
       requests = [r for r in app_tables.requests.search(current=True,
                                                         match_id=None)
-                  if r['user'] not in [user] + excluded_users]
+                  if (r['user'] not in [user] + excluded_users
+                      and _is_visible(r['user'], user))]
     else:
       assert request_type == "receive_first"
       requests = [r for r in app_tables.requests.search(current=True,
                                                         request_type="will_offer_first",
                                                         match_id=None)
-                  if r['user'] not in [user] + excluded_users]
+                  if (r['user'] not in [user] + excluded_users
+                      and _is_visible(r['user'], user))]
     if requests:
       current_row['ping_start'] = _now()
       current_row['match_id'] = _new_match_id()
@@ -522,7 +527,9 @@ def _request_emails(request_type):
     request_type_text = 'an empathy exchange.'
   cutoff_e = _now() - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
-                       if u['last_login'] > cutoff_e and u != user]
+                       if (u['last_login'] > cutoff_e 
+                           and u != user
+                           and _is_visible(user, u))]
   for email_address in emails:
     anvil.google.mail.send(to=email_address,
                            subject="Empathy Spot - Request active",
