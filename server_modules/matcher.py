@@ -47,7 +47,14 @@ def _is_visible(user2, user1=None):
   '''Is user2 visible to user1?'''
   if user1 == None:
     user1 = anvil.server.session['user']
-  return user2['trust_level'] > 0 and user1['trust_level'] > 0
+  trust1 = user1['trust_level']
+  trust2 = user2['trust_level']
+  if trust1 is None:
+    return False
+  elif trust2 is None:
+    return False
+  else:
+    return trust1 > 0 and trust2 > 0
   
 
 @anvil.server.callable
