@@ -89,8 +89,6 @@ def prune():
     if email_in_list:
       trust_level = 1
       user['trust_level'] = trust_level
-    else:
-      user['enabled'] = False
   test_mode = trust_level >= TEST_TRUST_LEVEL
   status, lc, ps, tallies = _get_status(user)
   if status in ('pinged', 'pinging'):

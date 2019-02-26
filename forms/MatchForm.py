@@ -29,9 +29,10 @@ class MatchForm(MatchFormTemplate):
                               ("Not ready to offer empathy first","receive_first"))
     tm, re, me, rt, s, lc, ps, tallies, e = anvil.server.call('prune')
     if e == False:
-      alert('Your email address is not approved to use this app. '
-            + 'Contact empathyspot@gmail.com for help.')
-      self.logout_user()
+      alert('This account is not yet authorized to match with other users. '
+            + 'You can test things out but your actions will not impact '
+            + 'or be visible to other users. '
+            + 'Contact empathyspot@gmail.com for help. ')
     self.test_mode.visible = tm
     self.request_em_check_box.checked = re
     self.match_em_check_box.checked = me
