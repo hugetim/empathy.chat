@@ -30,7 +30,7 @@ class MatchForm(MatchFormTemplate):
     tm, re, me, rt, s, lc, ps, tallies, e = anvil.server.call('prune')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
-            + 'You can test things out but your actions will not impact '
+            + 'You can test things out, but your actions will not impact '
             + 'or be visible to other users. '
             + 'For help, contact: empathyspot@gmail.com')
     self.test_mode.visible = tm
