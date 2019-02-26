@@ -42,7 +42,7 @@ def _get_request_type(user):
   if current_row:
     return current_row['request_type']
 
-  
+
 def _is_visible(user2, user1=None):
   '''Is user2 visible to user1?'''
   if user1 == None:
@@ -55,7 +55,7 @@ def _is_visible(user2, user1=None):
     return False
   else:
     return trust1 > 0 and trust2 > 0
-  
+
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -223,7 +223,7 @@ def _get_tallies(user):
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   cutoff_e = _now() - assume_inactive
   request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
-                     if (u['last_login'] > cutoff_e 
+                     if (u['last_login'] > cutoff_e
                          and u not in active_users
                          and _is_visible(u, user))]
   tallies['request_em'] = len(request_em_list)
@@ -528,7 +528,7 @@ def _request_emails(request_type):
     request_type_text = 'an empathy exchange.'
   cutoff_e = _now() - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
-                       if (u['last_login'] > cutoff_e 
+                       if (u['last_login'] > cutoff_e
                            and u != user
                            and _is_visible(user, u))]
   for email_address in emails:
