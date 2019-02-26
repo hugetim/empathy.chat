@@ -84,7 +84,7 @@ def prune():
   # Return after confirming wait
   trust_level, request_em, match_em = _get_user_info()
   email_in_list = None
-  if trust_level == 0:
+  if trust_level <= 0:
     email_in_list = _email_in_list(user['email'])
     if email_in_list:
       trust_level = 1
