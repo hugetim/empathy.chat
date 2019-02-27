@@ -507,7 +507,7 @@ def match_email():
 
 An empathy match has been found.
 
-Return to https://minty-sarcastic-telephone.anvil.app now to be connected for your empathy exchange.
+Return to ''' + p.URL + ''' now to be connected for your empathy exchange.
 
 Thanks!
 Tim
@@ -539,7 +539,7 @@ def _request_emails(request_type):
 
 Someone has requested ''' + request_type_text + '''
 
-Return to https://minty-sarcastic-telephone.anvil.app now and request empathy to be connected (if you are first to do so).
+Return to ''' + p.URL + ''' now and request empathy to be connected (if you are first to do so).
 
 Thanks!
 Tim

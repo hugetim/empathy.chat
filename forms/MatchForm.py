@@ -32,7 +32,7 @@ class MatchForm(MatchFormTemplate):
       alert('This account is not yet authorized to match with other users. '
             + 'You can test things out, but your actions will not impact '
             + 'or be visible to other users. '
-            + 'For help, contact: empathyspot@gmail.com')
+            + 'For help, contact: ' + p.CONTACT_EMAIL)
     self.test_mode.visible = tm
     self.request_em_check_box.checked = re
     self.match_em_check_box.checked = me
