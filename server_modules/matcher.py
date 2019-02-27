@@ -74,12 +74,12 @@ def prune():
   _prune_requests()
   # Complete old commenced matches for all users
   cutoff_m = _now() - assume_complete
-  old_matches = (m for m in app_tables.matches.search(complete=[0])
+  old_matches = (m for m in app_tables.matches.search(complete=[False])
                  if m['match_commence'] < cutoff_m)
   for row in old_matches:
     temp = row['complete']
     for i in range(len(temp)):
-      temp[i] = 1
+      temp[i] = True
     row['complete'] = temp
   # Return after confirming wait
   trust_level, request_em, match_em = _get_user_info()
@@ -193,10 +193,10 @@ def _get_status(user):
       status = "requesting"
       last_confirmed = current_row['last_confirmed']
   else:
-    current_matches = app_tables.matches.search(users=[user], complete=[0])
+    current_matches = app_tables.matches.search(users=[user], complete=[False])
     for row in current_matches:
       i = row['users'].index(user)
-      if row['complete'][i] == 0:
+      if row['complete'][i] == False:
         status = "matched"
         ping_start = row['match_commence']
   return status, last_confirmed, ping_start, tallies
@@ -242,10 +242,10 @@ def get_code(user_id=""):
     code = current_row['jitsi_code']
     request_type = current_row['request_type']
   else:
-    current_matches = app_tables.matches.search(users=[user], complete=[0])
+    current_matches = app_tables.matches.search(users=[user], complete=[False])
     for row in current_matches:
       i = row['users'].index(user)
-      if row['complete'][i] == 0:
+      if row['complete'][i] == False:
         assert code == None # assumes only one uncompleted for this user
         code = row['jitsi_code']
         request_type = row['request_types'][i]
@@ -424,7 +424,7 @@ def _match_commenced(user):
       for row in matched_requests:
         new_match['users'] += [row['user']]
         new_match['request_types'] += [row['request_type']]
-        new_match['complete'] += [0]
+        new_match['complete'] += [False]
         row['current'] = False
   return _get_status(user)
 
@@ -434,11 +434,11 @@ def _match_commenced(user):
 def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return tallies."""
   user = _get_user(user_id)
-  current_matches = app_tables.matches.search(users=[user], complete=[0])
+  current_matches = app_tables.matches.search(users=[user], complete=[False])
   for row in current_matches:
     i = row['users'].index(user)
     temp = row['complete']
-    temp[i] = 1
+    temp[i] = True
     row['complete'] = temp
   return _get_tallies(user)
 
