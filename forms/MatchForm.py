@@ -27,7 +27,7 @@ class MatchForm(MatchFormTemplate):
     self.confirming_wait = False
     self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
                               ("Not ready to offer empathy first","receive_first"))
-    tm, re, me, rt, s, lc, ps, tallies, e = anvil.server.call('prune')
+    tm, re, pe, rt, s, lc, ps, tallies, e = anvil.server.call('prune')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'You can test things out, but your actions will not impact '
@@ -35,7 +35,7 @@ class MatchForm(MatchFormTemplate):
             + 'For help, contact: ' + p.CONTACT_EMAIL)
     self.test_mode.visible = tm
     self.request_em_check_box.checked = re
-    self.match_em_check_box.checked = me
+    self.pinged_em_check_box.checked = pe
     self.tallies = tallies
     self.drop_down_1.selected_value = rt
     self.status = s
@@ -153,8 +153,8 @@ class MatchForm(MatchFormTemplate):
     self.reset_status()
 
   def confirm_match(self):
-    if self.match_em_check_box.checked:
-      anvil.server.call('match_email')
+    if self.pinged_em_check_box.checked:
+      anvil.server.call('pinged_email')
     f = TimerForm(self.seconds, self.status)
     out = confirm(content=f,
                   title="A match is available. Are you ready?",
@@ -212,7 +212,7 @@ class MatchForm(MatchFormTemplate):
         self.complete_button.visible = False
         self.renew_button.visible = True
         self.cancel_button.visible = True
-        self.match_em_check_box.visible = True
+        self.pinged_em_check_box.visible = True
       else:
         if self.status == "pinged":
           return self.confirm_match()
@@ -239,7 +239,7 @@ class MatchForm(MatchFormTemplate):
           self.cancel_button.visible = False
           self.complete_button.visible = True
           self.set_jitsi_link(jitsi_code)
-        self.match_em_check_box.visible = False
+        self.pinged_em_check_box.visible = False
     else:
       self.status_label.text = "Request an empathy match when ready:"
       self.status_label.bold = True
@@ -252,7 +252,7 @@ class MatchForm(MatchFormTemplate):
       self.request_button.visible = True
       self.drop_down_1.enabled = True
       self.drop_down_1.foreground = "black"
-      self.match_em_check_box.visible = False
+      self.pinged_em_check_box.visible = False
       self.update_tally_label()
 
   def update_tally_label(self):
@@ -336,9 +336,9 @@ class MatchForm(MatchFormTemplate):
     self.reset_status()
     open_form('LoginForm')
 
-  def match_em_check_box_change(self, **event_args):
+  def pinged_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
-    anvil.server.call('set_match_em', self.match_em_check_box.checked)
+    anvil.server.call('set_pinged_em', self.pinged_em_check_box.checked)
 
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""

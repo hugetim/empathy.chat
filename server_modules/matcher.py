@@ -62,7 +62,7 @@ def _is_visible(user2, user1=None):
 def prune():
   """
   Assumed to run upon initializing Form1
-  returns trust_level, request_em, match_em, current_status, ref_time (or None),
+  returns trust_level, request_em, pinged_em, current_status, ref_time (or None),
           tallies, alt_avail, email_in_list
   prunes old requests/offers/matches
   updates last_confirmed if currently requesting/ping
@@ -82,7 +82,7 @@ def prune():
       temp[i] = True
     row['complete'] = temp
   # Return after confirming wait
-  trust_level, request_em, match_em = _get_user_info()
+  trust_level, request_em, pinged_em = _get_user_info()
   email_in_list = None
   if trust_level == 0:
     email_in_list = _email_in_list(user['email'])
@@ -106,7 +106,7 @@ def prune():
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
-  return test_mode, request_em, match_em, request_type, status, lc, ps, tallies, email_in_list
+  return test_mode, request_em, pinged_em, request_type, status, lc, ps, tallies, email_in_list
 
 
 def _initialize_session():
@@ -477,15 +477,15 @@ def _get_user_info(user_id=""):
   if trust is None:
     user['trust_level'] = 0
     user['request_em'] = False
-    user['match_em'] = False
-  return user['trust_level'], user['request_em'], user['match_em']
+    user['pinged_em'] = False
+  return user['trust_level'], user['request_em'], user['pinged_em']
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def set_match_em(match_em_checked):
+def set_pinged_em(pinged_em_checked):
   user = anvil.server.session['user']
-  user['match_em'] = match_em_checked
+  user['pinged_em'] = pinged_em_checked
   _confirm_wait(user)
 
 
@@ -498,7 +498,7 @@ def set_request_em(request_em_checked):
 
 
 @anvil.server.callable
-def match_email():
+def pinged_email():
   user = anvil.server.session['user']
   anvil.google.mail.send(to=user['email'],
                          subject="Empathy Spot - Match available",
