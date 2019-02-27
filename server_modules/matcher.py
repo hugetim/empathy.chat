@@ -274,8 +274,8 @@ def _create_match(user, excluded=()):
       current_row['ping_start'] = _now()
       current_row['match_id'] = _new_match_id()
       current_row['jitsi_code'] = _new_jitsi_code()
-      cms = [r['cancelled_matches'] for r in requests]
-      eligible_requests = [r for r in requests if r['cancelled_matches'] == min(cms)]
+      cms = [r['missed_pings'] for r in requests]
+      eligible_requests = [r for r in requests if r['missed_pings'] == min(cms)]
       earliest_request = min(eligible_requests, key=lambda row: row['start'])
       earliest_request['ping_start'] = current_row['ping_start']
       earliest_request['match_id'] = current_row['match_id']
@@ -294,8 +294,8 @@ def _create_matches(excluded=()):
                                                         match_id=None)
                     if r['user'] not in excluded_users]
   if all_requests:
-    all_cms = [r['cancelled_matches'] for r in all_requests]
-    all_eligible_requests = [r for r in all_requests if r['cancelled_matches'] == min(all_cms)]
+    all_cms = [r['missed_pings'] for r in all_requests]
+    all_eligible_requests = [r for r in all_requests if r['missed_pings'] == min(all_cms)]
     current_row = min(all_eligible_requests, key=lambda row: row['start'])
     user = current_row['user']
     # attempt to create a match for top request
@@ -342,7 +342,7 @@ def _cancel(user):
         row['jitsi_code'] = None
         if h.seconds_left("requesting", row['last_confirmed']) <= 0:
           row['current'] = False
-      current_row['cancelled_matches'] += 1
+      current_row['missed_pings'] += 1
       _create_matches()
   return _get_tallies(user)
 
@@ -370,7 +370,7 @@ def _cancel_other(user):
         row['match_id'] = None
         row['jitsi_code'] = None
         if row['user'] != user:
-          row['cancelled_matches'] += 1
+          row['missed_pings'] += 1
           row['current'] = False
         if h.seconds_left("requesting", row['last_confirmed']) <= 0:
           row['current'] = False
@@ -450,7 +450,7 @@ def _add_request_row(user, request_type):
                                         request_type=request_type,
                                         start=now,
                                         last_confirmed=now,
-                                        cancelled_matches=0
+                                        missed_pings=0
                                        )
   return new_row
 
