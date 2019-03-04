@@ -17,7 +17,6 @@ class MatchForm(MatchFormTemplate):
   status = None
   last_confirmed = None # this or other_last_confirmed, whichever is earlier
   ping_start = None
-  seconds = None
 
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -97,9 +96,7 @@ class MatchForm(MatchFormTemplate):
       self.status = s
       self.last_confirmed = lc
       self.ping_start = ps
-      if self.status == "requesting":
-        self.seconds = self.seconds_left()
-      else:
+      if self.status != "requesting":
         self.reset_status()
     elif self.status == "pinging":
       self.status = "pinging-pending" # in case server call takes more than a second
@@ -107,9 +104,7 @@ class MatchForm(MatchFormTemplate):
       self.status = s
       self.last_confirmed = lc
       self.ping_start = ps
-      if self.status == "pinging":
-        self.seconds = self.seconds_left()
-      else:
+      if self.status != "pinging":
         if self.status == "requesting":
           alert("The other empathy request was cancelled.")
         self.reset_status()
@@ -120,10 +115,10 @@ class MatchForm(MatchFormTemplate):
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
     if self.status == "requesting":
-      self.seconds -= 1
+      seconds = self.seconds_left()
       self.timer_label.text = ("Your request will expire in:  "
-                               + h.seconds_to_digital(self.seconds) )
-      if self.seconds <= 0:
+                               + h.seconds_to_digital(seconds) )
+      if seconds <= 0:
         self.tallies = anvil.server.call('cancel')
         alert("Request cancelled due to "
               + str(p.WAIT_SECONDS) + " seconds of inactivity.",
@@ -133,11 +128,11 @@ class MatchForm(MatchFormTemplate):
         self.ping_start = None
         self.reset_status()
     elif self.status in ["pinging", "pinging-pending"]:
-      self.seconds -= 1
+      seconds = self.seconds_left()
       self.status_label.text = ("Potential match available. Time left for them "
                                 + "to confirm:  "
-                                + h.seconds_to_digital(self.seconds))
-      if self.status != "pinging-pending" and self.seconds <= 0:
+                                + h.seconds_to_digital(seconds))
+      if self.status != "pinging-pending" and seconds <= 0:
         self.status = "pinging-pending" # in case server call takes more than a second
         s, lc, ps, self.tallies = anvil.server.call('cancel_other')
         self.status = s
@@ -152,10 +147,10 @@ class MatchForm(MatchFormTemplate):
     self.ping_start = ps
     self.reset_status()
 
-  def confirm_match(self):
+  def confirm_match(self, seconds):
     if self.pinged_em_check_box.checked:
       anvil.server.call('pinged_email')
-    f = TimerForm(self.seconds, self.status)
+    f = TimerForm(seconds, self.status)
     out = confirm(content=f,
                   title="A match is available. Are you ready?",
                   large=False,
@@ -192,7 +187,7 @@ class MatchForm(MatchFormTemplate):
   def reset_status(self):
     if self.status:
       if self.status != "matched":
-        self.seconds = self.seconds_left()
+        seconds = self.seconds_left()
       self.request_button.visible = False
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
@@ -207,7 +202,7 @@ class MatchForm(MatchFormTemplate):
         self.status_label.bold = False
         self.set_jitsi_link("")
         self.timer_label.text = ("Your request will expire in:  "
-                                 + h.seconds_to_digital(self.seconds) )
+                                 + h.seconds_to_digital(seconds) )
         self.timer_label.visible = True
         self.complete_button.visible = False
         self.renew_button.visible = True
@@ -215,13 +210,13 @@ class MatchForm(MatchFormTemplate):
         self.pinged_em_check_box.visible = True
       else:
         if self.status == "pinged":
-          return self.confirm_match()
+          return self.confirm_match(seconds)
         assert self.status in ["pinging", "matched"]
         self.note_label.visible = False
         if self.status == "pinging":
           self.status_label.text = ("Potential match available. Time left for them "
                                     + "to confirm:  "
-                                    + h.seconds_to_digital(self.seconds))
+                                    + h.seconds_to_digital(seconds))
           self.set_jitsi_link("")
           self.timer_label.visible = False
           self.status_label.bold = False
