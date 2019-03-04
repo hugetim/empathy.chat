@@ -457,10 +457,10 @@ def _add_request_row(user, request_type):
 
 def _new_jitsi_code():
   num_chars = 5
-  charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  charset = "abcdefghijkmnopqrstuvwxyz23456789"
   random.seed()
   rand_code = "".join([random.choice(charset) for i in range(num_chars)])
-  code = "empathy_" + rand_code
+  code = "empathy-" + rand_code
   # match['jitsi_code'] = code
   return code
 
