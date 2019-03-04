@@ -222,10 +222,9 @@ class MatchForm(MatchFormTemplate):
           self.status_label.text = ("Potential match available. Time left for them "
                                     + "to confirm:  "
                                     + h.seconds_to_digital(self.seconds))
-          #                         + "Set up Jitsi at: ")
+          self.set_jitsi_link("")
           self.timer_label.visible = False
           self.status_label.bold = False
-          #jitsi_code, request_type = anvil.server.call('get_code')
           self.renew_button.visible = True
           self.cancel_button.visible = True
           self.complete_button.visible = False
@@ -233,7 +232,7 @@ class MatchForm(MatchFormTemplate):
           assert self.status == "matched"
           self.timer_label.visible = False
           jitsi_code, request_type = anvil.server.call('get_code')
-          self.status_label.text = "Status: You have a confirmed match. Use Jitsi to meet: "
+          self.status_label.text = "Status: You have a confirmed match. Use this Jitsi Meet code: "
           self.status_label.bold = True
           self.renew_button.visible = False
           self.cancel_button.visible = False
@@ -321,7 +320,7 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_link.url = ""
     else:
       self.jitsi_link.url = "https://meet.jit.si/" + jitsi_code
-      self.jitsi_link.text = self.jitsi_link.url
+      self.jitsi_link.text = jitsi_code
       self.jitsi_link.visible = True
 
   def logout_button_click(self, **event_args):
