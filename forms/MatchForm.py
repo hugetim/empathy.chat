@@ -192,6 +192,7 @@ class MatchForm(MatchFormTemplate):
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
       self.tally_label.visible = False
+      self.jitsi_test_check_box.visible = False
       if self.status == "requesting":
         self.status_label.text = "Status: Requesting an empathy exchange."
         self.note_label.text = ("(Note: When a match becomes available, "
@@ -235,14 +236,16 @@ class MatchForm(MatchFormTemplate):
           self.set_jitsi_link(jitsi_code)
         self.pinged_em_check_box.visible = False
     else:
-      self.status_label.text = "Request an empathy match when ready:"
+      self.status_label.text = "Request an empathy match when ready"
       self.status_label.bold = True
-      self.note_label.visible = False
+      self.jitsi_test_check_box.visible = True
       self.set_jitsi_link("")
+      self.note_label.visible = False
       self.timer_label.visible = False
       self.complete_button.visible = False
       self.renew_button.visible = False
       self.cancel_button.visible = False
+      self.request_button.enabled = self.jitsi_test_check_box.checked
       self.request_button.visible = True
       self.drop_down_1.enabled = True
       self.drop_down_1.foreground = "black"
@@ -377,3 +380,8 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
+
+  def jitsi_test_check_box_change(self, **event_args):
+    """This method is called when this checkbox is checked or unchecked"""
+    self.request_button.enabled = self.jitsi_test_check_box.checked
+
