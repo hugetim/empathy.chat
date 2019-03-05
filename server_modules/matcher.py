@@ -42,7 +42,7 @@ def _get_request_type(user):
   if current_row:
     return current_row['request_type']
 
-  
+
 def _is_visible(user2, user1=None):
   '''Is user2 visible to user1?'''
   if user1 == None:
@@ -55,7 +55,7 @@ def _is_visible(user2, user1=None):
     return False
   else:
     return trust1 > 0 and trust2 > 0
-  
+
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -74,11 +74,13 @@ def prune():
   _prune_requests()
   # Complete old commenced matches for all users
   cutoff_m = _now() - assume_complete
+  # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
   old_matches = (m for m in app_tables.matches.search(complete=[0])
                  if m['match_commence'] < cutoff_m)
   for row in old_matches:
     temp = row['complete']
     for i in range(len(temp)):
+      # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
       temp[i] = 1
     row['complete'] = temp
   # Return after confirming wait
@@ -193,6 +195,7 @@ def _get_status(user):
       status = "requesting"
       last_confirmed = current_row['last_confirmed']
   else:
+    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:
       i = row['users'].index(user)
@@ -223,7 +226,7 @@ def _get_tallies(user):
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   cutoff_e = _now() - assume_inactive
   request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
-                     if (u['last_login'] > cutoff_e 
+                     if (u['last_login'] > cutoff_e
                          and u not in active_users
                          and _is_visible(u, user))]
   tallies['request_em'] = len(request_em_list)
@@ -242,6 +245,7 @@ def get_code(user_id=""):
     code = current_row['jitsi_code']
     request_type = current_row['request_type']
   else:
+    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:
       i = row['users'].index(user)
@@ -424,6 +428,7 @@ def _match_commenced(user):
       for row in matched_requests:
         new_match['users'] += [row['user']]
         new_match['request_types'] += [row['request_type']]
+        # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
         new_match['complete'] += [0]
         row['current'] = False
   return _get_status(user)
@@ -434,6 +439,7 @@ def _match_commenced(user):
 def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return tallies."""
   user = _get_user(user_id)
+  # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
@@ -528,7 +534,7 @@ def _request_emails(request_type):
     request_type_text = 'an empathy exchange.'
   cutoff_e = _now() - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
-                       if (u['last_login'] > cutoff_e 
+                       if (u['last_login'] > cutoff_e
                            and u != user
                            and _is_visible(user, u))]
   for email_address in emails:
