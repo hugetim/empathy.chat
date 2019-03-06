@@ -358,11 +358,23 @@ class MatchForm(MatchFormTemplate):
 
   def pinged_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
-    anvil.server.call('set_pinged_em', self.pinged_em_check_box.checked)
+    checked = self.pinged_em_check_box.checked
+    s, lc, ps, t = anvil.server.call('set_pinged_em', checked)
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
+    self.tallies = t
+    self.reset_status()
 
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
-    anvil.server.call('set_request_em', self.request_em_check_box.checked) 
+    checked = self.request_em_check_box.checked
+    s, lc, ps, t = anvil.server.call('set_request_em', checked)
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
+    self.tallies = t
+    self.reset_status()
     
   def test_mode_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""

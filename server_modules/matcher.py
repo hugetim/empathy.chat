@@ -492,7 +492,7 @@ def _get_user_info(user_id=""):
 def set_pinged_em(pinged_em_checked):
   user = anvil.server.session['user']
   user['pinged_em'] = pinged_em_checked
-  _confirm_wait(user)
+  return _confirm_wait(user)
 
 
 @anvil.server.callable
@@ -500,7 +500,7 @@ def set_pinged_em(pinged_em_checked):
 def set_request_em(request_em_checked):
   user = anvil.server.session['user']
   user['request_em'] = request_em_checked
-  _confirm_wait(user)
+  return _confirm_wait(user)
 
 
 @anvil.server.callable
