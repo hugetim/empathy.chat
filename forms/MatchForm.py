@@ -8,6 +8,7 @@ from TimerForm import TimerForm
 import parameters as p
 import anvil.tz
 import helper as h
+import random
 
 
 class MatchForm(MatchFormTemplate):
@@ -239,19 +240,31 @@ class MatchForm(MatchFormTemplate):
       self.status_label.text = "Request an empathy match when ready"
       self.status_label.bold = True
       self.jitsi_test_check_box.visible = True
-      self.set_jitsi_link("")
+      self.set_jitsi_link(self.test_jitsi_code())
       self.note_label.visible = False
       self.timer_label.visible = False
       self.complete_button.visible = False
       self.renew_button.visible = False
       self.cancel_button.visible = False
       self.request_button.enabled = self.jitsi_test_check_box.checked
+      self.update_request_tooltip(self.request_button.enabled)
       self.request_button.visible = True
       self.drop_down_1.enabled = True
       self.drop_down_1.foreground = "black"
       self.pinged_em_check_box.visible = False
       self.update_tally_label()
 
+  def update_request_tooltip(self, enabled):
+    if enabled:
+      self.request_button.tooltip = "Request to be matched with someone to exchange empathy"
+    else:
+      self.request_button.tooltip = "The box above must be checked before you can request empathy"
+
+  def jitsi_test_check_box_change(self, **event_args):
+    """This method is called when this checkbox is checked or unchecked"""
+    self.request_button.enabled = self.jitsi_test_check_box.checked
+    self.update_request_tooltip(self.request_button.enabled)
+      
   def update_tally_label(self):
     temp = ""
     if self.tallies['receive_first'] > 1:
@@ -321,6 +334,14 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_link.text = jitsi_code
       self.jitsi_link.visible = True
 
+  def test_jitsi_code(self):
+    num_chars = 4
+    charset = "abcdefghijkmnopqrstuvwxyz23456789"
+    random.seed()
+    rand_code = "".join([random.choice(charset) for i in range(num_chars)])
+    code = "test-" + rand_code
+    return code      
+      
   def logout_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.logout_user()
@@ -339,8 +360,8 @@ class MatchForm(MatchFormTemplate):
 
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
-    anvil.server.call('set_request_em', self.request_em_check_box.checked)
-
+    anvil.server.call('set_request_em', self.request_em_check_box.checked) 
+    
   def test_mode_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     self.test_column_panel.visible = self.test_mode.checked
@@ -380,8 +401,3 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
-
-  def jitsi_test_check_box_change(self, **event_args):
-    """This method is called when this checkbox is checked or unchecked"""
-    self.request_button.enabled = self.jitsi_test_check_box.checked
-
