@@ -234,12 +234,15 @@ class MatchForm(MatchFormTemplate):
           self.renew_button.visible = False
           self.cancel_button.visible = False
           self.complete_button.visible = True
+          self.jitsi_link.font_size = None
           self.set_jitsi_link(jitsi_code)
         self.pinged_em_check_box.visible = False
     else:
       self.status_label.text = "Request an empathy match when ready"
       self.status_label.bold = True
       self.jitsi_test_check_box.visible = True
+      print self.jitsi_link.font_size
+      self.jitsi_link.font_size = 12
       self.set_jitsi_link(self.test_jitsi_code())
       self.note_label.visible = False
       self.timer_label.visible = False
