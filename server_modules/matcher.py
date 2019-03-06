@@ -67,7 +67,7 @@ def prune():
   prunes old requests/offers/matches
   updates last_confirmed if currently requesting/ping
   """
-  assume_complete = datetime.timedelta(hours=18)
+  assume_complete = datetime.timedelta(hours=4)
   _initialize_session()
   user = anvil.server.session['user']
   # Prune requests, including from this user
