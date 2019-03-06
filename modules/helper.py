@@ -8,9 +8,9 @@ import math
 
 def seconds_left(status, last_confirmed, ping_start=None):
   now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-  if status in ["pinging", "pinged"]:
+  if status in ["pinging", "pinging-pending", "pinged"]:
     confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).seconds
-    if status == "pinging":
+    if status in ["pinging", "pinging-pending"]:
       return confirm_match + 2*p.BUFFER_SECONDS
     elif status == "pinged":
       return confirm_match + p.BUFFER_SECONDS
