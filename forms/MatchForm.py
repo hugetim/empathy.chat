@@ -214,13 +214,13 @@ class MatchForm(MatchFormTemplate):
         if self.status == "pinged":
           return self.confirm_match(seconds)
         assert self.status in ["pinging", "matched"]
-        self.note_label.visible = False
         if self.status == "pinging":
           self.status_label.text = ("Potential match available. Time left for them "
                                     + "to confirm:  "
                                     + h.seconds_to_digital(seconds))
           self.set_jitsi_link("")
           self.timer_label.visible = False
+          self.note_label.visible = False
           self.status_label.bold = False
           self.renew_button.visible = True
           self.cancel_button.visible = True
@@ -236,6 +236,8 @@ class MatchForm(MatchFormTemplate):
           self.complete_button.visible = True
           self.jitsi_link.font_size = None
           self.set_jitsi_link(jitsi_code)
+          self.note_label.text = "Note: Jitsi Meet mobile app users may need to manually open the app and input the code."
+          self.note_label.visible = True
         self.pinged_em_check_box.visible = False
     else:
       self.status_label.text = "Request an empathy match when ready"
@@ -243,7 +245,8 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_test_check_box.visible = True
       self.jitsi_link.font_size = 12
       self.set_jitsi_link(self.test_jitsi_code())
-      self.note_label.visible = False
+      self.note_label.text = "Note: Jitsi Meet mobile app users may need to manually open the app and input the code."
+      self.note_label.visible = True
       self.timer_label.visible = False
       self.complete_button.visible = False
       self.renew_button.visible = False
