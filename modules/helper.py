@@ -21,9 +21,9 @@ def seconds_left(status, last_confirmed, ping_start=None):
 
 
 def seconds_to_digital(seconds):
-  minutes = math.floor(seconds / 60)
+  minutes = math.trunc(seconds / 60)
   seconds = int(seconds - minutes * 60)
-  hours = math.floor(minutes / 60)
+  hours = math.trunc(minutes / 60)
   minutes = int(minutes - hours * 60)
   output = ""
   minute_str = str(minutes)
@@ -40,9 +40,9 @@ def seconds_to_digital(seconds):
 
 
 def seconds_to_words(seconds):
-  minutes = math.floor(seconds / 60)
+  minutes = math.trunc(seconds / 60)
   seconds = int(seconds - minutes * 60)
-  hours = math.floor(minutes / 60)
+  hours = math.trunc(minutes / 60)
   minutes = int(minutes - hours * 60)
   if seconds == 1:
     second_str = "1 second"
