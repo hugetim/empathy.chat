@@ -62,7 +62,7 @@ def _is_visible(user2, user1=None):
 def prune():
   """
   Assumed to run upon initializing Form1
-  returns trust_level, request_em, match_em, current_status, ref_time (or None),
+  returns trust_level, request_em, pinged_em, current_status, ref_time (or None),
           tallies, alt_avail, email_in_list
   prunes old requests/offers/matches
   updates last_confirmed if currently requesting/ping
@@ -74,15 +74,17 @@ def prune():
   _prune_requests()
   # Complete old commenced matches for all users
   cutoff_m = _now() - assume_complete
+  # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
   old_matches = (m for m in app_tables.matches.search(complete=[0])
                  if m['match_commence'] < cutoff_m)
   for row in old_matches:
     temp = row['complete']
     for i in range(len(temp)):
+      # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
       temp[i] = 1
     row['complete'] = temp
   # Return after confirming wait
-  trust_level, request_em, match_em = _get_user_info()
+  trust_level, request_em, pinged_em = _get_user_info()
   email_in_list = None
   if trust_level == 0:
     email_in_list = _email_in_list(user['email'])
@@ -106,7 +108,7 @@ def prune():
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
-  return test_mode, request_em, match_em, request_type, status, lc, ps, tallies, email_in_list
+  return test_mode, request_em, pinged_em, request_type, status, lc, ps, tallies, email_in_list
 
 
 def _initialize_session():
@@ -193,6 +195,7 @@ def _get_status(user):
       status = "requesting"
       last_confirmed = current_row['last_confirmed']
   else:
+    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:
       i = row['users'].index(user)
@@ -242,6 +245,7 @@ def get_code(user_id=""):
     code = current_row['jitsi_code']
     request_type = current_row['request_type']
   else:
+    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
     current_matches = app_tables.matches.search(users=[user], complete=[0])
     for row in current_matches:
       i = row['users'].index(user)
@@ -274,8 +278,8 @@ def _create_match(user, excluded=()):
       current_row['ping_start'] = _now()
       current_row['match_id'] = _new_match_id()
       current_row['jitsi_code'] = _new_jitsi_code()
-      cms = [r['cancelled_matches'] for r in requests]
-      eligible_requests = [r for r in requests if r['cancelled_matches'] == min(cms)]
+      cms = [r['missed_pings'] for r in requests]
+      eligible_requests = [r for r in requests if r['missed_pings'] == min(cms)]
       earliest_request = min(eligible_requests, key=lambda row: row['start'])
       earliest_request['ping_start'] = current_row['ping_start']
       earliest_request['match_id'] = current_row['match_id']
@@ -294,8 +298,8 @@ def _create_matches(excluded=()):
                                                         match_id=None)
                     if r['user'] not in excluded_users]
   if all_requests:
-    all_cms = [r['cancelled_matches'] for r in all_requests]
-    all_eligible_requests = [r for r in all_requests if r['cancelled_matches'] == min(all_cms)]
+    all_cms = [r['missed_pings'] for r in all_requests]
+    all_eligible_requests = [r for r in all_requests if r['missed_pings'] == min(all_cms)]
     current_row = min(all_eligible_requests, key=lambda row: row['start'])
     user = current_row['user']
     # attempt to create a match for top request
@@ -342,7 +346,7 @@ def _cancel(user):
         row['jitsi_code'] = None
         if h.seconds_left("requesting", row['last_confirmed']) <= 0:
           row['current'] = False
-      current_row['cancelled_matches'] += 1
+      current_row['missed_pings'] += 1
       _create_matches()
   return _get_tallies(user)
 
@@ -370,7 +374,7 @@ def _cancel_other(user):
         row['match_id'] = None
         row['jitsi_code'] = None
         if row['user'] != user:
-          row['cancelled_matches'] += 1
+          row['missed_pings'] += 1
           row['current'] = False
         if h.seconds_left("requesting", row['last_confirmed']) <= 0:
           row['current'] = False
@@ -424,6 +428,7 @@ def _match_commenced(user):
       for row in matched_requests:
         new_match['users'] += [row['user']]
         new_match['request_types'] += [row['request_type']]
+        # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
         new_match['complete'] += [0]
         row['current'] = False
   return _get_status(user)
@@ -434,6 +439,7 @@ def _match_commenced(user):
 def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return tallies."""
   user = _get_user(user_id)
+  # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
@@ -450,17 +456,17 @@ def _add_request_row(user, request_type):
                                         request_type=request_type,
                                         start=now,
                                         last_confirmed=now,
-                                        cancelled_matches=0
+                                        missed_pings=0
                                        )
   return new_row
 
 
 def _new_jitsi_code():
   num_chars = 5
-  charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  charset = "abcdefghijkmnopqrstuvwxyz23456789"
   random.seed()
   rand_code = "".join([random.choice(charset) for i in range(num_chars)])
-  code = "empathy_" + rand_code
+  code = "empathy-" + rand_code
   # match['jitsi_code'] = code
   return code
 
@@ -477,15 +483,15 @@ def _get_user_info(user_id=""):
   if trust is None:
     user['trust_level'] = 0
     user['request_em'] = False
-    user['match_em'] = False
-  return user['trust_level'], user['request_em'], user['match_em']
+    user['pinged_em'] = False
+  return user['trust_level'], user['request_em'], user['pinged_em']
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def set_match_em(match_em_checked):
+def set_pinged_em(pinged_em_checked):
   user = anvil.server.session['user']
-  user['match_em'] = match_em_checked
+  user['pinged_em'] = pinged_em_checked
   _confirm_wait(user)
 
 
@@ -498,7 +504,7 @@ def set_request_em(request_em_checked):
 
 
 @anvil.server.callable
-def match_email():
+def pinged_email():
   user = anvil.server.session['user']
   anvil.google.mail.send(to=user['email'],
                          subject="Empathy Spot - Match available",
@@ -507,7 +513,7 @@ def match_email():
 
 An empathy match has been found.
 
-Return to https://minty-sarcastic-telephone.anvil.app now to be connected for your empathy exchange.
+Return to ''' + p.URL + ''' now to be connected for your empathy exchange.
 
 Thanks!
 Tim
@@ -539,7 +545,7 @@ def _request_emails(request_type):
 
 Someone has requested ''' + request_type_text + '''
 
-Return to https://minty-sarcastic-telephone.anvil.app now and request empathy to be connected (if you are first to do so).
+Return to ''' + p.URL + ''' now and request empathy to be connected (if you are first to do so).
 
 Thanks!
 Tim
