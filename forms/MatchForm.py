@@ -311,7 +311,9 @@ class MatchForm(MatchFormTemplate):
           temp += (str(self.tallies['request_em'])
                    + ' other person is currently receiving email notifications '
                    + 'about each request for empathy.')
+        self.tally_label.font_size = None
       else:
+        self.tally_label.font_size = 12
         if self.tallies['request_em'] > 1:
           temp += (str(self.tallies['request_em'])
                    + ' people are currently receiving email notifications '
@@ -320,6 +322,8 @@ class MatchForm(MatchFormTemplate):
           temp += (str(self.tallies['request_em'])
                    + ' person is currently receiving email notifications '
                    + 'about each request for empathy.')
+    else:
+      self.tally_label.font_size = None
     self.tally_label.text = temp
     if len(temp) > 0:
       self.tally_label.visible = True
