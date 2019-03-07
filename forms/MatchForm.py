@@ -27,12 +27,14 @@ class MatchForm(MatchFormTemplate):
     self.confirming_wait = False
     self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
                               ("Not ready to offer empathy first","receive_first"))
-    tm, re, pe, rt, s, lc, ps, tallies, e = anvil.server.call('prune')
+    tm, re, pe, rt, s, lc, ps, tallies, e, n = anvil.server.call('prune')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'You can test things out, but your actions will not impact '
             + 'or be visible to other users. '
             + 'For help, contact: ' + p.CONTACT_EMAIL)
+    elif e == True:
+      alert("Welcome, " + n + "!")
     self.test_mode.visible = tm
     self.request_em_check_box.checked = re
     self.pinged_em_check_box.checked = pe
@@ -214,13 +216,13 @@ class MatchForm(MatchFormTemplate):
         if self.status == "pinged":
           return self.confirm_match(seconds)
         assert self.status in ["pinging", "matched"]
-        self.note_label.visible = False
         if self.status == "pinging":
           self.status_label.text = ("Potential match available. Time left for them "
                                     + "to confirm:  "
                                     + h.seconds_to_digital(seconds))
           self.set_jitsi_link("")
           self.timer_label.visible = False
+          self.note_label.visible = False
           self.status_label.bold = False
           self.renew_button.visible = True
           self.cancel_button.visible = True
@@ -236,6 +238,8 @@ class MatchForm(MatchFormTemplate):
           self.complete_button.visible = True
           self.jitsi_link.font_size = None
           self.set_jitsi_link(jitsi_code)
+          self.note_label.text = "Note: Jitsi Meet mobile app users may need to manually open the app and input the code."
+          self.note_label.visible = True
         self.pinged_em_check_box.visible = False
     else:
       self.status_label.text = "Request an empathy match when ready"
@@ -243,7 +247,8 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_test_check_box.visible = True
       self.jitsi_link.font_size = 12
       self.set_jitsi_link(self.test_jitsi_code())
-      self.note_label.visible = False
+      self.note_label.text = "Note: Jitsi Meet mobile app users may need to manually open the app and input the code."
+      self.note_label.visible = True
       self.timer_label.visible = False
       self.complete_button.visible = False
       self.renew_button.visible = False
@@ -311,7 +316,9 @@ class MatchForm(MatchFormTemplate):
           temp += (str(self.tallies['request_em'])
                    + ' other person is currently receiving email notifications '
                    + 'about each request for empathy.')
+        self.tally_label.font_size = None
       else:
+        self.tally_label.font_size = 12
         if self.tallies['request_em'] > 1:
           temp += (str(self.tallies['request_em'])
                    + ' people are currently receiving email notifications '
@@ -320,6 +327,8 @@ class MatchForm(MatchFormTemplate):
           temp += (str(self.tallies['request_em'])
                    + ' person is currently receiving email notifications '
                    + 'about each request for empathy.')
+    else:
+      self.tally_label.font_size = None
     self.tally_label.text = temp
     if len(temp) > 0:
       self.tally_label.visible = True
@@ -358,11 +367,23 @@ class MatchForm(MatchFormTemplate):
 
   def pinged_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
-    anvil.server.call('set_pinged_em', self.pinged_em_check_box.checked)
+    checked = self.pinged_em_check_box.checked
+    s, lc, ps, t = anvil.server.call('set_pinged_em', checked)
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
+    self.tallies = t
+    self.reset_status()
 
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
-    anvil.server.call('set_request_em', self.request_em_check_box.checked) 
+    checked = self.request_em_check_box.checked
+    s, lc, ps, t = anvil.server.call('set_request_em', checked)
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
+    self.tallies = t
+    self.reset_status()
     
   def test_mode_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""

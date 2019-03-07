@@ -13,6 +13,7 @@ import datetime
 @anvil.server.callable
 @anvil.tables.in_transaction
 def test_add_user(em, level=1, r_em=False, p_em=False):
+  print("test_add_user", em, level, r_em, p_em)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
@@ -30,6 +31,7 @@ def test_add_user(em, level=1, r_em=False, p_em=False):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def test_add_request(user_id, request_type = "will_offer_first"):
+  print("test_add_request", user_id, request_type)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
@@ -56,6 +58,7 @@ def create_tests_record():
 @anvil.server.callable
 @anvil.tables.in_transaction
 def test_clear():
+  print("('test_clear')")
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   test_records = app_tables.test_data.search()
   test_matches = set()
@@ -74,6 +77,7 @@ def test_clear():
 
 @anvil.server.callable
 def test_get_user_list():
+  print("('test_get_user_list')")
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   users = app_tables.users.search()
   to_return = []

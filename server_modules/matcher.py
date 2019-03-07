@@ -67,7 +67,8 @@ def prune():
   prunes old requests/offers/matches
   updates last_confirmed if currently requesting/ping
   """
-  assume_complete = datetime.timedelta(hours=18)
+  print ("('prune')")
+  assume_complete = datetime.timedelta(hours=4)
   _initialize_session()
   user = anvil.server.session['user']
   # Prune requests, including from this user
@@ -86,11 +87,13 @@ def prune():
   # Return after confirming wait
   trust_level, request_em, pinged_em = _get_user_info()
   email_in_list = None
+  name = None
   if trust_level == 0:
-    email_in_list = _email_in_list(user['email'])
+    email_in_list = _email_in_list(user)
     if email_in_list:
       trust_level = 1
       user['trust_level'] = trust_level
+      name = user['name']
   elif trust_level < 0:
     email_in_list = False
   test_mode = trust_level >= TEST_TRUST_LEVEL
@@ -108,7 +111,7 @@ def prune():
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
-  return test_mode, request_em, pinged_em, request_type, status, lc, ps, tallies, email_in_list
+  return test_mode, request_em, pinged_em, request_type, status, lc, ps, tallies, email_in_list, name
 
 
 def _initialize_session():
@@ -129,10 +132,12 @@ def _get_user(user_id):
     return app_tables.users.get_by_id(user_id)
 
 
-def _email_in_list(email):
+def _email_in_list(user):
+  email = user['email']
   sheet = app_files._2018_integration_program['Sheet1']
   for row in sheet.rows:
     if _emails_equal(email, row['email']):
+      user['name'] = row['name']
       return True
   return False
 
@@ -148,6 +153,7 @@ def _emails_equal(a, b):
 @anvil.tables.in_transaction
 def confirm_wait(user_id=""):
   """updates last_confirmed for current request, returns _get_status(user)"""
+  print("confirm_wait", user_id)
   user = _get_user(user_id)
   return _confirm_wait(user)
 
@@ -237,6 +243,7 @@ def _get_tallies(user):
 @anvil.tables.in_transaction
 def get_code(user_id=""):
   """returns jitsi_code, request_type (or Nones)"""
+  print("get_code", user_id)
   user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   code = None
@@ -314,6 +321,7 @@ def add_request(request_type, user_id=""):
   """
   return status, last_confirmed, ping_start, num_emailed
   """
+  print("add_request", request_type, user_id)
   user = _get_user(user_id)
   return _add_request(user, request_type)
 
@@ -359,6 +367,7 @@ def cancel(user_id=""):
   Cancel any expired requests part of a cancelled match
   Returns tallies
   """
+  print("cancel", user_id)
   user = _get_user(user_id)
   return _cancel(user)
 
@@ -391,6 +400,7 @@ def cancel_other(user_id=""):
   cancel match (if applicable)--and cancel their request
   Cancel any other expired requests part of a cancelled match
   """
+  print("cancel_other", user_id)
   user = _get_user(user_id)
   return _cancel_other(user)
 
@@ -403,6 +413,7 @@ def match_commenced(user_id=""):
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
+  print("match_commenced", user_id)
   user = _get_user(user_id)
   return _match_commenced(user)
 
@@ -438,6 +449,7 @@ def _match_commenced(user):
 @anvil.tables.in_transaction
 def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return tallies."""
+  print("match_complete", user_id)
   user = _get_user(user_id)
   # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   current_matches = app_tables.matches.search(users=[user], complete=[0])
@@ -490,30 +502,36 @@ def _get_user_info(user_id=""):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def set_pinged_em(pinged_em_checked):
+  print("set_pinged_em", pinged_em_checked)
   user = anvil.server.session['user']
   user['pinged_em'] = pinged_em_checked
-  _confirm_wait(user)
+  return _confirm_wait(user)
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
 def set_request_em(request_em_checked):
+  print("set_request_em", request_em_checked)
   user = anvil.server.session['user']
   user['request_em'] = request_em_checked
-  _confirm_wait(user)
+  return _confirm_wait(user)
 
 
 @anvil.server.callable
 def pinged_email():
+  print("('pinged_email')")
   user = anvil.server.session['user']
+  name = user['name']
+  if not name:
+    name = "Empathy Spot user"
   anvil.google.mail.send(to=user['email'],
                          subject="Empathy Spot - Match available",
                          text=
-'''Dear Empathy Spot user,
+'''Dear ''' + name + ''',
 
 An empathy match has been found.
 
-Return to ''' + p.URL + ''' now to be connected for your empathy exchange.
+Return to ''' + p.URL + ''' now and confirm your availability to be connected for an empathy exchange.
 
 Thanks!
 Tim
@@ -527,6 +545,9 @@ def _request_emails(request_type):
   """email all users with request_em_check_box checked who logged in recently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   user = anvil.server.session['user']
+  name = user['name']
+  if not name:
+    name = "Empathy Spot user"
   if request_type == "receive_first":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
   else:
@@ -541,11 +562,11 @@ def _request_emails(request_type):
     anvil.google.mail.send(to=email_address,
                            subject="Empathy Spot - Request active",
                            text=
-'''Dear Empathy Spot user,
+'''Dear ''' + name + ''',
 
 Someone has requested ''' + request_type_text + '''
 
-Return to ''' + p.URL + ''' now and request empathy to be connected (if you are first to do so).
+Return to ''' + p.URL + ''' and request empathy to be connected for an empathy exchange (if you are first to do so).
 
 Thanks!
 Tim
