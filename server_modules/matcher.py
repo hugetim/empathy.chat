@@ -87,7 +87,7 @@ def prune():
   trust_level, request_em, pinged_em = _get_user_info()
   email_in_list = None
   if trust_level == 0:
-    email_in_list = _email_in_list(user['email'])
+    email_in_list = _email_in_list(user)
     if email_in_list:
       trust_level = 1
       user['trust_level'] = trust_level
@@ -129,10 +129,12 @@ def _get_user(user_id):
     return app_tables.users.get_by_id(user_id)
 
 
-def _email_in_list(email):
+def _email_in_list(user):
+  email = user['email']
   sheet = app_files._2018_integration_program['Sheet1']
   for row in sheet.rows:
     if _emails_equal(email, row['email']):
+      user['name'] = row['name']
       return True
   return False
 
