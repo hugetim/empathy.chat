@@ -510,10 +510,13 @@ def set_request_em(request_em_checked):
 @anvil.server.callable
 def pinged_email():
   user = anvil.server.session['user']
+  name = user['name']
+  if not name:
+    name = "Empathy Spot user"
   anvil.google.mail.send(to=user['email'],
                          subject="Empathy Spot - Match available",
                          text=
-'''Dear Empathy Spot user,
+'''Dear ''' + name + ''',
 
 An empathy match has been found.
 
@@ -531,6 +534,9 @@ def _request_emails(request_type):
   """email all users with request_em_check_box checked who logged in recently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   user = anvil.server.session['user']
+  name = user['name']
+  if not name:
+    name = "Empathy Spot user"
   if request_type == "receive_first":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
   else:
@@ -545,7 +551,7 @@ def _request_emails(request_type):
     anvil.google.mail.send(to=email_address,
                            subject="Empathy Spot - Request active",
                            text=
-'''Dear Empathy Spot user,
+'''Dear ''' + name + ''',
 
 Someone has requested ''' + request_type_text + '''
 
