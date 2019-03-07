@@ -86,11 +86,13 @@ def prune():
   # Return after confirming wait
   trust_level, request_em, pinged_em = _get_user_info()
   email_in_list = None
+  name = None
   if trust_level == 0:
     email_in_list = _email_in_list(user)
     if email_in_list:
       trust_level = 1
       user['trust_level'] = trust_level
+      name = user['name']
   elif trust_level < 0:
     email_in_list = False
   test_mode = trust_level >= TEST_TRUST_LEVEL
@@ -108,7 +110,7 @@ def prune():
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
-  return test_mode, request_em, pinged_em, request_type, status, lc, ps, tallies, email_in_list
+  return test_mode, request_em, pinged_em, request_type, status, lc, ps, tallies, email_in_list, name
 
 
 def _initialize_session():
