@@ -67,6 +67,7 @@ def prune():
   prunes old requests/offers/matches
   updates last_confirmed if currently requesting/ping
   """
+  print ("('prune')")
   assume_complete = datetime.timedelta(hours=4)
   _initialize_session()
   user = anvil.server.session['user']
@@ -152,6 +153,7 @@ def _emails_equal(a, b):
 @anvil.tables.in_transaction
 def confirm_wait(user_id=""):
   """updates last_confirmed for current request, returns _get_status(user)"""
+  print("confirm_wait", user_id)
   user = _get_user(user_id)
   return _confirm_wait(user)
 
@@ -241,6 +243,7 @@ def _get_tallies(user):
 @anvil.tables.in_transaction
 def get_code(user_id=""):
   """returns jitsi_code, request_type (or Nones)"""
+  print("get_code", user_id)
   user = _get_user(user_id)
   current_row = app_tables.requests.get(user=user, current=True)
   code = None
@@ -318,6 +321,7 @@ def add_request(request_type, user_id=""):
   """
   return status, last_confirmed, ping_start, num_emailed
   """
+  print("add_request", request_type, user_id)
   user = _get_user(user_id)
   return _add_request(user, request_type)
 
@@ -363,6 +367,7 @@ def cancel(user_id=""):
   Cancel any expired requests part of a cancelled match
   Returns tallies
   """
+  print("cancel", user_id)
   user = _get_user(user_id)
   return _cancel(user)
 
@@ -395,6 +400,7 @@ def cancel_other(user_id=""):
   cancel match (if applicable)--and cancel their request
   Cancel any other expired requests part of a cancelled match
   """
+  print("cancel_other", user_id)
   user = _get_user(user_id)
   return _cancel_other(user)
 
@@ -407,6 +413,7 @@ def match_commenced(user_id=""):
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
+  print("match_commenced", user_id)
   user = _get_user(user_id)
   return _match_commenced(user)
 
@@ -442,6 +449,7 @@ def _match_commenced(user):
 @anvil.tables.in_transaction
 def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return tallies."""
+  print("match_complete", user_id)
   user = _get_user(user_id)
   # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   current_matches = app_tables.matches.search(users=[user], complete=[0])
@@ -494,6 +502,7 @@ def _get_user_info(user_id=""):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def set_pinged_em(pinged_em_checked):
+  print("set_pinged_em", pinged_em_checked)
   user = anvil.server.session['user']
   user['pinged_em'] = pinged_em_checked
   return _confirm_wait(user)
@@ -502,6 +511,7 @@ def set_pinged_em(pinged_em_checked):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def set_request_em(request_em_checked):
+  print("set_request_em", request_em_checked)
   user = anvil.server.session['user']
   user['request_em'] = request_em_checked
   return _confirm_wait(user)
@@ -509,6 +519,7 @@ def set_request_em(request_em_checked):
 
 @anvil.server.callable
 def pinged_email():
+  print("('pinged_email')")
   user = anvil.server.session['user']
   name = user['name']
   if not name:
