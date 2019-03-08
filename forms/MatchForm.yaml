@@ -124,6 +124,21 @@ components:
   properties: {}
   name: navbar_links
   layout_properties: {slot: nav-right}
+  components:
+  - type: Label
+    properties: {}
+    name: label_4
+    layout_properties: {}
+    event_bindings: {}
+  - type: Label
+    properties: {}
+    name: label_2
+    layout_properties: {}
+    event_bindings: {}
+  - type: Link
+    properties: {text: link_1}
+    name: link_1
+    layout_properties: {}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: Empathy Spot, font_size: null, font: '', spacing_above: small, icon_align: left,
