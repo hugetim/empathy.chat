@@ -131,6 +131,7 @@ components:
     icon: ''}
   name: label_1
   layout_properties: {slot: title}
+  event_bindings: {}
 - type: Timer
   properties: {interval: 5.07}
   name: timer_1
