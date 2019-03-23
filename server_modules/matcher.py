@@ -85,7 +85,7 @@ def prune():
       temp[i] = 1
     row['complete'] = temp
   # Return after confirming wait
-  trust_level, request_em, pinged_em = _get_user_info()
+  trust_level, request_em, rem_opts, re_st, pinged_em = _get_user_info(user)
   email_in_list = None
   name = None
   if trust_level == 0:
@@ -111,7 +111,7 @@ def prune():
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
-  return test_mode, request_em, pinged_em, request_type, status, lc, ps, tallies, email_in_list, name
+  return test_mode, request_em, rem_opts, re_st, pinged_em, request_type, status, lc, ps, tallies, email_in_list, name
 
 
 def _initialize_session():
@@ -488,15 +488,19 @@ def _new_match_id():
   return match_id.int
 
 
-def _get_user_info(user_id=""):
+def _get_user_info(user):
   """Return user info, initializing it for new users"""
-  user = _get_user(user_id)
   trust = user['trust_level']
   if trust is None:
     user['trust_level'] = 0
     user['request_em'] = False
     user['pinged_em'] = False
-  return user['trust_level'], user['request_em'], user['pinged_em']
+  re_opts = user['request_em_settings']
+  if (user['request_em'] == True and re_opts["fixed"] 
+      and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
+    user['request_em'] = False
+  return (user['trust_level'], user['request_em'], user['request_em_settings'], 
+          user['request_em_set_time'], user['pinged_em'])
 
 
 @anvil.server.callable
@@ -514,7 +518,24 @@ def set_request_em(request_em_checked):
   print("set_request_em", request_em_checked)
   user = anvil.server.session['user']
   user['request_em'] = request_em_checked
-  return _confirm_wait(user)
+  if request_em_checked:
+    user['request_em_set_time'] = _now()
+  s, lc, ps, t = _confirm_wait(user)
+  return s, lc, ps, t, user['request_em_set_time']
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def set_request_em_opts(fixed, hours):
+  print("set_request_em_opts", fixed, hours)
+  user = anvil.server.session['user']
+  re_opts = user['request_em_settings']
+  re_opts["fixed"] = int(fixed)
+  re_opts["hours"] = hours
+  user['request_em_settings'] = re_opts
+  user['request_em_set_time'] = _now()
+  s, lc, ps, t = _confirm_wait(user)
+  return s, lc, ps, t, user['request_em_set_time']
 
 
 @anvil.server.callable

@@ -75,3 +75,11 @@ def seconds_to_words(seconds):
     else:
       output = second_str
   return output
+
+
+def re_hours(h, set_time):
+  print (h, set_time)
+  now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+  hours = (3600.0*h - (now - set_time).seconds)/3600.0
+  print hours
+  return hours

@@ -18,6 +18,9 @@ class MatchForm(MatchFormTemplate):
   status = None
   last_confirmed = None # this or other_last_confirmed, whichever is earlier
   ping_start = None
+  request_em_hours = None
+  request_em_set_time = None
+  pause_hours_update = False
 
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -27,7 +30,7 @@ class MatchForm(MatchFormTemplate):
     self.confirming_wait = False
     self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
                               ("Not ready to offer empathy first","receive_first"))
-    tm, re, pe, rt, s, lc, ps, tallies, e, n = anvil.server.call('prune')
+    tm, re, re_opts, re_st, pe, rt, s, lc, ps, tallies, e, n = anvil.server.call('prune')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'You can test things out, but your actions will not impact '
@@ -36,7 +39,7 @@ class MatchForm(MatchFormTemplate):
     elif e == True:
       alert("Welcome, " + n + "!")
     self.test_mode.visible = tm
-    self.request_em_check_box.checked = re
+    self.init_request_em_opts(re, re_opts, re_st)
     self.pinged_em_check_box.checked = pe
     self.tallies = tallies
     self.drop_down_1.selected_value = rt
@@ -94,6 +97,24 @@ class MatchForm(MatchFormTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5.07 seconds"""
+    if (self.request_em_check_box.checked and self.re_radio_button_fixed.selected
+        and  self.pause_hours_update == False):
+      hours_left = h.re_hours(self.request_em_hours, 
+                              self.request_em_set_time)
+      if hours_left <= 0:
+        checked = False
+        self.request_em_check_box.checked = checked
+        self.set_request_em_options(checked)
+        self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
+        s, lc, ps, t, re_st = anvil.server.call('set_request_em', checked)
+        self.request_em_set_time = re_st
+        self.status = s
+        self.last_confirmed = lc
+        self.ping_start = ps
+        self.tallies = t
+        self.reset_status()
+      else:
+        self.text_box_hours.text = "{:.1f}".format(hours_left)
     if self.status == "requesting":
       s, lc, ps, self.tallies = anvil.server.call_s('get_status')
       self.status = s
@@ -378,13 +399,100 @@ class MatchForm(MatchFormTemplate):
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     checked = self.request_em_check_box.checked
-    s, lc, ps, t = anvil.server.call('set_request_em', checked)
+    self.set_request_em_options(checked)
+    s, lc, ps, t, re_st = anvil.server.call('set_request_em', checked)
+    self.request_em_set_time = re_st
     self.status = s
     self.last_confirmed = lc
     self.ping_start = ps
     self.tallies = t
     self.reset_status()
+
+  def set_request_em_options(self, checked):
+    """Update state of request_em options."""
+    if checked:
+      self.re_radio_button_indef.enabled = True
+      self.re_radio_button_fixed.enabled = True
+      self.text_box_hours.enabled = self.re_radio_button_fixed.selected
+    else:
+      self.re_radio_button_indef.enabled = False
+      self.re_radio_button_fixed.enabled = False
+      self.text_box_hours.enabled = False
+
+  def init_request_em_opts(self, re, re_opts, re_st):
+    """Initialize to saved request_em option values"""
+    self.request_em_check_box.checked = re
+    self.request_em_hours = re_opts["hours"]
+    self.request_em_set_time = re_st
+    fixed = bool(re_opts["fixed"])
+    self.re_radio_button_indef.selected = not fixed
+    self.re_radio_button_fixed.selected = fixed
+    if self.request_em_check_box.checked and fixed:
+      hours_left = h.re_hours(self.request_em_hours, 
+                              self.request_em_set_time)
+    else:
+      hours_left = self.request_em_hours
+    self.set_request_em_options(re)
+    self.text_box_hours.text = "{:.1f}".format(hours_left)
+
+  def re_radio_button_indef_clicked(self, **event_args):
+    """This method is called when this radio button is selected"""
+    fixed = False
+    self.text_box_hours.enabled = fixed
+    hours = self.text_box_hours.text
+    self.request_em_hours = hours
+    s, lc, ps, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
+    self.request_em_set_time = re_st
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
+    self.tallies = t
+    self.reset_status() 
     
+  def re_radio_button_fixed_clicked(self, **event_args):
+    """This method is called when this radio button is selected"""
+    fixed = True
+    self.text_box_hours.enabled = fixed
+    hours = self.text_box_hours.text
+    self.request_em_hours = hours
+    s, lc, ps, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
+    self.request_em_set_time = re_st
+    self.status = s
+    self.last_confirmed = lc
+    self.ping_start = ps
+    self.tallies = t
+    self.reset_status() 
+
+  def text_box_hours_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    self.update_hours()
+
+  def text_box_hours_lost_focus(self, **event_args):
+    """This method is called when the TextBox loses focus"""
+    self.update_hours()
+    self.pause_hours_update = False
+  
+  def update_hours(self):
+    hours = self.text_box_hours.text
+    if hours and hours > 0:
+      fixed = self.re_radio_button_fixed.selected
+      self.request_em_hours = hours
+      s, lc, ps, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
+      self.request_em_set_time = re_st
+      self.status = s
+      self.last_confirmed = lc
+      self.ping_start = ps
+      self.tallies = t
+      self.reset_status()
+    else:
+      hours_left = h.re_hours(self.request_em_hours, 
+                              self.request_em_set_time)
+      self.text_box_hours.text = "{:.1f}".format(hours_left)
+
+  def text_box_hours_focus(self, **event_args):
+    """This method is called when the TextBox gets focus"""
+    self.pause_hours_update = True   
+      
   def test_mode_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     self.test_column_panel.visible = self.test_mode.checked
@@ -424,3 +532,10 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
+
+
+
+
+
+
+
