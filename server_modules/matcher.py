@@ -71,6 +71,8 @@ def prune():
   assume_complete = datetime.timedelta(hours=4)
   _initialize_session()
   user = anvil.server.session['user']
+  # Set request_em (of all users) False if expired
+  _prune_request_em()
   # Prune requests, including from this user
   _prune_requests()
   # Complete old commenced matches for all users
@@ -561,6 +563,16 @@ Empathy Spot maintainer
 p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
 ''')
 
+  
+def _prune_request_em():
+  """Switch expired request_em to false"""
+  expired_rem_users = [u for u in app_tables.users.search(request_em=True)
+                       if (u['request_em_settings']['fixed']
+                           and h.re_hours(u['request_em_settings']['hours'], 
+                                          u['request_em_set_time']) <= 0)]
+  for a_user in expired_rem_users:
+    a_user['request_em'] = False
+  
 
 def _request_emails(request_type):
   """email all users with request_em_check_box checked who logged in recently"""
@@ -577,6 +589,7 @@ def _request_emails(request_type):
     assert request_type == "will_offer_first"
     request_type_text = 'an empathy exchange.'
   cutoff_e = now - assume_inactive
+  _prune_request_em()
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
                        if (u['last_login'] > cutoff_e
                            and now > u['last_request_em'] + min_between
