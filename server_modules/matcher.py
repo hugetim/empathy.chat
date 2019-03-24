@@ -565,6 +565,8 @@ p.s. You are receiving this email because you checked the box: "Notify me by ema
 def _request_emails(request_type):
   """email all users with request_em_check_box checked who logged in recently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
+  min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
+  now = _now()
   user = anvil.server.session['user']
   name = user['name']
   if not name:
@@ -574,9 +576,10 @@ def _request_emails(request_type):
   else:
     assert request_type == "will_offer_first"
     request_type_text = 'an empathy exchange.'
-  cutoff_e = _now() - assume_inactive
+  cutoff_e = now - assume_inactive
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
                        if (u['last_login'] > cutoff_e
+                           and now > u['last_request_em'] + min_between
                            and u != user
                            and _is_visible(user, u))]
   for email_address in emails:
