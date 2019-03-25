@@ -166,7 +166,10 @@ def _confirm_wait(user):
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     current_row['last_confirmed'] = _now()
-  return _get_status(user)
+  status, last_confirmed, ping_start, tallies = _get_status(user)
+  if status == "requesting":
+    num_emailed = _request_emails(request_type)
+  return status, last_confirmed, ping_start, tallies
 
 
 @anvil.server.callable
