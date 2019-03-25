@@ -59,7 +59,7 @@ def _is_visible(user2, user1=None):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def prune():
+def init():
   """
   Assumed to run upon initializing Form1
   returns trust_level, request_em, pinged_em, current_status, ref_time (or None),
@@ -67,10 +67,11 @@ def prune():
   prunes old requests/offers/matches
   updates last_confirmed if currently requesting/ping
   """
-  print ("('prune')")
+  print ("('init')")
   assume_complete = datetime.timedelta(hours=4)
   _initialize_session()
   user = anvil.server.session['user']
+  print (user['email'])
   # Set request_em (of all users) False if expired
   _prune_request_em()
   # Prune requests, including from this user

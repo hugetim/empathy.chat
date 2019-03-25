@@ -30,7 +30,7 @@ class MatchForm(MatchFormTemplate):
     self.confirming_wait = False
     self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
                               ("Not ready to offer empathy first","receive_first"))
-    tm, re, re_opts, re_st, pe, rt, s, lc, ps, tallies, e, n = anvil.server.call('prune')
+    tm, re, re_opts, re_st, pe, rt, s, lc, ps, tallies, e, n = anvil.server.call('init')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'You can test things out, but your actions will not impact '
