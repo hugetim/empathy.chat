@@ -147,7 +147,7 @@ class MatchForm(MatchFormTemplate):
       if seconds <= 0:
         self.tallies = anvil.server.call('cancel')
         alert("Request cancelled due to "
-              + str(p.WAIT_SECONDS) + " seconds of inactivity.",
+              + h.seconds_to_words(p.WAIT_SECONDS) + " of inactivity.",
               dismissible=False)
         self.status = None
         self.last_confirmed = None
