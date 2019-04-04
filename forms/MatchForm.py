@@ -68,11 +68,13 @@ class MatchForm(MatchFormTemplate):
     if num == 1:
       message = ('Someone has been sent a '
                  + 'notification email about your request.')
+      headline = 'Email notification sent'
     else:
       message = (str(num) + ' others have been sent '
                  + 'notification emails about your request.')
+      headline = 'Email notifications sent'
     return Notification(message,
-                        title='Email notifications sent',
+                        title=headline,
                         timeout=10)
 
   def renew_button_click(self, **event_args):
