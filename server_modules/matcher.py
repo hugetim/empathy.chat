@@ -559,7 +559,7 @@ def pinged_email():
 
 An empathy match has been found.
 
-Return to ''' + p.URL + ''' now and confirm your availability to be connected for an empathy exchange.
+Return to ''' + p.URL_WITH_ALT + ''' now and confirm your availability to be connected for an empathy exchange.
 
 Thanks!
 Tim
@@ -608,7 +608,7 @@ def _request_emails(request_type):
 
 Someone has requested ''' + request_type_text + '''
 
-Return to ''' + p.URL + ''' and request empathy to be connected for an empathy exchange (if you are first to do so).
+Return to ''' + p.URL_WITH_ALT + ''' and request empathy to be connected for an empathy exchange (if you are first to do so).
 
 Thanks!
 Tim

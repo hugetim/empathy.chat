@@ -124,6 +124,23 @@ components:
   properties: {}
   name: navbar_links
   layout_properties: {slot: nav-right}
+  components:
+  - type: Link
+    properties: {role: null, url: '', align: left, tooltip: Help, border: '', foreground: '',
+      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+      spacing_above: small, icon_align: left, col_widths: '', spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: 'fa:question-circle'}
+    name: link_bar_help
+    layout_properties: {}
+    event_bindings: {}
+  - type: Link
+    properties: {role: null, url: '', align: left, tooltip: Log out, border: '', foreground: '',
+      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+      spacing_above: small, icon_align: left, col_widths: '', spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: 'fa:sign-out'}
+    name: link_bar_logout
+    layout_properties: {}
+    event_bindings: {}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: Empathy Spot, font_size: null, font: '', spacing_above: small, icon_align: left,
@@ -236,7 +253,7 @@ components:
     event_bindings: {click: logout_button_click}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Version 0.5.4, last updated 3/20/2019', font_size: 10,
+      visible: true, text: 'Version 0.5.4, last updated 7/8/2019', font_size: 10,
       font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     name: version_label
