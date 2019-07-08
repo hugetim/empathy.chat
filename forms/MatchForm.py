@@ -380,6 +380,10 @@ class MatchForm(MatchFormTemplate):
     """This method is called when the button is clicked"""
     self.logout_user()
 
+  def link_bar_logout_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    self.logout_user()
+    
   def logout_user(self):
     anvil.users.logout()
     self.status = None
@@ -534,6 +538,10 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
+
+
+
+
 
 
 
