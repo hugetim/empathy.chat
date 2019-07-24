@@ -417,10 +417,12 @@ class MatchForm(MatchFormTemplate):
   def set_request_em_options(self, checked):
     """Update state of request_em options."""
     if checked:
+      self.re_radio_button_panel.visible = True
       self.re_radio_button_indef.enabled = True
       self.re_radio_button_fixed.enabled = True
       self.text_box_hours.enabled = self.re_radio_button_fixed.selected
     else:
+      self.re_radio_button_panel.visible = False
       self.re_radio_button_indef.enabled = False
       self.re_radio_button_fixed.enabled = False
       self.text_box_hours.enabled = False
