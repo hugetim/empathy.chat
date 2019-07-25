@@ -256,7 +256,7 @@ components:
     components:
     - type: Button
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Send Feedback, font_size: null, font: '',
+        foreground: '', visible: true, text: Send Feedback, font_size: 13, font: '',
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:comments-o'}
       name: feedback_button
@@ -274,17 +274,17 @@ components:
     components:
     - type: Button
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Help, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:question-circle'}
+        foreground: '', visible: true, text: 'Help                     ', font_size: 13,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:question-circle'}
       name: help_button
       layout_properties: {grid_position: 'SRQCCK,EEKFMZ'}
       event_bindings: {}
   - type: Button
     properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Log out, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:sign-out'}
+      foreground: '', visible: true, text: 'Log out              ', font_size: 13,
+      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: 'fa:sign-out'}
     name: logout_button
     layout_properties: {grid_position: 'ASDYYZ,SAIRCP'}
     event_bindings: {click: logout_button_click}
