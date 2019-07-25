@@ -33,7 +33,7 @@ class MatchForm(MatchFormTemplate):
     tm, re, re_opts, re_st, pe, rt, s, lc, ps, tallies, e, n = anvil.server.call('init')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
-            + 'You can test things out, but your actions will not impact '
+            + 'Instead, it can be used to test things out. Your actions will not impact '
             + 'or be visible to other users. '
             + 'For help, contact: ' + p.CONTACT_EMAIL)
     elif e == True:
