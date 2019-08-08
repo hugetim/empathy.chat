@@ -1,0 +1,11 @@
+container:
+  type: HtmlTemplate
+  properties: {tooltip: '', html: '<center style="font-style:italic; color:#888; margin:
+      0em;">
+
+      <hr>
+
+      '}
+  event_bindings: {}
+components: []
+custom_component: true
