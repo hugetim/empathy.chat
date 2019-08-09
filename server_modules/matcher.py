@@ -36,6 +36,15 @@ def _prune_requests():
   for row in old_ping_requests:
     row['current'] = False
 
+    
+def _prune_messages():
+  all_messages = app_tables.chat.search()
+  matches = set(message['match'] for message in messages)
+  for match in matches:
+    if min(match['complete']) == 1:
+      for row in app_tables.chat.search(match=match):
+        row.delete()
+           
 
 def _get_request_type(user):
   current_row = app_tables.requests.get(user=user, current=True)
@@ -87,6 +96,8 @@ def init():
       # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
       temp[i] = 1
     row['complete'] = temp
+  # Prune messages from fully completed matches
+  _prune_messages()
   # Return after confirming wait
   trust_level, request_em, rem_opts, re_st, pinged_em = _get_user_info(user)
   email_in_list = None
@@ -512,6 +523,38 @@ def _get_user_info(user):
           user['request_em_set_time'], user['pinged_em'])
 
 
+@anvil.server.callable
+def add_message(message, user_id=""):
+  print("add_message", "[redacted]", user_id)
+  user = _get_user(user_id)
+  now = _now()
+  current_matches = app_tables.matches.search(users=[user], complete=[0])
+  for row in current_matches:
+    i = row['users'].index(user)
+    if row['complete'][i] == 0:
+      current_match = row
+  app_tables.chat.add_row(match=current_match,
+                          user=user, 
+                          message=self.text_box_1.text,
+                          time_stamp=now)
+
+    
+@anvil.server.callable
+def get_messages(user_id=""):
+  """
+  Returns iterable of dictionaries with keys: 'me', 'message'
+  """
+  print("get_messages", user_id)
+  user = _get_user(user_id)
+  current_matches = app_tables.matches.search(users=[user], complete=[0])
+  for row in current_matches:
+    i = row['users'].index(user)
+    if row['complete'][i] == 0:
+      current_match = row
+  messages = app_tables.chat.search(match=current_match)
+  return ({'me': (user == m['user']), 'message': m['message']} for m in messages)
+
+    
 @anvil.server.callable
 @anvil.tables.in_transaction
 def set_pinged_em(pinged_em_checked):

@@ -141,6 +141,9 @@ class MatchForm(MatchFormTemplate):
     elif self.status is None:
       self.tallies = anvil.server.call_s('get_tallies')
       self.update_tally_label()
+    elif self.status == "matched":
+      self.chat_repeating_panel.items = anvil.server.call('get_messages')
+      self.call_js('scrollCard') 
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
@@ -354,6 +357,8 @@ class MatchForm(MatchFormTemplate):
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
       self.jitsi_column_panel.visible = False
+      self.chat_display_card.visible = False
+      self.chat_send_card.visible = False
       self.jitsi_link.visible = False
       self.jitsi_link.text = ""
       self.jitsi_link.url = ""
@@ -363,6 +368,10 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_link.visible = True
       jitsi = self.jitsi_column_panel.add_component(MyJitsi(jitsi_code))
       self.jitsi_column_panel.visible = True
+      self.chat_repeating_panel.items = anvil.server.call('get_messages')
+      self.call_js('scrollCard') 
+      self.chat_display_card.visible = False
+      self.chat_send_card.visible = False
 
   def set_test_link(self):
     num_chars = 4
@@ -497,7 +506,14 @@ class MatchForm(MatchFormTemplate):
   def text_box_hours_focus(self, **event_args):
     """This method is called when the TextBox gets focus"""
     self.pause_hours_update = True   
-      
+
+  def message_textbox_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    anvil.server.call('add_message', self.message_textbox.text)
+    self.message_textbox.text = ""
+    self.chat_repeating_panel.items = anvil.server.call('get_messages')
+    self.call_js('scrollCard')
+    
   def test_mode_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     self.test_column_panel.visible = self.test_mode.checked
@@ -537,7 +553,6 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
-
 
 
 
