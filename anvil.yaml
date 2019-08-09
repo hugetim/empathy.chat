@@ -1,11 +1,3 @@
-allow_embedding: false
-package_name: empathy_room
-name: Empathy Spot test
-startup_form: LoginForm
-renamed: true
-runtime_options: {version: 1, server_version: python2-sandbox}
-metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico',
-  title: Empathy Spot}
 services:
 - source: /runtime/services/anvil/users.yml
   client_config: {use_microsoft: false, require_secure_passwords: true, use_email: true,
@@ -75,3 +67,12 @@ services:
         permissionId: '16734944853676040997', emailAddress: empathyroom@gmail.com}
       ownerNames: [Tim Huegerich]
   server_config: {delegation_refresh_token: 1/xK1M2AgZHPfjW-8HpXBFcJ3RhSZOi_pyFgD41HMUJLtWNS42xlnpjIbuCxzbx5Yp}
+package_name: empathy_room
+allow_embedding: false
+name: Empathy Spot test
+runtime_options: {version: 1, server_version: python2-sandbox}
+metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico',
+  title: Empathy Spot}
+startup_form: LoginForm
+native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
+renamed: true
