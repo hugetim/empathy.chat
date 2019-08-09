@@ -267,7 +267,7 @@ class MatchForm(MatchFormTemplate):
           self.cancel_button.visible = False
           self.complete_button.visible = True
           self.set_jitsi_link(jitsi_code)
-          self.note_label.text = "Note: If video does not appear above, click the link below or input the code into the Jitsi Meet app."
+          self.note_label.text = "Note: If video does not appear above, try clicking the link below or using the Jitsi Meet app."
           self.note_label.visible = True
         self.pinged_em_check_box.visible = False
     else:
