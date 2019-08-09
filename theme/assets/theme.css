@@ -639,7 +639,7 @@ body>div[data-notify="container"]>span[data-notify="message"] {
 }
 
 .anvil-role-card-scroll {
-  height: 25vh;
+  height: 100px;
   overflow: auto;
   border-radius: 2px;
   background-color: white;

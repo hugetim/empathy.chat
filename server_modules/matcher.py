@@ -39,7 +39,7 @@ def _prune_requests():
     
 def _prune_messages():
   all_messages = app_tables.chat.search()
-  matches = set(message['match'] for message in messages)
+  matches = set(message['match'] for message in all_messages)
   for match in matches:
     if min(match['complete']) == 1:
       for row in app_tables.chat.search(match=match):
@@ -535,7 +535,7 @@ def add_message(message, user_id=""):
       current_match = row
   app_tables.chat.add_row(match=current_match,
                           user=user, 
-                          message=self.text_box_1.text,
+                          message=message,
                           time_stamp=now)
 
     
@@ -552,7 +552,8 @@ def get_messages(user_id=""):
     if row['complete'][i] == 0:
       current_match = row
   messages = app_tables.chat.search(match=current_match)
-  return ({'me': (user == m['user']), 'message': m['message']} for m in messages)
+  if messages:
+    return [{'me': (user == m['user']), 'message': m['message']} for m in messages]
 
     
 @anvil.server.callable

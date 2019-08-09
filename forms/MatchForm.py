@@ -369,9 +369,9 @@ class MatchForm(MatchFormTemplate):
       jitsi = self.jitsi_column_panel.add_component(MyJitsi(jitsi_code))
       self.jitsi_column_panel.visible = True
       self.chat_repeating_panel.items = anvil.server.call('get_messages')
+      self.chat_display_card.visible = True
+      self.chat_send_card.visible = True
       self.call_js('scrollCard') 
-      self.chat_display_card.visible = False
-      self.chat_send_card.visible = False
 
   def set_test_link(self):
     num_chars = 4
