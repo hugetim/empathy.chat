@@ -290,24 +290,24 @@ class MatchForm(MatchFormTemplate):
       if self.tallies['will_offer_first'] > 0:
         temp = ('There are currently '
                 + str(self.tallies['receive_first'] + self.tallies['will_offer_first'])
-                + ' others requesting an empathy exchange, '
-                + 'some of whom are requesting a partner willing to offer empathy first.')
+                + ' others requesting an empathy exchange. Some are '
+                + 'requesting a match with someone willing to offer empathy first.')
       else:
         assert self.tallies['will_offer_first'] == 0
         temp = ('There are currently '
                 + str(self.tallies['receive_first'])
-                + ' others requesting partners willing to offer empathy first.')
+                + ' others requesting matches with someone willing to offer empathy first.')
     elif self.tallies['receive_first'] == 1:
       if self.tallies['will_offer_first'] > 0:
         temp = ('There are currently '
                 + str(self.tallies['receive_first'] + self.tallies['will_offer_first'])
                 + ' others requesting an empathy exchange. '
-                + 'One is requesting a partner willing to offer empathy first.')
+                + 'One is requesting a match with someone willing to offer empathy first.')
       else:
         assert self.tallies['will_offer_first'] == 0
         temp = ('There is '
                 + str(self.tallies['receive_first'])
-                + ' active request for a partner willing to offer empathy first.')
+                + ' active request for a match with someone willing to offer empathy first.')
     else:
       assert self.tallies['receive_first'] == 0
       if self.tallies['will_offer_first'] > 1:
