@@ -159,6 +159,7 @@ components:
       layout_properties: {grid_position: 'FDVHBQ,FAJUSC'}
       event_bindings: {click: link_1_click}
     event_bindings: {}
+  event_bindings: {}
 - type: FlowPanel
   properties: {}
   name: navbar_links
@@ -346,7 +347,7 @@ components:
     event_bindings: {click: logout_button_click}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Version 0.6.0, last updated 8/8/2019', font_size: 10,
+      visible: true, text: 'Version 0.6.0, last updated 8/9/2019', font_size: 10,
       font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     name: version_label

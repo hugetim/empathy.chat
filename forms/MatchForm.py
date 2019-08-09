@@ -22,6 +22,7 @@ class MatchForm(MatchFormTemplate):
   request_em_hours = None
   request_em_set_time = None
   pause_hours_update = False
+  jitsi_embed = None
 
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -49,6 +50,7 @@ class MatchForm(MatchFormTemplate):
     self.status = s
     self.last_confirmed = lc
     self.ping_start = ps
+    self.jitsi_embed = None
     self.reset_status()
     self.set_test_link()
 
@@ -357,17 +359,24 @@ class MatchForm(MatchFormTemplate):
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
       self.jitsi_column_panel.visible = False
+      if self.jitsi_embed:
+        self.jitsi_embed.remove_from_parent()
+        self.jitsi_embed = None
       self.chat_display_card.visible = False
       self.chat_send_card.visible = False
       self.jitsi_link.visible = False
       self.jitsi_link.text = ""
       self.jitsi_link.url = ""
+      self.test_link.visible = True
     else:
       self.jitsi_link.url = "https://meet.jit.si/" + jitsi_code
       self.jitsi_link.text = jitsi_code
       self.jitsi_link.visible = True
-      jitsi = self.jitsi_column_panel.add_component(MyJitsi(jitsi_code))
+      if not self.jitsi_embed:
+        self.jitsi_embed = MyJitsi(jitsi_code)
+        self.jitsi_column_panel.add_component(self.jitsi_embed)
       self.jitsi_column_panel.visible = True
+      self.test_link.visible = False
       self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
       self.chat_display_card.visible = True
       self.chat_send_card.visible = True
@@ -375,7 +384,7 @@ class MatchForm(MatchFormTemplate):
   def chat_display_card_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
     self.call_js('scrollCard')
-           
+
   def set_test_link(self):
     num_chars = 4
     charset = "abcdefghijkmnopqrstuvwxyz23456789"
@@ -556,6 +565,9 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
+
+
+
 
 
 
