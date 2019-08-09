@@ -11,5 +11,6 @@ class MyJitsi(MyJitsiTemplate):
     
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    self.call_js("initJitsi", "meet.jit.si", {"roomName": self.name, "height": 500})
+    self.call_js("initJitsi", "meet.jit.si", {"roomName": self.name, "height": 500,})
+
 

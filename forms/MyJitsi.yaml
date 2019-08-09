@@ -2,8 +2,11 @@ container:
   type: HtmlTemplate
   properties: {tooltip: '', html: "<div anvil-slot=\"default\"></div>\n<div id=\"\
       jitsi\"></div>\n\n<script>\n  function initJitsi(domain, options) {\n    options.parentNode\
-      \ = this.find(\"#jitsi\")[0]\n    window.japi = new JitsiMeetExternalAPI(domain,\
-      \ options);\n  }\n</script>\n\n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n\
-      \    border: none;\n  }\n</style>\n"}
+      \ = this.find(\"#jitsi\")[0]\n    options.configOverwrite = {fileRecordingsEnabled:\
+      \ false,\n                               liveStreamingEnabled: false,\n    \
+      \                           transcribingEnabled: false,\n                  \
+      \             enableClosePage: true,\n                              }\n    window.japi\
+      \ = new JitsiMeetExternalAPI(domain, options);\n  }\n</script>\n\n<style>\n\
+      \  #jitsi iframe {\n  \twidth: 100%;\n    border: none;\n  }\n</style>\n"}
   event_bindings: {show: form_show}
 components: []
