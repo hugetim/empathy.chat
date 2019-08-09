@@ -71,7 +71,7 @@ components:
         name: chat_repeating_panel
         layout_properties: {grid_position: 'NOKAIK,HLVTUU'}
         event_bindings: {}
-      event_bindings: {}
+      event_bindings: {show: chat_display_card_show}
     - type: ColumnPanel
       properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',

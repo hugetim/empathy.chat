@@ -544,7 +544,6 @@ def get_messages(user_id=""):
   """
   Returns iterable of dictionaries with keys: 'me', 'message'
   """
-  print("get_messages", user_id)
   user = _get_user(user_id)
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:

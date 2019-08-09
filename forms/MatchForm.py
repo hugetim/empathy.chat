@@ -142,7 +142,7 @@ class MatchForm(MatchFormTemplate):
       self.tallies = anvil.server.call_s('get_tallies')
       self.update_tally_label()
     elif self.status == "matched":
-      self.chat_repeating_panel.items = anvil.server.call('get_messages')
+      self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
       self.call_js('scrollCard') 
 
   def timer_2_tick(self, **event_args):
@@ -368,11 +368,14 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_link.visible = True
       jitsi = self.jitsi_column_panel.add_component(MyJitsi(jitsi_code))
       self.jitsi_column_panel.visible = True
-      self.chat_repeating_panel.items = anvil.server.call('get_messages')
+      self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
       self.chat_display_card.visible = True
       self.chat_send_card.visible = True
-      self.call_js('scrollCard') 
 
+  def chat_display_card_show(self, **event_args):
+    """This method is called when the column panel is shown on the screen"""
+    self.call_js('scrollCard')
+           
   def set_test_link(self):
     num_chars = 4
     charset = "abcdefghijkmnopqrstuvwxyz23456789"
@@ -553,6 +556,8 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
+
+
 
 
 
