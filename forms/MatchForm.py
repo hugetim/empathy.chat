@@ -5,6 +5,7 @@ import anvil.google.auth, anvil.google.drive
 import anvil.server
 import anvil.users
 from TimerForm import TimerForm
+from MyJitsi import MyJitsi
 import parameters as p
 import anvil.tz
 import helper as h
@@ -254,14 +255,13 @@ class MatchForm(MatchFormTemplate):
           assert self.status == "matched"
           self.timer_label.visible = False
           jitsi_code, request_type = anvil.server.call('get_code')
-          self.status_label.text = "Status: You have a confirmed match. Use this Jitsi Meet code: "
+          self.status_label.text = "Status: You have a confirmed match."
           self.status_label.bold = True
           self.renew_button.visible = False
           self.cancel_button.visible = False
           self.complete_button.visible = True
-          self.jitsi_link.font_size = None
           self.set_jitsi_link(jitsi_code)
-          self.note_label.text = "Note: Jitsi Meet mobile app users may need to manually open the app and input the code."
+          self.note_label.text = "Note: If video does not appear above, click the link below or input the code into the Jitsi Meet app."
           self.note_label.visible = True
         self.pinged_em_check_box.visible = False
     else:
@@ -345,6 +345,7 @@ class MatchForm(MatchFormTemplate):
 
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
+      self.jitsi_column_panel.visible = False
       self.jitsi_link.visible = False
       self.jitsi_link.text = ""
       self.jitsi_link.url = ""
@@ -352,6 +353,8 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_link.url = "https://meet.jit.si/" + jitsi_code
       self.jitsi_link.text = jitsi_code
       self.jitsi_link.visible = True
+      jitsi = self.jitsi_column_panel.add_component(MyJitsi(jitsi_code))
+      self.jitsi_column_panel.visible = True
 
   def set_test_link(self):
     num_chars = 4

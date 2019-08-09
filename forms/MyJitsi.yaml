@@ -5,4 +5,5 @@ container:
       \ = this.find(\"#jitsi\")[0]\n    window.japi = new JitsiMeetExternalAPI(domain,\
       \ options);\n  }\n</script>\n\n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n\
       \    border: none;\n  }\n</style>\n"}
+  event_bindings: {show: form_show}
 components: []
