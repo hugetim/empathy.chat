@@ -68,7 +68,7 @@ services:
       ownerNames: [Tim Huegerich]
   server_config: {delegation_refresh_token: 1/xK1M2AgZHPfjW-8HpXBFcJ3RhSZOi_pyFgD41HMUJLtWNS42xlnpjIbuCxzbx5Yp}
 package_name: empathy_room
-allow_embedding: false
+allow_embedding: true
 name: Empathy Spot test
 runtime_options: {version: 1, server_version: python2-sandbox}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico',
