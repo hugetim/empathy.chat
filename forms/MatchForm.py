@@ -255,8 +255,8 @@ class MatchForm(MatchFormTemplate):
           assert self.status == "matched"
           self.timer_label.visible = False
           jitsi_code, request_type = anvil.server.call('get_code')
-          self.status_label.text = "Status: You have a confirmed match."
-          self.status_label.bold = True
+          self.status_label.text = "Status: Exchanging Empathy"
+          self.status_label.bold = False
           self.renew_button.visible = False
           self.cancel_button.visible = False
           self.complete_button.visible = True
