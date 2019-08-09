@@ -12,10 +12,10 @@ container:
       \                 TOOLBAR_BUTTONS: ['microphone', 'camera', 'fullscreen',\n\
       \        \t\t\t\t\t\t\t\t\t\t\t\t  'fodeviceselection', 'info', 'chat',\n  \
       \      \t\t\t\t\t\t\t\t\t\t\t\t  'settings', 'videoquality', \n            \
-      \                                              'stats', 'videobackgroundblur'\n\
-      \                                                         ],\n             \
-      \                           SETTINGS_SECTIONS: [ 'devices', 'language' ],\n\
-      \                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
+      \                                              'videobackgroundblur'\n     \
+      \                                                    ],\n                  \
+      \                      SETTINGS_SECTIONS: [ 'devices', 'language' ],\n     \
+      \                                   ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
       \ 60000,\n                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
       \ options);\n  }\n</script>\n\n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n\
       \    border: none;\n  }\n</style>\n"}
