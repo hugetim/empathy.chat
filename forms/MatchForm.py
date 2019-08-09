@@ -39,6 +39,8 @@ class MatchForm(MatchFormTemplate):
             + 'For help, contact: ' + p.CONTACT_EMAIL)
     elif e == True:
       alert("Welcome, " + n + "!")
+    elif n:
+      self.welcome_label.text = "Hi, " + n + "!"
     self.test_mode.visible = tm
     self.init_request_em_opts(re, re_opts, re_st)
     self.pinged_em_check_box.checked = pe
@@ -216,6 +218,7 @@ class MatchForm(MatchFormTemplate):
     if self.status:
       if self.status != "matched":
         seconds = self.seconds_left()
+      self.welcome_label.visible = False
       self.request_button.visible = False
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
@@ -265,7 +268,8 @@ class MatchForm(MatchFormTemplate):
           self.note_label.visible = True
         self.pinged_em_check_box.visible = False
     else:
-      self.status_label.text = "Request an empathy match when ready"
+      self.welcome_label.visible = True
+      self.status_label.text = "Request an empathy match when you're ready."
       self.status_label.bold = True
       self.set_jitsi_link("")
       self.note_label.text = ""

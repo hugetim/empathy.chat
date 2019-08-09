@@ -99,6 +99,8 @@ def init():
       name = user['name']
   elif trust_level < 0:
     email_in_list = False
+  else:
+    name = user['name']
   test_mode = trust_level >= TEST_TRUST_LEVEL
   status, lc, ps, tallies = _get_status(user)
   if status in ('pinged', 'pinging'):
