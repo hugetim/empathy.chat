@@ -29,6 +29,12 @@ roles:
   components: [TextBox]
 - name: selected
   components: [Link]
+- name: bubble-left
+  components: [Label]
+- name: bubble-right
+  components: [Label]
+- name: card-scroll
+  components: [ColumnPanel]
 color_scheme:
   preset_groups:
   - name: Primary Colour
