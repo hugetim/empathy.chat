@@ -168,7 +168,7 @@ def _confirm_wait(user):
     current_row['last_confirmed'] = _now()
   status, last_confirmed, ping_start, tallies = _get_status(user)
   if status == "requesting":
-    num_emailed = _request_emails(request_type)
+    num_emailed = _request_emails(current_row['request_type'])
   return status, last_confirmed, ping_start, tallies
 
 
@@ -597,7 +597,7 @@ def _request_emails(request_type):
   _prune_request_em()
   emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
                        if (u['last_login'] > cutoff_e
-                           and now > u['last_request_em'] + min_between
+                           and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
                            and u != user
                            and _is_visible(user, u))]
   for email_address in emails:

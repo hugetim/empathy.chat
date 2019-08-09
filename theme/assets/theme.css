@@ -278,7 +278,7 @@ a:hover, a:active {
 
 .left-nav .anvil-component-icon.left-icon {
   width: 0;
-  margin-right: 56px;
+  margin-right: 36px; /* default: 56px */
   position: relative;
   top: 0.15em;  
 }

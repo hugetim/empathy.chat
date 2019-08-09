@@ -47,6 +47,7 @@ class MatchForm(MatchFormTemplate):
     self.last_confirmed = lc
     self.ping_start = ps
     self.reset_status()
+    self.set_test_link()
 
   def seconds_left(self):
     """derive seconds_left from status, last_confirmed, and ping_start"""
@@ -218,7 +219,6 @@ class MatchForm(MatchFormTemplate):
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
       self.tally_label.visible = False
-      self.jitsi_test_check_box.visible = False
       if self.status == "requesting":
         self.status_label.text = "Status: Requesting an empathy exchange."
         self.note_label.text = ("(Note: When a match becomes available, "
@@ -267,34 +267,19 @@ class MatchForm(MatchFormTemplate):
     else:
       self.status_label.text = "Request an empathy match when ready"
       self.status_label.bold = True
-      self.jitsi_test_check_box.visible = True
-      self.jitsi_link.font_size = 12
-      self.set_jitsi_link(self.test_jitsi_code())
-      self.note_label.text = "Note: Jitsi Meet mobile app users may need to manually open the app and input the code."
-      self.note_label.visible = True
+      self.set_jitsi_link("")
+      self.note_label.text = ""
+      self.note_label.visible = False
       self.timer_label.visible = False
       self.complete_button.visible = False
       self.renew_button.visible = False
       self.cancel_button.visible = False
-      self.request_button.enabled = self.jitsi_test_check_box.checked
-      self.update_request_tooltip(self.request_button.enabled)
       self.request_button.visible = True
       self.drop_down_1.enabled = True
       self.drop_down_1.foreground = "black"
       self.pinged_em_check_box.visible = False
       self.update_tally_label()
 
-  def update_request_tooltip(self, enabled):
-    if enabled:
-      self.request_button.tooltip = "Request to be matched with someone to exchange empathy"
-    else:
-      self.request_button.tooltip = "The box above must be checked before you can request empathy"
-
-  def jitsi_test_check_box_change(self, **event_args):
-    """This method is called when this checkbox is checked or unchecked"""
-    self.request_button.enabled = self.jitsi_test_check_box.checked
-    self.update_request_tooltip(self.request_button.enabled)
-      
   def update_tally_label(self):
     temp = ""
     if self.tallies['receive_first'] > 1:
@@ -368,12 +353,13 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_link.text = jitsi_code
       self.jitsi_link.visible = True
 
-  def test_jitsi_code(self):
+  def set_test_link(self):
     num_chars = 4
     charset = "abcdefghijkmnopqrstuvwxyz23456789"
     random.seed()
     rand_code = "".join([random.choice(charset) for i in range(num_chars)])
     code = "test-" + rand_code
+    self.test_link.url = "https://meet.jit.si/" + code
     return code      
       
   def logout_button_click(self, **event_args):
