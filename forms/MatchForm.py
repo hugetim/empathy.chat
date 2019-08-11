@@ -25,6 +25,7 @@ class MatchForm(MatchFormTemplate):
   pause_hours_update = False
   jitsi_embed = None
   last_5sec = None
+  seconds_left = None
 
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -106,17 +107,25 @@ class MatchForm(MatchFormTemplate):
     self.tallies = anvil.server.call('match_complete')
     self.reset_status()
 
-  def timer_1_tick(self, **event_args):
-    """This method is called Every 5.07 seconds"""
 
+  def timer_1_tick(self, **event_args):
+    """This method is called Every 1 seconds"""
+    if self.status == "requesting":
+      self.seconds_left -= 1
+      #seconds = self.seconds_left()
+      self.timer_label.text = ("Your request will expire in:  "
+                               + h.seconds_to_digital(self.seconds_left) )
+    elif self.status in ["pinging", "pinging-pending"]:
+      self.seconds_left -= 1
+      #seconds = self.seconds_left()
+      self.status_label.text = ("Potential match available. Time left for them "
+                                + "to confirm:  "
+                                + h.seconds_to_digital(seconds))
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
     # Run this code once a second
     if self.status == "requesting":
-      seconds = self.seconds_left()
-      self.timer_label.text = ("Your request will expire in:  "
-                               + h.seconds_to_digital(seconds) )
       if seconds <= 0:
         self.tallies = anvil.server.call('cancel')
         alert("Request cancelled due to "
@@ -127,10 +136,6 @@ class MatchForm(MatchFormTemplate):
         self.ping_start = None
         self.reset_status()
     elif self.status in ["pinging", "pinging-pending"]:
-      seconds = self.seconds_left()
-      self.status_label.text = ("Potential match available. Time left for them "
-                                + "to confirm:  "
-                                + h.seconds_to_digital(seconds))
       if self.status != "pinging-pending" and seconds <= 0:
         self.status = "pinging-pending" # in case server call takes more than a second
         s, lc, ps, self.tallies = anvil.server.call('cancel_other')

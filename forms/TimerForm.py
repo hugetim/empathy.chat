@@ -27,24 +27,20 @@ class TimerForm(TimerFormTemplate):
     self.last_5sec = h.now()
 
   def timer_1_tick(self, **event_args):
-    """This method is called Every 5.07 seconds"""
-
+    """This method is called Every 1 seconds"""
+    self.seconds_left -= 1
+    self.timer_label.text = ("Time left to confirm:  "
+                             + h.seconds_to_digital(self.seconds_left))
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
     # Run this code once a second
-    self.timer_label.text = ("Time left to confirm:  "
-                             + h.seconds_to_digital(self.seconds_left))
     if self.seconds_left <= 0:
       self.raise_event("x-close-alert", value="timer elapsed")
-    self.seconds_left -= 1
     if (h.now() - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = h.now()
       new_status, lc, ps, tallies = anvil.server.call_s('get_status')
-      if (self.status == "pinged" and new_status == "pinged"):
-        self.seconds_left = h.seconds_left(new_status, lc, ps)
-        self.status = new_status
-      elif new_status != self.status:
+      if new_status != self.status:
         print (new_status)
         self.raise_event("x-close-alert", value=new_status)

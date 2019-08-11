@@ -1,6 +1,7 @@
 container:
   type: ColumnPanel
   properties: {col_widths: '{}'}
+  event_bindings: {}
 components:
 - type: ColumnPanel
   properties: {role: card, col_widths: '{}'}
@@ -18,3 +19,7 @@ components:
   properties: {interval: 1}
   name: timer_2
   event_bindings: {tick: timer_2_tick}
+- name: timer_1
+  type: Timer
+  properties: {interval: 1}
+  event_bindings: {tick: timer_1_tick}
