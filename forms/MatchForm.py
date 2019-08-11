@@ -10,6 +10,7 @@ import parameters as p
 import anvil.tz
 import helper as h
 import random
+import datetime
 
 
 class MatchForm(MatchFormTemplate):
@@ -23,6 +24,7 @@ class MatchForm(MatchFormTemplate):
   request_em_set_time = None
   pause_hours_update = False
   jitsi_embed = None
+  last_5sec = None
 
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -51,6 +53,7 @@ class MatchForm(MatchFormTemplate):
     self.last_confirmed = lc
     self.ping_start = ps
     self.jitsi_embed = None
+    self.last_5sec = h.now()
     self.reset_status()
     self.set_test_link()
 
@@ -105,50 +108,55 @@ class MatchForm(MatchFormTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 5.07 seconds"""
-    if (self.request_em_check_box.checked and self.re_radio_button_fixed.selected
-        and  self.pause_hours_update == False):
-      hours_left = h.re_hours(self.request_em_hours, 
-                              self.request_em_set_time)
-      if hours_left <= 0:
-        checked = False
-        self.request_em_check_box.checked = checked
-        self.set_request_em_options(checked)
-        self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
-        s, lc, ps, t, re_st = anvil.server.call('set_request_em', checked)
-        self.request_em_set_time = re_st
-        self.status = s
-        self.last_confirmed = lc
-        self.ping_start = ps
-        self.tallies = t
-        self.reset_status()
-      else:
-        self.text_box_hours.text = "{:.1f}".format(hours_left)
-    if self.status == "requesting":
-      s, lc, ps, self.tallies = anvil.server.call_s('get_status')
-      self.status = s
-      self.last_confirmed = lc
-      self.ping_start = ps
-      if self.status != "requesting":
-        self.reset_status()
-    elif self.status == "pinging":
-      self.status = "pinging-pending" # in case server call takes more than a second
-      s, lc, ps, self.tallies = anvil.server.call_s('get_status')
-      self.status = s
-      self.last_confirmed = lc
-      self.ping_start = ps
-      if self.status != "pinging":
-        if self.status == "requesting":
-          alert("The other empathy request was cancelled.")
-        self.reset_status()
-    elif self.status is None:
-      self.tallies = anvil.server.call_s('get_tallies')
-      self.update_tally_label()
-    elif self.status == "matched":
-      self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
-      self.call_js('scrollCard') 
+
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
+    if (h.now() - self.last_5sec).seconds > 4.5:
+      # Run this code every 5 seconds
+      self.last_5sec = h.now()
+      if (self.request_em_check_box.checked and self.re_radio_button_fixed.selected
+          and  self.pause_hours_update == False):
+        hours_left = h.re_hours(self.request_em_hours, 
+                                self.request_em_set_time)
+        if hours_left <= 0:
+          checked = False
+          self.request_em_check_box.checked = checked
+          self.set_request_em_options(checked)
+          self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
+          s, lc, ps, t, re_st = anvil.server.call('set_request_em', checked)
+          self.request_em_set_time = re_st
+          self.status = s
+          self.last_confirmed = lc
+          self.ping_start = ps
+          self.tallies = t
+          self.reset_status()
+        else:
+          self.text_box_hours.text = "{:.1f}".format(hours_left)
+      if self.status == "requesting":
+        s, lc, ps, self.tallies = anvil.server.call_s('get_status')
+        self.status = s
+        self.last_confirmed = lc
+        self.ping_start = ps
+        if self.status != "requesting":
+          self.reset_status()
+      elif self.status == "pinging":
+        self.status = "pinging-pending" # in case server call takes more than a second
+        s, lc, ps, self.tallies = anvil.server.call_s('get_status')
+        self.status = s
+        self.last_confirmed = lc
+        self.ping_start = ps
+        if self.status != "pinging":
+          if self.status == "requesting":
+            alert("The other empathy request was cancelled.")
+          self.reset_status()
+      elif self.status is None:
+        self.tallies = anvil.server.call_s('get_tallies')
+        self.update_tally_label()
+      elif self.status == "matched":
+        self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
+        self.call_js('scrollCard') 
+    # Run this code once a second
     if self.status == "requesting":
       seconds = self.seconds_left()
       self.timer_label.text = ("Your request will expire in:  "

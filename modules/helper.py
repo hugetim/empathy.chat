@@ -6,16 +6,25 @@ import anvil.tz
 import math
 
 
+def now():
+  return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+
+
 def seconds_left(status, last_confirmed, ping_start=None):
-  now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
   if status in ["pinging", "pinging-pending", "pinged"]:
-    confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).seconds
+    if ping_start:
+      confirm_match = p.CONFIRM_MATCH_SECONDS - (now() - ping_start).seconds
+    else:
+      confirm_match = p.CONFIRM_MATCH_SECONDS
     if status in ["pinging", "pinging-pending"]:
       return confirm_match + 2*p.BUFFER_SECONDS
     elif status == "pinged":
       return confirm_match + p.BUFFER_SECONDS
-  if status == "requesting":
-    return p.WAIT_SECONDS - (now - last_confirmed).seconds
+  elif status == "requesting":
+    if last_confirmed:
+      return p.WAIT_SECONDS - (now() - last_confirmed).seconds
+    else:
+      return p.WAIT_SECONDS
   else:
     print("helper.seconds_left(s,lc,ps): " + status)
 
@@ -79,7 +88,6 @@ def seconds_to_words(seconds):
 
 def re_hours(h, set_time):
   print (h, set_time)
-  now = datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
-  hours = (3600.0*h - (now - set_time).seconds)/3600.0
+  hours = (3600.0*h - (now() - set_time).seconds)/3600.0
   print hours
   return hours
