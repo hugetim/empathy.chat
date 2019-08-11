@@ -32,6 +32,12 @@ class TimerForm(TimerFormTemplate):
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
+    # Run this code once a second
+    self.timer_label.text = ("Time left to confirm:  "
+                             + h.seconds_to_digital(self.seconds_left))
+    if self.seconds_left <= 0:
+      self.raise_event("x-close-alert", value="timer elapsed")
+    self.seconds_left -= 1
     if (h.now() - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = h.now()
@@ -42,9 +48,3 @@ class TimerForm(TimerFormTemplate):
       elif new_status != self.status:
         print (new_status)
         self.raise_event("x-close-alert", value=new_status)
-    # Run this code once a second
-    self.timer_label.text = ("Time left to confirm:  "
-                             + h.seconds_to_digital(self.seconds_left))
-    if self.seconds_left <= 0:
-      self.raise_event("x-close-alert", value="timer elapsed")
-    self.seconds_left -= 1

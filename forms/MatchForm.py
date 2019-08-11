@@ -112,6 +112,32 @@ class MatchForm(MatchFormTemplate):
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
+    # Run this code once a second
+    if self.status == "requesting":
+      seconds = self.seconds_left()
+      self.timer_label.text = ("Your request will expire in:  "
+                               + h.seconds_to_digital(seconds) )
+      if seconds <= 0:
+        self.tallies = anvil.server.call('cancel')
+        alert("Request cancelled due to "
+              + h.seconds_to_words(p.WAIT_SECONDS) + " of inactivity.",
+              dismissible=False)
+        self.status = None
+        self.last_confirmed = None
+        self.ping_start = None
+        self.reset_status()
+    elif self.status in ["pinging", "pinging-pending"]:
+      seconds = self.seconds_left()
+      self.status_label.text = ("Potential match available. Time left for them "
+                                + "to confirm:  "
+                                + h.seconds_to_digital(seconds))
+      if self.status != "pinging-pending" and seconds <= 0:
+        self.status = "pinging-pending" # in case server call takes more than a second
+        s, lc, ps, self.tallies = anvil.server.call('cancel_other')
+        self.status = s
+        self.last_confirmed = lc
+        self.ping_start = ps
+        self.reset_status()
     if (h.now() - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = h.now()
@@ -156,33 +182,7 @@ class MatchForm(MatchFormTemplate):
       elif self.status == "matched":
         self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
         self.call_js('scrollCard') 
-    # Run this code once a second
-    if self.status == "requesting":
-      seconds = self.seconds_left()
-      self.timer_label.text = ("Your request will expire in:  "
-                               + h.seconds_to_digital(seconds) )
-      if seconds <= 0:
-        self.tallies = anvil.server.call('cancel')
-        alert("Request cancelled due to "
-              + h.seconds_to_words(p.WAIT_SECONDS) + " of inactivity.",
-              dismissible=False)
-        self.status = None
-        self.last_confirmed = None
-        self.ping_start = None
-        self.reset_status()
-    elif self.status in ["pinging", "pinging-pending"]:
-      seconds = self.seconds_left()
-      self.status_label.text = ("Potential match available. Time left for them "
-                                + "to confirm:  "
-                                + h.seconds_to_digital(seconds))
-      if self.status != "pinging-pending" and seconds <= 0:
-        self.status = "pinging-pending" # in case server call takes more than a second
-        s, lc, ps, self.tallies = anvil.server.call('cancel_other')
-        self.status = s
-        self.last_confirmed = lc
-        self.ping_start = ps
-        self.reset_status()
-
+        
   def confirm_wait(self):
     s, lc, ps, self.tallies = anvil.server.call('confirm_wait')
     self.status = s
