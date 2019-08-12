@@ -183,10 +183,11 @@ class MatchForm(MatchFormTemplate):
     if self.pinged_em_check_box.checked:
       anvil.server.call('pinged_email')
     f = TimerForm(seconds, self.status)
-    out = confirm(content=f,
-                  title="A match is available. Are you ready?",
-                  large=False,
-                  dismissible=False)
+    out = alert(content=f,
+                title="A match is available. Are you ready?",
+                large=False,
+                dismissible=False,
+                buttons=[("Yes", True), ("No", False)])
     if out == True:
       self.status = "matched"
       s, lc, ps, self.tallies = anvil.server.call('match_commenced')
