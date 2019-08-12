@@ -106,20 +106,20 @@ class MatchForm(MatchFormTemplate):
     self.reset_status()
 
   def timer_1_tick(self, **event_args):
-    """This method is called Every 1 seconds"""
+    """This method is called once per second, updating timers"""
     if self.status == "requesting":
       self.seconds_left -= 1
       self.timer_label.text = ("Your request will expire in:  "
                                + h.seconds_to_digital(self.seconds_left) )
-    elif self.status in ["pinging", "pinging-pending"]:
+    elif self.status == "pinging":
       self.seconds_left -= 1
       self.status_label.text = ("Potential match available. Time left for them "
                                 + "to confirm:  "
                                 + h.seconds_to_digital(self.seconds_left))
 
   def timer_2_tick(self, **event_args):
-    """This method is called Every 1 seconds"""
-    # Run this code once a second
+    """This method is called approx. once per second, checking for status changes"""
+    # Run this code approx. once a second
     if self.status == "requesting":
       if self.seconds_left <= 0:
         self.tallies = anvil.server.call('cancel')
@@ -128,12 +128,10 @@ class MatchForm(MatchFormTemplate):
               dismissible=False)
         self.set_seconds_left(None)
         self.reset_status()
-    elif self.status in ["pinging", "pinging-pending"]:
-      if self.status != "pinging-pending" and self.seconds_left <= 0:
-        self.status = "pinging-pending" # in case server call takes more than a second
-        s, lc, ps, self.tallies = anvil.server.call('cancel_other')
-        self.set_seconds_left(s, lc, ps)
-        self.reset_status()
+    elif self.status == "pinging" and self.seconds_left <= 0:
+      s, lc, ps, self.tallies = anvil.server.call('cancel_other')
+      self.set_seconds_left(s, lc, ps)
+      self.reset_status()
     if (h.now() - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = h.now()
@@ -160,7 +158,6 @@ class MatchForm(MatchFormTemplate):
           self.set_seconds_left(s, lc, ps)
           self.reset_status()
       elif self.status == "pinging":
-        self.status = "pinging-pending" # in case server call takes more than a second
         s, lc, ps, self.tallies = anvil.server.call_s('get_status')
         if self.status != "pinging":
           self.set_seconds_left(s, lc, ps)
@@ -247,7 +244,7 @@ class MatchForm(MatchFormTemplate):
           self.timer_label.visible = False
           self.note_label.visible = False
           self.status_label.bold = False
-          self.renew_button.visible = True
+          self.renew_button.visible = False
           self.cancel_button.visible = True
           self.complete_button.visible = False
         else:
@@ -301,9 +298,7 @@ class MatchForm(MatchFormTemplate):
                 + 'One is requesting a match with someone willing to offer empathy first.')
       else:
         assert self.tallies['will_offer_first'] == 0
-        temp = ('There is '
-                + str(self.tallies['receive_first'])
-                + ' active request for a match with someone willing to offer empathy first.')
+        temp = ('There is currently one person requesting a match with someone willing to offer empathy first.')
     else:
       assert self.tallies['receive_first'] == 0
       if self.tallies['will_offer_first'] > 1:
