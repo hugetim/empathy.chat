@@ -17,9 +17,9 @@ def seconds_left(status, last_confirmed, ping_start=None):
     else:
       confirm_match = p.CONFIRM_MATCH_SECONDS
     if status == "pinging":
-      return confirm_match + 2*p.BUFFER_SECONDS
+      return confirm_match + 2*p.BUFFER_SECONDS # accounts for delay in response arriving
     elif status == "pinged":
-      return confirm_match + p.BUFFER_SECONDS
+      return confirm_match + p.BUFFER_SECONDS # accounts for delay in ping arriving
   elif status == "requesting":
     if last_confirmed:
       return p.WAIT_SECONDS - (now() - last_confirmed).seconds

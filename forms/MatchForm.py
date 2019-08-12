@@ -239,8 +239,8 @@ class MatchForm(MatchFormTemplate):
           return self.confirm_match(self.seconds_left)
         assert self.status in ["pinging", "matched"]
         if self.status == "pinging":
-          self.status_label.text = ("Potential match available. Time left for them "
-                                    + "to confirm:  "
+          self.status_label.text = ("A potential match is available. They have "
+                                    + "this long to confirm they are ready:  "
                                     + h.seconds_to_digital(self.seconds_left))
           self.set_jitsi_link("")
           self.timer_label.visible = False
