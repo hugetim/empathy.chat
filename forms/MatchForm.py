@@ -55,14 +55,16 @@ class MatchForm(MatchFormTemplate):
     self.set_seconds_left(s, lc, ps)
     self.reset_status()
 
-  def set_seconds_left(self, status=None, last_confirmed=None, ping_start=None):
+  def set_seconds_left(self, new_status=None, last_confirmed=None, ping_start=None):
     """
     Set status and related time variables
     """
     self.last_5sec = h.now()
-    if (status and status != "matched"):
-      self.seconds_left = h.seconds_left(status, last_confirmed, ping_start)
-    self.status = status
+    if (new_status and new_status != "matched"):
+      self.seconds_left = h.seconds_left(new_status, last_confirmed, ping_start)
+      if self.status == "pinging" and new_status == "requesting":
+        self.seconds_left = max(self.seconds_left, p.BUFFER_SECONDS)
+    self.status = new_status
     self.last_confirmed = last_confirmed
     self.ping_start = ping_start
     
@@ -107,11 +109,11 @@ class MatchForm(MatchFormTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called once per second, updating timers"""
-    if self.status == "requesting":
+    if self.status == "requesting" and self.seconds_left > 0:
       self.seconds_left -= 1
       self.timer_label.text = ("Your request will expire in:  "
                                + h.seconds_to_digital(self.seconds_left) )
-    elif self.status == "pinging":
+    elif self.status == "pinging" and self.seconds_left > 0:
       self.seconds_left -= 1
       self.status_label.text = ("Potential match available. Time left for them "
                                 + "to confirm:  "

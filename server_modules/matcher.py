@@ -24,7 +24,7 @@ def _now():
 
 def _prune_requests():
   """Prune definitely outdated requests, unmatched then matched"""
-  timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + p.BUFFER_SECONDS)
+  timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
   cutoff_r = _now() - timeout
   old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
                     if r['last_confirmed'] < cutoff_r)
