@@ -300,7 +300,7 @@ class MatchForm(MatchFormTemplate):
                 + 'One is requesting a match with someone willing to offer empathy first.')
       else:
         assert self.tallies['will_offer_first'] == 0
-        temp = ('There is currently one person requesting a match with someone willing to offer empathy first.')
+        temp = ('There is one person currently requesting a match with someone willing to offer empathy first.')
     else:
       assert self.tallies['receive_first'] == 0
       if self.tallies['will_offer_first'] > 1:
@@ -309,9 +309,8 @@ class MatchForm(MatchFormTemplate):
                 + ' others requesting an empathy exchange, '
                 + 'all of whom are willing to offer empathy first.')
       elif self.tallies['will_offer_first'] == 1:
-        temp = ('There is currently '
-                + str(self.tallies['will_offer_first'])
-                + ' person requesting an empathy exchange, '
+        temp = ('There is one'
+                + ' person currently requesting an empathy exchange, '
                 + 'willing to offer empathy first.')
       else:
         assert self.tallies['will_offer_first'] == 0
@@ -322,8 +321,7 @@ class MatchForm(MatchFormTemplate):
                    + ' others are currently receiving email notifications '
                    + 'about each request for empathy.')
         elif self.tallies['request_em'] == 1:
-          temp += (str(self.tallies['request_em'])
-                   + ' other person is currently receiving email notifications '
+          temp += ('One other person is currently receiving email notifications '
                    + 'about each request for empathy.')
         self.tally_label.font_size = None
       else:
@@ -333,8 +331,7 @@ class MatchForm(MatchFormTemplate):
                    + ' people are currently receiving email notifications '
                    + 'about each request for empathy.')
         elif self.tallies['request_em'] == 1:
-          temp += (str(self.tallies['request_em'])
-                   + ' person is currently receiving email notifications '
+          temp += ('One person is currently receiving email notifications '
                    + 'about each request for empathy.')
     else:
       self.tally_label.font_size = None
