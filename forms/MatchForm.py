@@ -146,7 +146,7 @@ class MatchForm(MatchFormTemplate):
           self.request_em_check_box.checked = checked
           self.set_request_em_options(checked)
           self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
-          s, lc, ps, t, re_st = anvil.server.call('set_request_em', checked)
+          s, lc, ps, t, re_st = anvil.server.call_s('set_request_em', checked)
           self.request_em_set_time = re_st
           if s != self.status:
             self.set_seconds_left(s, lc, ps)
@@ -267,8 +267,6 @@ class MatchForm(MatchFormTemplate):
       self.status_label.text = "Request an empathy match whenever you're ready."
       self.status_label.bold = False
       self.set_jitsi_link("")
-      self.note_label.text = ""
-      self.note_label.visible = False
       self.timer_label.visible = False
       self.complete_button.visible = False
       self.renew_button.visible = False
@@ -338,9 +336,17 @@ class MatchForm(MatchFormTemplate):
     self.tally_label.text = temp
     if len(temp) > 0:
       self.tally_label.visible = True
+      self.note_label.text = ""
+      self.note_label.visible = False
     else:
       self.tally_label.visible = False
-
+      if self.request_em_check_box.checked:
+        self.note_label.text = ""
+        self.note_label.visible = False
+      else:
+        self.note_label.text = "Note: In the Settings menu (upper left), you can opt-in to receive an email notification when someone else requests empathy."
+        self.note_label.visible = True
+      
   def set_jitsi_link(self, jitsi_code):
     if jitsi_code == "":
       self.jitsi_column_panel.visible = False
