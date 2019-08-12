@@ -50,25 +50,27 @@ class MatchForm(MatchFormTemplate):
     self.pinged_em_check_box.checked = pe
     self.tallies = tallies
     self.drop_down_1.selected_value = rt
-    self.status = s
-    self.last_confirmed = lc
-    self.ping_start = ps
     self.jitsi_embed = None
-    self.last_5sec = h.now()
-    self.reset_status()
     self.set_test_link()
+    self.set_seconds_left(s, lc, ps)
+    self.reset_status()
 
-  def seconds_left(self):
-    """derive seconds_left from status, last_confirmed, and ping_start"""
-    return h.seconds_left(self.status, self.last_confirmed, self.ping_start)
-
+  def set_seconds_left(self, status=None, last_confirmed=None, ping_start=None):
+    """
+    Set status and related time variables
+    """
+    self.last_5sec = h.now()
+    if (status and status != "matched"):
+      self.seconds_left = h.seconds_left(status, last_confirmed, ping_start)
+    self.status = status
+    self.last_confirmed = last_confirmed
+    self.ping_start = ping_start
+    
   def request_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     request_type = self.drop_down_1.selected_value
     s, lc, ps, num_emailed = anvil.server.call('add_request', request_type)
-    self.status = s
-    self.last_confirmed = lc
-    self.ping_start = ps
+    self.set_seconds_left(s, lc, ps)
     self.reset_status()
     if self.status == "requesting" and num_emailed > 0:
       self.emailed_notification(num_emailed).show()
@@ -93,61 +95,50 @@ class MatchForm(MatchFormTemplate):
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.status = None
-    self.last_confirmed = None
-    self.ping_start = None
+    self.set_seconds_left(None)
     self.tallies = anvil.server.call('cancel')
     self.reset_status()
 
   def complete_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.status = None
-    self.last_confirmed = None
-    self.ping_start = None
+    self.set_seconds_left(None)
     self.tallies = anvil.server.call('match_complete')
     self.reset_status()
-
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 1 seconds"""
     if self.status == "requesting":
       self.seconds_left -= 1
-      #seconds = self.seconds_left()
       self.timer_label.text = ("Your request will expire in:  "
                                + h.seconds_to_digital(self.seconds_left) )
     elif self.status in ["pinging", "pinging-pending"]:
       self.seconds_left -= 1
-      #seconds = self.seconds_left()
       self.status_label.text = ("Potential match available. Time left for them "
                                 + "to confirm:  "
-                                + h.seconds_to_digital(seconds))
+                                + h.seconds_to_digital(self.seconds_left))
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds"""
     # Run this code once a second
     if self.status == "requesting":
-      if seconds <= 0:
+      if self.seconds_left <= 0:
         self.tallies = anvil.server.call('cancel')
         alert("Request cancelled due to "
               + h.seconds_to_words(p.WAIT_SECONDS) + " of inactivity.",
               dismissible=False)
-        self.status = None
-        self.last_confirmed = None
-        self.ping_start = None
+        self.set_seconds_left(None)
         self.reset_status()
     elif self.status in ["pinging", "pinging-pending"]:
-      if self.status != "pinging-pending" and seconds <= 0:
+      if self.status != "pinging-pending" and self.seconds_left <= 0:
         self.status = "pinging-pending" # in case server call takes more than a second
         s, lc, ps, self.tallies = anvil.server.call('cancel_other')
-        self.status = s
-        self.last_confirmed = lc
-        self.ping_start = ps
+        self.set_seconds_left(s, lc, ps)
         self.reset_status()
     if (h.now() - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = h.now()
       if (self.request_em_check_box.checked and self.re_radio_button_fixed.selected
-          and  self.pause_hours_update == False):
+          and self.pause_hours_update == False):
         hours_left = h.re_hours(self.request_em_hours, 
                                 self.request_em_set_time)
         if hours_left <= 0:
@@ -157,27 +148,22 @@ class MatchForm(MatchFormTemplate):
           self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
           s, lc, ps, t, re_st = anvil.server.call('set_request_em', checked)
           self.request_em_set_time = re_st
-          self.status = s
-          self.last_confirmed = lc
-          self.ping_start = ps
+          if s != self.status:
+            self.set_seconds_left(s, lc, ps)
           self.tallies = t
           self.reset_status()
         else:
           self.text_box_hours.text = "{:.1f}".format(hours_left)
       if self.status == "requesting":
         s, lc, ps, self.tallies = anvil.server.call_s('get_status')
-        self.status = s
-        self.last_confirmed = lc
-        self.ping_start = ps
-        if self.status != "requesting":
+        if s != self.status:
+          self.set_seconds_left(s, lc, ps)
           self.reset_status()
       elif self.status == "pinging":
         self.status = "pinging-pending" # in case server call takes more than a second
         s, lc, ps, self.tallies = anvil.server.call_s('get_status')
-        self.status = s
-        self.last_confirmed = lc
-        self.ping_start = ps
         if self.status != "pinging":
+          self.set_seconds_left(s, lc, ps)
           if self.status == "requesting":
             alert("The other empathy request was cancelled.")
           self.reset_status()
@@ -190,9 +176,7 @@ class MatchForm(MatchFormTemplate):
         
   def confirm_wait(self):
     s, lc, ps, self.tallies = anvil.server.call('confirm_wait')
-    self.status = s
-    self.last_confirmed = lc
-    self.ping_start = ps
+    self.set_seconds_left(s, lc, ps)
     self.reset_status()
 
   def confirm_match(self, seconds):
@@ -206,36 +190,29 @@ class MatchForm(MatchFormTemplate):
     if out == True:
       self.status = "matched"
       s, lc, ps, self.tallies = anvil.server.call('match_commenced')
-      self.status = s
-      self.last_confirmed = lc
-      self.ping_start = ps
+      self.set_seconds_left(s, lc, ps)
     elif out in [False, "timer elapsed"]:
       self.tallies = anvil.server.call('cancel')
-      self.status = None
-      self.last_confirmed = None
-      self.ping_start = None
+      self.set_seconds_left(None)
       if out == "timer elapsed":
         alert("A match was found, but the time available for you to confirm ("
               + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
               dismissible=False)
     elif out is None:
       self.tallies = anvil.server.call_s('get_tallies')
-      self.status = None
-      self.last_confirmed = None
-      self.ping_start = None
+      self.set_seconds_left(None)
     else:
       print (out)
       assert out == "requesting"
       s, lc, ps, self.tallies = anvil.server.call_s('get_status')
-      self.status = s
-      self.last_confirmed = lc
-      self.ping_start = ps
+      self.set_seconds_left(s, lc, ps)
     self.reset_status()
 
   def reset_status(self):
+    """
+    Update form according to current state variables
+    """
     if self.status:
-      if self.status != "matched":
-        seconds = self.seconds_left()
       self.welcome_label.visible = False
       self.request_button.visible = False
       self.drop_down_1.enabled = False
@@ -251,7 +228,7 @@ class MatchForm(MatchFormTemplate):
         self.status_label.bold = False
         self.set_jitsi_link("")
         self.timer_label.text = ("Your request will expire in:  "
-                                 + h.seconds_to_digital(seconds) )
+                                 + h.seconds_to_digital(self.seconds_left) )
         self.timer_label.visible = True
         self.complete_button.visible = False
         self.renew_button.visible = True
@@ -259,12 +236,12 @@ class MatchForm(MatchFormTemplate):
         self.pinged_em_check_box.visible = True
       else:
         if self.status == "pinged":
-          return self.confirm_match(seconds)
+          return self.confirm_match(self.seconds_left)
         assert self.status in ["pinging", "matched"]
         if self.status == "pinging":
           self.status_label.text = ("Potential match available. Time left for them "
                                     + "to confirm:  "
-                                    + h.seconds_to_digital(seconds))
+                                    + h.seconds_to_digital(self.seconds_left))
           self.set_jitsi_link("")
           self.timer_label.visible = False
           self.note_label.visible = False
@@ -417,9 +394,7 @@ class MatchForm(MatchFormTemplate):
     
   def logout_user(self):
     anvil.users.logout()
-    self.status = None
-    self.last_confirmed = None
-    self.ping_start = None
+    self.set_seconds_left(None)
     self.reset_status()
     open_form('LoginForm')
 
@@ -427,9 +402,7 @@ class MatchForm(MatchFormTemplate):
     """This method is called when this checkbox is checked or unchecked"""
     checked = self.pinged_em_check_box.checked
     s, lc, ps, t = anvil.server.call('set_pinged_em', checked)
-    self.status = s
-    self.last_confirmed = lc
-    self.ping_start = ps
+    self.set_seconds_left(s, lc, ps)
     self.tallies = t
     self.reset_status()
 
@@ -439,9 +412,7 @@ class MatchForm(MatchFormTemplate):
     self.set_request_em_options(checked)
     s, lc, ps, t, re_st = anvil.server.call('set_request_em', checked)
     self.request_em_set_time = re_st
-    self.status = s
-    self.last_confirmed = lc
-    self.ping_start = ps
+    self.set_seconds_left(s, lc, ps)
     self.tallies = t
     self.reset_status()
 
@@ -482,9 +453,7 @@ class MatchForm(MatchFormTemplate):
     self.request_em_hours = hours
     s, lc, ps, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
     self.request_em_set_time = re_st
-    self.status = s
-    self.last_confirmed = lc
-    self.ping_start = ps
+    self.set_seconds_left(s, lc, ps)
     self.tallies = t
     self.reset_status() 
     
@@ -496,9 +465,7 @@ class MatchForm(MatchFormTemplate):
     self.request_em_hours = hours
     s, lc, ps, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
     self.request_em_set_time = re_st
-    self.status = s
-    self.last_confirmed = lc
-    self.ping_start = ps
+    self.set_seconds_left(s, lc, ps)
     self.tallies = t
     self.reset_status() 
 
@@ -518,9 +485,7 @@ class MatchForm(MatchFormTemplate):
       self.request_em_hours = hours
       s, lc, ps, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
       self.request_em_set_time = re_st
-      self.status = s
-      self.last_confirmed = lc
-      self.ping_start = ps
+      self.set_seconds_left(s, lc, ps)
       self.tallies = t
       self.reset_status()
     else:
@@ -578,18 +543,3 @@ class MatchForm(MatchFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
