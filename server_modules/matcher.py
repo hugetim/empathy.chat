@@ -524,7 +524,7 @@ def _get_user_info(user):
 
 
 @anvil.server.callable
-def add_message(message, user_id=""):
+def add_message(user_id="", message="[blank]"):
   print("add_message", "[redacted]", user_id)
   user = _get_user(user_id)
   now = _now()

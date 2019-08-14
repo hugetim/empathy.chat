@@ -431,7 +431,7 @@ components:
         enabled: true
         foreground: ''
         items: [cancel, confirm_wait, match_commenced, match_complete, get_status,
-          get_tallies, get_code]
+          get_tallies, get_code, add_message]
         visible: true
         font_size: null
         font: ''

@@ -505,7 +505,7 @@ class MatchForm(MatchFormTemplate):
 
   def message_textbox_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
-    anvil.server.call('add_message', self.message_textbox.text)
+    anvil.server.call('add_message', message=self.message_textbox.text)
     self.message_textbox.text = ""
     self.chat_repeating_panel.items = anvil.server.call('get_messages')
     self.call_js('scrollCard')
