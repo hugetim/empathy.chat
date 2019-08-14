@@ -64,6 +64,7 @@ class MatchForm(MatchFormTemplate):
       self.seconds_left = h.seconds_left(new_status, last_confirmed, ping_start)
       if self.status == "pinging" and new_status == "requesting":
         self.seconds_left = max(self.seconds_left, p.BUFFER_SECONDS)
+    print('before status change: ', self.seconds_left)
     self.status = new_status
     self.last_confirmed = last_confirmed
     self.ping_start = ping_start
