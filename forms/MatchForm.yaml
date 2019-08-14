@@ -463,14 +463,6 @@ components:
       name: test_clear
       layout_properties: {grid_position: 'APQCLU,GKHTHL'}
       event_bindings: {click: test_clear_click}
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-        font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false}
-      name: text_box_fudge
-      layout_properties: {grid_position: 'UABRKU,ZIDNTK'}
-      event_bindings: {}
     event_bindings: {}
   event_bindings: {}
 - type: Spacer
