@@ -170,8 +170,12 @@ class MatchForm(MatchFormTemplate):
         self.tallies = anvil.server.call_s('get_tallies')
         self.update_tally_label()
       elif self.status == "matched":
-        self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
-        self.call_js('scrollCard') 
+        old_items = self.chat_repeating_panel.items
+        new_items = anvil.server.call_s('get_messages')
+        if len(new_items) > len(old_items):
+          self.chat_repeating_panel.items = new_items
+          self.call_js('scrollCard')
+          self.chat_display_card.scroll_into_view()
         
   def confirm_wait(self):
     s, lc, ps, self.tallies = anvil.server.call('confirm_wait')
