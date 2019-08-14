@@ -8,8 +8,8 @@ container:
       \             enableClosePage: true,\n                               disableThirdPartyRequests:\
       \ true,\n                               localRecording: { enabled: false,},\
       \  \n                              };\n    options.interfaceConfigOverwrite\
-      \ = {DEFAULT_REMOTE_DISPLAY_NAME: 'Empathy Buddy',\n                       \
-      \                 TOOLBAR_BUTTONS: ['microphone', 'camera', 'fullscreen',\n\
+      \ = {DEFAULT_REMOTE_DISPLAY_NAME: 'Fellow EmpathySpotter',\n               \
+      \                         TOOLBAR_BUTTONS: ['microphone', 'camera', 'fullscreen',\n\
       \        \t\t\t\t\t\t\t\t\t\t\t\t  'fodeviceselection', 'info', 'chat',\n  \
       \      \t\t\t\t\t\t\t\t\t\t\t\t  'settings', 'videoquality', \n            \
       \                                              'videobackgroundblur'\n     \
