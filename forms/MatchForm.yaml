@@ -60,6 +60,14 @@ components:
       layout_properties: {grid_position: 'CJEHPC,DKFLGA'}
       event_bindings: {click: renew_button_click}
     - type: ColumnPanel
+      properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
+        wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
+        spacing_below: small, background: ''}
+      name: jitsi_column_panel
+      layout_properties: {grid_position: 'NNVOAA,WHQCIL'}
+      event_bindings: {}
+      components: []
+    - type: ColumnPanel
       properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
         spacing_below: none, background: 'theme:Gray 100'}
@@ -88,14 +96,6 @@ components:
         name: message_textbox
         layout_properties: {grid_position: 'IXQTHC,HCFYRM'}
         event_bindings: {pressed_enter: message_textbox_pressed_enter}
-    - type: ColumnPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
-        wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-        spacing_below: small, background: ''}
-      name: jitsi_column_panel
-      layout_properties: {grid_position: 'KSJUHS,WWVHIU'}
-      event_bindings: {}
-      components: []
     - type: DropDown
       properties:
         role: null

@@ -676,7 +676,7 @@ body>div[data-notify="container"].alert-warning>span[data-notify="title"]{
 }
 
 .anvil-role-card-scroll {
-  height: 100px;
+  height: 150px;
   overflow: auto;
   border-radius: 2px;
   background-color: white;
