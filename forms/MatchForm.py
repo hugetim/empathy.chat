@@ -158,7 +158,7 @@ class MatchForm(MatchFormTemplate):
           self.reset_status()
       elif self.status == "pinging":
         s, sl, self.tallies = anvil.server.call_s('get_status')
-        if self.status != "pinging":
+        if s != self.status:
           self.set_seconds_left(s, sl)
           if self.status == "requesting":
             alert("The other empathy request was cancelled.")

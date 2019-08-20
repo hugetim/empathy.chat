@@ -37,7 +37,7 @@ def _seconds_left(status, last_confirmed, ping_start=None):
       return p.WAIT_SECONDS - (_now() - last_confirmed).seconds
     else:
       return p.WAIT_SECONDS
-  elif status == None:
+  elif status in [None, "matched"]:
     return None
   else:
     print("matcher.seconds_left(s,lc,ps): " + status)
