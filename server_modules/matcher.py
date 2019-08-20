@@ -547,15 +547,12 @@ def add_message(user_id="", message="[blank]"):
   print("add_message", "[redacted]", user_id)
   user = _get_user(user_id)
   now = _now()
-  current_matches = app_tables.matches.search(users=[user], complete=[0])
-  for row in current_matches:
-    i = row['users'].index(user)
-    if row['complete'][i] == 0:
-      current_match = row
+  current_match = _current_match(user)
   app_tables.chat.add_row(match=current_match,
                           user=user, 
                           message=message,
                           time_stamp=now)
+  return _get_messages(user)
 
     
 @anvil.server.callable
@@ -564,14 +561,24 @@ def get_messages(user_id=""):
   Returns iterable of dictionaries with keys: 'me', 'message'
   """
   user = _get_user(user_id)
+  return _get_messages(user)
+  
+  
+def _get_messages(user):
+  current_match = _current_match(user)
+  messages = app_tables.chat.search(match=current_match)
+  if messages:
+    return [{'me': (user == m['user']), 'message': m['message']} for m in messages]
+
+  
+def _current_match(user):
+  current_match = None
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
     if row['complete'][i] == 0:
       current_match = row
-  messages = app_tables.chat.search(match=current_match)
-  if messages:
-    return [{'me': (user == m['user']), 'message': m['message']} for m in messages]
+  return current_match
 
     
 @anvil.server.callable
