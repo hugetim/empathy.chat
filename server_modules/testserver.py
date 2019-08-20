@@ -36,14 +36,15 @@ def test_add_request(user_id, request_type = "will_offer_first"):
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
   user = app_tables.users.get_by_id(user_id)
-  s, lc, ps, n = matcher._add_request(user, request_type)
+  s, sl, n = matcher._add_request(user, request_type)
   
   test_requests = anvil.server.session['test_record']['test_requests']
   new_row = app_tables.requests.get(user=user, current=True)  
   if new_row: # fails if match commenced instantly 
     anvil.server.session['test_record']['test_requests'] = test_requests + [new_row]
   else:
-    new_match = app_tables.matches.get(users=[user], match_commence=ps)
+    jcode, request_type = anvil.server.call('get_code', user_id)
+    new_match = app_tables.matches.get(users=[user], jitsi_code=jcode)
     test_row = app_tables.requests.get(user=user, match_id=new_match['match_id'])
     anvil.server.session['test_record']['test_requests'] = test_requests + [test_row]
   return new_row
