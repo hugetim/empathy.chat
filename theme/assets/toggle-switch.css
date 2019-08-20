@@ -48,7 +48,7 @@
 
 .anvil-role-toggleswitch-round input:checked + span:before {
   border-radius: 50px; /*34px*/
-  background-color: #016CA7;
+  background-color: white; /*#016CA7;*/
   -webkit-transform: translateX(12px);
   -ms-transform: translateX(12px);
   transform: translateX(12px);
