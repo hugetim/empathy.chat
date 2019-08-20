@@ -37,6 +37,8 @@ def _seconds_left(status, last_confirmed, ping_start=None):
       return p.WAIT_SECONDS - (_now() - last_confirmed).seconds
     else:
       return p.WAIT_SECONDS
+  elif status == None:
+    return None
   else:
     print("matcher.seconds_left(s,lc,ps): " + status)
 
@@ -196,10 +198,10 @@ def _confirm_wait(user):
   current_row = app_tables.requests.get(user=user, current=True)
   if current_row:
     current_row['last_confirmed'] = _now()
-  status, last_confirmed, ping_start, tallies = _get_status(user)
+  status, seconds_left, tallies = _get_status(user)
   if status == "requesting":
     num_emailed = _request_emails(current_row['request_type'])
-  return status, _seconds_left(status, last_confirmed, ping_start), tallies
+  return status, seconds_left, tallies
 
 
 @anvil.server.callable
@@ -364,17 +366,17 @@ def add_request(request_type, user_id=""):
 
 def _add_request(user, request_type):
   """
-  return status, last_confirmed, ping_start, num_emailed
+  return status, seconds_left, num_emailed
   """
   num_emailed = 0
-  status, last_confirmed, ping_start, tallies = _get_status(user)
+  status, seconds_left, tallies = _get_status(user)
   assert status == None
   _add_request_row(user, request_type)
   _create_matches()
-  status, last_confirmed, ping_start, tallies = _get_status(user)
+  status, seconds_left, tallies = _get_status(user)
   if status == "requesting":
     num_emailed = _request_emails(request_type)
-  return status, _seconds_left(status, last_confirmed, ping_start), num_emailed
+  return status, seconds_left, num_emailed
 
 
 def _cancel(user):
@@ -589,8 +591,8 @@ def set_request_em(request_em_checked):
   user['request_em'] = request_em_checked
   if request_em_checked:
     user['request_em_set_time'] = _now()
-  s, lc, ps, t = _confirm_wait(user)
-  return s, _seconds_left(s, lc, ps), t, user['request_em_set_time']
+  s, sl, t = _confirm_wait(user)
+  return s, sl, t, user['request_em_set_time']
 
 
 @anvil.server.callable
@@ -603,8 +605,8 @@ def set_request_em_opts(fixed, hours):
   re_opts["hours"] = hours
   user['request_em_settings'] = re_opts
   user['request_em_set_time'] = _now()
-  s, lc, ps, t = _confirm_wait(user)
-  return s, _seconds_left(s, lc, ps), t, user['request_em_set_time']
+  s, sl, t = _confirm_wait(user)
+  return s, sl, t, user['request_em_set_time']
 
 
 @anvil.server.callable
