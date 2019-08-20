@@ -10,26 +10,6 @@ def now():
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 
-def seconds_left(status, last_confirmed, ping_start=None):
-  if status in ["pinging", "pinged"]:
-    #if ping_start:
-    #  confirm_match = p.CONFIRM_MATCH_SECONDS - (now() - ping_start).seconds
-    #else:
-    confirm_match = p.CONFIRM_MATCH_SECONDS
-    if status == "pinging":
-      return confirm_match + 2*p.BUFFER_SECONDS # accounts for delay in response arriving
-    elif status == "pinged":
-      return confirm_match + p.BUFFER_SECONDS # accounts for delay in ping arriving
-  elif status == "requesting":
-    #if last_confirmed:
-    #  print(p.WAIT_SECONDS, (now() - last_confirmed).seconds, now(), last_confirmed)
-    #  return p.WAIT_SECONDS - (now() - last_confirmed).seconds
-    #else:
-    return p.WAIT_SECONDS
-  else:
-    print("helper.seconds_left(s,lc,ps): " + status)
-
-
 def seconds_to_digital(seconds):
   minutes = math.trunc(seconds / 60)
   seconds = int(seconds - minutes * 60)
