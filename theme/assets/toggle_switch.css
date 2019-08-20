@@ -1,0 +1,110 @@
+ /* The switch - the box around the slider */
+.anvil-role-toggleswitch-round {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.anvil-role-toggleswitch-round input {display:none;}
+
+/* The slider */
+.anvil-role-toggleswitch-round span {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2em;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50px;
+
+}
+
+.anvil-role-toggleswitch-round span:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 1px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50px;
+}
+
+.anvil-role-toggleswitch-round input:checked + span {
+  background-color: #2196F3;
+}
+
+.anvil-role-toggleswitch-round input:focus + span {
+  background-color: red;
+  box-shadow: 0 0 1px #2196F3;
+}
+
+.anvil-role-toggleswitch-round input:checked + span:before {
+  border-radius: 34px;
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+
+/* Square one */
+ /* The switch - the box around the slider */
+.anvil-role-toggleswitch-square {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.anvil-role-toggleswitch-square input {display:none;}
+
+/* The slider */
+.anvil-role-toggleswitch-square span {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2em;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+
+}
+
+.anvil-role-toggleswitch-square span:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 1px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.anvil-role-toggleswitch-square input:checked + span {
+  background-color: #2196F3;
+}
+
+.anvil-role-toggleswitch-square input:focus + span {
+  background-color: red;
+  box-shadow: 0 0 1px #2196F3;
+}
+
+.anvil-role-toggleswitch-square input:checked + span:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}

@@ -125,6 +125,11 @@ components:
       name: pinged_em_check_box
       layout_properties: {grid_position: 'TAANZK,ZBGCQJ'}
       event_bindings: {change: pinged_em_check_box_change}
+    - type: form:SV7QK4XBYUXPMHHM:Toggleswitch
+      properties: {}
+      name: toggleswitch_2
+      layout_properties: {grid_position: 'ROTMVP,EIQUSQ'}
+      event_bindings: {}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
         foreground: '', visible: false, text: Empathy Exchange Complete, font_size: null,
@@ -196,7 +201,7 @@ components:
   event_bindings: {tick: timer_2_tick}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: never, col_spacing: none, spacing_above: small, col_widths: '{"FXTNWS":71,"HDRLES":10}',
+    wrap_on: never, col_spacing: none, spacing_above: small, col_widths: '{"FXTNWS":71,"HDRLES":10,"FHDKLP":20}',
     spacing_below: small, background: ''}
   name: column_panel_1
   layout_properties: {slot: left-nav}
@@ -208,6 +213,11 @@ components:
       underline: false, icon: ''}
     name: label_3
     layout_properties: {grid_position: 'QALKNV,SDPIEU'}
+    event_bindings: {}
+  - type: form:SV7QK4XBYUXPMHHM:Toggleswitch
+    properties: {}
+    name: toggleswitch_1
+    layout_properties: {grid_position: 'DVPXUU,FHDKLP'}
     event_bindings: {}
   - type: CheckBox
     properties: {role: null, align: left, tooltip: Receive a notification email (even when logged out) whenever someone requests an empathy match,
