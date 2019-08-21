@@ -222,9 +222,9 @@ components:
     event_bindings: {x_change: request_em_check_box_change}
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Email notifications about requests for empathy exchanges,
-      font_size: 12, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: ''}
+      visible: true, text: Notify me of requests by email, font_size: 12, font: '',
+      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: ''}
     name: label_5
     layout_properties: {grid_position: 'DVPXUU,EZXOYG'}
     event_bindings: {}
