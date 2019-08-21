@@ -240,12 +240,10 @@ def _get_status(user):
       last_confirmed = current_row['last_confirmed']
   else:
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    current_matches = app_tables.matches.search(users=[user], complete=[0])
-    for row in current_matches:
-      i = row['users'].index(user)
-      if row['complete'][i] == 0:
-        status = "matched"
-        ping_start = row['match_commence']
+    current_match = _current_match(user)
+    if current_match:
+      status = "matched"
+      ping_start = current_match['match_commence']
   return status, _seconds_left(status, last_confirmed, ping_start), tallies
 
 
@@ -291,13 +289,9 @@ def get_code(user_id=""):
     request_type = current_row['request_type']
   else:
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    current_matches = app_tables.matches.search(users=[user], complete=[0])
-    for row in current_matches:
-      i = row['users'].index(user)
-      if row['complete'][i] == 0:
-        assert code == None # assumes only one uncompleted for this user
-        code = row['jitsi_code']
-        request_type = row['request_types'][i]
+    current_match, i = _current_match_i(user)
+    code = current_match['jitsi_code'] # assumes only one uncompleted for this user
+    request_type = current_match['request_types'][i]
   return code, request_type
 
 
@@ -490,12 +484,10 @@ def match_complete(user_id=""):
   print("match_complete", user_id)
   user = _get_user(user_id)
   # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
-  current_matches = app_tables.matches.search(users=[user], complete=[0])
-  for row in current_matches:
-    i = row['users'].index(user)
-    temp = row['complete']
-    temp[i] = 1
-    row['complete'] = temp
+  current_match, i = _current_match_i(user)
+  temp = current_match['complete']
+  temp[i] = 1
+  current_match['complete'] = temp
   return _get_tallies(user)
 
 
@@ -579,6 +571,16 @@ def _current_match(user):
     if row['complete'][i] == 0:
       current_match = row
   return current_match
+
+
+def _current_match_i(user):
+  current_match = None
+  current_matches = app_tables.matches.search(users=[user], complete=[0])
+  for row in current_matches:
+    i = row['users'].index(user)
+    if row['complete'][i] == 0:
+      current_match = row
+  return current_match, i
 
     
 @anvil.server.callable
