@@ -28,7 +28,7 @@ class MatchForm(MatchFormTemplate):
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
-
+  
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
     self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
@@ -51,8 +51,10 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_embed = None
     self.set_test_link()
     self.set_seconds_left(s, sl)
+    self.timer_1.interval = 1
+    self.timer_2.interval = 1
     self.reset_status()
-
+    
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """
     Set status and related time variables
@@ -147,8 +149,10 @@ class MatchForm(MatchFormTemplate):
           self.request_em_set_time = re_st
           if s != self.status:
             self.set_seconds_left(s, sl)
-          self.tallies = t
-          self.reset_status()
+            self.reset_status()
+          if not s:
+            self.tallies = t
+            self.update_tally_label()
         else:
           self.text_box_hours.text = "{:.1f}".format(hours_left)
       if self.status == "requesting":
@@ -254,6 +258,7 @@ class MatchForm(MatchFormTemplate):
           assert self.status == "matched"
           self.timer_label.visible = False
           jitsi_code, request_type = anvil.server.call('get_code')
+          bug = None + "stop code here"
           self.status_label.text = "Status: Exchanging Empathy"
           self.status_label.bold = False
           self.renew_button.visible = False
