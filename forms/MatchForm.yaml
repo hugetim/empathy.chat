@@ -201,7 +201,7 @@ components:
   event_bindings: {tick: timer_2_tick}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: never, col_spacing: none, spacing_above: small, col_widths: '{"FXTNWS":71,"HDRLES":10,"FHDKLP":20}',
+    wrap_on: never, col_spacing: none, spacing_above: small, col_widths: '{"FXTNWS":71,"HDRLES":10,"FHDKLP":6,"EZXOYG":42}',
     spacing_below: small, background: ''}
   name: column_panel_1
   layout_properties: {slot: left-nav}
@@ -215,18 +215,19 @@ components:
     layout_properties: {grid_position: 'QALKNV,SDPIEU'}
     event_bindings: {}
   - type: form:SV7QK4XBYUXPMHHM:Toggleswitch
-    properties: {}
-    name: toggleswitch_1
-    layout_properties: {grid_position: 'DVPXUU,FHDKLP'}
-    event_bindings: {}
-  - type: CheckBox
-    properties: {role: null, align: left, tooltip: Receive a notification email (even when logged out) whenever someone requests an empathy match,
-      border: '', enabled: true, foreground: '', visible: true, text: Notify me of requests by email,
-      font_size: 12, font: '', spacing_above: small, spacing_below: none, italic: false,
-      background: '', bold: false, checked: false, underline: false}
+    properties: {shape: round, enabled: true, visible: true, checked: null, spacing_above: small,
+      spacing_below: none}
     name: request_em_check_box
-    layout_properties: {grid_position: 'SUWGUP,XXYHSU'}
-    event_bindings: {change: request_em_check_box_change}
+    layout_properties: {grid_position: 'DVPXUU,FHDKLP'}
+    event_bindings: {x_change: request_em_check_box_change}
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: Email notifications about requests for empathy exchanges,
+      font_size: 12, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: ''}
+    name: label_5
+    layout_properties: {grid_position: 'DVPXUU,EZXOYG'}
+    event_bindings: {}
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
       visible: true, text: ' ', font_size: 6, font: '', spacing_above: small, icon_align: left,
