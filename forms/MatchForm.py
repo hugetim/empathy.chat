@@ -238,7 +238,7 @@ class MatchForm(MatchFormTemplate):
         self.complete_button.visible = False
         self.renew_button.visible = True
         self.cancel_button.visible = True
-        self.pinged_em_check_box.visible = True
+        self.pinged_em_check_panel.visible = True
       else:
         if self.status == "pinged":
           return self.confirm_match(self.seconds_left)
@@ -266,7 +266,7 @@ class MatchForm(MatchFormTemplate):
           self.set_jitsi_link(jitsi_code)
           self.note_label.text = "Note: If video does not appear above, try clicking the link below or using the Jitsi Meet app."
           self.note_label.visible = True
-        self.pinged_em_check_box.visible = False
+        self.pinged_em_check_panel.visible = False
     else:
       self.welcome_label.visible = True
       self.status_label.text = "Request an empathy match whenever you're ready."
@@ -279,7 +279,7 @@ class MatchForm(MatchFormTemplate):
       self.request_button.visible = True
       self.drop_down_1.enabled = True
       self.drop_down_1.foreground = "black"
-      self.pinged_em_check_box.visible = False
+      self.pinged_em_check_panel.visible = False
       self.update_tally_label()
 
   def update_tally_label(self):
