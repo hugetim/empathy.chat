@@ -51,9 +51,9 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_embed = None
     self.set_test_link()
     self.set_seconds_left(s, sl)
+    self.reset_status()
     self.timer_1.interval = 1
     self.timer_2.interval = 1
-    self.reset_status()
     
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """
