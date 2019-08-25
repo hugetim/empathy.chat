@@ -636,7 +636,7 @@ Return to ''' + p.URL_WITH_ALT + ''' now and confirm your availability to be con
 
 Thanks!
 Tim
-Empathy Spot maintainer
+Empathy Spot
 
 p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
 ''')
@@ -658,9 +658,7 @@ def _request_emails(request_type):
   min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
   now = _now()
   user = anvil.server.session['user']
-  name = user['name']
-  if not name:
-    name = "Empathy Spot user"
+  
   if request_type == "receive_first":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
   else:
@@ -668,16 +666,19 @@ def _request_emails(request_type):
     request_type_text = 'an empathy exchange.'
   cutoff_e = now - assume_inactive
   _prune_request_em()
-  emails = [u['email'] for u in app_tables.users.search(enabled=True, request_em=True)
-                       if (u['last_login'] > cutoff_e
-                           and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
-                           and u != user
-                           and _is_visible(user, u))]
-  for email_address in emails:
-    anvil.google.mail.send(to=email_address,
+  users_to_email = [u for u in app_tables.users.search(enabled=True, request_em=True)
+                      if (u['last_login'] > cutoff_e
+                          and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
+                          and u != user
+                          and _is_visible(user, u))]
+  for u in users_to_email:
+    name = u['name']
+    if not name:
+      name = "Empathy Spot user"
+    anvil.google.mail.send(to=u['email'],
                            subject="Empathy Spot - Request active",
                            text=
-'''Dear ''' + name + ''',
+"Dear " + name + ''',
 
 Someone has requested ''' + request_type_text + '''
 
@@ -685,7 +686,7 @@ Return to ''' + p.URL_WITH_ALT + ''' and request empathy to be connected for an 
 
 Thanks!
 Tim
-Empathy Spot maintainer
+Empathy Spot
 
 p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change this setting.
 ''')
