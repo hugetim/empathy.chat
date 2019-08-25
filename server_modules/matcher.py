@@ -690,4 +690,4 @@ Empathy Spot
 
 p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change this setting.
 ''')
-  return len(emails)
+  return len(users_to_email)
