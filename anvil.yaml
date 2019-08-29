@@ -70,6 +70,9 @@ services:
         permissionId: '16734944853676040997', emailAddress: empathyroom@gmail.com}
       ownerNames: [Tim Huegerich]
   server_config: {delegation_refresh_token: 1/xK1M2AgZHPfjW-8HpXBFcJ3RhSZOi_pyFgD41HMUJLtWNS42xlnpjIbuCxzbx5Yp}
+- source: /runtime/services/anvil/secrets.yml
+  client_config: {}
+  server_config: {}
 package_name: empathy_room
 allow_embedding: true
 name: Empathy Spot test
@@ -78,4 +81,8 @@ metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favic
   title: Empathy Spot}
 startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
+secrets:
+  new_key:
+    value: {? '' : owBRTMfdGiFcg6OrOwAFHxPUqiPdepcLs5NxphK+FaMTvAlm10Ve9ei9/rAwTOa2dHqUtiqBOuaI34DSz0VM1x4jN2nL89oYeuAFHU6yxxPbAvUaf6D6q8vc0t9lT5Enr42Nm8G1MV2qdn1l2A0fUACeoaoaj00=}
+    type: key
 renamed: true
