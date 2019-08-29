@@ -525,7 +525,7 @@ def _get_user_info(user):
     user['trust_level'] = 0
     user['request_em'] = False
     user['pinged_em'] = False
-    user['request_em_settings'] = {fixed: 0, hours: 2}
+    user['request_em_settings'] = {"fixed": 0, "hours": 2}
   re_opts = user['request_em_settings']
   if (user['request_em'] == True and re_opts["fixed"] 
       and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
