@@ -38,7 +38,8 @@ class MatchForm(MatchFormTemplate):
       alert('This account is not yet authorized to match with other users. '
             + 'Instead, it can be used to test things out. Your actions will not impact '
             + 'or be visible to other users. '
-            + 'For help, contact: ' + p.CONTACT_EMAIL)
+            + 'For help, contact: ' + p.CONTACT_EMAIL,
+            dismissible=False)
     elif e == True:
       alert("Welcome, " + n + "!")
     elif n:
