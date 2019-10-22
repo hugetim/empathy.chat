@@ -543,7 +543,7 @@ def add_message(user_id="", message="[blank]"):
   current_match = _current_match(user)
   app_tables.chat.add_row(match=current_match,
                           user=user, 
-                          message=message,
+                          message=anvil.secrets.encrypt_with_key("new_key", message),
                           time_stamp=now)
   return _get_messages(user)
 
@@ -561,7 +561,9 @@ def _get_messages(user):
   current_match = _current_match(user)
   messages = app_tables.chat.search(match=current_match)
   if messages:
-    return [{'me': (user == m['user']), 'message': m['message']} for m in messages]
+    return [{'me': (user == m['user']), 
+             'message': anvil.secrets.decrypt_with_key("new_key", m['message'])} 
+            for m in messages]
 
   
 def _current_match(user):
