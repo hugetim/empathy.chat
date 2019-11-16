@@ -2,7 +2,6 @@ import anvil.secrets
 import anvil.google.auth, anvil.google.drive, anvil.google.mail
 from anvil.google.drive import app_files
 import anvil.email
-import anvil.tables as tables
 from anvil.tables import app_tables
 import anvil.users
 import anvil.server
@@ -75,8 +74,8 @@ def _get_request_type(user):
 
 
 def _is_visible(user2, user1=None):
-  '''Is user2 visible to user1?'''
-  if user1 == None:
+  """Is user2 visible to user1?"""
+  if user1 is None:
     user1 = anvil.server.session['user']
   trust1 = user1['trust_level']
   trust2 = user2['trust_level']
@@ -365,7 +364,7 @@ def _add_request(user, request_type):
   """
   num_emailed = 0
   status, seconds_left, tallies = _get_status(user)
-  assert status == None
+  assert status is None
   _add_request_row(user, request_type)
   _create_matches()
   status, seconds_left, tallies = _get_status(user)

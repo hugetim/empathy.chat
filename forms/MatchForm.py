@@ -1,6 +1,5 @@
 from anvil import *
 import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
 import anvil.google.auth, anvil.google.drive
 import anvil.server
 import anvil.users
@@ -10,7 +9,6 @@ import parameters as p
 import anvil.tz
 import helper as h
 import random
-import datetime
 
 
 class MatchForm(MatchFormTemplate):
@@ -61,7 +59,7 @@ class MatchForm(MatchFormTemplate):
     Set status and related time variables
     """
     self.last_5sec = h.now()
-    if (new_status and new_status != "matched"):
+    if new_status and new_status != "matched":
       self.seconds_left = new_seconds_left
       if self.status == "pinging" and new_status == "requesting":
         self.seconds_left = max(self.seconds_left, p.BUFFER_SECONDS)
@@ -304,7 +302,7 @@ class MatchForm(MatchFormTemplate):
                 + 'One is requesting a match with someone willing to offer empathy first.')
       else:
         assert self.tallies['will_offer_first'] == 0
-        temp = ('There is one person currently requesting a match with someone willing to offer empathy first.')
+        temp = 'There is one person currently requesting a match with someone willing to offer empathy first.'
     else:
       assert self.tallies['receive_first'] == 0
       if self.tallies['will_offer_first'] > 1:
