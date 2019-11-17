@@ -81,6 +81,140 @@ metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favic
   title: Empathy Spot}
 startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
+dependency_order: [SV7QK4XBYUXPMHHM]
+dependency_code:
+  SV7QK4XBYUXPMHHM:
+    modules: []
+    branch: published
+    forms:
+    - container:
+        type: ColumnPanel
+        properties: {col_widths: '{}'}
+        event_bindings: {}
+      components:
+      - type: ColumnPanel
+        properties: {col_widths: '{}'}
+        name: column_panel_1
+        layout_properties: {grid_position: 'VLUSIK,NQRQIZ'}
+        components:
+        - type: Label
+          properties: {role: null, width: default, align: left, border: '', foreground: '',
+            visible: true, text: Version 0.6, font_size: null, font: '', spacing_above: small,
+            icon_align: left, spacing_below: small, italic: false, background: '',
+            bold: false, underline: false, icon: ''}
+          name: label_version
+          layout_properties: {grid_position: 'STBVKJ,XAFOGV'}
+        - type: form:Toggleswitch
+          properties: {style: round, enabled: true, visible: true, checked: null,
+            spacing_above: small, spacing_below: small}
+          name: toggleswitch_1
+          layout_properties: {grid_position: 'TFGAMS,WWMZYN'}
+          event_bindings: {clicked: toggleswitch_1_clicked, x_changed: toggleswitch_1_x_changed,
+            x_fred: toggleswitch_1_x_fred, x_change: toggleswitch_1_x_change}
+        - type: Label
+          properties: {}
+          name: label_status
+          layout_properties: {grid_position: 'TFGAMS,DEGKDM'}
+      - type: ColumnPanel
+        properties: {col_widths: '{}'}
+        name: column_panel_2
+        layout_properties: {grid_position: 'SLGNAK,IBOONZ'}
+        components:
+        - type: Button
+          properties: {role: null, width: default, align: center, border: '', enabled: true,
+            foreground: '', visible: true, text: Toggle Shape, font_size: null, font: '',
+            spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+            background: '', bold: false, underline: false, icon: ''}
+          name: button_shape
+          layout_properties: {grid_position: 'YNKDIY,RJUOTA'}
+          event_bindings: {click: button_shape_click}
+        - type: Button
+          properties: {role: null, width: default, align: center, border: '', enabled: true,
+            foreground: '', visible: true, text: Toggle Checked, font_size: null,
+            font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: ''}
+          name: button_checked
+          layout_properties: {grid_position: 'YNKDIY,FIPWNO'}
+          event_bindings: {click: button_checked_click}
+        - type: Button
+          properties: {role: null, width: default, align: center, border: '', enabled: true,
+            foreground: '', visible: true, text: Toggle Visible, font_size: null,
+            font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: ''}
+          name: button_visible
+          layout_properties: {grid_position: 'YNKDIY,WGHITY'}
+          event_bindings: {click: button_visible_click}
+      class_name: Form1
+      code: "from anvil import *\n\nclass Form1(Form1Template):\n\n  def __init__(self,\
+        \ **properties):\n    # You must call self.init_components() before doing\
+        \ anything else in this function\n    self.init_components(**properties)\n\
+        \n\n  def toggleswitch_1_x_change (self, **event_args):\n    self.label_status.text\
+        \ = \"x_change fired : \" + (\"Checked\" if self.toggleswitch_1.checked else\
+        \ \"Unchecked\")\n\n  def button_shape_click (self, **event_args):\n    #\
+        \ This method is called when the button is clicked\n    if self.toggleswitch_1.shape\
+        \ == \"round\":\n      self.toggleswitch_1.shape = \"square\"\n    else:\n\
+        \      self.toggleswitch_1.shape = \"round\"\n\n  def button_checked_click\
+        \ (self, **event_args):\n    # This method is called when the button is clicked\n\
+        \    self.toggleswitch_1.checked = not self.toggleswitch_1.checked\n\n  def\
+        \ button_visible_click (self, **event_args):\n    # This method is called\
+        \ when the button is clicked\n    self.toggleswitch_1.visible = not self.toggleswitch_1.visible\n\
+        \    \n\n\n\n\n\n\n    \n    \n    \n    "
+    - container:
+        type: HtmlTemplate
+        properties: {html: '@theme:toggle-switch.html'}
+        event_bindings: {}
+      components:
+      - type: CheckBox
+        properties: {role: null, width: default, align: left, border: '', enabled: true,
+          foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
+          spacing_below: small, italic: false, background: '', bold: false, checked: false,
+          underline: false}
+        name: check_box_1
+        layout_properties: {slot: default}
+        event_bindings: {change: check_box_1_change, show: check_box_1_show, hide: check_box_1_hide}
+      custom_component: true
+      properties:
+      - {name: enabled, type: boolean, default_value: true}
+      - {name: visible, type: boolean, default_value: true}
+      - {name: checked, type: boolean, default_value: null}
+      - {name: spacing_above, type: string, default_value: small}
+      - {name: spacing_below, type: string, default_value: small}
+      events:
+      - {name: x_change, default_event: true}
+      - {name: x_show}
+      - {name: x_hide}
+      class_name: Toggleswitch
+      code: "from anvil import *\n\nclass Toggleswitch (ToggleswitchTemplate):\n \
+        \ def __init__(self, **properties):\n    self.internal = False\n    self._checked=properties['checked']\n\
+        \    self._enabled=properties['enabled']\n    self._visible=properties['visible']\n\
+        \    self.init_components(**properties)\n    #self.check_box_1.role=\"toggleswitch-\"\
+        \ + str(self._shape)\n    self.check_box_1.role=\"toggleswitch-round\"\n \
+        \ \n  @property\n  def checked(self):\n    return self.check_box_1.checked\n\
+        \  \n  @checked.setter\n  def checked(self,value):\n    if type(value) is\
+        \ bool:\n      self._checked=value\n      self.update()\n      #self.check_box_1_change()\n\
+        \      \n  @property\n  def enabled(self):\n    return self.check_box_1.enabled\n\
+        \    \n  @enabled.setter\n  def enabled(self,value):\n    if type(value) is\
+        \ bool:\n      self._enabled = value\n      self.update()\n           \n \
+        \ @property\n  def visible(self):\n    return self.check_box_1.visible\n \
+        \ \n  @visible.setter\n  def visible(self,value):\n    if type(value) is bool:\n\
+        \      self.internal = not self.internal\n      #print(self.internal)\n  \
+        \    if self.internal:\n        #print(\"--true\",value)\n        self._visible\
+        \ = value\n        self.update()\n        self.internal = not self.internal\n\
+        \      \n  @property\n  def spacing_above(self):\n    return self.check_box_1.spacing_above\n\
+        \  \n  @spacing_above.setter\n  def spacing_above(self,value):\n    if value\
+        \ in ['none','small','medium','large']:\n      self.check_box_1.spacing_above\
+        \ = value\n      self.update()\n  \n  def update(self):\n    self.check_box_1.checked\
+        \ = self._checked\n    self.check_box_1.enabled = self._enabled\n    self.visible\
+        \ = self._visible\n    \n  def check_box_1_change (self, **event_args):\n\
+        \    self.raise_event(\"x_change\")\n\n  def check_box_1_show (self, **event_args):\n\
+        \    self.raise_event(\"x_show\")\n\n  def check_box_1_hide (self, **event_args):\n\
+        \    self.raise_event(\"x_hide\")\n   "
+    package_name: ToggleSwitch
+    name: Toggle Switch (v0.6 - live)
+    native_deps: {head_html: ''}
+    version: 21c99a226eb5b7f9b0dfaa59f5841ba66b517b53
+    depending_app: E6HFYSK4HHRI7BTC
+    server_modules: []
 secrets:
   new_key:
     value: {? '' : owBRTMfdGiFcg6OrOwAFHxPUqiPdepcLs5NxphK+FaMTvAlm10Ve9ei9/rAwTOa2dHqUtiqBOuaI34DSz0VM1x4jN2nL89oYeuAFHU6yxxPbAvUaf6D6q8vc0t9lT5Enr42Nm8G1MV2qdn1l2A0fUACeoaoaj00=}
