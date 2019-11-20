@@ -133,7 +133,7 @@ def confirm_wait_helper(user):
     current_row['last_confirmed'] = sm.now()
   status, seconds_left, tallies = _get_status(user)
   if status == "requesting":
-    num_emailed = _request_emails(current_row['request_type'])
+    num_emailed = sm.request_emails(current_row['request_type'])
   return status, seconds_left, tallies
 
 
@@ -178,6 +178,21 @@ def _get_status(user):
       status = "matched"
       ping_start = this_match['match_commence']
   return status, _seconds_left(status, last_confirmed, ping_start), tallies
+
+
+def has_status(user):
+  """
+  returns Boolean(current_status)
+  """
+  current_row = app_tables.requests.get(user=user, current=True)
+  if current_row:
+    return True
+  else:
+    this_match = current_match(user)
+    if this_match:
+      return True
+    else:
+      return False
 
 
 @anvil.server.callable
@@ -302,7 +317,7 @@ def _add_request(user, request_type):
   _create_matches()
   status, seconds_left, tallies = _get_status(user)
   if status == "requesting":
-    num_emailed = _request_emails(request_type)
+    num_emailed = sm.request_emails(request_type)
   return status, seconds_left, num_emailed
 
 

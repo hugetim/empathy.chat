@@ -207,8 +207,10 @@ p.s. You are receiving this email because you checked the box: "Notify me by ema
 ''')
 
 
-def _request_emails(request_type):
-  """Email all users with request_em_check_box checked who logged in recently"""
+def request_emails(request_type):
+  """Email non-active with request_em_check_box checked who logged in recently
+
+  Non-active means not requesting or matched currently"""
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
   now = now()
@@ -224,7 +226,8 @@ def _request_emails(request_type):
                       if (u['last_login'] > cutoff_e
                           and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
                           and u != user
-                          and is_visible(user, u))]
+                          and is_visible(user, u)
+                          and not m.has_status(user))]
   for u in users_to_email:
     name = u['name']
     if not name:
