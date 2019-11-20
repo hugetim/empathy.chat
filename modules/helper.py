@@ -9,6 +9,8 @@ def now():
 
 
 def seconds_to_digital(seconds):
+  original = seconds
+  seconds = abs(seconds)
   minutes = math.trunc(seconds / 60)
   seconds = int(seconds - minutes * 60)
   hours = math.trunc(minutes / 60)
@@ -24,10 +26,14 @@ def seconds_to_digital(seconds):
   if seconds < 10:
     second_str = "0" + second_str
   output += second_str
+  if original < abs(original):
+    output = "-" + output
   return output
 
 
 def seconds_to_words(seconds):
+  original = seconds
+  seconds = abs(seconds)
   minutes = math.trunc(seconds / 60)
   seconds = int(seconds - minutes * 60)
   hours = math.trunc(minutes / 60)
@@ -62,13 +68,13 @@ def seconds_to_words(seconds):
         output = minute_str
     else:
       output = second_str
+  if original < abs(original):
+    output = "-" + output
   return output
 
 
 def re_hours(h, set_time):
-  print (h, set_time)
   hours = (3600.0*h - (now() - set_time).seconds)/3600.0
-  print hours
   return hours
 
 
