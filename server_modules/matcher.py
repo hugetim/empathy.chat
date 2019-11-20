@@ -131,8 +131,6 @@ def confirm_wait_helper(user):
   if current_row:
     current_row['last_confirmed'] = sm.now()
   status, seconds_left, tallies = _get_status(user)
-  if status == "requesting":
-    num_emailed = sm.request_emails(current_row['request_type'])
   return status, seconds_left, tallies
 
 
