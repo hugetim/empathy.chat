@@ -69,7 +69,7 @@ def seconds_to_words(seconds):
     else:
       output = second_str
   if original < abs(original):
-    output = "-" + output
+    output = "minus " + output
   return output
 
 
