@@ -1,6 +1,4 @@
 from anvil import *
-import anvil.google.auth, anvil.google.drive
-import anvil.google.auth, anvil.google.drive
 import anvil.server
 import anvil.users
 from TimerForm import TimerForm
@@ -55,9 +53,7 @@ class MatchForm(MatchFormTemplate):
     self.timer_2.interval = 1
     
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
-    """
-    Set status and related time variables
-    """
+    """Set status and related time variables"""
     self.last_5sec = h.now()
     if new_status and new_status != "matched":
       self.seconds_left = new_seconds_left
@@ -67,7 +63,6 @@ class MatchForm(MatchFormTemplate):
     self.status = new_status
     
   def request_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     request_type = self.drop_down_1.selected_value
     s, sl, num_emailed = anvil.server.call('add_request', request_type)
     self.set_seconds_left(s, sl)
@@ -76,7 +71,7 @@ class MatchForm(MatchFormTemplate):
       self.emailed_notification(num_emailed).show()
 
   def emailed_notification(self, num):
-    """assumes num>0, returns Notification"""
+    """Return Notification (assumes num>0)"""
     if num == 1:
       message = ('Someone has been sent a '
                  + 'notification email about your request.')
@@ -90,23 +85,20 @@ class MatchForm(MatchFormTemplate):
                         timeout=10)
 
   def renew_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     self.confirm_wait()
 
   def cancel_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     self.set_seconds_left(None)
     self.tallies = anvil.server.call('cancel')
     self.reset_status()
 
   def complete_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     self.set_seconds_left(None)
     self.tallies = anvil.server.call('match_complete')
     self.reset_status()
 
   def timer_1_tick(self, **event_args):
-    """This method is called once per second, updating timers"""
+    """This method is called once per second, updating countdowns"""
     if self.status == "requesting" and self.seconds_left > 0:
       self.seconds_left -= 1
       self.timer_label.text = ("Your request will expire in:  "
@@ -213,9 +205,7 @@ class MatchForm(MatchFormTemplate):
     self.reset_status()
 
   def reset_status(self):
-    """
-    Update form according to current state variables
-    """
+    """Update form according to current state variables"""
     if self.status:
       self.welcome_label.visible = False
       self.request_button.visible = False
@@ -282,6 +272,7 @@ class MatchForm(MatchFormTemplate):
       self.update_tally_label()
 
   def update_tally_label(self):
+    """Update form based on tallies state"""
     if self.tallies['will_offer_first'] == 0 and self.tallies['receive_first'] == 0:
       self.tally_label.font_size = 12
     else:
@@ -301,6 +292,7 @@ class MatchForm(MatchFormTemplate):
         self.note_label.visible = True
       
   def set_jitsi_link(self, jitsi_code):
+    """Initialize or destroy embedded Jitsi Meet instance"""
     if jitsi_code == "":
       self.jitsi_column_panel.visible = False
       if self.jitsi_embed:
@@ -339,11 +331,9 @@ class MatchForm(MatchFormTemplate):
     return code      
       
   def logout_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     self.logout_user()
 
   def link_bar_logout_click(self, **event_args):
-    """This method is called when the link is clicked"""
     self.logout_user()
     
   def logout_user(self):
@@ -371,7 +361,7 @@ class MatchForm(MatchFormTemplate):
     self.reset_status()
 
   def set_request_em_options(self, checked):
-    """Update state of request_em options."""
+    """Update request_em options visibility/enabled."""
     if checked:
       self.re_radio_button_panel.visible = True
       self.re_radio_button_indef.enabled = True
@@ -400,7 +390,6 @@ class MatchForm(MatchFormTemplate):
     self.text_box_hours.text = "{:.1f}".format(hours_left)
 
   def re_radio_button_indef_clicked(self, **event_args):
-    """This method is called when this radio button is selected"""
     fixed = False
     self.text_box_hours.enabled = fixed
     hours = self.text_box_hours.text
@@ -412,7 +401,6 @@ class MatchForm(MatchFormTemplate):
     self.reset_status() 
     
   def re_radio_button_fixed_clicked(self, **event_args):
-    """This method is called when this radio button is selected"""
     fixed = True
     self.text_box_hours.enabled = fixed
     hours = self.text_box_hours.text
@@ -424,11 +412,9 @@ class MatchForm(MatchFormTemplate):
     self.reset_status() 
 
   def text_box_hours_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
     self.update_hours()
 
   def text_box_hours_lost_focus(self, **event_args):
-    """This method is called when the TextBox loses focus"""
     self.update_hours()
     self.pause_hours_update = False
   
@@ -448,11 +434,9 @@ class MatchForm(MatchFormTemplate):
       self.text_box_hours.text = "{:.1f}".format(hours_left)
 
   def text_box_hours_focus(self, **event_args):
-    """This method is called when the TextBox gets focus"""
-    self.pause_hours_update = True   
+    self.pause_hours_update = True
 
   def message_textbox_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
     temp = anvil.server.call('add_message', message=self.message_textbox.text)
     self.message_textbox.text = ""
     self.chat_repeating_panel.items = temp
@@ -465,7 +449,6 @@ class MatchForm(MatchFormTemplate):
       self.test_requestuser_drop_down_refresh()
 
   def test_adduser_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     email = self.test_adduser_email.text
     if email:
       anvil.server.call('test_add_user', email)
@@ -475,7 +458,6 @@ class MatchForm(MatchFormTemplate):
       alert("Email address required to add user.")
 
   def test_request_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     user_id = self.test_requestuser_drop_down.selected_value
     requesttype = self.test_requesttype_drop_down.selected_value
     if user_id and requesttype:
@@ -484,7 +466,6 @@ class MatchForm(MatchFormTemplate):
       alert("User and request type required to add request.")
 
   def test_clear_click(self, **event_args):
-    """This method is called when the button is clicked"""
     anvil.server.call('test_clear')
     self.test_requestuser_drop_down_refresh()
 
@@ -493,7 +474,6 @@ class MatchForm(MatchFormTemplate):
     self.test_requestuser_drop_down.items = out
 
   def test_other_action_click(self, **event_args):
-    """This method is called when the button is clicked"""
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
