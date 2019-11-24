@@ -216,11 +216,10 @@ def users_to_email_re_notif(user=None):
   _prune_request_em()
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
-  now = now()
-  cutoff_e = now - assume_inactive
+  cutoff_e = now() - assume_inactive
   return [u for u in app_tables.users.search(enabled=True, request_em=True)
                   if (u['last_login'] > cutoff_e
-                      and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
+                      and ((not u['last_request_em']) or now() > u['last_request_em'] + min_between)
                       and u != user
                       and is_visible(u, user)
                       and not m.has_status(u))]
