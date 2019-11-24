@@ -139,7 +139,7 @@ def _emails_equal(a, b):
   return a_match.group(1) == b_match.group(1) and a_match.group(2).lower() == b_match.group(2).lower()
 
 
-def prune_request_em():
+def _prune_request_em():
   """Switch expired request_em to false"""
   expired_rem_users = [u for u in app_tables.users.search(request_em=True)
                        if (u['request_em_settings']['fixed']
@@ -208,27 +208,35 @@ p.s. You are receiving this email because you checked the box: "Notify me by ema
 ''')
 
 
+def users_to_email_re_notif(user=None):
+  """Return list of users to email notifications triggered by user
+
+  Side effect: prune request_em (i.e. switch expired request_em to false)
+  """
+  _prune_request_em()
+  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
+  min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
+  now = now()
+  cutoff_e = now - assume_inactive
+  return [u for u in app_tables.users.search(enabled=True, request_em=True)
+                  if (u['last_login'] > cutoff_e
+                      and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
+                      and u != user
+                      and is_visible(u, user)
+                      and not m.has_status(u))]
+
+
 def request_emails(request_type):
   """Email non-active with request_em_check_box checked who logged in recently
 
   Non-active means not requesting or matched currently"""
-  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
-  min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
-  now = now()
   user = anvil.server.session['user']
   if request_type == "receive_first":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
   else:
     assert request_type == "will_offer_first"
     request_type_text = 'an empathy exchange.'
-  cutoff_e = now - assume_inactive
-  prune_request_em()
-  users_to_email = [u for u in app_tables.users.search(enabled=True, request_em=True)
-                      if (u['last_login'] > cutoff_e
-                          and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
-                          and u != user
-                          and is_visible(user, u)
-                          and not m.has_status(user))]
+  users_to_email = users_to_email_re_notif(user)
   for u in users_to_email:
     name = u['name']
     if not name:

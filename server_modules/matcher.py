@@ -79,7 +79,6 @@ def init():
   print ("('init')")
   sm.initialize_session()
   # Prune expired items for all users
-  sm.prune_request_em()
   _prune_requests()
   _prune_matches()
   sm.prune_messages()
@@ -195,6 +194,9 @@ def has_status(user):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_tallies():
+  """Return tallies dictionary
+
+  Side effects: prune requests and request_em settings"""
   _prune_requests()
   user = anvil.server.session['user']
   return _get_tallies(user)
@@ -204,19 +206,11 @@ def _get_tallies(user):
   tallies =	dict(receive_first=0,
                  will_offer_first=0,
                  request_em=0)
-  active_users = [user]
   for row in app_tables.requests.search(current=True, match_id=None):
     user2 = row['user']
     if user2 != user and sm.is_visible(user2, user):
       tallies[row['request_type']] += 1
-      active_users.append(user2)
-  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
-  cutoff_e = sm.now() - assume_inactive
-  request_em_list = [1 for u in app_tables.users.search(enabled=True, request_em=True)
-                     if (u['last_login'] > cutoff_e
-                         and u not in active_users
-                         and sm.is_visible(u, user))]
-  tallies['request_em'] = len(request_em_list)
+  tallies['request_em'] = len(sm.users_to_email_re_notif(user))
   return tallies
 
 
