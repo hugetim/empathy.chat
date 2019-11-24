@@ -308,7 +308,7 @@ def _add_request(user, request_type):
   _create_matches()
   status, seconds_left, tallies = _get_status(user)
   if status == "requesting":
-    num_emailed = sm.request_emails(request_type)
+    num_emailed = sm.request_emails(request_type, user)
   return status, seconds_left, num_emailed
 
 

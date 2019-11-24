@@ -225,11 +225,10 @@ def users_to_email_re_notif(user=None):
                       and not m.has_status(u))]
 
 
-def request_emails(request_type):
+def request_emails(request_type, user):
   """Email non-active with request_em_check_box checked who logged in recently
 
   Non-active means not requesting or matched currently"""
-  user = anvil.server.session['user']
   if request_type == "receive_first":
     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
   else:
