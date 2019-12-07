@@ -11,7 +11,7 @@ import uuid
 import re
 import parameters as p
 import helper as h
-import matcher as m
+import matcher
 
 
 def now():
@@ -96,7 +96,7 @@ def prune_messages():
 def add_message(user_id="", message="[blank]"):
   print("add_message", "[redacted]", user_id)
   user = get_user(user_id)
-  this_match = m.current_match(user)
+  this_match = matcher.current_match(user)
   app_tables.chat.add_row(match=this_match,
                           user=user,
                           message=anvil.secrets.encrypt_with_key("new_key", message),
@@ -114,7 +114,7 @@ def get_messages(user_id=""):
 
 
 def _get_messages(user):
-  this_match = m.current_match(user)
+  this_match = matcher.current_match(user)
   messages = app_tables.chat.search(match=this_match)
   if messages:
     return [{'me': (user == m['user']),
@@ -155,7 +155,7 @@ def set_pinged_em(pinged_em_checked):
   print("set_pinged_em", pinged_em_checked)
   user = anvil.server.session['user']
   user['pinged_em'] = pinged_em_checked
-  return m.confirm_wait_helper(user)
+  return matcher.confirm_wait_helper(user)
 
 
 @anvil.server.callable
@@ -166,7 +166,7 @@ def set_request_em(request_em_checked):
   user['request_em'] = request_em_checked
   if request_em_checked:
     user['request_em_set_time'] = now()
-  s, sl, t = m.confirm_wait_helper(user)
+  s, sl, t = matcher.confirm_wait_helper(user)
   return s, sl, t, user['request_em_set_time']
 
 
@@ -180,7 +180,7 @@ def set_request_em_opts(fixed, hours):
   re_opts["hours"] = hours
   user['request_em_settings'] = re_opts
   user['request_em_set_time'] = now()
-  s, sl, t = m.confirm_wait_helper(user)
+  s, sl, t = matcher.confirm_wait_helper(user)
   return s, sl, t, user['request_em_set_time']
 
 
@@ -222,7 +222,7 @@ def users_to_email_re_notif(user=None):
                       and ((not u['last_request_em']) or now() > u['last_request_em'] + min_between)
                       and u != user
                       and is_visible(u, user)
-                      and not m.has_status(u))]
+                      and not matcher.has_status(u))]
 
 
 def request_emails(request_type, user):
