@@ -108,7 +108,7 @@ def init():
   elif status == 'pinging' and seconds_left <= 0:
     status, seconds_left, tallies = _cancel_other(user)
   if status in ('requesting', 'pinged', 'pinging'):
-    status, seconds_left, tallies = _confirm_wait(user)
+    status, seconds_left, tallies = confirm_wait_helper(user)
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
