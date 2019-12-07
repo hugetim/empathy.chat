@@ -266,6 +266,11 @@ def _create_match(user, excluded=()):
                earliest_request['last_confirmed'])
       if (current_row['ping_start'] - lc).seconds <= p.BUFFER_SECONDS:
         _match_commenced(user)
+      else:
+        if lc == current_row['last_confirmed']:
+          sm.pinged_email(user)
+        else:
+          sm.pinged_email(earliest_request['user'])
 
 
 def _create_matches(excluded=()):

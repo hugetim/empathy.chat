@@ -184,16 +184,16 @@ def set_request_em_opts(fixed, hours):
   return s, sl, t, user['request_em_set_time']
 
 
-@anvil.server.callable
-def pinged_email():
+def pinged_email(user):
+  """Email pinged user, if settings allow"""
   print("('pinged_email')")
-  user = anvil.server.session['user']
-  name = user['name']
-  if not name:
-    name = "Empathy Spot user"
-  anvil.google.mail.send(to=user['email'],
-                         subject="Empathy Spot - Match available",
-                         text=
+  if user['pinged_em']:
+    name = user['name']
+    if not name:
+      name = "Empathy Spot user"
+    anvil.google.mail.send(to=user['email'],
+                           subject="Empathy Spot - Match available",
+                           text=
 '''Dear ''' + name + ''',
 
 An empathy match has been found.

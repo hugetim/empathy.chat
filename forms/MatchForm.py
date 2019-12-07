@@ -175,8 +175,6 @@ class MatchForm(MatchFormTemplate):
     self.reset_status()
 
   def confirm_match(self, seconds):
-    if self.pinged_em_check_box.checked:
-      anvil.server.call('pinged_email')
     f = TimerForm(seconds, self.status)
     out = alert(content=f,
                 title="A match is available. Are you ready?",
