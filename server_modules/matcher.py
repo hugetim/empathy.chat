@@ -1,3 +1,4 @@
+import anvil.microsoft.auth
 import anvil.tables
 from anvil.tables import app_tables
 import anvil.server

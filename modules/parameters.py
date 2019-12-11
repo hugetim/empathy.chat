@@ -1,3 +1,4 @@
+import anvil.microsoft.auth
 BUFFER_SECONDS = 7
 CONFIRM_MATCH_SECONDS = 15 #60
 WAIT_SECONDS = 55 #60*20

@@ -1,4 +1,5 @@
 from anvil import *
+import anvil.microsoft.auth
 
 
 class ChatTemplate(ChatTemplateTemplate):
