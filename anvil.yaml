@@ -3,7 +3,7 @@ dependencies:
   version: {dev: false}
 services:
 - source: /runtime/services/anvil/users.yml
-  client_config: {use_microsoft: false, require_secure_passwords: true, use_email: true,
+  client_config: {use_microsoft: true, require_secure_passwords: true, use_email: true,
     allow_remember_me: true, allow_signup: true, remember_me_seq: 1, enable_automatically: true,
     confirm_email: true, remember_me_days: 30, use_google: true, use_facebook: false}
   server_config: {user_table: 18972}
@@ -82,8 +82,6 @@ metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favic
 startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 dependency_order: [SV7QK4XBYUXPMHHM]
-extra_files:
-  .idea: {.gitignore: IyBEZWZhdWx0IGlnbm9yZWQgZmlsZXMKL3dvcmtzcGFjZS54bWw=}
 dependency_code:
   SV7QK4XBYUXPMHHM:
     modules: []
