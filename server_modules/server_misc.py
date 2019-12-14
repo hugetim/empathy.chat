@@ -33,7 +33,7 @@ def get_user(user_id):
   if user_id == "" or anvil.server.session['user_id'] == user_id:
     return anvil.server.session['user']
   else:
-    assert anvil.server.session['trust_level'] >= TEST_TRUST_LEVEL
+    assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
     return app_tables.users.get_by_id(user_id)
 
 
