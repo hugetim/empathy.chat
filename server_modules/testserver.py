@@ -68,6 +68,8 @@ def test_clear():
     row.delete()
     for match in test_matches:
       if match is not None:
+        for row in app_tables.chat.search(match=match):
+          row.delete()
         match.delete()
   anvil.server.session['test_record'] = None
 
