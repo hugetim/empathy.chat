@@ -82,6 +82,8 @@ metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favic
 startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 dependency_order: [SV7QK4XBYUXPMHHM]
+extra_files:
+  .idea: {.gitignore: IyBEZWZhdWx0IGlnbm9yZWQgZmlsZXMKL3dvcmtzcGFjZS54bWw=}
 dependency_code:
   SV7QK4XBYUXPMHHM:
     modules: []
