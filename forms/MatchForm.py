@@ -336,8 +336,6 @@ class MatchForm(MatchFormTemplate):
     
   def logout_user(self):
     anvil.users.logout()
-    self.set_seconds_left(None)
-    self.reset_status()
     open_form('LoginForm')
 
   def pinged_em_check_box_change(self, **event_args):
