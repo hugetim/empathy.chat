@@ -1,7 +1,8 @@
 container:
   type: HtmlTemplate
-  properties: {tooltip: '', html: "<div anvil-slot=\"default\"></div>\n<div id=\"\
-      jitsi\"></div>\n\n<script>\n  function initJitsi(domain, options) {\n    options.parentNode\
+  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
+    role: null, html: "<div anvil-slot=\"default\"></div>\n<div id=\"jitsi\"></div>\n\
+      \n<script>\n  function initJitsi(domain, options) {\n    options.parentNode\
       \ = this.find(\"#jitsi\")[0];\n    options.configOverwrite = {fileRecordingsEnabled:\
       \ false,\n                               liveStreamingEnabled: false,\n    \
       \                           transcribingEnabled: false,\n                  \
@@ -16,8 +17,9 @@ container:
       \                                                    ],\n                  \
       \                      SETTINGS_SECTIONS: [ 'devices', 'language' ],\n     \
       \                                   ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
-      \ 60000,\n                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
-      \ options);\n  }\n</script>\n\n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n\
-      \    border: none;\n  }\n</style>\n"}
+      \ 60000,\n                                       };\n    var window.japi = new\
+      \ JitsiMeetExternalAPI(domain, options);\n    var window.japi.executeCommand('subject',\
+      \ '');\n  }\n</script>\n\n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n   \
+      \ border: none;\n  }\n</style>\n"}
   event_bindings: {show: form_show}
 components: []
