@@ -1,3 +1,4 @@
+from ._anvil_designer import MyJitsiTemplate
 from anvil import *
 
 

@@ -1,11 +1,12 @@
+from ._anvil_designer import MatchFormTemplate
 from anvil import *
 import anvil.server
 import anvil.users
-from TimerForm import TimerForm
-from MyJitsi import MyJitsi
-import parameters as p
+from .TimerForm import TimerForm
+from .MyJitsi import MyJitsi
+from . import parameters as p
 import anvil.tz
-import helper as h
+from . import helper as h
 import random
 
 
@@ -196,7 +197,7 @@ class MatchForm(MatchFormTemplate):
       self.tallies = anvil.server.call_s('get_tallies')
       self.set_seconds_left(None)
     else:
-      print (out)
+      print(out)
       assert out == "requesting"
       s, sl, self.tallies = anvil.server.call_s('get_status')
       self.set_seconds_left(s, sl)

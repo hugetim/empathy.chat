@@ -1,3 +1,4 @@
+from ._anvil_designer import LoginFormTemplate
 from anvil import *
 import anvil.users
 

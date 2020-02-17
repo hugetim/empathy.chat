@@ -9,9 +9,9 @@ import datetime
 import random
 import uuid
 import re
-import parameters as p
-import helper as h
-import matcher
+from . import parameters as p
+from . import helper as h
+from . import matcher
 
 
 def now():

@@ -1,6 +1,6 @@
 from anvil.tables import app_tables
 import anvil.server
-import matcher
+from . import matcher
 
 
 @anvil.server.callable

@@ -3,8 +3,8 @@ from anvil.tables import app_tables
 import anvil.server
 import datetime
 import anvil.tz
-import parameters as p
-import server_misc as sm
+from . import parameters as p
+from . import server_misc as sm
 
 
 TEST_TRUST_LEVEL = 10
@@ -76,7 +76,7 @@ def init():
   prunes old requests/offers/matches
   updates last_confirmed if currently requesting/ping
   """
-  print ("('init')")
+  print("('init')")
   sm.initialize_session()
   # Prune expired items for all users
   _prune_requests()
@@ -84,7 +84,7 @@ def init():
   sm.prune_messages()
   # Initialize user info
   user = anvil.server.session['user']
-  print (user['email'])
+  print(user['email'])
   trust_level, request_em, rem_opts, re_st, pinged_em = sm.get_user_info(user)
   email_in_list = None
   name = None

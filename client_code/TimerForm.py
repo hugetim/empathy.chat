@@ -1,6 +1,7 @@
+from ._anvil_designer import TimerFormTemplate
 from anvil import *
 import anvil.server
-import helper as h
+from . import helper as h
 
 
 class TimerForm(TimerFormTemplate):
@@ -38,5 +39,5 @@ class TimerForm(TimerFormTemplate):
       self.last_5sec = h.now()
       new_status, sl, tallies = anvil.server.call_s('get_status')
       if new_status != self.status:
-        print (new_status)
+        print(new_status)
         self.raise_event("x-close-alert", value=new_status)
