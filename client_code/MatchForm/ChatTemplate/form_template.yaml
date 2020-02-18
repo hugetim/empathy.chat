@@ -42,3 +42,4 @@ components:
     - {property: text, code: 'self.item[''message'']'}
   data_bindings:
   - {property: visible, code: 'self.item[''me'']'}
+is_package: true

@@ -19,3 +19,4 @@ components:
   name: label_1
   layout_properties: {slot: title}
   event_bindings: {}
+is_package: true

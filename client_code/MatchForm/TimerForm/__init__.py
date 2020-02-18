@@ -1,7 +1,7 @@
 from ._anvil_designer import TimerFormTemplate
 from anvil import *
 import anvil.server
-from . import helper as h
+from ... import helper as h
 
 
 class TimerForm(TimerFormTemplate):

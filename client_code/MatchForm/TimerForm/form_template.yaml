@@ -23,3 +23,4 @@ components:
   type: Timer
   properties: {interval: 1}
   event_bindings: {tick: timer_1_tick}
+is_package: true

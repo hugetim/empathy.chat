@@ -24,3 +24,4 @@ container:
       \n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n    border: none;\n  }\n</style>\n"}
   event_bindings: {show: form_show}
 components: []
+is_package: true
