@@ -40,8 +40,7 @@ class MenuForm(MenuFormTemplate):
             dismissible=False)
     elif e == True:
       alert("Welcome, " + n + "!")
-    elif n:
-      self.welcome_label.text = "Hi, " + n + "!"
+    self.name = n
     self.test_mode.visible = tm
     self.init_request_em_opts(re, re_opts, re_st)
     self.pinged_em_check_box.checked = pe
@@ -204,11 +203,8 @@ class MenuForm(MenuFormTemplate):
   def reset_status(self):
     """Update form according to current state variables"""
     if self.status:
-      self.welcome_label.visible = False
-      self.request_button.visible = False
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
-      self.tally_label.visible = False
       if self.status == "requesting":
         self.status_label.text = "Status: Requesting an empathy exchange."
         self.note_label.text = ("(Note: When a match becomes available, "
@@ -254,7 +250,8 @@ class MenuForm(MenuFormTemplate):
           self.note_label.visible = True
         self.pinged_em_check_panel.visible = False
     else:
-      self.add_component(DashForm(self.drop_down_1_items, 
+      self.add_component(DashForm(self.name,
+                                  self.drop_down_1_items, 
                                   self.request_type, 
                                   self.tallies))
       
