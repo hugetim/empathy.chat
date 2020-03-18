@@ -1,16 +1,17 @@
-from ._anvil_designer import MatchFormTemplate
+from ._anvil_designer import MenuFormTemplate
 from anvil import *
 import anvil.server
 import anvil.users
 import anvil.tz
 from .TimerForm import TimerForm
 from .MyJitsi import MyJitsi
+from .DashForm import DashForm
 from .. import parameters as p
 from .. import helper as h
 import random
 
 
-class MatchForm(MatchFormTemplate):
+class MenuForm(MenuFormTemplate):
   tallies = dict(receive_first = 0,
                  will_offer_first = 0,
                  request_em = 0)
@@ -28,7 +29,7 @@ class MatchForm(MatchFormTemplate):
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
-    self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
+    self.drop_down_1_items = (("Willing to offer empathy first","will_offer_first"),
                               ("Not ready to offer empathy first","receive_first"))
     tm, re, re_opts, re_st, pe, rt, s, sl, tallies, e, n = anvil.server.call('init')
     if e == False:
@@ -45,7 +46,7 @@ class MatchForm(MatchFormTemplate):
     self.init_request_em_opts(re, re_opts, re_st)
     self.pinged_em_check_box.checked = pe
     self.tallies = tallies
-    self.drop_down_1.selected_value = rt
+    self.request_type = rt
     self.jitsi_embed = None
     self.set_test_link()
     self.set_seconds_left(s, sl)
@@ -62,15 +63,15 @@ class MatchForm(MatchFormTemplate):
         self.seconds_left = max(self.seconds_left, p.BUFFER_SECONDS)
     #print('before status change: ', self.seconds_left)
     self.status = new_status
-    
-  def request_button_click(self, **event_args):
-    request_type = self.drop_down_1.selected_value
-    s, sl, num_emailed = anvil.server.call('add_request', request_type)
+
+  def request_button_click(request_type):
+    self.request_type = request_type
+    s, sl, num_emailed = anvil.server.call('add_request', self.request_type)
     self.set_seconds_left(s, sl)
     self.reset_status()
     if self.status == "requesting" and num_emailed > 0:
-      self.emailed_notification(num_emailed).show()
-
+      self.emailed_notification(num_emailed).show())  
+    
   def emailed_notification(self, num):
     """Return Notification (assumes num>0)"""
     if num == 1:
@@ -159,9 +160,6 @@ class MatchForm(MatchFormTemplate):
           if self.status == "requesting":
             alert("The other empathy request was cancelled.")
           self.reset_status()
-      elif self.status is None:
-        self.tallies = anvil.server.call_s('get_tallies')
-        self.update_tally_label()
       elif self.status == "matched":
         old_items = self.chat_repeating_panel.items
         new_items = anvil.server.call_s('get_messages')
@@ -256,39 +254,9 @@ class MatchForm(MatchFormTemplate):
           self.note_label.visible = True
         self.pinged_em_check_panel.visible = False
     else:
-      self.welcome_label.visible = True
-      self.status_label.text = "Request an empathy match whenever you're ready."
-      self.status_label.bold = False
-      self.set_jitsi_link("")
-      self.timer_label.visible = False
-      self.complete_button.visible = False
-      self.renew_button.visible = False
-      self.cancel_button.visible = False
-      self.request_button.visible = True
-      self.drop_down_1.enabled = True
-      self.drop_down_1.foreground = "black"
-      self.pinged_em_check_panel.visible = False
-      self.update_tally_label()
-
-  def update_tally_label(self):
-    """Update form based on tallies state"""
-    if self.tallies['will_offer_first'] == 0 and self.tallies['receive_first'] == 0:
-      self.tally_label.font_size = 12
-    else:
-      self.tally_label.font_size = None
-    self.tally_label.text = h.tally_text(self.tallies)
-    if len(self.tally_label.text) > 0:
-      self.tally_label.visible = True
-      self.note_label.text = ""
-      self.note_label.visible = False
-    else:
-      self.tally_label.visible = False
-      if self.request_em_check_box.checked:
-        self.note_label.text = ""
-        self.note_label.visible = False
-      else:
-        self.note_label.text = "Note: In the Settings menu (upper left), you can opt-in to receive an email notification when someone else requests empathy."
-        self.note_label.visible = True
+      self.add_component(DashForm(self.drop_down_1_items, 
+                                  self.request_type, 
+                                  self.tallies))
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""

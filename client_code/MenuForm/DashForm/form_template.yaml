@@ -1,0 +1,75 @@
+components:
+- type: ColumnPanel
+  properties: {col_widths: '{}'}
+  name: content_panel
+  layout_properties: {slot: default}
+  components:
+  - type: ColumnPanel
+    properties: {role: card, col_widths: '{}'}
+    name: card_1
+    layout_properties: {grid_position: 'APRVOR,LSQCPI'}
+    components:
+    - type: Label
+      properties: {role: headline, align: center, tooltip: '', border: '', foreground: '',
+        visible: true, text: Welcome!, font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: welcome_label
+      layout_properties: {grid_position: 'OCHSTH,EDRVSX'}
+      event_bindings: {}
+    - type: Label
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+        visible: false, text: '', font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: true, background: '', bold: false,
+        underline: false, icon: ''}
+      name: tally_label
+      layout_properties: {grid_position: 'ZZVYCU,HGNPIK'}
+    - type: Label
+      properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
+        visible: true, text: Request an empathy match whenever you're ready., font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
+      name: status_label
+      layout_properties: {grid_position: 'YOJCEM,HURPQL'}
+      event_bindings: {}
+    - type: Button
+      properties: {role: primary-color, align: center, tooltip: Request to be matched with someone to exchange empathy,
+        border: '', enabled: true, foreground: '', visible: true, text: Request Match,
+        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+        italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
+      name: request_button
+      layout_properties: {grid_position: 'KPBDKY,QGKVUW'}
+      event_bindings: {click: request_button_click, show: request_button_show}
+    - type: DropDown
+      properties:
+        role: null
+        align: center
+        tooltip: Indicates whether you are ready to offer empathy first
+        border: ''
+        enabled: true
+        foreground: ''
+        items: [Willing to offer empathy first, Not ready to offer empathy first]
+        visible: true
+        font_size: 14
+        font: ''
+        spacing_above: small
+        spacing_below: small
+        italic: false
+        background: ''
+        bold: false
+        underline: false
+      name: drop_down_1
+      layout_properties: {grid_position: 'QIGTDN,MRMEKU', full_width_row: false}
+      event_bindings: {}
+    event_bindings: {}
+  event_bindings: {}
+- name: timer_2
+  type: Timer
+  properties: {interval: 0}
+  event_bindings: {tick: timer_2_tick}
+container:
+  type: HtmlTemplate
+  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
+    role: null, html: ''}
+  event_bindings: {hide: form_hide, show: form_show}
+is_package: true

@@ -211,6 +211,7 @@ dependency_code:
         \    self.raise_event(\"x_hide\")\n   "
     package_name: ToggleSwitch
     name: Toggle Switch (v0.6 - live)
+    runtime_options: {server_version: python2-sandbox}
     native_deps: {head_html: ''}
     version: 21c99a226eb5b7f9b0dfaa59f5841ba66b517b53
     depending_app: E6HFYSK4HHRI7BTC
