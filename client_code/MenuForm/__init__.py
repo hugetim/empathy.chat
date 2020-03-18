@@ -70,7 +70,7 @@ class MenuForm(MenuFormTemplate):
     self.set_seconds_left(s, sl)
     self.reset_status()
     if self.status == "requesting" and num_emailed > 0:
-      self.emailed_notification(num_emailed).show())  
+      self.emailed_notification(num_emailed).show()
     
   def emailed_notification(self, num):
     """Return Notification (assumes num>0)"""
