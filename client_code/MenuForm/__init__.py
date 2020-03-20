@@ -33,13 +33,13 @@ class MenuForm(MenuFormTemplate):
     self.name = n
     self.test_mode.visible = tm
     self.init_request_em_opts(re, re_opts, re_st)
-    self.pinged_em_check_box.checked = pe
+    self.pinged_em_checked = pe
     self.tallies = tallies
     self.request_type = rt
     self.set_test_link()
     self.set_seconds_left(s, sl)
     self.reset_status()
-    self.timer_2.interval = 1
+    self.timer_2.interval = 5
     
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """Set status and related time variables"""
@@ -80,54 +80,26 @@ class MenuForm(MenuFormTemplate):
     self.reset_status()   
   
   def timer_2_tick(self, **event_args):
-    """This method is called approx. once per second, checking for status changes"""
-    # Run this code approx. once a second
-    if self.status == "requesting":
-      if self.seconds_left <= 0:
-        self.tallies = anvil.server.call('cancel')
-        alert("Request cancelled due to "
-              + h.seconds_to_words(p.WAIT_SECONDS) + " of inactivity.",
-              dismissible=False)
-        self.set_seconds_left(None)
-        self.reset_status()
-    elif self.status == "pinging" and self.seconds_left <= 0:
-      s, sl, self.tallies = anvil.server.call('cancel_other')
-      self.set_seconds_left(s, sl)
-      self.reset_status()
-    if (h.now() - self.last_5sec).seconds > 4.5:
-      # Run this code every 5 seconds
-      self.last_5sec = h.now()
-      if (self.request_em_check_box.checked and self.re_radio_button_fixed.selected
-          and self.pause_hours_update == False):
-        hours_left = h.re_hours(self.request_em_hours, 
-                                self.request_em_set_time)
-        if hours_left <= 0:
-          checked = False
-          self.request_em_check_box.checked = checked
-          self.set_request_em_options(checked)
-          self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
-          s, sl, t, re_st = anvil.server.call_s('set_request_em', checked)
-          self.request_em_set_time = re_st
-          if s != self.status:
-            self.set_seconds_left(s, sl)
-            self.reset_status()
-          if not s:
-            self.tallies = t
-            self.update_tally_label()
-        else:
-          self.text_box_hours.text = "{:.1f}".format(hours_left)
-      if self.status == "requesting":
-        s, sl, self.tallies = anvil.server.call_s('get_status')
+    """This method is called approx. once per 5 seconds"""
+    if (self.request_em_check_box.checked and self.re_radio_button_fixed.selected
+        and self.pause_hours_update == False):
+      hours_left = h.re_hours(self.request_em_hours, 
+                              self.request_em_set_time)
+      if hours_left <= 0:
+        checked = False
+        self.request_em_check_box.checked = checked
+        self.set_request_em_options(checked)
+        self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
+        s, sl, t, re_st = anvil.server.call_s('set_request_em', checked)
+        self.request_em_set_time = re_st
         if s != self.status:
           self.set_seconds_left(s, sl)
           self.reset_status()
-      elif self.status == "pinging":
-        s, sl, self.tallies = anvil.server.call_s('get_status')
-        if s != self.status:
-          self.set_seconds_left(s, sl)
-          if self.status == "requesting":
-            alert("The other empathy request was cancelled.")
-          self.reset_status()
+        if not s:
+          self.tallies = t
+          self.update_tally_label()
+      else:
+        self.text_box_hours.text = "{:.1f}".format(hours_left)
         
   def confirm_wait(self):
     s, sl, self.tallies = anvil.server.call('confirm_wait')
