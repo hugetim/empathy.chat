@@ -16,21 +16,21 @@ class DashForm(DashFormTemplate):
     self.timer_2.interval = 5
     self.top_form = get_open_form()
        
-  def request_button_click(self, **event_args):
-    request_type = self.drop_down_1.selected_value
-    self.remove_from_parent()
-    self.top_form.request_button_click(request_type)
+  def form_show(self, **event_args):
+    """This method is called when the HTML panel is shown on the screen"""
+    self.update_tally_label()
 
   def timer_2_tick(self, **event_args):
     """This method is called every 5 seconds, checking for status changes"""
     # Run this code approx. once a second
     self.tallies = anvil.server.call_s('get_tallies')
-    self.update_tally_label()
-
-  def form_show(self, **event_args):
-    """This method is called when the HTML panel is shown on the screen"""
-    self.update_tally_label()
-
+    self.update_tally_label()    
+    
+  def request_button_click(self, **event_args):
+    request_type = self.drop_down_1.selected_value
+    self.remove_from_parent()
+    self.top_form.request_button_click(request_type)   
+    
   def update_tally_label(self):
     """Update form based on tallies state"""
     if self.tallies['will_offer_first'] == 0 and self.tallies['receive_first'] == 0:

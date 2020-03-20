@@ -37,9 +37,10 @@ components:
         role: null
         align: center
         tooltip: Indicates whether you are ready to offer empathy first
+        placeholder: ''
         border: ''
-        enabled: true
-        foreground: ''
+        enabled: false
+        foreground: gray
         items: [Willing to offer empathy first, Not ready to offer empathy first]
         visible: true
         font_size: 14
@@ -50,6 +51,7 @@ components:
         background: ''
         bold: false
         underline: false
+        include_placeholder: false
       name: drop_down_1
       layout_properties: {grid_position: 'QIGTDN,MRMEKU', full_width_row: false}
       event_bindings: {}

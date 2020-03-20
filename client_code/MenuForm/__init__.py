@@ -6,6 +6,7 @@ import anvil.tz
 from .TimerForm import TimerForm
 from .MyJitsi import MyJitsi
 from .DashForm import DashForm
+from .MatchForm import MatchForm
 from .. import parameters as p
 from .. import helper as h
 import random
@@ -50,7 +51,7 @@ class MenuForm(MenuFormTemplate):
     #print('before status change: ', self.seconds_left)
     self.status = new_status
 
-  def request_button_click(request_type):
+  def request_button_click(self, request_type):
     self.request_type = request_type
     s, sl, num_emailed = anvil.server.call('add_request', self.request_type)
     self.set_seconds_left(s, sl)
@@ -72,19 +73,12 @@ class MenuForm(MenuFormTemplate):
                         title=headline,
                         timeout=10)
 
-  def renew_button_click(self, **event_args):
-    self.confirm_wait()
-
-  def cancel_button_click(self, **event_args):
-    self.set_seconds_left(None)
-    self.tallies = anvil.server.call('cancel')
-    self.reset_status()
-
-  def complete_button_click(self, **event_args):
+  def complete_button_click(self):
     self.set_seconds_left(None)
     self.tallies = anvil.server.call('match_complete')
-    self.reset_status()
-
+    self.test_link.visible = True 
+    self.reset_status()   
+  
   def timer_2_tick(self, **event_args):
     """This method is called approx. once per second, checking for status changes"""
     # Run this code approx. once a second
@@ -134,13 +128,6 @@ class MenuForm(MenuFormTemplate):
           if self.status == "requesting":
             alert("The other empathy request was cancelled.")
           self.reset_status()
-      elif self.status == "matched":
-        old_items = self.chat_repeating_panel.items
-        new_items = anvil.server.call_s('get_messages')
-        if len(new_items) > len(old_items):
-          self.chat_repeating_panel.items = new_items
-          self.call_js('scrollCard')
-          self.chat_display_card.scroll_into_view()
         
   def confirm_wait(self):
     s, sl, self.tallies = anvil.server.call('confirm_wait')
@@ -150,8 +137,6 @@ class MenuForm(MenuFormTemplate):
   def reset_status(self):
     """Update form according to current state variables"""
     if self.status:
-      self.drop_down_1.enabled = False
-      self.drop_down_1.foreground = "gray"
       if self.status == "requesting":
         self.status_label.text = "Status: Requesting an empathy exchange."
         self.note_label.text = ("(Note: When a match becomes available, "
@@ -185,22 +170,16 @@ class MenuForm(MenuFormTemplate):
           self.complete_button.visible = False
         else:
           assert self.status == "matched"
-          self.timer_label.visible = False
-          jitsi_code, request_type = anvil.server.call('get_code')
-          self.status_label.text = "Status: Exchanging Empathy"
-          self.status_label.bold = False
-          self.renew_button.visible = False
-          self.cancel_button.visible = False
-          self.complete_button.visible = True
-          self.set_jitsi_link(jitsi_code)
-          self.note_label.text = "Note: If video does not appear above, try clicking the link below."
-          self.note_label.visible = True
+          self.test_link.visible = False
+          self.content = MatchForm(self.drop_down_1_items, 
+                                   self.request_type)
+          self.add_component(self.content)
         self.pinged_em_check_panel.visible = False
     else:
       self.content = DashForm(self.name,
-                                  self.drop_down_1_items, 
-                                  self.request_type, 
-                                  self.tallies)
+                              self.drop_down_1_items, 
+                              self.request_type, 
+                              self.tallies)
       self.add_component(self.content)
 
   def set_test_link(self):
