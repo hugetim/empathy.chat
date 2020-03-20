@@ -5,11 +5,6 @@ from ... import helper as h
 
 
 class TimerForm(TimerFormTemplate):
-  user_id = None
-  status = None
-  seconds_left = None
-  last_5sec = None
-
   def __init__(self, seconds_left, current_status, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)

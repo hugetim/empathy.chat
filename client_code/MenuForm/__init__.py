@@ -1,34 +1,24 @@
-from ._anvil_designer import MatchFormTemplate
+from ._anvil_designer import MenuFormTemplate
 from anvil import *
 import anvil.server
 import anvil.users
 import anvil.tz
 from .TimerForm import TimerForm
 from .MyJitsi import MyJitsi
+from .DashForm import DashForm
 from .. import parameters as p
 from .. import helper as h
 import random
 
 
-class MatchForm(MatchFormTemplate):
-  tallies = dict(receive_first = 0,
-                 will_offer_first = 0,
-                 request_em = 0)
-  status = None
-  request_em_hours = None
-  request_em_set_time = None
-  pause_hours_update = False
-  jitsi_embed = None
-  last_5sec = None
-  seconds_left = None
-
+class MenuForm(MenuFormTemplate):
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
-    self.drop_down_1.items = (("Willing to offer empathy first","will_offer_first"),
+    self.drop_down_1_items = (("Willing to offer empathy first","will_offer_first"),
                               ("Not ready to offer empathy first","receive_first"))
     tm, re, re_opts, re_st, pe, rt, s, sl, tallies, e, n = anvil.server.call('init')
     if e == False:
@@ -39,18 +29,15 @@ class MatchForm(MatchFormTemplate):
             dismissible=False)
     elif e == True:
       alert("Welcome, " + n + "!")
-    elif n:
-      self.welcome_label.text = "Hi, " + n + "!"
+    self.name = n
     self.test_mode.visible = tm
     self.init_request_em_opts(re, re_opts, re_st)
     self.pinged_em_check_box.checked = pe
     self.tallies = tallies
-    self.drop_down_1.selected_value = rt
-    self.jitsi_embed = None
+    self.request_type = rt
     self.set_test_link()
     self.set_seconds_left(s, sl)
     self.reset_status()
-    self.timer_1.interval = 1
     self.timer_2.interval = 1
     
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
@@ -62,15 +49,15 @@ class MatchForm(MatchFormTemplate):
         self.seconds_left = max(self.seconds_left, p.BUFFER_SECONDS)
     #print('before status change: ', self.seconds_left)
     self.status = new_status
-    
-  def request_button_click(self, **event_args):
-    request_type = self.drop_down_1.selected_value
-    s, sl, num_emailed = anvil.server.call('add_request', request_type)
+
+  def request_button_click(request_type):
+    self.request_type = request_type
+    s, sl, num_emailed = anvil.server.call('add_request', self.request_type)
     self.set_seconds_left(s, sl)
     self.reset_status()
     if self.status == "requesting" and num_emailed > 0:
       self.emailed_notification(num_emailed).show()
-
+    
   def emailed_notification(self, num):
     """Return Notification (assumes num>0)"""
     if num == 1:
@@ -97,18 +84,6 @@ class MatchForm(MatchFormTemplate):
     self.set_seconds_left(None)
     self.tallies = anvil.server.call('match_complete')
     self.reset_status()
-
-  def timer_1_tick(self, **event_args):
-    """This method is called once per second, updating countdowns"""
-    if self.status == "requesting" and self.seconds_left > 0:
-      self.seconds_left -= 1
-      self.timer_label.text = ("Your request will expire in:  "
-                               + h.seconds_to_digital(self.seconds_left) )
-    elif self.status == "pinging" and self.seconds_left > 0:
-      self.seconds_left -= 1
-      self.status_label.text = ("Potential match available. Time left for them "
-                                + "to confirm:  "
-                                + h.seconds_to_digital(self.seconds_left))
 
   def timer_2_tick(self, **event_args):
     """This method is called approx. once per second, checking for status changes"""
@@ -159,9 +134,6 @@ class MatchForm(MatchFormTemplate):
           if self.status == "requesting":
             alert("The other empathy request was cancelled.")
           self.reset_status()
-      elif self.status is None:
-        self.tallies = anvil.server.call_s('get_tallies')
-        self.update_tally_label()
       elif self.status == "matched":
         old_items = self.chat_repeating_panel.items
         new_items = anvil.server.call_s('get_messages')
@@ -175,42 +147,11 @@ class MatchForm(MatchFormTemplate):
     self.set_seconds_left(s, sl)
     self.reset_status()
 
-  def confirm_match(self, seconds):
-    f = TimerForm(seconds, self.status)
-    out = alert(content=f,
-                title="A match is available. Are you ready?",
-                large=False,
-                dismissible=False,
-                buttons=[("Yes", True), ("No", False)])
-    if out == True:
-      self.status = "matched"
-      s, sl, self.tallies = anvil.server.call('match_commenced')
-      self.set_seconds_left(s, sl)
-    elif out in [False, "timer elapsed"]:
-      self.tallies = anvil.server.call('cancel')
-      self.set_seconds_left(None)
-      if out == "timer elapsed":
-        alert("A match was found, but the time available for you to confirm ("
-              + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
-              dismissible=False)
-    elif out is None:
-      self.tallies = anvil.server.call_s('get_tallies')
-      self.set_seconds_left(None)
-    else:
-      print(out)
-      assert out == "requesting"
-      s, sl, self.tallies = anvil.server.call_s('get_status')
-      self.set_seconds_left(s, sl)
-    self.reset_status()
-
   def reset_status(self):
     """Update form according to current state variables"""
     if self.status:
-      self.welcome_label.visible = False
-      self.request_button.visible = False
       self.drop_down_1.enabled = False
       self.drop_down_1.foreground = "gray"
-      self.tally_label.visible = False
       if self.status == "requesting":
         self.status_label.text = "Status: Requesting an empathy exchange."
         self.note_label.text = ("(Note: When a match becomes available, "
@@ -256,69 +197,11 @@ class MatchForm(MatchFormTemplate):
           self.note_label.visible = True
         self.pinged_em_check_panel.visible = False
     else:
-      self.welcome_label.visible = True
-      self.status_label.text = "Request an empathy match whenever you're ready."
-      self.status_label.bold = False
-      self.set_jitsi_link("")
-      self.timer_label.visible = False
-      self.complete_button.visible = False
-      self.renew_button.visible = False
-      self.cancel_button.visible = False
-      self.request_button.visible = True
-      self.drop_down_1.enabled = True
-      self.drop_down_1.foreground = "black"
-      self.pinged_em_check_panel.visible = False
-      self.update_tally_label()
-
-  def update_tally_label(self):
-    """Update form based on tallies state"""
-    if self.tallies['will_offer_first'] == 0 and self.tallies['receive_first'] == 0:
-      self.tally_label.font_size = 12
-    else:
-      self.tally_label.font_size = None
-    self.tally_label.text = h.tally_text(self.tallies)
-    if len(self.tally_label.text) > 0:
-      self.tally_label.visible = True
-      self.note_label.text = ""
-      self.note_label.visible = False
-    else:
-      self.tally_label.visible = False
-      if self.request_em_check_box.checked:
-        self.note_label.text = ""
-        self.note_label.visible = False
-      else:
-        self.note_label.text = "Note: In the Settings menu (upper left), you can opt-in to receive an email notification when someone else requests empathy."
-        self.note_label.visible = True
-      
-  def set_jitsi_link(self, jitsi_code):
-    """Initialize or destroy embedded Jitsi Meet instance"""
-    if jitsi_code == "":
-      self.jitsi_column_panel.visible = False
-      if self.jitsi_embed:
-        self.jitsi_embed.remove_from_parent()
-        self.jitsi_embed = None
-      self.chat_display_card.visible = False
-      self.chat_send_card.visible = False
-      self.jitsi_link.visible = False
-      self.jitsi_link.text = ""
-      self.jitsi_link.url = ""
-      self.test_link.visible = True
-    else:
-      self.jitsi_link.url = "https://meet.jit.si/" + jitsi_code
-      self.jitsi_link.text = jitsi_code
-      self.jitsi_link.visible = True
-      if not self.jitsi_embed:
-        self.jitsi_embed = MyJitsi(jitsi_code)
-        self.jitsi_column_panel.add_component(self.jitsi_embed)
-      self.jitsi_column_panel.visible = True
-      self.test_link.visible = False
-      self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
-      self.chat_display_card.visible = True
-      self.chat_send_card.visible = True
-
-  def chat_display_card_show(self, **event_args):
-    """This method is called when the column panel is shown on the screen"""
-    self.call_js('scrollCard')
+      self.content = DashForm(self.name,
+                                  self.drop_down_1_items, 
+                                  self.request_type, 
+                                  self.tallies)
+      self.add_component(self.content)
 
   def set_test_link(self):
     num_chars = 4
@@ -338,14 +221,6 @@ class MatchForm(MatchFormTemplate):
   def logout_user(self):
     anvil.users.logout()
     open_form('LoginForm')
-
-  def pinged_em_check_box_change(self, **event_args):
-    """This method is called when this checkbox is checked or unchecked"""
-    checked = self.pinged_em_check_box.checked
-    s, sl, t = anvil.server.call('set_pinged_em', checked)
-    self.set_seconds_left(s, sl)
-    self.tallies = t
-    self.reset_status()
 
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
@@ -432,12 +307,6 @@ class MatchForm(MatchFormTemplate):
 
   def text_box_hours_focus(self, **event_args):
     self.pause_hours_update = True
-
-  def message_textbox_pressed_enter(self, **event_args):
-    temp = anvil.server.call('add_message', message=self.message_textbox.text)
-    self.message_textbox.text = ""
-    self.chat_repeating_panel.items = temp
-    self.call_js('scrollCard')
     
   def test_mode_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
