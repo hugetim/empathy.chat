@@ -141,10 +141,7 @@ class MenuForm(MenuFormTemplate):
           self.complete_button.visible = False
         else:
           assert self.status == "matched"
-          self.test_link.visible = False
-          self.content = MatchForm(self.drop_down_1_items, 
-                                   self.request_type)
-          self.add_component(self.content)
+          nav.go_match(self)
         self.pinged_em_check_panel.visible = False
     else:
       nav.go_dash(self) 
