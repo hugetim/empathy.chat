@@ -147,12 +147,12 @@ class MenuForm(MenuFormTemplate):
           self.add_component(self.content)
         self.pinged_em_check_panel.visible = False
     else:
-      nav.go_dash()
-      self.content = DashForm(self.name,
-                              self.drop_down_1_items, 
-                              self.request_type, 
-                              self.tallies)
-      self.add_component(self.content)    
+      nav.go_dash(self) 
+
+  def load_component(self, content):
+    self.content = content
+    self.column_panel_content.clear()
+    self.column_panel_content.add_component(self.content)  
       
   def set_test_link(self):
     num_chars = 4
