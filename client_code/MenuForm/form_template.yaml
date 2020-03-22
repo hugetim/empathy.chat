@@ -318,4 +318,9 @@ components:
   type: Timer
   properties: {interval: 0}
   event_bindings: {tick: timer_1_tick}
+- type: ColumnPanel
+  properties: {}
+  name: column_panel_content
+  layout_properties: {slot: default}
+  event_bindings: {}
 is_package: true

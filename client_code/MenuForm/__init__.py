@@ -5,8 +5,7 @@ import anvil.users
 import anvil.tz
 from .TimerForm import TimerForm
 from .MyJitsi import MyJitsi
-from .DashForm import DashForm
-from .MatchForm import MatchForm
+from .. import navigation as nav
 from .. import parameters as p
 from .. import helper as h
 import random
@@ -148,12 +147,13 @@ class MenuForm(MenuFormTemplate):
           self.add_component(self.content)
         self.pinged_em_check_panel.visible = False
     else:
+      nav.go_dash()
       self.content = DashForm(self.name,
                               self.drop_down_1_items, 
                               self.request_type, 
                               self.tallies)
-      self.add_component(self.content)
-
+      self.add_component(self.content)    
+      
   def set_test_link(self):
     num_chars = 4
     charset = "abcdefghijkmnopqrstuvwxyz23456789"
