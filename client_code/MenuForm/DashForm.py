@@ -14,10 +14,10 @@ class DashForm(DashFormTemplate):
     self.drop_down_1.selected_value = rt
     self.tallies = tallies
     self.timer_2.interval = 5
-    self.top_form = get_open_form()
        
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
+    self.top_form = get_open_form()
     self.update_tally_label()
 
   def timer_2_tick(self, **event_args):
@@ -28,7 +28,6 @@ class DashForm(DashFormTemplate):
     
   def request_button_click(self, **event_args):
     request_type = self.drop_down_1.selected_value
-    self.remove_from_parent()
     self.top_form.request_button_click(request_type)   
     
   def update_tally_label(self):
@@ -44,7 +43,7 @@ class DashForm(DashFormTemplate):
       self.note_label.visible = False
     else:
       self.tally_label.visible = False
-      if self.request_em_check_box.checked:
+      if self.top_form.request_em_check_box.checked:
         self.note_label.text = ""
         self.note_label.visible = False
       else:

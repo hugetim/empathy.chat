@@ -2,8 +2,8 @@ from ._anvil_designer import WaitFormTemplate
 from anvil import *
 import anvil.server
 from .TimerForm import TimerForm
-from .. import parameters as p
-from .. import helper as h
+from ... import parameters as p
+from ... import helper as h
 
 
 class WaitForm(WaitFormTemplate):
@@ -16,8 +16,34 @@ class WaitForm(WaitFormTemplate):
     self.pinged_em_check_box.checked = pe
     self.timer_1.interval = 1
     self.timer_2.interval = 1
-    self.top_form = get_open_form()
 
+  def form_show(self, **event_args):
+    """This method is called when the HTML panel is shown on the screen"""
+    self.top_form = get_open_form()
+    if self.top_form.status == "requesting":
+      self.status_label.text = "Status: Requesting an empathy exchange."
+      self.note_label.text = ("(Note: When a match becomes available, "
+                              + "you will have "
+                              + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS)
+                              + " to confirm the match.)")
+      self.note_label.visible = True
+      self.timer_label.text = ("Your request will expire in:  "
+                                 + h.seconds_to_digital(self.top_form.seconds_left) )
+      self.timer_label.visible = True
+      self.renew_button.visible = True
+      self.pinged_em_check_panel.visible = True
+    else:
+      if self.top_form.status == "pinged":
+        return self.confirm_match(self.top_form.seconds_left)
+      assert self.top_form.status == "pinging"
+      self.status_label.text = ("A potential match is available. They have "
+                                + "this long to confirm they are ready:  "
+                                + h.seconds_to_digital(self.top_form.seconds_left))
+      self.note_label.visible = False
+      self.timer_label.visible = False
+      self.renew_button.visible = False
+      self.pinged_em_check_panel.visible = False
+    
   def renew_button_click(self, **event_args):
     self.top_form.confirm_wait()
 
@@ -32,7 +58,7 @@ class WaitForm(WaitFormTemplate):
     if self.top_form.status == "requesting" and self.top_form.seconds_left > 0:
       self.top_form.seconds_left -= 1
       self.timer_label.text = ("Your request will expire in:  "
-                               + h.seconds_to_digital(self.seconds_left) )
+                               + h.seconds_to_digital(self.top_form.seconds_left) )
     elif self.top_form.status == "pinging" and self.top_form.seconds_left > 0:
       self.top_form.seconds_left -= 1
       self.status_label.text = ("Potential match available. Time left for them "
@@ -42,33 +68,33 @@ class WaitForm(WaitFormTemplate):
   def timer_2_tick(self, **event_args):
     """This method is called approx. once per second, checking for status changes"""
     # Run this code approx. once a second
-    if self.status == "requesting":
-      if self.seconds_left <= 0:
-        self.tallies = anvil.server.call('cancel')
+    if self.top_form.status == "requesting":
+      if self.top_form.seconds_left <= 0:
+        self.top_form.tallies = anvil.server.call('cancel')
         alert("Request cancelled due to "
               + h.seconds_to_words(p.WAIT_SECONDS) + " of inactivity.",
               dismissible=False)
-        self.set_seconds_left(None)
-        self.reset_status()
-    elif self.status == "pinging" and self.seconds_left <= 0:
-      s, sl, self.tallies = anvil.server.call('cancel_other')
-      self.set_seconds_left(s, sl)
-      self.reset_status()
-    if (h.now() - self.last_5sec).seconds > 4.5:
+        self.top_form.set_seconds_left(None)
+        self.top_form.reset_status()
+    elif self.top_form.status == "pinging" and self.top_form.seconds_left <= 0:
+      s, sl, self.top_form.tallies = anvil.server.call('cancel_other')
+      self.top_form.set_seconds_left(s, sl)
+      self.top_form.reset_status()
+    if (h.now() - self.top_form.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
-      self.last_5sec = h.now()
-      if self.status == "requesting":
-        s, sl, self.tallies = anvil.server.call_s('get_status')
-        if s != self.status:
-          self.set_seconds_left(s, sl)
-          self.reset_status()
-      elif self.status == "pinging":
-        s, sl, self.tallies = anvil.server.call_s('get_status')
-        if s != self.status:
-          self.set_seconds_left(s, sl)
-          if self.status == "requesting":
+      self.top_form.last_5sec = h.now()
+      if self.top_form.status == "requesting":
+        s, sl, self.top_form.tallies = anvil.server.call_s('get_status')
+        if s != self.top_form.status:
+          self.top_form.set_seconds_left(s, sl)
+          self.top_form.reset_status()
+      elif self.top_form.status == "pinging":
+        s, sl, self.top_form.tallies = anvil.server.call_s('get_status')
+        if s != self.top_form.status:
+          self.top_form.set_seconds_left(s, sl)
+          if self.top_form.status == "requesting":
             alert("The other empathy request was cancelled.")
-          self.reset_status()    
+          self.top_form.reset_status()    
       
   def confirm_match(self, seconds):
     f = TimerForm(seconds, self.top_form.status)
@@ -80,7 +106,7 @@ class WaitForm(WaitFormTemplate):
     s = None
     sl = None
     if out == True:
-      self.top_form.status = "matched"
+      #self.top_form.status = "matched"
       s, sl, t = anvil.server.call('match_commenced')
     elif out in [False, "timer elapsed"]:
       t = anvil.server.call('cancel')
@@ -104,8 +130,8 @@ class WaitForm(WaitFormTemplate):
     
   def reset_status(self, s, sl, t):
     """Reset WaitForm status, removing from parent if needed"""
+    old_status = self.top_form.status
     self.top_form.set_seconds_left(s, sl)
     self.top_form.tallies = t
-    if self.top_form.status not in ["requesting", "pinging"]:
-      self.remove_from_parent()
+    if old_status != s:
       self.top_form.reset_status()

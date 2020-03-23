@@ -3,8 +3,6 @@ from anvil import *
 import anvil.server
 import anvil.users
 import anvil.tz
-from .TimerForm import TimerForm
-from .MyJitsi import MyJitsi
 from .. import navigation as nav
 from .. import parameters as p
 from .. import helper as h
@@ -75,7 +73,6 @@ class MenuForm(MenuFormTemplate):
   def complete_button_click(self):
     self.set_seconds_left(None)
     self.tallies = anvil.server.call('match_complete')
-    self.test_link.visible = True 
     self.reset_status()   
   
   def timer_2_tick(self, **event_args):
@@ -95,8 +92,8 @@ class MenuForm(MenuFormTemplate):
           self.set_seconds_left(s, sl)
           self.reset_status()
         if not s:
-          self.tallies = t
-          self.update_tally_label()
+          self.content.tallies = t
+          self.content.update_tally_label()
       else:
         self.text_box_hours.text = "{:.1f}".format(hours_left)
         
@@ -107,43 +104,12 @@ class MenuForm(MenuFormTemplate):
 
   def reset_status(self):
     """Update form according to current state variables"""
-    if self.status:
-      if self.status == "requesting":
-        self.status_label.text = "Status: Requesting an empathy exchange."
-        self.note_label.text = ("(Note: When a match becomes available, "
-                                + "you will have "
-                                + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS)
-                                + " to confirm the match.)")
-        self.note_label.visible = True
-        self.status_label.bold = False
-        self.set_jitsi_link("")
-        self.timer_label.text = ("Your request will expire in:  "
-                                 + h.seconds_to_digital(self.seconds_left) )
-        self.timer_label.visible = True
-        self.complete_button.visible = False
-        self.renew_button.visible = True
-        self.cancel_button.visible = True
-        self.pinged_em_check_panel.visible = True
-      else:
-        if self.status == "pinged":
-          return self.confirm_match(self.seconds_left)
-        assert self.status in ["pinging", "matched"]
-        if self.status == "pinging":
-          self.status_label.text = ("A potential match is available. They have "
-                                    + "this long to confirm they are ready:  "
-                                    + h.seconds_to_digital(self.seconds_left))
-          self.set_jitsi_link("")
-          self.timer_label.visible = False
-          self.note_label.visible = False
-          self.status_label.bold = False
-          self.renew_button.visible = False
-          self.cancel_button.visible = True
-          self.complete_button.visible = False
-        else:
-          assert self.status == "matched"
-          nav.go_match(self)
-        self.pinged_em_check_panel.visible = False
+    if self.status in ["requesting", "pinged", "pinging"]:
+        nav.go_wait(self)
+    elif self.status == "matched":
+        nav.go_match(self)
     else:
+      assert not self.status
       nav.go_dash(self) 
 
   def load_component(self, content):
@@ -195,6 +161,7 @@ class MenuForm(MenuFormTemplate):
 
   def init_request_em_opts(self, re, re_opts, re_st):
     """Initialize to saved request_em option values"""
+    self.pause_hours_update = True
     self.request_em_check_box.checked = re
     self.request_em_hours = re_opts["hours"]
     self.request_em_set_time = re_st
@@ -208,6 +175,7 @@ class MenuForm(MenuFormTemplate):
       hours_left = self.request_em_hours
     self.set_request_em_options(re)
     self.text_box_hours.text = "{:.1f}".format(hours_left)
+    self.pause_hours_update = False
 
   def re_radio_button_indef_clicked(self, **event_args):
     fixed = False

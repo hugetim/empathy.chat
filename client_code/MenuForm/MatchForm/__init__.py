@@ -12,11 +12,11 @@ class MatchForm(MatchFormTemplate):
     self.drop_down_1.items = dd_items
     self.drop_down_1.selected_value = rt
     self.jitsi_embed = None
-    self.top_form = get_open_form()
     self.timer_2.interval = 5
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
+    self.top_form = get_open_form()
     jitsi_code, request_type = anvil.server.call('get_code')
     self.set_jitsi_link(jitsi_code)    
       
@@ -53,5 +53,4 @@ class MatchForm(MatchFormTemplate):
     self.call_js('scrollCard')
 
   def complete_button_click(self, **event_args):
-    self.remove_from_parent()
-    self.top_form.request_button_click(request_type)
+    self.top_form.complete_button_click()
