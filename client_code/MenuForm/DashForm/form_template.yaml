@@ -76,7 +76,7 @@ components:
             foreground: 'theme:White', visible: true, text: Trust Level, font_size: null,
             wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
             icon_align: right, col_widths: '', spacing_below: small, italic: false,
-            background: '', bold: true, underline: false, icon: 'fa:sort-amount-desc'}
+            background: '', bold: true, underline: false, icon: ''}
           name: link_trust
           layout_properties: {column: OCJIRI}
           event_bindings: {}
@@ -85,7 +85,7 @@ components:
             foreground: 'theme:White', visible: true, text: Start Time, font_size: null,
             wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
             icon_align: right, col_widths: '', spacing_below: small, italic: false,
-            background: '', bold: true, underline: false, icon: ''}
+            background: '', bold: true, underline: false, icon: 'fa:sort-desc'}
           name: link_start_time
           layout_properties: {column: ABFKML}
           event_bindings: {}
