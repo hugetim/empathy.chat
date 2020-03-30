@@ -24,13 +24,22 @@ components:
         underline: false, icon: ''}
       name: tally_label
       layout_properties: {grid_position: 'ZZVYCU,HGNPIK'}
+      event_bindings: {}
     - type: Label
       properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-        visible: true, text: Request an empathy match whenever you're ready., font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+        visible: true, text: You can accept an existing proposal for an empathy chat or propose your own.,
+        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+        italic: false, background: '', bold: false, underline: false, icon: ''}
       name: status_label
-      layout_properties: {grid_position: 'YOJCEM,HURPQL'}
+      layout_properties: {grid_position: 'HRKHPF,FQQXFA'}
+      event_bindings: {}
+    - type: Label
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+        visible: false, text: '', font_size: 12, font: '', spacing_above: small, icon_align: left,
+        spacing_below: none, italic: true, background: '', bold: false, underline: false,
+        icon: ''}
+      name: note_label
+      layout_properties: {grid_position: 'ENNGMB,TQOWQX'}
       event_bindings: {}
     - type: DataGrid
       properties:
@@ -106,42 +115,13 @@ components:
         event_bindings: {}
       event_bindings: {}
     - type: Button
-      properties: {role: primary-color, align: center, tooltip: Request to be matched with someone to exchange empathy,
-        border: '', enabled: true, foreground: '', visible: true, text: Request Match,
+      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time,
+        border: '', enabled: true, foreground: '', visible: true, text: Propose a New Empathy Chat,
         font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
         italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
       name: request_button
       layout_properties: {grid_position: 'KPBDKY,QGKVUW'}
       event_bindings: {click: request_button_click, show: request_button_show}
-    - type: DropDown
-      properties:
-        role: null
-        align: center
-        tooltip: Indicates whether you are ready to offer empathy first
-        border: ''
-        enabled: true
-        foreground: ''
-        items: [Willing to offer empathy first, Not ready to offer empathy first]
-        visible: true
-        font_size: 14
-        font: ''
-        spacing_above: small
-        spacing_below: small
-        italic: false
-        background: ''
-        bold: false
-        underline: false
-      name: drop_down_1
-      layout_properties: {grid_position: 'QIGTDN,MRMEKU', full_width_row: false}
-      event_bindings: {}
-    - type: Label
-      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-        visible: false, text: '', font_size: 12, font: '', spacing_above: small, icon_align: left,
-        spacing_below: none, italic: true, background: '', bold: false, underline: false,
-        icon: ''}
-      name: note_label
-      layout_properties: {grid_position: 'WOLXYM,FPKEGW'}
-      event_bindings: {}
     event_bindings: {}
   event_bindings: {}
 - name: timer_2
