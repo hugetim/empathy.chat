@@ -109,7 +109,7 @@ components:
           event_bindings: {}
         event_bindings: {}
       - type: RepeatingPanel
-        properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.DashForm.RowTemplate1}
+        properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.DashForm.ProposalRowTemplate}
         name: repeating_panel_1
         layout_properties: {}
         event_bindings: {}
