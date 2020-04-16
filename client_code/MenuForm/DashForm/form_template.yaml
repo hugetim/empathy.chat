@@ -45,11 +45,11 @@ components:
       properties:
         role: null
         columns:
-        - {title: Column 1, id: LRZCRL, data_key: name}
-        - {width: 107, title: Column 3, id: ABFKML, data_key: start_time, expand: false}
-        - {width: '', title: Column 4, id: YUYJUP, data_key: duration, expand: false}
-        - {width: '', title: Column 2, id: OCJIRI, data_key: type, expand: false}
-        - {title: Column 5, id: PHQQNP, data_key: buttons}
+        - {title: User(s), id: LRZCRL, data_key: users}
+        - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false}
+        - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false}
+        - {width: '', title: Type, id: OCJIRI, data_key: type, expand: false}
+        - {title: '', id: PHQQNP, data_key: buttons}
         auto_header: false
         tooltip: ''
         border: ''
@@ -77,7 +77,7 @@ components:
             wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
             icon_align: right, col_widths: '', spacing_below: small, italic: false,
             background: '', bold: true, underline: false, icon: ''}
-          name: link_name
+          name: link_users
           layout_properties: {column: LRZCRL}
           event_bindings: {}
         - type: Link
@@ -94,7 +94,7 @@ components:
             foreground: 'theme:White', visible: true, text: Start Time, font_size: null,
             wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
             icon_align: right, col_widths: '', spacing_below: small, italic: false,
-            background: '', bold: true, underline: false, icon: 'fa:sort-desc'}
+            background: '', bold: true, underline: false, icon: ''}
           name: link_start_time
           layout_properties: {column: ABFKML}
           event_bindings: {}
