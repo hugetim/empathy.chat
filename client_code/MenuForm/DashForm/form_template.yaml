@@ -46,9 +46,9 @@ components:
         role: null
         columns:
         - {title: Column 1, id: LRZCRL, data_key: name}
-        - {width: 118, title: Column 2, id: OCJIRI, data_key: trust_level, expand: false}
-        - {title: Column 3, id: ABFKML, data_key: start_time}
-        - {width: 77, title: Column 4, id: YUYJUP, data_key: length, expand: false}
+        - {width: 107, title: Column 3, id: ABFKML, data_key: start_time, expand: false}
+        - {width: '', title: Column 4, id: YUYJUP, data_key: duration, expand: false}
+        - {width: '', title: Column 2, id: OCJIRI, data_key: type, expand: false}
         - {title: Column 5, id: PHQQNP, data_key: buttons}
         auto_header: false
         tooltip: ''
@@ -82,7 +82,7 @@ components:
           event_bindings: {}
         - type: Link
           properties: {role: null, url: '', align: left, tooltip: '', border: '',
-            foreground: 'theme:White', visible: true, text: Trust Level, font_size: null,
+            foreground: 'theme:White', visible: true, text: Type, font_size: null,
             wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
             icon_align: right, col_widths: '', spacing_below: small, italic: false,
             background: '', bold: true, underline: false, icon: ''}
@@ -100,11 +100,11 @@ components:
           event_bindings: {}
         - type: Link
           properties: {role: null, url: '', align: left, tooltip: '', border: '',
-            foreground: 'theme:White', visible: true, text: Length, font_size: null,
+            foreground: 'theme:White', visible: true, text: Duration, font_size: null,
             wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
             icon_align: right, col_widths: '', spacing_below: small, italic: false,
             background: '', bold: true, underline: false, icon: ''}
-          name: link_length
+          name: link_duration
           layout_properties: {column: YUYJUP}
           event_bindings: {}
         event_bindings: {}
