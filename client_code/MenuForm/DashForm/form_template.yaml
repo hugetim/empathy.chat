@@ -48,7 +48,7 @@ components:
         - {title: User(s), id: LRZCRL, data_key: users}
         - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false}
         - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false}
-        - {width: '', title: Type, id: OCJIRI, data_key: type, expand: false}
+        - {width: '0', title: Type, id: OCJIRI, data_key: type, expand: false}
         - {title: '', id: PHQQNP, data_key: buttons}
         auto_header: false
         tooltip: ''
