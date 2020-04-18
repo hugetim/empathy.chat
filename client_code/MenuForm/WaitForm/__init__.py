@@ -7,12 +7,10 @@ from ... import helper as h
 
 
 class WaitForm(WaitFormTemplate):
-  def __init__(self, dd_items, rt, pe, **properties):
+  def __init__(self, pe, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     #
-    self.drop_down_1.items = dd_items
-    self.drop_down_1.selected_value = rt
     self.pinged_em_check_box.checked = pe
     self.timer_1.interval = 1
     self.timer_2.interval = 1

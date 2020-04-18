@@ -16,8 +16,6 @@ class MenuForm(MenuFormTemplate):
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
-    self.drop_down_1_items = (("Willing to offer empathy first","will_offer_first"),
-                              ("Not ready to offer empathy first","receive_first"))
     tm, re, re_opts, re_st, pe, rt, s, sl, tallies, e, n = anvil.server.call('init')
     if e == False:
       alert('This account is not yet authorized to match with other users. '

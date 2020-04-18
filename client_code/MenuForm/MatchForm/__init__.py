@@ -5,12 +5,10 @@ from .MyJitsi import MyJitsi
 
 
 class MatchForm(MatchFormTemplate):
-  def __init__(self, dd_items, rt, **properties):
+  def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     #
-    self.drop_down_1.items = dd_items
-    self.drop_down_1.selected_value = rt
     self.jitsi_embed = None
     self.timer_2.interval = 5
 

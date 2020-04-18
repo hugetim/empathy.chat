@@ -4,14 +4,12 @@ import anvil.server
 
 
 class DashForm(DashFormTemplate):
-  def __init__(self, name, dd_items, rt, tallies, **properties):
+  def __init__(self, name, tallies, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
     if name:
       self.welcome_label.text = "Hi, " + name + "!"
-    self.drop_down_1.items = dd_items
-    self.drop_down_1.selected_value = rt
     self.tallies = tallies
     self.timer_2.interval = 5
        
