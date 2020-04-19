@@ -1,6 +1,7 @@
 from ._anvil_designer import DashFormTemplate
 from anvil import *
 import anvil.server
+from .CreateForm import CreateForm
 
 
 class DashForm(DashFormTemplate):
@@ -23,10 +24,6 @@ class DashForm(DashFormTemplate):
     # Run this code approx. once a second
     self.tallies = anvil.server.call_s('get_tallies')
     self.update_tally_label()    
-    
-  def request_button_click(self, **event_args):
-    request_type = self.drop_down_1.selected_value
-    self.top_form.request_button_click(request_type)   
     
   def update_tally_label(self):
     """Update form based on tallies state"""
@@ -102,3 +99,15 @@ class DashForm(DashFormTemplate):
                    + 'about each request for empathy.')
     return text
     
+
+  def propose_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    f = CreateForm()
+    out = alert(content=f,
+                title="New Empathy Chat Proposal",
+                large=True,
+                dismissible=False,
+                buttons=[("OK", True), ("Cancel", False)])
+
+
+

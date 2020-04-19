@@ -48,7 +48,6 @@ components:
         - {title: User(s), id: LRZCRL, data_key: users}
         - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false}
         - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false}
-        - {width: '', title: Type, id: OCJIRI, data_key: type, expand: false}
         - {title: '', id: PHQQNP, data_key: buttons}
         auto_header: false
         tooltip: ''
@@ -82,15 +81,6 @@ components:
           event_bindings: {}
         - type: Link
           properties: {role: null, url: '', align: left, tooltip: '', border: '',
-            foreground: 'theme:White', visible: true, text: Type, font_size: null,
-            wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
-            icon_align: right, col_widths: '', spacing_below: small, italic: false,
-            background: '', bold: true, underline: false, icon: ''}
-          name: link_trust
-          layout_properties: {column: OCJIRI}
-          event_bindings: {}
-        - type: Link
-          properties: {role: null, url: '', align: left, tooltip: '', border: '',
             foreground: 'theme:White', visible: true, text: Start Time, font_size: null,
             wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
             icon_align: right, col_widths: '', spacing_below: small, italic: false,
@@ -119,9 +109,9 @@ components:
         border: '', enabled: true, foreground: '', visible: true, text: Propose a New Empathy Chat,
         font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
         italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
-      name: request_button
+      name: propose_button
       layout_properties: {grid_position: 'KPBDKY,QGKVUW'}
-      event_bindings: {click: request_button_click, show: request_button_show}
+      event_bindings: {click: propose_button_click}
     event_bindings: {}
   event_bindings: {}
 - name: timer_2

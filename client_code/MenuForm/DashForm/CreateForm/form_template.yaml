@@ -1,5 +1,187 @@
 container:
   type: ColumnPanel
   event_bindings: {}
-components: []
+  properties: {col_widths: '{}'}
+components:
+- type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
+    background: ''}
+  name: column_panel_1
+  layout_properties: {grid_position: 'HYVJID,XFGHDE'}
+  components:
+  - type: FlowPanel
+    properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
+    name: flow_panel_1
+    layout_properties: {grid_position: 'XLEYVN,SISVEV'}
+    components:
+    - type: ColumnPanel
+      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+        wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
+        spacing_below: small, background: ''}
+      name: column_panel_2
+      layout_properties: {width: 220}
+      components:
+      - type: Label
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+          visible: true, text: Start Time, font_size: null, font: '', spacing_above: small,
+          icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
+          underline: false, icon: ''}
+        name: label_1
+        layout_properties: {grid_position: 'SJMSJV,QPOZGU'}
+      - type: DropDown
+        properties:
+          role: null
+          align: full
+          tooltip: ''
+          placeholder: ''
+          border: ''
+          enabled: true
+          foreground: ''
+          items: [now, later]
+          visible: true
+          font_size: null
+          font: ''
+          spacing_above: small
+          spacing_below: small
+          italic: false
+          background: theme:Gray 200
+          bold: false
+          underline: false
+          include_placeholder: false
+        name: drop_down_1
+        layout_properties: {grid_position: 'QUHZRK,QHQAFR'}
+      - type: DatePicker
+        properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
+          placeholder: '', border: '', enabled: true, foreground: '', visible: false,
+          font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
+          date: '', min_date: '', background: '', bold: false, underline: false, format: ''}
+        name: date_picker_1
+        layout_properties: {grid_position: 'IZJUVQ,OAWYPD'}
+      event_bindings: {}
+    - type: ColumnPanel
+      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+        wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
+        spacing_below: small, background: ''}
+      name: column_panel_3
+      layout_properties: {width: 155}
+      components:
+      - type: Label
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+          visible: true, text: Duration, font_size: null, font: '', spacing_above: small,
+          icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
+          underline: false, icon: ''}
+        name: label_2
+        layout_properties: {grid_position: 'BUYRWB,YJMNFL'}
+      - type: DropDown
+        properties:
+          role: null
+          align: full
+          tooltip: ''
+          placeholder: ''
+          border: ''
+          enabled: true
+          foreground: ''
+          items: [15 min. (5 & 5), 25 min. (10 & 10), 35 min. (15 & 15), 45 min. (20 & 20),
+            55 min. (25 & 25), 65 min. (30 & 30)]
+          visible: true
+          font_size: null
+          font: ''
+          spacing_above: small
+          spacing_below: small
+          italic: false
+          background: theme:Gray 200
+          bold: false
+          underline: false
+          include_placeholder: false
+        name: drop_down_2
+        layout_properties: {grid_position: 'RPAKJT,YAYJAQ'}
+        event_bindings: {}
+      event_bindings: {}
+    - type: ColumnPanel
+      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+        wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
+        spacing_below: small, background: ''}
+      name: column_panel_4
+      layout_properties: {width: 220}
+      components:
+      - type: Label
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+          visible: true, text: 'Cancel if not accepted by:', font_size: null, font: '',
+          spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+          background: '', bold: true, underline: false, icon: ''}
+        name: label_3
+        layout_properties: {grid_position: 'WBOYUJ,FOOOUW'}
+      - type: DropDown
+        properties:
+          role: null
+          align: full
+          tooltip: ''
+          placeholder: ''
+          border: ''
+          enabled: true
+          foreground: ''
+          items: [5 min. prior, 15 min. prior, 30 min. prior, 1 hr. prior, 2 hrs. prior,
+            8 hrs. prior, 24 hrs. prior, 48 hrs. prior, Custom Time]
+          visible: true
+          font_size: null
+          font: ''
+          spacing_above: small
+          spacing_below: small
+          italic: false
+          background: theme:Gray 200
+          bold: false
+          underline: false
+          include_placeholder: false
+        name: drop_down_3
+        layout_properties: {grid_position: 'TPMAHC,OPGHSH'}
+      - type: DatePicker
+        properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
+          placeholder: '', border: '', enabled: true, foreground: '', visible: false,
+          font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
+          date: '', min_date: '', background: '', bold: false, underline: false, format: ''}
+        name: date_picker_2
+        layout_properties: {grid_position: 'HCXLQQ,LVQEHO'}
+    event_bindings: {}
+  - type: RepeatingPanel
+    properties: {item_template: MenuForm.DashForm.CreateForm.TimeProposalTemplate}
+    name: repeating_panel_1
+    layout_properties: {grid_position: 'NMTJRA,IQCFEX'}
+    event_bindings: {}
+- type: Button
+  properties: {role: null, align: left, tooltip: '', border: '', enabled: true, foreground: '',
+    visible: true, text: Add Alternate Time, font_size: null, font: '', spacing_above: small,
+    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+    underline: false, icon: ''}
+  name: button_add_alternate
+  layout_properties: {grid_position: 'MRHGPD,NARVWK'}
+  event_bindings: {}
+- type: Spacer
+  properties: {height: 32}
+  name: spacer_1
+  layout_properties: {grid_position: 'MGXSNE,CGULSX'}
+- type: DropDown
+  properties:
+    role: null
+    align: full
+    tooltip: ''
+    placeholder: ''
+    border: ''
+    enabled: true
+    foreground: ''
+    items: [Allow anyone to accept (up to 3rd degree connections), Limit to 2nd degree connections (or closer),
+      Limit to 1st degree connections]
+    visible: true
+    font_size: null
+    font: ''
+    spacing_above: small
+    spacing_below: small
+    italic: false
+    background: theme:Gray 200
+    bold: false
+    underline: false
+    include_placeholder: false
+  name: drop_down_4
+  layout_properties: {grid_position: 'MBKZLC,JAYDTW'}
 is_package: true
