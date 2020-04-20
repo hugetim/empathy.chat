@@ -13,6 +13,8 @@ import datetime
 
 class CreateForm(CreateFormTemplate):
 
+  CANCEL_DEFAULT = 15
+  
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
@@ -37,14 +39,14 @@ class CreateForm(CreateFormTemplate):
     self.drop_down_cancel_1.items = [(CANCEL_TEXT[m], m)
                                      for m in (5, 15, 30, 60, 120, 8*60, 24*60, 48*60)]
     self.drop_down_cancel_1.items += [(CANCEL_TEXT["custom"],"custom")]
-    self.drop_down_cancel_1.selected_value = 30
+    self.drop_down_cancel_1.selected_value = self.CANCEL_DEFAULT
     self.drop_down_eligible.items = [("Allow anyone to accept (up to 3rd degree connections)", 3),
                                      ("Limit to 2nd degree connections (or closer)", 2),
                                      ("Limit to 1st degree connections", 1)]
+    self.date_picker_start_1.min_date = h.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
     self.date_picker_start_1.date = (h.now() 
                                      + datetime.timedelta(seconds=60*p.MIN_NEXT_TIME))
-    self.date_picker_start_1.min_date = h.now() + datetime.timedelta(seconds=60*5)
-    
+    self.date_picker_cancel_1.min_date = h.now()    
 
   def drop_down_start_change(self, **event_args):
     """This method is called when an item is selected"""
@@ -58,19 +60,37 @@ class CreateForm(CreateFormTemplate):
   def drop_down_cancel_1_change(self, **event_args):
     """This method is called when an item is selected"""
     if self.drop_down_cancel_1.selected_value == "custom":
+      self.date_picker_cancel_1.max_date = self.date_picker_start_1.date
+      self.date_picker_cancel_1.date = (h.now() 
+                                        + datetime.timedelta(seconds=60*(self.date_picker_start_1.date 
+                                                                         - self.CANCEL_DEFAULT)))
       self.date_picker_cancel_1.visible = True
     else:
       self.date_picker_cancel_1.visible = False
+    self.check_cancel_time()
 
   def date_picker_start_1_change(self, **event_args):
     """This method is called when the selected date changes"""
+    self.date_picker_cancel_1.max_date = self.date_picker_start_1.date
+    self.check_cancel_time()
+    
+  def check_cancel_time(self):
     if self.drop_down_cancel_1.selected_value == "custom":
       cancel_date = self.date_picker_cancel_1.date
     else:
       minutes_prior = self.drop_down_cancel_1.selected_value
       cancel_date = self.date_picker_start_1.date - datetime.timedelta(seconds=60*minutes_prior)
     if cancel_date < h.now():
+      self.label_cancel_1.visible = True
       self.label_cancel_1.text = "Cancel time already past"
+    else:
+      self.label_cancel_1.visible = False
+      self.label_cancel_1.text = ""
+
+  def date_picker_cancel_1_change(self, **event_args):
+    """This method is called when the selected date changes"""
+    self.check_cancel_time()
+
 
 
 

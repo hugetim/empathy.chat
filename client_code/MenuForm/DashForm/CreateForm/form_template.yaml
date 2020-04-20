@@ -156,7 +156,7 @@ components:
           format: ''}
         name: date_picker_cancel_1
         layout_properties: {grid_position: 'HCXLQQ,LVQEHO'}
-        event_bindings: {}
+        event_bindings: {change: date_picker_cancel_1_change}
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '#ff0000',
           visible: false, text: '', font_size: null, font: '', spacing_above: small,
