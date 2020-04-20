@@ -17,8 +17,8 @@ components:
     layout_properties: {width: 220}
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
+      wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
+      spacing_below: none, background: ''}
     name: column_panel_1
     layout_properties: {width: 155}
     event_bindings: {}
