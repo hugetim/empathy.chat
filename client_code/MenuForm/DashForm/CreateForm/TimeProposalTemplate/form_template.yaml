@@ -14,7 +14,8 @@ components:
       font: '', spacing_above: small, spacing_below: small, italic: false, date: '',
       min_date: '', background: 'theme:Gray 200', bold: false, underline: false, format: ''}
     name: date_picker_1
-    layout_properties: {width: 220}
+    layout_properties: {width: 240}
+    event_bindings: {}
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
@@ -52,7 +53,7 @@ components:
       font: '', spacing_above: small, spacing_below: small, italic: false, date: '',
       min_date: '', background: 'theme:Gray 200', bold: false, underline: false, format: ''}
     name: date_picker_2
-    layout_properties: {width: 220}
+    layout_properties: {width: 240}
     event_bindings: {}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,

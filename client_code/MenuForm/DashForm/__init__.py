@@ -42,6 +42,7 @@ class DashForm(DashFormTemplate):
         self.note_label.text = ""
         self.note_label.visible = False
       else:
+        self.data_grid_1.visible = False
         self.note_label.text = "Note: In the Settings menu (upper left), you can opt-in to receive an email notification when someone else requests empathy."
         self.note_label.visible = True
 
