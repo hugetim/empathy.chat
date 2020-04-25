@@ -1,0 +1,8 @@
+container:
+  type: HtmlTemplate
+  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
+    role: null, html: <hr>}
+  event_bindings: {}
+components: []
+is_package: true
+custom_component: true

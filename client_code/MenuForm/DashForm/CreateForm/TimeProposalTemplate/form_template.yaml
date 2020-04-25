@@ -3,23 +3,45 @@ container:
   event_bindings: {}
   properties: {col_widths: '{}'}
 components:
-- type: FlowPanel
+- type: form:MenuForm.DashForm.CreateForm.TimeProposalTemplate.HorizontalRule
   properties: {}
+  name: horizontal_rule_1
+  layout_properties: {grid_position: 'JOSOGF,ENBJJD', row_background: hugetim@gmail.com}
+- type: FlowPanel
+  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+    foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: flow_panel_1
   layout_properties: {grid_position: 'GUKKSE,SZBAPF'}
   components:
-  - type: DatePicker
-    properties: {role: null, align: left, max_date: '', pick_time: false, tooltip: '',
-      placeholder: '', border: '', enabled: true, foreground: '', visible: true, font_size: null,
-      font: '', spacing_above: small, spacing_below: small, italic: false, date: '',
-      min_date: '', background: 'theme:Gray 200', bold: false, underline: false, format: ''}
-    name: date_picker_1
+  - type: ColumnPanel
+    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+      wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
+      spacing_below: small, background: ''}
+    name: column_panel_2
     layout_properties: {width: 240}
+    components:
+    - type: DatePicker
+      properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
+        placeholder: '', border: '', enabled: true, foreground: '', visible: true,
+        font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
+        date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
+        format: ''}
+      name: date_picker_start
+      layout_properties: {width: 240, grid_position: 'HTCLDG,TPPRCR'}
+      event_bindings: {change: date_picker_start_change}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '#ff0000',
+        visible: false, text: '', font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: label_start
+      layout_properties: {grid_position: 'WMWVKL,IFONMY'}
+      event_bindings: {}
     event_bindings: {}
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: none, background: ''}
+      spacing_below: small, background: ''}
     name: column_panel_1
     layout_properties: {width: 155}
     event_bindings: {}
@@ -44,25 +66,65 @@ components:
         bold: false
         underline: false
         include_placeholder: false
-      name: drop_down_1
+      name: drop_down_duration
       layout_properties: {grid_position: 'WRCAOD,YXLEEP'}
-      event_bindings: {}
-  - type: DatePicker
-    properties: {role: null, align: left, max_date: '', pick_time: false, tooltip: '',
-      placeholder: '', border: '', enabled: true, foreground: '', visible: true, font_size: null,
-      font: '', spacing_above: small, spacing_below: small, italic: false, date: '',
-      min_date: '', background: 'theme:Gray 200', bold: false, underline: false, format: ''}
-    name: date_picker_2
+      event_bindings: {change: drop_down_duration_change}
+  - type: ColumnPanel
+    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+      wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
+      spacing_below: small, background: ''}
+    name: column_panel_3
     layout_properties: {width: 240}
+    components:
+    - type: DropDown
+      properties:
+        role: null
+        align: full
+        tooltip: ''
+        placeholder: ''
+        border: ''
+        enabled: true
+        foreground: ''
+        items: []
+        visible: true
+        font_size: null
+        font: ''
+        spacing_above: small
+        spacing_below: small
+        italic: false
+        background: theme:Gray 200
+        bold: false
+        underline: false
+        include_placeholder: false
+      name: drop_down_cancel
+      layout_properties: {grid_position: 'IPVYAA,BWFDNN'}
+      event_bindings: {change: drop_down_cancel_change}
+    - type: DatePicker
+      properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
+        placeholder: '', border: '', enabled: true, foreground: '', visible: false,
+        font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
+        date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
+        format: ''}
+      name: date_picker_cancel
+      layout_properties: {width: 240, grid_position: 'XAHASN,ZYUTHA'}
+      event_bindings: {change: date_picker_cancel_change}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '#ff0000',
+        visible: false, text: '', font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: label_cancel
+      layout_properties: {grid_position: 'GGJSFE,QHDYYI'}
+      event_bindings: {}
     event_bindings: {}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
+      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:trash'}
     name: button_1
     layout_properties: {}
-    event_bindings: {}
+    event_bindings: {click: button_1_click}
   event_bindings: {}
 is_package: true
 item_type: {table_id: null}

@@ -1,6 +1,6 @@
 container:
   type: ColumnPanel
-  event_bindings: {}
+  event_bindings: {show: form_show}
   properties: {col_widths: '{}'}
 components:
 - type: ColumnPanel
@@ -12,7 +12,7 @@ components:
   components:
   - type: FlowPanel
     properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
+      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
     name: flow_panel_1
     layout_properties: {grid_position: 'XLEYVN,SISVEV'}
     components:
@@ -59,15 +59,15 @@ components:
           font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
           date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
           format: ''}
-        name: date_picker_start_1
+        name: date_picker_start
         layout_properties: {grid_position: 'IZJUVQ,OAWYPD'}
-        event_bindings: {show: date_picker_start_1_show, change: date_picker_start_1_change}
+        event_bindings: {change: date_picker_start_change}
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
           visible: false, text: '', font_size: null, font: '', spacing_above: small,
           icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
           underline: false, icon: ''}
-        name: label_start_1
+        name: label_start
         layout_properties: {grid_position: 'MAANVK,NUGJLS'}
         event_bindings: {}
       event_bindings: {}
@@ -106,7 +106,7 @@ components:
           bold: false
           underline: false
           include_placeholder: false
-        name: drop_down_duration_1
+        name: drop_down_duration
         layout_properties: {grid_position: 'RPAKJT,YAYJAQ'}
         event_bindings: {}
       event_bindings: {}
@@ -114,7 +114,7 @@ components:
       properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
         wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
         spacing_below: small, background: ''}
-      name: column_panel_cancel_1
+      name: column_panel_cancel
       layout_properties: {width: 240}
       components:
       - type: Label
@@ -135,7 +135,7 @@ components:
           foreground: ''
           items: [5 min. prior, 15 min. prior, 30 min. prior, 1 hr. prior, 2 hrs. prior,
             8 hrs. prior, 24 hrs. prior, 48 hrs. prior, a specific time...]
-          visible: true
+          visible: false
           font_size: null
           font: ''
           spacing_above: small
@@ -145,24 +145,24 @@ components:
           bold: false
           underline: false
           include_placeholder: false
-        name: drop_down_cancel_1
+        name: drop_down_cancel
         layout_properties: {grid_position: 'TPMAHC,OPGHSH'}
-        event_bindings: {change: drop_down_cancel_1_change}
+        event_bindings: {change: drop_down_cancel_change}
       - type: DatePicker
         properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
           placeholder: '', border: '', enabled: true, foreground: '', visible: false,
           font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
           date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
           format: ''}
-        name: date_picker_cancel_1
+        name: date_picker_cancel
         layout_properties: {grid_position: 'HCXLQQ,LVQEHO'}
-        event_bindings: {change: date_picker_cancel_1_change}
+        event_bindings: {change: date_picker_cancel_change}
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '#ff0000',
           visible: false, text: '', font_size: null, font: '', spacing_above: small,
           icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
           underline: false, icon: ''}
-        name: label_cancel_1
+        name: label_cancel
         layout_properties: {grid_position: 'MOAYGD,PBHCBD'}
         event_bindings: {}
       event_bindings: {}
@@ -179,7 +179,7 @@ components:
     underline: false, icon: ''}
   name: button_add_alternate
   layout_properties: {grid_position: 'MRHGPD,NARVWK'}
-  event_bindings: {}
+  event_bindings: {click: button_add_alternate_click}
 - type: Spacer
   properties: {height: 32}
   name: spacer_1
