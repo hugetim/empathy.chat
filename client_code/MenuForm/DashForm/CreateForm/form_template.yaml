@@ -207,4 +207,12 @@ components:
     include_placeholder: false
   name: drop_down_eligible
   layout_properties: {grid_position: 'MBKZLC,JAYDTW'}
+  event_bindings: {change: drop_down_eligible_change}
+- type: form:RUNLHYPKGVUNP7HZ:MultiSelectDropDown
+  properties:
+    unique: true
+    placeholder: Select user(s)
+    items: [Enter, Your, List, Of, Items, Here]
+  name: multi_select_drop_down
+  layout_properties: {grid_position: 'SGBZFH,BVLFZV', row_background: ''}
 is_package: true

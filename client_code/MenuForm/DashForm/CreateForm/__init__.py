@@ -168,3 +168,11 @@ class CreateForm(CreateFormTemplate):
     self.repeating_panel_1.items.remove(item_to_remove)
     if not self.repeating_panel_1.items and self.drop_down_start.selected_value != "later...":
       self.column_panel_cancel.visible = False
+
+  def drop_down_eligible_change(self, **event_args):
+    """This method is called when an item is selected"""
+    if self.drop_down_eligible.selected_value == "Select specific 1st degree connection(s)":
+      self.multi_select_drop_down.visible = True
+    else:
+      self.multi_select_drop_down.visible = False
+
