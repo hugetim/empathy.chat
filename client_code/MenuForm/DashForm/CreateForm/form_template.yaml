@@ -210,10 +210,10 @@ components:
   event_bindings: {change: drop_down_eligible_change}
 - type: form:RUNLHYPKGVUNP7HZ:MultiSelectDropDown
   properties:
-    unique: true
+    unique: false
     placeholder: Select connection(s)
-    items: ['']
-    visible: false
+    items: [Enter, Your, List, Of, Items, Here]
+    visible: true
   name: multi_select_drop_down
-  layout_properties: {grid_position: 'PDTJDV,XRZUTH'}
+  layout_properties: {grid_position: 'NASMVA,WNVFLL'}
 is_package: true
