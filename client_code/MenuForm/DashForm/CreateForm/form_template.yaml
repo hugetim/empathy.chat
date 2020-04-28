@@ -214,5 +214,5 @@ components:
     placeholder: Select user(s)
     items: [Enter, Your, List, Of, Items, Here]
   name: multi_select_drop_down
-  layout_properties: {grid_position: 'SGBZFH,BVLFZV', row_background: ''}
+  layout_properties: {grid_position: 'SGBZFH,BVLFZV', row_background: hugetim@gmail.com}
 is_package: true
