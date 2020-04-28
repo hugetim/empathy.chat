@@ -194,7 +194,7 @@ components:
     enabled: true
     foreground: ''
     items: [Allow anyone to accept (up to 3rd degree connections), Limit to 2nd degree connections (or closer),
-      Limit to 1st degree connections]
+      Limit to (all) 1st degree connections, Select specific 1st degree connection(s)]
     visible: true
     font_size: null
     font: ''
