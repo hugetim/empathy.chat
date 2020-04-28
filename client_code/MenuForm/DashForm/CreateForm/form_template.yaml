@@ -212,7 +212,7 @@ components:
   properties:
     unique: true
     placeholder: Select connection(s)
-    items: [Enter, Your, List, Of, Items, Here]
+    items: ['']
     visible: false
   name: multi_select_drop_down
   layout_properties: {grid_position: 'PDTJDV,XRZUTH'}

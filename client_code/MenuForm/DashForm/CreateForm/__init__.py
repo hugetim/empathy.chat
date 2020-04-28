@@ -50,6 +50,8 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
+    ## sample data
+    self.multi_select_drop_down.items = ["user 1", "user 2"]
     
   def init_date_picker_start(self):
     self.date_picker_start.min_date = (h.now() 
