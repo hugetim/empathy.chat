@@ -42,16 +42,14 @@ class CreateForm(CreateFormTemplate):
                                    for m in (5, 15, 30, 60, 120, 8*60, 24*60, 48*60)]
     self.drop_down_cancel.items += [(self.CANCEL_TEXT["custom"],"custom")]
     self.drop_down_cancel.selected_value = self.CANCEL_DEFAULT_MINUTES
-    self.drop_down_eligible.items = [("Allow anyone to accept (up to 3rd degree connections)", 3),
-                                     ("Limit to 2nd degree connections (or closer)", 2),
-                                     ("Limit to 1st degree connections", 1),
-                                     ("Select specific 1st degree connection(s)",0)
+    self.drop_down_eligible.items = [("Anyone (up to 3rd degree connections)", 3),
+                                     ("Any 1st or 2nd degree connections", 2),
+                                     ("Any 1st degree connections", 1),
+                                     ("Specific 1st degree connection(s)...",0)
                                     ]
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
-    ## sample data
-    self.multi_select_drop_down.items = ["user 1", "user 2"]
     
   def init_date_picker_start(self):
     self.date_picker_start.min_date = (h.now() 
