@@ -44,7 +44,9 @@ class CreateForm(CreateFormTemplate):
     self.drop_down_cancel.selected_value = self.CANCEL_DEFAULT_MINUTES
     self.drop_down_eligible.items = [("Allow anyone to accept (up to 3rd degree connections)", 3),
                                      ("Limit to 2nd degree connections (or closer)", 2),
-                                     ("Limit to 1st degree connections", 1)]
+                                     ("Limit to 1st degree connections", 1),
+                                     ("Select specific 1st degree connection(s)",0)
+                                    ]
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
@@ -171,7 +173,7 @@ class CreateForm(CreateFormTemplate):
 
   def drop_down_eligible_change(self, **event_args):
     """This method is called when an item is selected"""
-    if self.drop_down_eligible.selected_value == "Select specific 1st degree connection(s)":
+    if self.drop_down_eligible.selected_value == 0:
       self.multi_select_drop_down.visible = True
     else:
       self.multi_select_drop_down.visible = False
