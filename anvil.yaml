@@ -80,7 +80,7 @@ allow_embedding: true
 name: Empathy Spot test
 runtime_options: {version: 2, server_version: python3-sandbox, client_version: '3'}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico',
-  title: Empathy Spot}
+  title: empathy.chat}
 startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 db_schema:
