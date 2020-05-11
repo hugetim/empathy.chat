@@ -1,0 +1,37 @@
+components:
+- type: ColumnPanel
+  properties: {col_widths: '{}'}
+  name: column_panel_1
+  layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
+  event_bindings: {}
+  components:
+  - type: DataGrid
+    properties:
+      role: null
+      columns:
+      - {title: Name, id: TCRDJP, data_key: name}
+      - {title: Degree, id: CKNKJL, data_key: degree}
+      - {title: Last Active, id: VWXCEI, data_key: last_active}
+      - {title: '', id: NBEGGD, data_key: buttons}
+      auto_header: true
+      tooltip: ''
+      border: ''
+      foreground: ''
+      rows_per_page: 20
+      visible: true
+      show_page_controls: true
+      spacing_above: small
+      spacing_below: small
+      background: ''
+    name: data_grid_1
+    layout_properties: {grid_position: 'GITKSV,KQVHFQ'}
+    components:
+    - type: RepeatingPanel
+      properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.ConnectionsMenu.Connections.RowTemplate1}
+      name: repeating_panel_1
+      layout_properties: {}
+    event_bindings: {}
+container:
+  type: ColumnPanel
+  event_bindings: {}
+  properties: {col_widths: '{}'}
