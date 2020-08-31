@@ -84,6 +84,40 @@ metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favic
 startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 db_schema:
+- name: Connections
+  id: 73606
+  python_name: connections
+  columns:
+    1lj6fLPR+I0=:
+      name: user2
+      type: liveObject
+      backend: anvil.tables.Row
+      admin_ui: {order: 1, width: 200}
+      table_id: 18972
+    GKqLjCwvVRk=:
+      name: relationship2to1
+      type: string
+      admin_ui: {order: 3, width: 200}
+    Ldt7NL116Bk=:
+      name: date_proposed
+      type: datetime
+      admin_ui: {order: 5, width: 200}
+    OB45e_CA28Y=:
+      name: date_connected
+      type: datetime
+      admin_ui: {order: 4, width: 200}
+    Oa9ACUmaChA=:
+      name: user1
+      type: liveObject
+      backend: anvil.tables.Row
+      admin_ui: {order: 0, width: 200}
+      table_id: 18972
+    qlgxU1uCW8s=:
+      name: relationship1to2
+      type: string
+      admin_ui: {order: 2, width: 200}
+  access: {python_name: connections, app_id: E6HFYSK4HHRI7BTC, server: full, client: none,
+    table_id: 73606}
 - name: Chat
   id: 28196
   python_name: chat
