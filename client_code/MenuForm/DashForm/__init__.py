@@ -38,7 +38,7 @@ class DashForm(DashFormTemplate):
       self.note_label.visible = False
     else:
       self.tally_label.visible = False
-      if self.top_form.request_em_check_box.checked:
+      if self.top_form.re:
         self.note_label.text = ""
         self.note_label.visible = False
       else:
