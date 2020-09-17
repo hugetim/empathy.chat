@@ -27,7 +27,7 @@ components:
     event_bindings: {click: link_bar_logout_click}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: empathy.chat, font_size: null, font: '', spacing_above: small, icon_align: left,
+    text: Dashboard, font_size: null, font: '', spacing_above: small, icon_align: left,
     spacing_below: small, italic: false, background: '', bold: false, underline: false,
     icon: ''}
   name: label_1
