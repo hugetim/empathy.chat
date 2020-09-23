@@ -8,13 +8,14 @@ class SettingsForm(SettingsFormTemplate):
   def __init__(self, re, re_opts, re_st, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
-    
+    print("init")
     self.init_request_em_opts(re, re_opts, re_st)
     self.timer_2.interval = 5
     
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     checked = self.request_em_check_box.checked
+    print("change")
     self.set_request_em_options(checked)
     s, sl, t, re_st = anvil.server.call('set_request_em', checked)
     self.request_em_set_time = re_st
