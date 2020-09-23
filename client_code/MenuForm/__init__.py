@@ -99,6 +99,10 @@ class MenuForm(MenuFormTemplate):
     self.test_link.url = "https://meet.jit.si/" + code
     return code      
 
+  def home_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    nav.go_dash(self)
+  
   def settings_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     nav.go_settings(self)
@@ -148,4 +152,5 @@ class MenuForm(MenuFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
+
 

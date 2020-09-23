@@ -1,6 +1,6 @@
 container:
   type: ColumnPanel
-  event_bindings: {}
+  event_bindings: {show: form_show}
   properties: {col_widths: '{"XGVBRV":5,"FVYAVO":55,"VRISMF":5,"IDMREB":55}'}
 components:
 - type: ColumnPanel
@@ -11,13 +11,14 @@ components:
   components:
   - type: Label
     properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Settings, font_size: null, font: '', spacing_above: small,
+      visible: true, text: Notifications, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: ''}
     name: label_3
     layout_properties:
       col_widths: {}
       grid_position: LZIXQU,SNGWFY
+    event_bindings: {}
 - type: form:SV7QK4XBYUXPMHHM:Toggleswitch
   properties: {enabled: true, visible: true, checked: null, spacing_above: none, spacing_below: none}
   name: request_em_check_box
