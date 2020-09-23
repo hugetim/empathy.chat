@@ -2,7 +2,6 @@ from ._anvil_designer import MenuFormTemplate
 from anvil import *
 import anvil.server
 import anvil.users
-import anvil.tz
 from .. import navigation as nav
 from .. import parameters as p
 from .. import helper as h
@@ -16,7 +15,7 @@ class MenuForm(MenuFormTemplate):
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
-    tm, re, re_opts, re_st, pe, rt, s, sl, tallies, e, n = anvil.server.call('init')
+    tm, self.re, self.re_opts, self.re_st, pe, rt, s, sl, tallies, e, n = anvil.server.call('init')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'Instead, it can be used to test things out. Your actions will not impact '
@@ -33,7 +32,6 @@ class MenuForm(MenuFormTemplate):
     self.set_test_link()
     self.set_seconds_left(s, sl)
     self.reset_status()
-    self.timer_2.interval = 5
     
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """Set status and related time variables"""
@@ -71,28 +69,6 @@ class MenuForm(MenuFormTemplate):
     self.set_seconds_left(None)
     self.tallies = anvil.server.call('match_complete')
     self.reset_status()   
-  
-  def timer_2_tick(self, **event_args):
-    """This method is called approx. once per 5 seconds"""
-    if (self.request_em_check_box.checked and self.re_radio_button_fixed.selected
-        and self.pause_hours_update == False):
-      hours_left = h.re_hours(self.request_em_hours, 
-                              self.request_em_set_time)
-      if hours_left <= 0:
-        checked = False
-        self.request_em_check_box.checked = checked
-        self.set_request_em_options(checked)
-        self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
-        s, sl, t, re_st = anvil.server.call_s('set_request_em', checked)
-        self.request_em_set_time = re_st
-        if s != self.status:
-          self.set_seconds_left(s, sl)
-          self.reset_status()
-        if not s:
-          self.content.tallies = t
-          self.content.update_tally_label()
-      else:
-        self.text_box_hours.text = "{:.1f}".format(hours_left)
         
   def confirm_wait(self):
     s, sl, self.tallies = anvil.server.call('confirm_wait')
@@ -125,7 +101,7 @@ class MenuForm(MenuFormTemplate):
 
   def settings_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    nav.go_settings()
+    nav.go_settings(self)
   
   def logout_button_click(self, **event_args):
     self.logout_user()

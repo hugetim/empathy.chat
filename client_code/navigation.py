@@ -1,6 +1,7 @@
 from .MenuForm.DashForm import DashForm
 from .MenuForm.WaitForm import WaitForm
 from .MenuForm.MatchForm import MatchForm
+from .MenuForm.SettingsForm import SettingsForm
 
 
 def go_dash(top_form):
