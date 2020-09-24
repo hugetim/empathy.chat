@@ -89,11 +89,10 @@ class MenuForm(MenuFormTemplate):
       self.go_dash() 
 
   def clear_page(self):
+    self.nav_panel.visible = True
     self.test_link.visible = True 
-    self.home_button.visible = True
-    self.settings_button.visible = True
-    self.home_button.role = "raised"
-    self.settings_button.role = "raised"
+    for button in self.nav_panel.get_components():
+      button.role = "raised"
     self.column_panel_content.clear()
       
   def load_component(self, content):
@@ -113,17 +112,15 @@ class MenuForm(MenuFormTemplate):
     content = MatchForm()
     self.load_component(content)
     self.title_label.text = "Chat"
+    self.nav_panel.visible = False
     self.test_link.visible = False
-    self.settings_button.visible = False
-    self.home_button.visible = False
 
   def go_wait(self):
     content = WaitForm(self.pinged_em_checked)
     self.load_component(content)
     self.title_label.text = "Chat"
+    self.nav_panel.visible = False
     self.test_link.visible = False
-    self.settings_button.visible = False
-    self.home_button.visible = False
 
   def go_settings(self):
     content = SettingsForm()

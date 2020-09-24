@@ -44,22 +44,28 @@ components:
   name: column_panel_1
   layout_properties: {slot: left-nav}
   components:
-  - type: Button
-    properties: {role: primary-color, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: 'Home                       ', font_size: 13,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:home'}
-    name: home_button
-    layout_properties: {grid_position: 'CAGLBR,LSICGS'}
-    event_bindings: {click: home_button_click}
-  - type: Button
-    properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: 'Settings               ', font_size: 13,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:cog'}
-    name: settings_button
-    layout_properties: {grid_position: 'KVXGSZ,OQELCV'}
-    event_bindings: {click: settings_button_click}
+  - type: LinearPanel
+    properties: {}
+    name: nav_panel
+    layout_properties: {grid_position: 'EFBXVF,MRRYHX'}
+    event_bindings: {}
+    components:
+    - type: Button
+      properties: {role: primary-color, align: left, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: true, text: 'Home                       ', font_size: 13,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:home'}
+      name: home_button
+      layout_properties: {grid_position: 'CAGLBR,LSICGS'}
+      event_bindings: {click: home_button_click}
+    - type: Button
+      properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: true, text: 'Settings               ', font_size: 13,
+        font: '', spacing_above: medium, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:cog'}
+      name: settings_button
+      layout_properties: {grid_position: 'KVXGSZ,OQELCV'}
+      event_bindings: {click: settings_button_click}
   - type: Spacer
     properties: {visible: true, spacing_above: small, spacing_below: small, height: '4',
       tooltip: ''}
