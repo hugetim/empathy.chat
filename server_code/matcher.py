@@ -85,7 +85,7 @@ def init():
   # Initialize user info
   user = anvil.server.session['user']
   print(user['email'])
-  trust_level, request_em, rem_opts, re_st, pinged_em = sm.get_user_info(user)
+  trust_level, pinged_em = sm.get_user_info(user)
   email_in_list = None
   name = None
   if trust_level == 0:
@@ -112,7 +112,7 @@ def init():
     request_type = _get_request_type(user)
   else:
     request_type = "will_offer_first"
-  return test_mode, request_em, rem_opts, re_st, pinged_em, request_type, status, seconds_left, tallies, email_in_list, name
+  return test_mode, pinged_em, request_type, status, seconds_left, tallies, email_in_list, name
 
 
 @anvil.server.callable

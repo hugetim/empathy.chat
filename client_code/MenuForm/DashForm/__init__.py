@@ -27,24 +27,7 @@ class DashForm(DashFormTemplate):
     
   def update_tally_label(self):
     """Update form based on tallies state"""
-    if self.tallies['will_offer_first'] == 0 and self.tallies['receive_first'] == 0:
-      self.tally_label.font_size = 12
-    else:
-      self.tally_label.font_size = None
-    self.tally_label.text = self.tally_text(self.tallies)
-    if len(self.tally_label.text) > 0:
-      self.tally_label.visible = True
-      self.note_label.text = ""
-      self.note_label.visible = False
-    else:
-      self.tally_label.visible = False
-      if self.top_form.re:
-        self.note_label.text = ""
-        self.note_label.visible = False
-      else:
-        self.data_grid_1.visible = False
-        self.note_label.text = "Note: In the Settings menu (upper left), you can opt-in to receive an email notification when someone else requests empathy."
-        self.note_label.visible = True
+    pass
 
   def tally_text(self, tallies):
     text = ""

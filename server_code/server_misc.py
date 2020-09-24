@@ -29,7 +29,7 @@ def initialize_session():
   anvil.server.session['test_record'] = None
 
 
-def get_user(user_id):
+def get_user(user_id=""):
   if user_id == "" or anvil.server.session['user_id'] == user_id:
     return anvil.server.session['user']
   else:
@@ -52,21 +52,16 @@ def is_visible(user2, user1=None):
 
 
 def get_user_info(user):
-  """Return user info, initializing it for new users"""
+  """Return user info, initializing info for new users"""
   trust = user['trust_level']
   if trust is None:
     user['trust_level'] = 0
     user['request_em'] = False
     user['pinged_em'] = False
     user['request_em_settings'] = {"fixed": 0, "hours": 2}
-  re_opts = user['request_em_settings']
-  if (user['request_em'] == True and re_opts["fixed"]
-      and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
-    user['request_em'] = False
-  return (user['trust_level'], user['request_em'], user['request_em_settings'],
-          user['request_em_set_time'], user['pinged_em'])
+  return (user['trust_level'], user['pinged_em'])
 
-
+  
 def new_jitsi_code():
   num_chars = 5
   charset = "abcdefghijkmnopqrstuvwxyz23456789"
@@ -137,6 +132,18 @@ def _emails_equal(a, b):
   a_match = em_re.search(a)
   b_match = em_re.search(b)
   return a_match.group(1) == b_match.group(1) and a_match.group(2).lower() == b_match.group(2).lower()
+
+
+@anvil.server.callable
+def get_settings():
+  """Return user settings displayed on SettingsForm"""
+  user = get_user()
+  re_opts = user['request_em_settings']
+  if (user['request_em'] == True and re_opts["fixed"]
+      and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
+    user['request_em'] = False
+  return (user['request_em'], user['request_em_settings'],
+          user['request_em_set_time'])
 
 
 def _prune_request_em():

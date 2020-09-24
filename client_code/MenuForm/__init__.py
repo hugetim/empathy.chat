@@ -2,7 +2,10 @@ from ._anvil_designer import MenuFormTemplate
 from anvil import *
 import anvil.server
 import anvil.users
-from .. import navigation as nav
+from .DashForm import DashForm
+from .WaitForm import WaitForm
+from .MatchForm import MatchForm
+from .SettingsForm import SettingsForm
 from .. import parameters as p
 from .. import helper as h
 import random
@@ -15,7 +18,7 @@ class MenuForm(MenuFormTemplate):
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
-    tm, self.re, self.re_opts, self.re_st, pe, rt, s, sl, tallies, e, n = anvil.server.call('init')
+    tm, pe, rt, s, sl, tallies, e, n = anvil.server.call('init')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'Instead, it can be used to test things out. Your actions will not impact '
@@ -78,17 +81,55 @@ class MenuForm(MenuFormTemplate):
   def reset_status(self):
     """Update form according to current state variables"""
     if self.status in ["requesting", "pinged", "pinging"]:
-        nav.go_wait(self)
+        self.go_wait()
     elif self.status == "matched":
-        nav.go_match(self)
+        self.go_match()
     else:
       assert not self.status
-      nav.go_dash(self) 
+      self.go_dash() 
 
-  def load_component(self, content):
-    self.content = content
+  def clear_page(self):
+    self.test_link.visible = True 
+    self.home_button.visible = True
+    self.settings_button.visible = True
+    self.home_button.role = "raised"
+    self.settings_button.role = "raised"
     self.column_panel_content.clear()
+      
+  def load_component(self, content):
+    """Reset MenuForm and load content form"""
+    self.clear_page()
+    self.content = content
     self.column_panel_content.add_component(self.content)  
+    
+  def go_dash(self):
+    content = DashForm(self.name,
+                       self.tallies)
+    self.load_component(content)
+    self.title_label.text = "Dashboard"
+    self.home_button.role = "primary-color"
+
+  def go_match(self):
+    content = MatchForm()
+    self.load_component(content)
+    self.title_label.text = "Chat"
+    self.test_link.visible = False
+    self.settings_button.visible = False
+    self.home_button.visible = False
+
+  def go_wait(self):
+    content = WaitForm(self.pinged_em_checked)
+    self.load_component(content)
+    self.title_label.text = "Chat"
+    self.test_link.visible = False
+    self.settings_button.visible = False
+    self.home_button.visible = False
+
+  def go_settings(self):
+    content = SettingsForm()
+    self.load_component(content)
+    self.title_label.text = "Settings"
+    self.settings_button.role = "primary-color"
       
   def set_test_link(self):
     num_chars = 4
@@ -101,11 +142,11 @@ class MenuForm(MenuFormTemplate):
 
   def home_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    nav.go_dash(self)
+    self.go_dash()
   
   def settings_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    nav.go_settings(self)
+    self.go_settings()
   
   def logout_button_click(self, **event_args):
     self.logout_user()
