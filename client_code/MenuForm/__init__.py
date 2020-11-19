@@ -91,8 +91,8 @@ class MenuForm(MenuFormTemplate):
   def clear_page(self):
     self.nav_panel.visible = True
     self.test_link.visible = True 
-    for button in self.nav_panel.get_components():
-      button.role = "raised"
+    for link in self.nav_panel.get_components():
+      link.role = ""
     self.column_panel_content.clear()
       
   def load_component(self, content):
@@ -106,7 +106,7 @@ class MenuForm(MenuFormTemplate):
                        self.tallies)
     self.load_component(content)
     self.title_label.text = "Dashboard"
-    self.home_button.role = "primary-color"
+    self.home_link.role = "selected"
 
   def go_match(self):
     content = MatchForm()
@@ -126,7 +126,7 @@ class MenuForm(MenuFormTemplate):
     content = SettingsForm()
     self.load_component(content)
     self.title_label.text = "Settings"
-    self.settings_button.role = "primary-color"
+    self.settings_link.role = "selected"
       
   def set_test_link(self):
     num_chars = 4
@@ -137,12 +137,12 @@ class MenuForm(MenuFormTemplate):
     self.test_link.url = "https://meet.jit.si/" + code
     return code      
 
-  def home_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
+  def home_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
     self.go_dash()
   
-  def settings_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
+  def settings_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
     self.go_settings()
   
   def logout_button_click(self, **event_args):
