@@ -27,7 +27,7 @@ components:
     layout_properties: {grid_position: 'GITKSV,KQVHFQ'}
     components:
     - type: RepeatingPanel
-      properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.ConnectionsMenu.Connections.RowTemplate1}
+      properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.ConnectionsMenu.Connections.ConnectionRow}
       name: repeating_panel_1
       layout_properties: {}
     event_bindings: {}
