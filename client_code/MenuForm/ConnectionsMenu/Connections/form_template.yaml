@@ -5,7 +5,7 @@ container:
 components:
 - type: ColumnPanel
   properties: {col_widths: '{}'}
-  name: column_panel_1
+  name: content_column_panel
   layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
   event_bindings: {}
   components:

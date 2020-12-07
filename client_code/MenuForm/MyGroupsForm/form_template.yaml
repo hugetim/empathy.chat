@@ -104,3 +104,4 @@ container:
   type: ColumnPanel
   event_bindings: {}
   properties: {col_widths: '{}'}
+is_package: true

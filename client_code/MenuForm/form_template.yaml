@@ -72,6 +72,16 @@ components:
       event_bindings: {click: connections_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
+          500', visible: true, text: GROUPS, font_size: null, wrap_on: mobile, font: '',
+        col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
+        spacing_below: small, italic: false, background: '', bold: false, underline: false,
+        icon: 'fa:globe'}
+      name: groups_link
+      layout_properties: {}
+      components: []
+      event_bindings: {click: groups_link_click}
+    - type: Link
+      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
           500', visible: true, text: MY GROUPS, font_size: null, wrap_on: mobile,
         font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,

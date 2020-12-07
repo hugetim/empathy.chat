@@ -6,6 +6,7 @@ from .DashForm import DashForm
 from .WaitForm import WaitForm
 from .MatchForm import MatchForm
 from .ConnectionsMenu import ConnectionsMenu
+from .GroupsMenu import GroupsMenu
 from .MyGroupsForm import MyGroupsForm
 from .SettingsForm import SettingsForm
 from .. import parameters as p
@@ -131,6 +132,12 @@ class MenuForm(MenuFormTemplate):
     self.title_label.text = "Connections"
     self.connections_link.role = "selected"    
 
+  def go_groups(self):
+    content = GroupsMenu()
+    self.load_component(content)
+    self.title_label.text = "Groups"
+    self.groups_link.role = "selected"       
+    
   def go_my_groups(self):
     content = MyGroupsForm()
     self.load_component(content)
@@ -151,6 +158,10 @@ class MenuForm(MenuFormTemplate):
     """This method is called when the link is clicked"""
     self.go_connections()  
     
+  def groups_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    self.go_groups()  
+  
   def my_groups_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     self.go_my_groups()  
