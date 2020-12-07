@@ -109,53 +109,44 @@ class MenuForm(MenuFormTemplate):
   def go_dash(self):
     self.title_label.text = "Dashboard"
     self.home_link.role = "selected"
-    content = DashForm(self.name,
-                       self.tallies)
-    self.load_component(content)
+    self.load_component(DashForm(self.name, self.tallies))
 
   def go_match(self):
-    content = MatchForm()
-    self.load_component(content)
     self.title_label.text = "Chat"
     self.nav_panel.visible = False
     self.test_link.visible = False
+    self.load_component(MatchForm())
 
   def go_wait(self):
-    content = WaitForm(self.pinged_em_checked)
-    self.load_component(content)
     self.title_label.text = "Chat"
     self.nav_panel.visible = False
     self.test_link.visible = False
+    self.load_component(WaitForm(self.pinged_em_checked))
 
   def go_connections(self):
     self.title_label.text = "Connections"
     self.connections_link.role = "selected"   
-    content = ConnectionsMenu()
-    self.load_component(content)
+    self.load_component(ConnectionsMenu())
 
   def go_groups(self):
     self.title_label.text = "Groups"
     self.groups_link.role = "selected"
-    content = GroupsMenu()
-    self.load_component(content)       
+    self.load_component(GroupsMenu())       
     
   def go_my_groups(self):
     self.title_label.text = "My Groups"
     self.my_groups_link.role = "selected" 
-    content = MyGroupsForm()
-    self.load_component(content)   
+    self.load_component(MyGroupsForm())   
     
   def go_profile(self):
     self.title_label.text = "My Profile"
     self.profile_link.role = "selected"   
-    content = UserMenu()
-    self.load_component(content) 
+    self.load_component(UserMenu()) 
     
   def go_settings(self):
     self.title_label.text = "Settings"
     self.settings_link.role = "selected"
-    content = SettingsForm()
-    self.load_component(content)
+    self.load_component(SettingsForm())
 
   def home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
