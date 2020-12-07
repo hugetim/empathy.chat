@@ -12,7 +12,7 @@ class GroupsMenu(GroupsMenuTemplate):
    
     # Any code you write here will run when the form opens.
     self.top_form = get_open_form()
-    self.go_groups()
+    self.go_members()
     
   def clear_page(self):
     for button in self.tabs_flow_panel.get_components():
@@ -28,7 +28,7 @@ class GroupsMenu(GroupsMenuTemplate):
   def go_groups(self):
     content = Groups()
     self.load_component(content)
-    self.top_form.title_label.text = "Groups"
+    self.top_form.title_label.text = "Group Memberships"
     self.groups_tab_button.background = p.SELECTED_TAB_COLOR
 
   def go_members(self):
