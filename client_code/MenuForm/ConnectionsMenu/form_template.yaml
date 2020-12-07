@@ -4,8 +4,8 @@ container:
   event_bindings: {}
 components:
 - type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
+  properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
+    visible: true, spacing_above: small, spacing_below: none, background: ''}
   name: tabs_flow_panel
   layout_properties: {grid_position: 'BAZVOP,XWOJFJ', full_width_row: true}
   components:
@@ -13,7 +13,7 @@ components:
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Connections, font_size: null, font: '',
       spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-      background: 'theme:Gray 300', bold: false, underline: false, icon: ''}
+      background: 'theme:White', bold: false, underline: false, icon: ''}
     name: connections_tab_button
     layout_properties: {}
     event_bindings: {click: connections_tab_button_click}
@@ -21,7 +21,7 @@ components:
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Blocks, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray
-        100', bold: false, underline: false, icon: ''}
+        200', bold: false, underline: false, icon: ''}
     name: blocks_tab_button
     layout_properties: {}
     event_bindings: {click: blocks_tab_button_click}

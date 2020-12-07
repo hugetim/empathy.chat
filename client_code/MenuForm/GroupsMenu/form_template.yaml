@@ -1,15 +1,15 @@
 components:
 - type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
+  properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
+    visible: true, spacing_above: small, spacing_below: none, background: ''}
   name: tabs_flow_panel
   layout_properties: {grid_position: 'BAZVOP,XWOJFJ', full_width_row: true}
   components:
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Members, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray
-        100', bold: false, underline: false, icon: ''}
+      icon_align: left, spacing_below: none, italic: false, background: 'theme:White',
+      bold: false, underline: false, icon: ''}
     name: members_tab_button
     layout_properties: {}
     event_bindings: {click: members_tab_button_click}
@@ -17,7 +17,7 @@ components:
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Group List, font_size: null, font: '',
       spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-      background: 'theme:Gray 300', bold: false, underline: false, icon: ''}
+      background: 'theme:Gray 200', bold: false, underline: false, icon: ''}
     name: groups_tab_button
     layout_properties: {}
     event_bindings: {click: groups_tab_button_click}
