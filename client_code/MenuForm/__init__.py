@@ -165,6 +165,10 @@ class MenuForm(MenuFormTemplate):
   def my_groups_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     self.go_my_groups()  
+    
+  def profile_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    pass
   
   def settings_link_click(self, **event_args):
     """This method is called when the link is clicked"""
@@ -180,9 +184,6 @@ class MenuForm(MenuFormTemplate):
     return code          
     
   def logout_button_click(self, **event_args):
-    self.logout_user()
-
-  def link_bar_logout_click(self, **event_args):
     self.logout_user()
     
   def logout_user(self):
@@ -224,4 +225,3 @@ class MenuForm(MenuFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id)
-

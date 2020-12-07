@@ -9,6 +9,24 @@ components:
   layout_properties: {slot: nav-right}
   components:
   - type: Link
+    properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+      spacing_above: small, icon_align: left, col_widths: '{}', spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: 'fa:home'}
+    name: link_bar_home
+    layout_properties: {}
+    components: []
+    event_bindings: {click: home_link_click}
+  - type: Link
+    properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+      spacing_above: small, icon_align: left, col_widths: '{}', spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: 'fa:user'}
+    name: link_bar_profile
+    layout_properties: {}
+    components: []
+    event_bindings: {click: profile_link_click}
+  - type: Link
     properties: {role: null, url: 'https://www.empathyspot.org/help.html', align: left,
       tooltip: Help, border: '', foreground: '', visible: true, text: '', font_size: null,
       wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left,
@@ -17,14 +35,6 @@ components:
     name: link_bar_help
     layout_properties: {}
     event_bindings: {click: link_bar_help_click}
-  - type: Link
-    properties: {role: null, url: '', align: left, tooltip: Log out, border: '', foreground: '',
-      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
-      spacing_above: small, icon_align: left, col_widths: '', spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: 'fa:sign-out'}
-    name: link_bar_logout
-    layout_properties: {}
-    event_bindings: {click: link_bar_logout_click}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: Dashboard, font_size: null, font: '', spacing_above: small, icon_align: left,
@@ -92,6 +102,16 @@ components:
       event_bindings: {click: my_groups_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
+          500', visible: true, text: PROFILE, font_size: null, wrap_on: mobile, font: '',
+        col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
+        spacing_below: small, italic: false, background: '', bold: false, underline: false,
+        icon: 'fa:user'}
+      name: profile_link
+      layout_properties: {}
+      components: []
+      event_bindings: {click: profile_link_click}
+    - type: Link
+      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
           500', visible: true, text: SETTINGS, font_size: null, wrap_on: mobile, font: '',
         col_spacing: medium, spacing_above: medium, icon_align: left, col_widths: '',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
@@ -136,7 +156,7 @@ components:
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
         foreground: '', visible: true, text: 'Send Feedback    ', font_size: 13, font: '',
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:comments-o'}
+        background: '', bold: false, underline: false, icon: 'fa:comment-o'}
       name: feedback_button
       layout_properties: {grid_position: 'DMWLIO,YPJRKM'}
       event_bindings: {}
