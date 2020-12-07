@@ -37,7 +37,8 @@ class MenuForm(MenuFormTemplate):
     self.set_test_link()
     self.set_seconds_left(s, sl)
     self.reset_status()
-    
+
+### Code that doesn't really belong here, but pending moving it ###
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """Set status and related time variables"""
     self.last_5sec = h.now()
@@ -89,19 +90,19 @@ class MenuForm(MenuFormTemplate):
     else:
       assert not self.status
       self.go_dash() 
-
+###                                                                 ###
   def clear_page(self):
     self.nav_panel.visible = True
     self.test_link.visible = True 
     for link in self.nav_panel.get_components():
       link.role = ""
-    self.column_panel_content.clear()
+    self.content_column_panel.clear()
       
   def load_component(self, content):
     """Reset MenuForm and load content form"""
     self.clear_page()
     self.content = content
-    self.column_panel_content.add_component(self.content)  
+    self.content_column_panel.add_component(self.content)  
     
   def go_dash(self):
     content = DashForm(self.name,
@@ -141,15 +142,6 @@ class MenuForm(MenuFormTemplate):
     self.load_component(content)
     self.title_label.text = "Settings"
     self.settings_link.role = "selected"
-      
-  def set_test_link(self):
-    num_chars = 4
-    charset = "abcdefghijkmnopqrstuvwxyz23456789"
-    random.seed()
-    rand_code = "".join([random.choice(charset) for i in range(num_chars)])
-    code = "test-" + rand_code
-    self.test_link.url = "https://meet.jit.si/" + code
-    return code      
 
   def home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
@@ -166,7 +158,16 @@ class MenuForm(MenuFormTemplate):
   def settings_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     self.go_settings()
-  
+    
+  def set_test_link(self):
+    num_chars = 4
+    charset = "abcdefghijkmnopqrstuvwxyz23456789"
+    random.seed()
+    rand_code = "".join([random.choice(charset) for i in range(num_chars)])
+    code = "test-" + rand_code
+    self.test_link.url = "https://meet.jit.si/" + code
+    return code          
+    
   def logout_button_click(self, **event_args):
     self.logout_user()
 
@@ -176,7 +177,7 @@ class MenuForm(MenuFormTemplate):
   def logout_user(self):
     anvil.users.logout()
     open_form('LoginForm')
-    
+
   def test_mode_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     self.test_column_panel.visible = self.test_mode.checked

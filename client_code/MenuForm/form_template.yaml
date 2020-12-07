@@ -286,7 +286,7 @@ components:
   event_bindings: {tick: timer_1_tick}
 - type: ColumnPanel
   properties: {}
-  name: column_panel_content
+  name: content_column_panel
   layout_properties: {slot: default}
   event_bindings: {}
 is_package: true
