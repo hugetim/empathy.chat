@@ -8,6 +8,7 @@ from .MatchForm import MatchForm
 from .ConnectionsMenu import ConnectionsMenu
 from .GroupsMenu import GroupsMenu
 from .MyGroupsForm import MyGroupsForm
+from .UserMenu import UserMenu
 from .SettingsForm import SettingsForm
 from .. import parameters as p
 from .. import helper as h
@@ -106,11 +107,11 @@ class MenuForm(MenuFormTemplate):
     self.content_column_panel.add_component(self.content)  
     
   def go_dash(self):
+    self.title_label.text = "Dashboard"
+    self.home_link.role = "selected"
     content = DashForm(self.name,
                        self.tallies)
     self.load_component(content)
-    self.title_label.text = "Dashboard"
-    self.home_link.role = "selected"
 
   def go_match(self):
     content = MatchForm()
@@ -127,28 +128,34 @@ class MenuForm(MenuFormTemplate):
     self.test_link.visible = False
 
   def go_connections(self):
+    self.title_label.text = "Connections"
+    self.connections_link.role = "selected"   
     content = ConnectionsMenu()
     self.load_component(content)
-    self.title_label.text = "Connections"
-    self.connections_link.role = "selected"    
 
   def go_groups(self):
-    content = GroupsMenu()
-    self.load_component(content)
     self.title_label.text = "Groups"
-    self.groups_link.role = "selected"       
+    self.groups_link.role = "selected"
+    content = GroupsMenu()
+    self.load_component(content)       
     
   def go_my_groups(self):
-    content = MyGroupsForm()
-    self.load_component(content)
     self.title_label.text = "My Groups"
-    self.my_groups_link.role = "selected"    
+    self.my_groups_link.role = "selected" 
+    content = MyGroupsForm()
+    self.load_component(content)   
+    
+  def go_profile(self):
+    self.title_label.text = "My Profile"
+    self.profile_link.role = "selected"   
+    content = UserMenu()
+    self.load_component(content) 
     
   def go_settings(self):
-    content = SettingsForm()
-    self.load_component(content)
     self.title_label.text = "Settings"
     self.settings_link.role = "selected"
+    content = SettingsForm()
+    self.load_component(content)
 
   def home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
@@ -168,7 +175,7 @@ class MenuForm(MenuFormTemplate):
     
   def profile_link_click(self, **event_args):
     """This method is called when the link is clicked"""
-    pass
+    self.go_profile()
   
   def settings_link_click(self, **event_args):
     """This method is called when the link is clicked"""
