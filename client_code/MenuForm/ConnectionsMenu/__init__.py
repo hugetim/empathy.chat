@@ -29,13 +29,11 @@ class ConnectionsMenu(ConnectionsMenuTemplate):
   def go_connections(self):
     content = Connections()
     self.load_component(content)
-    self.top_form.title_label.text = "My Connections"
     self.connections_tab_button.background = p.SELECTED_TAB_COLOR
 
   def go_blocks(self):
     content = Blocks()
     self.load_component(content)
-    self.top_form.title_label.text = "My Blocks"
     self.blocks_tab_button.background = p.SELECTED_TAB_COLOR
     
   def connections_tab_button_click(self, **event_args):

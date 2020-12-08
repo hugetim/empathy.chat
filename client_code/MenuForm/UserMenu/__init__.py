@@ -29,19 +29,16 @@ class UserMenu(UserMenuTemplate):
   def go_profile(self):
     content = Profile()
     self.load_component(content)
-    self.top_form.title_label.text = "My Profile"
     self.profile_tab_button.background = p.SELECTED_TAB_COLOR    
     
   def go_connections(self):
     content = Connections()
     self.load_component(content)
-    self.top_form.title_label.text = "Connections"
     self.connections_tab_button.background = p.SELECTED_TAB_COLOR
 
   def go_history(self):
     content = History()
     self.load_component(content)
-    self.top_form.title_label.text = "History"
     self.history_tab_button.background = p.SELECTED_TAB_COLOR
     
   def profile_tab_button_click(self, **event_args):

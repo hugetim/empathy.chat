@@ -65,7 +65,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
   def date_picker_start_change(self, **event_args):
     """This method is called when the selected date changes"""
     self.check_times()
-    self.item['start'] = self.date_picker_cancel.date
+    self.item['start'] = self.date_picker_start.date
 
   def date_picker_cancel_change(self, **event_args):
     """This method is called when the selected date changes"""

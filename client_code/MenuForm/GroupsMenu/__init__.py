@@ -28,13 +28,11 @@ class GroupsMenu(GroupsMenuTemplate):
   def go_groups(self):
     content = Groups()
     self.load_component(content)
-    self.top_form.title_label.text = "Group Memberships"
     self.groups_tab_button.background = p.SELECTED_TAB_COLOR
 
   def go_members(self):
     content = Members()
     self.load_component(content)
-    self.top_form.title_label.text = "Group Members"
     self.members_tab_button.background = p.SELECTED_TAB_COLOR    
   
   def groups_tab_button_click(self, **event_args):

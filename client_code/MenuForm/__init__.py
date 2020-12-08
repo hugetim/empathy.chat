@@ -100,7 +100,7 @@ class MenuForm(MenuFormTemplate):
       link.role = ""
     self.content_column_panel.clear()
       
-  def load_component(self, content):
+  def reset_and_load(self, content):
     """Reset MenuForm and load content form"""
     self.clear_page()
     self.content = content
@@ -108,44 +108,44 @@ class MenuForm(MenuFormTemplate):
     
   def go_dash(self):
     self.title_label.text = "Dashboard"
-    self.load_component(DashForm(self.name, self.tallies))
+    self.reset_and_load(DashForm(self.name, self.tallies))
     self.home_link.role = "selected"
 
   def go_match(self):
     self.title_label.text = "Chat"
     self.nav_panel.visible = False
     self.test_link.visible = False
-    self.load_component(MatchForm())
+    self.reset_and_load(MatchForm())
 
   def go_wait(self):
     self.title_label.text = "Chat"
     self.nav_panel.visible = False
     self.test_link.visible = False
-    self.load_component(WaitForm(self.pinged_em_checked))
+    self.reset_and_load(WaitForm(self.pinged_em_checked))
 
   def go_connections(self):
-    self.title_label.text = "Connections"
-    self.load_component(ConnectionsMenu())
+    self.title_label.text = "My Connections"
+    self.reset_and_load(ConnectionsMenu())
     self.connections_link.role = "selected"   
 
   def go_groups(self):
     self.title_label.text = "Groups"
-    self.load_component(GroupsMenu())       
+    self.reset_and_load(GroupsMenu())       
     self.groups_link.role = "selected"
     
   def go_my_groups(self):
     self.title_label.text = "My Groups"
-    self.load_component(MyGroupsForm())   
+    self.reset_and_load(MyGroupsForm())   
     self.my_groups_link.role = "selected" 
     
   def go_profile(self):
     self.title_label.text = "My Profile"
-    self.load_component(UserMenu()) 
+    self.reset_and_load(UserMenu()) 
     self.profile_link.role = "selected"   
     
   def go_settings(self):
     self.title_label.text = "Settings"
-    self.load_component(SettingsForm())
+    self.reset_and_load(SettingsForm())
     self.settings_link.role = "selected"
 
   def home_link_click(self, **event_args):
