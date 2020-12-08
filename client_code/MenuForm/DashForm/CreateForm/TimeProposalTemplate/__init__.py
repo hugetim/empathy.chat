@@ -9,6 +9,7 @@ from anvil.tables import app_tables
 import anvil.users
 from ..... import helper as h
 from ..... import parameters as p
+from ..... import timeproposals as t
 import datetime
 from .. import CreateForm
 
@@ -22,12 +23,10 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     self.drop_down_duration.items = [(h.DURATION_TEXT[m], m) 
                                        for m in range(15, 75, 10)]
     self.drop_down_duration.selected_value = self.item['duration']
-    self.CANCEL_MIN_MINUTES = CreateForm.CANCEL_MIN_MINUTES
-    self.CANCEL_DEFAULT_MINUTES = CreateForm.CANCEL_DEFAULT_MINUTES
-    self.CANCEL_TEXT = CreateForm.CANCEL_TEXT
-    self.drop_down_cancel.items = [(self.CANCEL_TEXT[m], m)
-                                   for m in (5, 15, 30, 60, 120, 8*60, 24*60, 48*60)]
-    self.drop_down_cancel.items += [(self.CANCEL_TEXT["custom"],"custom")]
+    self.CANCEL_MIN_MINUTES = t.CANCEL_MIN_MINUTES
+    self.CANCEL_DEFAULT_MINUTES = t.CANCEL_DEFAULT_MINUTES
+    self.drop_down_cancel.items = [(t.CANCEL_TEXT[m], m)
+                                   for m in t.CANCEL_TEXT.keys()]
     self.drop_down_cancel.selected_value = self.item['cancel_drop']
     self.init_date_picker_start(self.item['start'])
     self.date_picker_cancel_initialized = False
