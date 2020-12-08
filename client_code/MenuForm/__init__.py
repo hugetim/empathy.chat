@@ -108,8 +108,8 @@ class MenuForm(MenuFormTemplate):
     
   def go_dash(self):
     self.title_label.text = "Dashboard"
-    self.home_link.role = "selected"
     self.load_component(DashForm(self.name, self.tallies))
+    self.home_link.role = "selected"
 
   def go_match(self):
     self.title_label.text = "Chat"
@@ -125,28 +125,28 @@ class MenuForm(MenuFormTemplate):
 
   def go_connections(self):
     self.title_label.text = "Connections"
-    self.connections_link.role = "selected"   
     self.load_component(ConnectionsMenu())
+    self.connections_link.role = "selected"   
 
   def go_groups(self):
     self.title_label.text = "Groups"
-    self.groups_link.role = "selected"
     self.load_component(GroupsMenu())       
+    self.groups_link.role = "selected"
     
   def go_my_groups(self):
     self.title_label.text = "My Groups"
-    self.my_groups_link.role = "selected" 
     self.load_component(MyGroupsForm())   
+    self.my_groups_link.role = "selected" 
     
   def go_profile(self):
     self.title_label.text = "My Profile"
-    self.profile_link.role = "selected"   
     self.load_component(UserMenu()) 
+    self.profile_link.role = "selected"   
     
   def go_settings(self):
     self.title_label.text = "Settings"
-    self.settings_link.role = "selected"
     self.load_component(SettingsForm())
+    self.settings_link.role = "selected"
 
   def home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
