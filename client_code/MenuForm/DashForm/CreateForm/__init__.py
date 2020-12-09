@@ -53,6 +53,7 @@ class CreateForm(CreateFormTemplate):
       self.date_picker_cancel.date = (self.item['start_date'] 
                                       - datetime.timedelta(minutes=self.item['cancel_buffer']))
       self.drop_down_cancel.selected_value = "custom"
+    ### Pick up here next in refactor
     self.drop_down_eligible.items = [("Anyone (up to 3rd degree connections)", 3),
                                      ("Any 1st or 2nd degree connections", 2),
                                      ("Any 1st degree connections", 1),
