@@ -3,14 +3,6 @@ import anvil.tz
 import math
 
 
-DURATION_TEXT = {15: "15 min. (5 & 5)",
-                 25: "25 min. (10 & 10)",
-                 35: "35 min. (15 & 15)",
-                 45: "45 min. (20 & 20)",
-                 55: "55 min. (25 & 25)",
-                 65: "65 min. (30 & 30)"}
-
-
 def now():
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 

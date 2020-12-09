@@ -2,6 +2,7 @@ from ._anvil_designer import DashFormTemplate
 from anvil import *
 import anvil.server
 from .CreateForm import CreateForm
+from ... import timeproposals as t
 
 
 class DashForm(DashFormTemplate):
@@ -86,7 +87,9 @@ class DashForm(DashFormTemplate):
 
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    f = CreateForm()
+    f = CreateForm(item={'start_now': 1,
+                         'duration': t.DURATION_DEFAULT_MINUTES
+                         'cancel_buffer': t.CANCEL_DEFAULT_MINUTES})
     out = alert(content=f,
                 title="New Empathy Chat Proposal",
                 large=True,

@@ -23,12 +23,12 @@ class CreateForm(CreateFormTemplate):
     
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel
-    self.drop_down_duration.items = [(h.DURATION_TEXT[m], m) 
-                                       for m in range(15, 75, 10)]
-    self.drop_down_duration.selected_value = 25
-
-    self.drop_down_cancel.items = [(t.CANCEL_TEXT[m], m)
-                                   for m in t.CANCEL_TEXT.keys()]
+    self.drop_down_start.items = [("now", 1), ("later...", 0)]
+    self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
+    if self.item['duration'] not in t.DURATION_TEXT.keys():
+      pass
+    self.drop_down_duration.selected_value = 
+    self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     self.drop_down_cancel.selected_value = t.CANCEL_DEFAULT_MINUTES
     self.drop_down_eligible.items = [("Anyone (up to 3rd degree connections)", 3),
                                      ("Any 1st or 2nd degree connections", 2),
