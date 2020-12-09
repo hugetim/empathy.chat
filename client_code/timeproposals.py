@@ -23,6 +23,14 @@ CANCEL_TEXT = {5: "5 min. prior",
               }
 
 
+def closest_duration(dur):
+  """Return the closest DURATION_TEXT key to dur
+  >>>closest_duration(24)
+  25
+  """
+  durations = DURATION_TEXT.keys()
+  return min(durations, key = lambda duration: abs(duration-dur))
+
 
 def get_proposal_errors(proposal):
   pass

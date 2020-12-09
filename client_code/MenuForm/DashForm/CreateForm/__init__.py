@@ -14,7 +14,28 @@ import datetime
 
 
 class CreateForm(CreateFormTemplate):
- 
+  @staticmethod
+  def proposal_to_item(proposal):
+    item = {key: value for (key, value) in proposal.items() if key not in ['cancel_buffer',
+                                                                           'cancel_date']}
+    if proposal['cancel_buffer'] in t.CANCEL_TEXT.keys():
+      item['cancel_buffer'] = proposal['cancel_buffer']
+      item['cancel_date'] = None
+    else:
+      item['cancel_buffer'] = "custom"
+      item['cancel_date'] = item['start_date'] - datetime.timedelta(minutes=proposal['cancel_buffer'])
+    return item
+      
+  @staticmethod
+  def item_to_proposal(item):
+    proposal = {key: value for (key, value) in item.items() if key not in ['cancel_buffer']}
+    if item['cancel_buffer'] != "custom":
+      proposal['cancel_buffer'] = item['cancel_buffer']
+    else:
+      delta = item['start_date'] - item['cancel_date']
+      proposal['cancel_buffer'] = delta.total_seconds() / 60
+    return proposal   
+      
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
@@ -26,8 +47,7 @@ class CreateForm(CreateFormTemplate):
     self.drop_down_start.items = [("now", 1), ("later...", 0)]
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     if self.item['duration'] not in t.DURATION_TEXT.keys():
-      pass
-    self.drop_down_duration.selected_value = 
+      self.drop_down_duration.selected_value = t.closest_duration(self.item['duration'])
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     self.drop_down_cancel.selected_value = t.CANCEL_DEFAULT_MINUTES
     self.drop_down_eligible.items = [("Anyone (up to 3rd degree connections)", 3),
