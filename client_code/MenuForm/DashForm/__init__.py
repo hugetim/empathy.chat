@@ -87,11 +87,7 @@ class DashForm(DashFormTemplate):
 
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    default_item = CreateForm.proposal_to_item({'start_now': 1,
-                                                'start_date': None,
-                                                'duration': t.DURATION_DEFAULT_MINUTES,
-                                                'cancel_buffer': t.CANCEL_DEFAULT_MINUTES})
-    f = CreateForm(item=default_item)
+    f = CreateForm(item=CreateForm.proposal_to_item(t.DEFAULT_PROPOSAL))
     out = alert(content=f,
                 title="New Empathy Chat Proposal",
                 large=True,

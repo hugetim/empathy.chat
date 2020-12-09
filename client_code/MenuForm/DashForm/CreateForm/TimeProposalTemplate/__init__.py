@@ -20,7 +20,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    self.drop_down_duration.items = [(h.DURATION_TEXT[m], m) 
+    self.drop_down_duration.items = [(t.DURATION_TEXT[m], m) 
                                        for m in range(15, 75, 10)]
     self.drop_down_duration.selected_value = self.item['duration']
     self.CANCEL_MIN_MINUTES = t.CANCEL_MIN_MINUTES

@@ -39,66 +39,72 @@ class CreateForm(CreateFormTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
-
-    # Any code you write here will run when the form opens.
-    
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel
+    
+    # Any code you write here will run when the form opens.
     self.drop_down_start.items = [("now", 1), ("later...", 0)]
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
+    self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
+    self.drop_down_eligible.items = [("Anyone (up to 3 degrees separation)", 3),
+                                     ('"Friends of friends" (2 degrees separation)', 2),
+                                     ("Direct connections only (1st degree)", 1),
+                                     ("Specific 1st degree connection(s)...",0)
+                                    ]
+    self.standardize_values()
+    self.date_picker_start_initialized = False
+    self.date_picker_cancel_initialized = False
+    if not self.item['start_now']:
+      self.drop_down_start_change()
+    self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
+
+  def standardize_values(self):
     if self.item['duration'] not in t.DURATION_TEXT.keys():
       self.drop_down_duration.selected_value = t.closest_duration(self.item['duration'])
-    self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     if self.item['cancel_buffer'] not in t.CANCEL_TEXT.keys():
       self.date_picker_cancel.date = (self.item['start_date'] 
                                       - datetime.timedelta(minutes=self.item['cancel_buffer']))
       self.drop_down_cancel.selected_value = "custom"
-    ### Pick up here next in refactor
-    self.drop_down_eligible.items = [("Anyone (up to 3rd degree connections)", 3),
-                                     ("Any 1st or 2nd degree connections", 2),
-                                     ("Any 1st degree connections", 1),
-                                     ("Specific 1st degree connection(s)...",0)
-                                    ]
-    self.date_picker_start_initialized = False
-    self.date_picker_cancel_initialized = False
-    self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
-    
+  
   def init_date_picker_start(self):
-    self.date_picker_start.min_date = (h.now() 
-                                       + datetime.timedelta(seconds=max(p.WAIT_SECONDS,
-                                                                        60*t.CANCEL_MIN_MINUTES)))
-    self.date_picker_start.max_date = h.now() + datetime.timedelta(days=31)
-    self.date_picker_start.date = (h.now() 
-                                   + datetime.timedelta(minutes=p.DEFAULT_NEXT_MINUTES))
+    self.date_picker_start.min_date = t.DEFAULT_START_MIN
+    self.date_picker_start.max_date = t.DEFAULT_START_MAX
+    if not self.date_picker_start.date:
+       self.date_picker_start.date = t.DEFAULT_ITEM['start_date']
     self.date_picker_start_initialized = True
     
   def init_date_picker_cancel(self):
     self.date_picker_cancel.min_date = h.now()
     self.date_picker_cancel.max_date = self.date_picker_start.max_date
-    init_minutes_prior = max(t.CANCEL_MIN_MINUTES,
-                             min(t.CANCEL_DEFAULT_MINUTES,
-                             ((self.date_picker_start.date - h.now()).seconds/60)/2))
-    self.date_picker_cancel.date = (self.date_picker_start.date 
-                                    - datetime.timedelta(minutes=init_minutes_prior))
+    self.date_picker_cancel.date = t.default_cancel_date(h.now(), self.date_picker_start.date)
     self.date_picker_cancel_initialized = True
+
+  def update_cancel_visibility(self):
+      if self.item['start_now']:
+        self.set_item_alt()
+        if not self.item['alt']:
+          self.column_panel_cancel.visible = False
+        else:
+          # this keeps the "Cancel" column heading for the alternatives
+          self.column_panel_cancel.visible = True
+          self.drop_down_cancel.visible = False
+          self.date_picker_cancel.visible = False
+      else:
+        self.column_panel_cancel.visible = True
+        self.drop_down_cancel.visible = True
+        self.drop_down_cancel_change()
     
   def drop_down_start_change(self, **event_args):
     """This method is called when an item is selected"""
-    if self.drop_down_start.selected_value == "later...":
+    if self.item['start_now']: #self.drop_down_start.selected_value == 0:
+      self.date_picker_start.visible = False
+      self.update_cancel_visibility()
+    else:
       if not self.date_picker_start_initialized:
         self.init_date_picker_start()
       self.check_times()
       self.date_picker_start.visible = True
-      self.column_panel_cancel.visible = True
-      self.drop_down_cancel.visible = True
-      self.drop_down_cancel_change()
-    else:
-      self.date_picker_start.visible = False
-      if not self.repeating_panel_1.items:
-        self.column_panel_cancel.visible = False
-      else:
-        self.drop_down_cancel.visible = False
-        self.date_picker_cancel.visible = False
+      self.update_cancel_visibility()
 
   def drop_down_cancel_change(self, **event_args):
     """This method is called when an item is selected"""
@@ -117,7 +123,7 @@ class CreateForm(CreateFormTemplate):
   def date_picker_cancel_change(self, **event_args):
     """This method is called when the selected date changes"""
     self.check_times()    
-    
+##### Continue refactor here ###################################################################3    
   def check_times(self):
     if self.drop_down_start == "now":
       return True
@@ -156,22 +162,20 @@ class CreateForm(CreateFormTemplate):
   def button_add_alternate_click(self, **event_args):
     """This method is called when the button is clicked"""
     if not self.repeating_panel_1.items:
-      if self.drop_down_start.selected_value == "later...":
+      if self.drop_down_start.selected_value == 0:
         start_1 = self.date_picker_start.date
       else:
         start_1 = h.now()
-        self.column_panel_cancel.visible = True
-        self.drop_down_cancel.visible = False
-        self.date_picker_cancel.visible = False
       self.repeating_panel_1.items = [{'start': (start_1 
-                                                 + datetime.timedelta(minutes=p.DEFAULT_NEXT_MINUTES)), 
+                                                 + datetime.timedelta(minutes=t.DEFAULT_NEXT_MINUTES)), 
                                        'duration': self.drop_down_duration.selected_value, 
                                        'cancel_drop': self.drop_down_cancel.selected_value,
                                       }]
+      self.update_cancel_visibility()
     else:
       previous_item = self.repeating_panel_1.items[-1]
       self.repeating_panel_1.items += [{'start': (previous_item['start']
-                                                  + datetime.timedelta(minutes=p.DEFAULT_NEXT_MINUTES)), 
+                                                  + datetime.timedelta(minutes=t.DEFAULT_NEXT_MINUTES)), 
                                         'duration': previous_item['duration'], 
                                         'cancel_drop': previous_item['cancel_drop'],
                                        }]
@@ -180,8 +184,7 @@ class CreateForm(CreateFormTemplate):
       
   def remove_alternate(self, item_to_remove, **event_args):
     self.repeating_panel_1.items.remove(item_to_remove)
-    if not self.repeating_panel_1.items and self.drop_down_start.selected_value != "later...":
-      self.column_panel_cancel.visible = False
+    self.update_cancel_visibility()
 
   def drop_down_eligible_change(self, **event_args):
     """This method is called when an item is selected"""
@@ -190,3 +193,5 @@ class CreateForm(CreateFormTemplate):
     else:
       self.multi_select_drop_down.visible = False
 
+  def set_item_alt(self):
+    self.item['alt'] = self.repeating_panel_1.items
