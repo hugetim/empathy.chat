@@ -49,7 +49,10 @@ class CreateForm(CreateFormTemplate):
     if self.item['duration'] not in t.DURATION_TEXT.keys():
       self.drop_down_duration.selected_value = t.closest_duration(self.item['duration'])
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
-    self.drop_down_cancel.selected_value = t.CANCEL_DEFAULT_MINUTES
+    if self.item['cancel_buffer'] not in t.CANCEL_TEXT.keys():
+      self.date_picker_cancel.date = (self.item['start_date'] 
+                                      - datetime.timedelta(minutes=self.item['cancel_buffer']))
+      self.drop_down_cancel.selected_value = "custom"
     self.drop_down_eligible.items = [("Anyone (up to 3rd degree connections)", 3),
                                      ("Any 1st or 2nd degree connections", 2),
                                      ("Any 1st degree connections", 1),
