@@ -6,6 +6,7 @@ import datetime
 
 
 class CreateForm(CreateFormTemplate):
+  @classmethod
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
     self.sync_item_alt()
