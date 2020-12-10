@@ -5,6 +5,7 @@ from . import parameters as p
 
 
 DEFAULT_NEXT_MINUTES = 60
+DEFAULT_NEXT_DELTA = datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES)
 DURATION_DEFAULT_MINUTES = 25
 DURATION_TEXT = {15: "15 min. (5 & 5)",
                  25: "25 min. (10 & 10)",

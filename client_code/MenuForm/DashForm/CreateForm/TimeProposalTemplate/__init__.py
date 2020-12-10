@@ -48,8 +48,8 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
       self.date_picker_cancel.visible = True
     else:
       self.date_picker_cancel.visible = False
-    self.parent.raise_event('x-update')
     self.check_times()
+    self.parent.raise_event('x-update')
     self.refresh_data_bindings()
       
   def drop_down_duration_change(self, **event_args):

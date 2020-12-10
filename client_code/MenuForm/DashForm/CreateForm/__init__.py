@@ -6,7 +6,30 @@ import datetime
 
 
 class CreateForm(CreateFormTemplate):
+  def proposal(self):
+    """Convert self.item into a proposal dictionary"""
+    self.sync_item_alt()
+    proposal = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
+    if self.item['cancel_buffer'] != "custom":
+      proposal['cancel_buffer'] = self.item['cancel_buffer']
+    else:
+      delta = self.item['start_date'] - self.item['cancel_date']
+      proposal['cancel_buffer'] = delta.total_seconds() / 60
+    return proposal   
   
+  @staticmethod
+  def proposal_to_item(proposal):
+    """Convert a proposal dictionary to the format of self.item"""
+    item = {key: value for (key, value) in proposal.items() if key not in ['cancel_buffer',
+                                                                           'cancel_date']}
+    if proposal['cancel_buffer'] in t.CANCEL_TEXT.keys():
+      item['cancel_buffer'] = proposal['cancel_buffer']
+      item['cancel_date'] = None
+    else:
+      item['cancel_buffer'] = "custom"
+      item['cancel_date'] = item['start_date'] - datetime.timedelta(minutes=proposal['cancel_buffer'])
+    return item
+   
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
@@ -116,23 +139,25 @@ class CreateForm(CreateFormTemplate):
       self.label_cancel.visible = True
 
   def button_add_alternate_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    self.sync_item_alt()
-    if not self.item['alt']:
+    """This method is called when the button is clicked
+    Refers to self.repeating_panel_1.items rather than self.item['alt']
+      because refresh_data_bindings was not working after assignments
+    """
+    if not self.repeating_panel_1.items:
       if self.item['start_now']:
         start_1 = h.now()
       else:
         start_1 = self.item['start_date']
       self.repeating_panel_1.items = [{'start_date': (start_1 
-                                                      + datetime.timedelta(minutes=t.DEFAULT_NEXT_MINUTES)), 
+                                                      + t.DEFAULT_NEXT_DELTA), 
                                        'duration': self.item['duration'], 
                                        'cancel_buffer': self.item['cancel_buffer'],
                                        'cancel_date': None
                                       }]
     else:
-      previous_item = self.item['alt'][-1]
+      previous_item = self.repeating_panel_1.items[-1]
       self.repeating_panel_1.items += [{'start_date': (previous_item['start_date']
-                                                  + datetime.timedelta(minutes=t.DEFAULT_NEXT_MINUTES)), 
+                                                       + t.DEFAULT_NEXT_DELTA), 
                                         'duration': previous_item['duration'], 
                                         'cancel_buffer': previous_item['cancel_buffer'],
                                         'cancel_date': None
@@ -153,25 +178,3 @@ class CreateForm(CreateFormTemplate):
   def alt_update(self, **event_args):
     self.sync_item_alt()
     
-  def proposal(self):
-    self.sync_item_alt()
-    proposal = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
-    if self.item['cancel_buffer'] != "custom":
-      proposal['cancel_buffer'] = self.item['cancel_buffer']
-    else:
-      delta = self.item['start_date'] - self.item['cancel_date']
-      proposal['cancel_buffer'] = delta.total_seconds() / 60
-    return proposal   
-  
-  @staticmethod
-  def proposal_to_item(proposal):
-    item = {key: value for (key, value) in proposal.items() if key not in ['cancel_buffer',
-                                                                           'cancel_date']}
-    if proposal['cancel_buffer'] in t.CANCEL_TEXT.keys():
-      item['cancel_buffer'] = proposal['cancel_buffer']
-      item['cancel_date'] = None
-    else:
-      item['cancel_buffer'] = "custom"
-      item['cancel_date'] = item['start_date'] - datetime.timedelta(minutes=proposal['cancel_buffer'])
-    return item
- 
