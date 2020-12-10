@@ -1,6 +1,6 @@
 container:
   type: ColumnPanel
-  event_bindings: {}
+  event_bindings: {show: form_show}
   properties: {col_widths: '{}'}
 components:
 - type: form:MenuForm.HorizontalRule
@@ -29,6 +29,8 @@ components:
       name: date_picker_start
       layout_properties: {width: 240, grid_position: 'HTCLDG,TPPRCR'}
       event_bindings: {change: date_picker_start_change}
+      data_bindings:
+      - {property: date, code: 'self.item[''start_date'']', writeback: true}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '#ff0000',
         visible: false, text: '', font_size: null, font: '', spacing_above: small,
@@ -69,6 +71,8 @@ components:
       name: drop_down_duration
       layout_properties: {grid_position: 'WRCAOD,YXLEEP'}
       event_bindings: {change: drop_down_duration_change}
+      data_bindings:
+      - {property: selected_value, code: 'self.item[''duration'']', writeback: true}
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
@@ -99,6 +103,8 @@ components:
       name: drop_down_cancel
       layout_properties: {grid_position: 'IPVYAA,BWFDNN'}
       event_bindings: {change: drop_down_cancel_change}
+      data_bindings:
+      - {property: selected_value, code: 'self.item[''cancel_buffer'']', writeback: true}
     - type: DatePicker
       properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
         placeholder: '', border: '', enabled: true, foreground: '', visible: false,
@@ -108,6 +114,8 @@ components:
       name: date_picker_cancel
       layout_properties: {width: 240, grid_position: 'XAHASN,ZYUTHA'}
       event_bindings: {change: date_picker_cancel_change}
+      data_bindings:
+      - {property: date, code: 'self.item[''cancel_date'']', writeback: true}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '#ff0000',
         visible: false, text: '', font_size: null, font: '', spacing_above: small,
@@ -122,9 +130,9 @@ components:
       foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:trash'}
-    name: button_1
+    name: remove_button
     layout_properties: {}
-    event_bindings: {click: button_1_click}
+    event_bindings: {click: remove_button_click}
   event_bindings: {}
 is_package: true
 item_type: {table_id: null}

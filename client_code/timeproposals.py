@@ -49,5 +49,29 @@ def closest_duration(dur):
   return min(durations, key = lambda duration: abs(duration-dur))
 
 
-def get_proposal_errors(proposal):
-  pass
+def get_proposal_times_errors(now, proposal):
+  """Return a dictionary of errors in a time proposal dictionary
+  >>>(get_proposal_times_errors(h.now(), {'start_now': 0, start_date': h.now()})
+      == {'start_date': ("The Start Time must be at least " 
+                         + str(CANCEL_MIN_MINUTES) + " minutes away.")}
+  True
+  """
+  messages = {}
+  if not proposal['start_now']:
+    if proposal['start_date'] < (now 
+                                 + datetime.timedelta(minutes=CANCEL_MIN_MINUTES)):
+      messages['start_date'] = ("The Start Time must be at least " 
+                                + str(CANCEL_MIN_MINUTES) + " minutes away.")
+    else:
+      cancel_date = (proposal['start_date'] 
+                     - datetime.timedelta(minutes=proposal['cancel_buffer']))
+      if cancel_date < now:
+        messages['cancel_buffer'] = 'The specified "Cancel" time has already passed.'
+      elif cancel_date > proposal['start_date']:
+        messages['cancel_buffer'] = ('The "Cancel" time must be prior to the Start Time (by at least '
+                                     + str(CANCEL_MIN_MINUTES) + ' minutes).')
+      elif cancel_date > (proposal['start_date'] 
+                          - datetime.timedelta(minutes=CANCEL_MIN_MINUTES)):
+        messages['cancel_buffer'] = ('The "Cancel" time must be at least ' 
+                                     + str(CANCEL_MIN_MINUTES) + ' minutes prior to the Start Time.')
+  return messages

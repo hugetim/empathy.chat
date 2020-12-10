@@ -39,7 +39,7 @@ components:
           border: ''
           enabled: true
           foreground: ''
-          items: [now, later...]
+          items: [now, later at. ..]
           visible: true
           font_size: null
           font: ''
