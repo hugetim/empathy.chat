@@ -27,28 +27,28 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel_initialized = False
     self.update()
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
-    self.repeating_panel_1.set_event_handler('x-update', self.sync_item_alt)
+    self.repeating_panel_1.set_event_handler('x-update', self.alt_update)
 
   def normalize_initial_state(self):
     if self.item['duration'] not in t.DURATION_TEXT.keys():
-      self.drop_down_duration.selected_value = t.closest_duration(self.item['duration'])
+      self.item['duration'] = t.closest_duration(self.item['duration'])
     if self.item['cancel_buffer'] not in t.CANCEL_TEXT.keys():
-      self.date_picker_cancel.date = (self.item['start_date'] 
-                                      - datetime.timedelta(minutes=self.item['cancel_buffer']))
-      self.drop_down_cancel.selected_value = "custom"
+      self.item['cancel_date'] = (self.item['start_date'] 
+                                  - datetime.timedelta(minutes=self.item['cancel_buffer']))
+      self.item['cancel_buffer'] = "custom"
   
   def init_date_picker_start(self):
     self.date_picker_start.min_date = t.DEFAULT_START_MIN
     self.date_picker_start.max_date = t.DEFAULT_START_MAX
-    if not self.date_picker_start.date:
-       self.date_picker_start.date = t.DEFAULT_ITEM['start_date']
+    if not self.item['start_date']:
+       self.item['start_date'] = t.DEFAULT_ITEM['start_date']
     self.date_picker_start_initialized = True
     
   def init_date_picker_cancel(self):
     self.date_picker_cancel.min_date = h.now()
     self.date_picker_cancel.max_date = self.date_picker_start.max_date
-    if not self.date_picker_cancel.date:
-      self.date_picker_cancel.date = t.default_cancel_date(h.now(), self.item['start_date'])
+    if not self.item['cancel_date']:
+      self.item['cancel_date'] = t.default_cancel_date(h.now(), self.item['start_date'])
     self.date_picker_cancel_initialized = True
 
   def update_times(self):
@@ -76,6 +76,7 @@ class CreateForm(CreateFormTemplate):
       else:
         self.date_picker_cancel.visible = False
       self.check_times()
+    self.refresh_data_bindings()
 
   def update_eligible(self):
     if self.drop_down_eligible.selected_value == 0:
@@ -93,7 +94,7 @@ class CreateForm(CreateFormTemplate):
 
   def drop_down_cancel_change(self, **event_args):
     """This method is called when an item is selected"""
-    self.update()   
+    self.update()
     
   def date_picker_start_change(self, **event_args):
     """This method is called when the selected date changes"""
@@ -126,6 +127,7 @@ class CreateForm(CreateFormTemplate):
                                                       + datetime.timedelta(minutes=t.DEFAULT_NEXT_MINUTES)), 
                                        'duration': self.item['duration'], 
                                        'cancel_buffer': self.item['cancel_buffer'],
+                                       'cancel_date': None
                                       }]
     else:
       previous_item = self.item['alt'][-1]
@@ -133,6 +135,7 @@ class CreateForm(CreateFormTemplate):
                                                   + datetime.timedelta(minutes=t.DEFAULT_NEXT_MINUTES)), 
                                         'duration': previous_item['duration'], 
                                         'cancel_buffer': previous_item['cancel_buffer'],
+                                        'cancel_date': None
                                        }]
     self.update()
       
@@ -144,8 +147,11 @@ class CreateForm(CreateFormTemplate):
     """This method is called when an item is selected"""
     self.update()
 
-  def sync_item_alt(self, **event_args):
+  def sync_item_alt(self):
     self.item['alt'] = self.repeating_panel_1.items
+    
+  def alt_update(self, **event_args):
+    self.sync_item_alt()
     
   def proposal(self):
     self.sync_item_alt()

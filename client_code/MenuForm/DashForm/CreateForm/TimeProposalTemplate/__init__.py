@@ -23,11 +23,11 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     
   def normalize_initial_state(self):
     if self.item['duration'] not in t.DURATION_TEXT.keys():
-      self.drop_down_duration.selected_value = t.closest_duration(self.item['duration'])
+      self.item['duration'] = t.closest_duration(self.item['duration'])
     if self.item['cancel_buffer'] not in t.CANCEL_TEXT.keys():
-      self.date_picker_cancel.date = (self.item['start_date'] 
-                                      - datetime.timedelta(minutes=self.item['cancel_buffer']))
-      self.drop_down_cancel.selected_value = "custom"
+      self.item['cancel_date'] = (self.item['start_date'] 
+                                  - datetime.timedelta(minutes=self.item['cancel_buffer']))
+      self.item['cancel_buffer'] = "custom"
   
   def init_date_picker_start(self):
     self.date_picker_start.min_date = t.DEFAULT_START_MIN
@@ -36,8 +36,8 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
   def init_date_picker_cancel(self):
     self.date_picker_cancel.min_date = h.now()
     self.date_picker_cancel.max_date = self.date_picker_start.max_date
-    if not self.date_picker_cancel.date:
-      self.date_picker_cancel.date = t.default_cancel_date(h.now(), self.item['start_date'])
+    if not self.item['cancel_date']:
+      self.item['cancel_date'] = t.default_cancel_date(h.now(), self.item['start_date'])
     self.date_picker_cancel_initialized = True
 
   def update(self):
@@ -49,6 +49,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
       self.date_picker_cancel.visible = False
     self.parent.raise_event('x-update')
     self.check_times()
+    self.refresh_data_bindings()
       
   def drop_down_duration_change(self, **event_args):
     """This method is called when an item is selected"""
