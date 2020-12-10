@@ -51,14 +51,13 @@ class CreateForm(CreateFormTemplate):
                                      ("Direct connections only (1st degree)", 1),
                                      ("Specific 1st degree connection(s)...",0)
                                     ]
-    self.standardize_values()
+    self.normalize_initial_state()
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
-    if not self.item['start_now']:
-      self.drop_down_start_change()
+    self.update()
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
 
-  def standardize_values(self):
+  def normalize_initial_state(self):
     if self.item['duration'] not in t.DURATION_TEXT.keys():
       self.drop_down_duration.selected_value = t.closest_duration(self.item['duration'])
     if self.item['cancel_buffer'] not in t.CANCEL_TEXT.keys():
@@ -79,9 +78,36 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel.date = t.default_cancel_date(h.now(), self.date_picker_start.date)
     self.date_picker_cancel_initialized = True
 
+  def update(self):
+    self.sync_item_alt()
+    if len(self.item['alt']) == 4:
+      self.button_add_alternate.visible = False
+    if self.item['start_now']:
+      self.date_picker_start.visible = False
+      if not self.item['alt']:
+        self.column_panel_cancel.visible = False
+      else:
+        # this keeps the "Cancel" column heading for the alternatives
+        self.column_panel_cancel.visible = True
+        self.drop_down_cancel.visible = False
+        self.date_picker_cancel.visible = False      
+    else:
+      if not self.date_picker_start_initialized:
+        self.init_date_picker_start()
+      self.date_picker_start.visible = True 
+      self.column_panel_cancel.visible = True
+      self.drop_down_cancel.visible = True
+      if self.drop_down_cancel.selected_value == "custom":
+        if not self.date_picker_cancel_initialized:
+          self.init_date_picker_cancel()
+        self.date_picker_cancel.visible = True
+      else:
+        self.date_picker_cancel.visible = False
+      self.check_times()
+    
   def update_cancel_visibility(self):
       if self.item['start_now']:
-        self.set_item_alt()
+        self.sync_item_alt()
         if not self.item['alt']:
           self.column_panel_cancel.visible = False
         else:
@@ -171,7 +197,6 @@ class CreateForm(CreateFormTemplate):
                                        'duration': self.drop_down_duration.selected_value, 
                                        'cancel_drop': self.drop_down_cancel.selected_value,
                                       }]
-      self.update_cancel_visibility()
     else:
       previous_item = self.repeating_panel_1.items[-1]
       self.repeating_panel_1.items += [{'start': (previous_item['start']
@@ -179,8 +204,7 @@ class CreateForm(CreateFormTemplate):
                                         'duration': previous_item['duration'], 
                                         'cancel_drop': previous_item['cancel_drop'],
                                        }]
-    if len(self.repeating_panel_1.items) == 4:
-      self.button_add_alternate.visible = False
+    self.update()
       
   def remove_alternate(self, item_to_remove, **event_args):
     self.repeating_panel_1.items.remove(item_to_remove)
@@ -193,5 +217,5 @@ class CreateForm(CreateFormTemplate):
     else:
       self.multi_select_drop_down.visible = False
 
-  def set_item_alt(self):
+  def sync_item_alt(self):
     self.item['alt'] = self.repeating_panel_1.items
