@@ -19,6 +19,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
 
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
+    # So it has a parent when it raises the 'x-update' event
     self.update()  
     
   def normalize_initial_state(self):
@@ -41,7 +42,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     self.date_picker_cancel_initialized = True
 
   def update(self):
-    if self.drop_down_cancel.selected_value == "custom":
+    if self.item['cancel_buffer'] == "custom":
       if not self.date_picker_cancel_initialized:
         self.init_date_picker_cancel()
       self.date_picker_cancel.visible = True

@@ -69,7 +69,7 @@ class CreateForm(CreateFormTemplate):
       self.date_picker_start.visible = True 
       self.column_panel_cancel.visible = True
       self.drop_down_cancel.visible = True
-      if self.drop_down_cancel.selected_value == "custom":
+      if self.item['cancel_buffer'] == "custom":
         if not self.date_picker_cancel_initialized:
           self.init_date_picker_cancel()
         self.date_picker_cancel.visible = True
