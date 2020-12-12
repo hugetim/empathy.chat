@@ -20,7 +20,8 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
     # So it has a parent when it raises the 'x-update' event
-    self.update()  
+    self.alert_form = get_open_form().proposal_alert
+    self.update()
     
   def normalize_initial_state(self):
     if self.item['duration'] not in t.DURATION_TEXT.keys():
@@ -72,12 +73,16 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     self.label_start.visible = False
     self.label_cancel.visible = False
     messages = t.get_proposal_times_errors(h.now(), self.proposal())
-    if 'start_date' in messages:
-      self.label_start.text = messages['start_date']
-      self.label_start.visible = True
-    elif 'cancel_buffer' in messages:
-      self.label_cancel.text = messages['cancel_buffer']
-      self.label_cancel.visible = True
+    if messages:
+      self.alert_form.enable_save(False)
+      if 'start_date' in messages:
+        self.label_start.text = messages['start_date']
+        self.label_start.visible = True
+      elif 'cancel_buffer' in messages:
+        self.label_cancel.text = messages['cancel_buffer']
+        self.label_cancel.visible = True
+    else:
+      self.alert_form.enable_save(True)
 
   def proposal(self):
     proposal = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}

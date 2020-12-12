@@ -62,7 +62,7 @@ components:
     components:
     - type: Link
       properties: {role: selected, url: '', align: left, tooltip: '', border: '',
-        foreground: 'theme:Primary 500', visible: true, text: HOME, font_size: null,
+        foreground: 'theme:Primary 500', visible: true, text: Home, font_size: null,
         wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left,
         col_widths: '{}', spacing_below: small, italic: false, background: '', bold: false,
         underline: false, icon: 'fa:home'}
@@ -72,7 +72,7 @@ components:
       event_bindings: {click: home_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: CONNECTIONS, font_size: null, wrap_on: mobile,
+          500', visible: true, text: My Network, font_size: null, wrap_on: mobile,
         font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:users'}
@@ -82,7 +82,7 @@ components:
       event_bindings: {click: connections_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: GROUPS, font_size: null, wrap_on: mobile, font: '',
+          500', visible: true, text: Groups, font_size: null, wrap_on: mobile, font: '',
         col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:globe'}
@@ -92,7 +92,7 @@ components:
       event_bindings: {click: groups_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: MY GROUPS, font_size: null, wrap_on: mobile,
+          500', visible: true, text: My Groups, font_size: null, wrap_on: mobile,
         font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:shield'}
@@ -102,7 +102,7 @@ components:
       event_bindings: {click: my_groups_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: PROFILE, font_size: null, wrap_on: mobile, font: '',
+          500', visible: true, text: Profile, font_size: null, wrap_on: mobile, font: '',
         col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:user'}
@@ -112,7 +112,7 @@ components:
       event_bindings: {click: profile_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: SETTINGS, font_size: null, wrap_on: mobile, font: '',
+          500', visible: true, text: Settings, font_size: null, wrap_on: mobile, font: '',
         col_spacing: medium, spacing_above: medium, icon_align: left, col_widths: '',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:cog'}

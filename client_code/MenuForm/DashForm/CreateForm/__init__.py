@@ -6,7 +6,6 @@ import datetime
 
 
 class CreateForm(CreateFormTemplate):
-  @classmethod
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
     self.sync_item_alt()
@@ -132,13 +131,21 @@ class CreateForm(CreateFormTemplate):
     self.label_start.visible = False
     self.label_cancel.visible = False
     messages = t.get_proposal_times_errors(h.now(), self.proposal())
-    if 'start_date' in messages:
-      self.label_start.text = messages['start_date']
-      self.label_start.visible = True
-    elif 'cancel_buffer' in messages:
-      self.label_cancel.text = messages['cancel_buffer']
-      self.label_cancel.visible = True
+    if messages:
+      self.enable_save(False)
+      if 'start_date' in messages:
+        self.label_start.text = messages['start_date']
+        self.label_start.visible = True
+      elif 'cancel_buffer' in messages:
+        self.label_cancel.text = messages['cancel_buffer']
+        self.label_cancel.visible = True
+    else:
+      self.enable_save(True)
 
+  def enable_save(self, enabled):
+    self.save_button.enabled = enabled
+    
+      
   def button_add_alternate_click(self, **event_args):
     """This method is called when the button is clicked
     Refers to self.repeating_panel_1.items rather than self.item['alt']
@@ -178,4 +185,15 @@ class CreateForm(CreateFormTemplate):
     
   def alt_update(self, **event_args):
     self.sync_item_alt()
-    
+
+  def save_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.raise_event("x-close-alert", value=True)
+
+  def cancel_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.raise_event("x-close-alert", value=False)
+
+
+
+

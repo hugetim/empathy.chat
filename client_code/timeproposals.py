@@ -32,7 +32,11 @@ DEFAULT_PROPOSAL = {'start_now': 0,
                     'start_date': DEFAULT_START,
                     'duration': DURATION_DEFAULT_MINUTES,
                     'cancel_buffer': CANCEL_DEFAULT_MINUTES,
-                    'alt': []}
+                    'alt': [],
+                    'eligible': 3,
+                    'eligible_users': [],
+                    'eligible_groups': [],
+                   }
 
 def default_cancel_date(now, start_date):
     minutes_prior = max(CANCEL_MIN_MINUTES,

@@ -39,7 +39,7 @@ components:
           border: ''
           enabled: true
           foreground: ''
-          items: [now, later at. ..]
+          items: [now (items set at runtime), later at. ..]
           visible: true
           font_size: null
           font: ''
@@ -98,8 +98,8 @@ components:
           border: ''
           enabled: true
           foreground: ''
-          items: [15 min. (5 & 5), 25 min. (10 & 10), 35 min. (15 & 15), 45 min. (20 & 20),
-            55 min. (25 & 25), 65 min. (30 & 30)]
+          items: [15 min. (5 & 5) (items set at runtime), 25 min. (10 & 10), 35 min. (15 & 15),
+            45 min. (20 & 20), 55 min. (25 & 25), 65 min. (30 & 30)]
           visible: true
           font_size: null
           font: ''
@@ -203,35 +203,95 @@ components:
     background: '', bold: true, underline: false, icon: ''}
   name: label_4
   layout_properties: {grid_position: 'YYMEXI,XTNOOT'}
-- type: DropDown
-  properties:
-    role: null
-    align: full
-    tooltip: ''
-    placeholder: ''
-    border: ''
-    enabled: true
-    foreground: ''
-    items: [drop_down_eligible (items set at runtime)]
-    visible: true
-    font_size: null
-    font: ''
-    spacing_above: small
-    spacing_below: small
-    italic: false
-    background: theme:Gray 200
-    bold: false
-    underline: false
-    include_placeholder: false
-  name: drop_down_eligible
-  layout_properties: {grid_position: 'MBKZLC,JAYDTW'}
-  event_bindings: {change: drop_down_eligible_change}
-- type: form:RUNLHYPKGVUNP7HZ:MultiSelectDropDown
-  properties:
-    unique: true
-    placeholder: Select connection to add
-    items: [user 1, user 2]
-    visible: false
-  name: multi_select_drop_down
-  layout_properties: {grid_position: 'NASMVA,WNVFLL'}
+- type: ColumnPanel
+  properties: {col_widths: '{"NYUXLB":15,"GNUIJB":45,"FGBSJH":15,"ONGDJV":45}'}
+  name: eligible_network_column_panel
+  layout_properties: {grid_position: 'DWTBKS,KFXKGR'}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'From my network:', font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: label_5
+    layout_properties: {grid_position: 'ZOGPKZ,NYUXLB'}
+  - type: DropDown
+    properties:
+      role: null
+      align: full
+      tooltip: ''
+      placeholder: ''
+      border: ''
+      enabled: true
+      foreground: ''
+      items: [drop_down_eligible (items set at runtime)]
+      visible: true
+      font_size: null
+      font: ''
+      spacing_above: small
+      spacing_below: small
+      italic: false
+      background: theme:Gray 200
+      bold: false
+      underline: false
+      include_placeholder: false
+    name: drop_down_eligible
+    layout_properties: {grid_position: 'ZOGPKZ,GNUIJB'}
+    event_bindings: {change: drop_down_eligible_change}
+    data_bindings:
+    - {property: selected_value, code: 'self.item[''eligible'']', writeback: true}
+  - type: Spacer
+    properties: {height: 32}
+    name: spacer_2
+    layout_properties: {grid_position: 'TDUTAU,FGBSJH'}
+  - type: form:RUNLHYPKGVUNP7HZ:MultiSelectDropDown
+    properties:
+      unique: true
+      placeholder: Select connection to add
+      items: [user 1, user 2]
+      visible: false
+    name: multi_select_drop_down
+    layout_properties: {grid_position: 'TDUTAU,ONGDJV'}
+    data_bindings:
+    - {property: items, code: 'self.item[''eligible_users'']'}
+- type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
+    wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"JVSIPB":10,"SNEKYN":50}',
+    spacing_below: small, background: ''}
+  name: eligible_groups_column_panel
+  layout_properties: {grid_position: 'TPNWHL,YVKYUS'}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'These groups:', font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: label_6
+    layout_properties: {grid_position: 'JWIJWQ,JVSIPB'}
+  - type: form:RUNLHYPKGVUNP7HZ:MultiSelectDropDown
+    properties:
+      unique: true
+      placeholder: Select a value
+      items: [Enter, Your, List, Of, Items, Here]
+      visible: false
+    name: multi_select_drop_down_1
+    layout_properties: {grid_position: 'JWIJWQ,SNEKYN'}
+    data_bindings:
+    - {property: items, code: 'self.item[''eligible_groups'']'}
+- type: Button
+  properties: {role: primary-color, align: right, tooltip: '', border: '', enabled: true,
+    foreground: '', visible: true, text: SAVE, font_size: null, font: '', spacing_above: small,
+    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+    underline: false, icon: ''}
+  name: save_button
+  layout_properties: {grid_position: 'MKSGPG,BGZIZC'}
+  event_bindings: {click: save_button_click}
+- type: Button
+  properties: {role: secondary-color, align: left, tooltip: '', border: '', enabled: true,
+    foreground: '', visible: true, text: CANCEL, font_size: null, font: '', spacing_above: small,
+    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+    underline: false, icon: ''}
+  name: cancel_button
+  layout_properties: {grid_position: 'MKSGPG,WWJCIE'}
+  event_bindings: {click: cancel_button_click}
 is_package: true
