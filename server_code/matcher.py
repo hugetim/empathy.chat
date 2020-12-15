@@ -5,6 +5,7 @@ import datetime
 import anvil.tz
 from . import parameters as p
 from . import server_misc as sm
+from .portable import DashProposal
 
 
 TEST_TRUST_LEVEL = 10
@@ -123,11 +124,18 @@ def _get_now_proposal_time(user):
   for prop in current_proposals:
     trial_get = app_tables.proposal_times.get(proposal=prop,
                                               current=True,
-                                              start_now=True
+                                              start_now=True,
                                              )
     if trial_get:
       return trial_get
   return None
+
+
+def _get_now_accept(user):
+  """Return user's current 'start_now' proposal_times row"""
+  return app_tables.proposal_times.get(user_accepting=user,
+                                       current=True,
+                                      )
 
 
 @anvil.server.callable
@@ -190,40 +198,53 @@ def _get_status(user):
 
 def has_status(user):
   """
-  returns Boolean(current_status)
+  returns bool(current_status)
   """
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = _get_now_proposal_time(user)
   if current_row:
     return True
   else:
-    this_match = current_match(user)
-    if this_match:
-      return True
+    current_accept = _get_now_accept(user)
+    if current_accept:
+       return True
     else:
-      return False
+      this_match = current_match(user)
+      if this_match:
+        return True
+  return False
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_tallies():
-  """Return tallies dictionary
-
-  Side effects: prune requests and request_em settings"""
+  """Return list of DashProposals
+  
+  Side effects: prune requests and request_em settings
+  """
   _prune_requests()
   user = anvil.server.session['user']
   return _get_tallies(user)
 
 
 def _get_tallies(user):
-  tallies =	dict(receive_first=0,
-                 will_offer_first=0,
-                 request_em=0)
-  for row in app_tables.requests.search(current=True, match_id=None):
-    user2 = row['user']
-    if user2 != user and sm.is_visible(user2, user):
-      tallies[row['request_type']] += 1
-  tallies['request_em'] = len(sm.users_to_email_re_notif(user))
-  return tallies
+  return [_dash_proposal(row, user)
+          for row in app_tables.proposal_times.search(current=True, match_id=None)
+                  if _proposal_is_visible(row['proposal'], user)
+         ]
+
+
+def _dash_proposal(proposal_time, user):
+  """Convert proposal_times row into a row for the client dashboard"""
+  proposer = proposal_time['proposal']['user']
+  own = proposer == user
+  return DashProposal(row_id=proposal_time.get_id(), own=own, name=proposer['name'],
+                      start_now=proposal_time['start_now'], start_date=proposal_time['start_date'],
+                      duration=proposal_time['duration'], expire_date=proposal_time['expire_date'],
+                     )
+
+
+def _proposal_is_visible(proposal, user):
+  return sm.is_visible(proposal['user'], user)
 
 
 @anvil.server.callable
