@@ -8,7 +8,6 @@ import datetime
 class CreateForm(CreateFormTemplate):
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
-    self.sync_item_alt()
     proposal = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
     if self.item['cancel_buffer'] != "custom":
       proposal['cancel_buffer'] = self.item['cancel_buffer']
@@ -50,7 +49,6 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel_initialized = False
     self.update()
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
-    self.repeating_panel_1.set_event_handler('x-update', self.alt_update)
 
   def normalize_initial_state(self):
     if self.item['duration'] not in t.DURATION_TEXT.keys():
@@ -75,7 +73,6 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel_initialized = True
 
   def update_times(self):
-    self.sync_item_alt()
     self.button_add_alternate.visible = len(self.item['alt']) < 4
     if self.item['start_now']:
       self.date_picker_start.visible = False
@@ -99,6 +96,7 @@ class CreateForm(CreateFormTemplate):
       else:
         self.date_picker_cancel.visible = False
       self.check_times()
+    print(self.item['alt'])
     self.refresh_data_bindings()
 
   def update_eligible(self):
@@ -145,26 +143,21 @@ class CreateForm(CreateFormTemplate):
   def enable_save(self, enabled):
     self.save_button.enabled = enabled
     
-      
   def button_add_alternate_click(self, **event_args):
-    """This method is called when the button is clicked
-    Refers to self.repeating_panel_1.items rather than self.item['alt']
-      because refresh_data_bindings was not working after assignments
-    """
-    if not self.repeating_panel_1.items:
+    """This method is called when the button is clicked"""
+    if not self.item['alt']:
       if self.item['start_now']:
         start_1 = h.now()
       else:
         start_1 = self.item['start_date']
-      self.repeating_panel_1.items = [{'start_date': (start_1 
-                                                      + t.DEFAULT_NEXT_DELTA), 
+      self.item['alt'] = [{'start_date': (start_1 + t.DEFAULT_NEXT_DELTA), 
                                        'duration': self.item['duration'], 
                                        'cancel_buffer': self.item['cancel_buffer'],
                                        'cancel_date': None
                                       }]
     else:
-      previous_item = self.repeating_panel_1.items[-1]
-      self.repeating_panel_1.items += [{'start_date': (previous_item['start_date']
+      previous_item = self.item['alt'][-1]
+      self.item['alt'] += [{'start_date': (previous_item['start_date']
                                                        + t.DEFAULT_NEXT_DELTA), 
                                         'duration': previous_item['duration'], 
                                         'cancel_buffer': previous_item['cancel_buffer'],
@@ -173,18 +166,12 @@ class CreateForm(CreateFormTemplate):
     self.update()
       
   def remove_alternate(self, item_to_remove, **event_args):
-    self.repeating_panel_1.items.remove(item_to_remove)
+    self.item['alt'].remove(item_to_remove)
     self.update()
 
   def drop_down_eligible_change(self, **event_args):
     """This method is called when an item is selected"""
     self.update()
-
-  def sync_item_alt(self):
-    self.item['alt'] = self.repeating_panel_1.items
-    
-  def alt_update(self, **event_args):
-    self.sync_item_alt()
 
   def save_button_click(self, **event_args):
     """This method is called when the button is clicked"""

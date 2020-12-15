@@ -16,10 +16,6 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     self.normalize_initial_state()
     self.init_date_picker_start()
     self.date_picker_cancel_initialized = False
-
-  def form_show(self, **event_args):
-    """This method is called when the column panel is shown on the screen"""
-    # So it has a parent when it raises the 'x-update' event
     self.alert_form = get_open_form().proposal_alert
     self.update()
     
@@ -50,7 +46,6 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     else:
       self.date_picker_cancel.visible = False
     self.check_times()
-    self.parent.raise_event('x-update')
     self.refresh_data_bindings()
       
   def drop_down_duration_change(self, **event_args):
