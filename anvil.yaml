@@ -280,6 +280,12 @@ db_schema:
       name: start_now
       type: bool
       admin_ui: {order: 1.9375, width: 200}
+    4xEU58r+rnc=:
+      name: user_accepting
+      type: liveObject
+      backend: anvil.tables.Row
+      admin_ui: {order: 2.84375, width: 200}
+      table_id: 18972
     hPi+bFpVPGk=:
       name: ping_start
       type: datetime
