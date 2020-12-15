@@ -42,7 +42,7 @@ def _prune_requests():
   # below (matched separately) ensures that no ping requests left hanging by cancelling only one
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
   cutoff_r = now - timeout
-  old_ping_requests = (r for r in app_tables.requests.search(current=True)
+  old_ping_requests = (r for r in app_tables.proposal_times.search(current=True, start_now=True)
                        if (r['match_id'] is not None and r['ping_start'] < cutoff_r))
   for row in old_ping_requests:
     row['current'] = False
@@ -173,21 +173,22 @@ def _get_status(user):
   """
   current_row = _get_now_proposal_time(user)
   status = None
-  last_confirmed = None
+  expire_date = None
   ping_start = None
   tallies = _get_tallies(user)
   if current_row:
     if current_row['match_id']:
       status = "pinged"
+      ping_start = current_row['ping_start']
     else:
       status = "requesting"
-      expire_date = current_row['expire_date']
+    expire_date = current_row['expire_date']
   else:
     current_accept = _get_now_accept(user)
     if current_accept:
       status = "pinging"
-      ping_start = current_row['ping_start']
-      expire_date = current_row['expire_date']
+      ping_start = current_accept['ping_start']
+      expire_date = current_accept['expire_date']
     else:
       this_match = current_match(user)
       if this_match:
@@ -235,9 +236,10 @@ def _get_tallies(user):
 
 def _dash_proposal(proposal_time, user):
   """Convert proposal_times row into a row for the client dashboard"""
-  proposer = proposal_time['proposal']['user']
+  proposal = proposal_time['proposal']
+  proposer = proposal['user']
   own = proposer == user
-  return DashProposal(row_id=proposal_time.get_id(), own=own, name=proposer['name'],
+  return DashProposal(prop_id=proposal.get_id(), time_id=proposal_time.get_id(), own=own, name=proposer['name'],
                       start_now=proposal_time['start_now'], start_date=proposal_time['start_date'],
                       duration=proposal_time['duration'], expire_date=proposal_time['expire_date'],
                      )
@@ -250,207 +252,204 @@ def _proposal_is_visible(proposal, user):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_code(user_id=""):
-  """returns jitsi_code, request_type (or Nones)"""
+  """returns jitsi_code, duration (or Nones)"""
   print("get_code", user_id)
   user = sm.get_user(user_id)
-  current_row = app_tables.requests.get(user=user, current=True)
-  code = None
-  request_type = None
+  
+  current_row = _get_now_proposal_time(user)
   if current_row:
-    code = current_row['jitsi_code']
-    request_type = current_row['request_type']
+    return current_row['jitsi_code'], current_row['duration']
   else:
-    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    this_match, i = current_match_i(user)
-    code = this_match['jitsi_code'] # assumes only one uncompleted for this user
-    request_type = this_match['request_types'][i]
-  return code, request_type
-
-
-def _create_match(user, excluded=()):
-  """attempt to create a match for user"""
-  excluded_users = list(excluded)
-  current_row = app_tables.requests.get(user=user, current=True)
-  if current_row:
-    request_type = current_row['request_type']
-    if request_type == "will_offer_first":
-      requests = [r for r in app_tables.requests.search(current=True,
-                                                        match_id=None)
-                  if (r['user'] not in [user] + excluded_users
-                      and sm.is_visible(r['user'], user))]
+    current_accept = _get_now_accept(user)
+    if current_accept:
+       return current_accept['jitsi_code'], current_accept['duration']
     else:
-      assert request_type == "receive_first"
-      requests = [r for r in app_tables.requests.search(current=True,
-                                                        request_type="will_offer_first",
-                                                        match_id=None)
-                  if (r['user'] not in [user] + excluded_users
-                      and sm.is_visible(r['user'], user))]
-    if requests:
-      current_row['ping_start'] = sm.now()
-      current_row['match_id'] = sm.new_match_id()
-      current_row['jitsi_code'] = sm.new_jitsi_code()
-      cms = [r['missed_pings'] for r in requests]
-      eligible_requests = [r for r in requests if r['missed_pings'] == min(cms)]
-      earliest_request = min(eligible_requests, key=lambda row: row['start'])
-      earliest_request['ping_start'] = current_row['ping_start']
-      earliest_request['match_id'] = current_row['match_id']
-      earliest_request['jitsi_code'] = current_row['jitsi_code']
-      lc = min(current_row['last_confirmed'],
-               earliest_request['last_confirmed'])
-      if (current_row['ping_start'] - lc).seconds <= p.BUFFER_SECONDS:
-        _match_commenced(user)
-      else:
-        if lc == current_row['last_confirmed']:
-          sm.pinged_email(user)
-        else:
-          sm.pinged_email(earliest_request['user'])
-
-
-def _create_matches(excluded=()):
-  """attempt to create a match from existing requests, iterate"""
-  excluded_users = list(excluded)
-  # find top request in queue
-  all_requests = [r for r in app_tables.requests.search(current=True,
-                                                        match_id=None)
-                    if r['user'] not in excluded_users]
-  if all_requests:
-    all_cms = [r['missed_pings'] for r in all_requests]
-    all_eligible_requests = [r for r in all_requests if r['missed_pings'] == min(all_cms)]
-    current_row = min(all_eligible_requests, key=lambda row: row['start'])
-    user = current_row['user']
-    # attempt to create a match for top request
-    _create_match(user, excluded_users)
-    # attempt to create matches for remaining requests
-    _create_matches(excluded_users + [user])
+      this_match = current_match(user)
+      if this_match:
+        return this_match['jitsi_code'], this_match['duration']
+  return None, None
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def add_request(request_type, user_id=""):
+def accept_proposal(proptime_id, user_id=""):
+  """Return status, seconds_left, tallies
+  
+  Side effect: update proptime table with acceptance, if available
   """
-  return status, last_confirmed, ping_start, num_emailed
-  """
-  print("add_request", request_type, user_id)
+  print("accept_proposal", proptime_id, user_id)
   user = sm.get_user(user_id)
-  return _add_request(user, request_type)
+  return _attempt_accept_proposal(user, proptime_id)
 
 
-def _add_request(user, request_type):
-  """
-  return status, seconds_left, num_emailed
-  """
-  num_emailed = 0
-  status, seconds_left, tallies = _get_status(user)
-  assert status is None
-  _add_request_row(user, request_type)
-  _create_matches()
-  status, seconds_left, tallies = _get_status(user)
+def _accept_proposal(user, proptime, status):
   if status == "requesting":
-    num_emailed = sm.request_emails(request_type, user)
-  return status, seconds_left, num_emailed
+    own_now_proposal = _get_now_proposal_time(user)
+    if own_now_proposal:
+      own_now_proposal['current'] = False
+  proposal = proptime['proposal']
+  proptime['user_accepting'] = user
+  proptime['ping_start'] = sm.now()
+  proptime['match_id'] = sm.new_match_id()
+  proptime['jitsi_code'] = sm.new_jitsi_code()
+  if (proptime['expire_date'] - datetime.timedelta(seconds=p.WAIT_SECONDS) 
+                              - proptime['ping_start']).seconds <= p.BUFFER_SECONDS:
+    _match_commenced(user)
+  else:
+    sm.pinged_email(proposal['user'])
 
 
-def _cancel(user):
-  current_row = app_tables.requests.get(user=user, current=True)
-  if current_row:
-    current_row['current'] = False
-    if current_row['match_id']:
-      matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
-                                                    current=True)
-      for row in matched_requests:
-        row['ping_start'] = None
-        row['match_id'] = None
-        row['jitsi_code'] = None
-        if _seconds_left("requesting", row['last_confirmed']) <= 0:
-          row['current'] = False
-      current_row['missed_pings'] += 1
-      _create_matches()
-  return _get_tallies(user)
-
-
-@anvil.server.callable
-@anvil.tables.in_transaction
-def cancel(user_id=""):
-  """
-  Remove request and cancel match (if applicable)
-  Cancel any expired requests part of a cancelled match
-  Returns tallies
-  """
-  print("cancel", user_id)
-  user = sm.get_user(user_id)
-  return _cancel(user)
-
-
-def _cancel_other(user):
-  current_row = app_tables.requests.get(user=user, current=True)
-  if current_row:
-    if current_row['match_id']:
-      matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
-                                                    current=True)
-      for row in matched_requests:
-        row['ping_start'] = None
-        row['match_id'] = None
-        row['jitsi_code'] = None
-        if row['user'] != user:
-          row['missed_pings'] += 1
-          row['current'] = False
-        if _seconds_left("requesting", row['last_confirmed']) <= 0:
-          row['current'] = False
-      _create_matches()
+def _attempt_accept_proposal(user, proptime_id):
+  status, seconds_left, tallies = _get_status(user)
+  if status in [None, "requesting"]:
+    proptime = app_tables.proposal_times.get_by_id(proptime_id)
+    if proptime['current'] and (proptime['user_accepting'] is None) and _proposal_is_visible(proptime['proposal'], user):
+      _accept_proposal(user, proptime, status)
   return _get_status(user)
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def cancel_other(user_id=""):
+def add_request(prop_dict, user_id=""):
+  """Return status, seconds_left, tallies
+  
+  Side effect: Update proposal tables with additions, if valid
   """
-  return new status
-  Upon failure of other to confirm match
-  cancel match (if applicable)--and cancel their request
-  Cancel any other expired requests part of a cancelled match
-  """
-  print("cancel_other", user_id)
+  print("add_request", prop_dict, user_id)
   user = sm.get_user(user_id)
-  return _cancel_other(user)
+  return _add_request(user, prop_dict)
+
+
+def _add_request(user, prop_dict):
+  status, seconds_left, tallies = _get_status(user)
+  if status is None:
+    _add_request_rows(user, prop_dict)
+  return _get_status(user)
+
+
+def _add_request_rows(user, prop_dict):
+  now = sm.now()
+  new_proposal = app_tables.proposals.add_row(user=user,
+                                              current=True,
+                                              request_type=request_type,
+                                              created=now,
+                                              last_edited=now,
+                                              eligible=prop_dict['eligible'],
+                                              eligible_users=prop_dict['eligible_users'],
+                                              eligible_groups=prop_dict['eligible_groups'],
+                                             )
+  _add_proposal_time(proposal=new_proposal,
+                     start_now=prop_dict['start_now'],
+                     start_date=prop_dict['start_date'],
+                     duration=prop_dict['duration'],
+                     expire_date=prop_dict['start_date']-prop_dict['cancel_buffer'],
+                    )
+  for alt_time in prop_dict['alt']:
+    _add_proposal_time(proposal=new_proposal,
+                       start_now=alt_time['start_now'],
+                       start_date=alt_time['start_date'],
+                       duration=alt_time['duration'],
+                       expire_date=alt_time['start_date']-alt_time['cancel_buffer'],
+                      )
+  return new_proposal
+
+
+def _add_proposal_time(proposal, start_now, start_date, duration, expire_date):
+  new_time = app_tables.proposal_times.add_row(proposal=proposal,
+                                               start_now=start_now,
+                                               start_date=start_date,
+                                               duration=duration,
+                                               expire_date=expire_date,
+                                               current=True,
+                                               missed_pings=0,
+                                              )
+  
+    
+def _cancel(user, proptime_id):
+  current_row = app_tables.proposal_times.get_by_id(proptime_id)
+  if current_row:
+    if user == current_row['user_accepting']:
+      current_row['user_accepting'] = None
+      current_row['ping_start'] = None
+      current_row['match_id'] = None
+      current_row['jitsi_code'] = None
+      if sm.now() > current_row['expire_date']:
+        current_row['current'] = False
+    elif user == current_row[proposal][user]:
+      current_row['current'] = False
+  return _get_tallies(user)
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def match_commenced(user_id=""):
+def cancel(proptime_id, user_id=""):
+  """Remove proptime and cancel pending match (if applicable)
+  Return tallies
   """
-  Returns _get_status(user)
-  Upon first commence, copy row over and delete "matching" row.
-  Should not cause error if already commenced
-  """
-  print("match_commenced", user_id)
+  print("cancel", proptime_id, user_id)
   user = sm.get_user(user_id)
-  return _match_commenced(user)
+  return _cancel(user, proptime_id)
 
 
-def _match_commenced(user):
+def _cancel_other(user, proptime_id):
+  current_row = app_tables.proposal_times.get_by_id(proptime_id)
+  if current_row:
+    if user == current_row['user_accepting']:
+      current_row['current'] = False
+      row['missed_pings'] += 1
+    elif user == current_row[proposal][user]:      
+      current_row['user_accepting'] = None
+      current_row['ping_start'] = None
+      current_row['match_id'] = None
+      current_row['jitsi_code'] = None
+      if sm.now() > current_row['expire_date']:
+        current_row['current'] = False
+  return _get_status(user)
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def cancel_other(proptime_id, user_id=""):
+  """Return new status
+  Upon failure of other to confirm match
+  cancel match (if applicable)--and cancel their request
+  Cancel any other expired requests part of a cancelled match
   """
-  Returns _get_status(user)
+  print("cancel_other", proptime_id, user_id)
+  user = sm.get_user(user_id)
+  return _cancel_other(user, proptime_id)
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def match_commenced(proptime_id, user_id=""):
+  """Returns _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
-  current_row = app_tables.requests.get(user=user, current=True)
+  print("match_commenced", proptime_id, user_id)
+  user = sm.get_user(user_id)
+  return _match_commenced(user, proptime_id)
+
+
+def _match_commenced(user, proptime_id):
+  """Returns _get_status(user)
+  Upon first commence, copy row over and delete "matching" row.
+  Should not cause error if already commenced
+  """
+  current_row = app_tables.proposal_times.get_by_id(proptime_id)
   if current_row:
     if current_row['match_id']:
-      matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
-                                                    current=True)
       match_start = sm.now()
-      new_match = app_tables.matches.add_row(users=[],
-                                             request_types=[],
+      users = [current_row['proposal'][user], current_row['accepting_user']]
+      new_match = app_tables.matches.add_row(users=users,
+                                             duration=current_row['duration'],
                                              match_id=current_row['match_id'],
                                              jitsi_code=current_row['jitsi_code'],
                                              match_commence=match_start,
-                                             complete=[])
-      for row in matched_requests:
-        new_match['users'] += [row['user']]
-        new_match['request_types'] += [row['request_type']]
-        # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-        new_match['complete'] += [0]
-        row['current'] = False
+                                             complete=[0]*len(users))
+      # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
+      current_row['current'] = False
   return _get_status(user)
 
 
@@ -466,18 +465,6 @@ def match_complete(user_id=""):
   temp[i] = 1
   this_match['complete'] = temp
   return _get_tallies(user)
-
-
-def _add_request_row(user, request_type):
-  now = sm.now()
-  new_row = app_tables.requests.add_row(user=user,
-                                        current=True,
-                                        request_type=request_type,
-                                        start=now,
-                                        last_confirmed=now,
-                                        missed_pings=0
-                                       )
-  return new_row
 
 
 def current_match(user):

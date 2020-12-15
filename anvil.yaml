@@ -157,7 +157,7 @@ db_schema:
     0aJF4Qcv3Fs=:
       name: current
       type: bool
-      admin_ui: {order: 6, width: 200}
+      admin_ui: {order: -1, width: 200}
     444E1fE3Bi8=:
       name: eligible_users
       type: liveObjectArray
@@ -296,9 +296,9 @@ db_schema:
   id: 18973
   python_name: matches
   columns:
-    DePapzMZJe0=:
-      name: request_types
-      type: simpleObject
+    0WcGVIBZPms=:
+      name: duration
+      type: number
       admin_ui: {order: 3.25, width: 200}
     FpbExr79vEw=:
       name: match_commence

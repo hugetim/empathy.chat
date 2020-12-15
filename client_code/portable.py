@@ -4,9 +4,10 @@ import anvil.server
 @anvil.server.portable_class
 class DashProposal():
 
-    def __init__(self, row_id=None, own=None, name=None, 
+    def __init__(self, prop_id=None, time_id=None, own=None, name=None, 
                  start_now=None, start_date=None, duration=None, expire_date=None):
-        self.row_id = row_id
+        self.prop_id = prop_id
+        self.time_id = time_id
         self.own = own
         self.name = name
         self.start_now = start_now

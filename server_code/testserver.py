@@ -25,25 +25,26 @@ def test_add_user(em, level=1, r_em=False, p_em=False):
 @anvil.tables.in_transaction
 def test_add_request(user_id, request_type = "will_offer_first"):
   print("test_add_request", user_id, request_type)
-  assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
-  if not anvil.server.session['test_record']:
-    anvil.server.session['test_record'] = create_tests_record()
-  user = app_tables.users.get_by_id(user_id)
-  s, sl, n = matcher._add_request(user, request_type)
-  
-  test_requests = anvil.server.session['test_record']['test_requests']
-  new_row = app_tables.requests.get(user=user, current=True)  
-  if new_row: # fails if match commenced instantly 
-    anvil.server.session['test_record']['test_requests'] = test_requests + [new_row]
-  else:
-    current_matches = app_tables.matches.search(users=[user], complete=[0])
-    for row in current_matches:
-      i = row['users'].index(user)
-      if row['complete'][i] == 0:
-        new_match = row
-    test_row = app_tables.requests.get(user=user, match_id=new_match['match_id'])
-    anvil.server.session['test_record']['test_requests'] = test_requests + [test_row]
-  return new_row
+  pass
+#  assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
+#  if not anvil.server.session['test_record']:
+#    anvil.server.session['test_record'] = create_tests_record()
+#  user = app_tables.users.get_by_id(user_id)
+#  s, sl, n = matcher._add_request(user, request_type)
+#  
+#  test_requests = anvil.server.session['test_record']['test_requests']
+#  new_row = app_tables.requests.get(user=user, current=True)  
+#  if new_row: # fails if match commenced instantly 
+#    anvil.server.session['test_record']['test_requests'] = test_requests + [new_row]
+#  else:
+#    current_matches = app_tables.matches.search(users=[user], complete=[0])
+#    for row in current_matches:
+#      i = row['users'].index(user)
+#      if row['complete'][i] == 0:
+#        new_match = row
+#    test_row = app_tables.requests.get(user=user, match_id=new_match['match_id'])
+#    anvil.server.session['test_record']['test_requests'] = test_requests + [test_row]
+#  return new_row
 
 
 def create_tests_record():
