@@ -11,7 +11,7 @@ from .portable import DashProposal
 TEST_TRUST_LEVEL = 10
 
 
-def _seconds_left(status, last_confirmed, ping_start=None):
+def _seconds_left(status, expire_date, ping_start=None):
   if status in ["pinging", "pinged"]:
     if ping_start:
       confirm_match = p.CONFIRM_MATCH_SECONDS - (sm.now() - ping_start).seconds
@@ -22,8 +22,8 @@ def _seconds_left(status, last_confirmed, ping_start=None):
     elif status == "pinged":
       return confirm_match + p.BUFFER_SECONDS # accounts for delay in ping arriving
   elif status == "requesting":
-    if last_confirmed:
-      return p.WAIT_SECONDS - (sm.now() - last_confirmed).seconds
+    if expire_date:
+      return (expire_date - sm.now()).seconds
     else:
       return p.WAIT_SECONDS
   elif status in [None, "matched"]:
@@ -77,7 +77,7 @@ def init():
   returns trust_level, request_em, pinged_em, current_status, ref_time (or None),
           tallies, alt_avail, email_in_list
   prunes old requests/offers/matches
-  updates last_confirmed if currently requesting/ping
+  updates expire_date if currently requesting/ping
   """
   print("('init')")
   sm.initialize_session()
@@ -141,17 +141,17 @@ def _get_now_accept(user):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def confirm_wait(user_id=""):
-  """updates last_confirmed for current request, returns _get_status(user)"""
+  """updates expire_date for current request, returns _get_status(user)"""
   print("confirm_wait", user_id)
   user = sm.get_user(user_id)
   return confirm_wait_helper(user)
 
 
 def confirm_wait_helper(user):
-  """updates last_confirmed for current request, returns _get_status(user)"""  
+  """updates expire_date for current request, returns _get_status(user)"""  
   current_row = _get_now_proposal_time(user)
   if current_row:
-    current_row['expire_date'] = sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
+    current_row['expire_date'] = sm.now() + _seconds_left("requesting")
   status, seconds_left, tallies = _get_status(user)
   return status, seconds_left, tallies
 
@@ -164,9 +164,7 @@ def get_status(user_id=""):
 
 
 def _get_status(user):
-  """
-  returns current_status, last_confirmed, ping_start, tallies
-  last_confirmed: min of this or other's last_confirmed
+  """Returns current_status, seconds_left, tallies
   ping_start: ping_start or, for "matched", match_commence
   assumes 2-person matches only
   assumes now proposals only
@@ -292,7 +290,7 @@ def _accept_proposal(user, proptime, status):
   proptime['ping_start'] = sm.now()
   proptime['match_id'] = sm.new_match_id()
   proptime['jitsi_code'] = sm.new_jitsi_code()
-  if (proptime['expire_date'] - datetime.timedelta(seconds=p.WAIT_SECONDS) 
+  if (proptime['expire_date'] - datetime.timedelta(seconds=_seconds_left("requesting")) 
                               - proptime['ping_start']).seconds <= p.BUFFER_SECONDS:
     _match_commenced(user)
   else:
@@ -322,7 +320,7 @@ def add_request(prop_dict, user_id=""):
 
 def _add_request(user, prop_dict):
   status, seconds_left, tallies = _get_status(user)
-  if status is None:
+  if status is None or not prop_dict['start_now']:
     _add_request_rows(user, prop_dict)
   return _get_status(user)
 
@@ -355,6 +353,8 @@ def _add_request_rows(user, prop_dict):
 
 
 def _add_proposal_time(proposal, start_now, start_date, duration, expire_date):
+  if start_now:
+    expire_date = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
   new_time = app_tables.proposal_times.add_row(proposal=proposal,
                                                start_now=start_now,
                                                start_date=start_date,
