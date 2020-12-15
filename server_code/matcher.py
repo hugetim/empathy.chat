@@ -35,12 +35,12 @@ def _prune_requests():
   """Prune definitely outdated requests, unmatched then matched"""
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
   cutoff_r = sm.now() - timeout
-  old_requests = (r for r in app_tables.requests.search(current=True, match_id=None)
+  old_requests = (r for r in app_tables.proposal_times.search(current=True, match_id=None)
                     if r['last_confirmed'] < cutoff_r)
   for row in old_requests:
     row['current'] = False
   # below (matched separately) ensures that no ping requests left hanging by cancelling only one
-  old_ping_requests = (r for r in app_tables.requests.search(current=True)
+  old_ping_requests = (r for r in app_tables.proposal_times.search(current=True)
                        if (r['match_id'] is not None and r['ping_start'] < cutoff_r))
   for row in old_ping_requests:
     row['current'] = False
@@ -61,7 +61,7 @@ def _prune_matches():
     row['complete'] = temp
     
 def _get_request_type(user):
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   if current_row:
     return current_row['request_type']
 
@@ -126,7 +126,7 @@ def confirm_wait(user_id=""):
 
 def confirm_wait_helper(user):
   """updates last_confirmed for current request, returns _get_status(user)"""
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   if current_row:
     current_row['last_confirmed'] = sm.now()
   status, seconds_left, tallies = _get_status(user)
@@ -147,7 +147,7 @@ def _get_status(user):
   ping_start: ping_start or, for "matched", match_commence
   assumes 2-person matches only
   """
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   status = None
   last_confirmed = None
   ping_start = None
@@ -155,7 +155,7 @@ def _get_status(user):
   if current_row:
     if current_row['match_id']:
       matched_request_confirms = [r['last_confirmed'] for r
-                                  in app_tables.requests.search(match_id=current_row['match_id'],
+                                  in app_tables.proposal_times.search(match_id=current_row['match_id'],
                                                                 current=True)]
       last_confirmed = min(matched_request_confirms)
       ping_start = current_row['ping_start']
@@ -180,7 +180,7 @@ def has_status(user):
   """
   returns Boolean(current_status)
   """
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   if current_row:
     return True
   else:
@@ -206,7 +206,7 @@ def _get_tallies(user):
   tallies =	dict(receive_first=0,
                  will_offer_first=0,
                  request_em=0)
-  for row in app_tables.requests.search(current=True, match_id=None):
+  for row in app_tables.proposal_times.search(current=True, match_id=None):
     user2 = row['user']
     if user2 != user and sm.is_visible(user2, user):
       tallies[row['request_type']] += 1
@@ -220,7 +220,7 @@ def get_code(user_id=""):
   """returns jitsi_code, request_type (or Nones)"""
   print("get_code", user_id)
   user = sm.get_user(user_id)
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   code = None
   request_type = None
   if current_row:
@@ -237,17 +237,17 @@ def get_code(user_id=""):
 def _create_match(user, excluded=()):
   """attempt to create a match for user"""
   excluded_users = list(excluded)
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   if current_row:
     request_type = current_row['request_type']
     if request_type == "will_offer_first":
-      requests = [r for r in app_tables.requests.search(current=True,
+      requests = [r for r in app_tables.proposal_times.search(current=True,
                                                         match_id=None)
                   if (r['user'] not in [user] + excluded_users
                       and sm.is_visible(r['user'], user))]
     else:
       assert request_type == "receive_first"
-      requests = [r for r in app_tables.requests.search(current=True,
+      requests = [r for r in app_tables.proposal_times.search(current=True,
                                                         request_type="will_offer_first",
                                                         match_id=None)
                   if (r['user'] not in [user] + excluded_users
@@ -277,7 +277,7 @@ def _create_matches(excluded=()):
   """attempt to create a match from existing requests, iterate"""
   excluded_users = list(excluded)
   # find top request in queue
-  all_requests = [r for r in app_tables.requests.search(current=True,
+  all_requests = [r for r in app_tables.proposal_times.search(current=True,
                                                         match_id=None)
                     if r['user'] not in excluded_users]
   if all_requests:
@@ -318,11 +318,11 @@ def _add_request(user, request_type):
 
 
 def _cancel(user):
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   if current_row:
     current_row['current'] = False
     if current_row['match_id']:
-      matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
+      matched_requests = app_tables.proposal_times.search(match_id=current_row['match_id'],
                                                     current=True)
       for row in matched_requests:
         row['ping_start'] = None
@@ -349,10 +349,10 @@ def cancel(user_id=""):
 
 
 def _cancel_other(user):
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
-      matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
+      matched_requests = app_tables.proposal_times.search(match_id=current_row['match_id'],
                                                     current=True)
       for row in matched_requests:
         row['ping_start'] = None
@@ -400,10 +400,10 @@ def _match_commenced(user):
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
-  current_row = app_tables.requests.get(user=user, current=True)
+  current_row = app_tables.proposal_times.get(user=user, current=True)
   if current_row:
     if current_row['match_id']:
-      matched_requests = app_tables.requests.search(match_id=current_row['match_id'],
+      matched_requests = app_tables.proposal_times.search(match_id=current_row['match_id'],
                                                     current=True)
       match_start = sm.now()
       new_match = app_tables.matches.add_row(users=[],
@@ -437,7 +437,7 @@ def match_complete(user_id=""):
 
 def _add_request_row(user, request_type):
   now = sm.now()
-  new_row = app_tables.requests.add_row(user=user,
+  new_row = app_tables.proposal_times.add_row(user=user,
                                         current=True,
                                         request_type=request_type,
                                         start=now,

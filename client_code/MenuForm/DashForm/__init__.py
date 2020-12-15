@@ -84,15 +84,17 @@ class DashForm(DashFormTemplate):
                    + 'about each request for empathy.')
     return text
     
-
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.top_form.proposal_alert = CreateForm(item=CreateForm.proposal_to_item(t.DEFAULT_PROPOSAL))
+    content = CreateForm(item=CreateForm.proposal_to_item(t.DEFAULT_PROPOSAL))
+    self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
                 title="New Empathy Chat Proposal",
                 large=True,
                 dismissible=False,
                 buttons=[])
-
-
-
+    if out is True:
+      if content.item['start_now']:
+        s, sl, num_emailed = anvil.server.call('add_request', self.request_type)
+        self.top_form.set_seconds_left(s, sl)
+        self.top_form.reset_status()

@@ -51,14 +51,6 @@ class MenuForm(MenuFormTemplate):
     #print('before status change: ', self.seconds_left)
     self.status = new_status
 
-  def request_button_click(self, request_type):
-    self.request_type = request_type
-    s, sl, num_emailed = anvil.server.call('add_request', self.request_type)
-    self.set_seconds_left(s, sl)
-    self.reset_status()
-    if self.status == "requesting" and num_emailed > 0:
-      self.emailed_notification(num_emailed).show()
-    
   def emailed_notification(self, num):
     """Return Notification (assumes num>0)"""
     if num == 1:
