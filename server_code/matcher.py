@@ -34,7 +34,7 @@ def _seconds_left(status, expire_date, ping_start=None, now=sm.now()):
 
 def _prune_requests(now=sm.now()):
   """Prune definitely outdated requests, unmatched then matched"""
-  old_requests = (r for r in app_tables.proposal_times.search(current=True, match_id=None)
+  old_requests = (r for r in app_tables.proposal_times.search(current=True, jitsi_code=None)
                     if r['expire_date'] < now)
   for row in old_requests:
     row['current'] = False
@@ -42,7 +42,7 @@ def _prune_requests(now=sm.now()):
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
   cutoff_r = now - timeout
   old_ping_requests = (r for r in app_tables.proposal_times.search(current=True, start_now=True)
-                       if (r['jitsi_code'] is not None and max(r['accept_dates']) < cutoff_r))
+                       if (r['jitsi_code'] is not None and r['accept_date'] < cutoff_r))
   for row in old_ping_requests:
     row['current'] = False
 
@@ -132,7 +132,7 @@ def _get_now_proposal_time(user):
 
 def _get_now_accept(user):
   """Return user's current 'start_now' proposal_times row"""
-  return app_tables.proposal_times.get(users_accepting=user,
+  return app_tables.proposal_times.get(users_accepting=[user],
                                        current=True,
                                       )
 
@@ -164,7 +164,7 @@ def get_status(user_id=""):
 
 def _get_status(user):
   """Returns current_status, seconds_left, tallies
-  ping_start: max(accept_dates) or, for "matched", match_commence
+  ping_start: accept_date or, for "matched", match_commence
   assumes 2-person matches only
   assumes now proposals only
   """
@@ -176,7 +176,7 @@ def _get_status(user):
   if current_row:
     if current_row['jitsi_code']:
       status = "pinged"
-      ping_start = max(current_row['accept_dates'])
+      ping_start = current_row['accept_date']
     else:
       status = "requesting"
     expire_date = current_row['expire_date']
@@ -185,7 +185,7 @@ def _get_status(user):
     if current_accept:
       if current_accept['jitsi_code']:
         status = "pinging"
-        ping_start = max(current_accept['accept_dates'])
+        ping_start = current_accept['accept_date']
         expire_date = current_accept['expire_date']
     else:
       this_match = current_match(user)
@@ -288,7 +288,7 @@ def _accept_proposal(user, proptime, status, now=sm.now()):
       own_now_proposal['current'] = False
   proposal = proptime['proposal']
   proptime['users_accepting'] = [user]
-  proptime['accept_dates'] = [now]
+  proptime['accept_date'] = now
   proptime['jitsi_code'] = sm.new_jitsi_code()
   if (proptime['expire_date'] - datetime.timedelta(seconds=_seconds_left("requesting")) 
                               - now).seconds <= p.BUFFER_SECONDS:
@@ -371,13 +371,9 @@ def _cancel(user, proptime_id, now=sm.now()):
 
 
 def _remove_user_accepting(user, proposal_time):
-  user_i = proposal_time['users_accepting'].index(user)
   new_users = list(proposal_time['users_accepting'].copy())
   new_users.remove(user)
-  proposal_time['users_accepting'] = new_users
-  new_dates = list(proposal_time['accept_dates'])
-  new_dates.pop(user_i)
-  proposal_time['accept_dates'] = new_dates
+  proposal_time['accept_date'] = None
 
   
 @anvil.server.callable
@@ -399,7 +395,7 @@ def _cancel_other(user, proptime_id, now=sm.now()):
       row['missed_pings'] += 1
     elif user == current_row[proposal][user]:      
       current_row['users_accepting'] = None
-      current_row['accept_dates'] = None
+      current_row['accept_date'] = None
       current_row['jitsi_code'] = None
       if now > current_row['expire_date']:
         current_row['current'] = False
