@@ -95,7 +95,7 @@ def add_message(user_id="", message="[blank]", now=now()):
   app_tables.chat.add_row(match=this_match,
                           user=user,
                           message=anvil.secrets.encrypt_with_key("new_key", message),
-                          time_stamp=now
+                          time_stamp=now)
   return _get_messages(user)
 
 
