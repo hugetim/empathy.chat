@@ -96,7 +96,6 @@ class CreateForm(CreateFormTemplate):
       else:
         self.date_picker_cancel.visible = False
       self.check_times()
-    print(self.item['alt'])
     self.refresh_data_bindings()
 
   def update_eligible(self):
