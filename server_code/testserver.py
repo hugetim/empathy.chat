@@ -42,7 +42,7 @@ def test_add_request(user_id, request_type = "will_offer_first"):
 #      i = row['users'].index(user)
 #      if row['complete'][i] == 0:
 #        new_match = row
-#    test_row = app_tables.requests.get(user=user, match_id=new_match['match_id'])
+#    test_row = new_match['proposal_time']
 #    anvil.server.session['test_record']['test_requests'] = test_requests + [test_row]
 #  return new_row
 
@@ -64,7 +64,7 @@ def test_clear():
     for user in row['test_users']:
       user.delete()
     for request in row['test_requests']:
-      test_matches.add(app_tables.matches.get(match_id=request['match_id']))
+      test_matches.add(app_tables.matches.get(proposal_time=request))
       request.delete()
     row.delete()
     for match in test_matches:

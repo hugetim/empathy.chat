@@ -72,11 +72,6 @@ def new_jitsi_code():
   return code
 
 
-def new_match_id():
-  match_id = uuid.uuid4()
-  return match_id.int
-
-
 def prune_messages():
   """Prune messages from fully completed matches"""
   all_messages = app_tables.chat.search()

@@ -42,7 +42,7 @@ def _prune_requests(now=sm.now()):
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
   cutoff_r = now - timeout
   old_ping_requests = (r for r in app_tables.proposal_times.search(current=True, start_now=True)
-                       if (r['match_id'] is not None and r['ping_start'] < cutoff_r))
+                       if (r['jitsi_code'] is not None and max(r['accept_dates']) < cutoff_r))
   for row in old_ping_requests:
     row['current'] = False
 
@@ -132,7 +132,7 @@ def _get_now_proposal_time(user):
 
 def _get_now_accept(user):
   """Return user's current 'start_now' proposal_times row"""
-  return app_tables.proposal_times.get(user_accepting=user,
+  return app_tables.proposal_times.get(users_accepting=user,
                                        current=True,
                                       )
 
@@ -164,7 +164,7 @@ def get_status(user_id=""):
 
 def _get_status(user):
   """Returns current_status, seconds_left, tallies
-  ping_start: ping_start or, for "matched", match_commence
+  ping_start: max(accept_dates) or, for "matched", match_commence
   assumes 2-person matches only
   assumes now proposals only
   """
@@ -174,18 +174,19 @@ def _get_status(user):
   ping_start = None
   tallies = _get_tallies(user)
   if current_row:
-    if current_row['match_id']:
+    if current_row['jitsi_code']:
       status = "pinged"
-      ping_start = current_row['ping_start']
+      ping_start = max(current_row['accept_dates'])
     else:
       status = "requesting"
     expire_date = current_row['expire_date']
   else:
     current_accept = _get_now_accept(user)
     if current_accept:
-      status = "pinging"
-      ping_start = current_accept['ping_start']
-      expire_date = current_accept['expire_date']
+      if current_accept['jitsi_code']:
+        status = "pinging"
+        ping_start = max(current_accept['accept_dates'])
+        expire_date = current_accept['expire_date']
     else:
       this_match = current_match(user)
       if this_match:
@@ -226,7 +227,7 @@ def get_tallies():
 
 def _get_tallies(user):
   return [_dash_proposal(row, user)
-          for row in app_tables.proposal_times.search(current=True, match_id=None)
+          for row in app_tables.proposal_times.search(current=True, jitsi_code=None)
                   if _proposal_is_visible(row['proposal'], user)
          ]
 
@@ -263,7 +264,8 @@ def get_code(user_id=""):
     else:
       this_match = current_match(user)
       if this_match:
-        return this_match['jitsi_code'], this_match['duration']
+        prop_time = this_match['proposal_time']
+        return prop_time['jitsi_code'], prop_time['duration']
   return None, None
 
 
@@ -285,12 +287,11 @@ def _accept_proposal(user, proptime, status, now=sm.now()):
     if own_now_proposal:
       own_now_proposal['current'] = False
   proposal = proptime['proposal']
-  proptime['user_accepting'] = user
-  proptime['ping_start'] = now
-  proptime['match_id'] = sm.new_match_id()
+  proptime['users_accepting'] = [user]
+  proptime['accept_dates'] = [now]
   proptime['jitsi_code'] = sm.new_jitsi_code()
   if (proptime['expire_date'] - datetime.timedelta(seconds=_seconds_left("requesting")) 
-                              - proptime['ping_start']).seconds <= p.BUFFER_SECONDS:
+                              - now).seconds <= p.BUFFER_SECONDS:
     _match_commenced(user)
   else:
     sm.pinged_email(proposal['user'])
@@ -300,7 +301,7 @@ def _attempt_accept_proposal(user, proptime_id):
   status, seconds_left, tallies = _get_status(user)
   if status in [None, "requesting"]:
     proptime = app_tables.proposal_times.get_by_id(proptime_id)
-    if proptime['current'] and (proptime['user_accepting'] is None) and _proposal_is_visible(proptime['proposal'], user):
+    if proptime['current'] and (not proptime['users_accepting']) and _proposal_is_visible(proptime['proposal'], user):
       _accept_proposal(user, proptime, status)
   return _get_status(user)
 
@@ -334,29 +335,21 @@ def _add_request_rows(user, prop_dict, now=sm.now()):
                                               eligible_users=prop_dict['eligible_users'],
                                               eligible_groups=prop_dict['eligible_groups'],
                                              )
-  _add_proposal_time(proposal=new_proposal,
-                     start_now=prop_dict['start_now'],
-                     start_date=prop_dict['start_date'],
-                     duration=prop_dict['duration'],
-                     expire_date=prop_dict['start_date']-prop_dict['cancel_buffer'],
-                    )
+  _add_proposal_time(proposal=new_proposal, prop_time_dict=prop_dict)
   for alt_time in prop_dict['alt']:
-    _add_proposal_time(proposal=new_proposal,
-                       start_now=alt_time['start_now'],
-                       start_date=alt_time['start_date'],
-                       duration=alt_time['duration'],
-                       expire_date=alt_time['start_date']-alt_time['cancel_buffer'],
-                      )
+    _add_proposal_time(proposal=new_proposal, prop_time_dict=alt_time)
   return new_proposal
 
 
-def _add_proposal_time(proposal, start_now, start_date, duration, expire_date, now=sm.now()):
-  if start_now:
+def _add_proposal_time(proposal, prop_time_dict, now=sm.now()):
+  if prop_time_dict['start_now']:
     expire_date = now + datetime.timedelta(seconds=_seconds_left("requesting"))
+  else:
+    expire_date=prop_time_dict['start_date']-prop_time_dict['cancel_buffer']
   new_time = app_tables.proposal_times.add_row(proposal=proposal,
-                                               start_now=start_now,
-                                               start_date=start_date,
-                                               duration=duration,
+                                               start_now=prop_time_dict['start_now'],
+                                               start_date=prop_time_dict['start_date'],
+                                               duration=prop_time_dict['duration'],
                                                expire_date=expire_date,
                                                current=True,
                                                missed_pings=0,
@@ -366,11 +359,10 @@ def _add_proposal_time(proposal, start_now, start_date, duration, expire_date, n
 def _cancel(user, proptime_id, now=sm.now()):
   current_row = app_tables.proposal_times.get_by_id(proptime_id)
   if current_row:
-    if user == current_row['user_accepting']:
-      current_row['user_accepting'] = None
-      current_row['ping_start'] = None
-      current_row['match_id'] = None
-      current_row['jitsi_code'] = None
+    if user in current_row['users_accepting']:
+      _remove_user_accepting(user, current_row)
+      if not current_row['users_accepting']:
+        current_row['jitsi_code'] = None
       if now > current_row['expire_date']:
         current_row['current'] = False
     elif user == current_row[proposal][user]:
@@ -378,6 +370,16 @@ def _cancel(user, proptime_id, now=sm.now()):
   return _get_tallies(user)
 
 
+def _remove_user_accepting(user, proposal_time):
+  user_i = proposal_time['users_accepting'].index(user)
+  new_users = list(proposal_time['users_accepting'].copy())
+  new_users.remove(user)
+  proposal_time['users_accepting'] = new_users
+  new_dates = list(proposal_time['accept_dates'])
+  new_dates.pop(user_i)
+  proposal_time['accept_dates'] = new_dates
+
+  
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel(proptime_id, user_id=""):
@@ -392,13 +394,12 @@ def cancel(proptime_id, user_id=""):
 def _cancel_other(user, proptime_id, now=sm.now()):
   current_row = app_tables.proposal_times.get_by_id(proptime_id)
   if current_row:
-    if user == current_row['user_accepting']:
+    if user in current_row['users_accepting']:
       current_row['current'] = False
       row['missed_pings'] += 1
     elif user == current_row[proposal][user]:      
-      current_row['user_accepting'] = None
-      current_row['ping_start'] = None
-      current_row['match_id'] = None
+      current_row['users_accepting'] = None
+      current_row['accept_dates'] = None
       current_row['jitsi_code'] = None
       if now > current_row['expire_date']:
         current_row['current'] = False
@@ -437,13 +438,11 @@ def _match_commenced(user, proptime_id, now=sm.now()):
   """
   current_row = app_tables.proposal_times.get_by_id(proptime_id)
   if current_row:
-    if current_row['match_id']:
+    if current_row['jitsi_code']:
       match_start = now
-      users = [current_row['proposal'][user], current_row['accepting_user']]
+      users = [current_row['proposal'][user]] + list(current_row['users_accepting'])
       new_match = app_tables.matches.add_row(users=users,
-                                             duration=current_row['duration'],
-                                             match_id=current_row['match_id'],
-                                             jitsi_code=current_row['jitsi_code'],
+                                             proposal_time=current_row,
                                              match_commence=match_start,
                                              complete=[0]*len(users))
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
