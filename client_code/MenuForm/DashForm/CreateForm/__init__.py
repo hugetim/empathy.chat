@@ -65,11 +65,11 @@ class CreateForm(CreateFormTemplate):
        self.item['start_date'] = t.DEFAULT_ITEM['start_date']
     self.date_picker_start_initialized = True
     
-  def init_date_picker_cancel(self):
-    self.date_picker_cancel.min_date = h.now()
+  def init_date_picker_cancel(self, now=h.now()):
+    self.date_picker_cancel.min_date = now
     self.date_picker_cancel.max_date = self.date_picker_start.max_date
     if not self.item['cancel_date']:
-      self.item['cancel_date'] = t.default_cancel_date(h.now(), self.item['start_date'])
+      self.item['cancel_date'] = t.default_cancel_date(now, self.item['start_date'])
     self.date_picker_cancel_initialized = True
 
   def update_times(self):
@@ -125,10 +125,10 @@ class CreateForm(CreateFormTemplate):
     """This method is called when the selected date changes"""
     self.update()    
 
-  def check_times(self):
+  def check_times(self, now=h.now()):
     self.label_start.visible = False
     self.label_cancel.visible = False
-    messages = t.get_proposal_times_errors(h.now(), self.proposal())
+    messages = t.get_proposal_times_errors(now, self.proposal())
     if messages:
       self.enable_save(False)
       if 'start_date' in messages:
@@ -143,11 +143,11 @@ class CreateForm(CreateFormTemplate):
   def enable_save(self, enabled):
     self.save_button.enabled = enabled
     
-  def button_add_alternate_click(self, **event_args):
+  def button_add_alternate_click(self, now=h.now(), **event_args):
     """This method is called when the button is clicked"""
     if not self.item['alt']:
       if self.item['start_now']:
-        start_1 = h.now()
+        start_1 = now
       else:
         start_1 = self.item['start_date']
       self.item['alt'] = [{'start_date': (start_1 + t.DEFAULT_NEXT_DELTA), 

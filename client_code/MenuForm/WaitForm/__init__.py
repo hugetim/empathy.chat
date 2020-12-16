@@ -63,7 +63,7 @@ class WaitForm(WaitFormTemplate):
                                 + "to confirm:  "
                                 + h.seconds_to_digital(self.top_form.seconds_left))
 
-  def timer_2_tick(self, **event_args):
+  def timer_2_tick(self, now=h.now(), **event_args):
     """This method is called approx. once per second, checking for status changes"""
     # Run this code approx. once a second
     if self.top_form.status == "requesting":
@@ -78,9 +78,9 @@ class WaitForm(WaitFormTemplate):
       s, sl, self.top_form.tallies = anvil.server.call('cancel_other')
       self.top_form.set_seconds_left(s, sl)
       self.top_form.reset_status()
-    if (h.now() - self.top_form.last_5sec).seconds > 4.5:
+    if (now - self.top_form.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
-      self.top_form.last_5sec = h.now()
+      self.top_form.last_5sec = now
       if self.top_form.status == "requesting":
         s, sl, self.top_form.tallies = anvil.server.call_s('get_status')
         if s != self.top_form.status:

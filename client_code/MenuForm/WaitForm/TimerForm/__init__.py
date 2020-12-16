@@ -5,7 +5,7 @@ from .... import helper as h
 
 
 class TimerForm(TimerFormTemplate):
-  def __init__(self, seconds_left, current_status, **properties):
+  def __init__(self, seconds_left, current_status, now=h.now(), **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     # Any code you write here will run when the form opens.
@@ -15,7 +15,7 @@ class TimerForm(TimerFormTemplate):
     self.timer_label.text = ("Time left to confirm:  "
                              + h.seconds_to_digital(self.seconds_left))
     self.status = current_status
-    self.last_5sec = h.now()
+    self.last_5sec = now
 
   def timer_1_tick(self, **event_args):
     """This method is called Every 1 seconds"""
@@ -24,14 +24,14 @@ class TimerForm(TimerFormTemplate):
       self.timer_label.text = ("Time left to confirm:  "
                                + h.seconds_to_digital(self.seconds_left))
 
-  def timer_2_tick(self, **event_args):
+  def timer_2_tick(self, now=h.now(), **event_args):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
     # Run this code once a second
     if self.seconds_left <= 0:
       self.raise_event("x-close-alert", value="timer elapsed")
-    if (h.now() - self.last_5sec).seconds > 4.5:
+    if (now - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
-      self.last_5sec = h.now()
+      self.last_5sec = now
       new_status, sl, tallies = anvil.server.call_s('get_status')
       if new_status != self.status:
         print(new_status)

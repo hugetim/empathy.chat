@@ -157,7 +157,7 @@ db_schema:
     0aJF4Qcv3Fs=:
       name: current
       type: bool
-      admin_ui: {order: -1, width: 200}
+      admin_ui: {order: -1, width: 95}
     444E1fE3Bi8=:
       name: eligible_users
       type: liveObjectArray
@@ -167,7 +167,7 @@ db_schema:
     IyZNdM27TO0=:
       name: eligible
       type: number
-      admin_ui: {order: 3, width: 200}
+      admin_ui: {order: 3, width: 98}
     KK4pFj2aGiM=:
       name: last_edited
       type: datetime
@@ -176,7 +176,7 @@ db_schema:
       name: user
       type: liveObject
       backend: anvil.tables.Row
-      admin_ui: {order: 0, width: 200}
+      admin_ui: {order: 0, width: 161}
       table_id: 18972
     gWMJa8dlAqw=:
       name: eligible_groups
@@ -241,37 +241,37 @@ db_schema:
     JUZV8JV_89g=:
       name: missed_pings
       type: number
-      admin_ui: {order: 7, width: 200}
+      admin_ui: {order: 7, width: 142}
     BCRjp3lPNTU=:
       name: jitsi_code
       type: string
-      admin_ui: {order: 4, width: 200}
+      admin_ui: {order: 4, width: 132.667}
     A3Zu5ZrHV20=:
       name: proposal
       type: liveObject
       backend: anvil.tables.Row
-      admin_ui: {order: 1.15625, width: 200}
+      admin_ui: {order: 1.15625, width: 159}
       table_id: 94455
     t5bAz9zRBug=:
       name: start_date
       type: datetime
-      admin_ui: {order: 2.5, width: 198}
+      admin_ui: {order: 1.546875, width: 198}
+    lT2H_DwhzFY=:
+      name: accepted_dates
+      type: simpleObject
+      admin_ui: {order: 3.421875, width: 200}
     7O1x8XMdev4=:
       name: expire_date
       type: datetime
-      admin_ui: {order: 2.75, width: 319}
-    ce6Lb1Tjrt4=:
-      name: match_id
-      type: number
-      admin_ui: {order: 3, width: 200}
+      admin_ui: {order: 2.75, width: 195.667}
     bAawb+jPjdw=:
       name: duration
       type: number
-      admin_ui: {order: 2.625, width: 200}
+      admin_ui: {order: 2.625, width: 98}
     TS6HwzDqseQ=:
       name: current
       type: bool
-      admin_ui: {order: 0.375, width: 200}
+      admin_ui: {order: 0.375, width: 91}
     UCSXFA8ZT1E=:
       name: remove_date
       type: datetime
@@ -279,35 +279,23 @@ db_schema:
     f6ZxhGovxjs=:
       name: start_now
       type: bool
-      admin_ui: {order: 1.9375, width: 200}
-    4xEU58r+rnc=:
-      name: user_accepting
-      type: liveObject
+      admin_ui: {order: 1.9375, width: 112}
+    C6Fn+mV6Df4=:
+      name: users_accepting
+      type: liveObjectArray
       backend: anvil.tables.Row
-      admin_ui: {order: 2.84375, width: 200}
+      admin_ui: {order: 2.84375, width: 158}
       table_id: 18972
-    hPi+bFpVPGk=:
-      name: ping_start
-      type: datetime
-      admin_ui: {order: 2.875, width: 244}
   access: {python_name: proposal_times, app_id: E6HFYSK4HHRI7BTC, server: full, client: none,
     table_mapping_name: null, table_mapping_id: null, table_id: 18974}
 - name: Matches
   id: 18973
   python_name: matches
   columns:
-    0WcGVIBZPms=:
-      name: duration
-      type: number
-      admin_ui: {order: 3.25, width: 200}
     FpbExr79vEw=:
       name: match_commence
       type: datetime
       admin_ui: {order: 5, width: 200}
-    GWJp4JLyJkA=:
-      name: jitsi_code
-      type: string
-      admin_ui: {order: 4, width: 200}
     Qh9xTL6VKPY=:
       name: users
       type: liveObjectArray
@@ -318,10 +306,12 @@ db_schema:
       name: complete
       type: simpleObject
       admin_ui: {order: 6, width: 200}
-    xGlgDh4K3ag=:
-      name: match_id
-      type: number
-      admin_ui: {order: 3.5, width: 200}
+    kKRkr3OLdwQ=:
+      name: proposal_time
+      type: liveObject
+      backend: anvil.tables.Row
+      admin_ui: {order: 3.625, width: 200}
+      table_id: 18974
   access: {python_name: matches, app_id: E6HFYSK4HHRI7BTC, server: full, client: none,
     table_mapping_name: null, table_mapping_id: null, table_id: 18973}
 - name: Connections

@@ -88,14 +88,14 @@ def prune_messages():
 
 
 @anvil.server.callable
-def add_message(user_id="", message="[blank]"):
+def add_message(user_id="", message="[blank]", now=now()):
   print("add_message", "[redacted]", user_id)
   user = get_user(user_id)
   this_match = matcher.current_match(user)
   app_tables.chat.add_row(match=this_match,
                           user=user,
                           message=anvil.secrets.encrypt_with_key("new_key", message),
-                          time_stamp=now())
+                          time_stamp=now
   return _get_messages(user)
 
 
@@ -167,26 +167,26 @@ def set_pinged_em(pinged_em_checked):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def set_request_em(request_em_checked):
+def set_request_em(request_em_checked, now=now()):
   print("set_request_em", request_em_checked)
   user = anvil.server.session['user']
   user['request_em'] = request_em_checked
   if request_em_checked:
-    user['request_em_set_time'] = now()
+    user['request_em_set_time'] = now
   s, sl, t = matcher.confirm_wait_helper(user)
   return s, sl, t, user['request_em_set_time']
 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def set_request_em_opts(fixed, hours):
+def set_request_em_opts(fixed, hours, now=now()):
   print("set_request_em_opts", fixed, hours)
   user = anvil.server.session['user']
   re_opts = user['request_em_settings']
   re_opts["fixed"] = int(fixed)
   re_opts["hours"] = hours
   user['request_em_settings'] = re_opts
-  user['request_em_set_time'] = now()
+  user['request_em_set_time'] = now
   s, sl, t = matcher.confirm_wait_helper(user)
   return s, sl, t, user['request_em_set_time']
 
@@ -215,7 +215,7 @@ p.s. You are receiving this email because you checked the box: "Notify me by ema
 ''')
 
 
-def users_to_email_re_notif(user=None):
+def users_to_email_re_notif(user=None, now=now()):
   """Return list of users to email notifications triggered by user
 
   Side effect: prune request_em (i.e. switch expired request_em to false)
@@ -223,10 +223,10 @@ def users_to_email_re_notif(user=None):
   _prune_request_em()
   assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
-  cutoff_e = now() - assume_inactive
+  cutoff_e = now - assume_inactive
   return [u for u in app_tables.users.search(enabled=True, request_em=True)
                   if (u['last_login'] > cutoff_e
-                      and ((not u['last_request_em']) or now() > u['last_request_em'] + min_between)
+                      and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
                       and u != user
                       and is_visible(u, user)
                       and not matcher.has_status(u))]

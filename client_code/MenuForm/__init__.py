@@ -41,9 +41,9 @@ class MenuForm(MenuFormTemplate):
     self.reset_status()
 
 ### Code that doesn't really belong here, but pending moving it ###
-  def set_seconds_left(self, new_status=None, new_seconds_left=None):
+  def set_seconds_left(self, new_status=None, new_seconds_left=None, now=h.now()):
     """Set status and related time variables"""
-    self.last_5sec = h.now()
+    self.last_5sec = now
     if new_status and new_status != "matched":
       self.seconds_left = new_seconds_left
       if self.status == "pinging" and new_status == "requesting":
