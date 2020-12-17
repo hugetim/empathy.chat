@@ -28,8 +28,9 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
       self.item['cancel_buffer'] = "custom"
   
   def init_date_picker_start(self):
-    self.date_picker_start.min_date = t.DEFAULT_START_MIN
-    self.date_picker_start.max_date = t.DEFAULT_START_MAX
+    defaults = t.Proposal().default_start()
+    self.date_picker_start.min_date = defaults['s_min']
+    self.date_picker_start.max_date = defaults['s_max']
     
   def init_date_picker_cancel(self, now=h.now()):
     self.date_picker_cancel.min_date = now

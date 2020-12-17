@@ -2,23 +2,42 @@ from ._anvil_designer import CreateFormTemplate
 from anvil import *
 from .... import helper as h
 from .... import timeproposals as t
-import datetime
+from datetime import timedelta
 
 
 class CreateForm(CreateFormTemplate):
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
-    proposal = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
-    if self.item['cancel_buffer'] != "custom":
-      proposal['cancel_buffer'] = self.item['cancel_buffer']
-    else:
-      delta = self.item['start_date'] - self.item['cancel_date']
-      proposal['cancel_buffer'] = delta.total_seconds() / 60
-    return proposal   
-  
+    expire_date = (self.item['cancel_date'] if self.item['cancel_buffer'] == "custom"
+                   else (self.item['start_date'] 
+                         - timedelta(minutes=self.item['cancel_buffer'])))
+    first_time = t.ProposalTime(start_now=self.item['start_now'],
+                                start_date=self.item['start_date'],
+                                duration=self.item['duration'],
+                                expire_date=expire_date,
+                               )
+    alts = [alt_proposal_time(alt) for alt in self.item['alt']]
+    return t.Proposal(times=[first_time] + alts,
+                      eligible=self.item['eligible'],
+                      eligible_users=self.item['eligible_users'],
+                      eligible_groups=self.item['eligible_groups'],
+                     )
+
+  @staticmethod
+  def alt_proposal_time(alt):
+    expire_date = (alt['cancel_date'] if alt['cancel_buffer'] == "custom"
+                   else alt['start_date'] - timedelta(minutes=alt['cancel_buffer']))
+    return t.ProposalTime(start_now=alt['start_now'],
+                          start_date=alt['start_date'],
+                          duration=self.item['duration'],
+                          expire_date=expire_date,
+                         )
+    
   @staticmethod
   def proposal_to_item(proposal):
     """Convert a proposal dictionary to the format of self.item"""
+    self.item['eligible'] = proposal.eligible
+    self.item['eligible_users'] = proposal.eligible_users
     item = {key: value for (key, value) in proposal.items() if key not in ['cancel_buffer',
                                                                            'cancel_date']}
     if proposal['cancel_buffer'] in t.CANCEL_TEXT.keys():
@@ -26,9 +45,9 @@ class CreateForm(CreateFormTemplate):
       item['cancel_date'] = None
     else:
       item['cancel_buffer'] = "custom"
-      item['cancel_date'] = item['start_date'] - datetime.timedelta(minutes=proposal['cancel_buffer'])
+      item['cancel_date'] = item['start_date'] - timedelta(minutes=proposal['cancel_buffer'])
     return item
-   
+  
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
@@ -55,14 +74,15 @@ class CreateForm(CreateFormTemplate):
       self.item['duration'] = t.closest_duration(self.item['duration'])
     if self.item['cancel_buffer'] not in t.CANCEL_TEXT.keys():
       self.item['cancel_date'] = (self.item['start_date'] 
-                                  - datetime.timedelta(minutes=self.item['cancel_buffer']))
+                                  - timedelta(minutes=self.item['cancel_buffer']))
       self.item['cancel_buffer'] = "custom"
   
   def init_date_picker_start(self):
-    self.date_picker_start.min_date = t.DEFAULT_START_MIN
-    self.date_picker_start.max_date = t.DEFAULT_START_MAX
+    defaults = t.Proposal().default_start()
+    self.date_picker_start.min_date = defaults['s_min']
+    self.date_picker_start.max_date = defaults['s_max']
     if not self.item['start_date']:
-       self.item['start_date'] = t.DEFAULT_ITEM['start_date']
+       self.item['start_date'] = defaults['start']
     self.date_picker_start_initialized = True
     
   def init_date_picker_cancel(self, now=h.now()):

@@ -1,3 +1,4 @@
+import anvil.server
 import datetime
 import anvil.tz
 from . import helper as h
@@ -25,18 +26,86 @@ CANCEL_TEXT = {5: "5 min. prior",
                48*60: "48 hrs. prior",
                "custom": "a specific time...",
               }
-DEFAULT_START_MIN = h.now() + datetime.timedelta(seconds=max(p.WAIT_SECONDS, 60*CANCEL_MIN_MINUTES))
-DEFAULT_START = h.now() + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES)
-DEFAULT_START_MAX = h.now() + datetime.timedelta(days=31)
-DEFAULT_PROPOSAL = {'start_now': 0,
-                    'start_date': DEFAULT_START,
-                    'duration': DURATION_DEFAULT_MINUTES,
-                    'cancel_buffer': CANCEL_DEFAULT_MINUTES,
-                    'alt': [],
-                    'eligible': 3,
-                    'eligible_users': [],
-                    'eligible_groups': [],
-                   }
+
+
+@anvil.server.portable_class
+class ProposalTime():
+
+  def __init__(self, time_id=None, start_now=True, start_date=None, 
+               duration=DURATION_DEFAULT_MINUTES, expire_date=None):
+    self.time_id = time_id      
+    self.start_now = start_now 
+    self.start_date = (start_date if (start_date or start_now)
+                       else h.now() + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES))
+    self.duration = duration
+    if expire_date:
+      self.expire_date = expire_date
+    else:
+      if not start_now:
+        self.expire_date = (self.start_date 
+                            - datetime.timedelta(minutes=CANCEL_DEFAULT_MINUTES))
+
+  def __serialize__(self, global_data):
+    dict_rep = self.__dict__
+    dict_rep['start_now'] = int(self.start_now)
+    return dict_rep
+
+  def __deserialize__(self, data, global_data):
+    self.__dict__.update(data)
+    self.start_now = bool(self.start_now)
+
+  @staticmethod  
+  def default_start(now=h.now()):
+    return {s_min: now + datetime.timedelta(seconds=max(p.WAIT_SECONDS, 60*CANCEL_MIN_MINUTES)),
+            start: now + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES),
+            s_max: now + datetime.timedelta(days=31)}
+        
+      
+@anvil.server.portable_class 
+class Proposal():
+  
+  def __init__(self, prop_id=None, own=True, name=None, times=[ProposalTime()], 
+               eligible=3, eligible_users=[], eligible_groups=[]):
+    self.prop_id = prop_id
+    self.own = own
+    self.name = name
+    self.times = times
+    self.eligible = eligible
+    self.eligible_users = eligible_users
+    self.eligible_groups = eligible_groups
+        
+  def __serialize__(self, global_data):
+    dict_rep = self.__dict__
+    dict_rep['own'] = int(self.own)
+    return dict_rep
+
+  def __deserialize__(self, data, global_data):
+    self.__dict__.update(data)
+    self.own = bool(self.own)
+        
+  def dash_rows(self):
+    rows = []
+    for time in self.times:
+      row = {prop_id: self.parent.prop_id,
+             own: self.parent.own,
+             name: self.parent.name,
+             time_id: self.time_id,
+             duration: self.duration,
+             expire_date: self.expire_date,
+            }
+      row['start_time'] = "now" if self.start_now else str(self.start_date)
+      rows.append(row)
+    return rows
+      
+#DEFAULT_PROPOSAL = {'start_now': 0,
+#                    'start_date': DEFAULT_START,
+#                    'duration': DURATION_DEFAULT_MINUTES,
+#                    'cancel_buffer': CANCEL_DEFAULT_MINUTES,
+#                    'alt': [],
+#                    'eligible': 3,
+#                    'eligible_users': [],
+#                    'eligible_groups': [],
+#                   }
 
 def default_cancel_date(now, start_date):
     minutes_prior = max(CANCEL_MIN_MINUTES,

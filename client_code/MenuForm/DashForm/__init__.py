@@ -29,13 +29,10 @@ class DashForm(DashFormTemplate):
   def update_tally_label(self):
     """Update form based on tallies state"""
     pass
-
-  def row_from_prop_dict(self, prop_dict):
-    row = {users: }
-    
+  
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    content = CreateForm(item=CreateForm.proposal_to_item(t.DEFAULT_PROPOSAL))
+    content = CreateForm(item=CreateForm.proposal_to_item(t.Proposal()))
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
                 title="New Empathy Chat Proposal",
