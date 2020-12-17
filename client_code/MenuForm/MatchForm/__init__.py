@@ -15,8 +15,8 @@ class MatchForm(MatchFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
-    jitsi_code, request_type = anvil.server.call('get_code')
-    self.set_jitsi_link(jitsi_code)    
+    jitsi_code, duration = anvil.server.call('get_code')
+    self.set_jitsi_link(jitsi_code)
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""

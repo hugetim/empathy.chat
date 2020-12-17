@@ -11,7 +11,7 @@ from .portable import DashProposal
 TEST_TRUST_LEVEL = 10
 
 
-def _seconds_left(status, expire_date, ping_start=None, now=sm.now()):
+def _seconds_left(status, expire_date=None, ping_start=None, now=sm.now()):
   if status in ["pinging", "pinged"]:
     if ping_start:
       confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).seconds
@@ -111,10 +111,7 @@ def init():
     status, seconds_left, tallies = _cancel_other(user)
   if status in ('requesting', 'pinged', 'pinging'):
     status, seconds_left, tallies = confirm_wait_helper(user)
-    #request_type = _get_request_type(user)
-  else:
-    request_type = "will_offer_first"
-  return test_mode, pinged_em, request_type, status, seconds_left, tallies, email_in_list, name
+  return test_mode, pinged_em, status, seconds_left, tallies, email_in_list, name
 
 
 def _get_now_proposal_time(user):
@@ -134,6 +131,7 @@ def _get_now_accept(user):
   """Return user's current 'start_now' proposal_times row"""
   return app_tables.proposal_times.get(users_accepting=[user],
                                        current=True,
+                                       start_now=True
                                       )
 
 
@@ -150,7 +148,7 @@ def confirm_wait_helper(user, now=sm.now()):
   """updates expire_date for current request, returns _get_status(user)"""  
   current_row = _get_now_proposal_time(user)
   if current_row:
-    current_row['expire_date'] = now + _seconds_left("requesting")
+    current_row['expire_date'] = now + datetime.timedelta(seconds=_seconds_left("requesting"))
   status, seconds_left, tallies = _get_status(user)
   return status, seconds_left, tallies
 
@@ -173,13 +171,13 @@ def _get_status(user):
   expire_date = None
   ping_start = None
   tallies = _get_tallies(user)
-  if current_row:
+  if current_row and current_row['start_now']:
+    expire_date = current_row['expire_date']
     if current_row['jitsi_code']:
       status = "pinged"
       ping_start = current_row['accept_date']
     else:
       status = "requesting"
-    expire_date = current_row['expire_date']
   else:
     current_accept = _get_now_accept(user)
     if current_accept:
@@ -328,7 +326,6 @@ def _add_request(user, prop_dict):
 def _add_request_rows(user, prop_dict, now=sm.now()):
   new_proposal = app_tables.proposals.add_row(user=user,
                                               current=True,
-                                              request_type=request_type,
                                               created=now,
                                               last_edited=now,
                                               eligible=prop_dict['eligible'],
@@ -347,7 +344,7 @@ def _add_proposal_time(proposal, prop_time_dict, now=sm.now()):
   else:
     expire_date=prop_time_dict['start_date']-prop_time_dict['cancel_buffer']
   new_time = app_tables.proposal_times.add_row(proposal=proposal,
-                                               start_now=prop_time_dict['start_now'],
+                                               start_now=bool(prop_time_dict['start_now']),
                                                start_date=prop_time_dict['start_date'],
                                                duration=prop_time_dict['duration'],
                                                expire_date=expire_date,
@@ -357,7 +354,12 @@ def _add_proposal_time(proposal, prop_time_dict, now=sm.now()):
   
     
 def _cancel(user, proptime_id, now=sm.now()):
-  current_row = app_tables.proposal_times.get_by_id(proptime_id)
+  if proptime_id:
+    current_row = app_tables.proposal_times.get_by_id(proptime_id)
+  else:
+    current_row = _get_now_proposal_time(user)
+    if not current_row:
+      current_row = _get_now_accept(user)
   if current_row:
     if user in current_row['users_accepting']:
       _remove_user_accepting(user, current_row)
@@ -378,7 +380,7 @@ def _remove_user_accepting(user, proposal_time):
   
 @anvil.server.callable
 @anvil.tables.in_transaction
-def cancel(proptime_id, user_id=""):
+def cancel(proptime_id=None, user_id=""):
   """Remove proptime and cancel pending match (if applicable)
   Return tallies
   """
@@ -388,7 +390,12 @@ def cancel(proptime_id, user_id=""):
 
 
 def _cancel_other(user, proptime_id, now=sm.now()):
-  current_row = app_tables.proposal_times.get_by_id(proptime_id)
+  if proptime_id:
+    current_row = app_tables.proposal_times.get_by_id(proptime_id)
+  else:
+    current_row = _get_now_proposal_time(user)
+    if not current_row:
+      current_row = _get_now_accept(user)
   if current_row:
     if user in current_row['users_accepting']:
       current_row['current'] = False
@@ -404,7 +411,7 @@ def _cancel_other(user, proptime_id, now=sm.now()):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def cancel_other(proptime_id, user_id=""):
+def cancel_other(proptime_id=None, user_id=""):
   """Return new status
   Upon failure of other to confirm match
   cancel match (if applicable)--and cancel their request

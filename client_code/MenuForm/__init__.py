@@ -22,7 +22,7 @@ class MenuForm(MenuFormTemplate):
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
-    tm, pe, rt, s, sl, tallies, e, n = anvil.server.call('init')
+    tm, pe, s, sl, tallies, e, n = anvil.server.call('init')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'Instead, it can be used to test things out. Your actions will not impact '
@@ -35,12 +35,10 @@ class MenuForm(MenuFormTemplate):
     self.test_mode.visible = tm
     self.pinged_em_checked = pe
     self.tallies = tallies
-    self.request_type = rt
     self.set_test_link()
     self.set_seconds_left(s, sl)
     self.reset_status()
 
-### Code that doesn't really belong here, but pending moving it ###
   def set_seconds_left(self, new_status=None, new_seconds_left=None, now=h.now()):
     """Set status and related time variables"""
     self.last_5sec = now
@@ -50,7 +48,7 @@ class MenuForm(MenuFormTemplate):
         self.seconds_left = max(self.seconds_left, p.BUFFER_SECONDS)
     #print('before status change: ', self.seconds_left)
     self.status = new_status
-
+### Code that doesn't really belong here, but pending moving it ###
   def emailed_notification(self, num):
     """Return Notification (assumes num>0)"""
     if num == 1:
@@ -69,7 +67,7 @@ class MenuForm(MenuFormTemplate):
     self.set_seconds_left(None)
     self.tallies = anvil.server.call('match_complete')
     self.reset_status()   
-        
+###                                                        ###
   def confirm_wait(self):
     s, sl, self.tallies = anvil.server.call('confirm_wait')
     self.set_seconds_left(s, sl)
@@ -77,14 +75,14 @@ class MenuForm(MenuFormTemplate):
 
   def reset_status(self):
     """Update form according to current state variables"""
-    if self.status in ["requesting", "pinged", "pinging"]:
+    if self.status in ["pinged", "pinging"]:
         self.go_wait()
     elif self.status == "matched":
         self.go_match()
     else:
-      assert not self.status
+      assert self.status in [None, "requesting"]
       self.go_dash() 
-###                                                                 ###
+
   def clear_page(self):
     self.nav_panel.visible = True
     self.test_link.visible = True 

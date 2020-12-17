@@ -93,8 +93,11 @@ class DashForm(DashFormTemplate):
                 large=True,
                 dismissible=False,
                 buttons=[])
+    print(out is True)
     if out is True:
-      if content.item['start_now']:
-        s, sl, num_emailed = anvil.server.call('add_request', self.request_type)
-        self.top_form.set_seconds_left(s, sl)
-        self.top_form.reset_status()
+      proposal = content.proposal()
+      s, sl, self.tallies = anvil.server.call('add_request', proposal)
+      self.top_form.set_seconds_left(s, sl)
+      self.top_form.reset_status()
+      if (not proposal['start_now']) or proposal['alt']:
+        alert(title='"later" proposals not implemented yet')
