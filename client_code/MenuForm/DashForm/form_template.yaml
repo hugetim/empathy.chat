@@ -98,12 +98,14 @@ components:
           layout_properties: {column: YUYJUP}
           event_bindings: {}
         event_bindings: {}
+        data_bindings: []
       - type: RepeatingPanel
         properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.DashForm.ProposalRowTemplate}
         name: repeating_panel_1
         layout_properties: {}
         event_bindings: {}
       event_bindings: {}
+      data_bindings: []
     - type: Button
       properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time,
         border: '', enabled: true, foreground: '', visible: true, text: Propose a New Empathy Chat,

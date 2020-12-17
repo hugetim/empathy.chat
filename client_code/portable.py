@@ -1,5 +1,5 @@
 import anvil.server
-
+import datetime
 
 @anvil.server.portable_class
 class DashProposal():
@@ -25,3 +25,13 @@ class DashProposal():
         self.__dict__.update(data)
         self.own = bool(self.own)
         self.start_now = bool(self.start_now)
+        
+    def dash_row(self):
+        row = {time_id: self.time_id,
+               own: self.own,
+               name: self.name,
+               duration: self.duration,
+               expire_date: self.expire_date
+              }
+        row['start_time'] = "now" if self.start_now else str(self.start_date)
+        return row
