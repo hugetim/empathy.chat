@@ -56,9 +56,9 @@ class ProposalTime():
 
   @staticmethod  
   def default_start(now=h.now()):
-    return {s_min: now + datetime.timedelta(seconds=max(p.WAIT_SECONDS, 60*CANCEL_MIN_MINUTES)),
-            start: now + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES),
-            s_max: now + datetime.timedelta(days=31)}
+    return {'s_min': now + datetime.timedelta(seconds=max(p.WAIT_SECONDS, 60*CANCEL_MIN_MINUTES)),
+            'start': now + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES),
+            's_max': now + datetime.timedelta(days=31)}
         
       
 @anvil.server.portable_class 
@@ -76,6 +76,7 @@ class Proposal():
         
   def __serialize__(self, global_data):
     dict_rep = self.__dict__
+    print('self.__dict__', dict_rep)
     dict_rep['own'] = int(self.own)
     return dict_rep
 
@@ -86,17 +87,18 @@ class Proposal():
   def dash_rows(self):
     rows = []
     for time in self.times:
-      row = {prop_id: self.parent.prop_id,
-             own: self.parent.own,
-             name: self.parent.name,
-             time_id: self.time_id,
-             duration: self.duration,
-             expire_date: self.expire_date,
+      row = {'prop_id': self.parent.prop_id,
+             'own': self.parent.own,
+             'name': self.parent.name,
+             'time_id': self.time_id,
+             'duration': self.duration,
+             'expire_date': self.expire_date,
             }
       row['start_time'] = "now" if self.start_now else str(self.start_date)
       rows.append(row)
     return rows
       
+    
 #DEFAULT_PROPOSAL = {'start_now': 0,
 #                    'start_date': DEFAULT_START,
 #                    'duration': DURATION_DEFAULT_MINUTES,
@@ -106,6 +108,7 @@ class Proposal():
 #                    'eligible_users': [],
 #                    'eligible_groups': [],
 #                   }
+
 
 def default_cancel_date(now, start_date):
     minutes_prior = max(CANCEL_MIN_MINUTES,

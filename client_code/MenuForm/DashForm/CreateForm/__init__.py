@@ -16,7 +16,7 @@ class CreateForm(CreateFormTemplate):
                                 duration=self.item['duration'],
                                 expire_date=expire_date,
                                )
-    alts = [alt_proposal_time(alt) for alt in self.item['alt']]
+    alts = [_alt_proposal_time(alt) for alt in self.item['alt']]
     return t.Proposal(times=[first_time] + alts,
                       eligible=self.item['eligible'],
                       eligible_users=self.item['eligible_users'],
@@ -24,7 +24,7 @@ class CreateForm(CreateFormTemplate):
                      )
 
   @staticmethod
-  def alt_proposal_time(alt):
+  def _alt_proposal_time(alt):
     expire_date = (alt['cancel_date'] if alt['cancel_buffer'] == "custom"
                    else alt['start_date'] - timedelta(minutes=alt['cancel_buffer']))
     return t.ProposalTime(start_now=alt['start_now'],
@@ -36,18 +36,23 @@ class CreateForm(CreateFormTemplate):
   @staticmethod
   def proposal_to_item(proposal):
     """Convert a proposal dictionary to the format of self.item"""
-    self.item['eligible'] = proposal.eligible
-    self.item['eligible_users'] = proposal.eligible_users
-    item = {key: value for (key, value) in proposal.items() if key not in ['cancel_buffer',
-                                                                           'cancel_date']}
-    if proposal['cancel_buffer'] in t.CANCEL_TEXT.keys():
-      item['cancel_buffer'] = proposal['cancel_buffer']
-      item['cancel_date'] = None
-    else:
-      item['cancel_buffer'] = "custom"
-      item['cancel_date'] = item['start_date'] - timedelta(minutes=proposal['cancel_buffer'])
-    return item
-  
+    item = {key: proposal.__dict__['key'] for key in ['eligible', 'eligible_users', 'eligible_groups']}
+    item['start_now'] = int(proposal.times[0].start_now)
+    item.update(_time_to_dict(proposal.times[0], item['start_now']))
+    item['alt'] = [_time_to_dict(time) for time in proposal.times[1:]]
+ 
+  @staticmethod
+  def _time_to_dict(prop_time, start_now=0):
+    time_dict = {key: prop_time.__dict__[key] for key in ['start_date', 'duration']}
+    if not start_now:
+      cancel_buffer = round((prop_time.start_date-prop_time.expire_date).total_seconds()/60)
+      if cancel_buffer in t.CANCEL_TEXT.keys():
+        time_dict['cancel_buffer'] = cancel_buffer
+        time_dict['cancel_date'] = None
+      else:
+        time_dict['cancel_buffer'] = "custom"
+        time_dict['cancel_date'] = prop_time.expire_date
+
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
