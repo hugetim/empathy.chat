@@ -32,20 +32,26 @@ def _seconds_left(status, expire_date=None, ping_start=None, now=sm.now()):
     print("matcher.seconds_left(s,lc,ps): " + status)
 
 
-def _prune_requests(now=sm.now()):
-  """Prune definitely outdated requests, unmatched then matched"""
-  old_requests = (r for r in app_tables.proposal_times.search(current=True, jitsi_code=None)
+def _prune_proposals(now=sm.now()):
+  """Prune definitely outdated prop_times, unmatched then matched, then proposals"""
+  old_prop_times = (r for r in app_tables.proposal_times.search(current=True, jitsi_code=None)
                     if r['expire_date'] < now)
-  for row in old_requests:
+  for row in old_prop_times:
     row['current'] = False
-  # below (matched separately) ensures that no ping requests left hanging by cancelling only one
+  # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
   cutoff_r = now - timeout
-  old_ping_requests = (r for r in app_tables.proposal_times.search(current=True, start_now=True)
-                       if (r['jitsi_code'] is not None and r['accept_date'] < cutoff_r))
-  for row in old_ping_requests:
+  old_ping_prop_times = (r for r in app_tables.proposal_times.search(current=True, start_now=True)
+                         if (r['jitsi_code'] is not None and r['accept_date'] < cutoff_r))
+  for row in old_ping_prop_times:
     row['current'] = False
-
+  # now proposals
+  old_proposals = (r for r in app_tables.proposals.search(current=True)
+                   if len(app_tables.proposal_times.search(current=True, proposal=r))==0)
+  for row in old_proposals:
+    row['current'] = False
+  for r in app_tables.proposals.search(current=True):
+    print(len(app_tables.proposal_times.search(current=True, proposal=r)))
 
 def _prune_matches(now=sm.now()):
   """Complete old commenced matches for all users"""
@@ -61,12 +67,6 @@ def _prune_matches(now=sm.now()):
       temp[i] = 1
     row['complete'] = temp
 
-                  
-#def _get_request_type(user):
-#  current_row = app_tables.requests.get(user=user, current=True)
-#  if current_row:
-#    return current_row['request_type']
-
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -75,13 +75,13 @@ def init():
   Assumed to run upon initializing Form1
   returns trust_level, request_em, pinged_em, current_status, ref_time (or None),
           proposals, alt_avail, email_in_list
-  prunes old requests/offers/matches
+  prunes old proposals/matches
   updates expire_date if currently requesting/ping
   """
   print("('init')")
   sm.initialize_session()
   # Prune expired items for all users
-  _prune_requests()
+  _prune_proposals()
   _prune_matches()
   sm.prune_messages()
   # Initialize user info
@@ -216,9 +216,9 @@ def has_status(user):
 def get_proposals():
   """Return list of Proposals
   
-  Side effects: prune requests and request_em settings
+  Side effects: prune proposals
   """
-  _prune_requests()
+  _prune_proposals()
   user = anvil.server.session['user']
   return _get_proposals(user)
 
@@ -236,8 +236,8 @@ def _proposal(proposal_row, user):
   own = proposer == user
   times = [_proposal_time(row) for row 
            in app_tables.proposal_times.search(current=True, proposal=proposal_row)]
-  return Proposal(prop_id=proposal_row.get_id(),  own=own, name=proposer_row['name'],
-                  times=times, eligible=proposal['eligible'],
+  return Proposal(prop_id=proposal_row.get_id(),  own=own, name=proposer['name'],
+                  times=times, eligible=proposal_row['eligible'],
                   eligible_users=proposal_row['eligible_users'], eligible_groups=proposal_row['eligible_groups'],
                  )
 
@@ -421,7 +421,6 @@ def cancel_other(proptime_id=None, user_id=""):
   """Return new status
   Upon failure of other to confirm match
   cancel match (if applicable)--and cancel their request
-  Cancel any other expired requests part of a cancelled match
   """
   print("cancel_other", proptime_id, user_id)
   user = sm.get_user(user_id)

@@ -16,7 +16,7 @@ class CreateForm(CreateFormTemplate):
                                 duration=self.item['duration'],
                                 expire_date=expire_date,
                                )
-    alts = [_alt_proposal_time(alt) for alt in self.item['alt']]
+    alts = [CreateForm._alt_proposal_time(alt) for alt in self.item['alt']]
     return t.Proposal(times=[first_time] + alts,
                       eligible=self.item['eligible'],
                       eligible_users=self.item['eligible_users'],
@@ -36,10 +36,12 @@ class CreateForm(CreateFormTemplate):
   @staticmethod
   def proposal_to_item(proposal):
     """Convert a proposal dictionary to the format of self.item"""
-    item = {key: proposal.__dict__['key'] for key in ['eligible', 'eligible_users', 'eligible_groups']}
-    item['start_now'] = int(proposal.times[0].start_now)
-    item.update(_time_to_dict(proposal.times[0], item['start_now']))
-    item['alt'] = [_time_to_dict(time) for time in proposal.times[1:]]
+    item = {key: proposal.__dict__[key] for key in ['eligible', 'eligible_users', 'eligible_groups']}
+    start_now = int(proposal.times[0].start_now)
+    item['start_now'] = start_now
+    print(proposal.times)
+    item.update(CreateForm._time_to_dict(proposal.times[0], start_now))
+    item['alt'] = [CreateForm._time_to_dict(time) for time in proposal.times[1:]]
  
   @staticmethod
   def _time_to_dict(prop_time, start_now=0):

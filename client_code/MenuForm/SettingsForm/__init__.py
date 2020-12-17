@@ -24,7 +24,7 @@ class SettingsForm(SettingsFormTemplate):
     s, sl, t, re_st = anvil.server.call('set_request_em', checked)
     self.request_em_set_time = re_st
     #self.set_seconds_left(s, sl)
-    self.tallies = t
+    self.proposals = t
     #self.reset_status()
 
   def set_request_em_options(self, checked):
@@ -66,7 +66,7 @@ class SettingsForm(SettingsFormTemplate):
     s, sl, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
     self.request_em_set_time = re_st
     #self.set_seconds_left(s, sl)
-    self.tallies = t
+    self.proposals = t
     #self.reset_status() 
     
   def re_radio_button_fixed_clicked(self, **event_args):
@@ -77,7 +77,7 @@ class SettingsForm(SettingsFormTemplate):
     s, sl, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
     self.request_em_set_time = re_st
     #self.set_seconds_left(s, sl)
-    self.tallies = t
+    self.proposals = t
     #self.reset_status() 
 
   def text_box_hours_pressed_enter(self, **event_args):
@@ -95,7 +95,7 @@ class SettingsForm(SettingsFormTemplate):
       s, sl, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
       self.request_em_set_time = re_st
       #self.set_seconds_left(s, sl)
-      self.tallies = t
+      self.proposals = t
       #self.reset_status()
     else:
       hours_left = h.re_hours(self.request_em_hours, 
@@ -122,7 +122,7 @@ class SettingsForm(SettingsFormTemplate):
         #  self.set_seconds_left(s, sl)
         #  self.reset_status()
         #if not s:
-        #  self.content.tallies = t
-        #  self.content.update_tally_label()
+        #  self.content.proposals = t
+        #  self.content.update_proposal_table()
       else:
         self.text_box_hours.text = "{:.1f}".format(hours_left)

@@ -6,29 +6,33 @@ from ... import timeproposals as t
 
 
 class DashForm(DashFormTemplate):
-  def __init__(self, name, tallies, **properties):
+  def __init__(self, name, proposals, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
     if name:
       self.welcome_label.text = "Hi, " + name + "!"
-    self.tallies = tallies
+    self.proposals = proposals
     self.timer_2.interval = 5
        
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
-    self.update_tally_label()
+    self.update_proposal_table()
 
   def timer_2_tick(self, **event_args):
     """This method is called every 5 seconds, checking for status changes"""
     # Run this code approx. once a second
-    self.tallies = anvil.server.call_s('get_tallies')
-    self.update_tally_label()    
+    self.proposals = anvil.server.call_s('get_proposals')
+    self.update_proposal_table()    
     
-  def update_tally_label(self):
-    """Update form based on tallies state"""
-    pass
+  def update_proposal_table(self):
+    """Update form based on proposals state"""
+    for prop in self.proposals:
+      print(prop.dash_rows())
+    if self.proposals:
+      self.repeating_panel_1.items = sum(prop.dash_rows() for prop in self.proposals)
+    self.data_grid_1.visible = bool(self.repeating_panel_1.items)
   
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -42,7 +46,7 @@ class DashForm(DashFormTemplate):
     print(out is True)
     if out is True:
       proposal = content.proposal()
-      s, sl, self.tallies = anvil.server.call('add_request', proposal)
+      s, sl, self.proposals = anvil.server.call('add_request', proposal)
       self.top_form.set_seconds_left(s, sl)
       self.top_form.reset_status()
       if (not proposal['start_now']) or proposal['alt']:

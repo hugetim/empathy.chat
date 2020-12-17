@@ -76,7 +76,6 @@ class Proposal():
         
   def __serialize__(self, global_data):
     dict_rep = self.__dict__
-    print('self.__dict__', dict_rep)
     dict_rep['own'] = int(self.own)
     return dict_rep
 

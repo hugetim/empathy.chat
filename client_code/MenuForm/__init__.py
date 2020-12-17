@@ -22,7 +22,7 @@ class MenuForm(MenuFormTemplate):
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
-    tm, pe, s, sl, tallies, e, n = anvil.server.call('init')
+    tm, pe, s, sl, proposals, e, n = anvil.server.call('init')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'Instead, it can be used to test things out. Your actions will not impact '
@@ -34,7 +34,7 @@ class MenuForm(MenuFormTemplate):
     self.name = n
     self.test_mode.visible = tm
     self.pinged_em_checked = pe
-    self.tallies = tallies
+    self.proposals = proposals
     self.set_test_link()
     self.set_seconds_left(s, sl)
     self.reset_status()
@@ -65,11 +65,11 @@ class MenuForm(MenuFormTemplate):
 
   def complete_button_click(self):
     self.set_seconds_left(None)
-    self.tallies = anvil.server.call('match_complete')
+    self.proposals = anvil.server.call('match_complete')
     self.reset_status()   
 ###                                                        ###
   def confirm_wait(self):
-    s, sl, self.tallies = anvil.server.call('confirm_wait')
+    s, sl, self.proposals = anvil.server.call('confirm_wait')
     self.set_seconds_left(s, sl)
     self.reset_status()
 
@@ -98,7 +98,7 @@ class MenuForm(MenuFormTemplate):
     
   def go_dash(self):
     self.title_label.text = "Dashboard"
-    self.reset_and_load(DashForm(self.name, self.tallies))
+    self.reset_and_load(DashForm(self.name, self.proposals))
     self.home_link.role = "selected"
 
   def go_match(self):

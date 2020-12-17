@@ -68,26 +68,26 @@ class WaitForm(WaitFormTemplate):
     # Run this code approx. once a second
     if self.top_form.status == "requesting":
       if self.top_form.seconds_left <= 0:
-        self.top_form.tallies = anvil.server.call('cancel')
+        self.top_form.proposals = anvil.server.call('cancel')
         alert("Request cancelled due to "
               + h.seconds_to_words(p.WAIT_SECONDS) + " of inactivity.",
               dismissible=False)
         self.top_form.set_seconds_left(None)
         self.top_form.reset_status()
     elif self.top_form.status == "pinging" and self.top_form.seconds_left <= 0:
-      s, sl, self.top_form.tallies = anvil.server.call('cancel_other')
+      s, sl, self.top_form.proposals = anvil.server.call('cancel_other')
       self.top_form.set_seconds_left(s, sl)
       self.top_form.reset_status()
     if (now - self.top_form.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.top_form.last_5sec = now
       if self.top_form.status == "requesting":
-        s, sl, self.top_form.tallies = anvil.server.call_s('get_status')
+        s, sl, self.top_form.proposals = anvil.server.call_s('get_status')
         if s != self.top_form.status:
           self.top_form.set_seconds_left(s, sl)
           self.top_form.reset_status()
       elif self.top_form.status == "pinging":
-        s, sl, self.top_form.tallies = anvil.server.call_s('get_status')
+        s, sl, self.top_form.proposals = anvil.server.call_s('get_status')
         if s != self.top_form.status:
           self.top_form.set_seconds_left(s, sl)
           if self.top_form.status == "requesting":
@@ -113,7 +113,7 @@ class WaitForm(WaitFormTemplate):
               + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
               dismissible=False)
     elif out is None:
-      t = anvil.server.call_s('get_tallies')
+      t = anvil.server.call_s('get_proposals')
     else:
       print(out)
       assert out == "requesting"
@@ -130,6 +130,6 @@ class WaitForm(WaitFormTemplate):
     """Reset WaitForm status, removing from parent if needed"""
     old_status = self.top_form.status
     self.top_form.set_seconds_left(s, sl)
-    self.top_form.tallies = t
+    self.top_form.proposals = t
     if old_status != s:
       self.top_form.reset_status()
