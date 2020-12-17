@@ -36,7 +36,7 @@ class DashForm(DashFormTemplate):
   
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    content = CreateForm(item=CreateForm.proposal_to_item(t.Proposal()))
+    content = CreateForm(item=t.Proposal().create_form_item())
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
                 title="New Empathy Chat Proposal",
@@ -49,5 +49,5 @@ class DashForm(DashFormTemplate):
       s, sl, self.proposals = anvil.server.call('add_request', proposal)
       self.top_form.set_seconds_left(s, sl)
       self.top_form.reset_status()
-      if (not proposal['start_now']) or proposal['alt']:
+      if (not proposal.times[0].start_now) or len(proposal.times)>1:
         alert(title='"later" proposals not implemented yet')

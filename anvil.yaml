@@ -187,7 +187,7 @@ db_schema:
     wkdw1wtjE8w=:
       name: created
       type: datetime
-      admin_ui: {order: 1, width: 200}
+      admin_ui: {order: -2, width: 200}
   access: {python_name: proposals, app_id: E6HFYSK4HHRI7BTC, server: full, client: none,
     table_mapping_name: null, table_mapping_id: null, table_id: 94455}
 - name: Chat

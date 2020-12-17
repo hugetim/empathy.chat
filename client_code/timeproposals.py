@@ -41,10 +41,12 @@ class ProposalTime():
     if expire_date:
       self.expire_date = expire_date
     else:
-      if not start_now:
+      if start_now:
+        self.expire_date = h.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
+      else:
         self.expire_date = (self.start_date 
                             - datetime.timedelta(minutes=CANCEL_DEFAULT_MINUTES))
-
+      
   def __serialize__(self, global_data):
     dict_rep = self.__dict__
     dict_rep['start_now'] = int(self.start_now)
@@ -53,6 +55,21 @@ class ProposalTime():
   def __deserialize__(self, data, global_data):
     self.__dict__.update(data)
     self.start_now = bool(self.start_now)
+
+  def time_prop_item(self):
+    time_dict = {key: self.__dict__[key] for key in ['start_now', 'start_date', 'duration']}
+    if self.start_now:
+      time_dict['cancel_buffer'] = CANCEL_DEFAULT_MINUTES
+      time_dict['cancel_date'] = None
+    else:
+      cancel_buffer = round((self.start_date-self.expire_date).total_seconds()/60)
+      if cancel_buffer in t.CANCEL_TEXT.keys():
+        time_dict['cancel_buffer'] = cancel_buffer
+        time_dict['cancel_date'] = None
+      else:
+        time_dict['cancel_buffer'] = "custom"
+        time_dict['cancel_date'] = self.expire_date    
+    return time_dict
 
   @staticmethod  
   def default_start(now=h.now()):
@@ -86,17 +103,24 @@ class Proposal():
   def dash_rows(self):
     rows = []
     for time in self.times:
-      row = {'prop_id': self.parent.prop_id,
-             'own': self.parent.own,
-             'name': self.parent.name,
-             'time_id': self.time_id,
-             'duration': self.duration,
-             'expire_date': self.expire_date,
+      row = {'prop_id': self.prop_id,
+             'own': self.own,
+             'name': self.name,
+             'time_id': time.time_id,
+             'duration': time.duration,
+             'expire_date': time.expire_date,
             }
-      row['start_time'] = "now" if self.start_now else str(self.start_date)
+      row['start_time'] = "now" if time.start_now else str(time.start_date)
       rows.append(row)
     return rows
-      
+    
+  def create_form_item(self):
+    """Convert a proposal dictionary to the format of self.item"""
+    item = {key: self.__dict__[key] for key in ['eligible', 'eligible_users', 'eligible_groups']}
+    item.update(self.times[0].time_prop_item())
+    item['alt'] = [time.time_prop_item() for time in self.times[1:]]
+    return item
+
     
 #DEFAULT_PROPOSAL = {'start_now': 0,
 #                    'start_date': DEFAULT_START,

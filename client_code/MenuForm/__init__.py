@@ -22,6 +22,7 @@ class MenuForm(MenuFormTemplate):
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
+    self.status = None
     tm, pe, s, sl, proposals, e, n = anvil.server.call('init')
     if e == False:
       alert('This account is not yet authorized to match with other users. '

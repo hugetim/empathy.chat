@@ -312,47 +312,44 @@ def _attempt_accept_proposal(user, proptime_id):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def add_request(prop_dict, user_id=""):
+def add_request(proposal, user_id=""):
   """Return status, seconds_left, proposals
   
   Side effect: Update proposal tables with additions, if valid
   """
-  print("add_request", prop_dict, user_id)
+  print("add_request", proposal, user_id)
   user = sm.get_user(user_id)
-  return _add_request(user, prop_dict)
+  return _add_request(user, proposal)
 
 
-def _add_request(user, prop_dict):
+def _add_request(user, proposal):
   status, seconds_left, proposals = _get_status(user)
-  if status is None or not prop_dict['start_now']:
-    _add_request_rows(user, prop_dict)
+  if status is None or not proposal.start_now:
+    _add_request_rows(user, proposal)
   return _get_status(user)
 
 
-def _add_request_rows(user, prop_dict, now=sm.now()):
+def _add_request_rows(user, proposal, now=sm.now()):
   new_proposal = app_tables.proposals.add_row(user=user,
                                               current=True,
                                               created=now,
                                               last_edited=now,
-                                              eligible=prop_dict['eligible'],
-                                              eligible_users=prop_dict['eligible_users'],
-                                              eligible_groups=prop_dict['eligible_groups'],
+                                              eligible=proposal.eligible,
+                                              eligible_users=proposal.eligible_users,
+                                              eligible_groups=proposal.eligible_groups,
                                              )
-  _add_proposal_time(proposal=new_proposal, prop_time_dict=prop_dict)
-  for alt_time in prop_dict['alt']:
-    _add_proposal_time(proposal=new_proposal, prop_time_dict=alt_time)
+  for time in proposal.times:
+    _add_proposal_time(prop_row=new_proposal, prop_time=time)
   return new_proposal
 
 
-def _add_proposal_time(proposal, prop_time_dict, now=sm.now()):
-  if prop_time_dict['start_now']:
-    expire_date = now + datetime.timedelta(seconds=_seconds_left("requesting"))
-  else:
-    expire_date=prop_time_dict['start_date']-prop_time_dict['cancel_buffer']
-  new_time = app_tables.proposal_times.add_row(proposal=proposal,
-                                               start_now=bool(prop_time_dict['start_now']),
-                                               start_date=prop_time_dict['start_date'],
-                                               duration=prop_time_dict['duration'],
+def _add_proposal_time(prop_row, prop_time, now=sm.now()):
+  expire_date=prop_time.expire_date
+  assert expire_date is not None
+  new_time = app_tables.proposal_times.add_row(proposal=prop_row,
+                                               start_now=bool(prop_time.start_now),
+                                               start_date=prop_time.start_date,
+                                               duration=prop_time.duration,
                                                expire_date=expire_date,
                                                current=True,
                                                missed_pings=0,

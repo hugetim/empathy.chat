@@ -8,9 +8,12 @@ from datetime import timedelta
 class CreateForm(CreateFormTemplate):
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
-    expire_date = (self.item['cancel_date'] if self.item['cancel_buffer'] == "custom"
-                   else (self.item['start_date'] 
-                         - timedelta(minutes=self.item['cancel_buffer'])))
+    if not self.item['start_now']:
+      expire_date = (self.item['cancel_date'] if self.item['cancel_buffer'] == "custom"
+                     else (self.item['start_date'] 
+                           - timedelta(minutes=self.item['cancel_buffer'])))
+    else:
+      expire_date = None
     first_time = t.ProposalTime(start_now=self.item['start_now'],
                                 start_date=self.item['start_date'],
                                 duration=self.item['duration'],
@@ -33,28 +36,6 @@ class CreateForm(CreateFormTemplate):
                           expire_date=expire_date,
                          )
     
-  @staticmethod
-  def proposal_to_item(proposal):
-    """Convert a proposal dictionary to the format of self.item"""
-    item = {key: proposal.__dict__[key] for key in ['eligible', 'eligible_users', 'eligible_groups']}
-    start_now = int(proposal.times[0].start_now)
-    item['start_now'] = start_now
-    print(proposal.times)
-    item.update(CreateForm._time_to_dict(proposal.times[0], start_now))
-    item['alt'] = [CreateForm._time_to_dict(time) for time in proposal.times[1:]]
- 
-  @staticmethod
-  def _time_to_dict(prop_time, start_now=0):
-    time_dict = {key: prop_time.__dict__[key] for key in ['start_date', 'duration']}
-    if not start_now:
-      cancel_buffer = round((prop_time.start_date-prop_time.expire_date).total_seconds()/60)
-      if cancel_buffer in t.CANCEL_TEXT.keys():
-        time_dict['cancel_buffer'] = cancel_buffer
-        time_dict['cancel_date'] = None
-      else:
-        time_dict['cancel_buffer'] = "custom"
-        time_dict['cancel_date'] = prop_time.expire_date
-
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
