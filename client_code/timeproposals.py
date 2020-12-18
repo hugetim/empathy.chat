@@ -117,8 +117,9 @@ class Proposal():
   def create_form_item(self):
     """Convert a proposal dictionary to the format of self.item"""
     item = {key: self.__dict__[key] for key in ['eligible', 'eligible_users', 'eligible_groups']}
-    item.update(self.times[0].time_prop_item())
-    item['alt'] = [time.time_prop_item() for time in self.times[1:]]
+    first, *alts = self.times
+    item.update(first.time_prop_item())
+    item['alt'] = [time.time_prop_item() for time in alts]
     return item
 
     
