@@ -55,14 +55,12 @@ def _prune_matches(now=sm.now()):
   """Complete old commenced matches for all users"""
   assume_complete = datetime.timedelta(hours=4)
   cutoff_m = now - assume_complete
-  # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-  old_matches = (m for m in app_tables.matches.search(complete=[0])
+  old_matches = (m for m in app_tables.matches.search(complete=[False])
                  if m['match_commence'] < cutoff_m)
   for row in old_matches:
     temp = row['complete']
     for i in range(len(temp)):
-      # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
-      temp[i] = 1
+      temp[i] = True
     row['complete'] = temp
 
 
@@ -446,8 +444,7 @@ def _match_commenced(user, proptime_id, now=sm.now()):
       new_match = app_tables.matches.add_row(users=users,
                                              proposal_time=current_row,
                                              match_commence=match_start,
-                                             complete=[0]*len(users))
-      # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
+                                             complete=[False]*len(users))
       current_row['current'] = False
   return _get_status(user)
 
@@ -458,10 +455,9 @@ def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return proposals."""
   print("match_complete", user_id)
   user = sm.get_user(user_id)
-  # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   this_match, i = current_match_i(user)
   temp = this_match['complete']
-  temp[i] = 1
+  temp[i] = True
   this_match['complete'] = temp
   return _get_proposals(user)
 
@@ -471,8 +467,7 @@ def current_match(user):
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
-    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    if row['complete'][i] == 0:
+    if row['complete'][i] == False:
       this_match = row
   return this_match
 
@@ -482,7 +477,6 @@ def current_match_i(user):
   current_matches = app_tables.matches.search(users=[user], complete=[0])
   for row in current_matches:
     i = row['users'].index(user)
-    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    if row['complete'][i] == 0:
+    if row['complete'][i] == False:
       this_match = row
   return this_match, i
