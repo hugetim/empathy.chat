@@ -50,8 +50,6 @@ def _prune_proposals(now=sm.now()):
                    if len(app_tables.proposal_times.search(current=True, proposal=r))==0)
   for row in old_proposals:
     row['current'] = False
-  for r in app_tables.proposals.search(current=True):
-    print(len(app_tables.proposal_times.search(current=True, proposal=r)))
 
 def _prune_matches(now=sm.now()):
   """Complete old commenced matches for all users"""
