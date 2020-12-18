@@ -31,7 +31,8 @@ class DashForm(DashFormTemplate):
     for prop in self.proposals:
       print(prop.dash_rows())
     if self.proposals:
-      self.repeating_panel_1.items = sum(prop.dash_rows() for prop in self.proposals)
+      
+      self.repeating_panel_1.items = [row for row in prop.dash_rows() for prop in self.proposals]
     self.data_grid_1.visible = bool(self.repeating_panel_1.items)
   
   def propose_button_click(self, **event_args):
