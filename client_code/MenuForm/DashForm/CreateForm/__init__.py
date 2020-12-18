@@ -30,9 +30,9 @@ class CreateForm(CreateFormTemplate):
   def _alt_proposal_time(alt):
     expire_date = (alt['cancel_date'] if alt['cancel_buffer'] == "custom"
                    else alt['start_date'] - timedelta(minutes=alt['cancel_buffer']))
-    return t.ProposalTime(start_now=alt['start_now'],
+    return t.ProposalTime(start_now=False,
                           start_date=alt['start_date'],
-                          duration=self.item['duration'],
+                          duration=alt['duration'],
                           expire_date=expire_date,
                          )
     
@@ -65,8 +65,8 @@ class CreateForm(CreateFormTemplate):
                                   - timedelta(minutes=self.item['cancel_buffer']))
       self.item['cancel_buffer'] = "custom"
   
-  def init_date_picker_start(self):
-    defaults = t.Proposal().default_start()
+  def init_date_picker_start(self, now=h.now()):
+    defaults = t.ProposalTime.default_start(now)
     self.date_picker_start.min_date = defaults['s_min']
     self.date_picker_start.max_date = defaults['s_max']
     if not self.item['start_date']:
@@ -135,7 +135,7 @@ class CreateForm(CreateFormTemplate):
   def check_times(self, now=h.now()):
     self.label_start.visible = False
     self.label_cancel.visible = False
-    messages = t.get_proposal_times_errors(now, self.proposal())
+    messages = t.get_proposal_times_errors(now, self.prop_time_dict())
     if messages:
       self.enable_save(False)
       if 'start_date' in messages:
@@ -147,6 +147,15 @@ class CreateForm(CreateFormTemplate):
     else:
       self.enable_save(True)
 
+  def prop_time_dict(self):
+    time_dict = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
+    if self.item['cancel_buffer'] != "custom":
+      time_dict['cancel_buffer'] = self.item['cancel_buffer']
+    else:
+      delta = self.item['start_date'] - self.item['cancel_date']
+      time_dict['cancel_buffer'] = delta.total_seconds() / 60
+    return time_dict   
+      
   def enable_save(self, enabled):
     self.save_button.enabled = enabled
     

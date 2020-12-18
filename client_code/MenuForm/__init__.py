@@ -49,6 +49,7 @@ class MenuForm(MenuFormTemplate):
         self.seconds_left = max(self.seconds_left, p.BUFFER_SECONDS)
     #print('before status change: ', self.seconds_left)
     self.status = new_status
+    
 ### Code that doesn't really belong here, but pending moving it ###
   def emailed_notification(self, num):
     """Return Notification (assumes num>0)"""
@@ -99,7 +100,7 @@ class MenuForm(MenuFormTemplate):
     
   def go_dash(self):
     self.title_label.text = "Dashboard"
-    self.reset_and_load(DashForm(self.name, self.proposals))
+    self.reset_and_load(DashForm())
     self.home_link.role = "selected"
 
   def go_match(self):
@@ -112,7 +113,7 @@ class MenuForm(MenuFormTemplate):
     self.title_label.text = "Chat"
     self.nav_panel.visible = False
     self.test_link.visible = False
-    self.reset_and_load(WaitForm(self.pinged_em_checked))
+    self.reset_and_load(WaitForm())
 
   def go_connections(self):
     self.title_label.text = "My Connections"

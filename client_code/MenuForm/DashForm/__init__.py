@@ -6,33 +6,30 @@ from ... import timeproposals as t
 
 
 class DashForm(DashFormTemplate):
-  def __init__(self, name, proposals, **properties):
+  def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
-    if name:
-      self.welcome_label.text = "Hi, " + name + "!"
-    self.proposals = proposals
     self.timer_2.interval = 5
        
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
+    if self.top_form.name:
+      self.welcome_label.text = "Hi, " + self.top_form.name + "!"
     self.update_proposal_table()
 
   def timer_2_tick(self, **event_args):
     """This method is called every 5 seconds, checking for status changes"""
     # Run this code approx. once a second
-    self.proposals = anvil.server.call_s('get_proposals')
+    self.top_form.proposals = anvil.server.call_s('get_proposals')
     self.update_proposal_table()    
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
-    for prop in self.proposals:
-      print(prop.dash_rows())
-    if self.proposals:  
-      self.repeating_panel_1.items = [row for row in prop.dash_rows() 
-                                      for prop in self.proposals]
+    if self.top_form.proposals:  
+      self.repeating_panel_1.items = [row for prop in self.top_form.proposals
+                                      for row in prop.dash_rows()]
     self.data_grid_1.visible = bool(self.repeating_panel_1.items)
   
   def propose_button_click(self, **event_args):
@@ -44,11 +41,13 @@ class DashForm(DashFormTemplate):
                 large=True,
                 dismissible=False,
                 buttons=[])
-    print(out is True)
     if out is True:
       proposal = content.proposal()
-      s, sl, self.proposals = anvil.server.call('add_request', proposal)
-      self.top_form.set_seconds_left(s, sl)
-      self.top_form.reset_status()
+      s, sl, self.top_form.proposals = anvil.server.call('add_request', proposal)
       if (not proposal.times[0].start_now) or len(proposal.times)>1:
         alert(title='"later" proposals not implemented yet')
+      self.top_form.set_seconds_left(s, sl)
+      if self.top_form.status not in [None, "requesting"]:
+        self.top_form.reset_status()
+      else:
+        self.update_proposal_table()

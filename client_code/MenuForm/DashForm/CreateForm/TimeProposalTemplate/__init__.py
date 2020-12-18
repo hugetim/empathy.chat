@@ -27,8 +27,8 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
                                   - datetime.timedelta(minutes=self.item['cancel_buffer']))
       self.item['cancel_buffer'] = "custom"
   
-  def init_date_picker_start(self):
-    defaults = t.Proposal().default_start()
+  def init_date_picker_start(self, now=h.now()):
+    defaults = t.ProposalTime.default_start(now)
     self.date_picker_start.min_date = defaults['s_min']
     self.date_picker_start.max_date = defaults['s_max']
     
@@ -68,7 +68,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
   def check_times(self, now=h.now()):
     self.label_start.visible = False
     self.label_cancel.visible = False
-    messages = t.get_proposal_times_errors(now, self.proposal())
+    messages = t.get_proposal_times_errors(now, self.prop_time_dict())
     if messages:
       self.alert_form.enable_save(False)
       if 'start_date' in messages:
@@ -80,15 +80,15 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     else:
       self.alert_form.enable_save(True)
 
-  def proposal(self):
-    proposal = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
-    proposal['start_now'] = 0
+  def prop_time_dict(self):
+    time_dict = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
+    time_dict['start_now'] = 0
     if self.item['cancel_buffer'] != "custom":
-      proposal['cancel_buffer'] = self.item['cancel_buffer']
+      time_dict['cancel_buffer'] = self.item['cancel_buffer']
     else:
       delta = self.item['start_date'] - self.item['cancel_date']
-      proposal['cancel_buffer'] = delta.total_seconds() / 60
-    return proposal       
+      time_dict['cancel_buffer'] = delta.total_seconds() / 60
+    return time_dict       
 
   def remove_button_click(self, **event_args):
     """This method is called when the button is clicked"""

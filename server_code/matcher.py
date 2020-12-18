@@ -330,7 +330,7 @@ def _add_request(user, proposal):
 
 
 def _add_request_rows(user, proposal, now=sm.now()):
-  new_proposal = app_tables.proposals.add_row(user=user,
+  new_prop_row = app_tables.proposals.add_row(user=user,
                                               current=True,
                                               created=now,
                                               last_edited=now,
@@ -339,8 +339,7 @@ def _add_request_rows(user, proposal, now=sm.now()):
                                               eligible_groups=proposal.eligible_groups,
                                              )
   for time in proposal.times:
-    _add_proposal_time(prop_row=new_proposal, prop_time=time)
-  return new_proposal
+    _add_proposal_time(prop_row=new_prop_row, prop_time=time)
 
 
 def _add_proposal_time(prop_row, prop_time, now=sm.now()):

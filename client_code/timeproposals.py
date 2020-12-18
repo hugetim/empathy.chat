@@ -105,12 +105,16 @@ class Proposal():
     for time in self.times:
       row = {'prop_id': self.prop_id,
              'own': self.own,
-             'name': self.name,
+             'users': self.name,
              'time_id': time.time_id,
-             'duration': time.duration,
+             'duration': DURATION_TEXT[time.duration],
              'expire_date': time.expire_date,
             }
-      row['start_time'] = "now" if time.start_now else str(time.start_date)
+      if time.start_now:
+        row['start_time'] = "now"  
+      else:
+        start = time.start_date.astimezone(anvil.tz.tzlocal())
+        row['start_time'] = start.strftime("%a, %b %m %I:%M%p")
       rows.append(row)
     return rows
     

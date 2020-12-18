@@ -4,7 +4,7 @@ import math
 
 
 def now():
-  return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
+  return datetime.datetime.now()
 
 
 def seconds_to_digital(seconds):

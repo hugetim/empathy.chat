@@ -7,17 +7,17 @@ from ... import helper as h
 
 
 class WaitForm(WaitFormTemplate):
-  def __init__(self, pe, **properties):
+  def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     #
-    self.pinged_em_check_box.checked = pe
     self.timer_1.interval = 1
     self.timer_2.interval = 1
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
+    self.pinged_em_check_box.checked = self.top_form.pinged_em_checked
     if self.top_form.status == "requesting":
       self.status_label.text = "Status: Requesting an empathy exchange."
       self.note_label.text = ("(Note: When a match becomes available, "
