@@ -15,6 +15,7 @@ components:
       background: '', bold: false, underline: false, icon: ''}
     name: accept_button
     layout_properties: {column: PHQQNP, grid_position: 'LKJQFF,PFVHKT'}
+    event_bindings: {click: accept_button_click}
   - type: Button
     properties: {role: null, align: center, tooltip: Renew this "now" proposal, border: '',
       enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '',
@@ -22,6 +23,7 @@ components:
       bold: false, underline: false, icon: 'fa:refresh'}
     name: renew_button
     layout_properties: {column: PHQQNP, grid_position: 'LKJQFF,HNLNSJ'}
+    event_bindings: {click: renew_button_click}
   - type: Button
     properties: {role: null, align: center, tooltip: Cancel this proposal time, border: '',
       enabled: true, foreground: 'theme:Secondary 700', visible: true, text: '', font_size: null,
@@ -29,4 +31,5 @@ components:
       background: '', bold: false, underline: false, icon: 'fa:times'}
     name: cancel_button
     layout_properties: {grid_position: 'LKJQFF,DBDZKE'}
+    event_bindings: {click: cancel_button_click}
 is_package: true

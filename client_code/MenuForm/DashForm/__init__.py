@@ -28,8 +28,10 @@ class DashForm(DashFormTemplate):
   def update_proposal_table(self):
     """Update form based on proposals state"""
     if self.top_form.proposals:  
-      self.repeating_panel_1.items = [row for prop in self.top_form.proposals
-                                      for row in prop.dash_rows()]
+      self.repeating_panel_1.items = [{'prop_time': time, 'prop_id': prop.prop_id,
+                                       'own': prop.own, 'users': prop.name}
+                                      for prop in self.top_form.proposals
+                                      for time in prop.times]
     self.data_grid_1.visible = bool(self.repeating_panel_1.items)
   
   def propose_button_click(self, **event_args):
@@ -43,11 +45,15 @@ class DashForm(DashFormTemplate):
                 buttons=[])
     if out is True:
       proposal = content.proposal()
-      s, sl, self.top_form.proposals = anvil.server.call('add_request', proposal)
       if (not proposal.times[0].start_now) or len(proposal.times)>1:
         alert(title='"later" proposals not implemented yet')
-      self.top_form.set_seconds_left(s, sl)
-      if self.top_form.status not in [None, "requesting"]:
-        self.top_form.reset_status()
-      else:
-        self.update_proposal_table()
+      self.update_status(anvil.server.call('add_request', proposal))
+      
+  def update_status(self, *args):
+    s, sl, self.top_form.proposals = args
+    self.top_form.set_seconds_left(s, sl)
+    if self.top_form.status not in [None, "requesting"]:
+      self.top_form.reset_status()
+    else:
+      self.update_proposal_table()
+    

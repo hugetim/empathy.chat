@@ -99,25 +99,7 @@ class Proposal():
   def __deserialize__(self, data, global_data):
     self.__dict__.update(data)
     self.own = bool(self.own)
-        
-  def dash_rows(self):
-    rows = []
-    for time in self.times:
-      row = {'prop_id': self.prop_id,
-             'own': self.own,
-             'users': self.name,
-             'time_id': time.time_id,
-             'duration': DURATION_TEXT[time.duration],
-             'expire_date': time.expire_date,
-            }
-      if time.start_now:
-        row['start_time'] = "now"  
-      else:
-        start = time.start_date.astimezone(anvil.tz.tzlocal())
-        row['start_time'] = start.strftime("%a, %b %m %I:%M%p")
-      rows.append(row)
-    return rows
-    
+          
   def create_form_item(self):
     """Convert a proposal dictionary to the format of self.item"""
     item = {key: self.__dict__[key] for key in ['eligible', 'eligible_users', 'eligible_groups']}

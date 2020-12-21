@@ -361,15 +361,15 @@ def _cancel(user, proptime_id, now=sm.now()):
     if not current_row:
       current_row = _get_now_accept(user)
   if current_row:
-    if user in current_row['users_accepting']:
+    if current_row['users_accepting'] and user in current_row['users_accepting']:
       _remove_user_accepting(user, current_row)
       if not current_row['users_accepting']:
         current_row['jitsi_code'] = None
       if now > current_row['expire_date']:
         current_row['current'] = False
-    elif user == current_row[proposal][user]:
+    elif user == current_row['proposal']['user']:
       current_row['current'] = False
-  return _get_proposals(user)
+  return _get_status(user)
 
 
 def _remove_user_accepting(user, proposal_time):
@@ -397,10 +397,10 @@ def _cancel_other(user, proptime_id, now=sm.now()):
     if not current_row:
       current_row = _get_now_accept(user)
   if current_row:
-    if user in current_row['users_accepting']:
+    if current_row['users_accepting'] and user in current_row['users_accepting']:
       current_row['current'] = False
       row['missed_pings'] += 1
-    elif user == current_row[proposal][user]:      
+    elif user == current_row['proposal']['user']:      
       current_row['users_accepting'] = None
       current_row['accept_date'] = None
       current_row['jitsi_code'] = None
