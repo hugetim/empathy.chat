@@ -314,24 +314,24 @@ def _attempt_accept_proposal(user, proptime_id):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def add_request(proposal, user_id=""):
+def add_proposal(proposal, user_id=""):
   """Return status, seconds_left, proposals
   
   Side effect: Update proposal tables with additions, if valid
   """
-  print("add_request", proposal, user_id)
+  print("add_proposal", proposal, user_id)
   user = sm.get_user(user_id)
-  return _add_request(user, proposal)
+  return _add_proposal(user, proposal)
 
 
-def _add_request(user, proposal):
+def _add_proposal(user, proposal):
   status, seconds_left, proposals = _get_status(user)
-  if status is None or not proposal.start_now:
-    _add_request_rows(user, proposal)
+  if status is None or not proposal.times[0].start_now:
+    _add_proposal_rows(user, proposal)
   return _get_status(user)
 
 
-def _add_request_rows(user, proposal):
+def _add_proposal_rows(user, proposal):
   now = sm.now()
   new_prop_row = app_tables.proposals.add_row(user=user,
                                               current=True,
@@ -360,7 +360,7 @@ def _add_proposal_time(prop_row, prop_time):
   
 @anvil.server.callable
 @anvil.tables.in_transaction
-def edit_request(proposal, user_id=""):
+def edit_proposal(proposal, user_id=""):
   """Return status, seconds_left, proposals
   
   Side effect: Update proposal tables with revision, if valid
@@ -370,35 +370,40 @@ def edit_request(proposal, user_id=""):
   return _edit_proposal(user, proposal)
 
 
-def _edit_request(user, proposal):
-  status, seconds_left, proposals = _get_status(user)
-  if status is None or not proposal.start_now:
-    _edit_request_rows(user, proposal)
+def _edit_proposal(user, proposal):
+  print("Not yet preventing editing to make multiple now proposals")
+  _edit_proposal_rows(user, proposal)
   return _get_status(user)
 
 
-def _edit_request_rows(user, proposal):
+def _edit_proposal_rows(user, proposal):
   prop_row = app_tables.proposals.get_by_id(proposal.prop_id)
   prop_row['current'] = True
   prop_row['last_edited'] = sm.now()
   prop_row['eligible'] = proposal.eligible
-  prop_row['eligible_users'] = proposal.eligible_users,
+  prop_row['eligible_users'] = proposal.eligible_users
   prop_row['eligible_groups'] = proposal.eligible_groups
+  ## First cancel removed rows
+  new_time_ids = [time.time_id for time in proposal.times]
+  for row in app_tables.proposal_times.search(current=True, proposal=prop_row):
+    if row.get_id() not in new_time_ids:
+      row['current'] = False
   for time in proposal.times:
-    _add_proposal_time(prop_row=prop_row, prop_time=time)
+    _edit_proposal_time(prop_row=prop_row, prop_time=time)
 
 
 def _edit_proposal_time(prop_row, prop_time):
   expire_date=prop_time.expire_date
   assert expire_date is not None
-  new_time = app_tables.proposal_times.add_row(proposal=prop_row,
-                                               start_now=bool(prop_time.start_now),
-                                               start_date=prop_time.start_date,
-                                               duration=prop_time.duration,
-                                               expire_date=expire_date,
-                                               current=True,
-                                               missed_pings=0,
-                                              )
+  time_row = app_tables.proposal_times.get_by_id(prop_time.time_id)
+  if time_row:
+    time_row['start_now'] = bool(prop_time.start_now)
+    time_row['start_date'] = prop_time.start_date
+    time_row['duration'] = prop_time.duration
+    time_row['expire_date'] = expire_date
+    time_row['current'] = True
+  else:
+    _add_proposal_time(prop_row, prop_time)
 
     
 def _cancel(user, proptime_id):

@@ -16,6 +16,10 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     self.normalize_initial_state()
     self.init_date_picker_start()
     self.date_picker_cancel_initialized = False
+    
+
+  def form_show(self, **event_args):
+    """This method is called when the column panel is shown on the screen"""
     self.alert_form = get_open_form().proposal_alert
     self.update()
     
@@ -28,7 +32,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
       self.item['cancel_buffer'] = "custom"
   
   def init_date_picker_start(self):
-    defaults = t.ProposalTime.default_start(h.now())
+    defaults = t.ProposalTime.default_start()
     self.date_picker_start.min_date = defaults['s_min']
     self.date_picker_start.max_date = defaults['s_max']
     
@@ -95,3 +99,4 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     """This method is called when the button is clicked"""
     self.parent.raise_event('x-remove', item_to_remove=self.item)
     self.remove_from_parent()
+

@@ -53,7 +53,7 @@ class DashForm(DashFormTemplate):
       proposal = content.proposal()
       if (not proposal.times[0].start_now) or len(proposal.times)>1:
         alert(title='"later" proposals not implemented yet')
-      self.update_status(anvil.server.call('add_request', proposal))
+      self.update_status(anvil.server.call('add_proposal', proposal))
 
   def edit_proposal(self, prop_id):
     """This method is called when the button is clicked"""

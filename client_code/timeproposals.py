@@ -63,7 +63,7 @@ class ProposalTime():
       time_dict['cancel_date'] = None
     else:
       cancel_buffer = round((self.start_date-self.expire_date).total_seconds()/60)
-      if cancel_buffer in t.CANCEL_TEXT.keys():
+      if cancel_buffer in CANCEL_TEXT.keys():
         time_dict['cancel_buffer'] = cancel_buffer
         time_dict['cancel_date'] = None
       else:

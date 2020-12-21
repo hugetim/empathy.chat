@@ -83,7 +83,7 @@ class CreateForm(CreateFormTemplate):
       self.item['cancel_buffer'] = "custom"
   
   def init_date_picker_start(self):
-    defaults = t.ProposalTime.default_start(h.now())
+    defaults = t.ProposalTime.default_start()
     self.date_picker_start.min_date = defaults['s_min']
     self.date_picker_start.max_date = defaults['s_max']
     if not self.item['start_date']:
@@ -184,19 +184,21 @@ class CreateForm(CreateFormTemplate):
         start_1 = h.now()
       else:
         start_1 = self.item['start_date']
-      self.item['alt'] = [{'start_date': (start_1 + t.DEFAULT_NEXT_DELTA), 
-                                       'duration': self.item['duration'], 
-                                       'cancel_buffer': self.item['cancel_buffer'],
-                                       'cancel_date': None
-                                      }]
+      self.item['alt'] = [{'start_date': (start_1 + t.DEFAULT_NEXT_DELTA),
+                           'duration': self.item['duration'],
+                           'cancel_buffer': self.item['cancel_buffer'],
+                           'cancel_date': None,
+                           'time_id': None,
+                          }]
     else:
       previous_item = self.item['alt'][-1]
       self.item['alt'] += [{'start_date': (previous_item['start_date']
-                                                       + t.DEFAULT_NEXT_DELTA), 
-                                        'duration': previous_item['duration'], 
-                                        'cancel_buffer': previous_item['cancel_buffer'],
-                                        'cancel_date': None
-                                       }]
+                                           + t.DEFAULT_NEXT_DELTA),
+                            'duration': previous_item['duration'],
+                            'cancel_buffer': previous_item['cancel_buffer'],
+                            'cancel_date': None,
+                            'time_id': None,
+                           }]
     self.update()
       
   def remove_alternate(self, item_to_remove, **event_args):

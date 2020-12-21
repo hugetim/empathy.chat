@@ -19,7 +19,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
 
   def init(self):
     if self.item['own']:
-      self.item['users'] += f" (#{self.item['prop_num']})"
+      self.item['users'] = f"My proposal #{self.item['prop_num']}"
     time = self.item['prop_time']
     self.item.update({'time_id': time.time_id,
                       'duration': t.DURATION_TEXT[time.duration],
@@ -29,7 +29,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.item['start_time'] = "now"  
     else:
       start = time.start_date.astimezone(anvil.tz.tzlocal())
-      self.item['start_time'] = start.strftime("%a, %b %m %I:%M%p")
+      self.item['start_time'] = start.strftime("%a, %b %d %I:%M%p")
 
   def update_expire_seconds(self, time_left):
     self.item['expires_in'], *rest = str(time_left).split('.')
@@ -45,7 +45,8 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       days_and_hours, minutes, *rest = str(time_left).split(':')
       self.item['expires_in'] = f"{days_and_hours}:{minutes}"
     self.accept_button.visible = not self.item['own']
-    self.renew_button.visible = self.item['own'] and self.item['start_time'] == "now"
+    self.edit_button.visible = self.item['own']
+    self.renew_button.visible = self.item['own'] and self.item['prop_time'].start_now
     self.cancel_button.visible = self.item['own']
 
   def update_dash(self, *args):

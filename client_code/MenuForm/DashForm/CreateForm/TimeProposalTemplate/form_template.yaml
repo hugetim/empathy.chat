@@ -1,6 +1,6 @@
 container:
   type: ColumnPanel
-  event_bindings: {}
+  event_bindings: {show: form_show}
   properties: {col_widths: '{}'}
 components:
 - type: form:MenuForm.HorizontalRule
