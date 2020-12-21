@@ -49,7 +49,7 @@ class DashForm(DashFormTemplate):
         alert(title='"later" proposals not implemented yet')
       self.update_status(anvil.server.call('add_request', proposal))
       
-  def update_status(self, *args):
+  def update_status(self, args):
     s, sl, self.top_form.proposals = args
     self.top_form.set_seconds_left(s, sl)
     if self.top_form.status not in [None, "requesting"]:
