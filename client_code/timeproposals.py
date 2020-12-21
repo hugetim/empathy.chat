@@ -57,7 +57,7 @@ class ProposalTime():
     self.start_now = bool(self.start_now)
 
   def time_prop_item(self):
-    time_dict = {key: self.__dict__[key] for key in ['start_now', 'start_date', 'duration']}
+    time_dict = {key: self.__dict__[key] for key in ['time_id', 'start_now', 'start_date', 'duration']}
     if self.start_now:
       time_dict['cancel_buffer'] = CANCEL_DEFAULT_MINUTES
       time_dict['cancel_date'] = None
@@ -72,7 +72,8 @@ class ProposalTime():
     return time_dict
 
   @staticmethod  
-  def default_start(now=h.now()):
+  def default_start():
+    now=h.now()
     return {'s_min': now + datetime.timedelta(seconds=max(p.WAIT_SECONDS, 60*CANCEL_MIN_MINUTES)),
             'start': now + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES),
             's_max': now + datetime.timedelta(days=31)}
@@ -102,7 +103,7 @@ class Proposal():
           
   def create_form_item(self):
     """Convert a proposal dictionary to the format of self.item"""
-    item = {key: self.__dict__[key] for key in ['eligible', 'eligible_users', 'eligible_groups']}
+    item = {key: self.__dict__[key] for key in ['prop_id', 'eligible', 'eligible_users', 'eligible_groups']}
     first, *alts = self.times
     item.update(first.time_prop_item())
     item['alt'] = [time.time_prop_item() for time in alts]

@@ -63,8 +63,9 @@ class WaitForm(WaitFormTemplate):
                                 + "to confirm:  "
                                 + h.seconds_to_digital(self.top_form.seconds_left))
 
-  def timer_2_tick(self, now=h.now(), **event_args):
+  def timer_2_tick(self, **event_args):
     """This method is called approx. once per second, checking for status changes"""
+    now=h.now()
     # Run this code approx. once a second
     if self.top_form.status == "requesting":
       if self.top_form.seconds_left <= 0:

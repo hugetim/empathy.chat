@@ -20,21 +20,38 @@ class CreateForm(CreateFormTemplate):
                                 expire_date=expire_date,
                                )
     alts = [CreateForm._alt_proposal_time(alt) for alt in self.item['alt']]
-    return t.Proposal(times=[first_time] + alts,
-                      eligible=self.item['eligible'],
-                      eligible_users=self.item['eligible_users'],
-                      eligible_groups=self.item['eligible_groups'],
-                     )
+    if self.item['prop_id']:
+      first_time.time_id = self.item['time_id']
+      return t.Proposal(prop_id=self.item['prop_id'],
+                        times=[first_time] + alts,
+                        eligible=self.item['eligible'],
+                        eligible_users=self.item['eligible_users'],
+                        eligible_groups=self.item['eligible_groups'],
+                       )
+    else:
+      return t.Proposal(times=[first_time] + alts,
+                        eligible=self.item['eligible'],
+                        eligible_users=self.item['eligible_users'],
+                        eligible_groups=self.item['eligible_groups'],
+                       )
 
   @staticmethod
   def _alt_proposal_time(alt):
     expire_date = (alt['cancel_date'] if alt['cancel_buffer'] == "custom"
                    else alt['start_date'] - timedelta(minutes=alt['cancel_buffer']))
-    return t.ProposalTime(start_now=False,
-                          start_date=alt['start_date'],
-                          duration=alt['duration'],
-                          expire_date=expire_date,
-                         )
+    if alt['time_id']:
+      return t.ProposalTime(time_id=alt['time_id'],
+                            start_now=False,
+                            start_date=alt['start_date'],
+                            duration=alt['duration'],
+                            expire_date=expire_date,
+                           )
+    else:
+      return t.ProposalTime(start_now=False,
+                            start_date=alt['start_date'],
+                            duration=alt['duration'],
+                            expire_date=expire_date,
+                           )
     
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
@@ -65,15 +82,16 @@ class CreateForm(CreateFormTemplate):
                                   - timedelta(minutes=self.item['cancel_buffer']))
       self.item['cancel_buffer'] = "custom"
   
-  def init_date_picker_start(self, now=h.now()):
-    defaults = t.ProposalTime.default_start(now)
+  def init_date_picker_start(self):
+    defaults = t.ProposalTime.default_start(h.now())
     self.date_picker_start.min_date = defaults['s_min']
     self.date_picker_start.max_date = defaults['s_max']
     if not self.item['start_date']:
        self.item['start_date'] = defaults['start']
     self.date_picker_start_initialized = True
     
-  def init_date_picker_cancel(self, now=h.now()):
+  def init_date_picker_cancel(self):
+    now=h.now()
     self.date_picker_cancel.min_date = now
     self.date_picker_cancel.max_date = self.date_picker_start.max_date
     if not self.item['cancel_date']:
@@ -132,10 +150,10 @@ class CreateForm(CreateFormTemplate):
     """This method is called when the selected date changes"""
     self.update()    
 
-  def check_times(self, now=h.now()):
+  def check_times(self):
     self.label_start.visible = False
     self.label_cancel.visible = False
-    messages = t.get_proposal_times_errors(now, self.prop_time_dict())
+    messages = t.get_proposal_times_errors(h.now(), self.prop_time_dict())
     if messages:
       self.enable_save(False)
       if 'start_date' in messages:
@@ -159,11 +177,11 @@ class CreateForm(CreateFormTemplate):
   def enable_save(self, enabled):
     self.save_button.enabled = enabled
     
-  def button_add_alternate_click(self, now=h.now(), **event_args):
+  def button_add_alternate_click(self, **event_args):
     """This method is called when the button is clicked"""
     if not self.item['alt']:
       if self.item['start_now']:
-        start_1 = now
+        start_1 = h.now()
       else:
         start_1 = self.item['start_date']
       self.item['alt'] = [{'start_date': (start_1 + t.DEFAULT_NEXT_DELTA), 

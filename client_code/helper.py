@@ -72,6 +72,6 @@ def seconds_to_words(seconds):
   return output
 
 
-def re_hours(h, set_time, now=now()):
-  hours = (3600.0*h - (now - set_time).seconds)/3600.0
+def re_hours(h, set_time):
+  hours = (3600.0*h - (now() - set_time).seconds)/3600.0
   return hours

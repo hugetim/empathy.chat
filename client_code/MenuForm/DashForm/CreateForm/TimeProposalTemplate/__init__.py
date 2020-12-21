@@ -27,12 +27,13 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
                                   - datetime.timedelta(minutes=self.item['cancel_buffer']))
       self.item['cancel_buffer'] = "custom"
   
-  def init_date_picker_start(self, now=h.now()):
-    defaults = t.ProposalTime.default_start(now)
+  def init_date_picker_start(self):
+    defaults = t.ProposalTime.default_start(h.now())
     self.date_picker_start.min_date = defaults['s_min']
     self.date_picker_start.max_date = defaults['s_max']
     
-  def init_date_picker_cancel(self, now=h.now()):
+  def init_date_picker_cancel(self):
+    now=h.now()
     self.date_picker_cancel.min_date = now
     self.date_picker_cancel.max_date = self.date_picker_start.max_date
     if not self.item['cancel_date']:
@@ -65,10 +66,10 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     """This method is called when the selected date changes"""
     self.update()    
     
-  def check_times(self, now=h.now()):
+  def check_times(self):
     self.label_start.visible = False
     self.label_cancel.visible = False
-    messages = t.get_proposal_times_errors(now, self.prop_time_dict())
+    messages = t.get_proposal_times_errors(h.now(), self.prop_time_dict())
     if messages:
       self.alert_form.enable_save(False)
       if 'start_date' in messages:

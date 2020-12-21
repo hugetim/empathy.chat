@@ -1,10 +1,13 @@
 container:
   type: DataRowPanel
   event_bindings: {}
+  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', auto_display_data: true,
+    visible: true, font_size: null, font: '', spacing_above: none, spacing_below: none,
+    italic: false, background: '', bold: false, underline: false}
 components:
 - type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+  properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
+    visible: true, spacing_above: small, spacing_below: small, background: ''}
   name: flow_panel_1
   layout_properties: {column: PHQQNP}
   components:
@@ -17,7 +20,15 @@ components:
     layout_properties: {column: PHQQNP, grid_position: 'LKJQFF,PFVHKT'}
     event_bindings: {click: accept_button_click}
   - type: Button
-    properties: {role: null, align: center, tooltip: Renew this "now" proposal, border: '',
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
+      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
+      underline: false, icon: 'fa:pencil'}
+    name: edit_button
+    layout_properties: {}
+    event_bindings: {click: edit_button_click}
+  - type: Button
+    properties: {role: null, align: center, tooltip: Renew your "now" proposal, border: '',
       enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '',
       spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
       bold: false, underline: false, icon: 'fa:refresh'}
@@ -32,4 +43,8 @@ components:
     name: cancel_button
     layout_properties: {grid_position: 'LKJQFF,DBDZKE'}
     event_bindings: {click: cancel_button_click}
+- type: Timer
+  properties: {interval: 0}
+  name: timer_1
+  event_bindings: {tick: timer_1_tick}
 is_package: true

@@ -5,6 +5,7 @@ import anvil.tz
 import datetime
 from .... import timeproposals as t
 from .... import helper as h
+from ....parameters import WAIT_SECONDS, BUFFER_SECONDS
 
 
 class ProposalRowTemplate(ProposalRowTemplateTemplate):
@@ -17,6 +18,8 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.update()
 
   def init(self):
+    if self.item['own']:
+      self.item['users'] += f" (#{self.item['prop_num']})"
     time = self.item['prop_time']
     self.item.update({'time_id': time.time_id,
                       'duration': t.DURATION_TEXT[time.duration],
@@ -27,9 +30,20 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     else:
       start = time.start_date.astimezone(anvil.tz.tzlocal())
       self.item['start_time'] = start.strftime("%a, %b %m %I:%M%p")
-    self.item['expires_in'] = str(self.item['expire_date'] - h.now())
+
+  def update_expire_seconds(self, time_left):
+    self.item['expires_in'], *rest = str(time_left).split('.')
+    self.refresh_data_bindings()
       
   def update(self):
+    time_left = self.item['expire_date'] - h.now()
+    if time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
+      self.update_expire_seconds(time_left)
+      self.timer_1.interval = 1
+    else:
+      self.timer_1.interval = 0
+      days_and_hours, minutes, *rest = str(time_left).split(':')
+      self.item['expires_in'] = f"{days_and_hours}:{minutes}"
     self.accept_button.visible = not self.item['own']
     self.renew_button.visible = self.item['own'] and self.item['start_time'] == "now"
     self.cancel_button.visible = self.item['own']
@@ -50,3 +64,13 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     """This method is called when the button is clicked"""
     self.update_dash(anvil.server.call('cancel', 
                                        self.item['prop_time'].time_id))
+
+  def timer_1_tick(self, **event_args):
+    """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
+    self.update_expire_seconds(self.item['expire_date'] - h.now())
+
+  def edit_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    get_open_form().content.edit_proposal(self.item['prop_id'])
+
+
