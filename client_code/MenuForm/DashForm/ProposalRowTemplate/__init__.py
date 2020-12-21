@@ -1,12 +1,8 @@
 from ._anvil_designer import ProposalRowTemplateTemplate
 from anvil import *
-import anvil.server
-import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
-import anvil.users
+import datetime
+from .... import helper as h
+
 
 class ProposalRowTemplate(ProposalRowTemplateTemplate):
   def __init__(self, **properties):
@@ -14,3 +10,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.accept_button.visible = not self.item['own']
+    self.renew_button.visible = self.item['own'] and self.item['start_time'] == "now"
+    self.cancel_button.visible = self.item['own']
+    self.item['expires_in'] = str(self.item['expire_date'] - h.now())

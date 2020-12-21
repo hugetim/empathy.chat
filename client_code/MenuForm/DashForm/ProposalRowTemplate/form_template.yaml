@@ -2,29 +2,30 @@ container:
   type: DataRowPanel
   event_bindings: {}
 components:
-- type: ColumnPanel
-  properties: {col_widths: '{"PFVHKT":27,"HNLNSJ":17,"DBDZKE":16}'}
-  name: column_panel_1
+- type: FlowPanel
+  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+    foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+  name: flow_panel_1
   layout_properties: {column: PHQQNP}
   components:
   - type: Button
     properties: {role: primary-color, align: center, tooltip: Accept this proposal to meet here at the time specified and exchange empathy for the duration listed,
-      border: '', enabled: true, foreground: '', visible: true, text: ACCEPT, font_size: 12,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      border: '', enabled: true, foreground: '', visible: true, text: ACCEPT, font_size: 10,
+      font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     name: accept_button
     layout_properties: {column: PHQQNP, grid_position: 'LKJQFF,PFVHKT'}
   - type: Button
     properties: {role: null, align: center, tooltip: Renew this "now" proposal, border: '',
       enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:refresh'}
+      spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
+      bold: false, underline: false, icon: 'fa:refresh'}
     name: renew_button
     layout_properties: {column: PHQQNP, grid_position: 'LKJQFF,HNLNSJ'}
   - type: Button
     properties: {role: null, align: center, tooltip: Cancel this proposal time, border: '',
       enabled: true, foreground: 'theme:Secondary 700', visible: true, text: '', font_size: null,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
       background: '', bold: false, underline: false, icon: 'fa:times'}
     name: cancel_button
     layout_properties: {grid_position: 'LKJQFF,DBDZKE'}

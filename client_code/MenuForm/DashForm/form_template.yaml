@@ -48,6 +48,7 @@ components:
         - {title: User(s), id: LRZCRL, data_key: users}
         - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false}
         - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false}
+        - {id: QGSDIT, title: Expires in..., data_key: expires_in}
         - {title: '', id: PHQQNP, data_key: buttons}
         auto_header: false
         tooltip: ''
@@ -97,6 +98,14 @@ components:
           name: link_duration
           layout_properties: {column: YUYJUP}
           event_bindings: {}
+        - type: Link
+          properties: {role: null, url: '', align: left, tooltip: '', border: '',
+            foreground: 'theme:White', visible: true, text: Expires in..., font_size: null,
+            wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
+            icon_align: left, col_widths: '', spacing_below: small, italic: false,
+            background: '', bold: true, underline: false, icon: ''}
+          name: link_expires_in
+          layout_properties: {column: QGSDIT}
         event_bindings: {}
         data_bindings: []
       - type: RepeatingPanel
