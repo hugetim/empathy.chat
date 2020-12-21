@@ -34,8 +34,8 @@ class WaitForm(WaitFormTemplate):
       if self.top_form.status == "pinged":
         return self.confirm_match(self.top_form.seconds_left)
       assert self.top_form.status == "pinging"
-      self.status_label.text = ("A potential match is available. They have "
-                                + "this long to confirm they are ready:  "
+      self.status_label.text = ("Potential match available. Time left for them "
+                                + "to confirm:  "
                                 + h.seconds_to_digital(self.top_form.seconds_left))
       self.note_label.visible = False
       self.timer_label.visible = False
@@ -46,9 +46,7 @@ class WaitForm(WaitFormTemplate):
     self.top_form.confirm_wait()
 
   def cancel_button_click(self, **event_args):
-    status = None
-    seconds_left = None
-    t = anvil.server.call('cancel')
+    status, seconds_left, t = anvil.server.call('cancel')
     self.reset_status(status, seconds_left, t)
 
   def timer_1_tick(self, **event_args):

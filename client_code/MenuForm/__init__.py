@@ -10,8 +10,10 @@ from .GroupsMenu import GroupsMenu
 from .MyGroupsForm import MyGroupsForm
 from .UserMenu import UserMenu
 from .SettingsForm import SettingsForm
+from .DashForm.CreateForm import CreateForm
 from .. import parameters as p
 from .. import helper as h
+from .. import timeproposals as t
 import random
 
 
@@ -86,6 +88,8 @@ class MenuForm(MenuFormTemplate):
       self.go_dash() 
 
   def clear_page(self):
+    self.link_bar_home.visible = True
+    self.link_bar_profile.visible = True
     self.nav_panel.visible = True
     self.test_link.visible = True 
     for link in self.nav_panel.get_components():
@@ -105,12 +109,16 @@ class MenuForm(MenuFormTemplate):
 
   def go_match(self):
     self.title_label.text = "Chat"
+    self.link_bar_home.visible = False
+    self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
     self.reset_and_load(MatchForm())
 
   def go_wait(self):
     self.title_label.text = "Chat"
+    self.link_bar_home.visible = False
+    self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
     self.reset_and_load(WaitForm())
@@ -195,13 +203,22 @@ class MenuForm(MenuFormTemplate):
     else:
       alert("Email address required to add user.")
 
-  def test_request_button_click(self, **event_args):
+  def test_proposal_button_click(self, **event_args):
     user_id = self.test_requestuser_drop_down.selected_value
-    requesttype = self.test_requesttype_drop_down.selected_value
-    if user_id and requesttype:
-      anvil.server.call('test_add_request', user_id, requesttype)
+    content = CreateForm(item=t.Proposal().create_form_item())
+    self.proposal_alert = content
+    out = alert(content=self.proposal_alert,
+                title="New Empathy Chat Proposal",
+                large=True,
+                dismissible=False,
+                buttons=[])
+    if user_id and out is True:
+      proposal = content.proposal()
+      if (not proposal.times[0].start_now) or len(proposal.times)>1:
+        alert(title='"later" proposals not implemented yet')
+      anvil.server.call('test_add_request', user_id, proposal)
     else:
-      alert("User and request type required to add request.")
+      alert("User and saved proposal required to add request.")
 
   def test_clear_click(self, **event_args):
     anvil.server.call('test_clear')
@@ -214,4 +231,4 @@ class MenuForm(MenuFormTemplate):
   def test_other_action_click(self, **event_args):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
-    anvil.server.call(action, user_id)
+    anvil.server.call(action, user_id=user_id)

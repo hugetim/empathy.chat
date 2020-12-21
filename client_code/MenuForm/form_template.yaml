@@ -234,34 +234,14 @@ components:
       name: test_requestuser_drop_down
       layout_properties: {grid_position: 'YGFMUC,ZKTFTS'}
       data_bindings: []
-    - type: DropDown
-      properties:
-        role: null
-        align: full
-        tooltip: ''
-        border: ''
-        enabled: true
-        foreground: ''
-        items: [will_offer_first, receive_first]
-        visible: true
-        font_size: null
-        font: ''
-        spacing_above: small
-        spacing_below: small
-        italic: false
-        background: ''
-        bold: false
-        underline: false
-      name: test_requesttype_drop_down
-      layout_properties: {grid_position: 'POPIZV,ZIUYFE'}
     - type: Button
       properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Add Request, font_size: null, font: '',
+        foreground: '', visible: true, text: Add Proposal, font_size: null, font: '',
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
-      name: test_request_button
+      name: test_proposal_button
       layout_properties: {grid_position: 'MDYDAL,UHDJZK'}
-      event_bindings: {click: test_request_button_click}
+      event_bindings: {click: test_proposal_button_click}
     - type: Spacer
       properties: {visible: true, spacing_above: small, spacing_below: small, height: '16',
         tooltip: ''}
@@ -272,11 +252,12 @@ components:
         role: null
         align: full
         tooltip: ''
+        placeholder: ''
         border: ''
         enabled: true
         foreground: ''
         items: [cancel, confirm_wait, match_commenced, match_complete, get_status,
-          get_tallies, get_code, add_message]
+          get_proposals, get_code, add_message]
         visible: true
         font_size: null
         font: ''
@@ -286,6 +267,7 @@ components:
         background: ''
         bold: false
         underline: false
+        include_placeholder: false
       name: test_other_action_drop_down
       layout_properties: {grid_position: 'AVYFRG,XQFVXD'}
     - type: Button

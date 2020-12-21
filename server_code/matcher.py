@@ -452,7 +452,7 @@ def _cancel_other(user, proptime_id):
   if current_row:
     if current_row['users_accepting'] and user in current_row['users_accepting']:
       current_row['current'] = False
-      row['missed_pings'] += 1
+      current_row['missed_pings'] += 1
     elif user == current_row['proposal']['user']:      
       current_row['users_accepting'] = None
       current_row['accept_date'] = None
@@ -476,7 +476,7 @@ def cancel_other(proptime_id=None, user_id=""):
 
 @anvil.server.callable
 @anvil.tables.in_transaction
-def match_commenced(proptime_id, user_id=""):
+def match_commenced(proptime_id=None, user_id=""):
   """Returns _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
@@ -491,9 +491,18 @@ def _match_commenced(user, proptime_id):
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
-  current_row = app_tables.proposal_times.get_by_id(proptime_id)
+  if proptime_id:
+    print("proptime_id")
+    current_row = app_tables.proposal_times.get_by_id(proptime_id)
+  else:
+    current_row = _get_now_proposal_time(user)
+    if not current_row:
+      print("not current_row")
+      current_row = _get_now_accept(user)
   if current_row:
+    print("current_row")
     if current_row['jitsi_code']:
+      print("'jitsi_code'")
       match_start = sm.now()
       users = [current_row['proposal'][user]] + list(current_row['users_accepting'])
       new_match = app_tables.matches.add_row(users=users,
