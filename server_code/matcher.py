@@ -73,11 +73,9 @@ def _prune_matches():
 @anvil.tables.in_transaction
 def init():
   """
-  Assumed to run upon initializing Form1
-  returns trust_level, request_em, pinged_em, current_status, ref_time (or None),
-          proposals, alt_avail, email_in_list
-  prunes old proposals/matches
-  updates expire_date if currently requesting/ping
+  Runs upon initializing app
+  Side effects: prunes old proposals/matches,
+                updates expire_date if currently requesting/ping
   """
   print("('init')")
   sm.initialize_session()
@@ -112,7 +110,14 @@ def init():
     status, seconds_left, proposals = _cancel_other(user)
   if status in ('requesting', 'pinged', 'pinging'):
     status, seconds_left, proposals = confirm_wait_helper(user)
-  return test_mode, pinged_em, status, seconds_left, proposals, email_in_list, name
+  return {'test_mode': test_mode, 
+          'pinged_em': pinged_em, 
+          'status': status, 
+          'seconds_left': seconds_left, 
+          'proposals': proposals, 
+          'email_in_list': email_in_list, 
+          'name': name,
+         }
 
 
 def _get_now_proposal_time(user):

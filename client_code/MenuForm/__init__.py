@@ -25,7 +25,9 @@ class MenuForm(MenuFormTemplate):
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     self.confirming_wait = False
     self.status = None
-    tm, pe, s, sl, proposals, e, n = anvil.server.call('init')
+    state = anvil.server.call('init')
+    e = state['email_in_list']
+    n = state['name']
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'Instead, it can be used to test things out. Your actions will not impact '
@@ -35,11 +37,11 @@ class MenuForm(MenuFormTemplate):
     elif e == True:
       alert("Welcome, " + n + "!")
     self.name = n
-    self.test_mode.visible = tm
-    self.pinged_em_checked = pe
-    self.proposals = proposals
+    self.test_mode.visible = state['test_mode']
+    self.pinged_em_checked = state['pinged_em']
+    self.proposals = state['proposals']
     self.set_test_link()
-    self.set_seconds_left(s, sl)
+    self.set_seconds_left(state['status'], state['seconds_left'])
     self.reset_status()
 
   def set_seconds_left(self, new_status=None, new_seconds_left=None):

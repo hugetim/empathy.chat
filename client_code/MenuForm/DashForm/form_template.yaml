@@ -49,7 +49,7 @@ components:
         - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false}
         - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false}
         - {id: QGSDIT, title: Expires in..., data_key: expires_in}
-        - {title: '', id: PHQQNP, data_key: buttons}
+        - {title: '', id: PHQQNP, data_key: buttons, expand: true}
         auto_header: false
         tooltip: ''
         border: ''
