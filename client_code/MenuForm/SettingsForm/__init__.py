@@ -21,11 +21,8 @@ class SettingsForm(SettingsFormTemplate):
     """This method is called when this checkbox is checked or unchecked"""
     checked = self.request_em_check_box.checked
     self.set_request_em_options(checked)
-    s, sl, t, re_st = anvil.server.call('set_request_em', checked)
+    re_st = anvil.server.call('set_request_em', checked)
     self.request_em_set_time = re_st
-    #self.set_seconds_left(s, sl)
-    self.proposals = t
-    #self.reset_status()
 
   def set_request_em_options(self, checked):
     """Update request_em options visibility/enabled."""
@@ -63,22 +60,16 @@ class SettingsForm(SettingsFormTemplate):
     self.text_box_hours.enabled = fixed
     hours = self.text_box_hours.text
     self.request_em_hours = hours
-    s, sl, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
+    re_st = anvil.server.call('set_request_em_opts', fixed, hours)
     self.request_em_set_time = re_st
-    #self.set_seconds_left(s, sl)
-    self.proposals = t
-    #self.reset_status() 
     
   def re_radio_button_fixed_clicked(self, **event_args):
     fixed = True
     self.text_box_hours.enabled = fixed
     hours = self.text_box_hours.text
     self.request_em_hours = hours
-    s, sl, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
+    re_st = anvil.server.call('set_request_em_opts', fixed, hours)
     self.request_em_set_time = re_st
-    #self.set_seconds_left(s, sl)
-    self.proposals = t
-    #self.reset_status() 
 
   def text_box_hours_pressed_enter(self, **event_args):
     self.update_hours()
@@ -92,11 +83,8 @@ class SettingsForm(SettingsFormTemplate):
     if hours and hours > 0:
       fixed = self.re_radio_button_fixed.selected
       self.request_em_hours = hours
-      s, sl, t, re_st = anvil.server.call('set_request_em_opts', fixed, hours)
+      re_st = anvil.server.call('set_request_em_opts', fixed, hours)
       self.request_em_set_time = re_st
-      #self.set_seconds_left(s, sl)
-      self.proposals = t
-      #self.reset_status()
     else:
       hours_left = h.re_hours(self.request_em_hours, 
                               self.request_em_set_time)
@@ -116,13 +104,7 @@ class SettingsForm(SettingsFormTemplate):
         self.request_em_check_box.checked = checked
         self.set_request_em_options(checked)
         self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
-        s, sl, t, re_st = anvil.server.call_s('set_request_em', checked)
+        re_st = anvil.server.call_s('set_request_em', checked)
         self.request_em_set_time = re_st
-        #if s != self.status:
-        #  self.set_seconds_left(s, sl)
-        #  self.reset_status()
-        #if not s:
-        #  self.content.proposals = t
-        #  self.content.update_proposal_table()
       else:
         self.text_box_hours.text = "{:.1f}".format(hours_left)

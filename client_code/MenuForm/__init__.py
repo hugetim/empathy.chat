@@ -23,11 +23,9 @@ class MenuForm(MenuFormTemplate):
     self.init_components(**properties)
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
-    self.confirming_wait = False
-    self.status = None
-    state = anvil.server.call('init')
-    e = state['email_in_list']
-    n = state['name']
+    init_state = anvil.server.call('init')
+    e = init_state.pop('email_in_list')
+    n = init_state.pop('name')
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'Instead, it can be used to test things out. Your actions will not impact '
@@ -37,57 +35,22 @@ class MenuForm(MenuFormTemplate):
     elif e == True:
       alert("Welcome, " + n + "!")
     self.name = n
-    self.test_mode.visible = state['test_mode']
-    self.pinged_em_checked = state['pinged_em']
-    self.proposals = state['proposals']
+    self.test_mode.visible = init_state['test_mode']
     self.set_test_link()
-    self.set_seconds_left(state['status'], state['seconds_left'])
-    self.reset_status()
+    self.reset_status(init_state)
 
-  def set_seconds_left(self, new_status=None, new_seconds_left=None):
-    """Set status and related time variables"""
-    self.last_5sec = h.now()
-    if new_status and new_status != "matched":
-      self.seconds_left = new_seconds_left
-      if self.status == "pinging" and new_status == "requesting":
-        self.seconds_left = max(self.seconds_left, p.BUFFER_SECONDS)
-    #print('before status change: ', self.seconds_left)
-    self.status = new_status
-    
-### Code that doesn't really belong here, but pending moving it ###
-  def emailed_notification(self, num):
-    """Return Notification (assumes num>0)"""
-    if num == 1:
-      message = ('Someone has been sent a '
-                 + 'notification email about your request.')
-      headline = 'Email notification sent'
-    else:
-      message = (str(num) + ' others have been sent '
-                 + 'notification emails about your request.')
-      headline = 'Email notifications sent'
-    return Notification(message,
-                        title=headline,
-                        timeout=10)
-
-  def complete_button_click(self):
-    self.set_seconds_left(None)
-    self.proposals = anvil.server.call('match_complete')
-    self.reset_status()   
-###                                                        ###
-  def confirm_wait(self):
-    s, sl, self.proposals = anvil.server.call('confirm_wait')
-    self.set_seconds_left(s, sl)
-    self.reset_status()
-
-  def reset_status(self):
+  def reset_status(self, state):
     """Update form according to current state variables"""
-    if self.status in ["pinged", "pinging"]:
-        self.go_wait()
-    elif self.status == "matched":
-        self.go_match()
+    if state['status'] in ["pinged", "pinging"]:
+      state_vars = {'status', 'seconds_left'}
+      self.go_wait(item={k: state[k] for k in state_vars})
+    elif state['status'] == "matched":
+      state_vars = {}
+      self.go_match(item={k: state[k] for k in state_vars})
     else:
-      assert self.status in [None, "requesting"]
-      self.go_dash() 
+      assert state['status'] in [None, "requesting"]
+      state_vars = {'status', 'seconds_left', 'proposals'}
+      self.go_dash(item={k: state[k] for k in state_vars}) 
 
   def clear_page(self):
     self.link_bar_home.visible = True
@@ -104,26 +67,26 @@ class MenuForm(MenuFormTemplate):
     self.content = content
     self.content_column_panel.add_component(self.content)  
     
-  def go_dash(self):
+  def go_dash(self, item):
     self.title_label.text = "Dashboard"
-    self.reset_and_load(DashForm())
+    self.reset_and_load(DashForm(item=item))
     self.home_link.role = "selected"
 
-  def go_match(self):
+  def go_match(self, item):
     self.title_label.text = "Chat"
     self.link_bar_home.visible = False
     self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
-    self.reset_and_load(MatchForm())
+    self.reset_and_load(MatchForm(item=item))
 
-  def go_wait(self):
+  def go_wait(self, item):
     self.title_label.text = "Chat"
     self.link_bar_home.visible = False
     self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
-    self.reset_and_load(WaitForm())
+    self.reset_and_load(WaitForm(item=item))
 
   def go_connections(self):
     self.title_label.text = "My Connections"

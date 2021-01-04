@@ -3,6 +3,7 @@ from anvil import *
 import anvil.server
 from .CreateForm import CreateForm
 from ... import timeproposals as t
+from ... import helper as h
 
 
 class DashForm(DashFormTemplate):
@@ -19,18 +20,25 @@ class DashForm(DashFormTemplate):
       self.welcome_label.text = "Hi, " + self.top_form.name + "!"
     self.update_proposal_table()
 
+  def set_seconds_left(self, new_status=None, new_seconds_left=None):
+    """Set status and related time variables"""
+    if new_status and new_status != "matched":
+      self.item['seconds_left'] = new_seconds_left
+    #print('before status change: ', self.item['seconds_left'])
+    self.item['status'] = new_status    
+ 
   def timer_2_tick(self, **event_args):
     """This method is called every 5 seconds, checking for status changes"""
     # Run this code approx. once a second
-    self.top_form.proposals = anvil.server.call_s('get_proposals')
+    self.item['proposals'] = anvil.server.call_s('get_proposals')
     self.update_proposal_table()    
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
-    if self.top_form.proposals:
+    if self.item['proposals']:
       items = []
       own_count = 0
-      for prop in self.top_form.proposals:
+      for prop in self.item['proposals']:
         own_count += prop.own
         for time in prop.times:
           items.append({'users': prop.name, 'prop_time': time, 'prop_id': prop.prop_id,
@@ -57,7 +65,7 @@ class DashForm(DashFormTemplate):
 
   def edit_proposal(self, prop_id):
     """This method is called when the button is clicked"""
-    [prop_to_edit] = [prop for prop in self.top_form.proposals 
+    [prop_to_edit] = [prop for prop in self.item['proposals'] 
                       if prop.prop_id == prop_id]
     content = CreateForm(item=prop_to_edit.create_form_item())
     self.top_form.proposal_alert = content
@@ -72,11 +80,27 @@ class DashForm(DashFormTemplate):
         alert(title='"later" proposals not implemented yet')
       self.update_status(anvil.server.call('edit_proposal', proposal))   
       
-  def update_status(self, args):
-    s, sl, self.top_form.proposals = args
-    self.top_form.set_seconds_left(s, sl)
-    if self.top_form.status not in [None, "requesting"]:
-      self.top_form.reset_status()
+  def update_status(self, state):
+    self.item['proposals'] = state['proposals']
+    self.set_seconds_left(state['status'], state['seconds_left'])
+    if self.item['status'] not in [None, "requesting"]:
+      self.top_form.reset_status(state)
     else:
       self.update_proposal_table()
+      
+### Legacy code to be possibly repurposed ###
+  def emailed_notification(self, num):
+    """Return Notification (assumes num>0)"""
+    if num == 1:
+      message = ('Someone has been sent a '
+                 + 'notification email about your request.')
+      headline = 'Email notification sent'
+    else:
+      message = (str(num) + ' others have been sent '
+                 + 'notification emails about your request.')
+      headline = 'Email notifications sent'
+    return Notification(message,
+                        title=headline,
+                        timeout=10)
+###                                                        ###
     

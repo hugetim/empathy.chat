@@ -59,7 +59,7 @@ def get_user_info(user):
     user['request_em'] = False
     user['pinged_em'] = False
     user['request_em_settings'] = {"fixed": 0, "hours": 2}
-  return (user['trust_level'], user['pinged_em'])
+  return user['trust_level']
 
   
 def new_jitsi_code():
@@ -151,13 +151,13 @@ def _prune_request_em():
     a_user['request_em'] = False
 
 
-@anvil.server.callable
-@anvil.tables.in_transaction
-def set_pinged_em(pinged_em_checked):
-  print("set_pinged_em", pinged_em_checked)
-  user = anvil.server.session['user']
-  user['pinged_em'] = pinged_em_checked
-  return matcher.confirm_wait_helper(user)
+#@anvil.server.callable
+#@anvil.tables.in_transaction
+#def set_pinged_em(pinged_em_checked):
+#  print("set_pinged_em", pinged_em_checked)
+#  user = anvil.server.session['user']
+#  user['pinged_em'] = pinged_em_checked
+#  return matcher.confirm_wait_helper(user)
 
 
 @anvil.server.callable
@@ -168,8 +168,7 @@ def set_request_em(request_em_checked):
   user['request_em'] = request_em_checked
   if request_em_checked:
     user['request_em_set_time'] = now()
-  s, sl, t = matcher.confirm_wait_helper(user)
-  return s, sl, t, user['request_em_set_time']
+  return user['request_em_set_time']
 
 
 @anvil.server.callable
@@ -182,8 +181,7 @@ def set_request_em_opts(fixed, hours):
   re_opts["hours"] = hours
   user['request_em_settings'] = re_opts
   user['request_em_set_time'] = now()
-  s, sl, t = matcher.confirm_wait_helper(user)
-  return s, sl, t, user['request_em_set_time']
+  return user['request_em_set_time']
 
 
 def pinged_email(user):

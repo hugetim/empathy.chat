@@ -30,7 +30,7 @@ def test_add_request(user_id, proposal):
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
   user = app_tables.users.get_by_id(user_id)
-  s, sl, n = matcher._add_proposal(user, proposal)
+  state = matcher._add_proposal(user, proposal)
   
   test_proposals = anvil.server.session['test_record']['test_proposals']
   new_row = app_tables.proposals.get_by_id(proposal.prop_id)

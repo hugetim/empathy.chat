@@ -17,42 +17,6 @@ components:
       name: status_label
       layout_properties: {grid_position: 'YOJCEM,HURPQL'}
       event_bindings: {}
-    - type: Label
-      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-        visible: false, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: timer_label
-      layout_properties: {grid_position: 'HHXUVE,NPWRYW'}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: false, text: RENEW YOUR REQUEST, font_size: 12, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:refresh'}
-      name: renew_button
-      layout_properties: {grid_position: 'CJEHPC,DKFLGA'}
-      event_bindings: {click: renew_button_click}
-    - type: FlowPanel
-      properties: {role: null, spacing: none, align: center, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-      name: pinged_em_check_panel
-      layout_properties: {grid_position: 'SLFIQX,DPOPXW'}
-      components:
-      - type: form:SV7QK4XBYUXPMHHM:Toggleswitch
-        properties: {enabled: true, visible: true, checked: null, spacing_above: small,
-          spacing_below: none}
-        name: pinged_em_check_box
-        layout_properties: {grid_position: 'ROTMVP,EIQUSQ'}
-        event_bindings: {x_change: pinged_em_check_box_change}
-      - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: Notify me by email when a match is found, font_size: null,
-          font: '', spacing_above: small, icon_align: left, spacing_below: medium,
-          italic: false, background: '', bold: false, underline: false, icon: ''}
-        name: label_6
-        layout_properties: {grid_position: 'KDXRTV,UBOSWF'}
-        event_bindings: {}
-      event_bindings: {}
     - type: Button
       properties: {role: secondary-color, align: center, tooltip: '', border: '',
         enabled: true, foreground: '', visible: true, text: Cancel, font_size: null,
@@ -61,14 +25,6 @@ components:
       name: cancel_button
       layout_properties: {grid_position: 'TZDHKG,MGNYKZ'}
       event_bindings: {click: cancel_button_click}
-    - type: Label
-      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-        visible: false, text: '', font_size: 12, font: '', spacing_above: small, icon_align: left,
-        spacing_below: none, italic: true, background: '', bold: false, underline: false,
-        icon: ''}
-      name: note_label
-      layout_properties: {grid_position: 'WOLXYM,FPKEGW'}
-      event_bindings: {}
     event_bindings: {}
   event_bindings: {}
 - name: timer_2

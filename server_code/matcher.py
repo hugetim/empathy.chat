@@ -86,7 +86,7 @@ def init():
   # Initialize user info
   user = anvil.server.session['user']
   print(user['email'])
-  trust_level, pinged_em = sm.get_user_info(user)
+  trust_level = sm.get_user_info(user)
   email_in_list = None
   name = None
   if trust_level == 0:
@@ -101,21 +101,20 @@ def init():
     name = user['name']
   test_mode = trust_level >= TEST_TRUST_LEVEL
   # Initialize user status
-  status, seconds_left, proposals = _get_status(user)
-  if status == 'pinged' and seconds_left <= 0:
-    status, seconds_left, proposals = _cancel(user)
-  elif status == 'pinged':
-    status, seconds_left, proposals = _match_commenced(user)
-  elif status == 'pinging' and seconds_left <= 0:
-    status, seconds_left, proposals = _cancel_other(user)
-  if status in ('requesting', 'pinged', 'pinging'):
-    status, seconds_left, proposals = confirm_wait_helper(user)
-  return {'test_mode': test_mode, 
-          'pinged_em': pinged_em, 
-          'status': status, 
-          'seconds_left': seconds_left, 
-          'proposals': proposals, 
-          'email_in_list': email_in_list, 
+  state = _get_status(user)
+  if state['status'] == 'pinged' and state['seconds_left'] <= 0:
+    state = _cancel(user)
+  elif state['status'] == 'pinged':
+    state = _match_commenced(user)
+  elif state['status'] == 'pinging' and state['seconds_left'] <= 0:
+    state = _cancel_other(user)
+  if state['status'] in ('requesting', 'pinged', 'pinging'):
+    state = confirm_wait_helper(user)
+  return {'test_mode': test_mode,
+          'status': state['status'],
+          'seconds_left': state['seconds_left'],
+          'proposals': state['proposals'],
+          'email_in_list': email_in_list,
           'name': name,
          }
 
@@ -155,8 +154,7 @@ def confirm_wait_helper(user):
   current_row = _get_now_proposal_time(user)
   if current_row:
     current_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
-  status, seconds_left, proposals = _get_status(user)
-  return status, seconds_left, proposals
+  return _get_status(user)
 
 
 @anvil.server.callable
@@ -196,7 +194,10 @@ def _get_status(user):
       if this_match:
         status = "matched"
         ping_start = this_match['match_commence']
-  return status, _seconds_left(status, expire_date, ping_start), proposals
+  return {'status': status, 
+          'seconds_left': _seconds_left(status, expire_date, ping_start), 
+          'proposals': proposals,
+         }
 
 
 def has_status(user):
@@ -260,7 +261,7 @@ def _proposal_is_visible(proposal, user):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def get_code(user_id=""):
-  """returns jitsi_code, duration (or Nones)"""
+  """Return jitsi_code, duration (or Nones)"""
   print("get_code", user_id)
   user = sm.get_user(user_id)
   
@@ -282,7 +283,7 @@ def get_code(user_id=""):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def accept_proposal(proptime_id, user_id=""):
-  """Return status, seconds_left, proposals
+  """Return _get_status
   
   Side effect: update proptime table with acceptance, if available
   """
@@ -309,7 +310,8 @@ def _accept_proposal(user, proptime, status):
 
 
 def _attempt_accept_proposal(user, proptime_id):
-  status, seconds_left, proposals = _get_status(user)
+  state = _get_status(user)
+  status = state['status']
   if status in [None, "requesting"]:
     proptime = app_tables.proposal_times.get_by_id(proptime_id)
     if proptime['current'] and (not proptime['users_accepting']) and _proposal_is_visible(proptime['proposal'], user):
@@ -320,7 +322,7 @@ def _attempt_accept_proposal(user, proptime_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def add_proposal(proposal, user_id=""):
-  """Return status, seconds_left, proposals
+  """Return _get_status
   
   Side effect: Update proposal tables with additions, if valid
   """
@@ -330,7 +332,8 @@ def add_proposal(proposal, user_id=""):
 
 
 def _add_proposal(user, proposal):
-  status, seconds_left, proposals = _get_status(user)
+  state = _get_status(user)
+  status = state['status']
   if status is None or not proposal.times[0].start_now:
     _add_proposal_rows(user, proposal)
   return _get_status(user)
@@ -366,7 +369,7 @@ def _add_proposal_time(prop_row, prop_time):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def edit_proposal(proposal, user_id=""):
-  """Return status, seconds_left, proposals
+  """Return _get_status
   
   Side effect: Update proposal tables with revision, if valid
   """
@@ -470,7 +473,7 @@ def _cancel_other(user, proptime_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel_other(proptime_id=None, user_id=""):
-  """Return new status
+  """Return new _get_status
   Upon failure of other to confirm match
   cancel match (if applicable)--and cancel their request
   """
@@ -482,7 +485,7 @@ def cancel_other(proptime_id=None, user_id=""):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_commenced(proptime_id=None, user_id=""):
-  """Returns _get_status(user)
+  """Return _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
@@ -492,7 +495,7 @@ def match_commenced(proptime_id=None, user_id=""):
 
 
 def _match_commenced(user, proptime_id):
-  """Returns _get_status(user)
+  """Return _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
