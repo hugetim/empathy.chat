@@ -512,7 +512,7 @@ def _match_commenced(user, proptime_id):
     if current_row['jitsi_code']:
       print("'jitsi_code'")
       match_start = sm.now()
-      users = [current_row['proposal'][user]] + list(current_row['users_accepting'])
+      users = [current_row['proposal']['user']] + list(current_row['users_accepting'])
       new_match = app_tables.matches.add_row(users=users,
                                              proposal_time=current_row,
                                              match_commence=match_start,
