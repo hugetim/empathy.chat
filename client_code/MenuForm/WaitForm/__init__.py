@@ -37,8 +37,7 @@ class WaitForm(WaitFormTemplate):
     self.item['status'] = new_status          
       
   def cancel_button_click(self, **event_args):
-    proposals = anvil.server.call('cancel')
-    state = {'status': None, 'seconds_left': None, 'proposals': proposals}
+    state = anvil.server.call('cancel')
     self.reset_status(state)
 
   def timer_1_tick(self, **event_args):
@@ -77,18 +76,15 @@ class WaitForm(WaitFormTemplate):
       #self.item['status'] = "matched"
       state = anvil.server.call('match_commenced')
     elif out in [False, "timer elapsed"]:
-      t = anvil.server.call('cancel')
-      state = {'status': None, 'seconds_left': None, 'proposals': t}
+      state = anvil.server.call('cancel')
       if out == "timer elapsed":
         alert("A match was found, but the time available for you to confirm ("
               + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
               dismissible=False)
-    elif out is None:
-      t = anvil.server.call_s('get_proposals')
-      state = {'status': None, 'seconds_left': None, 'proposals': t}
     else:
-      print(out)
-      assert out == "requesting"
+      if out:
+        print(out)
+        assert out == "requesting"
       state = anvil.server.call_s('get_status')
     self.reset_status(state)
       

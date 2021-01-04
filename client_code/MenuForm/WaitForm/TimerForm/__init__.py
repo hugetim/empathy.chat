@@ -26,7 +26,7 @@ class TimerForm(TimerFormTemplate):
 
   def timer_2_tick(self, **event_args):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
-    now=h.now()
+    now = h.now()
     # Run this code once a second
     if self.seconds_left <= 0:
       self.raise_event("x-close-alert", value="timer elapsed")

@@ -119,7 +119,7 @@ def init():
          }
 
 
-def _get_now_proposal_time(user):
+def get_now_proposal_time(user):
   """Return user's current 'start_now' proposal_times row"""
   current_proposals = app_tables.proposals.search(user=user, current=True)
   for prop in current_proposals:
@@ -151,7 +151,7 @@ def confirm_wait(user_id=""):
 
 def confirm_wait_helper(user):
   """updates expire_date for current request, returns _get_status(user)"""  
-  current_row = _get_now_proposal_time(user)
+  current_row = get_now_proposal_time(user)
   if current_row:
     current_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
   return _get_status(user)
@@ -169,8 +169,9 @@ def _get_status(user):
   ping_start: accept_date or, for "matched", match_commence
   assumes 2-person matches only
   assumes now proposals only
+  Side effects: prune proposals
   """
-  current_row = _get_now_proposal_time(user)
+  current_row = get_now_proposal_time(user)
   status = None
   expire_date = None
   ping_start = None
@@ -204,7 +205,7 @@ def has_status(user):
   """
   returns bool(current_status)
   """
-  current_row = _get_now_proposal_time(user)
+  current_row = get_now_proposal_time(user)
   if current_row:
     return True
   else:
@@ -218,19 +219,12 @@ def has_status(user):
   return False
 
 
-@anvil.server.callable
-@anvil.tables.in_transaction
-def get_proposals():
+def _get_proposals(user):
   """Return list of Proposals
   
   Side effects: prune proposals
   """
   _prune_proposals()
-  user = anvil.server.session['user']
-  return _get_proposals(user)
-
-
-def _get_proposals(user):
   return [_proposal(row, user)
           for row in app_tables.proposals.search(current=True)
                   if _proposal_is_visible(row, user)
@@ -265,7 +259,7 @@ def get_code(user_id=""):
   print("get_code", user_id)
   user = sm.get_user(user_id)
   
-  current_row = _get_now_proposal_time(user)
+  current_row = get_now_proposal_time(user)
   if current_row:
     return current_row['jitsi_code'], current_row['duration']
   else:
@@ -295,7 +289,7 @@ def accept_proposal(proptime_id, user_id=""):
 def _accept_proposal(user, proptime, status):
   now = sm.now()
   if status == "requesting":
-    own_now_proposal = _get_now_proposal_time(user)
+    own_now_proposal = get_now_proposal_time(user)
     if own_now_proposal:
       own_now_proposal['current'] = False
   proposal = proptime['proposal']
@@ -418,14 +412,12 @@ def _cancel(user, proptime_id):
   if proptime_id:
     current_row = app_tables.proposal_times.get_by_id(proptime_id)
   else:
-    current_row = _get_now_proposal_time(user)
+    current_row = get_now_proposal_time(user)
     if not current_row:
       current_row = _get_now_accept(user)
   if current_row:
     if current_row['users_accepting'] and user in current_row['users_accepting']:
       _remove_user_accepting(user, current_row)
-      if not current_row['users_accepting']:
-        current_row['jitsi_code'] = None
       if sm.now() > current_row['expire_date']:
         current_row['current'] = False
     elif user == current_row['proposal']['user']:
@@ -436,14 +428,17 @@ def _cancel(user, proptime_id):
 def _remove_user_accepting(user, proposal_time):
   new_users = list(proposal_time['users_accepting'].copy())
   new_users.remove(user)
+  # below code assumes only dyads allowed
+  proposal_time['users_accepting'] = new_users
   proposal_time['accept_date'] = None
+  proposal_time['jitsi_code'] = None
 
   
 @anvil.server.callable
 @anvil.tables.in_transaction
 def cancel(proptime_id=None, user_id=""):
   """Remove proptime and cancel pending match (if applicable)
-  Return proposals
+  Return _get_status
   """
   print("cancel", proptime_id, user_id)
   user = sm.get_user(user_id)
@@ -454,7 +449,7 @@ def _cancel_other(user, proptime_id):
   if proptime_id:
     current_row = app_tables.proposal_times.get_by_id(proptime_id)
   else:
-    current_row = _get_now_proposal_time(user)
+    current_row = get_now_proposal_time(user)
     if not current_row:
       current_row = _get_now_accept(user)
   if current_row:
@@ -503,7 +498,7 @@ def _match_commenced(user, proptime_id):
     print("proptime_id")
     current_row = app_tables.proposal_times.get_by_id(proptime_id)
   else:
-    current_row = _get_now_proposal_time(user)
+    current_row = get_now_proposal_time(user)
     if not current_row:
       print("not current_row")
       current_row = _get_now_accept(user)
@@ -525,7 +520,7 @@ def _match_commenced(user, proptime_id):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def match_complete(user_id=""):
-  """Switch 'complete' to true in matches table for user, return proposals."""
+  """Switch 'complete' to true in matches table for user, return status."""
   print("match_complete", user_id)
   user = sm.get_user(user_id)
   # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
@@ -533,7 +528,7 @@ def match_complete(user_id=""):
   temp = this_match['complete']
   temp[i] = 1
   this_match['complete'] = temp
-  return _get_proposals(user)
+  return _get_status(user)
 
 
 def current_match(user):

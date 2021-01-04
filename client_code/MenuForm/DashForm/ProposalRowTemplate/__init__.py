@@ -49,8 +49,8 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.renew_button.visible = self.item['own'] and self.item['prop_time'].start_now
     self.cancel_button.visible = self.item['own']
 
-  def update_dash(self, *args):
-    get_open_form().content.update_status(*args)
+  def update_dash(self, state):
+    get_open_form().content.update_status(state)
       
   def accept_button_click(self, **event_args):
     """This method is called when the button is clicked"""

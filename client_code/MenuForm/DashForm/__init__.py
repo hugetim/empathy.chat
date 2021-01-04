@@ -29,9 +29,8 @@ class DashForm(DashFormTemplate):
  
   def timer_2_tick(self, **event_args):
     """This method is called every 5 seconds, checking for status changes"""
-    # Run this code approx. once a second
-    self.item['proposals'] = anvil.server.call_s('get_proposals')
-    self.update_proposal_table()    
+    state = anvil.server.call_s('get_status')
+    self.update_status(state)    
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
