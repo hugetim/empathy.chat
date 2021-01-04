@@ -36,13 +36,12 @@ class MenuForm(MenuFormTemplate):
             dismissible=False)
     elif e == True:
       alert("Welcome, " + n + "!")
-    self.name = n
     self.test_mode.visible = state['test_mode']
     self.pinged_em_checked = state['pinged_em']
     self.proposals = state['proposals']
     self.set_test_link()
     self.set_seconds_left(state['status'], state['seconds_left'])
-    self.reset_status()
+    self.reset_status(state)
 
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """Set status and related time variables"""
@@ -84,9 +83,11 @@ class MenuForm(MenuFormTemplate):
     if self.status in ["pinged", "pinging"]:
         self.go_wait()
     elif self.status == "matched":
+        keys_needed = {'name'}
         self.go_match()
     else:
       assert self.status in [None, "requesting"]
+      keys_needed = {'name'}
       self.go_dash() 
 
   def clear_page(self):
