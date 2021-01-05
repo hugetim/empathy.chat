@@ -1,7 +1,6 @@
 from ._anvil_designer import WaitFormTemplate
 from anvil import *
 import anvil.server
-from .TimerForm import TimerForm
 from ... import parameters as p
 from ... import helper as h
 
@@ -18,8 +17,6 @@ class WaitForm(WaitFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
-    if self.item['status'] == "pinged":
-      return self.confirm_match(self.item['seconds_left'])
     assert self.item['status'] == "pinging"
     self.status_label.text = ("Potential match available. Time left for them "
                               + "to confirm:  "
@@ -64,29 +61,6 @@ class WaitForm(WaitFormTemplate):
         if state['status'] != self.item['status']:
           self.set_seconds_left(state['status'], state['seconds_left'])
           self.top_form.reset_status(state)    
-      
-  def confirm_match(self, seconds):
-    f = TimerForm(seconds, self.item['status'])
-    out = alert(content=f,
-                title="A match is available. Are you ready?",
-                large=False,
-                dismissible=False,
-                buttons=[("Yes", True), ("No", False)])
-    if out == True:
-      #self.item['status'] = "matched"
-      state = anvil.server.call('match_commenced')
-    elif out in [False, "timer elapsed"]:
-      state = anvil.server.call('cancel')
-      if out == "timer elapsed":
-        alert("A match was found, but the time available for you to confirm ("
-              + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
-              dismissible=False)
-    else:
-      if out:
-        print(out)
-        assert out == "requesting"
-      state = anvil.server.call_s('get_status')
-    self.reset_status(state)
       
   def reset_status(self, state):
     """Reset WaitForm status, removing from parent if needed"""

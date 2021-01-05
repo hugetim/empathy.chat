@@ -41,14 +41,14 @@ class MenuForm(MenuFormTemplate):
 
   def reset_status(self, state):
     """Update form according to current state variables"""
-    if state['status'] in ["pinged", "pinging"]:
+    if state['status'] in ["pinging"]:
       state_vars = {'status', 'seconds_left'}
       self.go_wait(item={k: state[k] for k in state_vars})
     elif state['status'] == "matched":
       state_vars = {}
       self.go_match(item={k: state[k] for k in state_vars})
     else:
-      assert state['status'] in [None, "requesting"]
+      assert state['status'] in [None, "requesting", "pinged"]
       state_vars = {'status', 'seconds_left', 'proposals'}
       self.go_dash(item={k: state[k] for k in state_vars}) 
 

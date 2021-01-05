@@ -2,6 +2,7 @@ from ._anvil_designer import DashFormTemplate
 from anvil import *
 import anvil.server
 from .CreateForm import CreateForm
+from .TimerForm import TimerForm
 from ... import timeproposals as t
 from ... import helper as h
 
@@ -18,8 +19,14 @@ class DashForm(DashFormTemplate):
     self.top_form = get_open_form()
     if self.top_form.name:
       self.welcome_label.text = "Hi, " + self.top_form.name + "!"
-    self.update_proposal_table()
+    self.update_form()
 
+  def update_form(self):
+    if self.item['status'] == "pinged":
+      self.confirm_match(self.item['seconds_left'])
+    else:
+      self.update_proposal_table()
+      
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """Set status and related time variables"""
     if new_status and new_status != "matched":
@@ -82,10 +89,38 @@ class DashForm(DashFormTemplate):
   def update_status(self, state):
     self.item['proposals'] = state['proposals']
     self.set_seconds_left(state['status'], state['seconds_left'])
-    if self.item['status'] not in [None, "requesting"]:
+    if self.item['status'] not in [None, "requesting", "pinged"]:
       self.top_form.reset_status(state)
     else:
-      self.update_proposal_table()
+      self.update_form()
+
+  def confirm_match(self, seconds):
+    try:
+      self.timer_2.interval = 0
+      f = TimerForm(seconds, self.item['status'])
+      out = alert(content=f,
+                  title="A match is available. Are you ready?",
+                  large=False,
+                  dismissible=False,
+                  buttons=[("Yes", True), ("No", False)])
+      if out == True:
+        #self.item['status'] = "matched"
+        state = anvil.server.call('match_commenced')
+      elif out in [False, "timer elapsed"]:
+        state = anvil.server.call('cancel')
+        if out == "timer elapsed":
+          alert("A match was found, but the time available for you to confirm ("
+                + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
+                dismissible=False)
+      else:
+        if out:
+          print("out:", out)
+          assert out == "requesting"
+        state = anvil.server.call_s('get_status')
+      self.update_status(state)
+    finally:
+      self.timer_2.interval = 5
+
       
 ### Legacy code to be possibly repurposed ###
   def emailed_notification(self, num):

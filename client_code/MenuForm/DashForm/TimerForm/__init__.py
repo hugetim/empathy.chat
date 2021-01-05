@@ -33,7 +33,8 @@ class TimerForm(TimerFormTemplate):
     if (now - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = now
-      new_status, sl, proposals = anvil.server.call_s('get_status')
+      state = anvil.server.call_s('get_status')
+      new_status = state['status']
       if new_status != self.status:
-        print(new_status)
+        print("new_status:", new_status)
         self.raise_event("x-close-alert", value=new_status)

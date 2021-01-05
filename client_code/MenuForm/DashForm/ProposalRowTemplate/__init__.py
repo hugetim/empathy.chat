@@ -30,13 +30,18 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     else:
       start = time.start_date.astimezone(anvil.tz.tzlocal())
       self.item['start_time'] = start.strftime("%a, %b %d %I:%M%p")
+    self.top_form = get_open_form()
 
   def update_expire_seconds(self, time_left):
     self.item['expires_in'], *rest = str(time_left).split('.')
     self.refresh_data_bindings()
-      
+
+  def time_left(self):
+    return max(self.item['expire_date'] - h.now(), 
+               datetime.timedelta(seconds=0))
+    
   def update(self):
-    time_left = self.item['expire_date'] - h.now()
+    time_left = self.time_left()
     if time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
       self.update_expire_seconds(time_left)
       self.timer_1.interval = 1
@@ -50,7 +55,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.cancel_button.visible = self.item['own']
 
   def update_dash(self, state):
-    get_open_form().content.update_status(state)
+    self.top_form.content.update_status(state)
       
   def accept_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -68,10 +73,11 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
-    self.update_expire_seconds(self.item['expire_date'] - h.now())
+    if self.top_form.content.timer_2.interval:
+      self.update_expire_seconds(self.time_left())
 
   def edit_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    get_open_form().content.edit_proposal(self.item['prop_id'])
+    self.top_form.content.edit_proposal(self.item['prop_id'])
 
 
