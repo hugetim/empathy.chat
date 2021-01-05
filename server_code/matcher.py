@@ -9,7 +9,7 @@ from .timeproposals import Proposal, ProposalTime
 
 
 TEST_TRUST_LEVEL = 10
-DEBUG = False
+DEBUG = True
 
 
 def _seconds_left(status, expire_date=None, ping_start=None):
@@ -42,8 +42,8 @@ def _prune_proposals():
   proposals_to_check = set()
   if DEBUG:
     print("old_prop_times")
-  old_prop_times = (r for r in app_tables.proposal_times.search(current=True, jitsi_code=None)
-                    if r['expire_date'] < now)
+  old_prop_times = [r for r in app_tables.proposal_times.search(current=True, jitsi_code=None)
+                    if r['expire_date'] < now]
   for row in old_prop_times:
     row['current'] = False
     proposals_to_check.add(row['proposal'])
@@ -54,8 +54,8 @@ def _prune_proposals():
   cutoff_r = now - timeout
   if DEBUG:
     print("old_ping_prop_times")
-  old_ping_prop_times = (r for r in app_tables.proposal_times.search(current=True, start_now=True)
-                         if (r['jitsi_code'] is not None and r['accept_date'] < cutoff_r))
+  old_ping_prop_times = [r for r in app_tables.proposal_times.search(current=True, start_now=True)
+                         if (r['jitsi_code'] is not None and r['accept_date'] < cutoff_r)]
   for row in old_ping_prop_times:
     row['current'] = False
     proposals_to_check.add(row['proposal'])
@@ -74,8 +74,8 @@ def _prune_matches():
   assume_complete = datetime.timedelta(hours=4)
   cutoff_m = sm.now() - assume_complete
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-  old_matches = (m for m in app_tables.matches.search(complete=[0])
-                 if m['match_commence'] < cutoff_m)
+  old_matches = [m for m in app_tables.matches.search(complete=[0])
+                 if m['match_commence'] < cutoff_m]
   for row in old_matches:
     temp = row['complete']
     for i in range(len(temp)):
@@ -136,6 +136,8 @@ def init():
 
 def get_now_proposal_time(user):
   """Return user's current 'start_now' proposal_times row"""
+  if DEBUG:
+    print("get_now_proposal_time")
   current_proposals = app_tables.proposals.search(user=user, current=True)
   for prop in current_proposals:
     trial_get = app_tables.proposal_times.get(proposal=prop,
@@ -186,7 +188,7 @@ def _get_status(user):
   ping_start: accept_date or, for "matched", match_commence
   assumes 2-person matches only
   assumes now proposals only
-  Side effects: prune proposals
+  Side effects: prune proposals when status in ["requesting", None]
   """
   if DEBUG:
     print("_get_status")
@@ -215,7 +217,7 @@ def _get_status(user):
         ping_start = this_match['match_commence']
       else:
         status = None
-        proposals = _get_proposals()
+        proposals = _get_proposals(user)
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
           'proposals': proposals,
@@ -241,7 +243,7 @@ def has_status(user):
 
 
 def _get_proposals(user):
-  """Return list of Proposals
+  """Return list of Proposals visible to user
   
   Side effects: prune proposals
   """
@@ -255,7 +257,7 @@ def _get_proposals(user):
 def _proposal(proposal_row, user):
   """Convert proposal_times row into a row for the client dashboard"""
   if DEBUG:
-    print("_proposal", proposal_row, user)
+    print("_proposal")
   proposer = proposal_row['user']
   own = proposer == user
   times = [_proposal_time(row) for row 
@@ -350,7 +352,7 @@ def add_proposal(proposal, user_id=""):
   
   Side effect: Update proposal tables with additions, if valid
   """
-  print("add_proposal", proposal, user_id)
+  print("add_proposal", user_id)
   user = sm.get_user(user_id)
   return _add_proposal(user, proposal)
 
@@ -397,7 +399,7 @@ def edit_proposal(proposal, user_id=""):
   
   Side effect: Update proposal tables with revision, if valid
   """
-  print("add_proposal", proposal, user_id)
+  print("edit_proposal", user_id)
   user = sm.get_user(user_id)
   return _edit_proposal(user, proposal)
 
@@ -440,7 +442,7 @@ def _edit_proposal_time(prop_row, prop_time):
     
 def _cancel(user, proptime_id):
   if DEBUG:
-    print("_cancel", user, proptime_id)
+    print("_cancel", proptime_id)
   if proptime_id:
     current_row = app_tables.proposal_times.get_by_id(proptime_id)
   else:
@@ -479,7 +481,7 @@ def cancel(proptime_id=None, user_id=""):
 
 def _cancel_other(user, proptime_id):
   if DEBUG:
-    print("_cancel_other", user, proptime_id)
+    print("_cancel_other", proptime_id)
   if proptime_id:
     current_row = app_tables.proposal_times.get_by_id(proptime_id)
   else:

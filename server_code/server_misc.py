@@ -30,6 +30,8 @@ def initialize_session():
 
 
 def get_user(user_id=""):
+  if matcher.DEBUG:
+    print("get_user", user_id)
   if user_id == "" or anvil.server.session['user_id'] == user_id:
     return anvil.server.session['user']
   else:
@@ -40,7 +42,7 @@ def get_user(user_id=""):
 def is_visible(user2, user1=None):
   """Is user2 visible to user1?"""
   if matcher.DEBUG:
-    print("server_misc.is_visible", user2, user1)
+    print("server_misc.is_visible")
   if user1 is None:
     user1 = anvil.server.session['user']
   trust1 = user1['trust_level']
@@ -79,7 +81,7 @@ def prune_messages():
   if matcher.DEBUG:
     print("server_misc.prune_messages()")
   all_messages = app_tables.chat.search()
-  matches = set(message['match'] for message in all_messages)
+  matches = {message['match'] for message in all_messages}
   for match in matches:
     if min(match['complete']) == 1:
       for row in app_tables.chat.search(match=match):

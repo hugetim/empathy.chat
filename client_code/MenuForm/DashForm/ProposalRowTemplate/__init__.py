@@ -75,8 +75,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
 
   def timer_1_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
-    if self.top_form.content.timer_2.interval:
-      self.update_expire_seconds(self.time_left())
+    self.update_expire_seconds(self.time_left())
 
   def edit_button_click(self, **event_args):
     """This method is called when the button is clicked"""

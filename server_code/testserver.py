@@ -26,7 +26,7 @@ def test_add_user(em, level=1, r_em=False, p_em=False):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def test_add_request(user_id, proposal):
-  print("test_add_request", user_id, proposal)
+  print("test_add_request", user_id)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
@@ -51,6 +51,7 @@ def create_tests_record():
 
 @anvil.server.callable
 def accept_now_proposal(user_id):
+  print("accept_now_proposal", user_id)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   tester = sm.get_user()
   tester_now_proposal = matcher.get_now_proposal_time(tester)
