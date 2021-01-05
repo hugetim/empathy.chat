@@ -96,8 +96,7 @@ class DashForm(DashFormTemplate):
       self.update_form()
 
   def confirm_match(self, seconds):
-    try:
-      self.timer_2.interval = 0
+    with h.PausedTimer(self.timer_2):
       f = TimerForm(seconds, self.item['status'])
       out = alert(content=f,
                   title="A match is available. Are you ready?",
@@ -119,10 +118,7 @@ class DashForm(DashFormTemplate):
           assert out == "requesting"
         state = anvil.server.call_s('get_status')
       self.update_status(state)
-    finally:
-      self.timer_2.interval = 5
 
-      
 ### Legacy code to be possibly repurposed ###
   def emailed_notification(self, num):
     """Return Notification (assumes num>0)"""

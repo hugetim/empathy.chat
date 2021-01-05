@@ -1,5 +1,6 @@
 import anvil.tables
 from anvil.tables import app_tables
+import anvil.tables.query as q
 import anvil.server
 import datetime
 import anvil.tz
@@ -42,8 +43,10 @@ def _prune_proposals():
   proposals_to_check = set()
   if DEBUG:
     print("old_prop_times")
-  old_prop_times = [r for r in app_tables.proposal_times.search(current=True, jitsi_code=None)
-                    if r['expire_date'] < now]
+  old_prop_times = app_tables.proposal_times.search(current=True, 
+                                                    jitsi_code=None,
+                                                    expire_date=q.less_than(now),
+                                                   )
   for row in old_prop_times:
     row['current'] = False
     proposals_to_check.add(row['proposal'])
@@ -54,8 +57,11 @@ def _prune_proposals():
   cutoff_r = now - timeout
   if DEBUG:
     print("old_ping_prop_times")
-  old_ping_prop_times = [r for r in app_tables.proposal_times.search(current=True, start_now=True)
-                         if (r['jitsi_code'] is not None and r['accept_date'] < cutoff_r)]
+  old_ping_prop_times = app_tables.proposal_times.search(current=True, 
+                                                         start_now=True,
+                                                         jitsi_code=q.not_(None),
+                                                         accept_date=q.less_than(cutoff_r)
+                                                        )
   for row in old_ping_prop_times:
     row['current'] = False
     proposals_to_check.add(row['proposal'])
@@ -74,8 +80,9 @@ def _prune_matches():
   assume_complete = datetime.timedelta(hours=4)
   cutoff_m = sm.now() - assume_complete
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-  old_matches = [m for m in app_tables.matches.search(complete=[0])
-                 if m['match_commence'] < cutoff_m]
+  old_matches = app_tables.matches.search(complete=[0],
+                                          match_commence=q.less_than(cutoff_m),
+                                         )
   for row in old_matches:
     temp = row['complete']
     for i in range(len(temp)):

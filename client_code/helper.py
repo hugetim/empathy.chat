@@ -75,3 +75,12 @@ def seconds_to_words(seconds):
 def re_hours(h, set_time):
   hours = (3600.0*h - (now() - set_time).seconds)/3600.0
   return hours
+
+
+class PausedTimer:
+  def __init__(self, timer):
+    self.orig_interval = timer.interval
+  def __enter__(self):
+    timer.interval = 0
+  def __exit__(self, type, value, tb):
+    timer.interval = self.orig_interval
