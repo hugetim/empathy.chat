@@ -37,8 +37,9 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.refresh_data_bindings()
 
   def time_left(self):
-    return max(self.item['expire_date'] - h.now(), 
-               datetime.timedelta(seconds=0))
+    diff = self.item['expire_date'] - h.now()
+    zero = datetime.timedelta(seconds=0)
+    return diff if diff > zero else zero 
     
   def update(self):
     time_left = self.time_left()
