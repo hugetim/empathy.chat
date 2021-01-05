@@ -39,6 +39,8 @@ def get_user(user_id=""):
 
 def is_visible(user2, user1=None):
   """Is user2 visible to user1?"""
+  if matcher.DEBUG:
+    print("server_misc.is_visible", user2, user1)
   if user1 is None:
     user1 = anvil.server.session['user']
   trust1 = user1['trust_level']
@@ -74,6 +76,8 @@ def new_jitsi_code():
 
 def prune_messages():
   """Prune messages from fully completed matches"""
+  if matcher.DEBUG:
+    print("server_misc.prune_messages()")
   all_messages = app_tables.chat.search()
   matches = set(message['match'] for message in all_messages)
   for match in matches:

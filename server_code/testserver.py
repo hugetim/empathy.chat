@@ -54,7 +54,8 @@ def accept_now_proposal(user_id):
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   tester = sm.get_user()
   tester_now_proposal = matcher.get_now_proposal_time(tester)
-  return matcher.accept_proposal(tester_now_proposal.get_id(), user_id)
+  if tester_now_proposal:
+    matcher.accept_proposal(tester_now_proposal.get_id(), user_id)
 
 
 @anvil.server.callable

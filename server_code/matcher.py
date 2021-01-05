@@ -9,6 +9,7 @@ from .timeproposals import Proposal, ProposalTime
 
 
 TEST_TRUST_LEVEL = 10
+DEBUG = True
 
 
 def _seconds_left(status, expire_date=None, ping_start=None):
@@ -35,19 +36,29 @@ def _seconds_left(status, expire_date=None, ping_start=None):
 
 def _prune_proposals():
   """Prune definitely outdated prop_times, unmatched then matched, then proposals"""
+  if DEBUG:
+    print("_prune_proposals")
   now = sm.now()
+  if DEBUG:
+    print("old_prop_times")
   old_prop_times = (r for r in app_tables.proposal_times.search(current=True, jitsi_code=None)
                     if r['expire_date'] < now)
   for row in old_prop_times:
     row['current'] = False
   # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
+  if DEBUG:
+    print("timeout")
   timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
   cutoff_r = now - timeout
+  if DEBUG:
+    print("old_ping_prop_times")
   old_ping_prop_times = (r for r in app_tables.proposal_times.search(current=True, start_now=True)
                          if (r['jitsi_code'] is not None and r['accept_date'] < cutoff_r))
   for row in old_ping_prop_times:
     row['current'] = False
   # now proposals, after proposal times so they get removed if all times are
+  if DEBUG:
+    print("old_proposals")
   old_proposals = (r for r in app_tables.proposals.search(current=True)
                    if len(app_tables.proposal_times.search(current=True, proposal=r))==0)
   for row in old_proposals:
@@ -56,6 +67,8 @@ def _prune_proposals():
     
 def _prune_matches():
   """Complete old commenced matches for all users"""
+  if DEBUG:
+    print("_prune_matches")
   assume_complete = datetime.timedelta(hours=4)
   cutoff_m = sm.now() - assume_complete
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
@@ -150,7 +163,9 @@ def confirm_wait(user_id=""):
 
 
 def confirm_wait_helper(user):
-  """updates expire_date for current request, returns _get_status(user)"""  
+  """updates expire_date for current request, returns _get_status(user)"""
+  if DEBUG:
+    print("confirm_wait_helper")
   current_row = get_now_proposal_time(user)
   if current_row:
     current_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
@@ -171,6 +186,8 @@ def _get_status(user):
   assumes now proposals only
   Side effects: prune proposals
   """
+  if DEBUG:
+    print("_get_status")
   current_row = get_now_proposal_time(user)
   status = None
   expire_date = None
@@ -233,6 +250,8 @@ def _get_proposals(user):
 
 def _proposal(proposal_row, user):
   """Convert proposal_times row into a row for the client dashboard"""
+  if DEBUG:
+    print("_proposal", proposal_row, user)
   proposer = proposal_row['user']
   own = proposer == user
   times = [_proposal_time(row) for row 
@@ -409,6 +428,8 @@ def _edit_proposal_time(prop_row, prop_time):
 
     
 def _cancel(user, proptime_id):
+  if DEBUG:
+    print("_cancel", user, proptime_id)
   if proptime_id:
     current_row = app_tables.proposal_times.get_by_id(proptime_id)
   else:
@@ -446,6 +467,8 @@ def cancel(proptime_id=None, user_id=""):
 
 
 def _cancel_other(user, proptime_id):
+  if DEBUG:
+    print("_cancel_other", user, proptime_id)
   if proptime_id:
     current_row = app_tables.proposal_times.get_by_id(proptime_id)
   else:
@@ -494,6 +517,8 @@ def _match_commenced(user, proptime_id):
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
+  if DEBUG:
+    print("_match_commenced")
   if proptime_id:
     print("proptime_id")
     current_row = app_tables.proposal_times.get_by_id(proptime_id)
