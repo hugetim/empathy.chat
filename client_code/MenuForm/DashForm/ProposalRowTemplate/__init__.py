@@ -38,8 +38,9 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
 
   def time_left(self):
     diff = self.item['expire_date'] - h.now()
-    #zero = datetime.timedelta(seconds=0)
-    return diff #if diff > zero else zero 
+    zero = datetime.timedelta(seconds=0)
+    #return diff if diff > zero else zero
+    return diff if diff.total_seconds() > zero.total_seconds() else zero
     
   def update(self):
     time_left = self.time_left()
