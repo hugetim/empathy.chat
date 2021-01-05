@@ -79,8 +79,9 @@ def re_hours(h, set_time):
 
 class PausedTimer:
   def __init__(self, timer):
+    self.timer = timer
     self.orig_interval = timer.interval
   def __enter__(self):
-    timer.interval = 0
+    self.timer.interval = 0
   def __exit__(self, type, value, tb):
-    timer.interval = self.orig_interval
+    self.timer.interval = self.orig_interval

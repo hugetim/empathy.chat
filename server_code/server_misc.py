@@ -149,12 +149,11 @@ def get_settings():
 
 def _prune_request_em():
   """Switch expired request_em to false"""
-  expired_rem_users = [u for u in app_tables.users.search(request_em=True)
-                       if (u['request_em_settings']['fixed']
-                           and h.re_hours(u['request_em_settings']['hours'],
-                                          u['request_em_set_time']) <= 0)]
-  for a_user in expired_rem_users:
-    a_user['request_em'] = False
+  expired_rem_users = []
+  for u in app_tables.users.search(request_em=True):
+    if (u['request_em_settings']['fixed']
+        and h.re_hours(u['request_em_settings']['hours'], u['request_em_set_time']) <= 0):
+      u['request_em'] = False
 
 
 #@anvil.server.callable
@@ -219,17 +218,19 @@ def users_to_email_re_notif(user=None):
 
   Side effect: prune request_em (i.e. switch expired request_em to false)
   """
-  now = now()
-  _prune_request_em()
-  assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
-  min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
-  cutoff_e = now - assume_inactive
-  return [u for u in app_tables.users.search(enabled=True, request_em=True)
-                  if (u['last_login'] > cutoff_e
-                      and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
-                      and u != user
-                      and is_visible(u, user)
-                      and not matcher.has_status(u))]
+  return []
+  #now = now()
+  #_prune_request_em()
+  #assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
+  #min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
+  #cutoff_e = now - assume_inactive
+  #### comprehension below should probably be converted to loop
+  #return [u for u in app_tables.users.search(enabled=True, request_em=True)
+  #                if (u['last_login'] > cutoff_e
+  #                    and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
+  #                    and u != user
+  #                    and is_visible(u, user)
+  #                    and not matcher.has_status(u))]
 
 
 def request_emails(request_type, user):

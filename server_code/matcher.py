@@ -158,6 +158,8 @@ def get_now_proposal_time(user):
 
 def _get_now_accept(user):
   """Return user's current 'start_now' proposal_times row"""
+  if DEBUG:
+    print("_get_now_accept")
   return app_tables.proposal_times.get(users_accepting=[user],
                                        current=True,
                                        start_now=True
@@ -255,10 +257,11 @@ def _get_proposals(user):
   Side effects: prune proposals
   """
   _prune_proposals()
-  return [_proposal(row, user)
-          for row in app_tables.proposals.search(current=True)
-                  if _proposal_is_visible(row, user)
-         ]
+  proposals = []
+  for row in app_tables.proposals.search(current=True):
+    if _proposal_is_visible(row, user):
+      proposals.append(row)
+  return proposals
 
 
 def _proposal(proposal_row, user):
@@ -447,7 +450,7 @@ def _edit_proposal_time(prop_row, prop_time):
     _add_proposal_time(prop_row, prop_time)
 
     
-def _cancel(user, proptime_id):
+def _cancel(user, proptime_id=None):
   if DEBUG:
     print("_cancel", proptime_id)
   if proptime_id:
@@ -486,7 +489,7 @@ def cancel(proptime_id=None, user_id=""):
   return _cancel(user, proptime_id)
 
 
-def _cancel_other(user, proptime_id):
+def _cancel_other(user, proptime_id=None):
   if DEBUG:
     print("_cancel_other", proptime_id)
   if proptime_id:
