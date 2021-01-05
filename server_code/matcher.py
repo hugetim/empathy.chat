@@ -9,7 +9,7 @@ from .timeproposals import Proposal, ProposalTime
 
 
 TEST_TRUST_LEVEL = 10
-DEBUG = True
+DEBUG = False
 
 
 def _seconds_left(status, expire_date=None, ping_start=None):
@@ -39,12 +39,14 @@ def _prune_proposals():
   if DEBUG:
     print("_prune_proposals")
   now = sm.now()
+  proposals_to_check = set()
   if DEBUG:
     print("old_prop_times")
   old_prop_times = (r for r in app_tables.proposal_times.search(current=True, jitsi_code=None)
                     if r['expire_date'] < now)
   for row in old_prop_times:
     row['current'] = False
+    proposals_to_check.add(row['proposal'])
   # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
   if DEBUG:
     print("timeout")
@@ -56,13 +58,13 @@ def _prune_proposals():
                          if (r['jitsi_code'] is not None and r['accept_date'] < cutoff_r))
   for row in old_ping_prop_times:
     row['current'] = False
+    proposals_to_check.add(row['proposal'])
   # now proposals, after proposal times so they get removed if all times are
   if DEBUG:
     print("old_proposals")
-  old_proposals = (r for r in app_tables.proposals.search(current=True)
-                   if len(app_tables.proposal_times.search(current=True, proposal=r))==0)
-  for row in old_proposals:
-    row['current'] = False
+  for row in proposals_to_check:
+    if len(app_tables.proposal_times.search(current=True, proposal=row))==0:
+      row['current'] = False
 
     
 def _prune_matches():
@@ -189,10 +191,9 @@ def _get_status(user):
   if DEBUG:
     print("_get_status")
   current_row = get_now_proposal_time(user)
-  status = None
   expire_date = None
   ping_start = None
-  proposals = _get_proposals(user)
+  proposals = []
   if current_row and current_row['start_now']:
     expire_date = current_row['expire_date']
     if current_row['jitsi_code']:
@@ -200,18 +201,21 @@ def _get_status(user):
       ping_start = current_row['accept_date']
     else:
       status = "requesting"
+      proposals = _get_proposals(user)
   else:
     current_accept = _get_now_accept(user)
-    if current_accept:
-      if current_accept['jitsi_code']:
-        status = "pinging"
-        ping_start = current_accept['accept_date']
-        expire_date = current_accept['expire_date']
+    if current_accept and current_accept['jitsi_code']:
+      status = "pinging"
+      ping_start = current_accept['accept_date']
+      expire_date = current_accept['expire_date']
     else:
       this_match = current_match(user)
       if this_match:
         status = "matched"
         ping_start = this_match['match_commence']
+      else:
+        status = None
+        proposals = _get_proposals()
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
           'proposals': proposals,
@@ -305,12 +309,19 @@ def accept_proposal(proptime_id, user_id=""):
   return _attempt_accept_proposal(user, proptime_id)
 
 
+def _remove_proposal_time_row(proposal_time_row):
+  proposal_time_row['current'] = False
+  proposal_row = proposal_time_row['proposal']
+  if len(app_tables.proposal_times.search(current=True, proposal=proposal_row))==0:
+    proposal_row['current'] = False
+
+    
 def _accept_proposal(user, proptime, status):
   now = sm.now()
   if status == "requesting":
-    own_now_proposal = get_now_proposal_time(user)
-    if own_now_proposal:
-      own_now_proposal['current'] = False
+    own_now_proposal_time = get_now_proposal_time(user)
+    if own_now_proposal_time:
+      _remove_proposal_time_row(own_now_proposal_time)
   proposal = proptime['proposal']
   proptime['users_accepting'] = [user]
   proptime['accept_date'] = now
@@ -440,9 +451,9 @@ def _cancel(user, proptime_id):
     if current_row['users_accepting'] and user in current_row['users_accepting']:
       _remove_user_accepting(user, current_row)
       if sm.now() > current_row['expire_date']:
-        current_row['current'] = False
+        _remove_proposal_time_row(current_row)
     elif user == current_row['proposal']['user']:
-      current_row['current'] = False
+      _remove_proposal_time_row(current_row)
   return _get_status(user)
 
 
@@ -477,14 +488,14 @@ def _cancel_other(user, proptime_id):
       current_row = _get_now_accept(user)
   if current_row:
     if current_row['users_accepting'] and user in current_row['users_accepting']:
-      current_row['current'] = False
+      _remove_proposal_time_row(current_row)
       current_row['missed_pings'] += 1
     elif user == current_row['proposal']['user']:      
       current_row['users_accepting'] = None
       current_row['accept_date'] = None
       current_row['jitsi_code'] = None
       if sm.now() > current_row['expire_date']:
-        current_row['current'] = False
+        _remove_proposal_time_row(current_row)
   return _get_status(user)
 
 
@@ -538,7 +549,7 @@ def _match_commenced(user, proptime_id):
                                              match_commence=match_start,
                                              complete=[0]*len(users))
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-      current_row['current'] = False
+      _remove_proposal_time_row(current_row)
   return _get_status(user)
 
 
