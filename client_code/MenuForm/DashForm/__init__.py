@@ -90,10 +90,10 @@ class DashForm(DashFormTemplate):
   def update_status(self, state):
     self.item['proposals'] = state['proposals']
     self.set_seconds_left(state['status'], state['seconds_left'])
-    if self.item['status'] not in [None, "requesting", "pinged"]:
-      self.top_form.reset_status(state)
-    else:
+    if self.item['status'] in [None, "requesting", "pinged"]:
       self.update_form()
+    else:
+      self.top_form.reset_status(state)
 
   def confirm_match(self, seconds):
     with h.PausedTimer(self.timer_2):
