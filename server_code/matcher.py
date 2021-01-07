@@ -260,7 +260,7 @@ def _get_proposals(user):
   proposals = []
   for row in app_tables.proposals.search(current=True):
     if _proposal_is_visible(row, user):
-      proposals.append(row)
+      proposals.append(_proposal(row, user))
   return proposals
 
 
