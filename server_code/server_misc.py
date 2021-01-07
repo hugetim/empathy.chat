@@ -67,6 +67,8 @@ def get_user_info(user):
 
   
 def new_jitsi_code():
+  if matcher.DEBUG:
+    print("server_misc.new_jitsi_code()")
   num_chars = 5
   charset = "abcdefghijkmnopqrstuvwxyz23456789"
   random.seed()

@@ -329,6 +329,8 @@ def _remove_proposal_time_row(proposal_time_row):
 
     
 def _accept_proposal(user, proptime, status):
+  if DEBUG:
+    print("_accept_proposal")
   now = sm.now()
   if status == "requesting":
     own_now_proposal_time = get_now_proposal_time(user)
@@ -346,6 +348,8 @@ def _accept_proposal(user, proptime, status):
 
 
 def _attempt_accept_proposal(user, proptime_id):
+  if DEBUG:
+    print("_attempt_accept_proposal")
   state = _get_status(user)
   status = state['status']
   if status in [None, "requesting"]:
