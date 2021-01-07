@@ -506,7 +506,8 @@ def _cancel_other(user, proptime_id=None):
     if current_row['users_accepting'] and user in current_row['users_accepting']:
       _remove_proposal_time_row(current_row)
       current_row['missed_pings'] += 1
-    elif user == current_row['proposal']['user']:      
+    elif user == current_row['proposal']['user']:
+      # below code assumes only dyads allowed
       current_row['users_accepting'] = None
       current_row['accept_date'] = None
       current_row['jitsi_code'] = None
