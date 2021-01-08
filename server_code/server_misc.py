@@ -15,7 +15,7 @@ from . import matcher
 
 
 def now():
-  """return utcnow"""
+  """Return utcnow"""
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 

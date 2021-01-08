@@ -62,14 +62,24 @@ def _prune_proposals():
                                                          jitsi_code=q.not_(None),
                                                          accept_date=q.less_than(cutoff_r)
                                                         )
+  if DEBUG:
+    print("old_ping_prop_times2")
   for row in old_ping_prop_times:
+    if DEBUG:
+      print("old_ping_prop_times3")
     row['current'] = False
+    if DEBUG:
+      print("old_ping_prop_times4")
     proposals_to_check.add(row['proposal'])
   # now proposals, after proposal times so they get removed if all times are
   if DEBUG:
     print("old_proposals")
   for row in proposals_to_check:
+    if DEBUG:
+      print("old_proposals2")
     if len(app_tables.proposal_times.search(current=True, proposal=row))==0:
+      if DEBUG:
+        print("old_proposals3")
       row['current'] = False
 
     
@@ -79,15 +89,25 @@ def _prune_matches():
     print("_prune_matches")
   assume_complete = datetime.timedelta(hours=4)
   cutoff_m = sm.now() - assume_complete
+  if DEBUG:
+    print("_prune_matches2")
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
   old_matches = app_tables.matches.search(complete=[0],
                                           match_commence=q.less_than(cutoff_m),
                                          )
+  if DEBUG:
+    print("_prune_matches3")
   for row in old_matches:
+    if DEBUG:
+      print("_prune_matches4")
     temp = row['complete']
     for i in range(len(temp)):
+      if DEBUG:
+        print("_prune_matches5")
       # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
       temp[i] = 1
+    if DEBUG:
+      print("_prune_matches6")
     row['complete'] = temp
 
 
