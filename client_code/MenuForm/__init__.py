@@ -14,6 +14,7 @@ from .DashForm.CreateForm import CreateForm
 from .. import parameters as p
 from .. import helper as h
 from .. import timeproposals as t
+import unittest
 import random
 
 
@@ -115,7 +116,7 @@ class MenuForm(MenuFormTemplate):
 
   def home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
-    self.go_dash()
+    self.reset_status(anvil.server.call('get_status'))
     
   def connections_link_click(self, **event_args):
     """This method is called when the link is clicked"""
@@ -197,3 +198,26 @@ class MenuForm(MenuFormTemplate):
     action = self.test_other_action_drop_down.selected_value
     user_id = self.test_requestuser_drop_down.selected_value
     anvil.server.call(action, user_id=user_id)
+
+  def autotest_butten_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    run_tests()
+
+class TestNow(unittest.TestCase):
+
+  def setUp(self):
+    self.top_form = get_open_form()
+    self.top_form.home_link_click()
+
+  def test_add_my_now_proposal(self):
+    self.top_form.content.propose_button_click()
+    #self.top_form.proposal_alert
+    #self.assertEqual( multiply(3,4), 12)
+
+
+def run_tests():
+  unittest.main()
+  print("run manually")
+  test = TestNow()
+  test.setUp()
+  test.test_add_my_now_proposal()

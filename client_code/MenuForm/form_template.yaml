@@ -209,6 +209,14 @@ components:
     name: test_column_panel
     layout_properties: {grid_position: 'JEWRYW,EWFQHO'}
     components:
+    - type: Button
+      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: true, text: Automatic tests, font_size: null, font: '',
+        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
+      name: autotest_butten
+      layout_properties: {grid_position: 'PANECG,VMUSSI'}
+      event_bindings: {click: autotest_butten_click}
     - type: TextBox
       properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
         border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
