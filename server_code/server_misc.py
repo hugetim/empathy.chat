@@ -2,8 +2,6 @@ import anvil.users
 import anvil.server
 import anvil.tables
 from anvil.tables import app_tables
-from anvil.google.drive import app_files
-import anvil.google.mail
 import anvil.secrets
 import datetime
 import random
@@ -120,16 +118,6 @@ def _get_messages(user):
             for m in messages]
 
 
-def email_in_list(user):
-  email = user['email']
-  sheet = app_files._2018_integration_program['Sheet1']
-  for row in sheet.rows:
-    if _emails_equal(email, row['email']):
-      user['name'] = row['name']
-      return True
-  return False
-
-
 def _emails_equal(a, b):
   em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
   a_match = em_re.search(a)
@@ -193,14 +181,14 @@ def set_request_em_opts(fixed, hours):
 
 def pinged_email(user):
   """Email pinged user, if settings allow"""
-  print("('pinged_email')")
+  print("'pinged_email' (disabled))")
   if user['pinged_em']:
     name = user['name']
     if not name:
       name = "Empathy Spot user"
-    anvil.google.mail.send(to=user['email'],
-                           subject="Empathy Spot - Match available",
-                           text=
+    #anvil.google.mail.send(to=user['email'],
+    #                       subject="Empathy Spot - Match available",
+    text=(
 '''Dear ''' + name + ''',
 
 An empathy match has been found.
@@ -249,9 +237,9 @@ def request_emails(request_type, user):
     name = u['name']
     if not name:
       name = "Empathy Spot user"
-    anvil.google.mail.send(to=u['email'],
-                           subject="Empathy Spot - Request active",
-                           text=
+    #anvil.google.mail.send(to=u['email'],
+    #                       subject="Empathy Spot - Request active",
+    text=(
 "Dear " + name + ''',
 
 Someone has requested ''' + request_type_text + '''

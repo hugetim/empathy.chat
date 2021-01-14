@@ -132,7 +132,7 @@ def init():
   email_in_list = None
   name = None
   if trust_level == 0:
-    email_in_list = sm.email_in_list(user)
+    email_in_list = False #sm.email_in_list(user)
     if email_in_list:
       trust_level = 1
       user['trust_level'] = trust_level
