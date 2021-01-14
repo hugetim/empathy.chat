@@ -16,6 +16,7 @@ from .. import helper as h
 from .. import timeproposals as t
 import unittest
 import random
+import time
 
 
 class MenuForm(MenuFormTemplate):
@@ -209,15 +210,23 @@ class TestNow(unittest.TestCase):
     self.top_form = get_open_form()
     self.top_form.home_link_click()
 
-  def test_add_my_now_proposal(self):
-    self.top_form.content.propose_button_click()
-    #self.top_form.proposal_alert
-    #self.assertEqual( multiply(3,4), 12)
+  def test_repeat_now_proposal(self):
+    for email, user_id in self.top_form.test_requestuser_drop_down.items:
+      if email == "A":
+        accept_user_id = user_id
+    while True:
+      anvil.server.call('add_now_proposal')
+      time.sleep(15)
+      anvil.server.call('accept_now_proposal', user_id=accept_user_id)
+      time.sleep(5)
+      anvil.server.call('cancel', user_id=accept_user_id)
+      time.sleep(5)
+      anvil.server.call('cancel')
 
 
 def run_tests():
-  unittest.main()
-  print("run manually")
+  #unittest.main()
+  #print("run manually")
   test = TestNow()
   test.setUp()
-  test.test_add_my_now_proposal()
+  test.test_repeat_now_proposal()

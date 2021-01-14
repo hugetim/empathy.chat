@@ -2,6 +2,7 @@ from anvil.tables import app_tables
 import anvil.server
 from . import server_misc as sm
 from . import matcher
+from . import timeproposals
 
 
 @anvil.server.callable
@@ -36,7 +37,7 @@ def test_add_request(user_id, proposal):
   test_proposals = anvil.server.session['test_record']['test_proposals']
   new_row = app_tables.proposals.get_by_id(proposal.prop_id)
   if new_row: 
-    anvil.server.session['test_record']['test_requests'] = test_proposals + [new_row]
+    anvil.server.session['test_record']['test_proposals'] = test_proposals + [new_row]
     test_times = anvil.server.session['test_record']['test_times']
     anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(proposal=new_row))
   return new_row
@@ -48,6 +49,23 @@ def create_tests_record():
                                       test_times = [],
                                      )
 
+
+@anvil.server.callable
+def add_now_proposal():
+  print("add_now_proposal")
+  assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
+  anvil.server.call('add_proposal', timeproposals.Proposal())
+  tester = sm.get_user()
+  tester_now_proptime_row = matcher.get_now_proposal_time(tester)
+  if tester_now_proptime_row:
+    if not anvil.server.session['test_record']:
+      anvil.server.session['test_record'] = create_tests_record()
+    test_proposals = anvil.server.session['test_record']['test_proposals']
+    new_row = tester_now_proptime_row['proposal']
+    anvil.server.session['test_record']['test_proposals'] = test_proposals + [new_row]
+    test_times = anvil.server.session['test_record']['test_times']
+    anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(proposal=new_row))
+    
 
 @anvil.server.callable
 def accept_now_proposal(user_id):

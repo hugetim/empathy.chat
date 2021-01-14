@@ -483,8 +483,14 @@ def _cancel(user, proptime_id=None):
     current_row = get_now_proposal_time(user)
     if not current_row:
       current_row = _get_now_accept(user)
+      if DEBUG:
+        print("_cancel here1")
   if current_row:
+    if DEBUG:
+      print("_cancel here2")
     if current_row['users_accepting'] and user in current_row['users_accepting']:
+      if DEBUG:
+        print("_cancel here3")
       _remove_user_accepting(user, current_row)
       if sm.now() > current_row['expire_date']:
         _remove_proposal_time_row(current_row)
@@ -494,10 +500,8 @@ def _cancel(user, proptime_id=None):
 
 
 def _remove_user_accepting(user, proposal_time):
-  new_users = list(proposal_time['users_accepting'].copy())
-  new_users.remove(user)
   # below code assumes only dyads allowed
-  proposal_time['users_accepting'] = new_users
+  proposal_time['users_accepting'] = None
   proposal_time['accept_date'] = None
   proposal_time['jitsi_code'] = None
 

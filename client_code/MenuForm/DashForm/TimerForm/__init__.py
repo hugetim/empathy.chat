@@ -28,13 +28,14 @@ class TimerForm(TimerFormTemplate):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
     now = h.now()
     # Run this code once a second
-    if self.seconds_left <= 0:
-      self.raise_event("x-close-alert", value="timer elapsed")
     if (now - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = now
       state = anvil.server.call_s('get_status')
       new_status = state['status']
+      print("new_status:", new_status)
       if new_status != self.status:
         print("new_status:", new_status)
         self.raise_event("x-close-alert", value=new_status)
+    if self.seconds_left <= 0:
+      self.raise_event("x-close-alert", value="timer elapsed")
