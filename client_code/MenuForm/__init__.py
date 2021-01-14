@@ -25,7 +25,7 @@ class MenuForm(MenuFormTemplate):
     self.init_components(**properties)
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
-    init_state = anvil.server.call('init')
+    init_state = self.item.copy()
     e = init_state.pop('email_in_list')
     n = init_state.pop('name')
     if e == False:
@@ -36,8 +36,7 @@ class MenuForm(MenuFormTemplate):
             dismissible=False)
     elif e == True:
       alert("Welcome, " + n + "!")
-    self.name = n
-    self.test_mode.visible = init_state['test_mode']
+    self.test_mode.visible = init_state.pop('test_mode')
     self.set_test_link()
     self.reset_status(init_state)
 

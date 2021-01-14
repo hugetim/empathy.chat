@@ -18,8 +18,9 @@ class DashForm(DashFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
-    if self.top_form.name:
-      self.welcome_label.text = "Hi, " + self.top_form.name + "!"
+    name = self.top_form.item['name']
+    if name:
+      self.welcome_label.text = "Hi, " + name + "!"
     self.update_form()
 
   def update_form(self):
