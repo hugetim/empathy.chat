@@ -21,8 +21,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     if self.item['own']:
       self.item['users'] = f"My proposal #{self.item['prop_num']}"
     time = self.item['prop_time']
-    self.item.update({'time_id': time.time_id,
-                      'duration': t.DURATION_TEXT[time.duration],
+    self.item.update({'duration': t.DURATION_TEXT[time.duration],
                       'expire_date': time.expire_date,
                      })
     if time.start_now:
