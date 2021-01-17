@@ -27,6 +27,7 @@ class DashForm(DashFormTemplate):
     if self.item['status'] == "pinged":
       self.confirm_match(self.item['seconds_left'])
     else:
+      #self.update_upcoming_table()
       self.update_proposal_table()
       
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
@@ -40,6 +41,21 @@ class DashForm(DashFormTemplate):
     """This method is called every 5 seconds, checking for status changes"""
     state = anvil.server.call_s('get_status')
     self.update_status(state)    
+
+  def update_upcoming_table(self):
+    """Update form based on upcoming state"""
+    if self.item['upcomings']:
+      items = []
+      own_count = 0
+      for prop in self.item['upcomings']:
+        own_count += prop.own
+        for time in prop.times:
+          items.append({'users': prop.name, 'prop_time': time, 'prop_id': prop.prop_id,
+                        'own': prop.own, 'prop_num': own_count})
+      self.upcoming_repeating_panel.items = items
+    else:
+      self.upcoming_repeating_panel.items = []
+    self.upcoming_data_grid.visible = bool(self.upcoming_repeating_panel.items)    
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
