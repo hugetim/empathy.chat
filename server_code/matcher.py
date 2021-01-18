@@ -388,7 +388,8 @@ def add_proposal(proposal, user_id=""):
   """
   print("add_proposal", user_id)
   user = sm.get_user(user_id)
-  return _add_proposal(user, proposal)
+  state, prop_id = _add_proposal(user, proposal)
+  return state
 
 
 def _add_proposal(user, proposal):
@@ -443,7 +444,7 @@ def edit_proposal(proposal, user_id=""):
 
 def _edit_proposal(user, proposal):
   print("Not yet preventing editing to make multiple now proposals")
-  _edit_proposal_rows(user, proposal)
+  prop_id = _edit_proposal_rows(user, proposal)
   return _get_status(user)
 
 

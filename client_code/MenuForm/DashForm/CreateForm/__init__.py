@@ -60,7 +60,10 @@ class CreateForm(CreateFormTemplate):
     #alert buttons: OK, Cancel
     
     # Any code you write here will run when the form opens.
-    self.drop_down_start.items = [("now", 1), ("later at...", 0)]
+    if self.item['now_allowed']:
+      self.drop_down_start.items = [("now", 1), ("later at...", 0)]
+    else:
+      self.drop_down_start.items = [("later at...", 0)]
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     self.drop_down_eligible.items = [("Anyone (up to 3 degrees separation)", 3),
