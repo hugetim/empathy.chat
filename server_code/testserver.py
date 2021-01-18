@@ -29,17 +29,11 @@ def test_add_user(em, level=1, r_em=False, p_em=False):
 def test_add_request(user_id, proposal):
   print("test_add_request", user_id)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
-  if not anvil.server.session['test_record']:
-    anvil.server.session['test_record'] = create_tests_record()
   user = app_tables.users.get_by_id(user_id)
   state = matcher._add_proposal(user, proposal)
-  
-  test_proposals = anvil.server.session['test_record']['test_proposals']
   new_row = app_tables.proposals.get_by_id(proposal.prop_id)
   if new_row: 
-    anvil.server.session['test_record']['test_proposals'] = test_proposals + [new_row]
-    test_times = anvil.server.session['test_record']['test_times']
-    anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(proposal=new_row))
+    _add_prop_row_to_test_record(new_row)
   return new_row
 
 
@@ -58,13 +52,7 @@ def add_now_proposal():
   tester = sm.get_user()
   tester_now_proptime_row = matcher.get_now_proposal_time(tester)
   if tester_now_proptime_row:
-    if not anvil.server.session['test_record']:
-      anvil.server.session['test_record'] = create_tests_record()
-    test_proposals = anvil.server.session['test_record']['test_proposals']
-    new_row = tester_now_proptime_row['proposal']
-    anvil.server.session['test_record']['test_proposals'] = test_proposals + [new_row]
-    test_times = anvil.server.session['test_record']['test_times']
-    anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(proposal=new_row))
+    _add_prop_row_to_test_record(tester_now_proptime_row['proposal'])
     
 
 @anvil.server.callable
@@ -72,10 +60,22 @@ def accept_now_proposal(user_id):
   print("accept_now_proposal", user_id)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   tester = sm.get_user()
-  tester_now_proposal = matcher.get_now_proposal_time(tester)
-  if tester_now_proposal:
-    matcher.accept_proposal(tester_now_proposal.get_id(), user_id)
+  tester_now_proptime_row = matcher.get_now_proposal_time(tester)
+  if tester_now_proptime_row:
+    state = matcher.accept_proposal(tester_now_proptime_row.get_id(), user_id)
+    if state['status'] in ['pinging', 'matched']:
+      _add_prop_row_to_test_record(tester_now_proptime_row['proposal'])
 
+    
+def _add_prop_row_to_test_record(prop_row):
+    if not anvil.server.session['test_record']:
+      anvil.server.session['test_record'] = create_tests_record()
+    test_proposals = anvil.server.session['test_record']['test_proposals']
+    if prop_row not in test_proposals:
+      anvil.server.session['test_record']['test_proposals'] = test_proposals + [prop_row]
+      test_times = anvil.server.session['test_record']['test_times']
+      anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(proposal=prop_row))
+ 
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -84,19 +84,20 @@ def test_clear():
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   test_records = app_tables.test_data.search()
   test_matches = set()
-  for row in test_records:
-    for user in row['test_users']:
+  for test_row in test_records:
+    for user in test_row['test_users']:
       user.delete()
-    for time in row['test_times']:
+    for time in test_row['test_times']:
+      print("time", time)
       test_matches.add(app_tables.matches.get(proposal_time=time))
       time.delete()
-    for proposal in row['test_proposals']:
+    for proposal in test_row['test_proposals']:
       proposal.delete()
-    row.delete()
+    test_row.delete()
     for match in test_matches:
       if match is not None:
-        for row in app_tables.chat.search(match=match):
-          row.delete()
+        for chat_row in app_tables.chat.search(match=match):
+          chat_row.delete()
         match.delete()
   anvil.server.session['test_record'] = None
 

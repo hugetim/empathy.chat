@@ -10,7 +10,7 @@ from .timeproposals import Proposal, ProposalTime
 
 
 TEST_TRUST_LEVEL = 10
-DEBUG = True
+DEBUG = False
 
 
 def _seconds_left(status, expire_date=None, ping_start=None):
