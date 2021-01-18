@@ -9,19 +9,20 @@ components:
   layout_properties: {slot: default}
   components:
   - type: ColumnPanel
-    properties: {role: card, tooltip: Quote of the Day, border: '', foreground: '',
-      visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small,
-      col_widths: '{}', spacing_below: small, background: ''}
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
+      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
+      spacing_below: small, background: ''}
     name: card_1
     layout_properties:
       col_widths: {}
       grid_position: QDXEEB,WIIDCI
     components:
     - type: Label
-      properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-        visible: true, text: '"We need to receive empathy to give empathy."', font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+      properties: {role: subheading, align: center, tooltip: Quote of the Day, border: '',
+        foreground: '', visible: true, text: '"We need to receive empathy to give
+          empathy."', font_size: null, font: '', spacing_above: small, icon_align: left,
+        spacing_below: none, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
       name: quote_label
       layout_properties: {grid_position: 'KBAKGL,GWZEXS'}
     - type: Link
