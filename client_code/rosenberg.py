@@ -12,8 +12,8 @@ quotes = ["We need to receive empathy to give empathy.",
           "It may be most difficult to empathize with those we are closest to.",
           "Your presence is the most precious gift you can give to another human being.",
           "Empathy lies in our ability to be present without opinion.",
-          ("Empathy is a respectful understanding of what others are experiencing. "
-           + "Instead of offering empathy, we often have a strong urge to give advice "
+          "Empathy is a respectful understanding of what others are experiencing.",
+          ("Instead of offering empathy, we often have a strong urge to give advice "
            + "or reassurance and to explain our own position or feeling. "
            + "Empathy, however, calls upon us to empty our mind and listen to others with our whole being."),
           "When people are upset, they often need empathy before they can hear what is being said to them.",
@@ -23,6 +23,6 @@ quotes = ["We need to receive empathy to give empathy.",
 
 
 def quote_of_the_day(date):
-  random.seed(str(date))
-  return f'''"{random.choice(quotes)}"
-- Marshall B. Rosenberg'''
+  random.seed(date.toordinal())
+  return f'''"{random.choice(quotes)}"'''
+#- Marshall B. Rosenberg'''
