@@ -395,8 +395,10 @@ def _add_proposal(user, proposal):
   state = _get_status(user)
   status = state['status']
   if status is None or not proposal.times[0].start_now:
-    _add_proposal_rows(user, proposal)
-  return _get_status(user)
+    prop_id = _add_proposal_rows(user, proposal)
+  else:
+    prop_id = None
+  return _get_status(user), prop_id
 
 
 def _add_proposal_rows(user, proposal):
@@ -411,6 +413,7 @@ def _add_proposal_rows(user, proposal):
                                              )
   for time in proposal.times:
     _add_proposal_time(prop_row=new_prop_row, prop_time=time)
+  return new_prop_row.get_id()
 
 
 def _add_proposal_time(prop_row, prop_time):

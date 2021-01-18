@@ -30,8 +30,8 @@ def test_add_request(user_id, proposal):
   print("test_add_request", user_id)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   user = app_tables.users.get_by_id(user_id)
-  state = matcher._add_proposal(user, proposal)
-  new_row = app_tables.proposals.get_by_id(proposal.prop_id)
+  state, prop_id = matcher._add_proposal(user, proposal)
+  new_row = app_tables.proposals.get_by_id(prop_id)
   if new_row: 
     _add_prop_row_to_test_record(new_row)
   return new_row
@@ -68,13 +68,14 @@ def accept_now_proposal(user_id):
 
     
 def _add_prop_row_to_test_record(prop_row):
-    if not anvil.server.session['test_record']:
-      anvil.server.session['test_record'] = create_tests_record()
-    test_proposals = anvil.server.session['test_record']['test_proposals']
-    if prop_row not in test_proposals:
-      anvil.server.session['test_record']['test_proposals'] = test_proposals + [prop_row]
-      test_times = anvil.server.session['test_record']['test_times']
-      anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(proposal=prop_row))
+  print("_prop_row_to_test_record", prop_row['created'])
+  if not anvil.server.session['test_record']:
+    anvil.server.session['test_record'] = create_tests_record()
+  test_proposals = anvil.server.session['test_record']['test_proposals']
+  if prop_row not in test_proposals:
+    anvil.server.session['test_record']['test_proposals'] = test_proposals + [prop_row]
+    test_times = anvil.server.session['test_record']['test_times']
+    anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(proposal=prop_row))
  
 
 @anvil.server.callable
@@ -88,14 +89,16 @@ def test_clear():
     for user in test_row['test_users']:
       user.delete()
     for time in test_row['test_times']:
-      print("time", time)
+      print("time", time['expire_date'])
       test_matches.add(app_tables.matches.get(proposal_time=time))
       time.delete()
     for proposal in test_row['test_proposals']:
+      print("proposal", proposal['created'])
       proposal.delete()
     test_row.delete()
     for match in test_matches:
       if match is not None:
+        print("match", match['match_commence'])
         for chat_row in app_tables.chat.search(match=match):
           chat_row.delete()
         match.delete()
