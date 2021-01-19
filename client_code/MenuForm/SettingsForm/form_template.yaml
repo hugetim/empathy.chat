@@ -92,6 +92,20 @@ components:
       name: label_2
       layout_properties: {grid_position: 'BMQVVK,MQGDSN ODTZKI,NRSFJF'}
       event_bindings: {}
+- type: TextBox
+  properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
+    border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
+    font: '', spacing_above: small, type: email, spacing_below: small, italic: false,
+    background: '', bold: false, underline: false}
+  name: email_text_box
+  layout_properties: {grid_position: 'ZEPIXP,ZCDLYH'}
+- type: TextBox
+  properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
+    border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
+    font: '', spacing_above: small, type: tel, spacing_below: small, italic: false,
+    background: '', bold: false, underline: false}
+  name: phone_text_box
+  layout_properties: {grid_position: 'IXXION,YHQUTK'}
 - type: Timer
   properties: {interval: 0}
   name: timer_2
