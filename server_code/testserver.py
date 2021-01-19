@@ -5,7 +5,10 @@ from . import matcher
 from . import timeproposals
 
 
-@anvil.server.callable
+authenticated_callable = anvil.server.callable(require_user=True)
+
+
+@authenticated_callable
 @anvil.tables.in_transaction
 def test_add_user(em, level=1, r_em=False, p_em=False):
   print("test_add_user", em, level, r_em, p_em)
@@ -24,7 +27,7 @@ def test_add_user(em, level=1, r_em=False, p_em=False):
   return new_user.get_id()
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def test_add_request(user_id, proposal):
   print("test_add_request", user_id)
@@ -44,7 +47,7 @@ def create_tests_record():
                                      )
 
 
-@anvil.server.callable
+@authenticated_callable
 def add_now_proposal():
   print("add_now_proposal")
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
@@ -55,7 +58,7 @@ def add_now_proposal():
     _add_prop_row_to_test_record(tester_now_proptime_row['proposal'])
     
 
-@anvil.server.callable
+@authenticated_callable
 def accept_now_proposal(user_id):
   print("accept_now_proposal", user_id)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
@@ -78,7 +81,7 @@ def _add_prop_row_to_test_record(prop_row):
     anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(proposal=prop_row))
  
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def test_clear():
   print("('test_clear')")
@@ -105,7 +108,7 @@ def test_clear():
   anvil.server.session['test_record'] = None
 
 
-@anvil.server.callable
+@authenticated_callable
 def test_get_user_list():
   print("('test_get_user_list')")
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL

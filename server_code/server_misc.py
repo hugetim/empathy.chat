@@ -12,6 +12,9 @@ from . import helper as h
 from . import matcher
 
 
+authenticated_callable = anvil.server.callable(require_user=True)
+
+
 def now():
   """Return utcnow"""
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
@@ -88,7 +91,7 @@ def prune_messages():
         row.delete()
 
 
-@anvil.server.callable
+@authenticated_callable
 def add_message(user_id="", message="[blank]"):
   print("add_message", "[redacted]", user_id)
   user = get_user(user_id)
@@ -100,7 +103,7 @@ def add_message(user_id="", message="[blank]"):
   return _get_messages(user)
 
 
-@anvil.server.callable
+@authenticated_callable
 def get_messages(user_id=""):
   """
   Returns iterable of dictionaries with keys: 'me', 'message'
@@ -125,7 +128,7 @@ def _emails_equal(a, b):
   return a_match.group(1) == b_match.group(1) and a_match.group(2).lower() == b_match.group(2).lower()
 
 
-@anvil.server.callable
+@authenticated_callable
 def get_settings():
   """Return user settings displayed on SettingsForm"""
   user = get_user()
@@ -146,7 +149,7 @@ def _prune_request_em():
       u['request_em'] = False
 
 
-#@anvil.server.callable
+#@authenticated_callable
 #@anvil.tables.in_transaction
 #def set_pinged_em(pinged_em_checked):
 #  print("set_pinged_em", pinged_em_checked)
@@ -155,7 +158,7 @@ def _prune_request_em():
 #  return matcher.confirm_wait_helper(user)
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def set_request_em(request_em_checked):
   print("set_request_em", request_em_checked)
@@ -166,7 +169,7 @@ def set_request_em(request_em_checked):
   return user['request_em_set_time']
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def set_request_em_opts(fixed, hours):
   print("set_request_em_opts", fixed, hours)

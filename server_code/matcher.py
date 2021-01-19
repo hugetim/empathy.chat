@@ -9,6 +9,7 @@ from . import server_misc as sm
 from .timeproposals import Proposal, ProposalTime
 
 
+authenticated_callable = anvil.server.callable(require_user=True)
 TEST_TRUST_LEVEL = 10
 DEBUG = False
 
@@ -111,7 +112,7 @@ def _prune_matches():
     row['complete'] = temp
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def init():
   """
@@ -186,7 +187,7 @@ def _get_now_accept(user):
                                       )
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def confirm_wait(user_id=""):
   """updates expire_date for current request, returns _get_status(user)"""
@@ -205,7 +206,7 @@ def confirm_wait_helper(user):
   return _get_status(user)
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def get_status(user_id=""):
   user = sm.get_user(user_id)
@@ -307,7 +308,7 @@ def _proposal_is_visible(proposal, user):
   return sm.is_visible(proposal['user'], user)
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def get_code(user_id=""):
   """Return jitsi_code, duration (or Nones)"""
@@ -329,7 +330,7 @@ def get_code(user_id=""):
   return None, None
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def accept_proposal(proptime_id, user_id=""):
   """Return _get_status
@@ -380,7 +381,7 @@ def _attempt_accept_proposal(user, proptime_id):
   return _get_status(user)
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def add_proposal(proposal, user_id=""):
   """Return _get_status
@@ -432,7 +433,7 @@ def _add_proposal_time(prop_row, prop_time):
                                               )
 
   
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def edit_proposal(proposal, user_id=""):
   """Return _get_status
@@ -514,7 +515,7 @@ def _remove_user_accepting(user, proposal_time):
   proposal_time['jitsi_code'] = None
 
   
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def cancel(proptime_id=None, user_id=""):
   """Remove proptime and cancel pending match (if applicable)
@@ -548,7 +549,7 @@ def _cancel_other(user, proptime_id=None):
   return _get_status(user)
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def cancel_other(proptime_id=None, user_id=""):
   """Return new _get_status
@@ -560,7 +561,7 @@ def cancel_other(proptime_id=None, user_id=""):
   return _cancel_other(user, proptime_id)
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def match_commenced(proptime_id=None, user_id=""):
   """Return _get_status(user)
@@ -602,7 +603,7 @@ def _match_commenced(user, proptime_id):
   return _get_status(user)
 
 
-@anvil.server.callable
+@authenticated_callable
 @anvil.tables.in_transaction
 def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return status."""
