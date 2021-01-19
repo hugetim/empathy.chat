@@ -343,6 +343,7 @@ def accept_proposal(proptime_id, user_id=""):
 
 def _remove_proposal_time_row(proposal_time_row):
   proposal_time_row['current'] = False
+  proposal_time_row['cancelled'] = True
   proposal_row = proposal_time_row['proposal']
   if len(app_tables.proposal_times.search(current=True, proposal=proposal_row))==0:
     proposal_row['current'] = False
@@ -426,6 +427,7 @@ def _add_proposal_time(prop_row, prop_time):
                                                duration=prop_time.duration,
                                                expire_date=expire_date,
                                                current=True,
+                                               cancelled=False,
                                                missed_pings=0,
                                               )
 
@@ -460,6 +462,7 @@ def _edit_proposal_rows(user, proposal):
   for row in app_tables.proposal_times.search(current=True, proposal=prop_row):
     if row.get_id() not in new_time_ids:
       row['current'] = False
+      row['cancelled'] = True
   for time in proposal.times:
     _edit_proposal_time(prop_row=prop_row, prop_time=time)
 
@@ -474,6 +477,7 @@ def _edit_proposal_time(prop_row, prop_time):
     time_row['duration'] = prop_time.duration
     time_row['expire_date'] = expire_date
     time_row['current'] = True
+    time_row['cancelled'] = False
   else:
     _add_proposal_time(prop_row, prop_time)
 

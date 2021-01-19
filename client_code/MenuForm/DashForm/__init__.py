@@ -46,12 +46,10 @@ class DashForm(DashFormTemplate):
     """Update form based on upcoming state"""
     if self.item['upcomings']:
       items = []
-      own_count = 0
       for prop in self.item['upcomings']:
-        own_count += prop.own
         for time in prop.times:
           items.append({'users': prop.name, 'prop_time': time, 'prop_id': prop.prop_id,
-                        'own': prop.own, 'prop_num': own_count})
+                        'own': prop.own})
       self.upcoming_repeating_panel.items = items
     else:
       self.upcoming_repeating_panel.items = []
