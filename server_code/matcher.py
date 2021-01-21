@@ -49,7 +49,7 @@ def _prune_proposals():
                                                     expire_date=q.less_than(now),
                                                    )
   for row in old_prop_times:
-    row['current'] = False
+    ProposalTime(row).cancel_time_only()
     proposals_to_check.add(row['proposal'])
   # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
   if DEBUG:
@@ -68,7 +68,7 @@ def _prune_proposals():
   for row in old_ping_prop_times:
     if DEBUG:
       print("old_ping_prop_times3")
-    row['current'] = False
+    ProposalTime(row).cancel_time_only()
     if DEBUG:
       print("old_ping_prop_times4")
     proposals_to_check.add(row['proposal'])
@@ -328,15 +328,7 @@ def accept_proposal(proptime_id, user_id=""):
   user = sm.get_user(user_id)
   return _attempt_accept_proposal(user, proptime_id)
 
-
-def _remove_proposal_time_row(proposal_time_row):
-  proposal_time_row['current'] = False
-  proposal_time_row['cancelled'] = True
-  proposal_row = proposal_time_row['proposal']
-  if len(app_tables.proposal_times.search(current=True, proposal=proposal_row))==0:
-    proposal_row['current'] = False
-
-    
+  
 def _accept_proposal(user, proptime, status):
   if DEBUG:
     print("_accept_proposal")
@@ -344,7 +336,7 @@ def _accept_proposal(user, proptime, status):
   if status == "requesting":
     own_now_proposal_time = get_now_proposal_time(user)
     if own_now_proposal_time:
-      _remove_proposal_time_row(own_now_proposal_time)
+      ProposalTime(own_now_proposal_time).cancel()
   proposal = proptime['proposal']
   proptime['users_accepting'] = [user]
   proptime['accept_date'] = now
@@ -429,9 +421,9 @@ def _cancel(user, proptime_id=None):
         print("_cancel here3")
       _remove_user_accepting(user, current_row)
       if sm.now() > current_row['expire_date']:
-        _remove_proposal_time_row(current_row)
+        ProposalTime(current_row).cancel()
     elif user == current_row['proposal']['user']:
-      _remove_proposal_time_row(current_row)
+      ProposalTime(current_row).cancel()
   return _get_status(user)
 
 
@@ -464,7 +456,7 @@ def _cancel_other(user, proptime_id=None):
       current_row = _get_now_accept(user)
   if current_row:
     if current_row['users_accepting'] and user in current_row['users_accepting']:
-      _remove_proposal_time_row(current_row)
+      ProposalTime(current_row).cancel()
       current_row['missed_pings'] += 1
     elif user == current_row['proposal']['user']:
       # below code assumes only dyads allowed
@@ -472,7 +464,7 @@ def _cancel_other(user, proptime_id=None):
       current_row['accept_date'] = None
       current_row['jitsi_code'] = None
       if sm.now() > current_row['expire_date']:
-        _remove_proposal_time_row(current_row)
+        ProposalTime(current_row).cancel()
   return _get_status(user)
 
 
@@ -526,7 +518,7 @@ def _match_commenced(user, proptime_id):
                                              match_commence=match_start,
                                              complete=[0]*len(users))
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-      _remove_proposal_time_row(current_row)
+      ProposalTime(current_row).cancel()
   return _get_status(user)
 
 
@@ -594,10 +586,16 @@ class ProposalTime():
     del row_dict['missed_pings']
     del row_dict['proposal']
     return port.ProposalTime(**row_dict)
+
+  def cancel_time_only(self):
+    self.proptime_row['current'] = False
+    self.proptime_row['cancelled'] = True
   
   def cancel(self):
-    row['current'] = False
-    row['cancelled'] = True
+    self.cancel_time_only()
+    proposal_row = self.proptime_row['proposal']
+    if len(app_tables.proposal_times.search(cancelled=False, proposal=proposal_row))==0:
+      proposal_row['current'] = False
 
   def confirm_wait(self, start_now=True):
     if start_now:
