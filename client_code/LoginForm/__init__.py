@@ -21,7 +21,7 @@ class LoginForm(LoginFormTemplate):
     self.init_state = anvil.server.call('init')
     self.enter_button.visible = True
 
-  def enter_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
+#   def enter_button_click(self, **event_args):
+#     """This method is called when the button is clicked"""
     open_form('MenuForm', item=self.init_state)
 

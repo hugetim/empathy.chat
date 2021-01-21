@@ -21,18 +21,20 @@ class CreateForm(CreateFormTemplate):
                                 expire_date=expire_date,
                                )
     alts = [CreateForm._alt_proposal_time(alt) for alt in self.item['alt']]
+    eligible_users = [t.User(user_id=item[1], name=item[0])
+                      for item in self.item['eligible_users']]
     if self.item['prop_id']:
       first_time.time_id = self.item['time_id']
       return t.Proposal(prop_id=self.item['prop_id'],
                         times=[first_time] + alts,
                         eligible=self.item['eligible'],
-                        eligible_users=self.item['eligible_users'],
+                        eligible_users=eligible_users,
                         eligible_groups=self.item['eligible_groups'],
                        )
     else:
       return t.Proposal(times=[first_time] + alts,
                         eligible=self.item['eligible'],
-                        eligible_users=self.item['eligible_users'],
+                        eligible_users=eligible_users,
                         eligible_groups=self.item['eligible_groups'],
                        )
 

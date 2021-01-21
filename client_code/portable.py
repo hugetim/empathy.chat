@@ -29,26 +29,35 @@ CANCEL_TEXT = {5: "5 min. prior",
 
 
 @anvil.server.portable_class
+class User():
+  
+  def __init__(self, user_id=None, name=None):
+    self.user_id = user_id
+    self.name = name
+  
+  @staticmethod
+  def get(user_row):
+    return User(user_row.get_id(), user_row['name'])
+
+    
+@anvil.server.portable_class
 class ProposalTime():
 
   def __init__(self, time_id=None, start_now=True, start_date=None, #status=None, 
                duration=DURATION_DEFAULT_MINUTES, expire_date=None,
-               accept_date=None, names_accepting=None, jitsi_code=None):
+               accept_date=None, users_accepting=None, jitsi_code=None):
     self.time_id = time_id
     self.start_now = start_now 
     self.start_date = (start_date if (start_date or start_now)
                        else h.now() + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES))
     self.duration = duration
-    if expire_date:
+    if expire_date or start_now:
       self.expire_date = expire_date
     else:
-      if start_now:
-        self.expire_date = h.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
-      else:
-        self.expire_date = (self.start_date 
-                            - datetime.timedelta(minutes=CANCEL_DEFAULT_MINUTES))
+      self.expire_date = (self.start_date 
+                          - datetime.timedelta(minutes=CANCEL_DEFAULT_MINUTES))
     self.accept_date = accept_date
-    self.names_accepting = names_accepting
+    self.users_accepting = users_accepting
     self.jitsi_code = jitsi_code
       
   def __serialize__(self, global_data):
@@ -88,11 +97,11 @@ class Proposal():
 
   MAX_ALT_TIMES = 4
   
-  def __init__(self, prop_id=None, own=True, name=None, times=[ProposalTime()], 
+  def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], 
                eligible=3, eligible_users=[], eligible_groups=[]):
     self.prop_id = prop_id
     self.own = own
-    self.name = name
+    self.user = user
     self.times = times
     self.eligible = eligible
     self.eligible_users = eligible_users

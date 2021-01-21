@@ -47,8 +47,9 @@ class DashForm(DashFormTemplate):
     if self.item['upcomings']:
       items = []
       for prop in self.item['upcomings']:
+        ## Need to add users_accepting
         for time in prop.times:
-          items.append({'users': prop.name, 'prop_time': time, 'prop_id': prop.prop_id,
+          items.append({'users': prop.user.name, 'prop_time': time, 'prop_id': prop.prop_id,
                         'own': prop.own})
       self.upcoming_repeating_panel.items = items
     else:
@@ -63,7 +64,7 @@ class DashForm(DashFormTemplate):
       for prop in self.item['proposals']:
         own_count += prop.own
         for time in prop.times:
-          items.append({'users': prop.name, 'prop_time': time, 'prop_id': prop.prop_id,
+          items.append({'users': prop.user.name, 'prop_time': time, 'prop_id': prop.prop_id,
                         'own': prop.own, 'prop_num': own_count})
       self.repeating_panel_1.items = items
     else:

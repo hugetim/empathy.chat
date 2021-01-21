@@ -196,14 +196,20 @@ def confirm_wait(user_id=""):
   return confirm_wait_helper(user)
 
 
-def confirm_wait_helper(user):
+def confirm_wait_helper(user, proptime=None):
   """updates expire_date for current request, returns _get_status(user)"""
   if DEBUG:
     print("confirm_wait_helper")
-  current_row = get_now_proposal_time(user)
+  if proptime:
+    current_row = proptime
+  else:
+    current_row = get_now_proposal_time(user)
   if current_row:
-    current_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
-  return _get_status(user)
+    ProposalTime(current_row).confirm_wait()
+  if user:
+    return _get_status(user)
+  else:
+    return None
 
 
 @authenticated_callable
@@ -281,7 +287,7 @@ def _get_proposals(user):
   proposals = []
   for row in app_tables.proposals.search(current=True):
     if _proposal_is_visible(row, user):
-      proposals.append(Proposal(row, user).portable())
+      proposals.append(Proposal(row).portable(user))
   return proposals
 
 
@@ -375,46 +381,16 @@ def add_proposal(proposal, user_id=""):
   return state
 
 
-def _add_proposal(user, proposal):
+def _add_proposal(user, port_prop):
   state = _get_status(user)
   status = state['status']
-  if status is None or not proposal.times[0].start_now:
-    prop_id = _add_proposal_rows(user, proposal)
+  if status is None or not port_prop.times[0].start_now:
+    prop_id = Proposal.add(user, port_prop).get_id()
   else:
     prop_id = None
   return _get_status(user), prop_id
 
 
-def _add_proposal_rows(user, proposal):
-  now = sm.now()
-  user_rows = [app_tables.users.get_by_id(user_id) for user_id in proposal.eligible_users]
-  new_prop_row = app_tables.proposals.add_row(user=user,
-                                              current=True,
-                                              created=now,
-                                              last_edited=now,
-                                              eligible=proposal.eligible,
-                                              eligible_users=user_rows,
-                                              eligible_groups=proposal.eligible_groups,
-                                             )
-  for time in proposal.times:
-    _add_proposal_time(prop_row=new_prop_row, prop_time=time)
-  return new_prop_row.get_id()
-
-
-def _add_proposal_time(prop_row, prop_time):
-  expire_date=prop_time.expire_date
-  assert expire_date is not None
-  new_time = app_tables.proposal_times.add_row(proposal=prop_row,
-                                               start_now=bool(prop_time.start_now),
-                                               start_date=prop_time.start_date,
-                                               duration=prop_time.duration,
-                                               expire_date=expire_date,
-                                               current=True,
-                                               cancelled=False,
-                                               missed_pings=0,
-                                              )
-
-  
 @authenticated_callable
 @anvil.tables.in_transaction
 def edit_proposal(proposal, user_id=""):
@@ -426,45 +402,14 @@ def edit_proposal(proposal, user_id=""):
   user = sm.get_user(user_id)
   return _edit_proposal(user, proposal)
 
-
-def _edit_proposal(user, proposal):
-  print("Not yet preventing editing to make multiple now proposals")
-  prop_id = _edit_proposal_rows(user, proposal)
+    
+def _edit_proposal(user, port_proposal):
+  print("Not yet preventing editing from making multiple now proposals")
+  prop_row = app_tables.proposals.get_by_id(port_proposal.prop_id)
+  Proposal(prop_row).update(port_proposal)
   return _get_status(user)
 
 
-def _edit_proposal_rows(user, proposal):
-  prop_row = app_tables.proposals.get_by_id(proposal.prop_id)
-  prop_row['current'] = True
-  prop_row['last_edited'] = sm.now()
-  prop_row['eligible'] = proposal.eligible
-  prop_row['eligible_users'] = proposal.eligible_users
-  prop_row['eligible_groups'] = proposal.eligible_groups
-  ## First cancel removed rows
-  new_time_ids = [time.time_id for time in proposal.times]
-  for row in app_tables.proposal_times.search(current=True, proposal=prop_row):
-    if row.get_id() not in new_time_ids:
-      row['current'] = False
-      row['cancelled'] = True
-  for time in proposal.times:
-    _edit_proposal_time(prop_row=prop_row, prop_time=time)
-
-
-def _edit_proposal_time(prop_row, prop_time):
-  expire_date=prop_time.expire_date
-  assert expire_date is not None
-  time_row = app_tables.proposal_times.get_by_id(prop_time.time_id)
-  if time_row:
-    time_row['start_now'] = bool(prop_time.start_now)
-    time_row['start_date'] = prop_time.start_date
-    time_row['duration'] = prop_time.duration
-    time_row['expire_date'] = expire_date
-    time_row['current'] = True
-    time_row['cancelled'] = False
-  else:
-    _add_proposal_time(prop_row, prop_time)
-
-    
 def _cancel(user, proptime_id=None):
   if DEBUG:
     print("_cancel", proptime_id)
@@ -625,15 +570,18 @@ class ProposalTime():
   
   def __init__(self, proptime_row):
     self.proptime_row = proptime_row
+
+  def get_id(self):
+    return self.proptime_row.get_id()  
     
   def portable(self):
     row_dict = dict(self.proptime_row)
-    row_dict['time_id'] = self.proptime_row.get_id()
+    row_dict['time_id'] = self.get_id()
     users_accepting = row_dict.pop('users_accepting')
     if users_accepting:
-      row_dict['names_accepting'] = [user['name'] for user in users_accepting]
+      row_dict['users_accepting'] = [port.User.get(user) for user in users_accepting]
     else:
-      row_dict['names_accepting'] = []
+      row_dict['users_accepting'] = []
 #     if row_dict.pop('current'):
 #       row_dict['status'] = "current"
 #     elif row_dict.pop('cancelled'):
@@ -646,26 +594,95 @@ class ProposalTime():
     del row_dict['missed_pings']
     del row_dict['proposal']
     return port.ProposalTime(**row_dict)
-
   
+  def cancel(self):
+    row['current'] = False
+    row['cancelled'] = True
+
+  def confirm_wait(self, start_now=True):
+    if start_now:
+      self.proptime_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
+      
+  def update(self, port_time):
+    self.proptime_row['start_now'] = port_time.start_now
+    self.proptime_row['start_date'] = port_time.start_date
+    self.proptime_row['duration'] = port_time.duration
+    if port_time.start_now:
+      self.confirm_wait()
+    else:
+      self.proptime_row['expire_date'] = port_time.expire_date
+    self.proptime_row['current'] = True
+    self.proptime_row['cancelled'] = False
+    
+  @staticmethod
+  def add(prop_row, port_time):
+    return ProposalTime(app_tables.proposal_times.add_row(proposal=prop_row,
+                                                          start_now=port_time.start_now,
+                                                          start_date=port_time.start_date,
+                                                          duration=port_time.duration,
+                                                          expire_date=port_time.expire_date,
+                                                          current=True,
+                                                          cancelled=False,
+                                                          missed_pings=0,
+                                                         )).confirm_wait(port_time.start_now)
+
+
 class Proposal():
   
-  def __init__(self, prop_row, user):
+  def __init__(self, prop_row):
     self.prop_row = prop_row
-    self.user = user
+
+  def get_id(self):
+    return self.prop_row.get_id()
     
-  def portable(self):
+  def portable(self, user):
     row_dict = dict(self.prop_row)
-    row_dict['prop_id'] = self.prop_row.get_id()
+    row_dict['prop_id'] = self.get_id()
     proposer = row_dict.pop('user')
-    row_dict['own'] = proposer == self.user
-    row_dict['name'] = proposer['name']
+    row_dict['own'] = proposer == user
+    row_dict['user'] = port.User.get(proposer)
     row_dict['times'] = [ProposalTime(row).portable() for row 
                          in app_tables.proposal_times.search(current=True, proposal=self.prop_row)]
     eligible_users = row_dict.pop('eligible_users')
-    row_dict['eligible_users'] = sm.port_eligible_users(others=eligible_users)
+    row_dict['eligible_users'] = [port.User.get(user) for user in eligible_users]
     assert row_dict['current']
     del row_dict['current']
     del row_dict['created']
     del row_dict['last_edited']
     return port.Proposal(**row_dict)
+ 
+  def update(self, port_prop):
+    #self.prop_row['current'] = True
+    self.prop_row['last_edited'] = sm.now()
+    self.prop_row['eligible'] = port_prop.eligible
+    self.prop_row['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id) 
+                                       for port_user in port_prop.eligible_users]
+    self.prop_row['eligible_groups'] = port_prop.eligible_groups
+    ## First cancel removed rows
+    new_time_ids = [port_time.time_id for port_time in port_prop.times]
+    for proptime_row in app_tables.proposal_times.search(current=True, proposal=self.prop_row):     
+      if proptime_row.get_id() not in new_time_ids:
+        ProposalTime(proptime_row).cancel()
+    ## Then update or add
+    for port_time in port_prop.times:
+      if port_time.time_id:
+        proptime_row = app_tables.proposal_times.get_by_id(port_time.time_id)
+        ProposalTime(proptime_row).update(port_time)
+      else:
+        ProposalTime.add(prop_row=self.prop_row, port_time=port_time)
+
+  @staticmethod
+  def add(user, port_prop):
+    now = sm.now()
+    user_rows = [app_tables.users.get_by_id(port_user.user_id) for port_user in port_prop.eligible_users]
+    new_prop_row = app_tables.proposals.add_row(user=user,
+                                                current=True,
+                                                created=now,
+                                                last_edited=now,
+                                                eligible=port_prop.eligible,
+                                                eligible_users=user_rows,
+                                                eligible_groups=port_prop.eligible_groups,
+                                               )
+    for port_time in port_prop.times:
+      ProposalTime.add(prop_row=new_prop_row, port_time=port_time)
+    return Proposal(new_prop_row)
