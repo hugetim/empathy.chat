@@ -3,7 +3,7 @@ from anvil import *
 import anvil.server
 import anvil.tz
 import datetime
-from .... import timeproposals as t
+from .... import portable as t
 from .... import helper as h
 from ....parameters import WAIT_SECONDS, BUFFER_SECONDS
 

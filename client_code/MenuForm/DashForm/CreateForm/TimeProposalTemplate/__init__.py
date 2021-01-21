@@ -1,7 +1,7 @@
 from ._anvil_designer import TimeProposalTemplateTemplate
 from anvil import *
 from ..... import helper as h
-from ..... import timeproposals as t
+from ..... import portable as t
 import datetime
 
 

@@ -3,7 +3,7 @@ from anvil import *
 import anvil.server
 import anvil.tz
 import datetime
-from ...timeproposals import DURATION_TEXT
+from ...portable import DURATION_TEXT
 
 
 class UpcomingRowTemplate(UpcomingRowTemplateTemplate):

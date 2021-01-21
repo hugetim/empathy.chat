@@ -6,7 +6,7 @@ import datetime
 import anvil.tz
 from . import parameters as p
 from . import server_misc as sm
-from .timeproposals import Proposal, ProposalTime
+from . import portable as port
 
 
 authenticated_callable = anvil.server.callable(require_user=True)
@@ -281,22 +281,8 @@ def _get_proposals(user):
   proposals = []
   for row in app_tables.proposals.search(current=True):
     if _proposal_is_visible(row, user):
-      proposals.append(_proposal(row, user))
+      proposals.append(Proposal(row, user).portable())
   return proposals
-
-
-def _proposal(proposal_row, user):
-  """Convert proposal_times row into a row for the client dashboard"""
-  if DEBUG:
-    print("_proposal")
-  proposer = proposal_row['user']
-  own = proposer == user
-  times = [ProposalTime.from_row(row) for row 
-           in app_tables.proposal_times.search(current=True, proposal=proposal_row)]
-  return Proposal(prop_id=proposal_row.get_id(),  own=own, name=proposer['name'],
-                  times=times, eligible=proposal_row['eligible'],
-                  eligible_users=proposal_row['eligible_users'], eligible_groups=proposal_row['eligible_groups'],
-                 )
 
 
 def _proposal_is_visible(proposal, user):
@@ -632,3 +618,48 @@ def current_match_i(user):
     if row['complete'][i] == 0:
       this_match = row
   return this_match, i
+
+
+class ProposalTime():
+  
+  def __init__(self, proptime_row):
+    self.proptime_row = proptime_row
+    
+  def port_proptime(self):
+    row_dict = dict(self.proptime_row)
+    row_dict['time_id'] = self.proptime_row.get_id()
+    row_dict['names_accepting'] = [user['name'] for user in row_dict.pop('users_accepting')]
+#     if row_dict.pop('current'):
+#       row_dict['status'] = "current"
+#     elif row_dict.pop('cancelled'):
+#       row_dict['status'] = "cancelled"
+#     else:
+#       row_dict['status'] = "hidden"
+    assert row_dict['current'] and not row_dict['cancelled']
+    del row_dict['current']
+    del row_dict['cancelled']
+    del row_dict['missed_pings']
+    del row_dict['proposal']
+    return port.ProposalTime(**row_dict)
+
+  
+class Proposal():
+  
+  def __init__(self, prop_row, user):
+    self.prop_row = prop_row
+    self.user = user
+    
+  def port_proposal(self):
+    row_dict = dict(self.prop_row)
+    row_dict['prop_id'] = self.prop_row.get_id()
+    proposer = prop_row['user']
+    row_dict['own'] = proposer == self.user
+    row_dict['name'] = proposer['name']
+    row_dict['times'] = [ProposalTime(row).portable() for row 
+                         in app_tables.proposal_times.search(current=True, proposal=proposal_row)]
+    eligible_users = row_dict.pop('eligible_users')
+    row_dict['eligible_users'] = sm.get_port_eligible_users(user_id=self.user.get_id(), others=eligible_users)
+    print("Proposal.port_proposal eligible_groups not yet implemented")
+    assert row_dict['current']
+    del row_dict['current']
+    return port.Proposal(**row_dict)

@@ -31,26 +31,10 @@ CANCEL_TEXT = {5: "5 min. prior",
 @anvil.server.portable_class
 class ProposalTime():
 
-  @staticmethod
-  def from_row(proptime_row):
-    row_dict = dict(proptime_row)
-    row_dict['time_id'] = proptime_row.get_id()
-    if row_dict.pop('current'):
-      row_dict['status'] = "current"
-    elif row_dict.pop('cancelled'):
-      row_dict['status'] = "cancelled"
-    else:
-      row_dict['status'] = "hidden"
-    row_dict['users_accepting'] = 
-    del row_dict['missed_pings']
-    del row_dict['proposal']
-    return ProposalTime(**row_dict)
-  
-  def __init__(self, time_id=None, status=None, start_now=True, start_date=None, 
+  def __init__(self, time_id=None, start_now=True, start_date=None, #status=None, 
                duration=DURATION_DEFAULT_MINUTES, expire_date=None,
-               accept_date=None, users_accepting=None, jitsi_code=None):
+               accept_date=None, names_accepting=None, jitsi_code=None):
     self.time_id = time_id
-
     self.start_now = start_now 
     self.start_date = (start_date if (start_date or start_now)
                        else h.now() + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES))
@@ -64,7 +48,7 @@ class ProposalTime():
         self.expire_date = (self.start_date 
                             - datetime.timedelta(minutes=CANCEL_DEFAULT_MINUTES))
     self.accept_date = accept_date
-    self.users_accepting = users_accepting
+    self.names_accepting = names_accepting
     self.jitsi_code = jitsi_code
       
   def __serialize__(self, global_data):
@@ -104,11 +88,6 @@ class Proposal():
 
   MAX_ALT_TIMES = 4
   
-  @staticmethod
-  def from_row(prop_row):
-    row_dict = dict(prop_row)
-    
-  
   def __init__(self, prop_id=None, own=True, name=None, times=[ProposalTime()], 
                eligible=3, eligible_users=[], eligible_groups=[]):
     self.prop_id = prop_id
@@ -116,7 +95,10 @@ class Proposal():
     self.name = name
     self.times = times
     self.eligible = eligible
-    self.eligible_users = eligible_users
+    if self.eligible_users:
+      self.eligible_users = eligible_users
+    else:
+      self.eligible_users = anvil.server.call('get_port_eligible_users')
     self.eligible_groups = eligible_groups
         
   def __serialize__(self, global_data):

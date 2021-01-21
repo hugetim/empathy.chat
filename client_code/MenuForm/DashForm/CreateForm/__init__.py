@@ -1,7 +1,7 @@
 from ._anvil_designer import CreateFormTemplate
 from anvil import *
 from .... import helper as h
-from .... import timeproposals as t
+from .... import portable as t
 from datetime import timedelta
 
 

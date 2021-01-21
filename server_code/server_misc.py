@@ -55,6 +55,16 @@ def is_visible(user2, user1=None):
   else:
     return trust1 > 0 and trust2 > 0
 
+  
+@authenticated_callable
+def get_port_eligible_users(user_id="", others=[]):
+  user = get_user(user_id)
+  if others:
+    return [(other['name'], other.get_id()) for other in others]
+  else:
+    return [(other['name'], other.get_id()) for other in app_tables.users.search()
+            if is_visible(other, user)]
+  
 
 def get_user_info(user):
   """Return user info, initializing info for new users"""

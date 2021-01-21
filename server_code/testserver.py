@@ -2,7 +2,7 @@ from anvil.tables import app_tables
 import anvil.server
 from . import server_misc as sm
 from . import matcher
-from . import timeproposals
+from . import portable
 
 
 authenticated_callable = anvil.server.callable(require_user=True)
@@ -51,7 +51,7 @@ def create_tests_record():
 def add_now_proposal():
   print("add_now_proposal")
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
-  anvil.server.call('add_proposal', timeproposals.Proposal())
+  anvil.server.call('add_proposal', portable.Proposal())
   tester = sm.get_user()
   tester_now_proptime_row = matcher.get_now_proposal_time(tester)
   if tester_now_proptime_row:

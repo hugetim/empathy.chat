@@ -13,7 +13,7 @@ from .SettingsForm import SettingsForm
 from .DashForm.CreateForm import CreateForm
 from .. import parameters as p
 from .. import helper as h
-from .. import timeproposals as t
+from .. import portable as t
 import unittest
 import random
 import time
