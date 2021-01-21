@@ -35,7 +35,7 @@ def _seconds_left(status, expire_date=None, ping_start=None):
   else:
     print("matcher.seconds_left(s,lc,ps): " + status)
 
-
+    
 def _prune_proposals():
   """Prune definitely outdated prop_times, unmatched then matched, then proposals"""
   if DEBUG:
@@ -291,17 +291,12 @@ def _proposal(proposal_row, user):
     print("_proposal")
   proposer = proposal_row['user']
   own = proposer == user
-  times = [_proposal_time(row) for row 
+  times = [ProposalTime.from_row(row) for row 
            in app_tables.proposal_times.search(current=True, proposal=proposal_row)]
   return Proposal(prop_id=proposal_row.get_id(),  own=own, name=proposer['name'],
                   times=times, eligible=proposal_row['eligible'],
                   eligible_users=proposal_row['eligible_users'], eligible_groups=proposal_row['eligible_groups'],
                  )
-
-def _proposal_time(prop_time_row):
-  return ProposalTime(time_id=prop_time_row.get_id(), 
-                      start_now=prop_time_row['start_now'], start_date=prop_time_row['start_date'],
-                      duration=prop_time_row['duration'], expire_date=prop_time_row['expire_date'],)
 
 
 def _proposal_is_visible(proposal, user):

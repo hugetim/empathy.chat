@@ -217,10 +217,6 @@ db_schema:
       name: current
       type: bool
       admin_ui: {order: 0.375, width: 91}
-    UCSXFA8ZT1E=:
-      name: remove_date
-      type: datetime
-      admin_ui: {order: 2.8125, width: 200}
     f6ZxhGovxjs=:
       name: start_now
       type: bool
