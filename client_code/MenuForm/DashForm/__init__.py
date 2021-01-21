@@ -91,7 +91,7 @@ class DashForm(DashFormTemplate):
     """This method is called when the button is clicked"""
     [prop_to_edit] = [prop for prop in self.item['proposals'] 
                       if prop.prop_id == prop_id]
-    content = CreateForm(item=prop_to_edit.create_form_item())
+    content = CreateForm(item=prop_to_edit.create_form_item(self.item['status']))
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
                 title="Edit Empathy Chat Proposal",

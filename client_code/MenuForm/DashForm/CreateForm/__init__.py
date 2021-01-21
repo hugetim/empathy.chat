@@ -1,5 +1,6 @@
 from ._anvil_designer import CreateFormTemplate
 from anvil import *
+import anvil.server
 from .... import helper as h
 from .... import portable as t
 from datetime import timedelta
@@ -71,6 +72,7 @@ class CreateForm(CreateFormTemplate):
                                      ("Direct connections only (1st degree)", 1),
                                      ("Specific 1st degree connection(s)...",0)
                                     ]
+    self.multi_select_drop_down.items = anvil.server.call('get_port_eligible_users')
     self.normalize_initial_state()
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False

@@ -95,10 +95,7 @@ class Proposal():
     self.name = name
     self.times = times
     self.eligible = eligible
-    if self.eligible_users:
-      self.eligible_users = eligible_users
-    else:
-      self.eligible_users = anvil.server.call('get_port_eligible_users')
+    self.eligible_users = eligible_users
     self.eligible_groups = eligible_groups
         
   def __serialize__(self, global_data):

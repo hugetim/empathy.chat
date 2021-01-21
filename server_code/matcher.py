@@ -387,12 +387,13 @@ def _add_proposal(user, proposal):
 
 def _add_proposal_rows(user, proposal):
   now = sm.now()
+  user_rows = [app_tables.users.get_by_id(user_id) for user_id in proposal.eligible_users]
   new_prop_row = app_tables.proposals.add_row(user=user,
                                               current=True,
                                               created=now,
                                               last_edited=now,
                                               eligible=proposal.eligible,
-                                              eligible_users=proposal.eligible_users,
+                                              eligible_users=user_rows,
                                               eligible_groups=proposal.eligible_groups,
                                              )
   for time in proposal.times:
@@ -625,10 +626,14 @@ class ProposalTime():
   def __init__(self, proptime_row):
     self.proptime_row = proptime_row
     
-  def port_proptime(self):
+  def portable(self):
     row_dict = dict(self.proptime_row)
     row_dict['time_id'] = self.proptime_row.get_id()
-    row_dict['names_accepting'] = [user['name'] for user in row_dict.pop('users_accepting')]
+    users_accepting = row_dict.pop('users_accepting')
+    if users_accepting:
+      row_dict['names_accepting'] = [user['name'] for user in users_accepting]
+    else:
+      row_dict['names_accepting'] = []
 #     if row_dict.pop('current'):
 #       row_dict['status'] = "current"
 #     elif row_dict.pop('cancelled'):
@@ -649,17 +654,18 @@ class Proposal():
     self.prop_row = prop_row
     self.user = user
     
-  def port_proposal(self):
+  def portable(self):
     row_dict = dict(self.prop_row)
     row_dict['prop_id'] = self.prop_row.get_id()
-    proposer = prop_row['user']
+    proposer = row_dict.pop('user')
     row_dict['own'] = proposer == self.user
     row_dict['name'] = proposer['name']
     row_dict['times'] = [ProposalTime(row).portable() for row 
-                         in app_tables.proposal_times.search(current=True, proposal=proposal_row)]
+                         in app_tables.proposal_times.search(current=True, proposal=self.prop_row)]
     eligible_users = row_dict.pop('eligible_users')
-    row_dict['eligible_users'] = sm.get_port_eligible_users(user_id=self.user.get_id(), others=eligible_users)
-    print("Proposal.port_proposal eligible_groups not yet implemented")
+    row_dict['eligible_users'] = sm.port_eligible_users(others=eligible_users)
     assert row_dict['current']
     del row_dict['current']
+    del row_dict['created']
+    del row_dict['last_edited']
     return port.Proposal(**row_dict)
