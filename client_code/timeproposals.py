@@ -102,6 +102,8 @@ class ProposalTime():
 @anvil.server.portable_class 
 class Proposal():
 
+  MAX_ALT_TIMES = 4
+  
   @staticmethod
   def from_row(prop_row):
     row_dict = dict(prop_row)

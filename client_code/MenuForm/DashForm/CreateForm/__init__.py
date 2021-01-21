@@ -102,7 +102,7 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel_initialized = True
 
   def update_times(self):
-    self.button_add_alternate.visible = len(self.item['alt']) < 4
+    self.button_add_alternate.visible = len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES
     if self.item['start_now']:
       self.date_picker_start.visible = False
       if not self.item['alt']:
