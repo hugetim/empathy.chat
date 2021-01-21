@@ -29,11 +29,11 @@ def test_add_user(em, level=1, r_em=False, p_em=False):
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def test_add_request(user_id, proposal):
+def test_add_request(user_id, port_prop):
   print("test_add_request", user_id)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   user = app_tables.users.get_by_id(user_id)
-  state, prop_id = matcher._add_proposal(user, proposal)
+  state, prop_id = matcher._add_proposal(user, port_prop)
   new_row = app_tables.proposals.get_by_id(prop_id)
   if new_row: 
     _add_prop_row_to_test_record(new_row)

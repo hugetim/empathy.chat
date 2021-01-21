@@ -239,7 +239,7 @@ def _get_status(user):
       ping_start = current_row['accept_date']
     else:
       status = "requesting"
-      proposals = _get_proposals(user)
+      proposals = Proposal.get_port_proposals(user)
   else:
     current_accept = _get_now_accept(user)
     if current_accept and current_accept['jitsi_code']:
@@ -253,7 +253,7 @@ def _get_status(user):
         ping_start = this_match['match_commence']
       else:
         status = None
-        proposals = _get_proposals(user)
+        proposals = Proposal.get_port_proposals(user)
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
           'proposals': proposals,
@@ -276,23 +276,6 @@ def has_status(user):
       if this_match:
         return True
   return False
-
-
-def _get_proposals(user):
-  """Return list of Proposals visible to user
-  
-  Side effects: prune proposals
-  """
-  _prune_proposals()
-  proposals = []
-  for row in app_tables.proposals.search(current=True):
-    if _proposal_is_visible(row, user):
-      proposals.append(Proposal(row).portable(user))
-  return proposals
-
-
-def _proposal_is_visible(proposal, user):
-  return sm.is_visible(proposal['user'], user)
 
 
 @authenticated_callable
@@ -326,38 +309,7 @@ def accept_proposal(proptime_id, user_id=""):
   """
   print("accept_proposal", proptime_id, user_id)
   user = sm.get_user(user_id)
-  return _attempt_accept_proposal(user, proptime_id)
-
-  
-def _accept_proposal(user, proptime, status):
-  if DEBUG:
-    print("_accept_proposal")
-  now = sm.now()
-  if status == "requesting":
-    own_now_proposal_time = get_now_proposal_time(user)
-    if own_now_proposal_time:
-      ProposalTime(own_now_proposal_time).cancel()
-  proposal = proptime['proposal']
-  proptime['users_accepting'] = [user]
-  proptime['accept_date'] = now
-  proptime['jitsi_code'] = sm.new_jitsi_code()
-  if (proptime['expire_date'] - datetime.timedelta(seconds=_seconds_left("requesting")) 
-                              - now).seconds <= p.BUFFER_SECONDS:
-    _match_commenced(user)
-  else:
-    sm.pinged_email(proposal['user'])
-
-
-def _attempt_accept_proposal(user, proptime_id):
-  if DEBUG:
-    print("_attempt_accept_proposal")
-  state = _get_status(user)
-  status = state['status']
-  if status in [None, "requesting"]:
-    proptime = app_tables.proposal_times.get_by_id(proptime_id)
-    if proptime['current'] and (not proptime['users_accepting']) and _proposal_is_visible(proptime['proposal'], user):
-      _accept_proposal(user, proptime, status)
-  return _get_status(user)
+  return ProposalTime.get_by_id(proptime_id).attempt_accept(user)
 
 
 @authenticated_callable
@@ -397,8 +349,7 @@ def edit_proposal(proposal, user_id=""):
     
 def _edit_proposal(user, port_proposal):
   print("Not yet preventing editing from making multiple now proposals")
-  prop_row = app_tables.proposals.get_by_id(port_proposal.prop_id)
-  Proposal(prop_row).update(port_proposal)
+  Proposal.get_by_id(port_proposal.prop_id).update(port_proposal)
   return _get_status(user)
 
 
@@ -587,15 +538,45 @@ class ProposalTime():
     del row_dict['proposal']
     return port.ProposalTime(**row_dict)
 
+  def proposal(self):
+    return Proposal(self.proptime_row['proposal'])
+  
+  def attempt_accept(self, user):
+    if DEBUG:
+      print("_attempt_accept_proptime")
+    state = _get_status(user)
+    status = state['status']
+    if status in [None, "requesting"]:
+      if (self.proptime_row['current'] and (not self.proptime_row['users_accepting'])
+          and self.proposal().is_visible(user)):
+        self._accept(user, status)
+    return _get_status(user)
+   
+  def _accept(self, user, status):
+    if DEBUG:
+      print("_accept_proptime")
+    now = sm.now()
+    if status == "requesting":
+      own_now_proposal_time = get_now_proposal_time(user)
+      if own_now_proposal_time:
+        ProposalTime(own_now_proposal_time).cancel()
+    self.proptime_row['users_accepting'] = [user]
+    self.proptime_row['accept_date'] = now
+    self.proptime_row['jitsi_code'] = sm.new_jitsi_code()
+    if (self.proptime_row['expire_date'] 
+        - datetime.timedelta(seconds=_seconds_left("requesting")) 
+        - now).seconds <= p.BUFFER_SECONDS:
+      _match_commenced(user)
+    else:
+      self.proposal().pinged_email()
+  
   def cancel_time_only(self):
     self.proptime_row['current'] = False
     self.proptime_row['cancelled'] = True
   
   def cancel(self):
     self.cancel_time_only()
-    proposal_row = self.proptime_row['proposal']
-    if len(app_tables.proposal_times.search(cancelled=False, proposal=proposal_row))==0:
-      proposal_row['current'] = False
+    self.proposal().cancel_if_no_times()
 
   def confirm_wait(self, start_now=True):
     if start_now:
@@ -623,8 +604,16 @@ class ProposalTime():
                                                           cancelled=False,
                                                           missed_pings=0,
                                                          )).confirm_wait(port_time.start_now)
+  
+  @staticmethod
+  def get_by_id(time_id):
+    return ProposalTime(app_tables.proposal_times.get_by_id(time_id))
 
+  @staticmethod
+  def none_left(prop_row):
+    return len(app_tables.proposal_times.search(cancelled=False, proposal=prop_row))==0
 
+  
 class Proposal():
   
   def __init__(self, prop_row):
@@ -648,7 +637,17 @@ class Proposal():
     del row_dict['created']
     del row_dict['last_edited']
     return port.Proposal(**row_dict)
+
+  def is_visible(self, user):
+    return sm.is_visible(self.prop_row['user'], user)
+
+  def pinged_email(self): 
+    sm.pinged_email(self.prop_row['user'])
  
+  def cancel_if_no_times(self):
+    if ProposalTime.none_left(self.prop_row):
+      self.prop_row['current'] = False
+
   def update(self, port_prop):
     #self.prop_row['current'] = True
     self.prop_row['last_edited'] = sm.now()
@@ -664,11 +663,10 @@ class Proposal():
     ## Then update or add
     for port_time in port_prop.times:
       if port_time.time_id:
-        proptime_row = app_tables.proposal_times.get_by_id(port_time.time_id)
-        ProposalTime(proptime_row).update(port_time)
+        ProposalTime.get_by_id(port_time.time_id).update(port_time)
       else:
         ProposalTime.add(prop_row=self.prop_row, port_time=port_time)
-
+  
   @staticmethod
   def add(user, port_prop):
     now = sm.now()
@@ -684,3 +682,21 @@ class Proposal():
     for port_time in port_prop.times:
       ProposalTime.add(prop_row=new_prop_row, port_time=port_time)
     return Proposal(new_prop_row)
+  
+  @staticmethod
+  def get_by_id(prop_id):
+    return Proposal(app_tables.proposals.get_by_id(prop_id))
+  
+  @staticmethod
+  def get_port_proposals(user):
+    """Return list of Proposals visible to user
+    
+    Side effects: prune proposals
+    """
+    _prune_proposals()
+    port_proposals = []
+    for row in app_tables.proposals.search(current=True):
+      prop = Proposal(row)
+      if prop.is_visible(user):
+        port_proposals.append(prop.portable(user))
+    return port_proposals
