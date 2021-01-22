@@ -35,52 +35,7 @@ def _seconds_left(status, expire_date=None, ping_start=None):
   else:
     print("matcher.seconds_left(s,lc,ps): " + status)
 
-    
-def _prune_proposals():
-  """Prune definitely outdated prop_times, unmatched then matched, then proposals"""
-  if DEBUG:
-    print("_prune_proposals")
-  now = sm.now()
-  proposals_to_check = set()
-  if DEBUG:
-    print("old_prop_times")
-  old_prop_times = app_tables.proposal_times.search(current=True, 
-                                                    jitsi_code="",
-                                                    expire_date=q.less_than(now),
-                                                   )
-  for row in old_prop_times:
-    ProposalTime(row).cancel_time_only()
-    proposals_to_check.add(row['proposal'])
-  # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
-  if DEBUG:
-    print("timeout")
-  timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
-  cutoff_r = now - timeout
-  if DEBUG:
-    print("old_ping_prop_times")
-  old_ping_prop_times = app_tables.proposal_times.search(current=True, 
-                                                         start_now=True,
-                                                         jitsi_code=q.not_(""),
-                                                         accept_date=q.less_than(cutoff_r)
-                                                        )
-  if DEBUG:
-    print("old_ping_prop_times2")
-  for row in old_ping_prop_times:
-    if DEBUG:
-      print("old_ping_prop_times3")
-    ProposalTime(row).cancel_time_only()
-    if DEBUG:
-      print("old_ping_prop_times4")
-    proposals_to_check.add(row['proposal'])
-  # now proposals, after proposal times so they get removed if all times are
-  if DEBUG:
-    print("old_proposals")
-  for row in proposals_to_check:
-    if DEBUG:
-      print("old_proposals2")
-    Proposal(row).cancel_if_no_times()
-
-    
+       
 def _prune_matches():
   """Complete old commenced matches for all users"""
   if DEBUG:
@@ -120,7 +75,7 @@ def init():
   print("('init')")
   sm.initialize_session()
   # Prune expired items for all users
-  _prune_proposals()
+  Proposal.prune_all()
   _prune_matches()
   sm.prune_messages()
   # Initialize user info
@@ -643,6 +598,32 @@ class ProposalTime():
     else:
       return None
 
+  @staticmethod
+  def old_to_prune(now):
+    if DEBUG:
+      print("old_prop_times")
+    for row in app_tables.proposal_times.search(cancelled=False, 
+                                                jitsi_code="",
+                                                expire_date=q.less_than(now),
+                                               ):
+      yield ProposalTime(row)
+  
+  @staticmethod
+  def old_ping_to_prune(now):
+    # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
+    if DEBUG:
+      print("timeout")
+    timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
+    cutoff_r = now - timeout
+    if DEBUG:
+      print("old_ping_prop_times")
+    for row in app_tables.proposal_times.search(cancelled=False, 
+                                                start_now=True,
+                                                jitsi_code=q.not_(""),
+                                                accept_date=q.less_than(cutoff_r),
+                                               ):
+      yield ProposalTime(row)
+  
   
 class Proposal():
   
@@ -733,10 +714,37 @@ class Proposal():
     
     Side effects: prune proposals
     """
-    _prune_proposals()
+    Proposal.prune_all()
     port_proposals = []
     for row in app_tables.proposals.search(current=True):
       prop = Proposal(row)
       if prop.is_visible(user):
         port_proposals.append(prop.portable(user))
     return port_proposals
+
+  @staticmethod
+  def prune_all():
+    """Prune definitely outdated prop_times, unmatched then matched, then proposals"""
+    if DEBUG:
+      print("_prune_proposals")
+    now = sm.now()
+    proposals_to_check = set()
+    for proptime in ProposalTime.old_to_prune(now):
+      proptime.cancel_time_only()
+      proposals_to_check.add(proptime.proposal())
+    # now proposals, after proposal times so they get removed if all times are
+    if DEBUG:
+      print("old_ping_prop_times2")
+    for proptime in ProposalTime.old_ping_to_prune(now):
+      if DEBUG:
+        print("old_ping_prop_times3")
+      proptime.cancel_time_only()
+      if DEBUG:
+        print("old_ping_prop_times4")
+      proposals_to_check.add(proptime.proposal())
+    if DEBUG:
+      print("old_proposals")
+    for proposal in proposals_to_check:
+      if DEBUG:
+        print("old_proposals2")
+      proposal.cancel_if_no_times()
