@@ -124,7 +124,6 @@ class Proposal():
     item.update(first.time_prop_item())
     item['alt'] = [time.time_prop_item() for time in alts]
     return item
-
     
 #DEFAULT_PROPOSAL = {'start_now': 0,
 #                    'start_date': DEFAULT_START,

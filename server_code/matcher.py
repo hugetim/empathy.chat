@@ -228,7 +228,8 @@ def accept_proposal(proptime_id, user_id=""):
   """
   print("accept_proposal", proptime_id, user_id)
   user = sm.get_user(user_id)
-  return ProposalTime.get_by_id(proptime_id).attempt_accept(user)
+  ProposalTime.get_by_id(proptime_id).attempt_accept(user)
+  return _get_status(user)
 
 
 @authenticated_callable
@@ -456,7 +457,6 @@ class ProposalTime():
       if (self._proptime_row['current'] and (not self._proptime_row['users_accepting'])
           and self.proposal().is_visible(user)):
         self._accept(user, status)
-    return _get_status(user)
    
   def _accept(self, user, status):
     if DEBUG:
