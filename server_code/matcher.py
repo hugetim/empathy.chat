@@ -599,8 +599,8 @@ class ProposalTime():
                                                           expire_date=port_time.expire_date,
                                                           current=True,
                                                           cancelled=False,
-                                                          users_accepting=[]
-                                                          jitsi_code=""
+                                                          users_accepting=[],
+                                                          jitsi_code="",
                                                           missed_pings=0,
                                                          )).confirm_wait(port_time.start_now)
   
