@@ -350,7 +350,7 @@ def _match_commenced(user, proptime_id=None):
       match_start = sm.now()
       users = current_proptime.all_users()
       new_match = app_tables.matches.add_row(users=users,
-                                             proposal_time=current_proptime.row(),
+                                             proposal_time=current_proptime._row(),
                                              match_commence=match_start,
                                              complete=[0]*len(users))
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
@@ -397,13 +397,13 @@ def current_match_i(user):
 class ProposalTime():
   
   def __init__(self, proptime_row):
-    self.proptime_row = proptime_row
+    self._proptime_row = proptime_row
 
   def get_id(self):
-    return self.proptime_row.get_id()  
+    return self._proptime_row.get_id()  
     
   def portable(self):
-    row_dict = dict(self.proptime_row)
+    row_dict = dict(self._proptime_row)
     row_dict['time_id'] = self.get_id()
     users_accepting = row_dict.pop('users_accepting')
     if users_accepting:
@@ -423,29 +423,29 @@ class ProposalTime():
     del row_dict['proposal']
     return port.ProposalTime(**row_dict)
 
-  def row(self):
-    return self.proptime_row
+  def _row(self):
+    return self._proptime_row
 
   def is_now(self):
-    return self.proptime_row['start_now']
+    return self._proptime_row['start_now']
 
   def get_expire_date(self):
-    return self.proptime_row['expire_date']
+    return self._proptime_row['expire_date']
 
   def get_ping_start(self):
-    return self.proptime_row['accept_date']
+    return self._proptime_row['accept_date']
   
   def get_code(self):
-    return self.proptime_row['jitsi_code'], self.proptime_row['duration']
+    return self._proptime_row['jitsi_code'], self._proptime_row['duration']
   
   def proposal(self):
-    return Proposal(self.proptime_row['proposal'])
+    return Proposal(self._proptime_row['proposal'])
 
   def is_accepted(self):
-    return bool(self.proptime_row['jitsi_code'])
+    return bool(self._proptime_row['jitsi_code'])
 
   def all_users(self):
-    return [self.proposal().proposer()] + list(self.proptime_row['users_accepting'])
+    return [self.proposal().proposer()] + list(self._proptime_row['users_accepting'])
   
   def attempt_accept(self, user):
     if DEBUG:
@@ -453,7 +453,7 @@ class ProposalTime():
     state = _get_status(user)
     status = state['status']
     if status in [None, "requesting"]:
-      if (self.proptime_row['current'] and (not self.proptime_row['users_accepting'])
+      if (self._proptime_row['current'] and (not self._proptime_row['users_accepting'])
           and self.proposal().is_visible(user)):
         self._accept(user, status)
     return _get_status(user)
@@ -466,10 +466,10 @@ class ProposalTime():
       own_now_proposal_time = ProposalTime.get_now_proposing(user)
       if own_now_proposal_time:
         ProposalTime(own_now_proposal_time).cancel()
-    self.proptime_row['users_accepting'] = [user]
-    self.proptime_row['accept_date'] = now
-    self.proptime_row['jitsi_code'] = sm.new_jitsi_code()
-    if (self.proptime_row['expire_date'] 
+    self._proptime_row['users_accepting'] = [user]
+    self._proptime_row['accept_date'] = now
+    self._proptime_row['jitsi_code'] = sm.new_jitsi_code()
+    if (self._proptime_row['expire_date'] 
         - datetime.timedelta(seconds=_seconds_left("requesting")) 
         - now).seconds <= p.BUFFER_SECONDS:
       _match_commenced(user)
@@ -477,13 +477,13 @@ class ProposalTime():
       self.proposal().pinged_email()
 
   def in_users_accepting(self, user):
-    return self.proptime_row['users_accepting'] and user in self.proptime_row['users_accepting']
+    return self._proptime_row['users_accepting'] and user in self._proptime_row['users_accepting']
       
   def remove_accepting(self, user=None):
     # below code assumes only dyads allowed
-    self.proptime_row['users_accepting'] = []
-    self.proptime_row['accept_date'] = None
-    self.proptime_row['jitsi_code'] = ""
+    self._proptime_row['users_accepting'] = []
+    self._proptime_row['accept_date'] = None
+    self._proptime_row['jitsi_code'] = ""
 
   def cancel_other(self, user):
     if self.in_users_accepting(user):
@@ -503,13 +503,13 @@ class ProposalTime():
       self.cancel()
 
   def is_expired(self):
-    return sm.now() > self.proptime_row['expire_date']
+    return sm.now() > self._proptime_row['expire_date']
     
   def cancel_time_only(self, missed_ping=None):
-    self.proptime_row['current'] = False
-    self.proptime_row['cancelled'] = True
+    self._proptime_row['current'] = False
+    self._proptime_row['cancelled'] = True
     if missed_ping:
-      self.proptime_row['missed_pings'] += 1
+      self._proptime_row['missed_pings'] += 1
   
   def cancel(self, missed_ping=None):
     self.cancel_time_only(missed_ping)
@@ -517,18 +517,18 @@ class ProposalTime():
     
   def confirm_wait(self, start_now=True):
     if start_now:
-      self.proptime_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
+      self._proptime_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
       
   def update(self, port_time):
-    self.proptime_row['start_now'] = port_time.start_now
-    self.proptime_row['start_date'] = port_time.start_date
-    self.proptime_row['duration'] = port_time.duration
+    self._proptime_row['start_now'] = port_time.start_now
+    self._proptime_row['start_date'] = port_time.start_date
+    self._proptime_row['duration'] = port_time.duration
     if port_time.start_now:
       self.confirm_wait()
     else:
-      self.proptime_row['expire_date'] = port_time.expire_date
-    self.proptime_row['current'] = True
-    self.proptime_row['cancelled'] = False
+      self._proptime_row['expire_date'] = port_time.expire_date
+    self._proptime_row['current'] = True
+    self._proptime_row['cancelled'] = False
     
   @staticmethod
   def add(prop_row, port_time):
@@ -553,7 +553,7 @@ class ProposalTime():
     return len(app_tables.proposal_times.search(cancelled=False, proposal=prop_row))==0
 
   @staticmethod
-  def rows_from_prop_row(prop_row, require_current=False):
+  def _rows_from_prop_row(prop_row, require_current=False):
     if require_current:
       return app_tables.proposal_times.search(current=True, proposal=prop_row)
     else:
@@ -628,19 +628,19 @@ class ProposalTime():
 class Proposal():
   
   def __init__(self, prop_row):
-    self.prop_row = prop_row
+    self._prop_row = prop_row
 
   def get_id(self):
-    return self.prop_row.get_id()
+    return self._prop_row.get_id()
     
   def portable(self, user):
-    row_dict = dict(self.prop_row)
+    row_dict = dict(self._prop_row)
     row_dict['prop_id'] = self.get_id()
     proposer = row_dict.pop('user')
     row_dict['own'] = proposer == user
     row_dict['user'] = port.User.get(proposer)
     row_dict['times'] = [ProposalTime(row).portable() for row 
-                         in ProposalTime.rows_from_prop_row(self.prop_row, require_current=True)]
+                         in ProposalTime._rows_from_prop_row(self._prop_row, require_current=True)]
     eligible_users = row_dict.pop('eligible_users')
     row_dict['eligible_users'] = [port.User.get(user) for user in eligible_users]
     assert row_dict['current']
@@ -649,32 +649,32 @@ class Proposal():
     del row_dict['last_edited']
     return port.Proposal(**row_dict)
 
-  def row(self):
-    return self.prop_row
+  def _row(self):
+    return self._prop_row
   
   def proposer(self):
-    return self.prop_row['user']
+    return self._prop_row['user']
   
   def is_visible(self, user):
-    return sm.is_visible(self.prop_row['user'], user)
+    return sm.is_visible(self._prop_row['user'], user)
 
   def pinged_email(self): 
-    sm.pinged_email(self.prop_row['user'])
+    sm.pinged_email(self._prop_row['user'])
 
   def cancel_if_no_times(self):
-    if ProposalTime.none_left(self.prop_row):
-      self.prop_row['current'] = False
+    if ProposalTime.none_left(self._prop_row):
+      self._prop_row['current'] = False
 
   def update(self, port_prop):
-    #self.prop_row['current'] = True
-    self.prop_row['last_edited'] = sm.now()
-    self.prop_row['eligible'] = port_prop.eligible
-    self.prop_row['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id) 
+    #self._prop_row['current'] = True
+    self._prop_row['last_edited'] = sm.now()
+    self._prop_row['eligible'] = port_prop.eligible
+    self._prop_row['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id) 
                                        for port_user in port_prop.eligible_users]
-    self.prop_row['eligible_groups'] = port_prop.eligible_groups
+    self._prop_row['eligible_groups'] = port_prop.eligible_groups
     ## First cancel removed rows
     new_time_ids = [port_time.time_id for port_time in port_prop.times]
-    for proptime_row in Proposal_Time.rows_from_prop_row(self.prop_row):     
+    for proptime_row in Proposal_Time._rows_from_prop_row(self._prop_row):     
       if proptime_row.get_id() not in new_time_ids:
         ProposalTime(proptime_row).cancel()
     ## Then update or add
@@ -682,7 +682,7 @@ class Proposal():
       if port_time.time_id:
         ProposalTime.get_by_id(port_time.time_id).update(port_time)
       else:
-        ProposalTime.add(prop_row=self.prop_row, port_time=port_time)
+        ProposalTime.add(prop_row=self._prop_row, port_time=port_time)
   
   @staticmethod
   def add(user, port_prop):
