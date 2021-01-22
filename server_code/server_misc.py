@@ -90,7 +90,6 @@ def new_jitsi_code():
   random.seed()
   rand_code = "".join([random.choice(charset) for i in range(num_chars)])
   code = "empathyspot-" + rand_code
-  # match['jitsi_code'] = code
   return code
 
 

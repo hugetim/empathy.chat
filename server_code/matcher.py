@@ -11,7 +11,7 @@ from . import portable as port
 
 authenticated_callable = anvil.server.callable(require_user=True)
 TEST_TRUST_LEVEL = 10
-DEBUG = False
+DEBUG = True
 
 
 def _seconds_left(status, expire_date=None, ping_start=None):
@@ -45,7 +45,7 @@ def _prune_proposals():
   if DEBUG:
     print("old_prop_times")
   old_prop_times = app_tables.proposal_times.search(current=True, 
-                                                    jitsi_code=None,
+                                                    jitsi_code="",
                                                     expire_date=q.less_than(now),
                                                    )
   for row in old_prop_times:
@@ -60,7 +60,7 @@ def _prune_proposals():
     print("old_ping_prop_times")
   old_ping_prop_times = app_tables.proposal_times.search(current=True, 
                                                          start_now=True,
-                                                         jitsi_code=q.not_(None),
+                                                         jitsi_code=q.not_(""),
                                                          accept_date=q.less_than(cutoff_r)
                                                         )
   if DEBUG:
@@ -78,10 +78,7 @@ def _prune_proposals():
   for row in proposals_to_check:
     if DEBUG:
       print("old_proposals2")
-    if len(app_tables.proposal_times.search(current=True, proposal=row))==0:
-      if DEBUG:
-        print("old_proposals3")
-      row['current'] = False
+    Proposal(row).cancel_if_no_times()
 
     
 def _prune_matches():
@@ -357,32 +354,12 @@ def _cancel(user, proptime_id=None):
   if DEBUG:
     print("_cancel", proptime_id)
   if proptime_id:
-    current_row = app_tables.proposal_times.get_by_id(proptime_id)
+    proptime = ProposalTime.get_by_id(proptime_id)
   else:
-    current_row = get_now_proposal_time(user)
-    if not current_row:
-      current_row = _get_now_accept(user)
-      if DEBUG:
-        print("_cancel here1")
-  if current_row:
-    if DEBUG:
-      print("_cancel here2")
-    if current_row['users_accepting'] and user in current_row['users_accepting']:
-      if DEBUG:
-        print("_cancel here3")
-      _remove_user_accepting(user, current_row)
-      if sm.now() > current_row['expire_date']:
-        ProposalTime(current_row).cancel()
-    elif user == current_row['proposal']['user']:
-      ProposalTime(current_row).cancel()
+    proptime = ProposalTime.get_now(user)
+  if proptime:
+    proptime.cancel_this(user)
   return _get_status(user)
-
-
-def _remove_user_accepting(user, proposal_time):
-  # below code assumes only dyads allowed
-  proposal_time['users_accepting'] = None
-  proposal_time['accept_date'] = None
-  proposal_time['jitsi_code'] = None
 
   
 @authenticated_callable
@@ -400,22 +377,11 @@ def _cancel_other(user, proptime_id=None):
   if DEBUG:
     print("_cancel_other", proptime_id)
   if proptime_id:
-    current_row = app_tables.proposal_times.get_by_id(proptime_id)
+    proptime = ProposalTime.get_by_id(proptime_id)
   else:
-    current_row = get_now_proposal_time(user)
-    if not current_row:
-      current_row = _get_now_accept(user)
-  if current_row:
-    if current_row['users_accepting'] and user in current_row['users_accepting']:
-      ProposalTime(current_row).cancel()
-      current_row['missed_pings'] += 1
-    elif user == current_row['proposal']['user']:
-      # below code assumes only dyads allowed
-      current_row['users_accepting'] = None
-      current_row['accept_date'] = None
-      current_row['jitsi_code'] = None
-      if sm.now() > current_row['expire_date']:
-        ProposalTime(current_row).cancel()
+    proptime = ProposalTime.get_now(user)
+  if proptime:
+    proptime.cancel_other(user)
   return _get_status(user)
 
 
@@ -569,15 +535,46 @@ class ProposalTime():
       _match_commenced(user)
     else:
       self.proposal().pinged_email()
-  
-  def cancel_time_only(self):
+
+  def in_users_accepting(self, user):
+    return self.proptime_row['users_accepting'] and user in self.proptime_row['users_accepting']
+      
+  def remove_accepting(self, user=None):
+    # below code assumes only dyads allowed
+    self.proptime_row['users_accepting'] = []
+    self.proptime_row['accept_date'] = None
+    self.proptime_row['jitsi_code'] = ""
+
+  def cancel_other(self, user):
+    if self.in_users_accepting(user):
+      self.cancel(missed_ping=1)
+    elif self.proposal().proposer_is(user):
+      # below code assumes only dyads allowed
+      self.remove_accepting()
+      if self.is_expired():
+        self.cancel()  
+    
+  def cancel_this(self, user):
+    if self.in_users_accepting(user):
+      self.remove_accepting()
+      if self.is_expired():
+       self.cancel() 
+    elif self.proposal().proposer_is(user):
+      self.cancel()
+
+  def is_expired(self):
+    return sm.now() > self.proptime_row['expire_date']
+    
+  def cancel_time_only(self, missed_ping=None):
     self.proptime_row['current'] = False
     self.proptime_row['cancelled'] = True
+    if missed_ping:
+      self.proptime_row['missed_pings'] += 1
   
-  def cancel(self):
-    self.cancel_time_only()
-    self.proposal().cancel_if_no_times()
-
+  def cancel(self, missed_ping=None):
+    self.cancel_time_only(missed_ping)
+    self.proposal().cancel_if_no_times() 
+    
   def confirm_wait(self, start_now=True):
     if start_now:
       self.proptime_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
@@ -602,6 +599,8 @@ class ProposalTime():
                                                           expire_date=port_time.expire_date,
                                                           current=True,
                                                           cancelled=False,
+                                                          users_accepting=[]
+                                                          jitsi_code=""
                                                           missed_pings=0,
                                                          )).confirm_wait(port_time.start_now)
   
@@ -609,6 +608,16 @@ class ProposalTime():
   def get_by_id(time_id):
     return ProposalTime(app_tables.proposal_times.get_by_id(time_id))
 
+  @staticmethod
+  def get_now(user):
+    current_row = get_now_proposal_time(user)
+    if not current_row:
+      current_row = _get_now_accept(user)
+    if current_row:
+      return ProposalTime(current_row)
+    else:
+      return None
+  
   @staticmethod
   def none_left(prop_row):
     return len(app_tables.proposal_times.search(cancelled=False, proposal=prop_row))==0
@@ -643,7 +652,10 @@ class Proposal():
 
   def pinged_email(self): 
     sm.pinged_email(self.prop_row['user'])
- 
+
+  def proposer_is(self, user):
+    return user == self.prop_row['user']
+    
   def cancel_if_no_times(self):
     if ProposalTime.none_left(self.prop_row):
       self.prop_row['current'] = False
