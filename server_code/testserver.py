@@ -34,9 +34,9 @@ def test_add_request(user_id, port_prop):
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   user = app_tables.users.get_by_id(user_id)
   state, prop_id = matcher._add_proposal(user, port_prop)
-  new_row = app_tables.proposals.get_by_id(prop_id)
+  new_prop = Proposal.get_by_id(prop_id)
   if new_row: 
-    _add_prop_row_to_test_record(new_row)
+    _add_prop_row_to_test_record(new_prop.row())
   return new_row
 
 
@@ -51,11 +51,11 @@ def create_tests_record():
 def add_now_proposal():
   print("add_now_proposal")
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
-  anvil.server.call('add_proposal', portable.Proposal())
   tester = sm.get_user()
-  tester_now_proptime_row = matcher.get_now_proposal_time(tester)
-  if tester_now_proptime_row:
-    _add_prop_row_to_test_record(tester_now_proptime_row['proposal'])
+  anvil.server.call('add_proposal', portable.Proposal(), tester.get_id())
+  tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
+  if tester_now_proptime:
+    _add_prop_row_to_test_record(tester_now_proptime.proposal().row())
     
 
 @authenticated_callable
@@ -63,11 +63,11 @@ def accept_now_proposal(user_id):
   print("accept_now_proposal", user_id)
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   tester = sm.get_user()
-  tester_now_proptime_row = matcher.get_now_proposal_time(tester)
-  if tester_now_proptime_row:
-    state = matcher.accept_proposal(tester_now_proptime_row.get_id(), user_id)
+  tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
+  if tester_now_proptime:
+    state = matcher.accept_proposal(tester_now_proptime.get_id(), user_id)
     if state['status'] in ['pinging', 'matched']:
-      _add_prop_row_to_test_record(tester_now_proptime_row['proposal'])
+      _add_prop_row_to_test_record(tester_now_proptime.proposal().row())
 
     
 def _add_prop_row_to_test_record(prop_row):
@@ -78,8 +78,7 @@ def _add_prop_row_to_test_record(prop_row):
   if prop_row not in test_proposals:
     anvil.server.session['test_record']['test_proposals'] = test_proposals + [prop_row]
     test_times = anvil.server.session['test_record']['test_times']
-    anvil.server.session['test_record']['test_times'] = test_times + list(app_tables.proposal_times.search(cancelled=False, 
-                                                                                                           proposal=prop_row))
+    anvil.server.session['test_record']['test_times'] = test_times + list(matcher.ProposalTime.rows_from_prop_row(prop_row))
  
 
 @authenticated_callable
