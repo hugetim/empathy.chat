@@ -452,19 +452,20 @@ class ProposalTime():
       print("_attempt_accept_proptime")
     state = _get_status(user)
     status = state['status']
-    if status in [None, "requesting"]:
-      if (self._proptime_row['current'] and (not self.is_accepted())
-          and self.proposal().is_visible(user)):
-        self._accept(user, status)
+    if (status in [None, "requesting"] 
+        and self._proptime_row['current'] 
+        and (not self.is_accepted())
+        and self.proposal().is_visible(user)):
+      self._accept(user, status)
    
   def _accept(self, user, status):
     if DEBUG:
       print("_accept_proptime")
     now = sm.now()
-    if status == "requesting":
+    if self.is_now() and status == "requesting":
       own_now_proposal_time = ProposalTime.get_now_proposing(user)
       if own_now_proposal_time:
-        ProposalTime(own_now_proposal_time).cancel()
+        ProposalTime(own_now_proposal_time).proposal().cancel_all_times()
     self._proptime_row['users_accepting'] = [user]
     self._proptime_row['accept_date'] = now
     self._proptime_row['jitsi_code'] = sm.new_jitsi_code()
@@ -554,6 +555,8 @@ class ProposalTime():
                                                           jitsi_code="",
                                                           missed_pings=0,
                                                          )).confirm_wait(port_time.start_now)
+
+  
   
   @staticmethod
   def get_by_id(time_id):
