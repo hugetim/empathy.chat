@@ -508,11 +508,12 @@ class ProposalTime():
     return sm.now() > self._proptime_row['expire_date']
     
   def cancel_time_only(self, missed_ping=None):
+    if self.is_accepted():
+      self.proposal().unhide_times()
     self._proptime_row['current'] = False
     self._proptime_row['cancelled'] = True
     if missed_ping:
-      self._proptime_row['missed_pings'] += 1
-    self.proposal().unhide_times()
+      self._proptime_row['missed_pings'] += 1   
   
   def cancel(self, missed_ping=None):
     self.cancel_time_only(missed_ping)
