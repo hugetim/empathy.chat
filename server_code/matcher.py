@@ -355,7 +355,7 @@ def _match_commenced(user, proptime_id=None):
                                              match_commence=match_start,
                                              complete=[0]*len(users))
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-      current_proptime.cancel()
+      current_proptime.proposal().cancel_all_times()
   return _get_status(user)
 
 
@@ -469,12 +469,14 @@ class ProposalTime():
     self._proptime_row['users_accepting'] = [user]
     self._proptime_row['accept_date'] = now
     self._proptime_row['jitsi_code'] = sm.new_jitsi_code()
+    proposal = self.proposal()
+    proposal.hide_unaccepted_times()
     if (self._proptime_row['expire_date'] 
         - datetime.timedelta(seconds=_seconds_left("requesting")) 
         - now).seconds <= p.BUFFER_SECONDS:
       _match_commenced(user)
     else:
-      self.proposal().pinged_email()
+      proposal.pinged_email()
 
   def in_users_accepting(self, user):
     return self._proptime_row['users_accepting'] and user in self._proptime_row['users_accepting']
@@ -484,6 +486,7 @@ class ProposalTime():
     self._proptime_row['users_accepting'] = []
     self._proptime_row['accept_date'] = None
     self._proptime_row['jitsi_code'] = ""
+    self.proposal().unhide_times()
 
   def cancel_other(self, user):
     if self.in_users_accepting(user):
@@ -514,6 +517,13 @@ class ProposalTime():
   def cancel(self, missed_ping=None):
     self.cancel_time_only(missed_ping)
     self.proposal().cancel_if_no_times() 
+
+  def hide(self):
+    self._proptime_row['current'] = False
+
+  def unhide(self):
+    assert self._proptime_row['cancelled'] == False
+    self._proptime_row['current'] = True
     
   def confirm_wait(self, start_now=True):
     if start_now:
@@ -553,11 +563,11 @@ class ProposalTime():
     return len(app_tables.proposal_times.search(cancelled=False, proposal=prop_row))==0
 
   @staticmethod
-  def _rows_from_prop_row(prop_row, require_current=False):
+  def times_from_proposal(proposal, require_current=False):
     if require_current:
-      return app_tables.proposal_times.search(current=True, proposal=prop_row)
+      for proptime_row in app_tables.proposal_times.search(current=True, proposal=proposal._row())
     else:
-      return app_tables.proposal_times.search(cancelled=False, proposal=prop_row)
+      return app_tables.proposal_times.search(cancelled=False, proposal=proposal._row())
 
   @staticmethod
   def get_now(user):
@@ -640,7 +650,7 @@ class Proposal():
     row_dict['own'] = proposer == user
     row_dict['user'] = port.User.get(proposer)
     row_dict['times'] = [ProposalTime(row).portable() for row 
-                         in ProposalTime._rows_from_prop_row(self._prop_row, require_current=True)]
+                         in ProposalTime.times_from_proposal(self, require_current=True)]
     eligible_users = row_dict.pop('eligible_users')
     row_dict['eligible_users'] = [port.User.get(user) for user in eligible_users]
     assert row_dict['current']
@@ -661,12 +671,29 @@ class Proposal():
   def pinged_email(self): 
     sm.pinged_email(self._prop_row['user'])
 
+  def hide_unaccepted_times(self):
+    for proptime in ProposalTime.times_from_proposal(self, require_current=True):
+      if not proptime.is_accepted():
+        proptime.hide()
+
+  def unhide_times(self):
+    for proptime in ProposalTime.times_from_proposal(self):
+      proptime.unhide()  
+    
+  def cancel_prop_only(self):
+    self._prop_row['current'] = False
+    
   def cancel_if_no_times(self):
     if ProposalTime.none_left(self._prop_row):
-      self._prop_row['current'] = False
+      self.cancel_prop_only()
 
+  def cancel_all_times(self):
+    for proptime in ProposalTime.times_from_proposal(self):
+      proptime.cancel_time_only()
+    self.cancel_prop_only()    
+      
   def update(self, port_prop):
-    #self._prop_row['current'] = True
+    self._prop_row['current'] = True
     self._prop_row['last_edited'] = sm.now()
     self._prop_row['eligible'] = port_prop.eligible
     self._prop_row['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id) 
@@ -674,7 +701,7 @@ class Proposal():
     self._prop_row['eligible_groups'] = port_prop.eligible_groups
     ## First cancel removed rows
     new_time_ids = [port_time.time_id for port_time in port_prop.times]
-    for proptime_row in Proposal_Time._rows_from_prop_row(self._prop_row):     
+    for proptime_row in Proposal_Time.times_from_proposal(self):     
       if proptime_row.get_id() not in new_time_ids:
         ProposalTime(proptime_row).cancel()
     ## Then update or add
@@ -683,7 +710,7 @@ class Proposal():
         ProposalTime.get_by_id(port_time.time_id).update(port_time)
       else:
         ProposalTime.add(prop_row=self._prop_row, port_time=port_time)
-  
+             
   @staticmethod
   def add(user, port_prop):
     now = sm.now()
