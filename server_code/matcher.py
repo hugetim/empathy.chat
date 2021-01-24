@@ -214,8 +214,7 @@ def get_code(user_id=""):
   else:
     this_match = current_match(user)
     if this_match:
-      proptime = this_match['proposal_time']
-      return proptime.get_code()
+      return ProposalTime(this_match['proposal_time']).get_code()
   return None, None
 
 
@@ -454,7 +453,7 @@ class ProposalTime():
     state = _get_status(user)
     status = state['status']
     if status in [None, "requesting"]:
-      if (self._proptime_row['current'] and (not self._proptime_row['users_accepting'])
+      if (self._proptime_row['current'] and (not self.is_accepted())
           and self.proposal().is_visible(user)):
         self._accept(user, status)
    
@@ -513,6 +512,7 @@ class ProposalTime():
     self._proptime_row['cancelled'] = True
     if missed_ping:
       self._proptime_row['missed_pings'] += 1
+    self.proposal().unhide_times()
   
   def cancel(self, missed_ping=None):
     self.cancel_time_only(missed_ping)
