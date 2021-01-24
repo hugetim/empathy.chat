@@ -78,7 +78,9 @@ def _add_prop_row_to_test_record(prop_row):
   if prop_row not in test_proposals:
     anvil.server.session['test_record']['test_proposals'] = test_proposals + [prop_row]
     test_times = anvil.server.session['test_record']['test_times']
-    anvil.server.session['test_record']['test_times'] = test_times + list(matcher.ProposalTime.rows_from_prop_row(prop_row))
+    proptimes = matcher.ProposalTime.times_from_proposal(matcher.Proposal(prop_row))
+    anvil.server.session['test_record']['test_times'] = test_times + [proptime._row() 
+                                                                      for proptime in proptimes]
  
 
 @authenticated_callable

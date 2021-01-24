@@ -541,8 +541,8 @@ class ProposalTime():
     self._proptime_row['cancelled'] = False
     
   @staticmethod
-  def add(prop_row, port_time):
-    return ProposalTime(app_tables.proposal_times.add_row(proposal=prop_row,
+  def add(proposal, port_time):
+    return ProposalTime(app_tables.proposal_times.add_row(proposal=proposal._row(),
                                                           start_now=port_time.start_now,
                                                           start_date=port_time.start_date,
                                                           duration=port_time.duration,
@@ -565,9 +565,13 @@ class ProposalTime():
   @staticmethod
   def times_from_proposal(proposal, require_current=False):
     if require_current:
-      for proptime_row in app_tables.proposal_times.search(current=True, proposal=proposal._row())
+      for proptime_row in app_tables.proposal_times.search(current=True, 
+                                                           proposal=proposal._row()):
+        yield ProposalTime(proptime_row)
     else:
-      return app_tables.proposal_times.search(cancelled=False, proposal=proposal._row())
+      for proptime_row in app_tables.proposal_times.search(cancelled=False, 
+                                                           proposal=proposal._row()):
+        yield ProposalTime(proptime_row)
 
   @staticmethod
   def get_now(user):
@@ -649,7 +653,7 @@ class Proposal():
     proposer = row_dict.pop('user')
     row_dict['own'] = proposer == user
     row_dict['user'] = port.User.get(proposer)
-    row_dict['times'] = [ProposalTime(row).portable() for row 
+    row_dict['times'] = [proptime.portable() for proptime
                          in ProposalTime.times_from_proposal(self, require_current=True)]
     eligible_users = row_dict.pop('eligible_users')
     row_dict['eligible_users'] = [port.User.get(user) for user in eligible_users]
@@ -701,15 +705,15 @@ class Proposal():
     self._prop_row['eligible_groups'] = port_prop.eligible_groups
     ## First cancel removed rows
     new_time_ids = [port_time.time_id for port_time in port_prop.times]
-    for proptime_row in Proposal_Time.times_from_proposal(self):     
-      if proptime_row.get_id() not in new_time_ids:
-        ProposalTime(proptime_row).cancel()
+    for proptime in ProposalTime.times_from_proposal(self):
+      if proptime.get_id() not in new_time_ids:
+        proptime.cancel()
     ## Then update or add
     for port_time in port_prop.times:
       if port_time.time_id:
         ProposalTime.get_by_id(port_time.time_id).update(port_time)
       else:
-        ProposalTime.add(prop_row=self._prop_row, port_time=port_time)
+        ProposalTime.add(proposal=self, port_time=port_time)
              
   @staticmethod
   def add(user, port_prop):
@@ -723,9 +727,10 @@ class Proposal():
                                                 eligible_users=user_rows,
                                                 eligible_groups=port_prop.eligible_groups,
                                                )
+    new_proposal = Proposal(new_prop_row)
     for port_time in port_prop.times:
-      ProposalTime.add(prop_row=new_prop_row, port_time=port_time)
-    return Proposal(new_prop_row)
+      ProposalTime.add(proposal=new_proposal, port_time=port_time)
+    return new_proposal
   
   @staticmethod
   def get_by_id(prop_id):
