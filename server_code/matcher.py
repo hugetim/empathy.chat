@@ -429,9 +429,9 @@ def match_complete(user_id=""):
 
 def current_match(user):
   this_match = None
-  now_minus = sm.now() - datetime.timedelta(minutes=p.START_EARLY_MINUTES)
+  now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
   current_matches = app_tables.matches.search(users=[user], complete=[0],
-                                              match_commence=q.less_than_or_equal_to(now_minus))
+                                              match_commence=q.less_than_or_equal_to(now_plus))
   for row in current_matches:
     i = row['users'].index(user)
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
@@ -442,9 +442,9 @@ def current_match(user):
 
 def current_match_i(user):
   this_match = None
-  now_minus = sm.now() - datetime.timedelta(minutes=p.START_EARLY_MINUTES)
+  now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
   current_matches = app_tables.matches.search(users=[user], complete=[0],
-                                              match_commence=q.less_than_or_equal_to(now_minus))
+                                              match_commence=q.less_than_or_equal_to(now_plus))
   for row in current_matches:
     i = row['users'].index(user)
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
