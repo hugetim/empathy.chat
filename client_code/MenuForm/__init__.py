@@ -43,15 +43,12 @@ class MenuForm(MenuFormTemplate):
   def reset_status(self, state):
     """Update form according to current state variables"""
     if state['status'] in ["pinging"]:
-      state_vars = {'status', 'seconds_left'}
-      self.go_wait(item={k: state[k] for k in state_vars})
-    elif state['status'] == "matched":
-      state_vars = {}
-      self.go_match(item={k: state[k] for k in state_vars})
+      self.go_wait(state)
+    elif state['status'] == "matched":   
+      self.go_match(state)
     else:
       assert state['status'] in [None, "requesting", "pinged"]
-      state_vars = {'status', 'seconds_left', 'proposals', 'upcomings'}
-      self.go_dash(item={k: state[k] for k in state_vars}) 
+      self.go_dash(state) 
 
   def clear_page(self):
     self.link_bar_home.visible = True
@@ -68,25 +65,28 @@ class MenuForm(MenuFormTemplate):
     self.content = content
     self.content_column_panel.add_component(self.content)  
     
-  def go_dash(self, item):
+  def go_dash(self, state):
     self.title_label.text = "Dashboard"
+    item = {k: state[k] for k in DashForm.state_keys}
     self.reset_and_load(DashForm(item=item))
     self.home_link.role = "selected"
 
-  def go_match(self, item):
+  def go_match(self, state):
     self.title_label.text = "Chat"
     self.link_bar_home.visible = False
     self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
+    item = {k: state[k] for k in MatchForm.state_keys}
     self.reset_and_load(MatchForm(item=item))
 
-  def go_wait(self, item):
+  def go_wait(self, state):
     self.title_label.text = "Chat"
     self.link_bar_home.visible = False
     self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
+    item = {k: state[k] for k in WaitForm.state_keys}
     self.reset_and_load(WaitForm(item=item))
 
   def go_connections(self):

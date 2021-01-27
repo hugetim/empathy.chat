@@ -9,6 +9,8 @@ from ... import parameters as p
 
 
 class DashForm(DashFormTemplate):
+  state_keys = {'status', 'seconds_left', 'proposals', 'upcomings'}
+  
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)

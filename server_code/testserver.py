@@ -70,7 +70,7 @@ def accept_now_proposal(user_id):
 
     
 def _add_prop_row_to_test_record(prop_row):
-  print("_prop_row_to_test_record", prop_row['created'])
+  print("_add_prop_row_to_test_record", prop_row['created'])
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
   test_proposals = anvil.server.session['test_record']['test_proposals']

@@ -624,10 +624,16 @@ class ProposalTime():
                                                          )).confirm_wait(port_time.start_now)
 
   
+  @staticmethod
+  def _return(proptime_row):
+    if proptime_row:
+      return ProposalTime(proptime_row)
+    else:
+      return None
   
   @staticmethod
   def get_by_id(time_id):
-    return ProposalTime(app_tables.proposal_times.get_by_id(time_id))
+    return ProposalTime._return(app_tables.proposal_times.get_by_id(time_id))
   
   @staticmethod
   def none_left(prop_row):
@@ -649,17 +655,14 @@ class ProposalTime():
     current_proptime = ProposalTime.get_now_proposing(user)
     if not current_proptime:
       current_proptime = ProposalTime.get_now_accepting(user)
-    if current_proptime:
-      return current_proptime
-    else:
-      return None  
+    return current_proptime
     
   @staticmethod
   def get_now_proposing(user):
     """Return user's current 'start_now' proposal_times row"""
     if DEBUG:
       print("get_now_proposal_time")
-    current_prop_rows = Proposal.get_current_prop_rows(user)
+    current_prop_rows = Proposal._get_current_prop_rows(user)
     for prop_row in current_prop_rows:
       trial_get = app_tables.proposal_times.get(proposal=prop_row,
                                                 current=True,
@@ -678,10 +681,7 @@ class ProposalTime():
                                                  current=True,
                                                  start_now=True,
                                                 )
-    if proptime_row:
-      return ProposalTime(proptime_row)
-    else:
-      return None
+    return ProposalTime._return(proptime_row)
 
   @staticmethod
   def old_to_prune(now):
@@ -805,10 +805,14 @@ class Proposal():
   
   @staticmethod
   def get_by_id(prop_id):
-    return Proposal(app_tables.proposals.get_by_id(prop_id))
+    prop_row = app_tables.proposals.get_by_id(prop_id)
+    if prop_row:
+      return Proposal(prop_row)
+    else:
+      return None
 
   @staticmethod
-  def get_current_prop_rows(user):
+  def _get_current_prop_rows(user):
     return app_tables.proposals.search(user=user, current=True)
   
   @staticmethod

@@ -5,6 +5,8 @@ from .MyJitsi import MyJitsi
 
 
 class MatchForm(MatchFormTemplate):
+  state_keys = {}
+  
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
