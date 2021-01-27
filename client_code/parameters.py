@@ -8,3 +8,4 @@ URL_WITH_ALT = "https://www.empathyspot.org (or https://minty-sarcastic-telephon
 URL = "https://www.empathyspot.org"
 SELECTED_TAB_COLOR = "theme:White"
 NONSELECTED_TAB_COLOR = "theme:Gray 200"
+START_EARLY_MINUTES = 5

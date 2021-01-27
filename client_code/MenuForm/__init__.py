@@ -50,7 +50,7 @@ class MenuForm(MenuFormTemplate):
       self.go_match(item={k: state[k] for k in state_vars})
     else:
       assert state['status'] in [None, "requesting", "pinged"]
-      state_vars = {'status', 'seconds_left', 'proposals'}
+      state_vars = {'status', 'seconds_left', 'proposals', 'upcomings'}
       self.go_dash(item={k: state[k] for k in state_vars}) 
 
   def clear_page(self):

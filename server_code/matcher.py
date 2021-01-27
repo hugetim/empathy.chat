@@ -109,6 +109,7 @@ def init():
           'status': state['status'],
           'seconds_left': state['seconds_left'],
           'proposals': state['proposals'],
+          'upcomings': state['upcomings'],
           'email_in_list': email_in_list,
           'name': name,
          }
@@ -184,9 +185,11 @@ def _get_status(user):
         status = None
         proposals = Proposal.get_port_proposals(user)
         upcomings = _get_upcomings(user)
+  print(len(upcomings))
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
           'proposals': proposals,
+          'upcomings': upcomings,
          }
 
 
@@ -194,14 +197,15 @@ def has_status(user):
   """
   returns bool(current_status)
   """
-  current_proptime = ProposalTime.get_now(user)
-  if current_proptime:
-    return True
-  else:
-    this_match = current_match(user)
-    if this_match:
-      return True
-  return False
+  return bool(_get_status(user))
+#   current_proptime = ProposalTime.get_now(user)
+#   if current_proptime:
+#     return True
+#   else:
+#     this_match = current_match(user)
+#     if this_match:
+#       return True
+#   return False
 
 
 def _get_upcomings(user):
@@ -209,13 +213,15 @@ def _get_upcomings(user):
     
     Side effects: prune proposals
     """
+    if DEBUG:
+      print("_get_upcomings")
     match_dicts = []
     now = sm.now()
     for match in app_tables.matches.search(users=[user], 
-                                           match_commence=q.less_than(now)):
-      other_names = [u['name'] for u in match['users']
+                                           match_commence=q.greater_than(now)):
+      port_users = [port.User(user_id=u.get_id(), name=u['name']) for u in match['users']
                      if u != user]
-      match_dict = {'users': other_names,
+      match_dict = {'port_users': port_users,
                     'start_date': match['match_commence'],
                     'duration_minutes': ProposalTime(match['proposal_time']).get_duration(),
                     'match_id': match.get_id(),
@@ -423,7 +429,9 @@ def match_complete(user_id=""):
 
 def current_match(user):
   this_match = None
-  current_matches = app_tables.matches.search(users=[user], complete=[0])
+  now_minus = sm.now() - datetime.timedelta(minutes=p.START_EARLY_MINUTES)
+  current_matches = app_tables.matches.search(users=[user], complete=[0],
+                                              match_commence=q.less_than_or_equal_to(now_minus))
   for row in current_matches:
     i = row['users'].index(user)
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
@@ -434,7 +442,9 @@ def current_match(user):
 
 def current_match_i(user):
   this_match = None
-  current_matches = app_tables.matches.search(users=[user], complete=[0])
+  now_minus = sm.now() - datetime.timedelta(minutes=p.START_EARLY_MINUTES)
+  current_matches = app_tables.matches.search(users=[user], complete=[0],
+                                              match_commence=q.less_than_or_equal_to(now_minus))
   for row in current_matches:
     i = row['users'].index(user)
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects

@@ -27,7 +27,7 @@ class DashForm(DashFormTemplate):
     if self.item['status'] == "pinged":
       self.confirm_match(self.item['seconds_left'])
     else:
-      #self.update_upcoming_table()
+      self.update_upcoming_table()
       self.update_proposal_table()
       
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
@@ -45,7 +45,7 @@ class DashForm(DashFormTemplate):
   def update_upcoming_table(self):
     """Update form based on upcoming state"""
     self.upcoming_repeating_panel.items = self.item['upcomings']
-    self.upcoming_data_grid.visible = bool(self.item['upcomings'])    
+    self.upcoming_column_panel.visible = bool(self.item['upcomings'])    
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
@@ -98,6 +98,7 @@ class DashForm(DashFormTemplate):
       
   def update_status(self, state):
     self.item['proposals'] = state['proposals']
+    self.item['upcomings'] = state['upcomings']
     self.set_seconds_left(state['status'], state['seconds_left'])
     if self.item['status'] in [None, "requesting", "pinged"]:
       self.update_form()
