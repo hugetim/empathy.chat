@@ -35,7 +35,7 @@ class MenuForm(MenuFormTemplate):
             dismissible=False)
     elif e == True:
       alert("Welcome, " + n + "!")
-    self.test_mode.visible = self.item('test_mode')
+    self.test_mode.visible = self.item['test_mode']
     self.set_test_link()
     self.reset_status(self.item['state'])
 
