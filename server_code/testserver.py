@@ -34,10 +34,9 @@ def test_add_request(user_id, port_prop):
   assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
   user = app_tables.users.get_by_id(user_id)
   state, prop_id = matcher._add_proposal(user, port_prop)
-  new_prop = Proposal.get_by_id(prop_id)
-  if new_row: 
+  new_prop = matcher.Proposal.get_by_id(prop_id)
+  if new_prop: 
     _add_prop_row_to_test_record(new_prop._row())
-  return new_row
 
 
 def create_tests_record():

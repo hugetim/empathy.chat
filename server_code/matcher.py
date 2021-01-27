@@ -100,7 +100,7 @@ def init():
   if state['status'] == 'pinged' and state['seconds_left'] <= 0:
     state = _cancel(user)
   elif state['status'] == 'pinged':
-    state = _match_commenced(user)
+    state = _match_commit(user)
   elif state['status'] == 'pinging' and state['seconds_left'] <= 0:
     state = _cancel_other(user)
   if state['status'] in ('requesting', 'pinged', 'pinging'):
@@ -321,23 +321,23 @@ def cancel_other(proptime_id=None, user_id=""):
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def match_commenced(proptime_id=None, user_id=""):
+def match_commit(proptime_id=None, user_id=""):
   """Return _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
-  print("match_commenced", proptime_id, user_id)
+  print("match_commit", proptime_id, user_id)
   user = sm.get_user(user_id)
-  return _match_commenced(user, proptime_id)
+  return _match_commit(user, proptime_id)
 
 
-def _match_commenced(user, proptime_id=None):
+def _match_commit(user, proptime_id=None):
   """Return _get_status(user)
   Upon first commence, copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
   if DEBUG:
-    print("_match_commenced")
+    print("_match_commit")
   if proptime_id:
     print("proptime_id")
     current_proptime = ProposalTime.get_by_id(proptime_id)
@@ -347,14 +347,20 @@ def _match_commenced(user, proptime_id=None):
     print("current_proptime")
     if current_proptime.is_accepted():
       print("'accepted'")
-      match_start = sm.now()
+      if current_proptime.is_now():
+        match_start = sm.now()
+      else:
+        match_start = current_proptime.get_start_date()
       users = current_proptime.all_users()
       new_match = app_tables.matches.add_row(users=users,
                                              proposal_time=current_proptime._row(),
                                              match_commence=match_start,
                                              complete=[0]*len(users))
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-      current_proptime.proposal().cancel_all_times()
+      proposal = current_proptime.proposal()
+      proposal.cancel_all_times()
+      if not current_proptime.is_now():
+        proposal.pinged_email()
   return _get_status(user)
 
 
@@ -429,6 +435,9 @@ class ProposalTime():
   def is_now(self):
     return self._proptime_row['start_now']
 
+  def get_start_date(self):
+    return self._proptime_row['start_date']
+  
   def get_expire_date(self):
     return self._proptime_row['expire_date']
 
@@ -474,7 +483,7 @@ class ProposalTime():
     if (self._proptime_row['expire_date'] 
         - datetime.timedelta(seconds=_seconds_left("requesting")) 
         - now).seconds <= p.BUFFER_SECONDS:
-      _match_commenced(user)
+      _match_commit(user)
     else:
       proposal.pinged_email()
 

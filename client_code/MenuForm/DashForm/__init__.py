@@ -123,7 +123,7 @@ class DashForm(DashFormTemplate):
                   buttons=[("Yes", True), ("No", False)])
       if out == True:
         #self.item['status'] = "matched"
-        state = anvil.server.call('match_commenced')
+        state = anvil.server.call('match_commit')
       elif out in [False, "timer elapsed"]:
         state = anvil.server.call('cancel')
         if out == "timer elapsed":
