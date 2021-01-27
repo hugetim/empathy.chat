@@ -159,6 +159,7 @@ def _get_status(user):
   expire_date = None
   ping_start = None
   proposals = []
+  upcomings = []
   if current_proptime and current_proptime.is_now():
     expire_date = current_proptime.get_expire_date()
     if current_proptime.is_accepted():
@@ -167,6 +168,7 @@ def _get_status(user):
     else:
       status = "requesting"
       proposals = Proposal.get_port_proposals(user)
+      upcomings = _get_upcomings(user)
   else:
     current_accept_time = ProposalTime.get_now_accepting(user)
     if current_accept_time and current_accept_time.is_accepted():
@@ -181,6 +183,7 @@ def _get_status(user):
       else:
         status = None
         proposals = Proposal.get_port_proposals(user)
+        upcomings = _get_upcomings(user)
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
           'proposals': proposals,
@@ -201,6 +204,46 @@ def has_status(user):
   return False
 
 
+def _get_upcomings(user):
+    """Return list of user's upcoming matches
+    
+    Side effects: prune proposals
+    """
+    match_dicts = []
+    now = sm.now()
+    for match in app_tables.matches.search(users=[user], 
+                                           match_commence=q.less_than(now)):
+      other_names = [u['name'] for u in match['users']
+                     if u != user]
+      match_dict = {'users': other_names,
+                    'start_date': match['match_commence'],
+                    'duration_minutes': ProposalTime(match['proposal_time']).get_duration(),
+                    'match_id': match.get_id(),
+                   }
+      match_dicts.append(match_dict)
+    return match_dicts
+
+  
+def _cancel_match(user, match_id):
+  if DEBUG:
+    print("_cancel_match", match_id)
+  match = app_tables.matches.get_by_id(match_id)
+  if match:
+    match.delete()
+  return _get_status(user)
+
+  
+@authenticated_callable
+@anvil.tables.in_transaction
+def cancel_match(match_id, user_id=""):
+  """Cancel pending match
+  Return _get_status
+  """
+  print("cancel", match_id, user_id)
+  user = sm.get_user(user_id)
+  return _cancel_match(user, match_id)  
+  
+  
 @authenticated_callable
 @anvil.tables.in_transaction
 def get_code(user_id=""):
@@ -444,6 +487,9 @@ class ProposalTime():
   def get_ping_start(self):
     return self._proptime_row['accept_date']
   
+  def get_duration(self):
+    return self._proptime_row['duration']
+  
   def get_code(self):
     return self._proptime_row['jitsi_code'], self._proptime_row['duration']
   
@@ -484,6 +530,8 @@ class ProposalTime():
         - datetime.timedelta(seconds=_seconds_left("requesting")) 
         - now).seconds <= p.BUFFER_SECONDS:
       _match_commit(user)
+    elif not self.is_now():
+      _match_commit(user, self.get_id())
     else:
       proposal.pinged_email()
 

@@ -44,17 +44,8 @@ class DashForm(DashFormTemplate):
 
   def update_upcoming_table(self):
     """Update form based on upcoming state"""
-    if self.item['upcomings']:
-      items = []
-      for prop in self.item['upcomings']:
-        ## Need to add users_accepting
-        for time in prop.times:
-          items.append({'users': prop.user.name, 'prop_time': time, 'prop_id': prop.prop_id,
-                        'own': prop.own})
-      self.upcoming_repeating_panel.items = items
-    else:
-      self.upcoming_repeating_panel.items = []
-    self.upcoming_data_grid.visible = bool(self.upcoming_repeating_panel.items)    
+    self.upcoming_repeating_panel.items = self.item['upcomings']
+    self.upcoming_data_grid.visible = bool(self.item['upcomings'])    
     
   def update_proposal_table(self):
     """Update form based on proposals state"""

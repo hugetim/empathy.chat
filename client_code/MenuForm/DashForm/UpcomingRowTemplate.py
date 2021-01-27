@@ -15,11 +15,8 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     self.init()
 
   def init(self):
-    time = self.item['prop_time']
-    if self.item['own']:
-      self.item['users'] = time['users_accepting']
-    self.item['duration'] = DURATION_TEXT[time.duration]
-    start = time.start_date.astimezone(anvil.tz.tzlocal())
+    self.item['duration'] = DURATION_TEXT[self.item['duration_minutes']]
+    start = item['start_date'].astimezone(anvil.tz.tzlocal())
     self.item['start_time'] = start.strftime("%a, %b %d %I:%M%p")
     self.top_form = get_open_form()
 
@@ -28,6 +25,6 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
       
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.update_dash(anvil.server.call('cancel', 
-                                       self.item['prop_time'].time_id))
+    self.update_dash(anvil.server.call('cancel_match', 
+                                       self.item['match_id']))
 
