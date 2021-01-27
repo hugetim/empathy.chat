@@ -25,9 +25,8 @@ class MenuForm(MenuFormTemplate):
     self.init_components(**properties)
   
     # 'prune' initializes new users to trust level 0 (via '_get_user_info')
-    init_state = self.item.copy()
-    e = init_state.pop('email_in_list')
-    n = init_state.pop('name')
+    e = self.item['email_in_list']
+    n = self.item['name']
     if e == False:
       alert('This account is not yet authorized to match with other users. '
             + 'Instead, it can be used to test things out. Your actions will not impact '
@@ -36,9 +35,9 @@ class MenuForm(MenuFormTemplate):
             dismissible=False)
     elif e == True:
       alert("Welcome, " + n + "!")
-    self.test_mode.visible = init_state.pop('test_mode')
+    self.test_mode.visible = self.item('test_mode')
     self.set_test_link()
-    self.reset_status(init_state)
+    self.reset_status(self.item['state'])
 
   def reset_status(self, state):
     """Update form according to current state variables"""

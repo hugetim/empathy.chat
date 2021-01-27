@@ -18,10 +18,10 @@ class LoginForm(LoginFormTemplate):
     while not anvil.users.get_user():
       anvil.users.login_with_form()
     self.card_1.visible = True
-    self.init_state = anvil.server.call('init')
+    self.init_dict = anvil.server.call('init')
     self.enter_button.visible = True
 
 #   def enter_button_click(self, **event_args):
 #     """This method is called when the button is clicked"""
-    open_form('MenuForm', item=self.init_state)
+    open_form('MenuForm', item=self.init_dict)
 

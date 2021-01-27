@@ -106,12 +106,9 @@ def init():
   if state['status'] in ('requesting', 'pinged', 'pinging'):
     state = confirm_wait_helper(user)
   return {'test_mode': test_mode,
-          'status': state['status'],
-          'seconds_left': state['seconds_left'],
-          'proposals': state['proposals'],
-          'upcomings': state['upcomings'],
           'email_in_list': email_in_list,
           'name': name,
+          'state': state,
          }
 
 
