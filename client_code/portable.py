@@ -116,7 +116,7 @@ class Proposal():
     self.__dict__.update(data)
     self.own = bool(self.own)
           
-  def create_form_item(self, status):
+  def create_form_item(self, status=None):
     """Convert a proposal dictionary to the format of self.item"""
     item = {key: self.__dict__[key] for key in ['prop_id', 'eligible', 'eligible_users', 'eligible_groups']}
     first, *alts = self.times

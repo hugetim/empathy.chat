@@ -57,8 +57,8 @@ class DashForm(DashFormTemplate):
       for prop in self.item['proposals']:
         own_count += prop.own
         for time in prop.times:
-          items.append({'users': prop.user.name, 'prop_time': time, 'prop_id': prop.prop_id,
-                        'own': prop.own, 'prop_num': own_count})
+          items.append({'prop_time': time, 'prop': prop,
+                        'prop_num': own_count})
       self.repeating_panel_1.items = items
     else:
       self.repeating_panel_1.items = []

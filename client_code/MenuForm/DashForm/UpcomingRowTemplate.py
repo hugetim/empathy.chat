@@ -16,9 +16,9 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
 
   def init(self):
     # assumes only dyads allowed
-    self.item['users'] = self.item['port_users'][0].name
-    self.item['duration'] = DURATION_TEXT[self.item['duration_minutes']]
-    start = self.item['start_date'].astimezone(anvil.tz.tzlocal())
+    self.item['users'] = self.item.pop('port_users')[0].name
+    self.item['duration'] = DURATION_TEXT[self.item.pop('duration_minutes')]
+    start = self.item.pop('start_date').astimezone(anvil.tz.tzlocal())
     self.item['start_time'] = start.strftime("%a, %b %d %I:%M%p")
     self.top_form = get_open_form()
 

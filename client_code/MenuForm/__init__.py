@@ -170,7 +170,7 @@ class MenuForm(MenuFormTemplate):
 
   def test_proposal_button_click(self, **event_args):
     user_id = self.test_requestuser_drop_down.selected_value
-    content = CreateForm(item=t.Proposal().create_form_item(self.item['status']))
+    content = CreateForm(item=t.Proposal().create_form_item())
     self.proposal_alert = content
     out = alert(content=self.proposal_alert,
                 title="New Empathy Chat Proposal",
