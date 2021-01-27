@@ -31,7 +31,26 @@ class DashForm(DashFormTemplate):
     else:
       self.update_upcoming_table()
       self.update_proposal_table()
-      
+
+  def update_upcoming_table(self):
+    """Update form based on upcoming state"""
+    self.upcoming_repeating_panel.items = self.item['upcomings']
+    self.upcoming_column_panel.visible = bool(self.item['upcomings'])    
+    
+  def update_proposal_table(self):
+    """Update form based on proposals state"""
+    self.repeating_panel_1.items = self.item['proposals']
+    self.data_grid_1.visible = bool(self.item['proposals'])
+  
+  def update_status(self, state):
+    self.set_seconds_left(state['status'], state['seconds_left'])
+    if self.item['status'] in [None, "requesting", "pinged"]:
+      self.item['proposals'] = state['proposals']
+      self.item['upcomings'] = state['upcomings']
+      self.update_form()
+    else:
+      self.top_form.reset_status(state)
+    
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """Set status and related time variables"""
     if new_status and new_status != "matched":
@@ -44,16 +63,6 @@ class DashForm(DashFormTemplate):
     state = anvil.server.call_s('get_status')
     self.update_status(state)    
 
-  def update_upcoming_table(self):
-    """Update form based on upcoming state"""
-    self.upcoming_repeating_panel.items = self.item['upcomings']
-    self.upcoming_column_panel.visible = bool(self.item['upcomings'])    
-    
-  def update_proposal_table(self):
-    """Update form based on proposals state"""
-    self.repeating_panel_1.items = self.item['proposals']
-    self.data_grid_1.visible = bool(self.item['proposals'])
-  
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     start_now = not bool(self.item['status'])
@@ -88,15 +97,6 @@ class DashForm(DashFormTemplate):
         alert(title='"later" proposals not implemented yet')
       self.update_status(anvil.server.call('edit_proposal', proposal))   
       
-  def update_status(self, state):
-    self.item['proposals'] = state['proposals']
-    self.item['upcomings'] = state['upcomings']
-    self.set_seconds_left(state['status'], state['seconds_left'])
-    if self.item['status'] in [None, "requesting", "pinged"]:
-      self.update_form()
-    else:
-      self.top_form.reset_status(state)
-
   def confirm_match(self, seconds):
     with h.PausedTimer(self.timer_2):
       f = TimerForm(seconds, self.item['status'])

@@ -24,6 +24,13 @@ class WaitForm(WaitFormTemplate):
                               + "to confirm:  "
                               + h.seconds_to_digital(self.item['seconds_left']))
 
+  def reset_status(self, state):
+    """Reset WaitForm status, removing from parent if needed"""
+    old_status = self.item['status']
+    self.set_seconds_left(state['status'], state['seconds_left'])
+    if old_status != state['status']:
+      self.top_form.reset_status(state)
+    
   def set_seconds_left(self, new_status=None, new_seconds_left=None):
     """Set status and related time variables"""
     self.last_5sec = h.now()
@@ -52,21 +59,11 @@ class WaitForm(WaitFormTemplate):
     now=h.now()
     # Run this code approx. once a second
     if self.item['status'] == "pinging" and self.item['seconds_left'] <= 0:
-      state = anvil.server.call('cancel_other')
-      self.set_seconds_left(state['status'], state['seconds_left'])
-      self.top_form.reset_status(state)
+      self.reset_status(anvil.server.call('cancel_other'))
     if (now - self.last_5sec).seconds > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = now
       if self.item['status'] == "pinging":
         state = anvil.server.call_s('get_status')
         if state['status'] != self.item['status']:
-          self.set_seconds_left(state['status'], state['seconds_left'])
-          self.top_form.reset_status(state)    
-      
-  def reset_status(self, state):
-    """Reset WaitForm status, removing from parent if needed"""
-    old_status = self.item['status']
-    self.set_seconds_left(state['status'], state['seconds_left'])
-    if old_status != state['status']:
-      self.top_form.reset_status(state)
+          self.reset_status(state)
