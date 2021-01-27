@@ -824,7 +824,7 @@ class Proposal():
       prop = Proposal(row)
       if prop.is_visible(user):
         port_proposals.append(prop.portable(user))
-    return port_proposals
+    return port.Proposal.create_view_items(port_proposals)
 
   @staticmethod
   def prune_all():

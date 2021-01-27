@@ -124,7 +124,18 @@ class Proposal():
     item.update(first.time_prop_item())
     item['alt'] = [time.time_prop_item() for time in alts]
     return item
-    
+
+  @staticmethod
+  def create_view_items(port_proposals):
+    items = []
+    own_count = 0
+    for prop in port_proposals:
+      own_count += prop.own
+      for time in prop.times:
+        items.append({'prop_time': time, 'prop': prop,
+                      'prop_num': own_count})
+    return items
+  
 #DEFAULT_PROPOSAL = {'start_now': 0,
 #                    'start_date': DEFAULT_START,
 #                    'duration': DURATION_DEFAULT_MINUTES,

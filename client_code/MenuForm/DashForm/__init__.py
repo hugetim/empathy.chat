@@ -51,18 +51,8 @@ class DashForm(DashFormTemplate):
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
-    if self.item['proposals']:
-      items = []
-      own_count = 0
-      for prop in self.item['proposals']:
-        own_count += prop.own
-        for time in prop.times:
-          items.append({'prop_time': time, 'prop': prop,
-                        'prop_num': own_count})
-      self.repeating_panel_1.items = items
-    else:
-      self.repeating_panel_1.items = []
-    self.data_grid_1.visible = bool(self.repeating_panel_1.items)
+    self.repeating_panel_1.items = self.item['proposals']
+    self.data_grid_1.visible = bool(self.item['proposals'])
   
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
