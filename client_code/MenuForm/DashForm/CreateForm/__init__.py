@@ -9,22 +9,11 @@ from datetime import timedelta
 class CreateForm(CreateFormTemplate):
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
-    if not self.item['start_now']:
-      expire_date = (self.item['cancel_date'] if self.item['cancel_buffer'] == "custom"
-                     else (self.item['start_date'] 
-                           - timedelta(minutes=self.item['cancel_buffer'])))
-    else:
-      expire_date = None
-    first_time = t.ProposalTime(start_now=self.item['start_now'],
-                                start_date=self.item['start_date'],
-                                duration=self.item['duration'],
-                                expire_date=expire_date,
-                               )
+    first_time = t.ProposalTime.from_create_form(self.item)
     alts = [CreateForm._alt_proposal_time(alt) for alt in self.item['alt']]
     eligible_users = [t.User(user_id=item[1], name=item[0])
                       for item in self.item['eligible_users']]
     if self.item['prop_id']:
-      first_time.time_id = self.item['time_id']
       return t.Proposal(prop_id=self.item['prop_id'],
                         times=[first_time] + alts,
                         eligible=self.item['eligible'],

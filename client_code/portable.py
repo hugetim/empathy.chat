@@ -69,7 +69,7 @@ class ProposalTime():
     self.__dict__.update(data)
     self.start_now = bool(self.start_now)
 
-  def time_prop_item(self):
+  def create_form_item(self):
     time_dict = {key: self.__dict__[key] for key in ['time_id', 'start_now', 'start_date', 'duration']}
     if self.start_now:
       time_dict['cancel_buffer'] = CANCEL_DEFAULT_MINUTES
@@ -84,6 +84,24 @@ class ProposalTime():
         time_dict['cancel_date'] = self.expire_date    
     return time_dict
 
+  @staticmethod
+  def from_create_form(item):
+    if item['start_now']:
+      expire_date = None
+    else:
+      expire_date = (item['cancel_date'] if item['cancel_buffer'] == "custom"
+                     else (item['start_date'] 
+                           - timedelta(minutes=item['cancel_buffer'])))
+    return ProposalTime(time_id=item.get('time_id', None),
+                        start_now=self.item['start_now'],
+                        start_date=self.item['start_date'],
+                        duration=self.item['duration'],
+                        expire_date=expire_date,
+                        accept_date=item.get('accept_date', None), 
+                        users_accepting=item.get('users_accepting', None), 
+                        jitsi_code=item.get('jitsi_code', None),
+                       )
+  
   @staticmethod  
   def default_start():
     now=h.now()
@@ -121,7 +139,7 @@ class Proposal():
     item = {key: self.__dict__[key] for key in ['prop_id', 'eligible', 'eligible_users', 'eligible_groups']}
     first, *alts = self.times
     item['now_allowed'] = not(status and first.start_now == False)
-    item.update(first.time_prop_item())
+    item.update(first.create_form_item())
     item['alt'] = [time.time_prop_item() for time in alts]
     return item
 
