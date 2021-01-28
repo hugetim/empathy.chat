@@ -69,6 +69,18 @@ class ProposalTime():
     self.__dict__.update(data)
     self.start_now = bool(self.start_now)
 
+  def has_conflict(self, conflict_checks):
+    this = self.get_check_item()
+    for check_item in conflict_checks:
+      if this['start'] < check_item['end'] and check_item['start'] < this['end']:
+        return True
+    return False
+    
+  def get_check_item(self):
+    start = h.now() if self.start_now else self.start_date
+    return {'start': start,
+            'end': start + timedelta(minutes=self.duration)}
+    
   def create_form_item(self):
     time_dict = {key: self.__dict__[key] for key in ['time_id', 'start_now', 'start_date', 'duration']}
     if self.start_now:
@@ -134,15 +146,23 @@ class Proposal():
     self.__dict__.update(data)
     self.own = bool(self.own)
           
-  def create_form_item(self, status=None):
+  def create_form_item(self, status=None, conflict_checks=None):
     """Convert a proposal dictionary to the format of self.item"""
     item = {key: self.__dict__[key] for key in ['prop_id', 'eligible', 'eligible_users', 'eligible_groups']}
     first, *alts = self.times
     item['now_allowed'] = not(status and first.start_now == False)
     item.update(first.create_form_item())
     item['alt'] = [time.time_prop_item() for time in alts]
+    item['conflict_checks'] = conflict_checks
     return item
 
+  def get_check_items(self):
+    items = []
+    if self.own:
+      for time in self.times:
+        items.append(time.get_check_item())
+    return items
+  
   @staticmethod
   def create_view_items(port_proposals):
     items = []

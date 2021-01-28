@@ -6,6 +6,7 @@ from .TimerForm import TimerForm
 from ... import portable as t
 from ... import helper as h
 from ... import parameters as p
+from datetime import timedelta
 
 
 class DashForm(DashFormTemplate):
@@ -63,11 +64,20 @@ class DashForm(DashFormTemplate):
     state = anvil.server.call_s('get_status')
     self.update_status(state)    
 
+  def get_conflict_checks(self):
+    conflict_checks = [{'start': match_dict['start_date'],
+                        'end': (match_dict['start_date']
+                                + timedelta(minutes=match_dict['duration_minutes']))} 
+                       for match_dict in self.item['upcomings']]
+    for port_prop in self.item['proposals']:
+      conflict_checks += port_prop.get_check_items()
+    
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     start_now = not bool(self.item['status'])
     new_prop = t.Proposal(times=[t.ProposalTime(start_now=start_now)])
-    content = CreateForm(item=new_prop.create_form_item(self.item['status']))
+    content = CreateForm(item=new_prop.create_form_item(self.item['status'],
+                                                        self.get_conflict_checks()))
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
                 title="New Empathy Chat Proposal",
@@ -84,7 +94,8 @@ class DashForm(DashFormTemplate):
     """This method is called when the button is clicked"""
     [prop_to_edit] = [prop for prop in self.item['proposals'] 
                       if prop.prop_id == prop_id]
-    content = CreateForm(item=prop_to_edit.create_form_item(self.item['status']))
+    content = CreateForm(item=prop_to_edit.create_form_item(self.item['status'],
+                                                            self.get_conflict_checks()))
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
                 title="Edit Empathy Chat Proposal",
