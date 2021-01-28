@@ -93,9 +93,9 @@ class ProposalTime():
                      else (item['start_date'] 
                            - timedelta(minutes=item['cancel_buffer'])))
     return ProposalTime(time_id=item.get('time_id', None),
-                        start_now=self.item['start_now'],
-                        start_date=self.item['start_date'],
-                        duration=self.item['duration'],
+                        start_now=item['start_now'],
+                        start_date=item['start_date'],
+                        duration=item['duration'],
                         expire_date=expire_date,
                         accept_date=item.get('accept_date', None), 
                         users_accepting=item.get('users_accepting', None), 
