@@ -79,10 +79,13 @@ class ProposalTime():
   def get_check_item(self):
     start = h.now() if self.start_now else self.start_date
     return {'start': start,
-            'end': start + timedelta(minutes=self.duration)}
+            'end': start + datetime.timedelta(minutes=self.duration)}
     
   def create_form_item(self):
-    time_dict = {key: self.__dict__[key] for key in ['time_id', 'start_now', 'start_date', 'duration']}
+    time_dict = {'time_id': self.time_id, 
+                 'start_now': self.start_now, 
+                 'start_date': self.start_date, 
+                 'duration': self.duration}
     if self.start_now:
       time_dict['cancel_buffer'] = CANCEL_DEFAULT_MINUTES
       time_dict['cancel_date'] = None
@@ -98,22 +101,23 @@ class ProposalTime():
 
   @staticmethod
   def from_create_form(item):
-    if item['start_now']:
+    start_now = item.get('start_now', False)
+    if start_now:
       expire_date = None
     else:
       expire_date = (item['cancel_date'] if item['cancel_buffer'] == "custom"
                      else (item['start_date'] 
-                           - timedelta(minutes=item['cancel_buffer'])))
-    return ProposalTime(time_id=item.get('time_id', None),
-                        start_now=item['start_now'],
+                           - datetime.timedelta(minutes=item['cancel_buffer'])))
+    return ProposalTime(time_id=item.get('time_id'),
+                        start_now=start_now,
                         start_date=item['start_date'],
                         duration=item['duration'],
                         expire_date=expire_date,
-                        accept_date=item.get('accept_date', None), 
-                        users_accepting=item.get('users_accepting', None), 
-                        jitsi_code=item.get('jitsi_code', None),
+                        accept_date=item.get('accept_date'), 
+                        users_accepting=item.get('users_accepting'), 
+                        jitsi_code=item.get('jitsi_code'),
                        )
-  
+ 
   @staticmethod  
   def default_start():
     now=h.now()
@@ -145,16 +149,6 @@ class Proposal():
   def __deserialize__(self, data, global_data):
     self.__dict__.update(data)
     self.own = bool(self.own)
-          
-  def create_form_item(self, status=None, conflict_checks=None):
-    """Convert a proposal dictionary to the format of self.item"""
-    item = {key: self.__dict__[key] for key in ['prop_id', 'eligible', 'eligible_users', 'eligible_groups']}
-    first, *alts = self.times
-    item['now_allowed'] = not(status and first.start_now == False)
-    item.update(first.create_form_item())
-    item['alt'] = [time.time_prop_item() for time in alts]
-    item['conflict_checks'] = conflict_checks
-    return item
 
   def get_check_items(self):
     items = []
@@ -162,7 +156,33 @@ class Proposal():
       for time in self.times:
         items.append(time.get_check_item())
     return items
-  
+           
+  def create_form_item(self, status=None, conflict_checks=None):
+    """Convert a proposal dictionary to the format of self.item"""
+    item = {'prop_id': self.prop_id, 
+            'eligible': self.eligible, 
+            'eligible_users': self.eligible_users, 
+            'eligible_groups': self.eligible_groups}
+    first, *alts = self.times
+    item['now_allowed'] = not(status and first.start_now == False)
+    item.update(first.create_form_item())
+    item['alt'] = [time.create_form_item() for time in alts]
+    item['conflict_checks'] = conflict_checks
+    return item
+
+  @staticmethod
+  def from_create_form(item):
+    first_time = ProposalTime.from_create_form(item)
+    alts = [ProposalTime.from_create_form(alt) for alt in item['alt']]
+    eligible_users = item['eligible_users'] #[User(user_id=u[1], name=u[0])
+                      #for u in item['eligible_users']]
+    return Proposal(prop_id=item.get('prop_id'),
+                    times=[first_time] + alts,
+                    eligible=item['eligible'],
+                    eligible_users=eligible_users,
+                    eligible_groups=item['eligible_groups'],
+                   )
+
   @staticmethod
   def create_view_items(port_proposals):
     items = []
@@ -173,6 +193,14 @@ class Proposal():
         items.append({'prop_time': time, 'prop': prop,
                       'prop_num': own_count})
     return items
+  
+  @staticmethod
+  def props_from_view_items(items):
+    props = set()
+    for item in items:
+      props.add(item['prop'])
+    for prop in props:
+      yield prop
   
 #DEFAULT_PROPOSAL = {'start_now': 0,
 #                    'start_date': DEFAULT_START,

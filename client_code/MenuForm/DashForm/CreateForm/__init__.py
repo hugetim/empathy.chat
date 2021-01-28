@@ -9,42 +9,8 @@ from datetime import timedelta
 class CreateForm(CreateFormTemplate):
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
-    first_time = t.ProposalTime.from_create_form(self.item)
-    alts = [CreateForm._alt_proposal_time(alt) for alt in self.item['alt']]
-    eligible_users = [t.User(user_id=item[1], name=item[0])
-                      for item in self.item['eligible_users']]
-    if self.item['prop_id']:
-      return t.Proposal(prop_id=self.item['prop_id'],
-                        times=[first_time] + alts,
-                        eligible=self.item['eligible'],
-                        eligible_users=eligible_users,
-                        eligible_groups=self.item['eligible_groups'],
-                       )
-    else:
-      return t.Proposal(times=[first_time] + alts,
-                        eligible=self.item['eligible'],
-                        eligible_users=eligible_users,
-                        eligible_groups=self.item['eligible_groups'],
-                       )
-
-  @staticmethod
-  def _alt_proposal_time(alt):
-    expire_date = (alt['cancel_date'] if alt['cancel_buffer'] == "custom"
-                   else alt['start_date'] - timedelta(minutes=alt['cancel_buffer']))
-    if alt['time_id']:
-      return t.ProposalTime(time_id=alt['time_id'],
-                            start_now=False,
-                            start_date=alt['start_date'],
-                            duration=alt['duration'],
-                            expire_date=expire_date,
-                           )
-    else:
-      return t.ProposalTime(start_now=False,
-                            start_date=alt['start_date'],
-                            duration=alt['duration'],
-                            expire_date=expire_date,
-                           )
-    
+    return t.Proposal.from_create_form(self.item)
+  
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)

@@ -7,7 +7,7 @@ from ... import portable as t
 from ... import helper as h
 from ... import parameters as p
 from datetime import timedelta
-
+from copy import deepcopy
 
 class DashForm(DashFormTemplate):
   state_keys = {'status', 'seconds_left', 'proposals', 'upcomings'}
@@ -35,12 +35,12 @@ class DashForm(DashFormTemplate):
 
   def update_upcoming_table(self):
     """Update form based on upcoming state"""
-    self.upcoming_repeating_panel.items = self.item['upcomings']
+    self.upcoming_repeating_panel.items = deepcopy(self.item['upcomings'])
     self.upcoming_column_panel.visible = bool(self.item['upcomings'])    
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
-    self.repeating_panel_1.items = self.item['proposals']
+    self.repeating_panel_1.items = deepcopy(self.item['proposals'])
     self.data_grid_1.visible = bool(self.item['proposals'])
   
   def update_status(self, state):
@@ -69,7 +69,7 @@ class DashForm(DashFormTemplate):
                         'end': (match_dict['start_date']
                                 + timedelta(minutes=match_dict['duration_minutes']))} 
                        for match_dict in self.item['upcomings']]
-    for port_prop in self.item['proposals']:
+    for port_prop in t.Proposal.props_from_view_items(self.item['proposals']):
       conflict_checks += port_prop.get_check_items()
     
   def propose_button_click(self, **event_args):
