@@ -110,7 +110,8 @@ class ProposalTime():
     time_dict = {'time_id': self.time_id, 
                  'start_now': self.start_now, 
                  'start_date': self.start_date, 
-                 'duration': self.duration,}
+                 'duration': self.duration,
+                 'save_ready': True,}
     if self.start_now:
       time_dict['cancel_buffer'] = CANCEL_DEFAULT_MINUTES
       time_dict['cancel_date'] = None
@@ -121,7 +122,7 @@ class ProposalTime():
         time_dict['cancel_date'] = None
       else:
         time_dict['cancel_buffer'] = "custom"
-        time_dict['cancel_date'] = self.expire_date    
+        time_dict['cancel_date'] = self.expire_date
     return time_dict
 
   @staticmethod

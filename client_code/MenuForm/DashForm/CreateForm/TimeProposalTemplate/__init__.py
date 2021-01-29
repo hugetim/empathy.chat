@@ -77,7 +77,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     self.label_cancel.visible = False
     messages = self.proptime().get_errors(self.alert_form.item['conflict_checks'])
     if messages:
-      self.alert_form.enable_save(False)
+      self.update_save_ready(False)
       if 'start_date' in messages:
         self.label_start.text = messages['start_date']
         self.label_start.visible = True
@@ -85,8 +85,14 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
         self.label_cancel.text = messages['cancel_buffer']
         self.label_cancel.visible = True
     else:
-      pass #self.alert_form.enable_save(True)
+      self.update_save_ready(True)
 
+  def update_save_ready(self, ready):
+    old = self.item['save_ready']
+    self.item['save_ready'] = ready
+    if ready != old:
+      self.alert_form.update_save_enable()
+      
   def remove_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.parent.raise_event('x-remove', item_to_remove=self.item)

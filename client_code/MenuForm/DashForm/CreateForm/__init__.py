@@ -120,7 +120,7 @@ class CreateForm(CreateFormTemplate):
     self.label_cancel.visible = False
     messages = self.proptime().get_errors(self.item['conflict_checks'])
     if messages:
-      self.enable_save(False)
+      self.update_save_ready(False)
       if 'start_date' in messages:
         self.label_start.text = messages['start_date']
         self.label_start.visible = True
@@ -128,9 +128,17 @@ class CreateForm(CreateFormTemplate):
         self.label_cancel.text = messages['cancel_buffer']
         self.label_cancel.visible = True
     else:
-      self.enable_save(True)
-    
-  def enable_save(self, enabled):
+      self.update_save_ready(True)
+
+  def update_save_ready(self, ready):
+    old = self.item['save_ready']
+    self.item['save_ready'] = ready
+    if ready != old:
+      self.update_save_enable()    
+      
+  def update_save_enable(self):
+    enabled = all([self.item['save_ready']]
+                   + [item['save_ready'] for item in self.item['alt']])
     self.save_button.enabled = enabled
     
   def button_add_alternate_click(self, **event_args):
@@ -146,6 +154,7 @@ class CreateForm(CreateFormTemplate):
                            'cancel_date': None,
                            'time_id': None,
                            'conflict_checks': self.item['conflict_checks'],
+                           'save_ready': True,
                           }]
     else:
       previous_item = self.item['alt'][-1]
@@ -156,6 +165,7 @@ class CreateForm(CreateFormTemplate):
                             'cancel_date': None,
                             'time_id': None,
                             'conflict_checks': self.item['conflict_checks'],
+                            'save_ready': True,
                            }]
     self.update()
       
