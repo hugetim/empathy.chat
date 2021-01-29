@@ -6,6 +6,9 @@ import datetime
 
 
 class TimeProposalTemplate(TimeProposalTemplateTemplate):
+  def proptime(self):
+    return t.ProposalTime.from_create_form(self.item)
+
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
@@ -17,7 +20,6 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
     self.init_date_picker_start()
     self.date_picker_cancel_initialized = False
     
-
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
     self.alert_form = get_open_form().proposal_alert
@@ -73,7 +75,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
   def check_times(self):
     self.label_start.visible = False
     self.label_cancel.visible = False
-    messages = t.get_proposal_times_errors(h.now(), self.prop_time_dict())
+    messages = self.proptime().get_errors(self.alert_form.item['conflict_checks'])
     if messages:
       self.alert_form.enable_save(False)
       if 'start_date' in messages:
@@ -83,20 +85,9 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
         self.label_cancel.text = messages['cancel_buffer']
         self.label_cancel.visible = True
     else:
-      self.alert_form.enable_save(True)
-
-  def prop_time_dict(self):
-    time_dict = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
-    time_dict['start_now'] = 0
-    if self.item['cancel_buffer'] != "custom":
-      time_dict['cancel_buffer'] = self.item['cancel_buffer']
-    else:
-      delta = self.item['start_date'] - self.item['cancel_date']
-      time_dict['cancel_buffer'] = delta.total_seconds() / 60
-    return time_dict       
+      pass #self.alert_form.enable_save(True)
 
   def remove_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.parent.raise_event('x-remove', item_to_remove=self.item)
     self.remove_from_parent()
-

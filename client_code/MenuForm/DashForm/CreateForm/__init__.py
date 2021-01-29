@@ -10,6 +10,9 @@ class CreateForm(CreateFormTemplate):
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
     return t.Proposal.from_create_form(self.item)
+
+  def proptime(self):
+    return t.ProposalTime.from_create_form(self.item)
   
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
@@ -83,7 +86,7 @@ class CreateForm(CreateFormTemplate):
         self.date_picker_cancel.visible = True
       else:
         self.date_picker_cancel.visible = False
-      self.check_times()
+    self.check_times()
     self.refresh_data_bindings()
 
   def update_eligible(self):
@@ -115,7 +118,7 @@ class CreateForm(CreateFormTemplate):
   def check_times(self):
     self.label_start.visible = False
     self.label_cancel.visible = False
-    messages = t.get_proposal_times_errors(h.now(), self.prop_time_dict())
+    messages = self.proptime().get_errors(self.item['conflict_checks'])
     if messages:
       self.enable_save(False)
       if 'start_date' in messages:
@@ -126,16 +129,7 @@ class CreateForm(CreateFormTemplate):
         self.label_cancel.visible = True
     else:
       self.enable_save(True)
-
-  def prop_time_dict(self):
-    time_dict = {key: value for (key, value) in self.item.items() if key not in ['cancel_buffer']}
-    if self.item['cancel_buffer'] != "custom":
-      time_dict['cancel_buffer'] = self.item['cancel_buffer']
-    else:
-      delta = self.item['start_date'] - self.item['cancel_date']
-      time_dict['cancel_buffer'] = delta.total_seconds() / 60
-    return time_dict   
-      
+    
   def enable_save(self, enabled):
     self.save_button.enabled = enabled
     
@@ -151,6 +145,7 @@ class CreateForm(CreateFormTemplate):
                            'cancel_buffer': self.item['cancel_buffer'],
                            'cancel_date': None,
                            'time_id': None,
+                           'conflict_checks': self.item['conflict_checks'],
                           }]
     else:
       previous_item = self.item['alt'][-1]
@@ -160,6 +155,7 @@ class CreateForm(CreateFormTemplate):
                             'cancel_buffer': previous_item['cancel_buffer'],
                             'cancel_date': None,
                             'time_id': None,
+                            'conflict_checks': self.item['conflict_checks'],
                            }]
     self.update()
       

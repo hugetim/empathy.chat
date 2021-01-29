@@ -81,7 +81,7 @@ class ProposalTime():
     return {'start': start,
             'end': start + datetime.timedelta(minutes=self.duration)}
 
-  def get_errors(self):
+  def get_errors(self, conflict_checks=None):
     """Return a dictionary of errors
     >>>(ProposalTime(start_now=False, start_date= h.now()).get_errors()
         == {'start_date': ("The Start Time must be at least " 
@@ -110,7 +110,7 @@ class ProposalTime():
     time_dict = {'time_id': self.time_id, 
                  'start_now': self.start_now, 
                  'start_date': self.start_date, 
-                 'duration': self.duration}
+                 'duration': self.duration,}
     if self.start_now:
       time_dict['cancel_buffer'] = CANCEL_DEFAULT_MINUTES
       time_dict['cancel_date'] = None
@@ -187,12 +187,12 @@ class Proposal():
     item = {'prop_id': self.prop_id, 
             'eligible': self.eligible, 
             'eligible_users': self.eligible_users, 
-            'eligible_groups': self.eligible_groups}
+            'eligible_groups': self.eligible_groups,
+            'conflict_checks': conflict_checks,}
     first, *alts = self.times
     item['now_allowed'] = not(status and first.start_now == False)
     item.update(first.create_form_item())
     item['alt'] = [time.create_form_item() for time in alts]
-    item['conflict_checks'] = conflict_checks
     return item
 
   @staticmethod
