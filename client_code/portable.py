@@ -80,7 +80,32 @@ class ProposalTime():
     start = h.now() if self.start_now else self.start_date
     return {'start': start,
             'end': start + datetime.timedelta(minutes=self.duration)}
-    
+
+  def get_errors(self):
+    """Return a dictionary of errors
+    >>>(ProposalTime(start_now=False, start_date= h.now()).get_errors()
+        == {'start_date': ("The Start Time must be at least " 
+                          + str(CANCEL_MIN_MINUTES) + " minutes away.")}
+    True
+    """
+    now = h.now()
+    messages = {}
+    if not self.start_now:
+      if self.start_date < (now + datetime.timedelta(minutes=CANCEL_MIN_MINUTES)):
+        messages['start_date'] = ("The Start Time must be at least " 
+                                  + str(CANCEL_MIN_MINUTES) + " minutes away.")
+      else:
+        if self.expire_date < now:
+          messages['cancel_buffer'] = 'The specified "Cancel" time has already passed.'
+        elif self.expire_date > self.start_date:
+          messages['cancel_buffer'] = ('The "Cancel" time must be prior to the Start Time (by at least '
+                                      + str(CANCEL_MIN_MINUTES) + ' minutes).')
+        elif self.expire_date > (self.start_date 
+                                 - datetime.timedelta(minutes=CANCEL_MIN_MINUTES)):
+          messages['cancel_buffer'] = ('The "Cancel" time must be at least ' 
+                                      + str(CANCEL_MIN_MINUTES) + ' minutes prior to the Start Time.')
+    return messages
+  
   def create_form_item(self):
     time_dict = {'time_id': self.time_id, 
                  'start_now': self.start_now, 
@@ -156,7 +181,7 @@ class Proposal():
       for time in self.times:
         items.append(time.get_check_item())
     return items
-           
+  
   def create_form_item(self, status=None, conflict_checks=None):
     """Convert a proposal dictionary to the format of self.item"""
     item = {'prop_id': self.prop_id, 
