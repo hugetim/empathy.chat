@@ -26,7 +26,7 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_link.text = jitsi_code
     self.jitsi_link.visible = True
     if not self.jitsi_embed:
-      self.jitsi_embed = MyJitsi(jitsi_code)
+      self.jitsi_embed = MyJitsi(item={'room_name': jitsi_code, 'name': self.top_form.item['name']})
       self.jitsi_column_panel.add_component(self.jitsi_embed)
     self.jitsi_column_panel.visible = True
     self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
