@@ -1,5 +1,7 @@
 from ._anvil_designer import ConnectionsMenuTemplate
 from anvil import *
+import anvil.google.auth, anvil.google.drive
+from anvil.google.drive import app_files
 import anvil.server
 from .Connections import Connections
 from .Blocks import Blocks

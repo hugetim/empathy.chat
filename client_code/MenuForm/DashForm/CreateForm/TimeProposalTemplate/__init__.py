@@ -1,5 +1,7 @@
 from ._anvil_designer import TimeProposalTemplateTemplate
 from anvil import *
+import anvil.google.auth, anvil.google.drive
+from anvil.google.drive import app_files
 from ..... import helper as h
 from ..... import portable as t
 import datetime
