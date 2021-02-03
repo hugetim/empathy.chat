@@ -7,7 +7,6 @@ from anvil.tables import app_tables
 import anvil.secrets
 import datetime
 import random
-import uuid
 import re
 from . import parameters as p
 from . import helper as h
