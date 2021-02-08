@@ -87,7 +87,8 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
         self.label_cancel.text = messages['cancel_buffer']
         self.label_cancel.visible = True
     else:
-      self.update_save_ready(True)
+      self.update_save_ready(T
+                             rue)
 
   def update_save_ready(self, ready):
     old = self.item['save_ready']
