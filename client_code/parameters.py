@@ -1,5 +1,3 @@
-import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
 BUFFER_SECONDS = 7
 CONFIRM_MATCH_SECONDS = 60 #15
 WAIT_SECONDS = 60*20 #55
