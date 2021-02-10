@@ -13,7 +13,7 @@ from . import portable as port
 
 authenticated_callable = anvil.server.callable(require_user=True)
 TEST_TRUST_LEVEL = 10
-DEBUG = True
+DEBUG = False
 
 
 def _seconds_left(status, expire_date=None, ping_start=None):
@@ -184,7 +184,6 @@ def _get_status(user):
         status = None
         proposals = Proposal.get_port_proposals(user)
         upcomings = _get_upcomings(user)
-  print(len(upcomings))
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
           'proposals': proposals,
