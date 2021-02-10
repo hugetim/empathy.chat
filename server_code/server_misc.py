@@ -76,7 +76,7 @@ def get_user_info(user):
   """Return user info, initializing info for new users"""
   trust = user['trust_level']
   if trust is None:
-    user['trust_level'] = 0
+    user['trust_level'] = 1
     user['request_em'] = False
     user['pinged_em'] = False
     user['request_em_settings'] = {"fixed": 0, "hours": 2}
