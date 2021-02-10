@@ -222,7 +222,7 @@ components:
       tooltip: ''
       placeholder: ''
       border: ''
-      enabled: true
+      enabled: false
       foreground: ''
       items: [drop_down_eligible (items set at runtime)]
       visible: true
