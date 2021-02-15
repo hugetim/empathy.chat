@@ -72,7 +72,7 @@ components:
       event_bindings: {click: home_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: My Network, font_size: null, wrap_on: mobile,
+          500', visible: false, text: My Network, font_size: null, wrap_on: mobile,
         font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:users'}
@@ -82,7 +82,7 @@ components:
       event_bindings: {click: connections_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: Groups, font_size: null, wrap_on: mobile, font: '',
+          500', visible: false, text: Groups, font_size: null, wrap_on: mobile, font: '',
         col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:globe'}
@@ -92,7 +92,7 @@ components:
       event_bindings: {click: groups_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: My Groups, font_size: null, wrap_on: mobile,
+          500', visible: false, text: My Groups, font_size: null, wrap_on: mobile,
         font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:shield'}
@@ -102,7 +102,7 @@ components:
       event_bindings: {click: my_groups_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: Profile, font_size: null, wrap_on: mobile, font: '',
+          500', visible: false, text: Profile, font_size: null, wrap_on: mobile, font: '',
         col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:user'}
@@ -112,8 +112,8 @@ components:
       event_bindings: {click: profile_link_click}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: Settings, font_size: null, wrap_on: mobile, font: '',
-        col_spacing: medium, spacing_above: medium, icon_align: left, col_widths: '',
+          500', visible: false, text: Settings, font_size: null, wrap_on: mobile,
+        font: '', col_spacing: medium, spacing_above: medium, icon_align: left, col_widths: '',
         spacing_below: small, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:cog'}
       name: settings_link
@@ -180,9 +180,9 @@ components:
       event_bindings: {}
   - type: Button
     properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: 'Log out                  ', font_size: 13,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:sign-out'}
+      foreground: 'theme:Secondary 500', visible: true, text: 'Log out                  ',
+      font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: 'fa:sign-out'}
     name: logout_button
     layout_properties: {grid_position: 'ASDYYZ,SAIRCP'}
     event_bindings: {click: logout_button_click}

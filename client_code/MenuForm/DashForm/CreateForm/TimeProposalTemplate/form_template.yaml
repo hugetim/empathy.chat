@@ -127,9 +127,9 @@ components:
     event_bindings: {}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:trash'}
+      foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null,
+      font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: 'fa:trash'}
     name: remove_button
     layout_properties: {}
     event_bindings: {click: remove_button_click}
