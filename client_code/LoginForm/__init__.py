@@ -5,6 +5,7 @@ from anvil.google.drive import app_files
 import anvil.users
 from .. import rosenberg
 from datetime import date
+from .. import parameters
 
 
 class LoginForm(LoginFormTemplate):
@@ -21,7 +22,10 @@ class LoginForm(LoginFormTemplate):
       anvil.users.login_with_form()
     self.card_1.visible = True
     self.init_dict = anvil.server.call('init')
-    self.enter_button.visible = True
+    if parameters.TEST_MODE:
+      self.enter_button_click()
+    else:
+      self.enter_button.visible = True
 
   def enter_button_click(self, **event_args):
     """This method is called when the button is clicked"""
