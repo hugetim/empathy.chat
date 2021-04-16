@@ -3,6 +3,8 @@ dependencies:
   version: {dev: false}
 - app_id: RUNLHYPKGVUNP7HZ
   version: {dev: false}
+- app_id: MFQJNLWQIOGGXL4W
+  version: {dev: false}
 services:
 - source: /runtime/services/anvil/users.yml
   client_config: {use_microsoft: false, require_secure_passwords: true, use_email: true,
@@ -66,6 +68,10 @@ db_schema:
       name: email
       type: string
       admin_ui: {order: 0, width: 200}
+    _mqNTfEFbZ8=:
+      name: n_password_failures
+      type: number
+      admin_ui: {order: 15, width: 200}
     gkmtmubESt4=:
       name: last_request_em
       type: datetime
