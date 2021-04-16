@@ -5,7 +5,7 @@ components:
   layout_properties: {slot: default}
   components:
   - type: ColumnPanel
-    properties: {role: card, col_widths: '{"KEDGKD":3,"QOBJSC":72,"VIBZLT":5}'}
+    properties: {role: card, col_widths: '{"QOBJSC":72}'}
     name: card_1
     layout_properties: {grid_position: 'APRVOR,LSQCPI'}
     components:
@@ -33,25 +33,16 @@ components:
       layout_properties: {grid_position: 'NNVOAA,WHQCIL'}
       event_bindings: {}
       components: []
-    - type: Spacer
-      properties: {height: 32}
-      name: spacer_1
-      layout_properties: {grid_position: 'MYOOEQ,KEDGKD'}
-      event_bindings: {}
     - type: form:MFQJNLWQIOGGXL4W:slider
       properties:
         value: 5
         minval: 0
         maxval: 10
         step: 1
-        labels: [disconnection / rage (needing empathy), '', self-connection / peace (empathy need met)]
+        labels: [empathy tank empty, '', empathy tank full]
       name: slider_1
       layout_properties: {grid_position: 'MYOOEQ,QOBJSC'}
       event_bindings: {}
-    - type: Spacer
-      properties: {height: 32}
-      name: spacer_2
-      layout_properties: {grid_position: 'MYOOEQ,VIBZLT'}
     - type: ColumnPanel
       properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
