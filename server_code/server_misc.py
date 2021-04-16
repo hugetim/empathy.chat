@@ -68,7 +68,7 @@ def port_eligible_users(others=[]):
 def get_port_eligible_users(user_id=""):
   user = get_user(user_id)
   others = [other for other in app_tables.users.search()
-            if is_visible(other, user)]
+            if (is_visible(other, user) and user['name'] is not None)]
   return port_eligible_users(others)
 
 

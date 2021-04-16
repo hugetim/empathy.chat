@@ -33,6 +33,16 @@ components:
       layout_properties: {grid_position: 'NNVOAA,WHQCIL'}
       event_bindings: {}
       components: []
+    - type: form:MFQJNLWQIOGGXL4W:slider
+      properties:
+        value: 5
+        minval: 0
+        maxval: 10
+        step: 1
+        labels: [disconnection/rage (needing empathy), neutral, self-connection/peace (empathy need met)]
+      name: slider_1
+      layout_properties: {grid_position: 'MYOOEQ,QOBJSC'}
+      event_bindings: {}
     - type: ColumnPanel
       properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
