@@ -4,6 +4,7 @@ import anvil.google.auth, anvil.google.drive
 from anvil.google.drive import app_files
 import anvil.server
 from .MyJitsi import MyJitsi
+from .SliderPanel import SliderPanel
 
 
 class MatchForm(MatchFormTemplate):
@@ -21,6 +22,9 @@ class MatchForm(MatchFormTemplate):
     self.top_form = get_open_form()
     jitsi_code, duration = anvil.server.call('get_code')
     self.set_jitsi_link(jitsi_code)
+    slider_item = {'visible': True, 'status': None, 'my_value': 5, 'their_value': 5}
+    self.slider_panel = SliderPanel(item=slider_item)
+    self.slider_column_panel.add_component(self.slider_panel)
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
@@ -31,7 +35,7 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_embed = MyJitsi(item={'room_name': jitsi_code, 'name': self.top_form.item['name']})
       self.jitsi_column_panel.add_component(self.jitsi_embed)
     self.jitsi_column_panel.visible = True
-    self.chat_repeating_panel.items = anvil.server.call_s('get_messages')
+    self.chat_repeating_panel.items, their_value = anvil.server.call_s('get_messages')
     self.chat_display_card.visible = True
     self.chat_send_card.visible = True
 
@@ -42,7 +46,7 @@ class MatchForm(MatchFormTemplate):
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
     old_items = self.chat_repeating_panel.items
-    new_items = anvil.server.call_s('get_messages')
+    new_items, their_value = anvil.server.call_s('get_messages')
     if len(new_items) > len(old_items):
       self.chat_repeating_panel.items = new_items
       self.call_js('scrollCard')

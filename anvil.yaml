@@ -260,6 +260,10 @@ db_schema:
       backend: anvil.tables.Row
       admin_ui: {order: 3, width: 200}
       table_id: 18972
+    cMuArsMykD4=:
+      name: slider_values
+      type: simpleObject
+      admin_ui: {order: 4, width: 200}
     iBZj3FqDyoY=:
       name: complete
       type: simpleObject

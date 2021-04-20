@@ -121,20 +121,36 @@ def add_message(user_id="", message="[blank]"):
 @authenticated_callable
 def get_messages(user_id=""):
   """
-  Returns iterable of dictionaries with keys: 'me', 'message'
+  Return (iterable of dictionaries with keys: 'me', 'message'), their_value
   """
   user = get_user(user_id)
   return _get_messages(user)
 
 
 def _get_messages(user):
-  this_match = matcher.current_match(user)
+  this_match, i = matcher.current_match_i(user)
+  their_value = this_match['slider_values'][i]
   messages = app_tables.chat.search(match=this_match)
   if messages:
-    return [{'me': (user == m['user']),
-             'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
-            for m in messages]
+    return ([{'me': (user == m['user']),
+              'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
+             for m in messages],
+            their_value)
 
+  
+@authenticated_callable
+def submit_slider(value, user_id=""):
+  """Return their_value"""
+  print("submit_slider", "[redacted]", user_id)
+  user = get_user(user_id)
+  this_match, i = matcher.current_match_i(user)
+  temp_values = this_match['slider_values']
+  temp_values[i] = value
+  this_match['slider_values'] = temp_values # this is not list assignment
+  temp_values.pop(i)
+  assert len(temp_values) == 1              # assumes dyads only
+  return temp_values[0]                     # return the remaining value
+  
 
 def _emails_equal(a, b):
   em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")

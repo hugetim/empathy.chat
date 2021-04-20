@@ -402,7 +402,8 @@ def _match_commit(user, proptime_id=None):
       new_match = app_tables.matches.add_row(users=users,
                                              proposal_time=current_proptime._row(),
                                              match_commence=match_start,
-                                             complete=[0]*len(users))
+                                             complete=[0]*len(users),
+                                             slider_values=[""]*len(users))
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal()
       proposal.cancel_all_times()
