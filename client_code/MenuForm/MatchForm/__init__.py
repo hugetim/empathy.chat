@@ -50,7 +50,10 @@ class MatchForm(MatchFormTemplate):
     if len(new_items) > len(old_items):
       self.chat_repeating_panel.items = new_items
       self.call_js('scrollCard')
-      self.chat_display_card.scroll_into_view()     
+      self.chat_display_card.scroll_into_view()   
+    if their_value:
+      self.slider_panel.receive_value(their_value)
+      
 
   def message_textbox_pressed_enter(self, **event_args):
     temp = anvil.server.call('add_message', message=self.message_textbox.text)

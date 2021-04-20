@@ -19,17 +19,25 @@ class SliderPanel(SliderPanelTemplate):
   def hide_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item['visible'] = False
+    self.refresh_data_bindings()
 
   def submit_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item['status'] = "submitted"
+    self.refresh_data_bindings()
     their_value = anvil.server.call('submit_slider', 
                                     self.my_slider.value)
     if their_value:
-      self.item['their_value'] = their_value
-      self.item['status'] = "received"
+      self.receive_value(their_value)
 
+  def receive_value(self, their_value):
+    self.item['their_value'] = their_value
+    self.item['visible'] = True
+    self.item['status'] = "received"
+    self.refresh_data_bindings()
+      
   def show_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item['visible'] = True
+    self.refresh_data_bindings()
 
