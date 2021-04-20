@@ -19,6 +19,8 @@ components:
     name: my_slider
     layout_properties: {grid_position: 'YBRIZN,NLCFYD'}
     event_bindings: {}
+    data_bindings:
+    - {property: value, code: 'self.item[''my_value'']'}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
@@ -27,6 +29,8 @@ components:
     name: submit_button
     layout_properties: {grid_position: 'YBRIZN,OINZXS IKKFWJ,IDOYES'}
     event_bindings: {}
+    data_bindings:
+    - {property: enabled, code: 'not self.item[''status'']'}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: 'Hide
@@ -45,6 +49,10 @@ components:
       labels: ['']
     name: their_slider
     layout_properties: {grid_position: 'KXEYXE,NHKALN'}
+    data_bindings:
+    - {property: is_visible, code: 'self.item[''status''] == "received"'}
+    - {property: value, code: 'self.item[''their_value'']'}
+    event_bindings: {}
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
       visible: true, text: Waiting for other to submit..., font_size: null, font: '',
@@ -54,4 +62,5 @@ components:
     layout_properties: {grid_position: 'KXEYXE,VSWMDI'}
   data_bindings:
   - {property: visible, code: 'self.item[''visible'']'}
+  event_bindings: {}
 is_package: true

@@ -10,7 +10,12 @@ import anvil.users
 
 class SliderPanel(SliderPanelTemplate):
   def __init__(self, **properties):
-    """self.item assumed to have these keys: 'visible'"""
+    """self.item assumed to have these keys: 
+    'visible',
+    'their_value', default 5
+    'my_value', default 5
+    'status' in [None, 'submitted', 'received']
+    """
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
 
