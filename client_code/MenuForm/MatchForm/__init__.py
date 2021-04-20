@@ -22,9 +22,6 @@ class MatchForm(MatchFormTemplate):
     self.top_form = get_open_form()
     jitsi_code, duration = anvil.server.call('get_code')
     self.set_jitsi_link(jitsi_code)
-    slider_item = {'visible': True, 'status': None, 'my_value': 5, 'their_value': 5}
-    self.slider_panel = SliderPanel(item=slider_item)
-    self.slider_column_panel.add_component(self.slider_panel)
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
@@ -38,6 +35,9 @@ class MatchForm(MatchFormTemplate):
     self.chat_repeating_panel.items, their_value = anvil.server.call_s('get_messages')
     self.chat_display_card.visible = True
     self.chat_send_card.visible = True
+    slider_item = {'visible': True, 'status': None, 'my_value': 5, 'their_value': 5}
+    self.slider_panel = SliderPanel(item=slider_item)
+    self.slider_column_panel.add_component(self.slider_panel)
 
   def chat_display_card_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
