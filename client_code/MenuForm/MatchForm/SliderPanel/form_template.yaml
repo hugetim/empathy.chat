@@ -1,0 +1,57 @@
+container:
+  type: ColumnPanel
+  event_bindings: {}
+components:
+- type: ColumnPanel
+  properties: {col_widths: '{"NLCFYD":50,"OINZXS":10,"NHKALN":50,"VSWMDI":10}'}
+  name: slider_column_panel
+  layout_properties:
+    col_widths: {}
+    grid_position: QBSBSY,HWTLHD
+  components:
+  - type: form:MFQJNLWQIOGGXL4W:slider
+    properties:
+      value: 5
+      minval: 0
+      maxval: 10
+      step: 0.2
+      labels: [Empty, '', Full]
+    name: my_slider
+    layout_properties: {grid_position: 'YBRIZN,NLCFYD'}
+    event_bindings: {}
+  - type: Button
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: submit_button
+    layout_properties: {grid_position: 'YBRIZN,OINZXS IKKFWJ,IDOYES'}
+    event_bindings: {}
+  - type: Button
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: 'Hide
+
+        ', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: ''}
+    name: hide_button
+    layout_properties: {grid_position: 'YBRIZN,OINZXS GLODAL,FOMWST'}
+    event_bindings: {click: hide_button_click}
+  - type: form:MFQJNLWQIOGGXL4W:slider
+    properties:
+      value: 5
+      minval: 0
+      maxval: 10
+      step: 0.2
+      labels: ['']
+    name: their_slider
+    layout_properties: {grid_position: 'KXEYXE,NHKALN'}
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: Waiting for other to submit..., font_size: null, font: '',
+      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: ''}
+    name: label_1
+    layout_properties: {grid_position: 'KXEYXE,VSWMDI'}
+  data_bindings:
+  - {property: visible, code: 'self.item[''visible'']'}
+is_package: true

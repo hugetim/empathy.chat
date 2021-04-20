@@ -34,28 +34,10 @@ components:
       event_bindings: {}
       components: []
     - type: ColumnPanel
-      properties: {col_widths: '{"NLCFYD":50,"OINZXS":10}'}
+      properties: {col_widths: '{}'}
       name: slider_column_panel
       layout_properties: {grid_position: 'UYFDVH,LVXAXL'}
-      components:
-      - type: form:MFQJNLWQIOGGXL4W:slider
-        properties:
-          value: 5
-          minval: 0
-          maxval: 10
-          step: 0.2
-          labels: [Empty, '', Full]
-        name: slider_1
-        layout_properties: {grid_position: 'YBRIZN,NLCFYD'}
-        event_bindings: {}
-      - type: Button
-        properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-          foreground: '', visible: true, text: Submit, font_size: null, font: '',
-          spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-          background: '', bold: false, underline: false, icon: ''}
-        name: submit_slider_button
-        layout_properties: {grid_position: 'YBRIZN,OINZXS'}
-        event_bindings: {}
+      components: []
     - type: ColumnPanel
       properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
