@@ -51,7 +51,7 @@ class MatchForm(MatchFormTemplate):
       self.chat_repeating_panel.items = new_items
       self.call_js('scrollCard')
       self.chat_display_card.scroll_into_view()   
-    if their_value:
+    if self.slider_panel.item['status'] == "submitted" and their_value:
       self.slider_panel.receive_value(their_value)
       
 

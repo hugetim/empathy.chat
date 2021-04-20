@@ -129,7 +129,7 @@ def get_messages(user_id=""):
 
 def _get_messages(user):
   this_match, i = matcher.current_match_i(user)
-  their_value = this_match['slider_values'][i]
+  their_value = _their_value(this_match['slider_values'], i)
   messages = app_tables.chat.search(match=this_match)
   if messages:
     return ([{'me': (user == m['user']),
@@ -146,11 +146,16 @@ def submit_slider(value, user_id=""):
   this_match, i = matcher.current_match_i(user)
   temp_values = this_match['slider_values']
   temp_values[i] = value
-  this_match['slider_values'] = temp_values # this is not list assignment
-  temp_values.pop(i)
+  this_match['slider_values'] = temp_values 
+  return _their_value(this_match['slider_values'], i)
+
+
+def _their_value(values, my_i):
+  temp_values = [value for value in values]
+  temp_values.pop(my_i)
   assert len(temp_values) == 1              # assumes dyads only
   return temp_values[0]                     # return the remaining value
-  
+
 
 def _emails_equal(a, b):
   em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
