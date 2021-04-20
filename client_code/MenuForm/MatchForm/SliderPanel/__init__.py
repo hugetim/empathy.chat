@@ -1,12 +1,7 @@
 from ._anvil_designer import SliderPanelTemplate
 from anvil import *
 import anvil.server
-import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
-import anvil.users
+
 
 class SliderPanel(SliderPanelTemplate):
   def __init__(self, **properties):
@@ -25,3 +20,8 @@ class SliderPanel(SliderPanelTemplate):
     """This method is called when the button is clicked"""
     self.item['visible'] = 0
 
+  def submit_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.item['status'] = "submitted"
+    self.item['status'], self.item['their_value'] = anvil.server.call('submit_slider', 
+                                                                      self.my_slider.value)
