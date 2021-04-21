@@ -32,7 +32,6 @@ class SliderPanel(SliderPanelTemplate):
 
   def receive_value(self, their_value):
     self.item['their_value'] = their_value
-    self.item['visible'] = True
     self.item['status'] = "received"
     self.refresh_data_bindings()
       

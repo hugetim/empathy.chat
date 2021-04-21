@@ -251,18 +251,20 @@ def cancel_match(match_id, user_id=""):
 @authenticated_callable
 @anvil.tables.in_transaction
 def get_code(user_id=""):
-  """Return jitsi_code, duration (or Nones)"""
+  """Return jitsi_code, duration (or Nones), my_slider_value"""
   print("get_code", user_id)
   user = sm.get_user(user_id)
   
   current_proptime = ProposalTime.get_now(user)
   if current_proptime:
-    return current_proptime.get_code()
+    jitsi_code, duration = current_proptime.get_code()
+    return jitsi_code, duration, None
   else:
-    this_match = current_match(user)
+    this_match, i = current_match_i(user)
     if this_match:
-      return ProposalTime(this_match['proposal_time']).get_code()
-  return None, None
+      jitsi_code, duration = ProposalTime(this_match['proposal_time']).get_code()
+      return jitsi_code, duration, this_match['slider_values'][i]
+  return None, None, None
 
 
 @authenticated_callable

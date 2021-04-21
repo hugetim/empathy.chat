@@ -20,8 +20,11 @@ class MatchForm(MatchFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
-    jitsi_code, duration = anvil.server.call('get_code')
+    jitsi_code, duration, my_value = anvil.server.call('get_code')
     self.set_jitsi_link(jitsi_code)
+    self.chat_repeating_panel.items = []
+    self.init_slider_panel(my_value)
+    self.update()
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
@@ -32,19 +35,18 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_embed = MyJitsi(item={'room_name': jitsi_code, 'name': self.top_form.item['name']})
       self.jitsi_column_panel.add_component(self.jitsi_embed)
     self.jitsi_column_panel.visible = True
-    self.chat_repeating_panel.items, their_value = anvil.server.call_s('get_messages')
-    self.chat_display_card.visible = True
-    self.chat_send_card.visible = True
-    slider_item = {'visible': True, 'status': None, 'my_value': 5, 'their_value': 5}
+
+  def init_slider_panel(self, my_value):
+    if my_value:
+      slider_item = {'visible': False, 'status': "submitted", 
+                     'my_value': my_value, 'their_value': 5}
+    else:
+      slider_item = {'visible': True, 'status': None, 
+                     'my_value': 5, 'their_value': 5}
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
-
-  def chat_display_card_show(self, **event_args):
-    """This method is called when the column panel is shown on the screen"""
-    self.call_js('scrollCard')      
     
-  def timer_2_tick(self, **event_args):
-    """This method is called approx. once every 5 seconds, checking for messages"""
+  def update(self):
     old_items = self.chat_repeating_panel.items
     new_items, their_value = anvil.server.call_s('get_messages')
     if len(new_items) > len(old_items):
@@ -53,7 +55,14 @@ class MatchForm(MatchFormTemplate):
       self.chat_display_card.scroll_into_view()   
     if self.slider_panel.item['status'] == "submitted" and their_value:
       self.slider_panel.receive_value(their_value)
-      
+
+#   def chat_display_card_show(self, **event_args):
+#     """This method is called when the column panel is shown on the screen"""
+#     self.call_js('scrollCard')      
+    
+  def timer_2_tick(self, **event_args):
+    """This method is called approx. once every 5 seconds, checking for messages"""
+    self.update() 
 
   def message_textbox_pressed_enter(self, **event_args):
     temp = anvil.server.call('add_message', message=self.message_textbox.text)
