@@ -44,6 +44,7 @@ class DashForm(DashFormTemplate):
     """Update form based on proposals state"""
     self.repeating_panel_1.items = deepcopy(self.item['proposals'])
     self.data_grid_1.visible = bool(self.item['proposals'])
+    self.status_label.visible = self.data_grid_1.visible
   
   def update_status(self, state):
     self.set_seconds_left(state['status'], state['seconds_left'])
