@@ -24,6 +24,7 @@ components:
     event_bindings: {}
     data_bindings:
     - {property: value, code: 'self.item[''my_value'']', writeback: true}
+    - {property: enabled, code: 'not self.item[''status'']'}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
@@ -50,6 +51,8 @@ components:
       maxval: 10
       step: 0.2
       labels: ['']
+      is_visible: true
+      enabled: false
     name: their_slider
     layout_properties: {grid_position: 'KXEYXE,NHKALN'}
     data_bindings:
