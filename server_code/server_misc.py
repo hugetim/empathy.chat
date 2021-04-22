@@ -129,13 +129,14 @@ def get_messages(user_id=""):
 
 def _get_messages(user):
   this_match, i = matcher.current_match_i(user)
-  their_value = _their_value(this_match['slider_values'], i)
-  messages = app_tables.chat.search(match=this_match)
-  if messages:
-    return ([{'me': (user == m['user']),
-              'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
-             for m in messages],
-            their_value)
+  if this_match:
+    their_value = _their_value(this_match['slider_values'], i)
+    messages = app_tables.chat.search(match=this_match)
+    if messages:
+      return ([{'me': (user == m['user']),
+                'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
+               for m in messages],
+              their_value)
 
   
 @authenticated_callable
