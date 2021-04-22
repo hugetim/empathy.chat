@@ -44,7 +44,27 @@ class DashForm(DashFormTemplate):
     """Update form based on proposals state"""
     self.repeating_panel_1.items = deepcopy(self.item['proposals'])
     self.data_grid_1.visible = bool(self.item['proposals'])
-    self.status_label.visible = self.data_grid_1.visible
+    others_props_visible = (self.data_grid_1.visible
+                            and any([not item['prop'].own
+                                     for item in self.item['proposals']]))
+    own_props_visible = (self.data_grid_1.visible
+                         and any([item['prop'].own
+                                  for item in self.item['proposals']]))
+    if own_props_visible:
+      self.status_label.text = "Proposals:"
+      self.status_label.align = "left"
+      self.status_label.role = ""
+      self.status_label.spacing_below = "none"
+      self.status_label.visible = True
+    elif others_props_visible:
+      self.status_label.text = (
+        "You can accept an existing proposal for an empathy chat or propose your own.")
+      self.status_label.align = "center"
+      self.status_label.role = "subheading"
+      self.status_label.spacing_below = "small"
+      self.status_label.visible = True
+    else:
+      self.status_label.visible = False
   
   def update_status(self, state):
     self.set_seconds_left(state['status'], state['seconds_left'])
