@@ -2,15 +2,14 @@ container:
   type: ColumnPanel
   event_bindings: {}
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
+    wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"NBITFD":50,"HWTLHD":10}',
     spacing_below: small, background: ''}
 components:
 - type: ColumnPanel
-  properties: {col_widths: '{"NLCFYD":50,"OINZXS":10,"NHKALN":50,"VSWMDI":10}'}
-  name: slider_column_panel
-  layout_properties:
-    col_widths: {}
-    grid_position: QBSBSY,HWTLHD
+  properties: {col_widths: '{}'}
+  name: column_panel_1
+  layout_properties: {grid_position: 'QBSBSY,NBITFD'}
+  event_bindings: {}
   components:
   - type: form:MFQJNLWQIOGGXL4W:slider
     properties:
@@ -20,30 +19,11 @@ components:
       step: 0.2
       labels: [Empty, '', Full]
     name: my_slider
-    layout_properties: {grid_position: 'YBRIZN,NLCFYD'}
+    layout_properties: {grid_position: 'MJQSPQ,NXGKFS'}
     event_bindings: {}
     data_bindings:
     - {property: value, code: 'self.item[''my_value'']', writeback: true}
     - {property: enabled, code: 'not self.item[''status'']'}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: submit_button
-    layout_properties: {grid_position: 'YBRIZN,OINZXS IKKFWJ,IDOYES'}
-    event_bindings: {click: submit_button_click}
-    data_bindings:
-    - {property: enabled, code: 'not self.item[''status'']'}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: 'Hide
-
-        ', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: ''}
-    name: hide_button
-    layout_properties: {grid_position: 'YBRIZN,OINZXS GLODAL,FOMWST'}
-    event_bindings: {click: hide_button_click}
   - type: form:MFQJNLWQIOGGXL4W:slider
     properties:
       value: 5
@@ -54,11 +34,38 @@ components:
       is_visible: true
       enabled: false
     name: their_slider
-    layout_properties: {grid_position: 'KXEYXE,NHKALN'}
+    layout_properties: {grid_position: 'QXZSDK,RMGHHG'}
     data_bindings:
     - {property: is_visible, code: 'self.item[''status''] == "received"'}
     - {property: value, code: 'self.item[''their_value'']', writeback: true}
     event_bindings: {}
+- type: ColumnPanel
+  properties: {col_widths: '{"VSWMDI":10}'}
+  name: slider_column_panel
+  layout_properties:
+    col_widths: {}
+    grid_position: QBSBSY,HWTLHD
+  components:
+  - type: Button
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: submit_button
+    layout_properties: {grid_position: 'IKKFWJ,IDOYES'}
+    event_bindings: {click: submit_button_click}
+    data_bindings:
+    - {property: enabled, code: 'not self.item[''status'']'}
+    - {property: visible, code: 'self.item[''status''] != "received"'}
+  - type: Button
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: 'Hide
+
+        ', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: ''}
+    name: hide_button
+    layout_properties: {grid_position: 'GLODAL,FOMWST'}
+    event_bindings: {click: hide_button_click}
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
       visible: true, text: Waiting for other to submit..., font_size: null, font: '',
