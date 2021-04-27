@@ -34,6 +34,7 @@ class SliderPanel(SliderPanelTemplate):
     self.item['their_value'] = their_value
     self.item['status'] = "received"
     self.refresh_data_bindings()
+    self.their_slider.scroll_into_view()
       
   def show_button_click(self, **event_args):
     """This method is called when the button is clicked"""
