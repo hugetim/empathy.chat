@@ -19,7 +19,7 @@ components:
     event_bindings: {click: home_link_click}
   - type: Link
     properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+      visible: false, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
       spacing_above: small, icon_align: left, col_widths: '{}', spacing_below: small,
       italic: false, background: '', bold: false, underline: false, icon: 'fa:user'}
     name: link_bar_profile
@@ -28,7 +28,7 @@ components:
     event_bindings: {click: profile_link_click}
   - type: Link
     properties: {role: null, url: 'https://www.empathyspot.org/help.html', align: left,
-      tooltip: Help, border: '', foreground: '', visible: true, text: '', font_size: null,
+      tooltip: Help, border: '', foreground: '', visible: false, text: '', font_size: null,
       wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left,
       col_widths: '', spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:question-circle'}
@@ -154,8 +154,8 @@ components:
     components:
     - type: Button
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: 'Send Feedback    ', font_size: 13, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        foreground: '', visible: false, text: 'Send Feedback    ', font_size: 13,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:comment-o'}
       name: feedback_button
       layout_properties: {grid_position: 'DMWLIO,YPJRKM'}
@@ -172,7 +172,7 @@ components:
     components:
     - type: Button
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: 'Help                         ', font_size: 13,
+        foreground: '', visible: false, text: 'Help                         ', font_size: 13,
         font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:question-circle'}
       name: help_button
