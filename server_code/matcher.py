@@ -410,7 +410,7 @@ def _match_commit(user, proptime_id=None):
       proposal = current_proptime.proposal()
       proposal.cancel_all_times()
       if not current_proptime.is_now():
-        proposal.pinged_email()
+        current_proptime.pinged_email()
   return _get_status(user)
 
 
@@ -544,8 +544,11 @@ class ProposalTime():
     elif not self.is_now():
       _match_commit(user, self.get_id())
     else:
-      proposal.pinged_email()
-
+      self.pinged_email()
+ 
+  def pinged_email(self):   
+    sm.pinged_email(self.proposal().proposer())    
+      
   def in_users_accepting(self, user):
     return self._proptime_row['users_accepting'] and user in self._proptime_row['users_accepting']
       
@@ -743,9 +746,6 @@ class Proposal():
   
   def is_visible(self, user):
     return sm.is_visible(self._prop_row['user'], user)
-
-  def pinged_email(self): 
-    sm.pinged_email(self._prop_row['user'])
 
   def hide_unaccepted_times(self):
     for proptime in ProposalTime.times_from_proposal(self, require_current=True):

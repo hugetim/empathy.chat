@@ -221,14 +221,17 @@ def set_request_em_opts(fixed, hours):
 
 def pinged_email(user):
   """Email pinged user, if settings allow"""
-  print("'pinged_email' (disabled))")
+  print("'pinged_email'")
   if user['pinged_em']:
     name = user['name']
     if not name:
-      name = "Empathy Spot user"
-    #anvil.google.mail.send(to=user['email'],
-    #                       subject="Empathy Spot - Match available",
-    text=(
+      name = "empathy.chat user"
+    anvil.email.send(
+      from_name="empathy.chat support", 
+      to=user['email'], 
+      subject="Welcome",
+      subject="empathy.chat - match confirmed",
+      text=(
 '''Dear ''' + name + ''',
 
 An empathy match has been found.
@@ -237,10 +240,9 @@ Return to ''' + p.URL_WITH_ALT + ''' now and confirm your availability to be con
 
 Thanks!
 Tim
-Empathy Spot
-
-p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
+empathy.chat
 ''')
+#p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
 
 
 def users_to_email_re_notif(user=None):
@@ -276,7 +278,7 @@ def request_emails(request_type, user):
   for u in users_to_email:
     name = u['name']
     if not name:
-      name = "Empathy Spot user"
+      name = "empathy.chat user"
     #anvil.google.mail.send(to=u['email'],
     #                       subject="Empathy Spot - Request active",
     text=(
@@ -288,7 +290,7 @@ Return to ''' + p.URL_WITH_ALT + ''' and request empathy to be connected for an 
 
 Thanks!
 Tim
-Empathy Spot
+empathy.chat
 
 p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change this setting.
 ''')
