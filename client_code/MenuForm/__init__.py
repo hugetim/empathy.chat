@@ -26,7 +26,6 @@ class MenuForm(MenuFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
   
-    # 'prune' initializes new users to trust level 0 (via '_get_user_info')
     e = self.item['email_in_list']
     n = self.item['name']
     if e == False:
