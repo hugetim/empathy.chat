@@ -16,7 +16,7 @@ class LoginForm(LoginFormTemplate):
     # Any code you write here will run when the form opens.
     self.quote_label.text = rosenberg.quote_of_the_day(date.today())
     
-  def form_show (self, **event_args):
+  def form_show(self, **event_args):
     # Do the code here to show this blank form.
     while not anvil.users.get_user():
       anvil.users.login_with_form()

@@ -229,10 +229,8 @@ def pinged_email(user):
     anvil.email.send(
       from_name="empathy.chat support", 
       to=user['email'], 
-      subject="Welcome",
       subject="empathy.chat - match confirmed",
-      text=(
-'''Dear ''' + name + ''',
+      text=('''Dear ''' + name + ''',
 
 An empathy match has been found.
 
@@ -241,8 +239,9 @@ Return to ''' + p.URL_WITH_ALT + ''' now and confirm your availability to be con
 Thanks!
 Tim
 empathy.chat
-''')
-#p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
+'''))
+  #p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
+    pass
 
 
 def users_to_email_re_notif(user=None):
