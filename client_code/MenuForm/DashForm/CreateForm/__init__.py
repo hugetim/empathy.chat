@@ -32,7 +32,7 @@ class CreateForm(CreateFormTemplate):
     self.drop_down_eligible.items = [("Anyone (up to 3 degrees separation)", 3),
                                      ('"Friends of friends" (2 degrees separation)', 2),
                                      ("Direct connections only (1st degree)", 1),
-                                     ("Specific 1st degree connection(s)...",0)
+                                     ("Specific user(s)...",0)
                                     ]
     self.multi_select_drop_down.items = anvil.server.call('get_port_eligible_users')
     self.normalize_initial_state()
