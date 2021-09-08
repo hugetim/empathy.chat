@@ -1,7 +1,5 @@
 from ._anvil_designer import LoginFormTemplate
 from anvil import *
-import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
 import anvil.users
 from .. import rosenberg
 from datetime import date

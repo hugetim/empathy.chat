@@ -1,7 +1,5 @@
 from ._anvil_designer import MyJitsiTemplate
 from anvil import *
-import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
 
 
 class MyJitsi(MyJitsiTemplate):
