@@ -96,16 +96,16 @@ def test_clear():
       print("time", time['expire_date'])
       test_matches.add(app_tables.matches.get(proposal_time=time))
       time.delete()
-    for proposal in test_row['test_proposals']:
+    for proposal in set(test_row['test_proposals']):
       print("proposal", proposal['created'])
       proposal.delete()
     test_row.delete()
-    for match in test_matches:
-      if match is not None:
-        print("match", match['match_commence'])
-        for chat_row in app_tables.chat.search(match=match):
-          chat_row.delete()
-        match.delete()
+  for match in test_matches:
+    if match is not None:
+      print("match", match['match_commence'])
+      for chat_row in app_tables.chat.search(match=match):
+        chat_row.delete()
+      match.delete()
   anvil.server.session['test_record'] = None
 
 
