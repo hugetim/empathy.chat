@@ -3,6 +3,7 @@ import anvil.server
 import anvil.tables
 from anvil.tables import app_tables
 import anvil.secrets
+import anvil.email
 import datetime
 import random
 import re
@@ -231,24 +232,25 @@ def pinged_email(user, start, duration):
       subject="empathy.chat - match confirmed",
       text=(f'''Dear {name},
 
-Your proposal for a {duration} minute empathy match starting {when} has been found.
+Your proposal for a {duration} minute empathy match starting {when} has been accepted.
 
 Please return to {p.URL_WITH_ALT} {when} to be connected for the empathy exchange.
 
 Thanks!
 Tim
 empathy.chat
-'''))
+'''
+           )
+    )
   #p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
-    pass
 
 
-def users_to_email_re_notif(user=None):
-  """Return list of users to email notifications triggered by user
+# def users_to_email_re_notif(user=None):
+#   """Return list of users to email notifications triggered by user
 
-  Side effect: prune request_em (i.e. switch expired request_em to false)
-  """
-  return []
+#   Side effect: prune request_em (i.e. switch expired request_em to false)
+#   """
+#   return []
   #now = now()
   #_prune_request_em()
   #assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
@@ -263,33 +265,33 @@ def users_to_email_re_notif(user=None):
   #                    and not matcher.has_status(u))]
 
 
-def request_emails(request_type, user):
-  """Email non-active with request_em_check_box checked who logged in recently
+# def request_emails(request_type, user):
+#   """Email non-active with request_em_check_box checked who logged in recently
 
-  Non-active means not requesting or matched currently"""
-  if request_type == "receive_first":
-    request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
-  else:
-    assert request_type == "will_offer_first"
-    request_type_text = 'an empathy exchange.'
-  users_to_email = users_to_email_re_notif(user)
-  for u in users_to_email:
-    name = u['name']
-    if not name:
-      name = "empathy.chat user"
-    #anvil.google.mail.send(to=u['email'],
-    #                       subject="Empathy Spot - Request active",
-    text=(
-"Dear " + name + ''',
+#   Non-active means not requesting or matched currently"""
+#   if request_type == "receive_first":
+#     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
+#   else:
+#     assert request_type == "will_offer_first"
+#     request_type_text = 'an empathy exchange.'
+#   users_to_email = users_to_email_re_notif(user)
+#   for u in users_to_email:
+#     name = u['name']
+#     if not name:
+#       name = "empathy.chat user"
+#     #anvil.google.mail.send(to=u['email'],
+#     #                       subject="Empathy Spot - Request active",
+#     text=(
+# "Dear " + name + ''',
 
-Someone has requested ''' + request_type_text + '''
+# Someone has requested ''' + request_type_text + '''
 
-Return to ''' + p.URL_WITH_ALT + ''' and request empathy to be connected for an empathy exchange (if you are first to do so).
+# Return to ''' + p.URL_WITH_ALT + ''' and request empathy to be connected for an empathy exchange (if you are first to do so).
 
-Thanks!
-Tim
-empathy.chat
+# Thanks!
+# Tim
+# empathy.chat
 
-p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change this setting.
-''')
-  return len(users_to_email)
+# p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change this setting.
+# ''')
+#   return len(users_to_email)
