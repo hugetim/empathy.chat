@@ -217,7 +217,7 @@ def set_request_em_opts(fixed, hours):
   return user['request_em_set_time']
 
 
-def pinged_email(user):
+def pinged_email(user, start, duration):
   """Email pinged user, if settings allow"""
   print("'pinged_email'")
   if user['pinged_em']:

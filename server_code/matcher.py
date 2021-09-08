@@ -545,7 +545,10 @@ class ProposalTime():
       self.pinged_email()
  
   def pinged_email(self):   
-    sm.pinged_email(self.proposal().proposer())    
+    sm.pinged_email(user=self.proposal().proposer(),
+                    start=None if self.is_now() else self.get_start_date(),
+                    duration=self.get_duration(),
+                   )    
       
   def in_users_accepting(self, user):
     return self._proptime_row['users_accepting'] and user in self._proptime_row['users_accepting']
