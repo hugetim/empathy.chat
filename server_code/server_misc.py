@@ -225,16 +225,16 @@ def pinged_email(user, start, duration):
     name = user['name']
     if not name:
       name = "empathy.chat user"
-    when = f"in {h.seconds_to_words((now() - start).seconds)}" if start else "now"
+    when = f"in {h.seconds_to_words((start-now()).seconds)}" if start else "now"
     anvil.email.send(
-      from_name="empathy.chat support", 
+      from_name="empathy.chat", 
       to=user['email'], 
       subject="empathy.chat - match confirmed",
       text=(f'''Dear {name},
 
 Your proposal for a {duration} minute empathy match starting {when} has been accepted.
 
-Please return to {p.URL_WITH_ALT} {when} to be connected for the empathy exchange.
+Go to {p.URL_WITH_ALT} to be connected for the empathy exchange.
 
 Thanks!
 Tim
