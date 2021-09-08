@@ -370,7 +370,7 @@ def cancel_other(proptime_id=None, user_id=""):
 @anvil.tables.in_transaction
 def match_commit(proptime_id=None, user_id=""):
   """Return _get_status(user)
-  Upon first commence, copy row over and delete "matching" row.
+  Upon first commence of "now", copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
   print("match_commit", proptime_id, user_id)
@@ -379,10 +379,7 @@ def match_commit(proptime_id=None, user_id=""):
 
 
 def _match_commit(user, proptime_id=None):
-  """Return _get_status(user)
-  Upon first commence, copy row over and delete "matching" row.
-  Should not cause error if already commenced
-  """
+  """Return _get_status(user)"""
   if DEBUG:
     print("_match_commit")
   if proptime_id:
