@@ -232,7 +232,7 @@ def pinged_email(user, start, duration):
       subject="empathy.chat - match confirmed",
       text=(f'''Dear {name},
 
-Your proposal for a {duration} minute empathy match starting {when} has been accepted.
+Your proposal for a {duration} minute empathy match starting {when} (from the time of this email) has been accepted.
 
 Go to {p.URL_WITH_ALT} to be connected for the empathy exchange.
 
