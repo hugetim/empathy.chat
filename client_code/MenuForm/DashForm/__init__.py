@@ -36,7 +36,7 @@ class DashForm(DashFormTemplate):
   def update_upcoming_table(self):
     """Update form based on upcoming state"""
     self.upcoming_repeating_panel.items = deepcopy(self.item['upcomings'])
-    self.upcoming_column_panel.visible = bool(self.item['upcomings'])    
+    self.upcoming_card.visible = bool(self.item['upcomings'])    
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
