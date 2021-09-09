@@ -37,7 +37,7 @@ class User():
   
   @staticmethod
   def get(user_row):
-    return User(user_row.get_id(), user_row['name'])
+    return User(user_row.get_id(), user_row['first_name'])
 
     
 @anvil.server.portable_class

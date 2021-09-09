@@ -58,7 +58,7 @@ def is_visible(user2, user1=None):
   
 def port_eligible_users(others=[]):
   if others:
-    return [(other['name'], other.get_id()) for other in others]
+    return [(other['first_name'], other.get_id()) for other in others]
   else:
     return []
 
@@ -67,7 +67,7 @@ def port_eligible_users(others=[]):
 def get_port_eligible_users(user_id=""):
   user = get_user(user_id)
   others = [other for other in app_tables.users.search()
-            if (is_visible(other, user) and user['name'] is not None)]
+            if (is_visible(other, user) and user['first_name'] is not None)]
   return port_eligible_users(others)
 
 
@@ -222,7 +222,7 @@ def pinged_email(user, start, duration):
   """Email pinged user, if settings allow"""
   print("'pinged_email'")
   if user['pinged_em']:
-    name = user['name']
+    name = user['first_name']
     if not name:
       name = "empathy.chat user"
     when = (f"in {h.seconds_to_words((start-now()).seconds)} (from the time of this email)" 

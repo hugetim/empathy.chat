@@ -89,11 +89,11 @@ def init():
     if email_in_list:
       trust_level = 1
       user['trust_level'] = trust_level
-      name = user['name']
+      name = user['first_name']
   elif trust_level < 0:
     email_in_list = False
   else:
-    name = user['name']
+    name = user['first_name']
   test_mode = trust_level >= TEST_TRUST_LEVEL
   # Initialize user status
   state = _get_status(user)
@@ -215,7 +215,7 @@ def _get_upcomings(user):
     now = sm.now()
     for match in app_tables.matches.search(users=[user], 
                                            match_commence=q.greater_than(now)):
-      port_users = [port.User(user_id=u.get_id(), name=u['name']) for u in match['users']
+      port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
                      if u != user]
       match_dict = {'port_users': port_users,
                     'start_date': match['match_commence'],

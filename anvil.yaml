@@ -53,7 +53,7 @@ db_schema:
       type: string
       admin_ui: {order: 5, width: 200}
     yf1MJkV+04M=:
-      name: name
+      name: first_name
       type: string
       admin_ui: {order: 0.5, width: 200}
     abXkavc_SxA=:
@@ -76,6 +76,10 @@ db_schema:
       name: last_request_em
       type: datetime
       admin_ui: {order: 8.5, width: 200}
+    LEqbmMFkGI0=:
+      name: last_name
+      type: string
+      admin_ui: {order: 0.75, width: 200}
     w18d1jhMkE0=:
       name: request_em_settings
       type: simpleObject

@@ -16,7 +16,7 @@ def test_add_user(em, level=1, r_em=False, p_em=False):
   if not anvil.server.session['test_record']:
     anvil.server.session['test_record'] = create_tests_record()
   new_user = app_tables.users.add_row(email=em,
-                                      name = em,
+                                      first_name = em,
                                       enabled=True,
                                       trust_level=level,
                                       request_em=r_em,
