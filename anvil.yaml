@@ -310,10 +310,18 @@ db_schema:
       backend: anvil.tables.Row
       admin_ui: {order: 0, width: 200}
       table_id: 18972
-    qlgxU1uCW8s=:
-      name: relationship1to2
-      type: string
-      admin_ui: {order: 2, width: 200}
+    WRwVdJAQbqM=:
+      name: distance
+      type: number
+      admin_ui: {order: 6, width: 200}
+    he2V1R2pzcA=:
+      name: starred
+      type: bool
+      admin_ui: {order: 6, width: 200}
+    saW6sipxA+I=:
+      name: date_described
+      type: datetime
+      admin_ui: {order: 7, width: 200}
   access: {python_name: connections, app_id: E6HFYSK4HHRI7BTC, server: full, client: none,
     table_mapping_name: null, table_mapping_id: null, table_id: 73606}
 secrets:
