@@ -19,7 +19,7 @@ components:
     event_bindings: {click: connections_tab_button_click}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Blocks, font_size: null, font: '', spacing_above: small,
+      foreground: '', visible: false, text: Blocks, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray
         200', bold: false, underline: false, icon: ''}
     name: blocks_tab_button
