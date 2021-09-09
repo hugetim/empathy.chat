@@ -1,4 +1,3 @@
-container: {type: DataRowPanel}
 components:
 - type: Button
   properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
@@ -7,4 +6,4 @@ components:
     underline: false, icon: 'fa:star-o'}
   name: star_button
   layout_properties: {column: NBEGGD}
-is_package: true
+container: {type: DataRowPanel}
