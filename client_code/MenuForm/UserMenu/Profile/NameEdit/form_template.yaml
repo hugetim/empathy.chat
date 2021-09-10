@@ -54,23 +54,21 @@ components:
       - {property: text, code: 'self.item[''last'']', writeback: true}
       event_bindings: {change: text_box_change}
   - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
+    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: false,
       foreground: '', visible: true, text: Save, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: ''}
     name: save_button
     layout_properties: {}
     event_bindings: {click: save_button_click}
-    data_bindings:
-    - {property: enabled, code: 'self.item[''edits'']'}
+    data_bindings: []
   - type: Button
-    properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: true,
+    properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: false,
       foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: ''}
     name: cancel_button
     layout_properties: {}
-    data_bindings:
-    - {property: enabled, code: 'self.item[''edits'']'}
+    data_bindings: []
     event_bindings: {click: cancel_button_click}
 is_package: true

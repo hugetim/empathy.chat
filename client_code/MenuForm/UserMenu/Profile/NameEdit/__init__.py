@@ -4,7 +4,7 @@ import anvil.server
 
 
 class NameEdit(NameEditTemplate):
-  item_keys = {'first', 'last', 'edits'}
+  item_keys = {'first', 'last'}
   
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
@@ -12,14 +12,11 @@ class NameEdit(NameEditTemplate):
 
     # Any code you write here will run when the form opens.
 
-  def update(self):
-    self.refresh_data_bindings()
-    
   def text_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
-    if not self.item['edits']:
-      self.item['edits'] = True
-      self.update()
+    if not self.save_button.enabled:
+      self.save_button.enabled = True
+      self.cancel_button.enabled = True
 
   def save_button_click(self, **event_args):
     """This method is called when the button is clicked"""

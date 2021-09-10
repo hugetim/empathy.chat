@@ -31,7 +31,6 @@ class Profile(ProfileTemplate):
     """This method is called when the button is clicked"""
     name_item = {'first': self.item['first'],
                  'last': self.item['last'],
-                 'edits': False,
                 }
     name_edit_form = NameEdit(item=name_item)
     out = alert(content=name_edit_form,

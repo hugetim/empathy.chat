@@ -14,7 +14,10 @@ components:
     layout_properties: {grid_position: 'CWBUWZ,TBTGME'}
     components:
     - type: Label
-      properties: {}
+      properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: '', font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
       name: name_label
       layout_properties: {grid_position: 'LXCNAQ,JUHEKB'}
       data_bindings: []
