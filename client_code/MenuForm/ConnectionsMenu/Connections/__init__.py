@@ -7,6 +7,8 @@ from anvil.tables import app_tables
 import anvil.users
 
 class Connections(ConnectionsTemplate):
+  item_keys = {'user_id'}
+  
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)

@@ -23,6 +23,7 @@ components:
     name: connections_tab_button
     layout_properties: {}
     event_bindings: {click: connections_tab_button_click}
+    data_bindings: []
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: History, font_size: null, font: '', spacing_above: small,

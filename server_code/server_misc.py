@@ -79,6 +79,10 @@ def get_user_info(user):
     user['request_em'] = False
     user['pinged_em'] = False
     user['request_em_settings'] = {"fixed": 0, "hours": 2}
+    user['first_name'] = ""
+    user['last_name'] = ""
+    user['how_empathy'] = ""
+    user['profile'] = ""
   return user['trust_level']
 
 
@@ -86,13 +90,31 @@ def get_user_info(user):
 def init_profile(user_id=""):
   user = get_user(user_id)
   return {'me': user == anvil.server.session['user'],
+          'user_id': user_id,
           'first': user['first_name'],
           'last': user['last_name'],
+          'degree': _degree(user),
           'seeking': user['seeking_buddy'],
           'how_empathy': user['how_empathy'],
-          'profile': user['profile']
+          'profile': user['profile'],
          }
 
+
+def _degree(user):
+  print("Warning: sm._degree not yet implemented")
+  return None
+
+@authenticated_callable
+def set_seeking_buddy(seeking, user_id=""):
+  user = get_user(user_id)
+  user['seeking_buddy'] = seeking
+  
+  
+@authenticated_callable
+def save_name(name_item, user_id=""):
+  user = get_user(user_id)
+  user['first_name'] = name_item['first']
+  user['last_name'] = name_item['last']
   
 def new_jitsi_code():
   if matcher.DEBUG:

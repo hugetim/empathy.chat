@@ -87,10 +87,15 @@ class MenuForm(MenuFormTemplate):
     item = {k: state[k] for k in WaitForm.state_keys}
     self.reset_and_load(WaitForm(item=item))
 
-  def go_connections(self):
-    self.title_label.text = "My Connections"
-    self.reset_and_load(ConnectionsMenu())
-    self.connections_link.role = "selected"   
+  def go_connections(self, user_id=""):
+    if user_id and user_id != anvil.users.get_user().get_id():
+      self.title_label.text = "" # other user's profile
+      item = {'user_id': user_id, 'tab': 'connections'}
+      self.reset_and_load(UserMenu(item=item)) 
+    else:
+      self.title_label.text = "My Connections"
+      self.reset_and_load(ConnectionsMenu())
+      self.connections_link.role = "selected"   
 
   def go_groups(self):
     self.title_label.text = "Groups"
@@ -102,9 +107,10 @@ class MenuForm(MenuFormTemplate):
     self.reset_and_load(MyGroupsForm())   
     self.my_groups_link.role = "selected" 
     
-  def go_profile(self):
+  def go_my_profile(self):
     self.title_label.text = "My Profile"
-    self.reset_and_load(UserMenu()) 
+    item = {'user_id': "", 'tab': 'profile'}
+    self.reset_and_load(UserMenu(item=item)) 
     self.profile_link.role = "selected"   
     
   def go_settings(self):
@@ -130,7 +136,7 @@ class MenuForm(MenuFormTemplate):
     
   def profile_link_click(self, **event_args):
     """This method is called when the link is clicked"""
-    self.go_profile()
+    self.go_my_profile()
   
   def settings_link_click(self, **event_args):
     """This method is called when the link is clicked"""
