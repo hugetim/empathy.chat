@@ -65,7 +65,7 @@ components:
       name: seeking_toggleswitch
       layout_properties: {width: 38}
       data_bindings:
-      - {property: checked, code: 'self.item[''seeking'']'}
+      - {property: checked, code: 'self.item[''seeking'']', writeback: true}
       event_bindings: {x_change: seeking_toggleswitch_change}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',

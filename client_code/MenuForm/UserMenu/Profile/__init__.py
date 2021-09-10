@@ -41,9 +41,11 @@ class Profile(ProfileTemplate):
                 buttons=[])
     if out is True:
       anvil.server.call('save_name', name_edit_form.item)
+      self.item['first'] = name_edit_form.item['first']
+      self.item['last'] = name_edit_form.item['last']
       self.update()
 
   def seeking_toggleswitch_change(self, **event_args):
     self.item['seeking']
-    anvil.server.call('set_seeking_buddy', self.seeking_toggleswitch.checked)
+    anvil.server.call('set_seeking_buddy', self.item['seeking'])
 
