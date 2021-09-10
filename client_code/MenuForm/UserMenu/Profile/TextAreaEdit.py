@@ -1,10 +1,10 @@
-from ._anvil_designer import NameEditTemplate
+from ._anvil_designer import TextAreaEditTemplate
 from anvil import *
 import anvil.server
 
 
-class NameEdit(NameEditTemplate):
-  item_keys = {'first', 'last'}
+class TextAreaEdit(TextAreaEditTemplate):
+  item_keys = {'prompt', 'text'}
   
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
@@ -12,7 +12,7 @@ class NameEdit(NameEditTemplate):
 
     # Any code you write here will run when the form opens.
 
-  def text_box_change(self, **event_args):
+  def text_area_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
     if not self.save_button.enabled:
       self.save_button.enabled = True

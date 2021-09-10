@@ -63,7 +63,7 @@ components:
     event_bindings: {click: save_button_click}
     data_bindings: []
   - type: Button
-    properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: false,
+    properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: ''}

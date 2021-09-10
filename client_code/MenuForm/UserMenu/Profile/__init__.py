@@ -3,6 +3,7 @@ from anvil import *
 import anvil.server
 import anvil.users
 from .NameEdit import NameEdit
+from .TextAreaEdit import TextAreaEdit
 
 
 class Profile(ProfileTemplate):
@@ -21,6 +22,9 @@ class Profile(ProfileTemplate):
     self.name_label.text = self.item['first']
     if (self.item['me'] or (self.item['degree'] in {1, 2})):
       self.name_label.text += " " + self.item['last']
+    name_likes = ("I like" if self.item['me'] 
+                  else self.item['first'] + " likes")
+    self.how_empathy_rich_text.data = {"name_likes": name_likes}    
     self.refresh_data_bindings()
 
   def connections_button_click(self, **event_args):
@@ -32,19 +36,50 @@ class Profile(ProfileTemplate):
     name_item = {'first': self.item['first'],
                  'last': self.item['last'],
                 }
-    name_edit_form = NameEdit(item=name_item)
-    out = alert(content=name_edit_form,
+    edit_form = NameEdit(item=name_item)
+    out = alert(content=edit_form,
                 title="Edit Name",
                 large=False,
                 dismissible=False,
                 buttons=[])
     if out is True:
-      anvil.server.call('save_name', name_edit_form.item)
-      self.item['first'] = name_edit_form.item['first']
-      self.item['last'] = name_edit_form.item['last']
+      anvil.server.call('save_name', edit_form.item)
+      self.item['first'] = edit_form.item['first']
+      self.item['last'] = edit_form.item['last']
       self.update()
 
   def seeking_toggleswitch_change(self, **event_args):
     self.item['seeking']
     anvil.server.call('set_seeking_buddy', self.item['seeking'])
 
+  def edit_how_empathy_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    prompt = ('(e.g., "silent empathy," "wait until I request an empathy guess," '
+              'or "feel free to interrupt with guesses")')
+    area_item = {'prompt': prompt, 'text': self.item['how_empathy']}
+    edit_form = TextAreaEdit(item=area_item)
+    out = alert(content=edit_form,
+                title="How do you like to receive empathy?",
+                large=True,
+                dismissible=False,
+                buttons=[])
+    if out is True:
+      anvil.server.call('save_user_item', 'how_empathy', edit_form.item['text'])
+      self.item['how_empathy'] = edit_form.item['text']
+      self.update()
+
+  def edit_profile_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    prompt = ("What would meet a potential empathy buddy's need for trust? "
+              "Share as much or as little as you'd like.")
+    area_item = {'prompt': prompt, 'text': self.item['profile']}
+    edit_form = TextAreaEdit(item=area_item)
+    out = alert(content=edit_form,
+                title="Edit Profile",
+                large=True,
+                dismissible=False,
+                buttons=[])
+    if out is True:
+      anvil.server.call('save_user_item', 'profile', edit_form.item['text'])
+      self.item['profile'] = edit_form.item['text']
+      self.update()

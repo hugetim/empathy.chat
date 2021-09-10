@@ -116,6 +116,13 @@ def save_name(name_item, user_id=""):
   user['first_name'] = name_item['first']
   user['last_name'] = name_item['last']
   
+  
+@authenticated_callable
+def save_user_item(item_name, text, user_id=""):
+  user = get_user(user_id)
+  user[item_name] = text
+  
+  
 def new_jitsi_code():
   if matcher.DEBUG:
     print("server_misc.new_jitsi_code()")
