@@ -43,67 +43,79 @@ db_schema:
     i1LC3P04gJ0=:
       name: signed_up
       type: datetime
-      admin_ui: {order: 2, width: 200}
+      admin_ui: {order: 2, width: 153}
     eilFxZYShAA=:
       name: pinged_em
       type: bool
-      admin_ui: {order: 7.5, width: 200}
+      admin_ui: {order: 7.5, width: 113}
     ZPyAzOAGKpQ=:
       name: email_confirmation_key
       type: string
-      admin_ui: {order: 5, width: 200}
+      admin_ui: {order: 5, width: 198}
     yf1MJkV+04M=:
       name: first_name
       type: string
-      admin_ui: {order: 0.5, width: 200}
+      admin_ui: {order: 0.5, width: 113}
     abXkavc_SxA=:
       name: trust_level
       type: number
-      admin_ui: {order: 7, width: 200}
+      admin_ui: {order: 7, width: 86}
+    XaoHpd3nhCc=:
+      name: profile
+      type: string
+      admin_ui: {order: 7.875, width: 124}
     YRmwdykrmFk=:
       name: request_em_set_time
       type: datetime
-      admin_ui: {order: 8.375, width: 200}
+      admin_ui: {order: 8.375, width: 165}
     0WqHJC85tj8=:
       name: email
       type: string
       admin_ui: {order: 0, width: 200}
+    KBHipFpHuVc=:
+      name: how_empathy
+      type: string
+      admin_ui: {order: 7.75, width: 115}
     _mqNTfEFbZ8=:
       name: n_password_failures
       type: number
-      admin_ui: {order: 15, width: 200}
+      admin_ui: {order: 15, width: 178}
     gkmtmubESt4=:
       name: last_request_em
       type: datetime
-      admin_ui: {order: 8.5, width: 200}
+      admin_ui: {order: 8.5, width: 150}
     LEqbmMFkGI0=:
       name: last_name
       type: string
-      admin_ui: {order: 0.75, width: 200}
+      admin_ui: {order: 0.75, width: 113}
+    cXR25sD2xSs=:
+      name: seeking_buddy
+      type: bool
+      admin_ui: {order: 7.625, width: 200}
     w18d1jhMkE0=:
       name: request_em_settings
       type: simpleObject
-      admin_ui: {order: 8.25, width: 200}
+      admin_ui: {order: 8.25, width: 181}
     XiNoYGcfl6U=:
       name: last_login
       type: datetime
-      admin_ui: {order: 6, width: 200}
+      admin_ui: {order: 6, width: 155}
     FbwsFXTEXuo=:
       name: request_em
       type: bool
-      admin_ui: {order: 8, width: 200}
+      admin_ui: {order: 8, width: 118}
     G4PJo8T8DrY=:
       name: remembered_logins
       type: simpleObject
-      admin_ui: {order: 10, width: 200}
+      admin_ui: {order: 10, width: 166}
     CDvtWmrKzmk=:
       name: password_hash
       type: string
-      admin_ui: {order: 3, width: 200}
+      admin_ui: {order: 3, width: 99}
     WfSNDWDvr_Q=:
       name: confirmed_email
       type: bool
-      admin_ui: {order: 4, width: 200}
+      admin_ui: {order: 4, width: 149}
   access: {python_name: users, app_id: E6HFYSK4HHRI7BTC, server: full, client: none,
     table_mapping_name: null, table_mapping_id: null, table_id: 18972}
 - name: Proposal Times

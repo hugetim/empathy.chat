@@ -81,6 +81,18 @@ def get_user_info(user):
     user['request_em_settings'] = {"fixed": 0, "hours": 2}
   return user['trust_level']
 
+
+@authenticated_callable
+def init_profile(user_id=""):
+  user = get_user(user_id)
+  return {'me': user == anvil.server.session['user'],
+          'first': user['first_name'],
+          'last': user['last_name'],
+          'seeking': user['seeking_buddy'],
+          'how_empathy': user['how_empathy'],
+          'profile': user['profile']
+         }
+
   
 def new_jitsi_code():
   if matcher.DEBUG:
