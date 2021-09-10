@@ -61,7 +61,8 @@ components:
     name: save_button
     layout_properties: {}
     event_bindings: {click: save_button_click}
-    data_bindings: []
+    data_bindings:
+    - {property: enabled, code: 'self.item[''edits'']'}
   - type: Button
     properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small,
@@ -69,6 +70,7 @@ components:
       underline: false, icon: ''}
     name: cancel_button
     layout_properties: {}
-    data_bindings: []
+    data_bindings:
+    - {property: enabled, code: 'self.item[''edits'']'}
     event_bindings: {click: cancel_button_click}
 is_package: true
