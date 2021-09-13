@@ -7,4 +7,35 @@ components:
     underline: false, icon: 'fa:star-o'}
   name: star_button
   layout_properties: {column: NBEGGD}
+- type: Label
+  properties: {role: null, align: left, tooltip: 'Yes, currently seeking a regular
+      empathy buddy', border: '', foreground: '', visible: true, text: '', font_size: null,
+    font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+    background: '', bold: false, underline: false, icon: 'fa:hand-paper-o'}
+  name: seeking_label
+  layout_properties: {column: PGULWY}
+  data_bindings:
+  - {property: visible, code: 'self.item[''seeking'']'}
+- type: FlowPanel
+  properties: {}
+  name: flow_panel_1
+  layout_properties: {column: TCRDJP}
+  components:
+  - type: Link
+    properties: {}
+    name: link_1
+    layout_properties: {column: TCRDJP}
+    data_bindings:
+    - {property: text, code: 'self.item[''name'']'}
+    event_bindings: {click: link_1_click}
+  - type: Label
+    properties: {role: null, align: left, tooltip: 'Partner: confirmed url and has
+        contributed >1 hour (or eq.)', border: '', foreground: '', visible: true,
+      text: '*', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: true, underline: false,
+      icon: ''}
+    name: label_1
+    layout_properties: {}
+    data_bindings:
+    - {property: visible, code: 'self.item[''confirmed'']'}
 is_package: true

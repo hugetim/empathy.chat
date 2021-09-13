@@ -36,6 +36,10 @@ db_schema:
   id: 18972
   python_name: users
   columns:
+    4cUq8diBvqM=:
+      name: confirmed_url
+      type: string
+      admin_ui: {order: 7.96875, width: 200}
     KRqYcnmPB3c=:
       name: enabled
       type: bool
@@ -108,6 +112,10 @@ db_schema:
       name: remembered_logins
       type: simpleObject
       admin_ui: {order: 10, width: 166}
+    xqXfUGoeW0k=:
+      name: phone
+      type: string
+      admin_ui: {order: 7.9375, width: 200}
     CDvtWmrKzmk=:
       name: password_hash
       type: string
@@ -223,13 +231,9 @@ db_schema:
       type: string
       admin_ui: {order: 3, width: 200}
     Ldt7NL116Bk=:
-      name: date_proposed
+      name: date
       type: datetime
       admin_ui: {order: 2.5, width: 200}
-    OB45e_CA28Y=:
-      name: date_connected
-      type: datetime
-      admin_ui: {order: 4, width: 200}
     Oa9ACUmaChA=:
       name: user1
       type: liveObject

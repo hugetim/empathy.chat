@@ -20,7 +20,7 @@ class Profile(ProfileTemplate):
     
   def update(self):
     self.name_label.text = self.item['first']
-    if (self.item['me'] or (self.item['degree'] in {1, 2})):
+    if (self.item['degree'] <= 2):
       self.name_label.text += " " + self.item['last']
     name_likes = ("I like" if self.item['me'] 
                   else self.item['first'] + " likes")

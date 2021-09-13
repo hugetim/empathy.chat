@@ -38,7 +38,7 @@ class UserMenu(UserMenuTemplate):
     self.content_column_panel.add_component(self.content)  
 
   def go_profile(self):
-    content = Profile()
+    content = Profile(self.item['user_id'])
     self.load_component(content)
     self.profile_tab_button.background = p.SELECTED_TAB_COLOR    
     

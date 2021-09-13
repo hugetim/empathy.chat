@@ -83,26 +83,31 @@ def get_user_info(user):
     user['last_name'] = ""
     user['how_empathy'] = ""
     user['profile'] = ""
+    user['phone'] = ""
+    user['confirmed_url'] = ""
   return user['trust_level']
 
 
 @authenticated_callable
 def init_profile(user_id=""):
   user = get_user(user_id)
+  degree = _degree(user)
   return {'me': user == anvil.server.session['user'],
           'user_id': user_id,
           'first': user['first_name'],
-          'last': user['last_name'],
-          'degree': _degree(user),
+          'last': user['last_name'] if degree <= 2 else "",
+          'degree': degree,
           'seeking': user['seeking_buddy'],
+          'confirmed_url': user['confirmed_url'],
           'how_empathy': user['how_empathy'],
           'profile': user['profile'],
          }
 
 
-def _degree(user):
+def _degree(user2, user1_id=""):
   print("Warning: sm._degree not yet implemented")
-  return None
+  user1 = get_user(user1_id)
+  return 0 if user2 == user1 else 1
 
 @authenticated_callable
 def set_seeking_buddy(seeking, user_id=""):
@@ -123,6 +128,29 @@ def save_user_item(item_name, text, user_id=""):
   user[item_name] = text
   
   
+@authenticated_callable
+def get_connections(user_id=""):
+  print("get_connections: only direct currently implemented")
+  user = get_user(user_id)
+  direct_users = [row['user2']
+           for row in app_tables.connections.search(user1=user)]
+  output = []
+  for user2 in direct_users:
+    degree = _degree(user2, user1_id=user_id)
+    name = user2['first_name']
+    if degree <= 2:
+      name += " " + user2['last_name']
+    output.append({'user_id': user2.get_id(),
+                   'name': name,
+                   'degree': degree,
+                   'seeking': user2['seeking_buddy'],
+                   'confirmed': bool(user2['confirmed_url']),
+                   'last_active': user2['last_login'].strftime("%m/%d/%Y"),
+                   'status': "", # unread message, invited, invite
+                  })
+  return output
+
+
 def new_jitsi_code():
   if matcher.DEBUG:
     print("server_misc.new_jitsi_code()")
