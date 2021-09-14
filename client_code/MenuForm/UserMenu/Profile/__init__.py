@@ -26,7 +26,7 @@ class Profile(ProfileTemplate):
     self.degree_label.text = h.add_num_suffix(self.item['degree'])
     name_likes = ("I like" if self.item['me'] 
                   else self.item['first'] + " likes")
-    self.how_empathy_rich_text.data = {"name_likes": name_likes}    
+    self.how_empathy_label.text = f"How {name_likes} to receive empathy:"
     self.refresh_data_bindings()
 
   def connections_button_click(self, **event_args):
