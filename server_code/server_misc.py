@@ -92,13 +92,18 @@ def get_user_info(user):
 def init_profile(user_id=""):
   user = get_user(user_id)
   degree = _degree(user)
+  confirmed_url_date = (
+    user['confirmed_url_date'].strftime("%m/%d/%Y") if user['confirmed_url']
+    else ""
+  )
   return {'me': user == anvil.server.session['user'],
           'user_id': user_id,
           'first': user['first_name'],
-          'last': user['last_name'] if degree <= 2 else "",
+          'name': _full_name(user['first_name'], user['last_name'], degree),
           'degree': degree,
           'seeking': user['seeking_buddy'],
           'confirmed_url': user['confirmed_url'],
+          'confirmed_date': confirmed_url_date,
           'how_empathy': user['how_empathy'],
           'profile': user['profile'],
          }
@@ -108,6 +113,11 @@ def _degree(user2, user1_id=""):
   print("Warning: sm._degree not yet implemented")
   user1 = get_user(user1_id)
   return 0 if user2 == user1 else 1
+
+
+def _full_name(first, last, degree=3):
+  return first + (" " + last if degree <= 2 else "")
+    
 
 @authenticated_callable
 def set_seeking_buddy(seeking, user_id=""):
@@ -133,15 +143,12 @@ def get_connections(user_id=""):
   print("get_connections: only direct currently implemented")
   user = get_user(user_id)
   direct_users = [row['user2']
-           for row in app_tables.connections.search(user1=user)]
+                  for row in app_tables.connections.search(user1=user)]
   output = []
   for user2 in direct_users:
     degree = _degree(user2, user1_id=user_id)
-    name = user2['first_name']
-    if degree <= 2:
-      name += " " + user2['last_name']
     output.append({'user_id': user2.get_id(),
-                   'name': name,
+                   'name': _full_name(user2['first_name'], user2['last_name'], degree),
                    'degree': degree,
                    'seeking': user2['seeking_buddy'],
                    'confirmed': bool(user2['confirmed_url']),

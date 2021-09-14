@@ -80,6 +80,10 @@ db_schema:
       name: how_empathy
       type: string
       admin_ui: {order: 7.75, width: 115}
+    f6JjMVkE7WU=:
+      name: confirmed_url_date
+      type: datetime
+      admin_ui: {order: 7.984375, width: 200}
     _mqNTfEFbZ8=:
       name: n_password_failures
       type: number

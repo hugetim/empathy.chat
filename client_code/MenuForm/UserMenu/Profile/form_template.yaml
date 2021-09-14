@@ -79,6 +79,35 @@ components:
         background: '', bold: false, underline: false, icon: ''}
       name: label_1
       layout_properties: {grid_position: 'NNIROM,LFIATU'}
+  - type: FlowPanel
+    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
+      foreground: '', visible: true, spacing_above: large, spacing_below: none, background: ''}
+    name: flow_panel_3
+    layout_properties: {grid_position: 'SUCHPK,PSRLXY'}
+    components:
+    - type: Link
+      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: External Web Page, font_size: null, wrap_on: mobile,
+        font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '',
+        spacing_below: small, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
+      name: link_1
+      layout_properties: {}
+      data_bindings:
+      - {property: url, code: 'self.item[''confirmed_url'']'}
+    - type: Label
+      properties: {role: null, align: left, tooltip: 'Partner: confirmed url and has
+          contributed >1 hour (or eq.)', border: '', foreground: '', visible: true,
+        text: '', font_size: null, font: '', spacing_above: medium, icon_align: left,
+        spacing_below: small, italic: false, background: '', bold: true, underline: false,
+        icon: 'fa:check'}
+      name: label_1_copy
+      layout_properties: {}
+      data_bindings:
+      - {property: tooltip, code: 'f"{self.item[''first'']}''s ownership of this web
+          page was confirmed on {self.item[''confirmed_date'']}."'}
+    data_bindings:
+    - {property: visible, code: 'self.item[''confirmed_url'']'}
   - type: RichText
     properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
       foreground: '', visible: true, font_size: null, content: 'How {name_likes} to

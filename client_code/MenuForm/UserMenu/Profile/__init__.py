@@ -7,7 +7,7 @@ from .TextAreaEdit import TextAreaEdit
 
 
 class Profile(ProfileTemplate):
-  item_keys = {'me', 'user_id', 'first', 'last', 'degree', 
+  item_keys = {'me', 'user_id', 'first', 'name', 'degree', 'degree_str',
                'seeking', 'how_empathy', 'profile'}
   
   def __init__(self, user_id="", **properties):
@@ -19,9 +19,7 @@ class Profile(ProfileTemplate):
     self.update()
     
   def update(self):
-    self.name_label.text = self.item['first']
-    if (self.item['degree'] <= 2):
-      self.name_label.text += " " + self.item['last']
+    self.name_label.text = self.item['name']
     name_likes = ("I like" if self.item['me'] 
                   else self.item['first'] + " likes")
     self.how_empathy_rich_text.data = {"name_likes": name_likes}    

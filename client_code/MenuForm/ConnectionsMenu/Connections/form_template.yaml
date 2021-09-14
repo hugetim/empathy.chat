@@ -28,12 +28,13 @@ components:
       foreground: ''
       rows_per_page: 20
       visible: true
+      wrap_on: never
       show_page_controls: true
       spacing_above: small
       spacing_below: small
       background: ''
     name: data_grid_1
-    layout_properties: {grid_position: 'GITKSV,KQVHFQ'}
+    layout_properties: {grid_position: 'CMNMLE,IMYCAB'}
     components:
     - type: RepeatingPanel
       properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.ConnectionsMenu.Connections.ConnectionRow}

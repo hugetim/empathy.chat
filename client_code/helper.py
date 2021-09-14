@@ -7,6 +7,12 @@ def now():
   return datetime.datetime.now().replace(tzinfo=anvil.tz.tzlocal())
 
 
+def add_num_suffix(num):
+  num_suffix = {1: "st", 2: "nd", 3: "rd"}
+  return str(num) + num_suffix.get(num, "th")
+  
+
+
 def seconds_to_digital(seconds):
   original = seconds
   seconds = abs(seconds)
