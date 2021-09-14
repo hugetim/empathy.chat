@@ -294,6 +294,24 @@ def set_request_em_opts(fixed, hours):
   return user['request_em_set_time']
 
 
+@authenticated_callable
+def send_sample_sms():
+  from twilio.rest import Client
+
+  account_sid = anvil.secrets.get_secret('account_sid')
+  auth_token = anvil.secrets.get_secret('auth_token')
+
+  client = Client(account_sid, auth_token)
+
+  message = client.messages.create(
+    body="Join Earth's mightiest heroes. Like Kevin Bacon.",
+    from_='+12312905138',
+    to='+13145706688',
+  )
+
+  print(message.sid)
+
+
 def pinged_email(user, start, duration):
   """Email pinged user, if settings allow"""
   print("'pinged_email'")
