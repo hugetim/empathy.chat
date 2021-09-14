@@ -1,11 +1,15 @@
 import datetime
 import anvil.tz
 import math
+import anvil.users
 
 
 def now():
   return datetime.datetime.now().replace(tzinfo=anvil.tz.tzlocal())
 
+
+def not_me(user_id):
+  return user_id and user_id != anvil.users.get_user().get_id()
 
 def add_num_suffix(num):
   num_suffix = {1: "st", 2: "nd", 3: "rd"}

@@ -88,7 +88,7 @@ class MenuForm(MenuFormTemplate):
     self.reset_and_load(WaitForm(item=item))
 
   def go_connections(self, user_id=""):
-    if user_id and user_id != anvil.users.get_user().get_id():
+    if h.not_me(user_id):
       self.title_label.text = "" # other user's profile
       item = {'user_id': user_id, 'tab': 'connections'}
       self.reset_and_load(UserMenu(item=item)) 
@@ -108,7 +108,7 @@ class MenuForm(MenuFormTemplate):
     self.my_groups_link.role = "selected" 
     
   def go_profile(self, user_id=""):
-    if user_id and user_id != anvil.users.get_user().get_id():
+    if h.not_me(user_id):
       self.title_label.text = "" # other user's profile
       item = {'user_id': user_id, 'tab': 'profile'}
       self.reset_and_load(UserMenu(item=item)) 

@@ -2,6 +2,7 @@ from ._anvil_designer import ProfileTemplate
 from anvil import *
 import anvil.server
 import anvil.users
+from .... import helper as h
 from .NameEdit import NameEdit
 from .TextAreaEdit import TextAreaEdit
 
@@ -19,7 +20,10 @@ class Profile(ProfileTemplate):
     self.update()
     
   def update(self):
+    if not self.item['me']:
+      get_open_form().title_label.text = f"{self.item['first']}'s Profile"
     self.name_label.text = self.item['name']
+    self.degree_label.text = h.add_num_suffix(self.item['degree'])
     name_likes = ("I like" if self.item['me'] 
                   else self.item['first'] + " likes")
     self.how_empathy_rich_text.data = {"name_likes": name_likes}    
@@ -27,7 +31,10 @@ class Profile(ProfileTemplate):
 
   def connections_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    get_open_form().go_connections(self.item['user_id'])
+    if self.item['me']:
+      get_open_form().go_connections()
+    else:
+      get_open_form().content.go_connections()
 
   def edit_name_button_click(self, **event_args):
     """This method is called when the button is clicked"""
