@@ -14,8 +14,7 @@ class NameEdit(NameEditTemplate):
 
   def text_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
-    if not self.save_button.enabled:
-      self.save_button.enabled = True
+    self.save_button.enabled = self.first_name_text_box.text
 
   def save_button_click(self, **event_args):
     """This method is called when the button is clicked"""

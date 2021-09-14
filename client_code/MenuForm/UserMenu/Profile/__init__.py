@@ -8,7 +8,7 @@ from .TextAreaEdit import TextAreaEdit
 
 
 class Profile(ProfileTemplate):
-  item_keys = {'me', 'user_id', 'first', 'name', 'degree', 'degree_str',
+  item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'degree_str',
                'seeking', 'how_empathy', 'profile'}
   
   def __init__(self, user_id="", **properties):
@@ -51,6 +51,7 @@ class Profile(ProfileTemplate):
       anvil.server.call('save_name', edit_form.item)
       self.item['first'] = edit_form.item['first']
       self.item['last'] = edit_form.item['last']
+      self.item['name'] = f"{self.item['first']} {self.item['last']}"
       self.update()
 
   def seeking_toggleswitch_change(self, **event_args):

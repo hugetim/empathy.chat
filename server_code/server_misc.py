@@ -130,6 +130,8 @@ def init_profile(user_id=""):
     else ""
   )
   record.update({'me': user == anvil.server.session['user'],
+                 'first': user['first_name'],
+                 'last': user['last_name'],
                  'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
