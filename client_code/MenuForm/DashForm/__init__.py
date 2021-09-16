@@ -111,8 +111,10 @@ class DashForm(DashFormTemplate):
     """This method is called when the button is clicked"""
     start_now = not bool(self.item['status'])
     new_prop = t.Proposal(times=[t.ProposalTime(start_now=start_now)])
-    content = CreateForm(item=new_prop.create_form_item(self.item['status'],
-                                                        self.get_conflict_checks()))
+    form_item = new_prop.create_form_item(self.item['status'],
+                                          self.get_conflict_checks())
+    form_item['user_items'] = anvil.server.call('get_port_eligible_users')
+    content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
                 title="New Empathy Chat Proposal",

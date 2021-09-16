@@ -53,7 +53,7 @@ def is_visible(user2, user1=None):
   elif trust2 is None:
     return False
   else:
-    return trust1 > 0 and trust2 > 0
+    return trust1 > 0 and trust2 > 0 and _degree(user2, user1) <= 3
 
   
 def port_eligible_users(others=[]):

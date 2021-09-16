@@ -180,7 +180,9 @@ class MenuForm(MenuFormTemplate):
 
   def test_proposal_button_click(self, **event_args):
     user_id = self.test_requestuser_drop_down.selected_value
-    content = CreateForm(item=t.Proposal().create_form_item())
+    form_item = t.Proposal().create_form_item()
+    form_item['user_items'] = anvil.server.call('get_port_eligible_users', user_id)
+    content = CreateForm(item=form_item)
     self.proposal_alert = content
     out = alert(content=self.proposal_alert,
                 title="New Empathy Chat Proposal",
@@ -189,8 +191,6 @@ class MenuForm(MenuFormTemplate):
                 buttons=[])
     if user_id and out is True:
       proposal = content.proposal()
-      if (not proposal.times[0].start_now) or len(proposal.times)>1:
-        alert(title='"later" proposals not implemented yet')
       anvil.server.call('test_add_request', user_id, proposal)
     else:
       alert("User and saved proposal required to add request.")
