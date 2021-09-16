@@ -187,7 +187,7 @@ class Proposal():
     """Convert a proposal dictionary to the format of self.item"""
     item = {'prop_id': self.prop_id, 
             'eligible': self.eligible, 
-            'eligible_users': self.eligible_users, 
+            'eligible_users': [port_user.user_id for port_user in self.eligible_users], 
             'eligible_groups': self.eligible_groups,
             'conflict_checks': conflict_checks,}
     first, *alts = self.times
@@ -200,8 +200,9 @@ class Proposal():
   def from_create_form(item):
     first_time = ProposalTime.from_create_form(item)
     alts = [ProposalTime.from_create_form(alt) for alt in item['alt']]
-    eligible_users = item['eligible_users'] #[User(user_id=u[1], name=u[0])
-                      #for u in item['eligible_users']]
+    name_dict = {user_id: name for name, user_id in item['user_items']}
+    eligible_users = [User(user_id=user_id, name=name_dict[user_id])
+                      for user_id in item['eligible_users']]
     return Proposal(prop_id=item.get('prop_id'),
                     times=[first_time] + alts,
                     eligible=item['eligible'],

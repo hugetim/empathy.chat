@@ -247,7 +247,8 @@ components:
     name: multi_select_drop_down
     layout_properties: {grid_position: 'ZOGPKZ,GNUIJB PGYIAA,VZADMQ'}
     data_bindings:
-    - {property: selected, code: 'self.item[''eligible_users'']', writeback: true}
+    - {property: items, code: 'self.item[''user_items'']'}
+    event_bindings: {change: multi_select_drop_down_change}
   - type: Spacer
     properties: {height: 32}
     name: spacer_2

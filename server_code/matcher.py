@@ -788,7 +788,7 @@ class Proposal():
   @staticmethod
   def add(user, port_prop):
     now = sm.now()
-    user_rows = [app_tables.users.get_by_id(eligible_user_id) for eligible_user_id in port_prop.eligible_users]
+    user_rows = [app_tables.users.get_by_id(port_user.user_id) for port_user in port_prop.eligible_users]
     new_prop_row = app_tables.proposals.add_row(user=user,
                                                 current=True,
                                                 created=now,

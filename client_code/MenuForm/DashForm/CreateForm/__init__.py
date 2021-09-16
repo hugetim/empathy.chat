@@ -16,6 +16,7 @@ class CreateForm(CreateFormTemplate):
   
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
+    print(self.item)
     self.init_components(**properties)
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel
@@ -32,7 +33,8 @@ class CreateForm(CreateFormTemplate):
                                      ("Direct connections only (1st degree)", 1),
                                      ("Specific user(s)...",0)
                                     ]
-    self.multi_select_drop_down.items = anvil.server.call('get_port_eligible_users')
+    print(self.item)
+    self.multi_select_drop_down.selected = self.item['eligible_users']
     self.normalize_initial_state()
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
@@ -184,6 +186,11 @@ class CreateForm(CreateFormTemplate):
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.raise_event("x-close-alert", value=False)
+
+  def multi_select_drop_down_change(self, **event_args):
+    """This method is called when the selected values change"""
+    self.item['eligible_users'] = self.multi_select_drop_down.selected
+
 
 
 

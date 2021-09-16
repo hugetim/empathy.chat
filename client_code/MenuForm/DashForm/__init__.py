@@ -127,8 +127,11 @@ class DashForm(DashFormTemplate):
     """This method is called when the button is clicked"""
     [prop_to_edit] = [prop_item['prop'] for prop_item in self.item['proposals'] 
                       if prop_item['prop'].prop_id == prop_id]
-    content = CreateForm(item=prop_to_edit.create_form_item(self.item['status'],
-                                                            self.get_conflict_checks()))
+    form_item = prop_to_edit.create_form_item(self.item['status'],
+                                              self.get_conflict_checks())
+    form_item['user_items'] = anvil.server.call('get_port_eligible_users')
+    print(form_item)
+    content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
                 title="Edit Empathy Chat Proposal",
@@ -136,9 +139,9 @@ class DashForm(DashFormTemplate):
                 dismissible=False,
                 buttons=[])
     if out is True:
+      print(content.item)
       proposal = content.proposal()
-      if (not proposal.times[0].start_now) or len(proposal.times)>1:
-        alert(title='"later" proposals not implemented yet')
+      print(proposal)
       self.update_status(anvil.server.call('edit_proposal', proposal))   
       
   def confirm_match(self, seconds):
