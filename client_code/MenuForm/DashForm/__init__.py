@@ -130,7 +130,6 @@ class DashForm(DashFormTemplate):
     form_item = prop_to_edit.create_form_item(self.item['status'],
                                               self.get_conflict_checks())
     form_item['user_items'] = anvil.server.call('get_port_eligible_users')
-    print(form_item)
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
@@ -139,9 +138,7 @@ class DashForm(DashFormTemplate):
                 dismissible=False,
                 buttons=[])
     if out is True:
-      print(content.item)
       proposal = content.proposal()
-      print(proposal)
       self.update_status(anvil.server.call('edit_proposal', proposal))   
       
   def confirm_match(self, seconds):

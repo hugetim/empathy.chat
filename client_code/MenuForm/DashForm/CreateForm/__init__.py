@@ -16,7 +16,6 @@ class CreateForm(CreateFormTemplate):
   
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
-    print(self.item)
     self.init_components(**properties)
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel
@@ -33,7 +32,6 @@ class CreateForm(CreateFormTemplate):
                                      ("Direct connections only (1st degree)", 1),
                                      ("Specific user(s)...",0)
                                     ]
-    print(self.item)
     self.multi_select_drop_down.selected = self.item['eligible_users']
     self.normalize_initial_state()
     self.date_picker_start_initialized = False
