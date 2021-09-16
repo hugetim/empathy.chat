@@ -1,6 +1,6 @@
 container:
   type: ColumnPanel
-  event_bindings: {show: form_show}
+  event_bindings: {}
   properties: {col_widths: '{}'}
 components:
 - type: ColumnPanel
