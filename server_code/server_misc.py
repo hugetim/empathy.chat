@@ -54,7 +54,7 @@ def is_visible(user2, user1=None):
   elif trust2 is None:
     return False
   else:
-    return trust1 > 0 and trust2 > 0 and _degree(user2, user1) <= 3
+    return trust1 > 0 and trust2 > 0 and _degree(user2, user1.get_id()) <= 3
 
   
 def port_eligible_users(others=[]):
@@ -68,7 +68,8 @@ def port_eligible_users(others=[]):
 def get_port_eligible_users(user_id=""):
   user = get_user(user_id)
   others = [other for other in app_tables.users.search()
-            if (is_visible(other, user) and user['first_name'] is not None)]
+            if (is_visible(other, user) and other != user)
+           ]
   return port_eligible_users(others)
 
 
@@ -90,22 +91,23 @@ def get_user_info(user):
 
 
 def _degree(user2, user1_id=""):
-  """Returns -1 if no degree <= 3 found"""
+  """Returns 9 if no degree <= 3 found"""
   user1 = get_user(user1_id)
-  degree1s = [row['user2'] for row in app_tables.connections.search(user1=user1)]
+  degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user1)])
   degree2s = set()
+  degree01s = degree1s | {user1}
   for degree1 in degree1s:
     degree2s.update(
       [row['user2'] for row in app_tables.connections.search(user1=q.any_of(*degree1s))
-       if row['user2'] not in degree1s
+       if row['user2'] not in degree01s
       ]
     )
   degree3s = set()
-  degree12s = degree1s | degree2s
+  degree02s = degree01s | degree2s
   for degree2 in degree2s:
     degree3s.update(
       [row['user2'] for row in app_tables.connections.search(user1=q.any_of(*degree2s))
-       if row['user2'] not in degree12s
+       if row['user2'] not in degree02s
       ]
     )
   if user2 == user1:
@@ -117,7 +119,7 @@ def _degree(user2, user1_id=""):
   elif user2 in degree3s:
     return 3
   else:
-    return -1
+    return 9
 
 
 def _full_name(first, last, degree=3):

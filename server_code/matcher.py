@@ -751,7 +751,7 @@ class Proposal():
     return self._prop_row['user']
   
   def is_visible(self, user):
-    return (sm._degree(self._prop_row['user'], user) <= self.eligible
+    return (sm._degree(self._prop_row['user'], user.get_id()) <= self.eligible
             or (self.eligible == 0 and user in self.eligible_users)
            )
 
