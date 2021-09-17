@@ -50,7 +50,7 @@ services:
   server_config: {}
 package_name: empathy_chat
 allow_embedding: true
-name: empathy.chat test
+name: empathy.chat
 runtime_options: {version: 2, server_version: python3-full, client_version: '3'}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico',
   title: empathy.chat}
