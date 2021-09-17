@@ -67,9 +67,8 @@ def port_eligible_users(others=[]):
 @authenticated_callable
 def get_port_eligible_users(user_id=""):
   user = get_user(user_id)
-  others = [other for other in app_tables.users.search()
-            if (is_visible(other, user) and other != user)
-           ]
+  dset = _get_connections(user, 1)
+  others = [other for other in dset[1]]
   return port_eligible_users(others)
 
 
@@ -90,36 +89,36 @@ def get_user_info(user):
   return user['trust_level']
 
 
-def _degree(user2, user1_id=""):
-  """Returns 9 if no degree <= 3 found"""
+def _get_connections(user, up_to_degree=3):
+  """Return dictionary from degree to set of connections"""
+  assert up_to_degree in [1, 2, 3]
+  degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user)])
+  out = {1: degree1s}
+  assert user not in out[1]
+  prev = {user}
+  for d in range(up_to_degree):
+    current = set()
+    prev.update(out[d])
+    current.update(
+      {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]))
+        if row['user2'] not in prev
+      }
+    )
+    out[d+1] = current
+  return out
+    
+    
+def _degree(user2, user1_id="", up_to_degree=3):
+  """Returns 99 if no degree <= up_to_degree found"""
   user1 = get_user(user1_id)
-  degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user1)])
-  degree2s = set()
-  degree01s = degree1s | {user1}
-  for degree1 in degree1s:
-    degree2s.update(
-      [row['user2'] for row in app_tables.connections.search(user1=q.any_of(*degree1s))
-       if row['user2'] not in degree01s
-      ]
-    )
-  degree3s = set()
-  degree02s = degree01s | degree2s
-  for degree2 in degree2s:
-    degree3s.update(
-      [row['user2'] for row in app_tables.connections.search(user1=q.any_of(*degree2s))
-       if row['user2'] not in degree02s
-      ]
-    )
+  dset = _get_connections(user1, up_to_degree)
   if user2 == user1:
     return 0
-  elif user2 in degree1s:
-    return 1
-  elif user2 in degree2s:
-    return 2
-  elif user2 in degree3s:
-    return 3
   else:
-    return 9
+    for d in range(1, up_to_degree+1):
+      if user2 in dset[d]:
+        return d
+    return 99
 
 
 def _full_name(first, last, degree=3):
