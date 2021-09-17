@@ -2,6 +2,7 @@ import anvil.users
 import anvil.server
 import anvil.tables
 from anvil.tables import app_tables
+import anvil.tables.query as q
 import anvil.secrets
 import anvil.email
 import datetime
@@ -89,9 +90,34 @@ def get_user_info(user):
 
 
 def _degree(user2, user1_id=""):
-  print("Warning: sm._degree not yet implemented")
+  """Returns -1 if no degree <= 3 found"""
   user1 = get_user(user1_id)
-  return 0 if user2 == user1 else 1
+  degree1s = [row['user2'] for row in app_tables.connections.search(user1=user1)]
+  degree2s = set()
+  for degree1 in degree1s:
+    degree2s.update(
+      [row['user2'] for row in app_tables.connections.search(user1=q.any_of(*degree1s))
+       if row['user2'] not in degree1s
+      ]
+    )
+  degree3s = set()
+  degree12s = degree1s | degree2s
+  for degree2 in degree2s:
+    degree3s.update(
+      [row['user2'] for row in app_tables.connections.search(user1=q.any_of(*degree2s))
+       if row['user2'] not in degree12s
+      ]
+    )
+  if user2 == user1:
+    return 0
+  elif user2 in degree1s:
+    return 1
+  elif user2 in degree2s:
+    return 2
+  elif user2 in degree3s:
+    return 3
+  else:
+    return -1
 
 
 def _full_name(first, last, degree=3):
