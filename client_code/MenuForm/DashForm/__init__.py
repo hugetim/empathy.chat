@@ -113,7 +113,7 @@ class DashForm(DashFormTemplate):
     new_prop = t.Proposal(times=[t.ProposalTime(start_now=start_now)])
     form_item = new_prop.create_form_item(self.item['status'],
                                           self.get_conflict_checks())
-    form_item['user_items'] = anvil.server.call('get_port_eligible_users')
+    form_item['user_items'] = anvil.server.call('get_create_user_items')
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
@@ -131,7 +131,7 @@ class DashForm(DashFormTemplate):
                       if prop_item['prop'].prop_id == prop_id]
     form_item = prop_to_edit.create_form_item(self.item['status'],
                                               self.get_conflict_checks())
-    form_item['user_items'] = anvil.server.call('get_port_eligible_users')
+    form_item['user_items'] = anvil.server.call('get_create_user_items')
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,

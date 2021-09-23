@@ -59,7 +59,7 @@ def is_visible(user2, user1=None):
 
   
 @authenticated_callable
-def get_port_eligible_users(user_id=""):
+def get_create_user_items(user_id=""):
   """Return list with 1st---2nd""" # add pending connections to front
   user = get_user(user_id)
   dset = _get_connections(user, 2)
