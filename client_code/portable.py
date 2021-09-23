@@ -28,16 +28,34 @@ CANCEL_TEXT = {5: "5 min. prior",
               }
 
 
+def last_name(last, degree=3):
+  return last if degree <= 2 else ""
+
+
+def full_name(first, last, degree=3):
+  maybe_last = last_name(last, degree)
+  return first + (" " + maybe_last if maybe_last else "")
+    
+
 @anvil.server.portable_class
 class User():
   
   def __init__(self, user_id=None, name=None):
     self.user_id = user_id
     self.name = name
+
+  def item(self):
+    return (self.name, self.user_id)
+
+  @staticmethod
+  def from_item(item):
+    return User(item(1), item(0))
   
   @staticmethod
-  def get(user_row):
-    return User(user_row.get_id(), user_row['first_name'])
+  def get(user_row, degree=3):
+    return User(user_row.get_id(), 
+                full_name(user_row['first_name'], user_row['last_name'], degree),
+               )
 
     
 @anvil.server.portable_class

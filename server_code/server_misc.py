@@ -11,6 +11,7 @@ import re
 from . import parameters as p
 from . import helper as h
 from . import matcher
+from . import portable as port
 
 
 authenticated_callable = anvil.server.callable(require_user=True)
@@ -57,19 +58,15 @@ def is_visible(user2, user1=None):
     return trust1 > 0 and trust2 > 0 and _degree(user2, user1.get_id()) <= 3
 
   
-def port_eligible_users(others=[]):
-  if others:
-    return [(other['first_name'], other.get_id()) for other in others]
-  else:
-    return []
-
-
 @authenticated_callable
 def get_port_eligible_users(user_id=""):
+  """Return list with 1st---2nd""" # add pending connections to front
   user = get_user(user_id)
-  dset = _get_connections(user, 1)
-  others = [other for other in dset[1]]
-  return port_eligible_users(others)
+  degree = 1
+  dset = _get_connections(user, degree)
+  for degree in [1, 2]:
+    items[degree] = [port.User.get(other, degree).item() for other in dset[degree]]
+  return items[1] + ["---"] + items[2]
 
 
 def get_user_info(user):
@@ -121,10 +118,6 @@ def _degree(user2, user1_id="", up_to_degree=3):
     return 99
 
 
-def _full_name(first, last, degree=3):
-  return first + (" " + last if degree <= 2 else "")
-    
-
 @authenticated_callable
 def get_connections(user_id=""):
   print("get_connections: only direct currently implemented")
@@ -137,7 +130,7 @@ def get_connections(user_id=""):
 def _connection_record(user2, user_id=""):
   degree = _degree(user2, user1_id=user_id)
   return {'user_id': user2.get_id(),
-          'name': _full_name(user2['first_name'], user2['last_name'], degree),
+          'name': port.full_name(user2['first_name'], user2['last_name'], degree),
           'degree': degree,
           'seeking': user2['seeking_buddy'],
           'confirmed': bool(user2['confirmed_url']),
@@ -158,7 +151,7 @@ def init_profile(user_id=""):
   )
   record.update({'me': user == anvil.server.session['user'],
                  'first': user['first_name'],
-                 'last': user['last_name'],
+                 'last': port.last_name(user['last_name'], record['degree']),
                  'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
