@@ -63,6 +63,7 @@ def get_create_user_items(user_id=""):
   """Return list with 1st---2nd""" # add pending connections to front
   user = get_user(user_id)
   dset = _get_connections(user, 2)
+  items = {}
   for degree in [1, 2]:
     items[degree] = [port.User.get(other, degree).item() for other in dset[degree]]
   return items[1] + ["---"] + items[2]
@@ -89,9 +90,9 @@ def _get_connections(user, up_to_degree=3):
   """Return dictionary from degree to set of connections"""
   assert up_to_degree in [1, 2, 3]
   degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user)])
-  out = {1: degree1s}
+  out = {0: {user}, 1: degree1s}
   assert user not in out[1]
-  prev = {user}
+  prev = set()
   for d in range(up_to_degree):
     current = set()
     prev.update(out[d])
@@ -101,6 +102,7 @@ def _get_connections(user, up_to_degree=3):
       }
     )
     out[d+1] = current
+  del out[0]
   return out
     
     
