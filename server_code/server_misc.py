@@ -62,8 +62,7 @@ def is_visible(user2, user1=None):
 def get_port_eligible_users(user_id=""):
   """Return list with 1st---2nd""" # add pending connections to front
   user = get_user(user_id)
-  degree = 1
-  dset = _get_connections(user, degree)
+  dset = _get_connections(user, 2)
   for degree in [1, 2]:
     items[degree] = [port.User.get(other, degree).item() for other in dset[degree]]
   return items[1] + ["---"] + items[2]
@@ -119,12 +118,14 @@ def _degree(user2, user1_id="", up_to_degree=3):
 
 
 @authenticated_callable
-def get_connections(user_id=""):
-  print("get_connections: only direct currently implemented")
+def get_connections(user_id="", up_to_degree=3):
+  print("get_connections")
   user = get_user(user_id)
-  direct_users = [row['user2']
-                  for row in app_tables.connections.search(user1=user)]
-  return [_connection_record(user2, user_id) for user2 in direct_users]
+  dset = _get_connections(user, up_to_degree)
+  user2s = []
+  for d in range(1, up_to_degree+1):
+    user2s += dset[d]
+  return [_connection_record(user2, user_id) for user2 in user2s]
 
 
 def _connection_record(user2, user_id=""):
