@@ -181,7 +181,6 @@ class MenuForm(MenuFormTemplate):
   def test_proposal_button_click(self, **event_args):
     user_id = self.test_requestuser_drop_down.selected_value
     form_item = t.Proposal().create_form_item()
-    form_item['user_items'] = anvil.server.call('get_create_user_items', user_id)
     content = CreateForm(item=form_item)
     self.proposal_alert = content
     out = alert(content=self.proposal_alert,

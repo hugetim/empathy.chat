@@ -109,11 +109,16 @@ class DashForm(DashFormTemplate):
     
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
+    self.propose()
+    
+  def propose(self, specified_user=""):
     start_now = not bool(self.item['status'])
     new_prop = t.Proposal(times=[t.ProposalTime(start_now=start_now)])
     form_item = new_prop.create_form_item(self.item['status'],
                                           self.get_conflict_checks())
-    form_item['user_items'] = anvil.server.call('get_create_user_items')
+    if specified_user:
+      form_item['eligible'] = 0
+      form_item['eligible_users'] = [specified_user]
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
@@ -131,7 +136,6 @@ class DashForm(DashFormTemplate):
                       if prop_item['prop'].prop_id == prop_id]
     form_item = prop_to_edit.create_form_item(self.item['status'],
                                               self.get_conflict_checks())
-    form_item['user_items'] = anvil.server.call('get_create_user_items')
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,

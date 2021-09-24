@@ -68,6 +68,10 @@ components:
         background: '', bold: false, underline: false, icon: 'fa:child'}
       name: propose_button
       layout_properties: {}
+      data_bindings:
+      - {property: visible, code: '(not self.item[''me'']) and self.item[''degree'']
+          <= 2'}
+      event_bindings: {click: propose_button_click}
   - type: ColumnPanel
     properties: {col_widths: '{}'}
     name: column_panel_relationship

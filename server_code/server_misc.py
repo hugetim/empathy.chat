@@ -153,16 +153,43 @@ def init_profile(user_id=""):
     user['confirmed_url_date'].strftime("%m/%d/%Y") if user['confirmed_url']
     else ""
   )
-  record.update({'me': user == anvil.server.session['user'],
+  is_me = user == anvil.server.session['user']
+  record.update({'me': is_me,
                  'first': user['first_name'],
                  'last': port.last_name(user['last_name'], record['degree']),
+                 'relationships': [] if is_me else _get_relationships(user, anvil.server.session['user_id']),
                  'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
                 })
   return record
-  
+
+
+def _get_relationship(user2, user1_id="", up_to_degree=3):
+  """Returns ordered list of dictionaries"""
+  user1 = get_user(user1_id)
+  dset = _get_connections(user1, up_to_degree)
+  if user2 == user1:
+    return []
+  else:
+    degree = None
+    for d in range(1, up_to_degree+1):
+      if user2 in dset[d]:
+        degree = d
+        break
+    if not degree: 
+      return []
+    elif degree == 1:
+      conn_row = app_tables.connections.get(user1=user1, user2=user2)
+      return [{"via": False, "whose": "my", "desc": conn_row["relationship2to1"], "date": ""}]
+    #[{"via": True, "whose": "", "desc": "", "date": ""}] if degree <= 2 else 
+    out = []
+    dset2 = _get_connections(user2, degree-1)
+    for d in range(degree-1, 0, -1):
+      if 
+    
+    
   
 @authenticated_callable
 def set_seeking_buddy(seeking, user_id=""):

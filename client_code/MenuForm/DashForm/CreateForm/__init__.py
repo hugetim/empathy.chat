@@ -14,9 +14,10 @@ class CreateForm(CreateFormTemplate):
   def proptime(self):
     return t.ProposalTime.from_create_form(self.item)
   
-  def __init__(self, **properties):
+  def __init__(self, item, **properties):
     # Set Form properties and Data Bindings.
-    self.init_components(**properties)
+    item['user_items'] = anvil.server.call('get_create_user_items')
+    self.init_components(item=item, **properties)
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel
     

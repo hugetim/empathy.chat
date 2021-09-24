@@ -89,3 +89,14 @@ class Profile(ProfileTemplate):
       anvil.server.call('save_user_item', 'profile', edit_form.item['text'])
       self.item['profile'] = edit_form.item['text']
       self.update()
+
+  def propose_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    state = anvil.server.call('get_status')
+    top_form = get_open_form()
+    top_form.reset_status(state)
+    if state['status'] not in ["pinging", "matched"]:
+      top_form.content.propose(specified_user=self.item['user_id'])
+    else:
+      alert("Unable to propose exchange just now. Please try again later.")
+
