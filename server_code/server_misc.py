@@ -89,7 +89,7 @@ def get_user_info(user):
 
 def _get_connections(user, up_to_degree=3, include_zero=False):
   """Return dictionary from degree to set of connections"""
-  assert up_to_degree in [1, 2, 3]
+  assert (up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)
   degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user)])
   out = {0: {user}, 1: degree1s}
   assert user not in out[1]
@@ -164,7 +164,6 @@ def init_profile(user_id=""):
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
                 })
-  print(record['relationships'])
   return record
 
 

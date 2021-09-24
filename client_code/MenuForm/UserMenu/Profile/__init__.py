@@ -5,6 +5,7 @@ import anvil.users
 from .... import helper as h
 from .NameEdit import NameEdit
 from .TextAreaEdit import TextAreaEdit
+from .Relationship import Relationship
 
 
 class Profile(ProfileTemplate):
@@ -17,6 +18,7 @@ class Profile(ProfileTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.relationship_repeating_panel.items = self.item['relationships']
     self.update()
     
   def update(self):
