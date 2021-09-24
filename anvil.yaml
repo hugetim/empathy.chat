@@ -1,6 +1,4 @@
 dependencies:
-- app_id: SV7QK4XBYUXPMHHM
-  version: {dev: false}
 - app_id: MFQJNLWQIOGGXL4W
   version: {dev: false}
 - app_id: C6ZZPAPN4YYF5NVJ
