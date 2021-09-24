@@ -739,11 +739,21 @@ class Proposal():
   def _row(self):
     return self._prop_row
   
+  @property
+  def eligible(self):
+    return self._prop_row['eligible']
+
+  @property
+  def eligible_users(self):
+    return self._prop_row['eligible_users']
+  
   def proposer(self):
     return self._prop_row['user']
   
   def is_visible(self, user):
-    return sm.is_visible(self._prop_row['user'], user)
+    return (sm._degree(self._prop_row['user'], user.get_id()) <= self.eligible
+            or (self.eligible == 0 and user in self.eligible_users)
+           )
 
   def hide_unaccepted_times(self):
     for proptime in ProposalTime.times_from_proposal(self, require_current=True):

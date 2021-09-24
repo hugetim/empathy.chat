@@ -2,6 +2,7 @@ import anvil.users
 import anvil.server
 import anvil.tables
 from anvil.tables import app_tables
+import anvil.tables.query as q
 import anvil.secrets
 import anvil.email
 import datetime
@@ -10,6 +11,7 @@ import re
 from . import parameters as p
 from . import helper as h
 from . import matcher
+from . import portable as port
 
 
 authenticated_callable = anvil.server.callable(require_user=True)
@@ -53,22 +55,19 @@ def is_visible(user2, user1=None):
   elif trust2 is None:
     return False
   else:
-    return trust1 > 0 and trust2 > 0
+    return trust1 > 0 and trust2 > 0 and _degree(user2, user1.get_id()) <= 3
 
   
-def port_eligible_users(others=[]):
-  if others:
-    return [(other['first_name'], other.get_id()) for other in others]
-  else:
-    return []
-
-
 @authenticated_callable
-def get_port_eligible_users(user_id=""):
+def get_create_user_items(user_id=""):
+  """Return list with 1st---2nd""" # add pending connections to front
+  print("get_create_user_items", user_id)
   user = get_user(user_id)
-  others = [other for other in app_tables.users.search()
-            if (is_visible(other, user) and user['first_name'] is not None)]
-  return port_eligible_users(others)
+  dset = _get_connections(user, 2)
+  items = {}
+  for degree in [1, 2]:
+    items[degree] = [port.User.get(other, degree).item() for other in dset[degree]]
+  return items[1] + ["---"] + items[2]
 
 
 def get_user_info(user):
@@ -88,29 +87,54 @@ def get_user_info(user):
   return user['trust_level']
 
 
-def _degree(user2, user1_id=""):
-  print("Warning: sm._degree not yet implemented")
-  user1 = get_user(user1_id)
-  return 0 if user2 == user1 else 1
-
-
-def _full_name(first, last, degree=3):
-  return first + (" " + last if degree <= 2 else "")
+def _get_connections(user, up_to_degree=3):
+  """Return dictionary from degree to set of connections"""
+  assert up_to_degree in [1, 2, 3]
+  degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user)])
+  out = {0: {user}, 1: degree1s}
+  assert user not in out[1]
+  prev = set()
+  for d in range(up_to_degree):
+    current = set()
+    prev.update(out[d])
+    current.update(
+      {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]))
+        if row['user2'] not in prev
+      }
+    )
+    out[d+1] = current
+  del out[0]
+  return out
     
+    
+def _degree(user2, user1_id="", up_to_degree=3):
+  """Returns 99 if no degree <= up_to_degree found"""
+  user1 = get_user(user1_id)
+  dset = _get_connections(user1, up_to_degree)
+  if user2 == user1:
+    return 0
+  else:
+    for d in range(1, up_to_degree+1):
+      if user2 in dset[d]:
+        return d
+    return 99
+
 
 @authenticated_callable
-def get_connections(user_id=""):
-  print("get_connections: only direct currently implemented")
+def get_connections(user_id="", up_to_degree=3):
+  print("get_connections", user_id, up_to_degree)
   user = get_user(user_id)
-  direct_users = [row['user2']
-                  for row in app_tables.connections.search(user1=user)]
-  return [_connection_record(user2, user_id) for user2 in direct_users]
+  dset = _get_connections(user, up_to_degree)
+  user2s = []
+  for d in range(1, up_to_degree+1):
+    user2s += dset[d]
+  return [_connection_record(user2, user_id) for user2 in user2s]
 
 
 def _connection_record(user2, user_id=""):
   degree = _degree(user2, user1_id=user_id)
   return {'user_id': user2.get_id(),
-          'name': _full_name(user2['first_name'], user2['last_name'], degree),
+          'name': port.full_name(user2['first_name'], user2['last_name'], degree),
           'degree': degree,
           'seeking': user2['seeking_buddy'],
           'confirmed': bool(user2['confirmed_url']),
@@ -131,7 +155,7 @@ def init_profile(user_id=""):
   )
   record.update({'me': user == anvil.server.session['user'],
                  'first': user['first_name'],
-                 'last': user['last_name'],
+                 'last': port.last_name(user['last_name'], record['degree']),
                  'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
