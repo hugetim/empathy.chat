@@ -87,7 +87,7 @@ def get_user_info(user):
   return user['trust_level']
 
 
-def _get_connections(user, up_to_degree=3):
+def _get_connections(user, up_to_degree=3, include_zero=False):
   """Return dictionary from degree to set of connections"""
   assert up_to_degree in [1, 2, 3]
   degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user)])
@@ -103,7 +103,8 @@ def _get_connections(user, up_to_degree=3):
       }
     )
     out[d+1] = current
-  del out[0]
+  if not include_zero:
+    del out[0]
   return out
     
     
@@ -150,7 +151,7 @@ def init_profile(user_id=""):
   user = get_user(user_id)
   record = _connection_record(user)
   confirmed_url_date = (
-    user['confirmed_url_date'].strftime("%m/%d/%Y") if user['confirmed_url']
+    user['confirmed_url_date'].strftime(p.DATE_FORMAT) if user['confirmed_url']
     else ""
   )
   is_me = user == anvil.server.session['user']
@@ -163,10 +164,11 @@ def init_profile(user_id=""):
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
                 })
+  print(record['relationships'])
   return record
 
 
-def _get_relationship(user2, user1_id="", up_to_degree=3):
+def _get_relationships(user2, user1_id="", up_to_degree=3):
   """Returns ordered list of dictionaries"""
   user1 = get_user(user1_id)
   dset = _get_connections(user1, up_to_degree)
@@ -181,14 +183,35 @@ def _get_relationship(user2, user1_id="", up_to_degree=3):
     if not degree: 
       return []
     elif degree == 1:
-      conn_row = app_tables.connections.get(user1=user1, user2=user2)
-      return [{"via": False, "whose": "my", "desc": conn_row["relationship2to1"], "date": ""}]
+      conn = app_tables.connections.get(user1=user1, user2=user2)
+      return [{"via": False, 
+               "whose": "my", 
+               "desc": conn['relationship2to1'], 
+               "date": conn['date_described'].strftime(p.DATE_FORMAT), 
+               "child": None}]
     #[{"via": True, "whose": "", "desc": "", "date": ""}] if degree <= 2 else 
     out = []
-    dset2 = _get_connections(user2, degree-1)
-    for d in range(degree-1, 0, -1):
-      if 
-    
+    dset2 = _get_connections(user2, degree-2, include_zero=True)
+    seconds = dset[2] & dset2[degree-2]
+    for second in seconds:
+      dset_second = _get_connections(second, 1)
+      firsts = dset[1] & dset_second[1]
+      for first in firsts:
+        name = port.full_name(first['first_name'], first['last_name'], 1)
+        conn2 = app_tables.connections.get(user1=first, user2=second)
+        conn1 = app_tables.connections.get(user1=user1, user2=first)
+        out.append({"via": degree > 2,
+                    "whose": f"{name}'s", 
+                    "desc": conn2['relationship2to1'],
+                    "date": conn2['date_described'].strftime(p.DATE_FORMAT),
+                    "child": {"via": False,
+                              "whose": "my", 
+                              "desc": conn1['relationship2to1'],
+                              "date": conn1['date_described'].strftime(p.DATE_FORMAT),
+                              "child": None,
+                             },
+                   })
+    return out 
     
   
 @authenticated_callable

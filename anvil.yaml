@@ -73,10 +73,33 @@ db_schema:
       admin_ui: {width: 200}
       type: datetime
   invites:
-    title: Table 9
+    title: Invites
     client: none
     server: full
-    columns: []
+    columns:
+    - name: user1
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: user2
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: date
+      admin_ui: {width: 200}
+      type: datetime
+    - name: relationship2to1
+      admin_ui: {width: 200}
+      type: string
+    - name: date_described
+      admin_ui: {width: 200}
+      type: datetime
+    - name: distance
+      admin_ui: {width: 200}
+      type: number
+    - name: guess
+      admin_ui: {width: 200}
+      type: string
   users:
     title: Users
     client: none
