@@ -61,6 +61,7 @@ def is_visible(user2, user1=None):
 @authenticated_callable
 def get_create_user_items(user_id=""):
   """Return list with 1st---2nd""" # add pending connections to front
+  print("get_create_user_items", user_id)
   user = get_user(user_id)
   dset = _get_connections(user, 2)
   items = {}
@@ -121,7 +122,7 @@ def _degree(user2, user1_id="", up_to_degree=3):
 
 @authenticated_callable
 def get_connections(user_id="", up_to_degree=3):
-  print("get_connections")
+  print("get_connections", user_id, up_to_degree)
   user = get_user(user_id)
   dset = _get_connections(user, up_to_degree)
   user2s = []
