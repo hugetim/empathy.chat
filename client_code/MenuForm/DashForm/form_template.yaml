@@ -106,10 +106,6 @@ components:
   type: Timer
   properties: {interval: 0}
   event_bindings: {tick: timer_2_tick}
-- name: timer_1
-  type: Timer
-  properties: {interval: 0}
-  event_bindings: {tick: timer_1_tick}
 - type: ColumnPanel
   properties: {role: card, col_widths: '{}'}
   name: card_2
@@ -208,5 +204,5 @@ container:
   type: HtmlTemplate
   properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
     role: null, html: ''}
-  event_bindings: {hide: form_hide, show: form_show}
+  event_bindings: {show: form_show}
 is_package: true

@@ -92,16 +92,27 @@ components:
       name: spacer_1
       layout_properties: {width: 41}
     - type: form:SV7QK4XBYUXPMHHM:Toggleswitch
-      properties: {}
+      properties: {enabled: true, visible: false, checked: null, spacing_above: small,
+        spacing_below: small}
       name: seeking_toggleswitch
       layout_properties: {width: 38}
       data_bindings:
       - {property: checked, code: 'self.item[''seeking'']', writeback: true}
       - {property: enabled, code: 'self.item[''me'']'}
       event_bindings: {x_change: seeking_toggleswitch_change}
+    - type: form:C6ZZPAPN4YYF5NVJ:Switch
+      properties: {tooltip: '', enabled: true, foreground: null, text_post: Currently seeking a regular empathy buddy,
+        visible: true, font_size: 14, spacing_above: small, checked_color: null, spacing_below: small,
+        italic: null, text_pre: '', background: null, bold: null, checked: false}
+      name: seeking_switch
+      layout_properties: {}
+      event_bindings: {change: seeking_toggleswitch_change}
+      data_bindings:
+      - {property: checked, code: 'self.item[''seeking'']', writeback: true}
+      - {property: enabled, code: 'self.item[''me'']'}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: Currently seeking a regular empathy buddy, font_size: null,
+        visible: false, text: Currently seeking a regular empathy buddy, font_size: null,
         font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       name: label_1

@@ -1,8 +1,6 @@
 dependencies:
 - app_id: SV7QK4XBYUXPMHHM
   version: {dev: false}
-- app_id: RUNLHYPKGVUNP7HZ
-  version: {dev: false}
 - app_id: MFQJNLWQIOGGXL4W
   version: {dev: false}
 - app_id: C6ZZPAPN4YYF5NVJ
@@ -57,6 +55,30 @@ metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favic
 startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 db_schema:
+  chat:
+    title: Chat
+    client: none
+    server: full
+    columns:
+    - name: match
+      admin_ui: {width: 200}
+      type: link_single
+      target: matches
+    - name: user
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: message
+      admin_ui: {width: 200}
+      type: string
+    - name: time_stamp
+      admin_ui: {width: 200}
+      type: datetime
+  invites:
+    title: Table 9
+    client: none
+    server: full
+    columns: []
   users:
     title: Users
     client: none
@@ -131,64 +153,6 @@ db_schema:
     - name: n_password_failures
       admin_ui: {width: 178}
       type: number
-  matches:
-    title: Matches
-    client: none
-    server: full
-    columns:
-    - name: users
-      admin_ui: {width: 200}
-      type: link_multiple
-      target: users
-    - name: proposal_time
-      admin_ui: {width: 200}
-      type: link_single
-      target: proposal_times
-    - name: match_commence
-      admin_ui: {width: 200}
-      type: datetime
-    - name: complete
-      admin_ui: {width: 200}
-      type: simpleObject
-    - name: slider_values
-      admin_ui: {width: 200}
-      type: simpleObject
-  test_data:
-    title: Test Data
-    client: none
-    server: full
-    columns:
-    - name: test_users
-      admin_ui: {width: 200}
-      type: link_multiple
-      target: users
-    - name: test_times
-      admin_ui: {width: 200}
-      type: link_multiple
-      target: proposal_times
-    - name: test_proposals
-      admin_ui: {width: 200}
-      type: link_multiple
-      target: proposals
-  chat:
-    title: Chat
-    client: none
-    server: full
-    columns:
-    - name: match
-      admin_ui: {width: 200}
-      type: link_single
-      target: matches
-    - name: user
-      admin_ui: {width: 200}
-      type: link_single
-      target: users
-    - name: message
-      admin_ui: {width: 200}
-      type: string
-    - name: time_stamp
-      admin_ui: {width: 200}
-      type: datetime
   proposal_times:
     title: Proposal Times
     client: none
@@ -258,6 +222,45 @@ db_schema:
       admin_ui: {width: 200}
       type: link_multiple
       target: groups
+  matches:
+    title: Matches
+    client: none
+    server: full
+    columns:
+    - name: users
+      admin_ui: {width: 200}
+      type: link_multiple
+      target: users
+    - name: proposal_time
+      admin_ui: {width: 200}
+      type: link_single
+      target: proposal_times
+    - name: match_commence
+      admin_ui: {width: 200}
+      type: datetime
+    - name: complete
+      admin_ui: {width: 200}
+      type: simpleObject
+    - name: slider_values
+      admin_ui: {width: 200}
+      type: simpleObject
+  test_data:
+    title: Test Data
+    client: none
+    server: full
+    columns:
+    - name: test_users
+      admin_ui: {width: 200}
+      type: link_multiple
+      target: users
+    - name: test_times
+      admin_ui: {width: 200}
+      type: link_multiple
+      target: proposal_times
+    - name: test_proposals
+      admin_ui: {width: 200}
+      type: link_multiple
+      target: proposals
   groups:
     title: Groups
     client: none

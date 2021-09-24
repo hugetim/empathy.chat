@@ -1,7 +1,7 @@
 container:
   type: HtmlTemplate
   properties: {html: '@theme:standard-page.html'}
-  event_bindings: {hide: form_hide, show: form_show}
+  event_bindings: {}
 components:
 - type: FlowPanel
   properties: {}
@@ -34,7 +34,7 @@ components:
       underline: false, icon: 'fa:question-circle'}
     name: link_bar_help
     layout_properties: {}
-    event_bindings: {click: link_bar_help_click}
+    event_bindings: {}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: Dashboard, font_size: null, font: '', spacing_above: small, icon_align: left,
@@ -43,10 +43,6 @@ components:
   name: title_label
   layout_properties: {slot: title}
   event_bindings: {}
-- name: timer_2
-  type: Timer
-  properties: {interval: 0}
-  event_bindings: {tick: timer_2_tick}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
     wrap_on: never, col_spacing: none, spacing_above: small, col_widths: '{}', spacing_below: small,
@@ -300,10 +296,6 @@ components:
       event_bindings: {click: test_clear_click}
     event_bindings: {}
   event_bindings: {}
-- name: timer_1
-  type: Timer
-  properties: {interval: 0}
-  event_bindings: {tick: timer_1_tick}
 - type: ColumnPanel
   properties: {}
   name: content_column_panel
