@@ -218,7 +218,9 @@ class Proposal():
   def from_create_form(item):
     first_time = ProposalTime.from_create_form(item)
     alts = [ProposalTime.from_create_form(alt) for alt in item['alt']]
-    name_dict = {user_id: name for name, user_id in item['user_items']}
+    non_dash_items = [user_item for user_item in item['user_items']
+                      if user_item != "---"]
+    name_dict = {user_id: name for name, user_id in non_dash_items}
     eligible_users = [User(user_id=user_id, name=name_dict[user_id])
                       for user_id in item['eligible_users']]
     return Proposal(prop_id=item.get('prop_id'),
