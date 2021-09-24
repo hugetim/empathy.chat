@@ -122,14 +122,24 @@ def _degree(user2, user1_id="", up_to_degree=3):
 
 
 @authenticated_callable
-def get_connections(user_id="", up_to_degree=3):
-  print("get_connections", user_id, up_to_degree)
+def get_connections(user_id=""):
+  print("get_connections", user_id)
   user = get_user(user_id)
-  dset = _get_connections(user, up_to_degree)
-  user2s = []
-  for d in range(1, up_to_degree+1):
-    user2s += dset[d]
-  return [_connection_record(user2, user_id) for user2 in user2s]
+  is_me = user == anvil.server.session['user']
+  up_to_degree = 3
+  dset = _get_connections(anvil.server.session['user'], up_to_degree, include_zero=True)
+  if is_me:
+    user2s = []
+    for d in range(1, up_to_degree+1):
+      user2s += dset[d]
+    return [_connection_record(user2, user_id) for user2 in user2s]
+  else:
+    dset2 = _get_connections(user, 1)
+    user2s = []
+    for d in range(0, up_to_degree+1):
+      user2s += dset[d] & dset2[1]
+    return [_connection_record(user2, anvil.server.session['user_id']) for user2 in user2s]
+    
 
 
 def _connection_record(user2, user_id=""):

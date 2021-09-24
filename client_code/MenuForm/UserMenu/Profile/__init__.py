@@ -19,6 +19,11 @@ class Profile(ProfileTemplate):
 
     # Any code you write here will run when the form opens.
     self.relationship_repeating_panel.items = self.item['relationships']
+    
+  def form_show(self, **event_args):
+    """This method is called when the column panel is shown on the screen"""
+    if self.item['degree'] > 1:
+      get_open_form().content.connections_tab_button.visible = False
     self.update()
     
   def update(self):
