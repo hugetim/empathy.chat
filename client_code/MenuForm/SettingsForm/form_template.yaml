@@ -1,7 +1,7 @@
 container:
   type: ColumnPanel
   event_bindings: {show: form_show}
-  properties: {col_widths: '{"XGVBRV":5,"FVYAVO":55,"VRISMF":5,"IDMREB":55}'}
+  properties: {col_widths: '{"VRISMF":5,"IDMREB":55}'}
 components:
 - type: ColumnPanel
   properties: {}
@@ -19,22 +19,13 @@ components:
       col_widths: {}
       grid_position: LZIXQU,SNGWFY
     event_bindings: {}
-- type: form:SV7QK4XBYUXPMHHM:Toggleswitch
-  properties: {enabled: true, visible: true, checked: null, spacing_above: none, spacing_below: none}
+- type: form:C6ZZPAPN4YYF5NVJ:Switch
+  properties: {tooltip: '', enabled: true, foreground: null, text_post: Notify me of requests by email,
+    visible: true, font_size: 12, spacing_above: small, checked_color: null, spacing_below: small,
+    italic: null, text_pre: '', background: null, bold: null, checked: false}
   name: request_em_check_box
-  layout_properties:
-    col_widths: {}
-    grid_position: LZOSGV,XGVBRV
-  event_bindings: {x_change: request_em_check_box_change}
-- type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: Notify me of requests by email, font_size: 12, font: '', spacing_above: none,
-    icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-    underline: false, icon: ''}
-  name: label_5
-  layout_properties:
-    col_widths: {}
-    grid_position: LZOSGV,FVYAVO
+  layout_properties: {grid_position: 'LZOSGV,ZEBSGS'}
+  event_bindings: {change: request_em_check_box_change}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: ' ', font_size: 6, font: '', spacing_above: small, icon_align: left, spacing_below: small,
