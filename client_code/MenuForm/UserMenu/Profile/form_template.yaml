@@ -15,7 +15,7 @@ components:
     components:
     - type: Button
       properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
+        foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: small,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
         underline: false, icon: 'fa:star-o'}
       name: star_button
@@ -23,7 +23,7 @@ components:
     - type: Label
       properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
+        icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
         underline: false, icon: ''}
       name: name_label
       layout_properties: {grid_position: 'LXCNAQ,JUHEKB'}
@@ -31,7 +31,7 @@ components:
     - type: Button
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
         foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
         underline: false, icon: 'fa:pencil'}
       name: edit_name_button
       layout_properties: {grid_position: 'LXCNAQ,YBPYBY'}
@@ -41,7 +41,7 @@ components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: false, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
         underline: false, icon: ''}
       name: degree_label
       layout_properties: {grid_position: 'CWBUWZ,PZTEKG'}
@@ -50,21 +50,21 @@ components:
     - type: Button
       properties: {role: primary-color, align: center, tooltip: Connect, border: '',
         enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:plus'}
       name: connect_button
       layout_properties: {}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: Message, border: '',
         enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:comment'}
       name: message_button
       layout_properties: {}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: Propose Exchange,
         border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:child'}
       name: propose_button
       layout_properties: {}
