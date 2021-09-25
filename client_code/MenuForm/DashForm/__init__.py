@@ -171,6 +171,17 @@ class DashForm(DashFormTemplate):
         state = anvil.server.call_s('get_status')
       self.update_status(state)
 
+  
+  def prompts_open_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    current = self.prompts_repeating_panel.visible
+    self.prompts_repeating_panel.visible = not current
+    if current:
+      self.prompts_open_link.icon = "fa:chevron-right"
+    else:
+      self.prompts_open_link.icon = "fa:chevron-down"
+    
+      
 ### Legacy code to be possibly repurposed ###
   def emailed_notification(self, num):
     """Return Notification (assumes num>0)"""
