@@ -3,7 +3,7 @@ from anvil import *
 import anvil.server
 import anvil.users
 from .Profile import Profile
-from ..ConnectionsMenu.Connections import Connections
+from ..NetworkMenu.Connections import Connections
 from .History import History
 from ... import parameters as p
 

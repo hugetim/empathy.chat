@@ -11,12 +11,12 @@ components:
   components:
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Connections, font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-      background: 'theme:White', bold: false, underline: false, icon: ''}
-    name: connections_tab_button
+      foreground: '', visible: true, text: Network, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: none, italic: false, background: 'theme:White',
+      bold: false, underline: false, icon: ''}
+    name: network_tab_button
     layout_properties: {}
-    event_bindings: {click: connections_tab_button_click}
+    event_bindings: {click: network_tab_button_click}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: Blocks, font_size: null, font: '', spacing_above: small,

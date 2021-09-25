@@ -34,7 +34,7 @@ components:
       grid_position: RPUZJA,HVLYLM
     components:
     - type: RepeatingPanel
-      properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.ConnectionsMenu.Connections.ConnectionRow}
+      properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.NetworkMenu.Connections.ConnectionRow}
       name: repeating_panel_1
       layout_properties: {}
 container:

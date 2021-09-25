@@ -1,12 +1,11 @@
-from ._anvil_designer import ConnectionsMenuTemplate
+from ._anvil_designer import NetworkMenuTemplate
 from anvil import *
 import anvil.server
 from .Connections import Connections
 from .Blocks import Blocks
 from ... import parameters as p
 
-class ConnectionsMenu(ConnectionsMenuTemplate):
-  
+class NetworkMenu(NetworkMenuTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
@@ -29,14 +28,14 @@ class ConnectionsMenu(ConnectionsMenuTemplate):
   def go_connections(self):
     content = Connections(item={'user_id': ""})
     self.load_component(content)
-    self.connections_tab_button.background = p.SELECTED_TAB_COLOR
+    self.network_tab_button.background = p.SELECTED_TAB_COLOR
 
   def go_blocks(self):
     content = Blocks()
     self.load_component(content)
     self.blocks_tab_button.background = p.SELECTED_TAB_COLOR
     
-  def connections_tab_button_click(self, **event_args):
+  def network_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.go_connections()
 

@@ -5,7 +5,7 @@ import anvil.users
 from .DashForm import DashForm
 from .WaitForm import WaitForm
 from .MatchForm import MatchForm
-from .ConnectionsMenu import ConnectionsMenu
+from .NetworkMenu import NetworkMenu
 from .GroupsMenu import GroupsMenu
 from .MyGroupsForm import MyGroupsForm
 from .UserMenu import UserMenu
@@ -94,7 +94,7 @@ class MenuForm(MenuFormTemplate):
       self.reset_and_load(UserMenu(item=item)) 
     else:
       self.title_label.text = "My Connections"
-      self.reset_and_load(ConnectionsMenu())
+      self.reset_and_load(NetworkMenu())
       self.connections_link.role = "selected"   
 
   def go_groups(self):
