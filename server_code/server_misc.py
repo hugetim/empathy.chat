@@ -32,13 +32,14 @@ def initialize_session():
   anvil.server.session['test_record'] = None
 
 
-def get_user(user_id=""):
+def get_user(user_id="", require_auth=True):
   if matcher.DEBUG:
     print("get_user", user_id)
   if user_id == "" or anvil.server.session['user_id'] == user_id:
     return anvil.server.session['user']
+  elif (require_auth and anvil.server.session['trust_level'] < matcher.TEST_TRUST_LEVEL):
+    raise RuntimeError("User not authorized to access this information")
   else:
-    assert anvil.server.session['trust_level'] >= matcher.TEST_TRUST_LEVEL
     return app_tables.users.get_by_id(user_id)
 
 
@@ -55,7 +56,7 @@ def is_visible(user2, user1=None):
   elif trust2 is None:
     return False
   else:
-    return trust1 > 0 and trust2 > 0 and _degree(user2, user1.get_id()) <= 3
+    return trust1 > 0 and trust2 > 0 and _degree(user2, user1) <= 3
 
   
 @authenticated_callable
@@ -108,9 +109,8 @@ def _get_connections(user, up_to_degree=3, include_zero=False):
   return out
     
     
-def _degree(user2, user1_id="", up_to_degree=3):
+def _degree(user2, user1, up_to_degree=3):
   """Returns 99 if no degree <= up_to_degree found"""
-  user1 = get_user(user1_id)
   dset = _get_connections(user1, up_to_degree)
   if user2 == user1:
     return 0
@@ -122,9 +122,9 @@ def _degree(user2, user1_id="", up_to_degree=3):
 
 
 @authenticated_callable
-def get_connections(user_id=""):
+def get_connections(user_id):
   print("get_connections", user_id)
-  user = get_user(user_id)
+  user = get_user(user_id, require_auth=False)
   is_me = user == anvil.server.session['user']
   up_to_degree = 3
   dset = _get_connections(anvil.server.session['user'], up_to_degree, include_zero=True)
@@ -132,18 +132,20 @@ def get_connections(user_id=""):
     user2s = []
     for d in range(1, up_to_degree+1):
       user2s += dset[d]
-    return [_connection_record(user2, user_id) for user2 in user2s]
+    return [_connection_record(user2, user) for user2 in user2s]
+  elif (anvil.server.session['trust_level'] < matcher.TEST_TRUST_LEVEL
+        and _degree(user, anvil.server.session['user']) > 1):
+    return []
   else:
     dset2 = _get_connections(user, 1)
     user2s = []
     for d in range(0, up_to_degree+1):
       user2s += dset[d] & dset2[1]
-    return [_connection_record(user2, anvil.server.session['user_id']) for user2 in user2s]
-    
+    return [_connection_record(user2, anvil.server.session['user']) for user2 in user2s]
 
 
-def _connection_record(user2, user_id=""):
-  degree = _degree(user2, user1_id=user_id)
+def _connection_record(user2, user1):
+  degree = _degree(user2, user1)
   return {'user_id': user2.get_id(),
           'name': port.full_name(user2['first_name'], user2['last_name'], degree),
           'degree': degree,
@@ -158,8 +160,8 @@ def _connection_record(user2, user_id=""):
 
 @authenticated_callable
 def init_profile(user_id=""):
-  user = get_user(user_id)
-  record = _connection_record(user)
+  user = get_user(user_id, require_auth=False)
+  record = _connection_record(user, get_user())
   confirmed_url_date = (
     user['confirmed_url_date'].strftime(p.DATE_FORMAT) if user['confirmed_url']
     else ""
@@ -168,7 +170,7 @@ def init_profile(user_id=""):
   record.update({'me': is_me,
                  'first': user['first_name'],
                  'last': port.last_name(user['last_name'], record['degree']),
-                 'relationships': [] if is_me else _get_relationships(user, anvil.server.session['user_id']),
+                 'relationships': [] if is_me else _get_relationships(user),
                  'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
@@ -325,9 +327,9 @@ def _emails_equal(a, b):
 
 
 @authenticated_callable
-def get_settings():
+def get_settings(user1_id=""):
   """Return user settings displayed on SettingsForm"""
-  user = get_user()
+  user = get_user(user1_id)
   re_opts = user['request_em_settings']
   if (user['request_em'] == True and re_opts["fixed"]
       and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
@@ -356,9 +358,9 @@ def _prune_request_em():
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def set_request_em(request_em_checked):
+def set_request_em(request_em_checked, user_id=""):
   print("set_request_em", request_em_checked)
-  user = anvil.server.session['user']
+  user = get_user(user_id)
   user['request_em'] = request_em_checked
   if request_em_checked:
     user['request_em_set_time'] = now()
@@ -367,9 +369,9 @@ def set_request_em(request_em_checked):
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def set_request_em_opts(fixed, hours):
+def set_request_em_opts(fixed, hours, user_id=""):
   print("set_request_em_opts", fixed, hours)
-  user = anvil.server.session['user']
+  user = get_user(user_id)
   re_opts = user['request_em_settings']
   re_opts["fixed"] = int(fixed)
   re_opts["hours"] = hours
