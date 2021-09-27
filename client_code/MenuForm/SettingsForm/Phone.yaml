@@ -71,11 +71,7 @@ components:
       icon: ''}
     name: phone_error_label
     layout_properties: {}
-- type: Timer
-  properties: {interval: 0}
-  name: timer_2
-  event_bindings: {tick: timer_2_tick}
 container:
   type: ColumnPanel
-  event_bindings: {show: form_show}
+  event_bindings: {}
   properties: {col_widths: '{}'}

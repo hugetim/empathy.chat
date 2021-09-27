@@ -399,6 +399,7 @@ def send_verification_sms(number, user_id=""):
     address=number,
     code=code,
     user=user,
+    date=now()
   )
   print(message.sid)
   
@@ -411,6 +412,7 @@ def check_phone_code(code, user_id=""):
   code_matches = code == latest_code_row['code']
   if code_matches:
     user['phone'] = latest_code_row['address']
+  return code_matches
   
 
 def pinged_email(user, start, duration):
