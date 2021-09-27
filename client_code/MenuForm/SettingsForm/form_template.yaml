@@ -1,10 +1,91 @@
 container:
   type: ColumnPanel
   event_bindings: {show: form_show}
-  properties: {col_widths: '{"VRISMF":5,"IDMREB":55}'}
+  properties: {col_widths: '{}'}
 components:
-- type: ColumnPanel
+- type: LinearPanel
   properties: {}
+  name: phone_linear_panel
+  layout_properties: {grid_position: 'OUXQPZ,GSYNHG'}
+  components:
+  - type: Label
+    properties: {role: headline, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: Phone, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: label_1
+    layout_properties: {grid_position: 'LFYPJB,HFMYLF'}
+  - type: FlowPanel
+    properties: {}
+    name: flow_panel_2
+    layout_properties: {grid_position: 'KTKKYI,IMCAQV'}
+    components:
+    - type: Label
+      properties: {role: null, align: right, tooltip: Only US phone numbers currently supported.,
+        border: '', foreground: '', visible: true, text: '+1', font_size: null, font: '',
+        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
+      name: phone_label
+      layout_properties: {grid_position: 'GAJZRJ,RQMRED'}
+    - type: TextBox
+      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: (212)555-1234,
+        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
+        font: '', spacing_above: small, type: tel, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false}
+      name: phone_text_box
+      layout_properties: {grid_position: 'KTKKYI,YLZSSI', width: 138.4}
+      data_bindings:
+      - {property: text, code: 'self.item[''phone'']', writeback: true}
+      event_bindings: {change: phone_text_box_change}
+    - type: Button
+      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: true, text: Add, font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: phone_button
+      layout_properties: {}
+      event_bindings: {click: phone_button_click}
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
+    name: phone_instructions_label
+    layout_properties: {}
+  - type: FlowPanel
+    properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+      foreground: '', visible: false, spacing_above: small, spacing_below: small,
+      background: ''}
+    name: phone_code_panel
+    layout_properties: {}
+    components:
+    - type: TextBox
+      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: verification code,
+        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
+        font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false}
+      name: phone_code_text_box
+      layout_properties: {width: 207.4}
+      event_bindings: {change: phone_code_text_box_change}
+    - type: Button
+      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: phone_code_submit_button
+      layout_properties: {}
+      event_bindings: {click: phone_code_submit_button_click}
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
+      visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
+    name: phone_error_label
+    layout_properties: {}
+- type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
+    wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"JACWUL":5,"VVAILZ":55}',
+    spacing_below: small, background: ''}
   name: content_panel
   layout_properties: {grid_position: 'HCWJAV,RRWPII'}
   event_bindings: {}
@@ -19,84 +100,79 @@ components:
       col_widths: {}
       grid_position: LZIXQU,SNGWFY
     event_bindings: {}
-- type: form:C6ZZPAPN4YYF5NVJ:Switch
-  properties: {tooltip: '', enabled: true, foreground: null, text_post: Notify me of requests by email,
-    visible: true, font_size: 12, spacing_above: small, checked_color: null, spacing_below: small,
-    italic: null, text_pre: '', background: null, bold: null, checked: false}
-  name: request_em_check_box
-  layout_properties: {grid_position: 'LZOSGV,ZEBSGS'}
-  event_bindings: {change: request_em_check_box_change}
-- type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: ' ', font_size: 6, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-    italic: false, background: '', bold: false, underline: false, icon: ''}
-  name: label_4
-  layout_properties:
-    col_widths: {}
-    grid_position: SEJPYC,VRISMF
-- type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: never, col_spacing: none, spacing_above: none, col_widths: '{"MQGDSN":51}',
-    spacing_below: none, background: ''}
-  name: re_radio_button_panel
-  layout_properties:
-    col_widths: {}
-    grid_position: SEJPYC,IDMREB
-  components:
-  - type: RadioButton
-    properties: {role: null, selected: true, align: left, tooltip: '', border: '',
-      enabled: true, foreground: '', value: '', visible: true, text: indefinitely,
-      font_size: 12, font: '', spacing_above: none, spacing_below: none, italic: false,
-      background: '', bold: false, group_name: radioGroupRE, underline: false}
-    name: re_radio_button_indef
-    layout_properties: {grid_position: 'ASKYPH,QIGRUA'}
-    event_bindings: {clicked: re_radio_button_indef_clicked}
-  - type: FlowPanel
-    properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
-    name: flow_panel_1
-    layout_properties: {grid_position: 'ODTZKI,OTYXWR'}
-    event_bindings: {}
+  - type: form:C6ZZPAPN4YYF5NVJ:Switch
+    properties: {tooltip: '', enabled: true, foreground: null, text_post: Notify me of requests by email,
+      visible: true, font_size: 12, spacing_above: small, checked_color: null, spacing_below: small,
+      italic: null, text_pre: '', background: null, bold: null, checked: false}
+    name: request_em_check_box
+    layout_properties: {grid_position: 'JRFIZE,CKZXKZ'}
+    event_bindings: {change: request_em_check_box_change}
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: ' ', font_size: 6, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
+    name: label_4
+    layout_properties:
+      col_widths: {}
+      grid_position: VVUSUI,JACWUL
+  - type: ColumnPanel
+    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+      wrap_on: never, col_spacing: none, spacing_above: none, col_widths: '{"MQGDSN":51}',
+      spacing_below: none, background: ''}
+    name: re_radio_button_panel
+    layout_properties:
+      col_widths: {}
+      grid_position: VVUSUI,VVAILZ
     components:
     - type: RadioButton
-      properties: {role: null, selected: false, align: right, tooltip: '', border: '',
-        enabled: true, foreground: '', value: '', visible: true, text: 'for:', font_size: 12,
-        font: '', spacing_above: none, spacing_below: small, italic: false, background: '',
-        bold: false, group_name: radioGroupRE, underline: false}
-      name: re_radio_button_fixed
-      layout_properties: {grid_position: 'BMQVVK,MQGDSN ODTZKI,HRTLXS'}
-      event_bindings: {clicked: re_radio_button_fixed_clicked}
-    - type: TextBox
-      properties: {role: null, align: center, hide_text: false, tooltip: '', placeholder: '2.0',
-        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 12,
-        font: '', spacing_above: none, type: number, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false}
-      name: text_box_hours
-      layout_properties: {grid_position: 'BMQVVK,MQGDSN ODTZKI,HVKDDK', width: 25}
-      event_bindings: {pressed_enter: text_box_hours_pressed_enter, lost_focus: text_box_hours_lost_focus,
-        focus: text_box_hours_focus}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: ' hours', font_size: 11, font: '', spacing_above: none,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: label_2
-      layout_properties: {grid_position: 'BMQVVK,MQGDSN ODTZKI,NRSFJF'}
+      properties: {role: null, selected: true, align: left, tooltip: '', border: '',
+        enabled: true, foreground: '', value: '', visible: true, text: indefinitely,
+        font_size: 12, font: '', spacing_above: none, spacing_below: none, italic: false,
+        background: '', bold: false, group_name: radioGroupRE, underline: false}
+      name: re_radio_button_indef
+      layout_properties: {grid_position: 'ASKYPH,QIGRUA'}
+      event_bindings: {clicked: re_radio_button_indef_clicked}
+    - type: FlowPanel
+      properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
+        foreground: '', visible: true, spacing_above: none, spacing_below: small,
+        background: ''}
+      name: flow_panel_1
+      layout_properties: {grid_position: 'ODTZKI,OTYXWR'}
       event_bindings: {}
+      components:
+      - type: RadioButton
+        properties: {role: null, selected: false, align: right, tooltip: '', border: '',
+          enabled: true, foreground: '', value: '', visible: true, text: 'for:', font_size: 12,
+          font: '', spacing_above: none, spacing_below: small, italic: false, background: '',
+          bold: false, group_name: radioGroupRE, underline: false}
+        name: re_radio_button_fixed
+        layout_properties: {grid_position: 'BMQVVK,MQGDSN ODTZKI,HRTLXS'}
+        event_bindings: {clicked: re_radio_button_fixed_clicked}
+      - type: TextBox
+        properties: {role: null, align: center, hide_text: false, tooltip: '', placeholder: '2.0',
+          border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 12,
+          font: '', spacing_above: none, type: number, spacing_below: small, italic: false,
+          background: '', bold: false, underline: false}
+        name: text_box_hours
+        layout_properties: {grid_position: 'BMQVVK,MQGDSN ODTZKI,HVKDDK', width: 25}
+        event_bindings: {pressed_enter: text_box_hours_pressed_enter, lost_focus: text_box_hours_lost_focus,
+          focus: text_box_hours_focus}
+      - type: Label
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+          visible: true, text: ' hours', font_size: 11, font: '', spacing_above: none,
+          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+          underline: false, icon: ''}
+        name: label_2
+        layout_properties: {grid_position: 'BMQVVK,MQGDSN ODTZKI,NRSFJF'}
+        event_bindings: {}
 - type: TextBox
   properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-    border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
+    border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
     font: '', spacing_above: small, type: email, spacing_below: small, italic: false,
     background: '', bold: false, underline: false}
   name: email_text_box
   layout_properties: {grid_position: 'ZEPIXP,ZCDLYH'}
-- type: TextBox
-  properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-    border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-    font: '', spacing_above: small, type: tel, spacing_below: small, italic: false,
-    background: '', bold: false, underline: false}
-  name: phone_text_box
-  layout_properties: {grid_position: 'IXXION,YHQUTK'}
 - type: Timer
   properties: {interval: 0}
   name: timer_2

@@ -1,7 +1,7 @@
 import anvil.users
 import anvil.server
 import anvil.tables
-from anvil.tables import app_tables
+from anvil.tables import app_tables, order_by
 import anvil.tables.query as q
 import anvil.secrets
 import anvil.email
@@ -247,12 +247,13 @@ def save_user_item(item_name, text, user_id=""):
 def new_jitsi_code():
   if matcher.DEBUG:
     print("server_misc.new_jitsi_code()")
-  num_chars = 5
+  return "empathyspot-" + _random_code()
+
+
+def _random_code(num_chars=5):
   charset = "abcdefghijkmnopqrstuvwxyz23456789"
   random.seed()
-  rand_code = "".join([random.choice(charset) for i in range(num_chars)])
-  code = "empathyspot-" + rand_code
-  return code
+  return "".join([random.choice(charset) for i in range(num_chars)])
 
 
 def prune_messages():
@@ -381,22 +382,32 @@ def set_request_em_opts(fixed, hours, user_id=""):
 
 
 @authenticated_callable
-def send_sample_sms():
+def send_verification_sms(number, user_id=""):
+  user = get_user()
   from twilio.rest import Client
-
   account_sid = anvil.secrets.get_secret('account_sid')
   auth_token = anvil.secrets.get_secret('auth_token')
-
   client = Client(account_sid, auth_token)
-
+  code = _random_code(5)
   message = client.messages.create(
-    body="Join Earth's mightiest heroes. Like Kevin Bacon.",
+    body=f"Your empathy.chat verification code is: {code}",
     from_='+12312905138',
-    to='+13145706688',
+    to=number,
   )
-
+  app_tables.codes.add_row(
+    type="phone",
+    code=code,
+    user=user,
+  )
   print(message.sid)
-
+  
+  
+@authenticated_callable
+def check_phone_code(code, user_id=""):
+  user = get_user(user_id)
+  current_codes = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone", )
+  return code == list(current_codes)[0]
+  
 
 def pinged_email(user, start, duration):
   """Email pinged user, if settings allow"""

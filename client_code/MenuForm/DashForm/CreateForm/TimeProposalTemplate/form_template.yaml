@@ -32,7 +32,7 @@ components:
       data_bindings:
       - {property: date, code: 'self.item[''start_date'']', writeback: true}
     - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '#ff0000',
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
         visible: false, text: '', font_size: null, font: '', spacing_above: small,
         icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
         underline: false, icon: ''}
@@ -117,7 +117,7 @@ components:
       data_bindings:
       - {property: date, code: 'self.item[''cancel_date'']', writeback: true}
     - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '#ff0000',
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
         visible: false, text: '', font_size: null, font: '', spacing_above: small,
         icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
         underline: false, icon: ''}

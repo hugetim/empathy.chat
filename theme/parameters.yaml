@@ -184,3 +184,5 @@ color_scheme:
   - {name: Gray 900, color: '#212121'}
   - {name: Black, color: '#000000'}
   - {name: Light Yellow, color: '#ffffe0'}
+  - {name: Light Blue, color: '#add8e6'}
+  - {name: Red, color: '#ff0000'}

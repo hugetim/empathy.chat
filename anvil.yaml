@@ -53,6 +53,11 @@ metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favic
 startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 db_schema:
+  codes:
+    title: Table 10
+    client: none
+    server: full
+    columns: []
   chat:
     title: Chat
     client: none
