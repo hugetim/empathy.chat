@@ -406,7 +406,7 @@ def send_verification_sms(number, user_id=""):
 def check_phone_code(code, user_id=""):
   user = get_user(user_id)
   current_codes = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone", )
-  return code == list(current_codes)[0]
+  return code == current_codes[0]
   
 
 def pinged_email(user, start, duration):
