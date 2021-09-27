@@ -336,7 +336,7 @@ def get_settings(user1_id=""):
       and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
     user['request_em'] = False
   return (user['request_em'], user['request_em_settings'],
-          user['request_em_set_time'])
+          user['request_em_set_time'], user['phone'])
 
 
 def _prune_request_em():

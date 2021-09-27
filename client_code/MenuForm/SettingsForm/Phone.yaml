@@ -12,7 +12,7 @@ components:
     - type: Label
       properties: {role: null, align: right, tooltip: Only US phone numbers currently supported.,
         border: '', foreground: '', visible: true, text: '+1', font_size: null, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        spacing_above: medium, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       name: phone_label
       layout_properties: {grid_position: 'GAJZRJ,RQMRED'}
