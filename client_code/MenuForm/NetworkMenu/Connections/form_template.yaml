@@ -17,12 +17,11 @@ components:
     properties:
       role: null
       columns:
-      - {title: Name, id: TCRDJP, data_key: name, $$hashKey: 'object:25129', expand: true,
-        width: '80'}
-      - {title: Degree, id: CKNKJL, data_key: degree, $$hashKey: 'object:25130'}
-      - {id: PGULWY, title: 'Seeking Buddy?', data_key: seeking, $$hashKey: 'object:25131'}
-      - {title: Last Active, id: VWXCEI, data_key: last_active, $$hashKey: 'object:25132'}
-      - {title: '', id: NBEGGD, data_key: buttons, $$hashKey: 'object:25133'}
+      - {title: Name, id: TCRDJP, data_key: name, expand: true, width: '80'}
+      - {title: Degree, id: CKNKJL, data_key: degree}
+      - {id: PGULWY, title: 'Seeking Buddy?', data_key: seeking}
+      - {title: Last Active, id: VWXCEI, data_key: last_active}
+      - {title: '', id: NBEGGD, data_key: buttons}
       auto_header: true
       tooltip: ''
       border: ''

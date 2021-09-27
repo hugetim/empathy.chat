@@ -3,85 +3,17 @@ container:
   event_bindings: {show: form_show}
   properties: {col_widths: '{}'}
 components:
-- type: LinearPanel
+- type: Label
+  properties: {role: headline, align: left, tooltip: '', border: '', foreground: '',
+    visible: true, text: Phone, font_size: null, font: '', spacing_above: small, icon_align: left,
+    spacing_below: small, italic: false, background: '', bold: false, underline: false,
+    icon: ''}
+  name: label_1
+  layout_properties: {grid_position: 'MIGXQH,RMYQJI'}
+- type: form:MenuForm.SettingsForm.Phone
   properties: {}
-  name: phone_linear_panel
-  layout_properties: {grid_position: 'OUXQPZ,GSYNHG'}
-  components:
-  - type: Label
-    properties: {role: headline, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Phone, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: label_1
-    layout_properties: {grid_position: 'LFYPJB,HFMYLF'}
-  - type: FlowPanel
-    properties: {}
-    name: flow_panel_2
-    layout_properties: {grid_position: 'KTKKYI,IMCAQV'}
-    components:
-    - type: Label
-      properties: {role: null, align: right, tooltip: Only US phone numbers currently supported.,
-        border: '', foreground: '', visible: true, text: '+1', font_size: null, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
-      name: phone_label
-      layout_properties: {grid_position: 'GAJZRJ,RQMRED'}
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: (212)555-1234,
-        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-        font: '', spacing_above: small, type: tel, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false}
-      name: phone_text_box
-      layout_properties: {grid_position: 'KTKKYI,YLZSSI', width: 138.4}
-      data_bindings:
-      - {property: text, code: 'self.item[''phone'']', writeback: true}
-      event_bindings: {change: phone_text_box_change}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Add, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: phone_button
-      layout_properties: {}
-      event_bindings: {click: phone_button_click}
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
-      spacing_below: small, italic: false, background: '', bold: false, underline: false,
-      icon: ''}
-    name: phone_instructions_label
-    layout_properties: {}
-  - type: FlowPanel
-    properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-      foreground: '', visible: false, spacing_above: small, spacing_below: small,
-      background: ''}
-    name: phone_code_panel
-    layout_properties: {}
-    components:
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: verification code,
-        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-        font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false}
-      name: phone_code_text_box
-      layout_properties: {width: 207.4}
-      event_bindings: {change: phone_code_text_box_change}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: phone_code_submit_button
-      layout_properties: {}
-      event_bindings: {click: phone_code_submit_button_click}
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
-      visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
-      spacing_below: small, italic: false, background: '', bold: false, underline: false,
-      icon: ''}
-    name: phone_error_label
-    layout_properties: {}
+  name: phone_panel
+  layout_properties: {grid_position: 'FKDGGH,TIYMUL'}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
     wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"JACWUL":5,"VVAILZ":55}',

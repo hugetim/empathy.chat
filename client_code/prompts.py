@@ -6,7 +6,7 @@ def get(spec_dict):
     def add_phone():
       top_form = get_open_form()
       top_form.go_settings()
-      top_form.content.phone_text_box.focus()
+      top_form.content.phone_panel.phone_text_box.focus()
     return {"markdown": "Confirm a phone number to unlock basic empathy.chat features", 
             "tooltip": "We require a phone number to verify identity and foster trust",
             "dismissable": True,
