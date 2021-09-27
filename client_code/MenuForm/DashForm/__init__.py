@@ -11,7 +11,7 @@ from datetime import timedelta
 from copy import deepcopy
 
 class DashForm(DashFormTemplate):
-  state_keys = {'status', 'seconds_left', 'proposals', 'upcomings'}
+  state_keys = {'status', 'seconds_left', 'proposals', 'upcomings', 'prompts'}
   
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function

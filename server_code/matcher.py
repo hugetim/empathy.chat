@@ -158,6 +158,7 @@ def _get_status(user):
   ping_start = None
   proposals = []
   upcomings = []
+  prompts = []
   if current_proptime and current_proptime.is_now():
     expire_date = current_proptime.get_expire_date()
     if current_proptime.is_accepted():
@@ -167,6 +168,7 @@ def _get_status(user):
       status = "requesting"
       proposals = Proposal.get_port_proposals(user)
       upcomings = _get_upcomings(user)
+      prompts = _get_prompts(user)
   else:
     current_accept_time = ProposalTime.get_now_accepting(user)
     if current_accept_time and current_accept_time.is_accepted():
@@ -182,10 +184,12 @@ def _get_status(user):
         status = None
         proposals = Proposal.get_port_proposals(user)
         upcomings = _get_upcomings(user)
+        prompts = _get_prompts(user)
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
           'proposals': proposals,
           'upcomings': upcomings,
+          'prompts': prompts,
          }
 
 
@@ -202,6 +206,13 @@ def has_status(user):
 #     if this_match:
 #       return True
 #   return False
+
+
+def _get_prompts(user):
+  out = []
+  if not user['phone']:
+    out.append({"name": "phone"})
+  return out
 
 
 def _get_upcomings(user):

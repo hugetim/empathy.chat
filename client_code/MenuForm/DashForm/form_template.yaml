@@ -121,6 +121,8 @@ components:
       properties: {item_template: MenuForm.DashForm.PromptTemplate}
       name: prompts_repeating_panel
       layout_properties: {grid_position: 'XUQQLH,UMLUMQ'}
+      data_bindings:
+      - {property: items, code: 'self.item[''prompts'']'}
   event_bindings: {}
 - name: timer_2
   type: Timer

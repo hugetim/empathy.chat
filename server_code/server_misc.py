@@ -384,9 +384,9 @@ def set_request_em_opts(fixed, hours, user_id=""):
 @authenticated_callable
 def send_verification_sms(number, user_id=""):
   user = get_user()
-  from twilio.rest import Client
   account_sid = anvil.secrets.get_secret('account_sid')
   auth_token = anvil.secrets.get_secret('auth_token')
+  from twilio.rest import Client
   client = Client(account_sid, auth_token)
   code = _random_code(5)
   message = client.messages.create(
@@ -396,6 +396,7 @@ def send_verification_sms(number, user_id=""):
   )
   app_tables.codes.add_row(
     type="phone",
+    address=number,
     code=code,
     user=user,
   )
@@ -405,8 +406,11 @@ def send_verification_sms(number, user_id=""):
 @authenticated_callable
 def check_phone_code(code, user_id=""):
   user = get_user(user_id)
-  current_codes = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone", )
-  return code == current_codes[0]
+  current_code_rows = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone")
+  latest_code_row = current_code_rows[0]
+  code_matches = code == latest_code_row['code']
+  if code_matches:
+    user['phone'] = latest_code_row['address']
   
 
 def pinged_email(user, start, duration):

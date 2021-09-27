@@ -54,10 +54,26 @@ startup_form: LoginForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 db_schema:
   codes:
-    title: Table 10
+    title: Codes
     client: none
     server: full
-    columns: []
+    columns:
+    - name: type
+      admin_ui: {width: 200}
+      type: string
+    - name: address
+      admin_ui: {width: 200}
+      type: string
+    - name: code
+      admin_ui: {width: 200}
+      type: string
+    - name: user
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: date
+      admin_ui: {width: 200}
+      type: datetime
   chat:
     title: Chat
     client: none
