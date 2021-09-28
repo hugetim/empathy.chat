@@ -9,7 +9,7 @@ def get(spec_dict):
       top_form.content.phone_form.phone_text_box.focus()
     return {"markdown": "Confirm a phone number to unlock basic empathy.chat features", 
             "tooltip": "We require a phone number to verify identity and foster trust",
-            "dismissable": True,
+            "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Blue",
             "click_fn": add_phone,
            }
