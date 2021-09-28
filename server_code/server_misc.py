@@ -390,7 +390,7 @@ def send_verification_sms(number, user_id=""):
   client = Client(account_sid, auth_token)
   code = _random_code(5)
   message = client.messages.create(
-    body=f"Your empathy.chat verification code is: {code}",
+    body=f"empathy.chat: Your verification code is {code}. It expires in 10 minutes.",
     from_='+12312905138',
     to=number,
   )
@@ -407,12 +407,20 @@ def send_verification_sms(number, user_id=""):
 @authenticated_callable
 def check_phone_code(code, user_id=""):
   user = get_user(user_id)
+  # first expunge old codes
+  now = now()
+  for code_row in app_tables.codes.search():
+    if now - code_row['date'] > datetime.timedelta(minutes=10):
+      code_row.delete()
   current_code_rows = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone")
-  latest_code_row = current_code_rows[0]
-  code_matches = code == latest_code_row['code']
-  if code_matches:
-    user['phone'] = latest_code_row['address']
-  return code_matches
+  if len(current_code_rows) > 0:
+    latest_code_row = current_code_rows[0]
+    code_matches = code == latest_code_row['code']
+    if code_matches:
+      user['phone'] = latest_code_row['address']
+    return code_matches
+  else:
+    return None
   
 
 def pinged_email(user, start, duration):
