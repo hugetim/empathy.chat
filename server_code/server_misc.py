@@ -61,6 +61,13 @@ def get_user_info(user):
   return user['trust_level']
 
 
+def get_prompts(user):
+  out = []
+  if not user['phone']:
+    out.append({"name": "phone"})
+  return out
+
+
 @authenticated_callable
 def init_profile(user_id=""):
   from . import connections as c
