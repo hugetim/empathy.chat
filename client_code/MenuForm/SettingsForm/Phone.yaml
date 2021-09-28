@@ -18,7 +18,7 @@ components:
       name: phone_label
       layout_properties: {grid_position: 'GAJZRJ,RQMRED'}
     - type: TextBox
-      properties: {role: null, align: center, hide_text: false, tooltip: '', placeholder: (212)555-1234,
+      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: (212)555-1234,
         border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
         font: '', spacing_above: small, type: tel, spacing_below: small, italic: false,
         background: '', bold: false, underline: false}
