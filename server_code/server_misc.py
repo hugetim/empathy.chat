@@ -56,7 +56,7 @@ def is_visible(user2, user1=None):
   elif trust2 is None:
     return False
   else:
-    return trust1 > 0 and trust2 > 0 and _degree(user2, user1) <= 3
+    return trust1 > 0 and trust2 > 0 and _distance(user2, user1) <= 3
 
   
 @authenticated_callable
@@ -67,7 +67,7 @@ def get_create_user_items(user_id=""):
   dset = _get_connections(user, 2)
   items = {}
   for degree in [1, 2]:
-    items[degree] = [port.User.get(other, degree).item() for other in dset[degree]]
+    items[degree] = [port.User.get(other, distance=degree).item() for other in dset[degree]]
   return items[1] + ["---"] + items[2]
 
 
@@ -120,6 +120,10 @@ def _degree(user2, user1, up_to_degree=3):
         return d
     return 99
 
+  
+def _distance(user2, user1, up_to_distance=3):
+  print("Warning: _distance not yet implemented. Returning _degree.")
+  return _degree(user2, user1, up_to_distance)
 
 @authenticated_callable
 def get_connections(user_id):
@@ -149,6 +153,7 @@ def _connection_record(user2, user1):
   return {'user_id': user2.get_id(),
           'name': port.full_name(user2['first_name'], user2['last_name'], degree),
           'degree': degree,
+          'distance': degree, ################ TEMPORARY
           'seeking': user2['seeking_buddy'],
           'confirmed': bool(user2['confirmed_url']),
           'last_active': user2['last_login'].strftime("%m/%d/%Y"),

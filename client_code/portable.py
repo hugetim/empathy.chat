@@ -28,12 +28,12 @@ CANCEL_TEXT = {5: "5 min. prior",
               }
 
 
-def last_name(last, degree=3):
-  return last if degree <= 2 else ""
+def last_name(last, distance=3):
+  return last if distance <= 2 else ""
 
 
-def full_name(first, last, degree=3):
-  maybe_last = last_name(last, degree)
+def full_name(first, last, distance=3):
+  maybe_last = last_name(last, distance)
   return first + (" " + maybe_last if maybe_last else "")
     
 
@@ -52,9 +52,9 @@ class User():
     return User(item(1), item(0))
   
   @staticmethod
-  def get(user_row, degree=3):
+  def get(user_row, distance=3):
     return User(user_row.get_id(), 
-                full_name(user_row['first_name'], user_row['last_name'], degree),
+                full_name(user_row['first_name'], user_row['last_name'], distance),
                )
 
     

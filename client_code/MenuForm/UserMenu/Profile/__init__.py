@@ -9,7 +9,7 @@ from .Relationship import Relationship
 
 
 class Profile(ProfileTemplate):
-  item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'degree_str',
+  item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
                'seeking', 'how_empathy', 'profile'}
   
   def __init__(self, user_id="", **properties):
@@ -22,7 +22,7 @@ class Profile(ProfileTemplate):
     
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
-    if self.item['degree'] > 1:
+    if self.item['distance'] > 1:
       get_open_form().content.connections_tab_button.visible = False
     self.update()
     
@@ -30,7 +30,7 @@ class Profile(ProfileTemplate):
     if not self.item['me']:
       get_open_form().title_label.text = f"{self.item['first']}'s Profile"
     self.name_label.text = self.item['name']
-    self.degree_label.text = h.add_num_suffix(self.item['degree'])
+    self.degree_label.text = h.add_num_suffix(self.item['distance'])
     name_likes = ("I like" if self.item['me'] 
                   else self.item['first'] + " likes")
     self.how_empathy_label.text = f"How {name_likes} to receive empathy:"
