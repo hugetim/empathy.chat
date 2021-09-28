@@ -6,11 +6,10 @@ import datetime
 import anvil.tz
 from . import parameters as p
 from . import server_misc as sm
+from .server_misc import authenticated_callable
 from . import portable as port
 
 
-authenticated_callable = anvil.server.callable(require_user=True)
-TEST_TRUST_LEVEL = 10
 DEBUG = False
 
 
@@ -94,7 +93,7 @@ def init():
     email_in_list = False
   else:
     name = user['first_name']
-  test_mode = trust_level >= TEST_TRUST_LEVEL
+  test_mode = trust_level >= sm.TEST_TRUST_LEVEL
   # Initialize user status
   state = _get_status(user)
   if state['status'] == 'pinged' and state['seconds_left'] <= 0:

@@ -1,11 +1,9 @@
 from anvil.tables import app_tables
 import anvil.server
 from . import server_misc as sm
+from .server_misc import authenticated_callable
 from . import matcher
 from . import portable
-
-
-authenticated_callable = anvil.server.callable(require_user=True)
 
 
 @authenticated_callable
