@@ -2,6 +2,7 @@ from ._anvil_designer import SettingsFormTemplate
 from anvil import *
 import anvil.server
 from ... import helper as h
+from .Phone import Phone
 
 
 class SettingsForm(SettingsFormTemplate):
@@ -11,18 +12,18 @@ class SettingsForm(SettingsFormTemplate):
     
     re, re_opts, re_st, phone = anvil.server.call('get_settings')
     self.init_request_em_opts(re, re_opts, re_st)
+    self.timer_2.interval = 0 #5
     self.init_phone(phone)
-    self.timer_2.interval = 5
 
+  def init_phone(self, phone):
+    self.phone_form = Phone(item={"phone": phone[2:], # removing "+1" 
+                                  "status": "confirmed" if phone else None,
+                                 })
+    self.phone_panel.add_component(self.phone_form)
+    
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
- 
-  def init_phone(self, phone):
-    if phone:
-      self.phone_panel.phone_text_box.text = phone[2:]
-      self.phone_panel.phone_text_box.enabled = False
-      self.phone_panel.phone_button.visible = False
 
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""

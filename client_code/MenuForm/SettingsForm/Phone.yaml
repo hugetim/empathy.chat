@@ -5,7 +5,8 @@ components:
   layout_properties: {grid_position: 'OUXQPZ,GSYNHG'}
   components:
   - type: FlowPanel
-    properties: {}
+    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
+      foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
     name: flow_panel_2
     layout_properties: {grid_position: 'KTKKYI,IMCAQV'}
     components:
@@ -17,15 +18,15 @@ components:
       name: phone_label
       layout_properties: {grid_position: 'GAJZRJ,RQMRED'}
     - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: (212)555-1234,
+      properties: {role: null, align: center, hide_text: false, tooltip: '', placeholder: (212)555-1234,
         border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
         font: '', spacing_above: small, type: tel, spacing_below: small, italic: false,
         background: '', bold: false, underline: false}
       name: phone_text_box
-      layout_properties: {grid_position: 'KTKKYI,YLZSSI', width: 138.4}
+      layout_properties: {grid_position: 'KTKKYI,YLZSSI', width: 114.4}
       data_bindings:
-      - {property: text, code: 'self.item[''phone'']', writeback: true}
-      event_bindings: {change: phone_text_box_change}
+      - {property: text, code: 'self.item[''phone'']', writeback: false}
+      event_bindings: {change: phone_text_box_change, pressed_enter: phone_button_click}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
         foreground: '', visible: true, text: Add, font_size: null, font: '', spacing_above: small,
@@ -34,6 +35,7 @@ components:
       name: phone_button
       layout_properties: {}
       event_bindings: {click: phone_button_click}
+      data_bindings: []
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
       visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
@@ -41,6 +43,7 @@ components:
       icon: ''}
     name: phone_instructions_label
     layout_properties: {}
+    data_bindings: []
   - type: FlowPanel
     properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
       foreground: '', visible: false, spacing_above: small, spacing_below: small,
@@ -54,8 +57,8 @@ components:
         font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
         background: '', bold: false, underline: false}
       name: phone_code_text_box
-      layout_properties: {width: 207.4}
-      event_bindings: {change: phone_code_text_box_change}
+      layout_properties: {width: 121.4}
+      event_bindings: {change: phone_code_text_box_change, pressed_enter: phone_code_submit_button_click}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
         foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
@@ -64,6 +67,15 @@ components:
       name: phone_code_submit_button
       layout_properties: {}
       event_bindings: {click: phone_code_submit_button_click}
+    - type: Button
+      properties: {role: secondary-color, align: center, tooltip: '', border: '',
+        enabled: true, foreground: '', visible: true, text: Cancel, font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
+      name: cancel_button
+      layout_properties: {}
+      event_bindings: {click: cancel_button_click}
+    data_bindings: []
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
       visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,

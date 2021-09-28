@@ -408,9 +408,9 @@ def send_verification_sms(number, user_id=""):
 def check_phone_code(code, user_id=""):
   user = get_user(user_id)
   # first expunge old codes
-  now = now()
+  _now = now()
   for code_row in app_tables.codes.search():
-    if now - code_row['date'] > datetime.timedelta(minutes=10):
+    if _now - code_row['date'] > datetime.timedelta(minutes=10):
       code_row.delete()
   current_code_rows = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone")
   if len(current_code_rows) > 0:
