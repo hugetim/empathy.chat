@@ -10,9 +10,6 @@ from .server_misc import authenticated_callable
 from . import portable as port
 
 
-DEBUG = False
-
-
 def _seconds_left(status, expire_date=None, ping_start=None):
   now = sm.now()
   if status in ["pinging", "pinged"]:
@@ -37,28 +34,28 @@ def _seconds_left(status, expire_date=None, ping_start=None):
        
 def _prune_matches():
   """Complete old commenced matches for all users"""
-  if DEBUG:
+  if sm.DEBUG:
     print("_prune_matches")
   assume_complete = datetime.timedelta(hours=4)
   cutoff_m = sm.now() - assume_complete
-  if DEBUG:
+  if sm.DEBUG:
     print("_prune_matches2")
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
   old_matches = app_tables.matches.search(complete=[0],
                                           match_commence=q.less_than(cutoff_m),
                                          )
-  if DEBUG:
+  if sm.DEBUG:
     print("_prune_matches3")
   for row in old_matches:
-    if DEBUG:
+    if sm.DEBUG:
       print("_prune_matches4")
     temp = row['complete']
     for i in range(len(temp)):
-      if DEBUG:
+      if sm.DEBUG:
         print("_prune_matches5")
       # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
       temp[i] = 1
-    if DEBUG:
+    if sm.DEBUG:
       print("_prune_matches6")
     row['complete'] = temp
 
@@ -122,7 +119,7 @@ def confirm_wait(user_id=""):
 
 def confirm_wait_helper(user, proptime=None):
   """updates expire_date for current request, returns _get_status(user)"""
-  if DEBUG:
+  if sm.DEBUG:
     print("confirm_wait_helper")
   if proptime:
     current_proptime = proptime
@@ -150,7 +147,7 @@ def _get_status(user):
   assumes now proposals only
   Side effects: prune proposals when status in ["requesting", None]
   """
-  if DEBUG:
+  if sm.DEBUG:
     print("_get_status")
   current_proptime = ProposalTime.get_now_proposing(user)
   expire_date = None
@@ -219,7 +216,7 @@ def _get_upcomings(user):
     
     Side effects: prune proposals
     """
-    if DEBUG:
+    if sm.DEBUG:
       print("_get_upcomings")
     match_dicts = []
     now = sm.now()
@@ -237,7 +234,7 @@ def _get_upcomings(user):
 
   
 def _cancel_match(user, match_id):
-  if DEBUG:
+  if sm.DEBUG:
     print("_cancel_match", match_id)
   match = app_tables.matches.get_by_id(match_id)
   if match:
@@ -330,7 +327,7 @@ def _edit_proposal(user, port_proposal):
 
 
 def _cancel(user, proptime_id=None):
-  if DEBUG:
+  if sm.DEBUG:
     print("_cancel", proptime_id)
   if proptime_id:
     proptime = ProposalTime.get_by_id(proptime_id)
@@ -353,7 +350,7 @@ def cancel(proptime_id=None, user_id=""):
 
 
 def _cancel_other(user, proptime_id=None):
-  if DEBUG:
+  if sm.DEBUG:
     print("_cancel_other", proptime_id)
   if proptime_id:
     proptime = ProposalTime.get_by_id(proptime_id)
@@ -390,7 +387,7 @@ def match_commit(proptime_id=None, user_id=""):
 
 def _match_commit(user, proptime_id=None):
   """Return _get_status(user)"""
-  if DEBUG:
+  if sm.DEBUG:
     print("_match_commit")
   if proptime_id:
     print("proptime_id")
@@ -519,7 +516,7 @@ class ProposalTime():
     return [self.proposal().proposer()] + list(self._proptime_row['users_accepting'])
   
   def attempt_accept(self, user):
-    if DEBUG:
+    if sm.DEBUG:
       print("_attempt_accept_proptime")
     state = _get_status(user)
     status = state['status']
@@ -530,7 +527,7 @@ class ProposalTime():
       self._accept(user, status)
    
   def _accept(self, user, status):
-    if DEBUG:
+    if sm.DEBUG:
       print("_accept_proptime")
     now = sm.now()
     if self.is_now() and status == "requesting":
@@ -672,7 +669,7 @@ class ProposalTime():
   @staticmethod
   def get_now_proposing(user):
     """Return user's current 'start_now' proposal_times row"""
-    if DEBUG:
+    if sm.DEBUG:
       print("get_now_proposal_time")
     current_prop_rows = Proposal._get_current_prop_rows(user)
     for prop_row in current_prop_rows:
@@ -687,7 +684,7 @@ class ProposalTime():
   @staticmethod
   def get_now_accepting(user):
     """Return user's current 'start_now' proposal_times row"""
-    if DEBUG:
+    if sm.DEBUG:
       print("_get_now_accept")
     proptime_row = app_tables.proposal_times.get(users_accepting=[user],
                                                  current=True,
@@ -697,7 +694,7 @@ class ProposalTime():
 
   @staticmethod
   def old_to_prune(now):
-    if DEBUG:
+    if sm.DEBUG:
       print("old_prop_times")
     for row in app_tables.proposal_times.search(cancelled=False, 
                                                 jitsi_code="",
@@ -708,11 +705,11 @@ class ProposalTime():
   @staticmethod
   def old_ping_to_prune(now):
     # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
-    if DEBUG:
+    if sm.DEBUG:
       print("timeout")
     timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
     cutoff_r = now - timeout
-    if DEBUG:
+    if sm.DEBUG:
       print("old_ping_prop_times")
     for row in app_tables.proposal_times.search(cancelled=False, 
                                                 start_now=True,
@@ -761,7 +758,8 @@ class Proposal():
     return self._prop_row['user']
   
   def is_visible(self, user):
-    return (sm._distance(self._prop_row['user'], user) <= self.eligible
+    from . import connections as c
+    return (c.distance(self._prop_row['user'], user) <= self.eligible
             or (self.eligible == 0 and user in self.eligible_users)
            )
 
@@ -851,7 +849,7 @@ class Proposal():
   @staticmethod
   def prune_all():
     """Prune definitely outdated prop_times, unmatched then matched, then proposals"""
-    if DEBUG:
+    if sm.DEBUG:
       print("_prune_proposals")
     now = sm.now()
     proposals_to_check = set()
@@ -859,18 +857,18 @@ class Proposal():
       proptime.cancel_time_only()
       proposals_to_check.add(proptime.proposal())
     # now proposals, after proposal times so they get removed if all times are
-    if DEBUG:
+    if sm.DEBUG:
       print("old_ping_prop_times2")
     for proptime in ProposalTime.old_ping_to_prune(now):
-      if DEBUG:
+      if sm.DEBUG:
         print("old_ping_prop_times3")
       proptime.cancel_time_only()
-      if DEBUG:
+      if sm.DEBUG:
         print("old_ping_prop_times4")
       proposals_to_check.add(proptime.proposal())
-    if DEBUG:
+    if sm.DEBUG:
       print("old_proposals")
     for proposal in proposals_to_check:
-      if DEBUG:
+      if sm.DEBUG:
         print("old_proposals2")
       proposal.cancel_if_no_times()

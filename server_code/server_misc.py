@@ -10,11 +10,10 @@ import random
 import re
 from . import parameters as p
 from . import helper as h
-from . import matcher
 from . import portable as port
-from . import connections as c
 
 
+DEBUG = False
 TEST_TRUST_LEVEL = 10
 authenticated_callable = anvil.server.callable(require_user=True)
 
@@ -35,11 +34,11 @@ def initialize_session():
 
 
 def get_user(user_id="", require_auth=True):
-  if matcher.DEBUG:
+  if DEBUG:
     print("get_user", user_id)
   if user_id == "" or anvil.server.session['user_id'] == user_id:
     return anvil.server.session['user']
-  elif (require_auth and anvil.server.session['trust_level'] < matcher.TEST_TRUST_LEVEL):
+  elif (require_auth and anvil.server.session['trust_level'] < TEST_TRUST_LEVEL):
     raise RuntimeError("User not authorized to access this information")
   else:
     return app_tables.users.get_by_id(user_id)
@@ -62,85 +61,11 @@ def get_user_info(user):
   return user['trust_level']
 
 
-def _get_connections(user, up_to_degree=3, include_zero=False):
-  """Return dictionary from degree to set of connections"""
-  assert (up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)
-  degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user)])
-  out = {0: {user}, 1: degree1s}
-  assert user not in out[1]
-  prev = set()
-  for d in range(up_to_degree):
-    current = set()
-    prev.update(out[d])
-    current.update(
-      {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]))
-        if row['user2'] not in prev
-      }
-    )
-    out[d+1] = current
-  if not include_zero:
-    del out[0]
-  return out
-    
-    
-def _degree(user2, user1, up_to_degree=3):
-  """Returns 99 if no degree <= up_to_degree found"""
-  dset = _get_connections(user1, up_to_degree)
-  if user2 == user1:
-    return 0
-  else:
-    for d in range(1, up_to_degree+1):
-      if user2 in dset[d]:
-        return d
-    return 99
-
-  
-def _distance(user2, user1, up_to_distance=3):
-  print("Warning: _distance not yet implemented. Returning _degree.")
-  return _degree(user2, user1, up_to_distance)
-
-@authenticated_callable
-def get_connections(user_id):
-  print("get_connections", user_id)
-  user = get_user(user_id, require_auth=False)
-  is_me = user == anvil.server.session['user']
-  up_to_degree = 3
-  dset = _get_connections(anvil.server.session['user'], up_to_degree, include_zero=True)
-  if is_me:
-    user2s = []
-    for d in range(1, up_to_degree+1):
-      user2s += dset[d]
-    return [_connection_record(user2, user) for user2 in user2s]
-  elif (anvil.server.session['trust_level'] < matcher.TEST_TRUST_LEVEL
-        and _degree(user, anvil.server.session['user']) > 1):
-    return []
-  else:
-    dset2 = _get_connections(user, 1)
-    user2s = []
-    for d in range(0, up_to_degree+1):
-      user2s += dset[d] & dset2[1]
-    return [_connection_record(user2, anvil.server.session['user']) for user2 in user2s]
-
-
-def _connection_record(user2, user1):
-  degree = _degree(user2, user1)
-  return {'user_id': user2.get_id(),
-          'name': port.full_name(user2['first_name'], user2['last_name'], degree),
-          'degree': degree,
-          'distance': degree, ################ TEMPORARY
-          'seeking': user2['seeking_buddy'],
-          'confirmed': bool(user2['confirmed_url']),
-          'last_active': user2['last_login'].strftime("%m/%d/%Y"),
-          'starred': None, #True/False
-          'status': "", # invited, invite
-          'unread_message': None, # True/False
-         }
-
-
 @authenticated_callable
 def init_profile(user_id=""):
+  from . import connections as c
   user = get_user(user_id, require_auth=False)
-  record = _connection_record(user, get_user())
+  record = c.connection_record(user, get_user())
   confirmed_url_date = (
     user['confirmed_url_date'].strftime(p.DATE_FORMAT) if user['confirmed_url']
     else ""
@@ -149,59 +74,13 @@ def init_profile(user_id=""):
   record.update({'me': is_me,
                  'first': user['first_name'],
                  'last': port.last_name(user['last_name'], record['degree']),
-                 'relationships': [] if is_me else _get_relationships(user),
+                 'relationships': [] if is_me else c.get_relationships(user),
                  'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
                 })
   return record
-
-
-def _get_relationships(user2, user1_id="", up_to_degree=3):
-  """Returns ordered list of dictionaries"""
-  user1 = get_user(user1_id)
-  dset = _get_connections(user1, up_to_degree)
-  if user2 == user1:
-    return []
-  else:
-    degree = None
-    for d in range(1, up_to_degree+1):
-      if user2 in dset[d]:
-        degree = d
-        break
-    if not degree: 
-      return []
-    elif degree == 1:
-      conn = app_tables.connections.get(user1=user1, user2=user2)
-      return [{"via": False, 
-               "whose": "my", 
-               "desc": conn['relationship2to1'], 
-               "date": conn['date_described'].strftime(p.DATE_FORMAT), 
-               "child": None}]
-    #[{"via": True, "whose": "", "desc": "", "date": ""}] if degree <= 2 else 
-    out = []
-    dset2 = _get_connections(user2, degree-2, include_zero=True)
-    seconds = dset[2] & dset2[degree-2]
-    for second in seconds:
-      dset_second = _get_connections(second, 1)
-      firsts = dset[1] & dset_second[1]
-      for first in firsts:
-        name = port.full_name(first['first_name'], first['last_name'], 1)
-        conn2 = app_tables.connections.get(user1=first, user2=second)
-        conn1 = app_tables.connections.get(user1=user1, user2=first)
-        out.append({"via": degree > 2,
-                    "whose": f"{name}'s", 
-                    "desc": conn2['relationship2to1'],
-                    "date": conn2['date_described'].strftime(p.DATE_FORMAT),
-                    "child": {"via": False,
-                              "whose": "my", 
-                              "desc": conn1['relationship2to1'],
-                              "date": conn1['date_described'].strftime(p.DATE_FORMAT),
-                              "child": None,
-                             },
-                   })
-    return out 
     
   
 @authenticated_callable
@@ -224,7 +103,7 @@ def save_user_item(item_name, text, user_id=""):
   
 
 def new_jitsi_code():
-  if matcher.DEBUG:
+  if DEBUG:
     print("server_misc.new_jitsi_code()")
   return "empathyspot-" + _random_code()
 
@@ -237,7 +116,7 @@ def _random_code(num_chars=5):
 
 def prune_messages():
   """Prune messages from fully completed matches"""
-  if matcher.DEBUG:
+  if DEBUG:
     print("server_misc.prune_messages()")
   all_messages = app_tables.chat.search()
   matches = {message['match'] for message in all_messages}
@@ -249,6 +128,7 @@ def prune_messages():
 
 @authenticated_callable
 def add_message(user_id="", message="[blank]"):
+  from . import matcher
   print("add_message", "[redacted]", user_id)
   user = get_user(user_id)
   this_match = matcher.current_match(user)
@@ -269,6 +149,7 @@ def get_messages(user_id=""):
 
 
 def _get_messages(user):
+  from . import matcher
   this_match, i = matcher.current_match_i(user)
   if this_match:
     their_value = _their_value(this_match['slider_values'], i)
@@ -283,6 +164,7 @@ def _get_messages(user):
 @authenticated_callable
 def submit_slider(value, user_id=""):
   """Return their_value"""
+  from . import matcher
   print("submit_slider", "[redacted]", user_id)
   user = get_user(user_id)
   this_match, i = matcher.current_match_i(user)
@@ -331,6 +213,7 @@ def _prune_request_em():
 #@anvil.tables.in_transaction
 #def set_pinged_em(pinged_em_checked):
 #  print("set_pinged_em", pinged_em_checked)
+#  from . import matcher
 #  user = anvil.server.session['user']
 #  user['pinged_em'] = pinged_em_checked
 #  return matcher.confirm_wait_helper(user)
@@ -436,6 +319,7 @@ empathy.chat
 #   Side effect: prune request_em (i.e. switch expired request_em to false)
 #   """
 #   return []
+  #from . import matcher
   #now = now()
   #_prune_request_em()
   #assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
