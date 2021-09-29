@@ -47,7 +47,7 @@ components:
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:times'}
+      underline: false, icon: 'fa:chain-broken'}
     name: unconnect_button
     layout_properties: {}
     data_bindings:
