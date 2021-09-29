@@ -138,6 +138,8 @@ components:
       layout_properties: {}
       data_bindings:
       - {property: url, code: 'self.item[''confirmed_url'']'}
+      - {property: tooltip, code: 'f"{self.item[''first'']}''s ownership of this web
+          page was confirmed on {self.item[''confirmed_date'']}."'}
     - type: Label
       properties: {role: null, align: left, tooltip: 'Partner: confirmed url and has
           contributed >1 hour (or eq.)', border: '', foreground: '', visible: true,
@@ -146,9 +148,7 @@ components:
         icon: 'fa:check'}
       name: label_1_copy
       layout_properties: {}
-      data_bindings:
-      - {property: tooltip, code: 'f"{self.item[''first'']}''s ownership of this web
-          page was confirmed on {self.item[''confirmed_date'']}."'}
+      data_bindings: []
     data_bindings:
     - {property: visible, code: 'self.item[''confirmed_url'']'}
   - type: Label

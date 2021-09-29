@@ -1,0 +1,18 @@
+container:
+  type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none,
+    background: ''}
+components:
+- type: Label
+  properties: {role: null, align: left, tooltip: 'Partner: confirmed url and has contributed
+      at least a half hour''s worth', border: '', foreground: '', visible: true, text: '',
+    font_size: null, font: '', spacing_above: medium, icon_align: left, spacing_below: small,
+    italic: false, background: '', bold: true, underline: false, icon: 'fa:check'}
+  name: label_1
+  layout_properties:
+    col_widths: {}
+    grid_position: PQUDLZ,VJVEVR
+  data_bindings:
+  - {property: visible, code: 'self.item[''confirmed'']'}
+is_package: true
