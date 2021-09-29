@@ -140,15 +140,12 @@ components:
       - {property: url, code: 'self.item[''confirmed_url'']'}
       - {property: tooltip, code: 'f"{self.item[''first'']}''s ownership of this web
           page was confirmed on {self.item[''confirmed_date'']}."'}
-    - type: Label
-      properties: {role: null, align: left, tooltip: 'Partner: confirmed url and has
-          contributed >1 hour (or eq.)', border: '', foreground: '', visible: true,
-        text: '', font_size: null, font: '', spacing_above: medium, icon_align: left,
-        spacing_below: small, italic: false, background: '', bold: true, underline: false,
-        icon: 'fa:check'}
-      name: label_1_copy
+    - type: form:Name.PartnerCheck
+      properties: {}
+      name: partner_check_1
       layout_properties: {}
-      data_bindings: []
+      data_bindings:
+      - {property: item, code: self.item}
     data_bindings:
     - {property: visible, code: 'self.item[''confirmed_url'']'}
   - type: Label

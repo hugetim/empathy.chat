@@ -99,10 +99,11 @@ def get_connections(user_id):
 
 def connection_record(user2, user1):
   degree = _degree(user2, user1)
+  distance = degree ################ TEMPORARY
   return {'user_id': user2.get_id(),
-          'name': port.full_name(user2['first_name'], user2['last_name'], degree),
+          'name': port.full_name(user2['first_name'], user2['last_name'], distance),
           'degree': degree,
-          'distance': degree, ################ TEMPORARY
+          'distance': distance, 
           'seeking': user2['seeking_buddy'],
           'confirmed': bool(user2['confirmed_url']),
           'last_active': user2['last_login'].strftime(p.DATE_FORMAT),

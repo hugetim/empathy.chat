@@ -1,3 +1,41 @@
-container: {type: ColumnPanel}
-components: []
+container:
+  type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '', spacing_below: none,
+    background: ''}
+  event_bindings: {show: form_show}
+components:
+- type: FlowPanel
+  properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '',
+    visible: true, spacing_above: small, spacing_below: none, background: ''}
+  name: flow_panel_1
+  layout_properties:
+    col_widths: {}
+    grid_position: GWGBWQ,MQOSIW
+  components:
+  - type: Button
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
+      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
+      underline: false, icon: 'fa:star-o'}
+    name: star_button
+    layout_properties: {column: TCRDJP, grid_position: 'AGBMOO,XUVFMH'}
+    data_bindings: []
+  - type: Link
+    properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+      spacing_above: none, icon_align: left, col_widths: '{}', spacing_below: none,
+      italic: false, background: '', bold: false, underline: false, icon: ''}
+    name: link_1
+    layout_properties: {column: TCRDJP}
+    data_bindings:
+    - {property: text, code: 'self.item[''name'']'}
+    event_bindings: {click: link_1_click}
+    components: []
+  - type: form:Name.PartnerCheck
+    properties: {visible: false}
+    name: partner_check
+    layout_properties: {}
+    data_bindings:
+    - {property: item, code: self.item}
 is_package: true

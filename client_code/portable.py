@@ -40,9 +40,12 @@ def full_name(first, last, distance=3):
 @anvil.server.portable_class
 class User():
   
-  def __init__(self, user_id=None, name=None):
+  def __init__(self, user_id=None, name=None, confirmed=None, starred=None, distance=None):
     self.user_id = user_id
     self.name = name
+    self.confirmed = confirmed
+    self.starred = starred
+    self.distance = distance
 
   def item(self):
     return (self.name, self.user_id)
@@ -53,8 +56,10 @@ class User():
   
   @staticmethod
   def get(user_row, distance=3):
+    """Only works in server code"""
     return User(user_row.get_id(), 
                 full_name(user_row['first_name'], user_row['last_name'], distance),
+                distance=distance
                )
 
     
