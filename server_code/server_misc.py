@@ -115,8 +115,11 @@ def new_jitsi_code():
   return "empathyspot-" + _random_code()
 
 
-def _random_code(num_chars=5):
-  charset = "abcdefghijkmnopqrstuvwxyz23456789"
+def _random_code(num_chars=5, digits_only=False):
+  if digits_only:
+    charset = "1234567890"
+  else:
+    charset = "abcdefghijkmnopqrstuvwxyz23456789"
   random.seed()
   return "".join([random.choice(charset) for i in range(num_chars)])
 
@@ -257,9 +260,9 @@ def send_verification_sms(number, user_id=""):
   auth_token = anvil.secrets.get_secret('auth_token')
   from twilio.rest import Client
   client = Client(account_sid, auth_token)
-  code = _random_code(5)
+  code = _random_code(num_chars=6, digits_only=True)
   message = client.messages.create(
-    body=f"empathy.chat: Your verification code is {code}. It expires in 10 minutes.",
+    body=f"{code} is your empathy.chat verification code. It expires in 10 minutes.",
     from_='+12312905138',
     to=number,
   )
