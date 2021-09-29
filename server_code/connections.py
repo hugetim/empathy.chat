@@ -33,7 +33,7 @@ def get_create_user_items(user_id=""):
   dset = _get_connections(user, 2)
   items = {}
   for degree in [1, 2]:
-    items[degree] = [port.User.get(other, distance=degree).item() for other in dset[degree]]
+    items[degree] = [sm.get_port_user(other, distance=degree).item() for other in dset[degree]]
   return items[1] + ["---"] + items[2]
 
 
@@ -99,18 +99,14 @@ def get_connections(user_id):
 
 def connection_record(user2, user1):
   degree = _degree(user2, user1)
-  distance = degree ################ TEMPORARY
-  return {'user_id': user2.get_id(),
-          'name': port.full_name(user2['first_name'], user2['last_name'], distance),
-          'degree': degree,
-          'distance': distance, 
-          'seeking': user2['seeking_buddy'],
-          'confirmed': bool(user2['confirmed_url']),
-          'last_active': user2['last_login'].strftime(p.DATE_FORMAT),
-          'starred': None, #True/False
-          'status': "", # invited, invite
-          'unread_message': None, # True/False
-         }
+  _distance = distance(user2, user1)
+  record = vars(sm.get_port_user(user2, _distance))
+  record.update({'degree': degree, 
+                 'last_active': user2['last_login'].strftime(p.DATE_FORMAT),
+                 'status': "", # invited, invite
+                 'unread_message': None, # True/False
+                })
+  return record
 
 
 def get_relationships(user2, user1_id="", up_to_degree=3):

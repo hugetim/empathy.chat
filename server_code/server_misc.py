@@ -61,6 +61,24 @@ def get_user_info(user):
   return user['trust_level']
 
 
+def get_port_user(user2, distance=None, user1_id="", simple=False):
+  if not distance:
+    from . import connections as c
+    user1 = get_user(user1_id)
+    distance = c.distance(user2, user1)
+  name = port.full_name(user2['first_name'], user2['last_name'], distance)
+  if simple:
+    return port.User(user2.get_id(), name)
+  else:
+    return port.User(user2.get_id(), 
+                     name,
+                     confirmed=bool(user2['confirmed_url']),
+                     distance=distance,
+                     seeking=user2['seeking_buddy'],
+                     starred=None, #True/False
+                    )
+
+
 def get_prompts(user):
   out = []
   if not user['phone']:

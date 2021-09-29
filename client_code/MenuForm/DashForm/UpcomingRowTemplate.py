@@ -4,6 +4,7 @@ import anvil.server
 import anvil.tz
 import datetime
 from ...portable import DURATION_TEXT
+from ...Name import Name
 
 
 class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
@@ -16,7 +17,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
 
   def init(self):
     # assumes only dyads allowed
-    self.item['users'] = self.item.pop('port_users')[0].name
+    self.users_flow_panel.add_component(Name(item=self.item.pop('port_users')[0].__dict__))
     self.item['duration'] = DURATION_TEXT[self.item.pop('duration_minutes')]
     start = self.item.pop('start_date').astimezone(anvil.tz.tzlocal())
     self.item['start_time'] = start.strftime("%a, %b %d %I:%M%p")

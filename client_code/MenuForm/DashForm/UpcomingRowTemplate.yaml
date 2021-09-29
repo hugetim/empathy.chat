@@ -13,6 +13,10 @@ components:
     name: cancel_button
     layout_properties: {grid_position: 'LKJQFF,DBDZKE'}
     event_bindings: {click: cancel_button_click}
+- type: FlowPanel
+  properties: {}
+  name: users_flow_panel
+  layout_properties: {column: LRZCRL}
 container:
   type: DataRowPanel
   event_bindings: {}

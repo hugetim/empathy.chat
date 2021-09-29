@@ -462,7 +462,7 @@ class ProposalTime():
     row_dict['time_id'] = self.get_id()
     users_accepting = row_dict.pop('users_accepting')
     if users_accepting:
-      row_dict['users_accepting'] = [port.User.get(user) for user in users_accepting]
+      row_dict['users_accepting'] = [sm.get_port_user(user) for user in users_accepting]
     else:
       row_dict['users_accepting'] = []
 #     if row_dict.pop('current'):
@@ -725,11 +725,11 @@ class Proposal():
     row_dict['prop_id'] = self.get_id()
     proposer = row_dict.pop('user')
     row_dict['own'] = proposer == user
-    row_dict['user'] = port.User.get(proposer)
+    row_dict['user'] = sm.get_port_user(proposer)
     row_dict['times'] = [proptime.portable() for proptime
                          in ProposalTime.times_from_proposal(self, require_current=True)]
     eligible_users = row_dict.pop('eligible_users')
-    row_dict['eligible_users'] = [port.User.get(user) for user in eligible_users]
+    row_dict['eligible_users'] = [sm.get_port_user(user, simple=True) for user in eligible_users]
     assert row_dict['current']
     del row_dict['current']
     del row_dict['created']

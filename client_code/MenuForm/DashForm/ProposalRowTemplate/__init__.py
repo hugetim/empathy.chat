@@ -6,6 +6,7 @@ import datetime
 from .... import portable as t
 from .... import helper as h
 from ....parameters import WAIT_SECONDS, BUFFER_SECONDS
+from ....Name import Name
 
 
 class ProposalRowTemplate(ProposalRowTemplateTemplate):
@@ -19,11 +20,12 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
 
   def init(self):    
     prop = self.item.pop('prop')
-    self.item.update({'users': prop.user.name, 
-                      'prop_id': prop.prop_id,
+    self.item.update({'prop_id': prop.prop_id,
                       'own': prop.own,})
     if self.item['own']:
-      self.item['users'] = f"My proposal #{self.item['prop_num']}"
+      self.users_flow_panel.add_component(Label(text=f"My proposal #{self.item['prop_num']}"))
+    else:
+      self.users_flow_panel.add_component(Name(item=prop.user.__dict__))
     time = self.item['prop_time']
     self.item.update({'duration': t.DURATION_TEXT[time.duration],
                       'expire_date': time.expire_date,})
