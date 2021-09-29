@@ -154,3 +154,37 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
                    })
     return out 
 
+  
+@authenticated_callable
+def cancel_invite(link_key, user_id=""):
+  user = sm.get_user(user_id)
+  row = app_tables.invites.get(link_key=link_key)
+  if row:
+    row.delete()
+
+
+@authenticated_callable
+@anvil.tables.in_transaction
+def add_invite(item, user_id=""):
+  user = sm.get_user(user_id)
+  now = sm.now()
+  link_key = sm.random_code(num_chars=7)
+  app_tables.invites.add_row(date=now,
+                             user1=user,
+                             relationship2to1=item['relationship'],
+                             date_described=now,
+                             guess=item['phone_last4'],
+                             distance=1,
+                             link_key=link_key,
+                            )
+  return {"link_key": link_key,
+          "invite_url": f"{p.URL}#?invite={link_key}"}
+
+@anvil.server.callable
+def invite_visit(link_key):
+  invite = app_tables.invites.get(link_key=link_key)
+  if invite:
+    anvil.server.session['invite_link_key'] = link_key
+    return True
+  else:
+    return False

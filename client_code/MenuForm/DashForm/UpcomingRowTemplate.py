@@ -28,6 +28,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
       
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.update_dash(anvil.server.call('cancel_match', 
-                                       self.item['match_id']))
+    if confirm("Are you sure you want to cancel this upcoming empathy exchange?"):
+      self.update_dash(anvil.server.call('cancel_match',
+                                         self.item['match_id']))
 

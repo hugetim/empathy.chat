@@ -1,4 +1,5 @@
 from anvil import *
+from .MenuForm.NetworkMenu.Invite import Invite
 
 
 def get(spec_dict):
@@ -12,6 +13,16 @@ def get(spec_dict):
             "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Blue",
             "click_fn": add_phone,
+           }
+  elif spec_dict["name"] == "invite_close":
+    def invite_dialog():
+      item = {"relationship": "", "phone_last4": ""}
+      alert(content=Invite(item=item), title="Invite a close connection to empathy.chat", buttons=[], large=True, dismissible=False)
+    return {"markdown": "Invite a new close connection to join you on empathy.chat", 
+            "tooltip": "Do you have an empathy buddy you haven't invited yet?",
+            "dismissable": False, ################### TEMPORARY
+            "background": "theme:Light Mint",
+            "click_fn": invite_dialog,
            }
   else:
     print("Warning: No prompt matches that spec_dict")

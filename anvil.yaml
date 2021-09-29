@@ -44,13 +44,14 @@ services:
 - source: /runtime/services/google.yml
   client_config: {}
   server_config: {}
+startup: {type: module, module: startup}
 package_name: empathy_chat
 allow_embedding: true
 name: empathy.chat
 runtime_options: {version: 2, server_version: python3-full, client_version: '3'}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favicon-child.ico',
   title: empathy.chat}
-startup_form: LoginForm
+startup_form: null
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 db_schema:
   codes:
@@ -121,6 +122,12 @@ db_schema:
     - name: guess
       admin_ui: {width: 200}
       type: string
+    - name: link_key
+      admin_ui: {width: 200}
+      type: string
+    - name: prop_item
+      admin_ui: {width: 200}
+      type: simpleObject
   users:
     title: Users
     client: none

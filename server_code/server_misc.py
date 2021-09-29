@@ -83,6 +83,8 @@ def get_prompts(user):
   out = []
   if not user['phone']:
     out.append({"name": "phone"})
+  else:
+    out.append({"name": "invite_close"})
   return out
 
 
@@ -130,10 +132,10 @@ def save_user_item(item_name, text, user_id=""):
 def new_jitsi_code():
   if DEBUG:
     print("server_misc.new_jitsi_code()")
-  return "empathyspot-" + _random_code()
+  return "empathyspot-" + random_code()
 
 
-def _random_code(num_chars=5, digits_only=False):
+def random_code(num_chars=5, digits_only=False):
   if digits_only:
     charset = "1234567890"
   else:
@@ -278,7 +280,7 @@ def send_verification_sms(number, user_id=""):
   auth_token = anvil.secrets.get_secret('auth_token')
   from twilio.rest import Client
   client = Client(account_sid, auth_token)
-  code = _random_code(num_chars=6, digits_only=True)
+  code = random_code(num_chars=6, digits_only=True)
   message = client.messages.create(
     body=f"{code} is your empathy.chat verification code. It expires in 10 minutes.",
     from_='+12312905138',
