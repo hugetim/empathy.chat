@@ -45,11 +45,6 @@ components:
       properties: {}
       name: why_1
       layout_properties: {}
-  - type: form:MenuForm.SettingsForm.Phone
-    properties: {}
-    name: phone_form
-    layout_properties: {}
-    data_bindings: []
 - type: Spacer
   properties: {height: 19}
   name: spacer_1

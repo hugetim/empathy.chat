@@ -182,15 +182,20 @@ def add_invite(item, user_id=""):
 
 @anvil.server.callable
 def invite_visit(link_key):
-  invite = app_tables.invites.get(link_key=link_key)
+  invite = app_tables.invites.get(origin=True, link_key=link_key)
   if invite:
     anvil.server.session['invite_link_key'] = link_key
     item = {'link_key': link_key}
     item['relationship1to2'] = invite['relationship2to1']
-    item['relationship'] = ""
-    item['phone_last4'] = ""
     item['inviter'] = invite['user1']['first_name']
     item['inviter_id'] = invite['user1'].get_id()
+    invite_reply = app_tables.invites.get(origin=False, link_key=link_key)
+    if invite_reply:
+      item['relationship'] = invite_reply['relationship2to1']
+      item['phone_last4'] = invite_reply['guess']
+    else:
+      item['relationship'] = ""
+      item['phone_last4'] = ""
     return item
   else:
     return False

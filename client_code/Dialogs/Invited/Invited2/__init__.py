@@ -1,6 +1,7 @@
 from ._anvil_designer import Invited2Template
 from anvil import *
 import anvil.users
+from ....MenuForm.SettingsForm.Phone import Phone
 
 
 class Invited2(Invited2Template):
@@ -15,7 +16,9 @@ class Invited2(Invited2Template):
 
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
-    pass    
+    if self.logged_in:
+      self.phone_form = Phone()
+      self.user_linear_panel.add_component(self.phone_form)
     
   def ok_button_click(self, **event_args):
     """This method is called when the button is clicked"""
