@@ -69,9 +69,9 @@ def _degree(user2, user1, up_to_degree=3):
         return d
     return 99
 
-  
+
+print("Warning: distance not yet implemented. Returning _degree instead.")
 def distance(user2, user1, up_to_distance=3):
-  print("Warning: distance not yet implemented. Returning _degree.")
   return _degree(user2, user1, up_to_distance)
 
 @authenticated_callable
