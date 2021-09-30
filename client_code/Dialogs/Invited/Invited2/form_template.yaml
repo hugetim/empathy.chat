@@ -15,11 +15,11 @@ components:
     components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'The next step is to create an empathy.chat account.
-          Then you will be prompted to add a phone number, which will complete the
-          process of connecting.', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+        visible: true, text: 'The next step is to sign up for an empathy.chat account
+          with an email address. Then you will be prompted to add a phone number,
+          which will complete the process of connecting.', font_size: null, font: '',
+        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
       name: label_2
       layout_properties: {}
 - type: LinearPanel

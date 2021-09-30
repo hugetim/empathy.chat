@@ -17,7 +17,7 @@ class LoginForm(LoginFormTemplate):
   def form_show(self, **event_args):
     # Do the code here to show this blank form.
     while not anvil.users.get_user():
-      anvil.users.login_with_form()
+      anvil.users.login_with_form(show_signup_option=False)
     self.card_1.visible = True
     self.init_dict = anvil.server.call('init')
     if parameters.TEST_MODE:

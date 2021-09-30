@@ -9,9 +9,11 @@ if isinstance(h, dict) and 'invite' in h:
     if anvil.alert(content=invited_alert, 
                    title="You have been invited to empathy.chat", 
                    buttons=[], large=True, dismissible=False):
-      anvil.users.signup_with_form()
+      new_user = anvil.users.signup_with_form()
+      anvil.server.call('invite_visit_register', h['invite'], new_user)
+      anvil.open_form('LoginForm')
   else:
     anvil.alert("This is not a valid invite link.")
-
-anvil.open_form('LoginForm')
+else:
+  anvil.open_form('LoginForm')
 

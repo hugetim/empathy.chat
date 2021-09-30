@@ -199,8 +199,21 @@ def invite_visit(link_key):
     return item
   else:
     return False
-  
 
+  
+@anvil.server.callable
+@anvil.tables.in_transaction
+def invite_visit_register(link_key, user):
+  invite = app_tables.invites.get(origin=True, link_key=link_key)
+  invite_reply = app_tables.invites.get(origin=False, link_key=link_key)
+  if invite and invite_reply:
+    anvil.users.force_login(user)
+    invite.update(user2=user)
+    invite_reply.update(user1=user)
+  else:
+    print("Warning: invite_visit_register failed", link_key, user.get_id())
+
+  
 @anvil.server.callable
 @anvil.tables.in_transaction
 def add_invited(item):
@@ -209,16 +222,21 @@ def add_invited(item):
   if item['phone_last4'] == user2['phone'][-4:]:
     now = sm.now()
     link_key = item['link_key']
-    app_tables.invites.add_row(date=now,
-                               origin=False,
-                               user1=user,
-                               user2=user2,
-                               relationship2to1=item['relationship'],
-                               date_described=now,
-                               guess=item['phone_last4'],
-                               distance=1,
-                               link_key=link_key,
-                              )
+    info = dict(date=now,
+                origin=False,
+                user1=user,
+                user2=user2,
+                relationship2to1=item['relationship'],
+                date_described=now,
+                guess=item['phone_last4'],
+                distance=1,
+                link_key=link_key,
+               )
+    invite_reply = app_tables.invites.get(origin=False, link_key=link_key)
+    if invite_reply:
+      invite_reply.update(**info)
+    else:
+      app_tables.invites.add_row(**info)
     if user:
       invite = app_tables.invites.get(origin=True, user1=user2, link_key=link_key)
       if invite:
@@ -227,7 +245,8 @@ def add_invited(item):
   else:
     return None
 
-@authenticated_callable
+
+@anvil.server.callable
 def cancel_invited(item):
   row = app_tables.invites.get(link_key=item['link_key'],
                                relationship2to1=item['relationship'],

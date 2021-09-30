@@ -3,12 +3,20 @@ from .MenuForm.NetworkMenu.Invite import Invite
 
 
 def get(spec_dict):
+  def add_phone():
+    top_form = get_open_form()
+    top_form.go_settings()
+    top_form.content.phone_form.phone_text_box.focus()
   if spec_dict["name"] == "phone":
-    def add_phone():
-      top_form = get_open_form()
-      top_form.go_settings()
-      top_form.content.phone_form.phone_text_box.focus()
     return {"markdown": "Confirm a phone number to unlock basic empathy.chat features", 
+            "tooltip": "We require a phone number to verify identity and foster trust",
+            "dismissable": False, ################### TEMPORARY
+            "background": "theme:Light Blue",
+            "click_fn": add_phone,
+           }
+  elif spec_dict["name"] == "phone-invited":
+    return {"markdown": ("Confirm a phone number to complete your connection "
+                         f"to {spec_dict['inviter']} and unlock basic empathy.chat features"), 
             "tooltip": "We require a phone number to verify identity and foster trust",
             "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Blue",

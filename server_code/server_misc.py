@@ -78,11 +78,23 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
                      starred=None, #True/False
                     )
 
+  
+def _latest_invited(user, return_all=False):
+  inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user)
+  if return_all:
+    return inviteds
+  else:
+    return inviteds[0]
+
 
 def get_prompts(user):
   out = []
   if not user['phone']:
-    out.append({"name": "phone"})
+    invited = _latest_invited(user)
+    if invited:
+      out.append({"name": "phone-invited", "inviter": invited['user1']['first_name']})
+    else:
+      out.append({"name": "phone"})
   else:
     out.append({"name": "invite_close"})
   return out
@@ -310,9 +322,20 @@ def check_phone_code(code, user_id=""):
     code_matches = code == latest_code_row['code']
     if code_matches:
       user['phone'] = latest_code_row['address']
+      _check_for_confirmed_invites(user)
     return code_matches
   else:
     return None
+ 
+
+def _check_for_confirmed_invites(user):
+  inviteds = _latest_invited(user, retrnr_all=True)
+  for invite in inviteds:
+    if invite['guess'] == user['phone'][-4:]:
+      _connect(invite)
+    
+def _connect(invite):
+  invite_reply = app_tables.invites.get()
   
 
 def pinged_email(user, start, duration):
