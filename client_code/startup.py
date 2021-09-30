@@ -1,10 +1,12 @@
-from anvil import *
+import anvil
 
 
-h = get_url_hash()
+h = anvil.get_url_hash()
 if isinstance(h, dict) and 'invite' in h:
-  if not anvil.server.call('invite_visit', h['invite']):
-    alert("This is not a valid invite link.")
+  if anvil.server.call('invite_visit', h['invite']):
+    pass
+  else:
+    anvil.alert("This is not a valid invite link.")
 
-open_form('LoginForm')
+anvil.open_form('LoginForm')
 

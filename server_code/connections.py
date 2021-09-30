@@ -184,6 +184,10 @@ def invite_visit(link_key):
   invite = app_tables.invites.get(link_key=link_key)
   if invite:
     anvil.server.session['invite_link_key'] = link_key
+    item = {}
+    item['relationship1to2'] = invite['relationship2to1']
+    item['relationship2to1'] = ""
+    item['inviter'] = invite['user1']['first_name']
     return True
   else:
     return False

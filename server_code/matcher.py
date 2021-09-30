@@ -80,18 +80,7 @@ def init():
   _prune_matches()
   sm.prune_messages()
   
-  email_in_list = None
-  name = None
-  if trust_level == 0:
-    email_in_list = False #sm.email_in_list(user)
-    if email_in_list:
-      trust_level = 1
-      user['trust_level'] = trust_level
-      name = user['first_name']
-  elif trust_level < 0:
-    email_in_list = False
-  else:
-    name = user['first_name']
+  name = user['first_name']
   test_mode = trust_level >= sm.TEST_TRUST_LEVEL
   # Initialize user status
   state = _get_status(user)
@@ -104,7 +93,7 @@ def init():
   if state['status'] in ('requesting', 'pinged', 'pinging'):
     state = confirm_wait_helper(user)
   return {'test_mode': test_mode,
-          'email_in_list': email_in_list,
+          'trust_level': trust_level,
           'name': name,
           'state': state,
          }

@@ -22,16 +22,12 @@ class MenuForm(MenuFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
   
-    e = self.item['email_in_list']
-    n = self.item['name']
-    if e == False:
-      alert('This account is not yet authorized to match with other users. '
-            + 'Instead, it can be used to test things out. Your actions will not impact '
+    if self.item['trust_level'] < 0:
+      alert('This account is not yet authorized, but '
+            + 'it can be used to test things out. Your actions will not impact '
             + 'or be visible to other users. '
             + 'For help, contact: ' + p.CONTACT_EMAIL,
             dismissible=False)
-    elif e == True:
-      alert("Welcome, " + n + "!")
     self.test_mode.visible = self.item['test_mode']
     self.set_test_link()
     self.reset_status(self.item['state'])

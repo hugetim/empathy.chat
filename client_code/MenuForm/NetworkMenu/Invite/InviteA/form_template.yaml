@@ -71,6 +71,10 @@ components:
       italic: false, background: '', bold: true, underline: false, icon: ''}
     name: label_6
     layout_properties: {}
+- type: form:MenuForm.NetworkMenu.Invite.InviteA.RelationshipPrompt
+  properties: {}
+  name: custom_1
+  layout_properties: {grid_position: 'WHZIWR,CONYFA'}
 - type: Spacer
   properties: {height: 19}
   name: spacer_1
