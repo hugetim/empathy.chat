@@ -14,3 +14,7 @@ components:
     col_widths: {}
     grid_position: TMAIRN,RIWYWO
 is_package: true
+custom_component: true
+properties:
+- {name: tooltip, type: string, default_value: 'At empathy.chat, we want "connection"
+    to really mean something, to foster trust.', default_binding_prop: true}

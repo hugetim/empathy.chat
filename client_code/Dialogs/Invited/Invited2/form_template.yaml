@@ -39,6 +39,10 @@ components:
         icon: ''}
       name: link_1_copy
       layout_properties: {}
+    - type: form:Why
+      properties: {}
+      name: why_1
+      layout_properties: {}
   - type: form:MenuForm.SettingsForm.Phone
     properties: {}
     name: phone_form
