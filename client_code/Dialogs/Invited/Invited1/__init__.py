@@ -15,7 +15,7 @@ class Invited1(Invited1Template):
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
     self.relationship_prompt = RelationshipPrompt(
-      item={k: self.item['k'] for k in {'relationship', 'phone_last4'}}
+      item={k: self.item[k] for k in {'relationship', 'phone_last4'}}
     )
     self.linear_panel_1.add_component(self.relationship_prompt)
     self.relationship_prompt.label_4.text = (

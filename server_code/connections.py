@@ -212,9 +212,10 @@ def add_invited(item):
                                distance=1,
                                link_key=link_key,
                               )
-    invite = app_tables.invites.get(user1=user2, link_key=link_key)
-    if invite:
-      invite.update(user2=user)
+    if user:
+      invite = app_tables.invites.get(user1=user2, link_key=link_key)
+      if invite:
+        invite.update(user2=user)
     return item
   else:
     return None
