@@ -81,10 +81,13 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
   
 def _latest_invited(user, return_all=False):
   inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user)
-  if return_all:
-    return inviteds
+  if len(inviteds) == 0:
+    return None
   else:
-    return inviteds[0]
+    if return_all:
+      return inviteds
+    else:
+      return inviteds[0]
 
 
 def get_prompts(user):
