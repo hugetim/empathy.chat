@@ -332,10 +332,11 @@ def _check_for_confirmed_invites(user):
   inviteds = _latest_invited(user, retrnr_all=True)
   for invite in inviteds:
     if invite['guess'] == user['phone'][-4:]:
+      invite_reply = app_tables.invites.get(origin=False, )
       _connect(invite)
     
-def _connect(invite):
-  invite_reply = app_tables.invites.get()
+def _connect(invite, invite_reply):
+  
   
 
 def pinged_email(user, start, duration):
