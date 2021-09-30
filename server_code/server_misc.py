@@ -334,16 +334,17 @@ def _check_for_confirmed_invites(user):
   any_confirmed = False
   for invite in inviteds:
     if invite['guess'] == user['phone'][-4:]:
-      invite_reply = app_tables.invites.get(origin=False, user2=user, link_key=invite['link_key'])
+      invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
       if invite_reply:
-        _connect(invite)
+        _connect(invite, invite_reply)
         any_confirmed = True
+  return any_confirmed
 
         
 def _connect(invite, invite_reply):
   for row in [invite, invite_reply]:
     item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
-    app_tables.connections.add_row(**item)
+    app_tables.connections.add_row(starred=False, **item)
     row.delete()
   
 
