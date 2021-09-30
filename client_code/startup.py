@@ -6,9 +6,10 @@ if isinstance(h, dict) and 'invite' in h:
   item = anvil.server.call('invite_visit', h['invite'])
   if item:
     invited_alert = Invited(item=item)
-    anvil.alert(content=invited_alert, 
-                title="You have been invited to empathy.chat", 
-                buttons=[], large=True, dismissible=False)
+    if anvil.alert(content=invited_alert, 
+                   title="You have been invited to empathy.chat", 
+                   buttons=[], large=True, dismissible=False):
+      anvil.users.signup_with_form()
   else:
     anvil.alert("This is not a valid invite link.")
 

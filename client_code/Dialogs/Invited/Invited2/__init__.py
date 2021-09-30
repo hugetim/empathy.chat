@@ -29,7 +29,7 @@ class Invited2(Invited2Template):
                    "entered match your confirmed number."):
           self.parent.raise_event("x-close-alert", value=False)
     else:
-      self.parent.raise_event("x-close-alert", value=False)
+      self.parent.raise_event("x-close-alert", value=True)
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""

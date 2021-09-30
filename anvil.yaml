@@ -99,6 +99,9 @@ db_schema:
     client: none
     server: full
     columns:
+    - name: origin
+      admin_ui: {width: 200}
+      type: bool
     - name: user1
       admin_ui: {width: 200}
       type: link_single

@@ -169,6 +169,7 @@ def add_invite(item, user_id=""):
   now = sm.now()
   link_key = sm.random_code(num_chars=7)
   app_tables.invites.add_row(date=now,
+                             origin=True,
                              user1=user,
                              relationship2to1=item['relationship'],
                              date_described=now,
@@ -204,6 +205,7 @@ def add_invited(item):
     now = sm.now()
     link_key = item['link_key']
     app_tables.invites.add_row(date=now,
+                               origin=False,
                                user1=user,
                                user2=user2,
                                relationship2to1=item['relationship'],
@@ -213,7 +215,7 @@ def add_invited(item):
                                link_key=link_key,
                               )
     if user:
-      invite = app_tables.invites.get(user1=user2, link_key=link_key)
+      invite = app_tables.invites.get(origin=True, user1=user2, link_key=link_key)
       if invite:
         invite.update(user2=user)
     return item
