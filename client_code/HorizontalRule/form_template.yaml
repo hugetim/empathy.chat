@@ -1,0 +1,7 @@
+container:
+  type: HtmlTemplate
+  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
+    role: null, html: <hr>}
+components: []
+is_package: true
+custom_component: true

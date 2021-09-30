@@ -184,6 +184,10 @@ components:
     event_bindings: {}
     data_bindings:
     - {property: items, code: 'self.item[''alt'']'}
+  - type: form:HorizontalRule
+    properties: {}
+    name: horizontal_rule_1
+    layout_properties: {grid_position: 'MBSIRL,WLTAOZ'}
 - type: Button
   properties: {role: null, align: left, tooltip: '', border: '', enabled: true, foreground: '',
     visible: true, text: Add Alternate Time, font_size: null, font: '', spacing_above: small,
