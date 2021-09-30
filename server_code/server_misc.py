@@ -309,6 +309,7 @@ def send_verification_sms(number, user_id=""):
   
   
 @authenticated_callable
+@anvil.tables.in_transaction
 def check_phone_code(code, user_id=""):
   user = get_user(user_id)
   # first expunge old codes
@@ -322,21 +323,28 @@ def check_phone_code(code, user_id=""):
     code_matches = code == latest_code_row['code']
     if code_matches:
       user['phone'] = latest_code_row['address']
-      _check_for_confirmed_invites(user)
+      any_confirmed = _check_for_confirmed_invites(user)
     return code_matches
   else:
     return None
  
 
 def _check_for_confirmed_invites(user):
-  inviteds = _latest_invited(user, retrnr_all=True)
+  inviteds = _latest_invited(user, return_all=True)
+  any_confirmed = False
   for invite in inviteds:
     if invite['guess'] == user['phone'][-4:]:
-      invite_reply = app_tables.invites.get(origin=False, )
-      _connect(invite)
-    
+      invite_reply = app_tables.invites.get(origin=False, user2=user, link_key=invite['link_key'])
+      if invite_reply:
+        _connect(invite)
+        any_confirmed = True
+
+        
 def _connect(invite, invite_reply):
-  
+  for row in [invite, invite_reply]:
+    item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
+    app_tables.connections.add_row(**item)
+    row.delete()
   
 
 def pinged_email(user, start, duration):
