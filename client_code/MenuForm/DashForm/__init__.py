@@ -132,8 +132,9 @@ class DashForm(DashFormTemplate):
 
   def edit_proposal(self, prop_id):
     """This method is called when the button is clicked"""
-    [prop_to_edit] = [prop_item['prop'] for prop_item in self.item['proposals'] 
+    props_to_edit = [prop_item['prop'] for prop_item in self.item['proposals'] 
                       if prop_item['prop'].prop_id == prop_id]
+    prop_to_edit = props_to_edit[0]
     form_item = prop_to_edit.create_form_item(self.item['status'],
                                               self.get_conflict_checks())
     content = CreateForm(item=form_item)
@@ -170,7 +171,6 @@ class DashForm(DashFormTemplate):
           assert out == "requesting"
         state = anvil.server.call_s('get_status')
       self.update_status(state)
-
   
   def prompts_open_link_click(self, **event_args):
     """This method is called when the link is clicked"""
@@ -179,8 +179,7 @@ class DashForm(DashFormTemplate):
     if current:
       self.prompts_open_link.icon = "fa:chevron-right"
     else:
-      self.prompts_open_link.icon = "fa:chevron-down"
-    
+      self.prompts_open_link.icon = "fa:chevron-down" 
       
 ### Legacy code to be possibly repurposed ###
   def emailed_notification(self, num):

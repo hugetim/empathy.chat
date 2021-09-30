@@ -69,16 +69,17 @@ def init():
                 updates expire_date if currently requesting/ping
   """
   print("('init')")
-  print("Warning: distance not yet implemented. Returning _degree instead.")
   sm.initialize_session()
-  # Prune expired items for all users
-  Proposal.prune_all()
-  _prune_matches()
-  sm.prune_messages()
   # Initialize user info
   user = anvil.server.session['user']
   print(user['email'])
   trust_level = sm.get_user_info(user)
+  print("Warning: distance not yet implemented. Returning _degree instead.")
+  # Prune expired items for all users
+  Proposal.prune_all()
+  _prune_matches()
+  sm.prune_messages()
+  
   email_in_list = None
   name = None
   if trust_level == 0:

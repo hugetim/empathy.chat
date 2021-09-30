@@ -27,14 +27,17 @@ class TestNow(unittest.TestCase):
 
   def test_multiple_proposal_times(self):
     self.top_form.content.propose_button_click()
+    time.sleep(5)
     self.top_form.proposal_alert.button_add_alternate_click()
+    time.sleep(5)
+    self.top_form.proposal_alert.save_button_click()
 
 def run_tests():
   #unittest.main()
   #print("run manually")
   test = TestNow()
   test.setUp()
-  test.test_repeat_now_proposal()
+  #test.test_repeat_now_proposal()
   test.test_multiple_proposal_times()
 
 # class TestNow(unittest.TestCase):
