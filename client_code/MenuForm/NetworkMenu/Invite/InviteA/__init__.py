@@ -1,8 +1,8 @@
 from ._anvil_designer import InviteATemplate
 from anvil import *
 import anvil.server
-from anvil_extras.utils import wait_for_writeback
 from ..InviteB import InviteB
+from .RelationshipPrompt import RelationshipPrompt
 
 class InviteA(InviteATemplate):
   def __init__(self, **properties):
@@ -10,23 +10,18 @@ class InviteA(InviteATemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-
-  def relationship_text_box_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
-    self.phone_last4_text_box.focus()
+  def form_show(self, **event_args):
+    """This method is called when the column panel is shown on the screen"""
+    self.relationship_prompt = RelationshipPrompt(item={k:self.item[k] for k in {'relationship', 'phone_last4'}})
+    self.linear_panel_1.add_component(self.relationship_prompt)
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.parent.raise_event("x-close-alert", value=False)
-
-  def phone_last4_text_box_pressed_enter(self, **event_args):
-    """This method is called when the user presses Enter in this text box"""
-    if self.continue_button.enabled:
-      self.continue_button_click()
-
-  @wait_for_writeback    
+  
   def continue_button_click(self, **event_args):
     """This method is called when the button is clicked"""
+    self.item.update(self.relationship_prompt.item)
     if len(self.item['phone_last4']) != 4:
       self.error("Wrong number of digits entered.")
     elif len(self.item['relationship']) < 3:
@@ -42,7 +37,4 @@ class InviteA(InviteATemplate):
     self.error_label.text = text
     self.error_label.visible = True
     
-
-
-
 

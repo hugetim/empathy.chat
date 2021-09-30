@@ -14,3 +14,12 @@ class RelationshipPrompt(RelationshipPromptTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+
+  def relationship_text_box_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    self.phone_last4_text_box.focus()
+  
+  def phone_last4_text_box_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    if self.continue_button.enabled:
+      self.continue_button_click()

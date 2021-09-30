@@ -17,7 +17,11 @@ def get(spec_dict):
   elif spec_dict["name"] == "invite_close":
     def invite_dialog():
       item = {"relationship": "", "phone_last4": ""}
-      alert(content=Invite(item=item), title="Invite a close connection to empathy.chat", buttons=[], large=True, dismissible=False)
+      top_form = get_open_form()
+      top_form.invite_alert = Invite(item=item)
+      alert(content=top_form.invite_alert, 
+            title="Invite a close connection to empathy.chat", 
+            buttons=[], large=True, dismissible=False)
     return {"markdown": "Invite a new close connection to join you on empathy.chat", 
             "tooltip": "Do you have an empathy buddy you haven't invited yet?",
             "dismissable": False, ################### TEMPORARY

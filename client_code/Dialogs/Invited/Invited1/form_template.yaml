@@ -1,6 +1,7 @@
 container:
   type: ColumnPanel
   properties: {col_widths: '{}'}
+  event_bindings: {show: form_show}
 components:
 - type: RichText
   properties: {role: null, align: center, tooltip: '', enable_slots: true, border: '',
@@ -13,4 +14,31 @@ components:
   layout_properties: {grid_position: 'NBHBNT,RCQAHT'}
   data_bindings:
   - {property: data, code: self.item}
+- type: LinearPanel
+  properties: {}
+  name: linear_panel_1
+  layout_properties: {grid_position: 'QLZNBW,VYQTAB'}
+- type: Label
+  properties: {role: null, align: center, tooltip: '', border: '', foreground: 'theme:Red',
+    visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+    spacing_below: small, italic: false, background: '', bold: false, underline: false,
+    icon: ''}
+  name: error_label
+  layout_properties: {grid_position: 'OONUCY,KEQRHK'}
+- type: FlowPanel
+  properties: {role: null, spacing: medium, align: right, tooltip: '', border: '',
+    foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+  name: flow_panel_1
+  layout_properties: {grid_position: 'LLFKIB,HUWYPI'}
+  components:
+  - type: Button
+    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Continue, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: continue_button
+    layout_properties:
+      col_widths: {}
+      grid_position: XYHSBP,NRUTHG
+    event_bindings: {click: continue_button_click}
 is_package: true

@@ -157,7 +157,7 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
 @authenticated_callable
 def cancel_invite(link_key, user_id=""):
   user = sm.get_user(user_id)
-  row = app_tables.invites.get(link_key=link_key)
+  row = app_tables.invites.get(link_key=link_key, user1=user)
   if row:
     row.delete()
 
@@ -184,10 +184,46 @@ def invite_visit(link_key):
   invite = app_tables.invites.get(link_key=link_key)
   if invite:
     anvil.server.session['invite_link_key'] = link_key
-    item = {}
+    item = {'link_key': link_key}
     item['relationship1to2'] = invite['relationship2to1']
-    item['relationship2to1'] = ""
+    item['relationship'] = ""
+    item['phone_last4'] = ""
     item['inviter'] = invite['user1']['first_name']
-    return True
+    item['inviter_id'] = invite['user1'].get_id()
+    return item
   else:
     return False
+  
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def add_invited(item):
+  user = anvil.users.get_user()
+  user2 = app_tables.users.get_by_id(item['inviter_id'])
+  if item['phone_last4'] == user2['phone'][-4:]:
+    now = sm.now()
+    link_key = item['link_key']
+    app_tables.invites.add_row(date=now,
+                               user1=user,
+                               user2=user2,
+                               relationship2to1=item['relationship'],
+                               date_described=now,
+                               guess=item['phone_last4'],
+                               distance=1,
+                               link_key=link_key,
+                              )
+    invite = app_tables.invites.get(user1=user2, link_key=link_key)
+    if invite:
+      invite.update(user2=user)
+    return item
+  else:
+    return None
+
+@authenticated_callable
+def cancel_invited(item):
+  row = app_tables.invites.get(link_key=item['link_key'],
+                               relationship2to1=item['relationship'],
+                               user2=app_tables.users.get_by_id(item['inviter_id']),
+                              )
+  if row:
+    row.delete()
