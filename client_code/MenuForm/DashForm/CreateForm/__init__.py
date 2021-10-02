@@ -17,6 +17,7 @@ class CreateForm(CreateFormTemplate):
   def __init__(self, item, **properties):
     # Set Form properties and Data Bindings.
     item['user_items'] = anvil.server.call('get_create_user_items')
+    item['group_items'] = []
     self.init_components(item=item, **properties)
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel

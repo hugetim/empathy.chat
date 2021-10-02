@@ -207,6 +207,8 @@ components:
     background: '', bold: true, underline: false, icon: ''}
   name: label_4
   layout_properties: {grid_position: 'YYMEXI,XTNOOT'}
+  data_bindings:
+  - {property: visible, code: 'self.item[''user_items''] or self.item[''group_items'']'}
 - type: ColumnPanel
   properties: {col_widths: '{"NYUXLB":15,"GNUIJB":45,"FGBSJH":15}'}
   name: eligible_network_column_panel
@@ -257,6 +259,8 @@ components:
     properties: {height: 32}
     name: spacer_2
     layout_properties: {grid_position: 'TDUTAU,FGBSJH'}
+  data_bindings:
+  - {property: visible, code: 'self.item[''user_items'']'}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
     wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"JVSIPB":10}',
@@ -277,6 +281,8 @@ components:
     layout_properties: {grid_position: 'JWIJWQ,TNFAHU'}
     data_bindings:
     - {property: items, code: 'self.item[''eligible_groups'']'}
+  data_bindings:
+  - {property: visible, code: 'self.item[''group_items'']'}
 - type: FlowPanel
   properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
     foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
