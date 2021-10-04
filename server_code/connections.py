@@ -181,9 +181,12 @@ def add_invite(item, user_id=""):
           "invite_url": f"{p.URL}#?invite={link_key}"}
 
 @anvil.server.callable
-def invite_visit(link_key):
+def invite_visit(link_key, user_id=""):
   invite = app_tables.invites.get(origin=True, link_key=link_key)
   if invite:
+    user2 = app_tables.users.get_by_id(user_id) if user_id else None
+    if user2:
+      invite['user2'] = user2
     anvil.server.session['invite_link_key'] = link_key
     item = {'link_key': link_key}
     item['relationship1to2'] = invite['relationship2to1']
@@ -193,6 +196,7 @@ def invite_visit(link_key):
     if invite_reply:
       item['relationship'] = invite_reply['relationship2to1']
       item['phone_last4'] = invite_reply['guess']
+      invite_reply['user1'] = user2
     else:
       item['relationship'] = ""
       item['phone_last4'] = ""
