@@ -1,8 +1,8 @@
-import anvil.app
+from anvil import app
 
 
 BUFFER_SECONDS = 7
-if anvil.app.environment.name in {"Production", "Staging"}:
+if app.environment.name in {"Production", "Staging"}:
     TEST_MODE = False
 else:
     # Probably a personal debug environment
