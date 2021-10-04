@@ -1,5 +1,12 @@
+import anvil.app
+
+
 BUFFER_SECONDS = 7
-TEST_MODE = True
+if anvil.app.environment.name in {"Production", "Staging"}:
+    TEST_MODE = False
+else:
+    # Probably a personal debug environment
+    TEST_MODE = True
 CONFIRM_MATCH_SECONDS = 15 if TEST_MODE else 60
 WAIT_SECONDS = 55 if TEST_MODE else 60*20
 ASSUME_INACTIVE_DAYS = 60 # 30 day persistent login + 30 days
