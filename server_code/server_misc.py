@@ -181,19 +181,19 @@ def add_message(user_id="", message="[blank]"):
                           user=user,
                           message=anvil.secrets.encrypt_with_key("new_key", message),
                           time_stamp=now())
-  return _get_messages(user)
+  return _update_match_form(user)
 
 
 @authenticated_callable
-def get_messages(user_id=""):
+def update_match_form(user_id=""):
   """
-  Return (iterable of dictionaries with keys: 'me', 'message'), their_value
+  Return (iterable of dictionaries with keys: 'me', 'message'), their_value, how_empathy_list
   """
   user = get_user(user_id)
-  return _get_messages(user)
+  return _update_match_form(user)
 
 
-def _get_messages(user):
+def _update_match_form(user):
   from . import matcher
   this_match, i = matcher.current_match_i(user)
   if this_match:
@@ -203,7 +203,8 @@ def _get_messages(user):
       return ([{'me': (user == m['user']),
                 'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
                for m in messages],
-              their_value)
+              their_value, [])
+  return [], None, []
 
   
 @authenticated_callable

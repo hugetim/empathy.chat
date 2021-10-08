@@ -18,7 +18,9 @@ class MatchForm(MatchFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
-    jitsi_code, duration, my_value = anvil.server.call('get_code')
+    jitsi_code, duration, my_value, how_empathy_list = (
+      anvil.server.call('init_match_form')
+    )
     self.set_jitsi_link(jitsi_code)
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
@@ -46,7 +48,7 @@ class MatchForm(MatchFormTemplate):
     
   def update(self):
     old_items = self.chat_repeating_panel.items
-    new_items, their_value = anvil.server.call_s('get_messages')
+    new_items, their_value, how_empathy_list = anvil.server.call_s('update_match_form')
     if len(new_items) > len(old_items):
       self.chat_repeating_panel.items = new_items
       self.call_js('scrollCard')
