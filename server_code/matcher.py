@@ -246,12 +246,12 @@ def init_match_form(user_id=""):
   
   current_proptime = ProposalTime.get_now(user)
   if current_proptime:
-    jitsi_code, duration = current_proptime.get_code()
-    return jitsi_code, duration, None
+    jitsi_code, duration = current_proptime.get_match_info()
+    return jitsi_code, duration, None, []
   else:
     this_match, i = current_match_i(user)
     if this_match:
-      jitsi_code, duration = ProposalTime(this_match['proposal_time']).get_code()
+      jitsi_code, duration = ProposalTime(this_match['proposal_time']).get_match_info()
       return jitsi_code, duration, this_match['slider_values'][i], []
   return None, None, None, []
 
@@ -487,7 +487,7 @@ class ProposalTime():
   def get_duration(self):
     return self._proptime_row['duration']
   
-  def get_code(self):
+  def get_match_info(self):
     return self._proptime_row['jitsi_code'], self._proptime_row['duration']
   
   def proposal(self):
