@@ -93,6 +93,14 @@ def update_trust_level(user):
     user['trust_level'] = trust
   return user['trust_level']
 
+trust_label = {0: "Visitor",
+               1: "Guest",
+               2: "Confirmed",
+               3: "Member",
+               4: "Partner",
+               10: "Admin",
+              }
+
 def get_port_user(user2, distance=None, user1_id="", simple=False):
   if not distance:
     from . import connections as c
@@ -153,6 +161,7 @@ def init_profile(user_id=""):
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
+                 'trust_label': trust_label[user['trust_level']],
                 })
   return record
     

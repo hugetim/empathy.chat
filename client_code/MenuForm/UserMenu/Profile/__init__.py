@@ -10,7 +10,7 @@ from .Relationship import Relationship
 
 class Profile(ProfileTemplate):
   item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
-               'seeking', 'how_empathy', 'profile'}
+               'seeking', 'how_empathy', 'profile', 'trust_label'}
   
   def __init__(self, user_id="", **properties):
     # Set Form properties and Data Bindings.
