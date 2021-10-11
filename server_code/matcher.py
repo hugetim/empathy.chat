@@ -251,6 +251,7 @@ def init_match_form(user_id=""):
   else:
     this_match, i = current_match_i(user)
     if this_match:
+      this_match['present'][i] = 1
       jitsi_code, duration = ProposalTime(this_match['proposal_time']).get_match_info()
       how_empathy_list = ([user['how_empathy']]
                           + [u['how_empathy'] for u in this_match['users']
@@ -394,6 +395,7 @@ def _match_commit(user, proptime_id=None):
       new_match = app_tables.matches.add_row(users=users,
                                              proposal_time=current_proptime._row(),
                                              match_commence=match_start,
+                                             present=[0]*len(users),
                                              complete=[0]*len(users),
                                              slider_values=[""]*len(users))
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects

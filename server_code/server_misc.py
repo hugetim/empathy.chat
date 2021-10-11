@@ -45,10 +45,8 @@ def get_user(user_id="", require_auth=True):
 
 
 def get_user_info(user):
-  """Return user info, initializing info for new users"""
-  trust = user['trust_level']
-  if trust is None:
-    user['trust_level'] = 1
+  """Return user info, initializing info for new users & updating trust_level"""
+  if user['trust_level'] is None:
     user['request_em'] = False
     user['pinged_em'] = False
     user['request_em_settings'] = {"fixed": 0, "hours": 2}
@@ -58,8 +56,40 @@ def get_user_info(user):
     user['profile'] = ""
     user['phone'] = ""
     user['confirmed_url'] = ""
-  return user['trust_level']
+  return update_trust_level(user)
 
+
+def update_trust_level(user):
+  """Return trust level based on other info
+  
+  Side-effect: update user['trust_level']"""
+  def matched_with_degree1_member():
+    degree1s = _get_connections(user, 1)[1]
+    for user2 in degree1s:
+      user2_matches = app_tables.matches.search(users=[user,user2])
+      for match in user2_matches:
+        both_present = 1
+        for i, u in enumerate(match['users']):
+          if u in [user, user2] and match['present'][i] == 0:
+            both_present = 0
+            break
+        if both_present:
+          return True
+    return False
+  trust = user['trust_level']
+  if not trust:
+    trust = 0
+  if trust < 1 and user['confirmed_email']:
+    trust = 1 # Guest
+  if (trust >= 1 and trust < 2) and user['phone']:
+    trust = 2 # Confirmed
+  if (trust >= 2 and trust < 3) and matched_with_degree1_member():
+    trust = 3 # Member
+  if (trust >= 3 and trust < 4) and user['confirmed_url']:
+    trust = 4 # Partner
+  if not user['trust_level'] or trust > user['trust_level']:
+    user['trust_level'] = trust
+  return user['trust_level']
 
 def get_port_user(user2, distance=None, user1_id="", simple=False):
   if not distance:

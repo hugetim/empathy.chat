@@ -290,6 +290,9 @@ db_schema:
     - name: match_commence
       admin_ui: {width: 200}
       type: datetime
+    - name: present
+      admin_ui: {width: 200}
+      type: simpleObject
     - name: complete
       admin_ui: {width: 200}
       type: simpleObject

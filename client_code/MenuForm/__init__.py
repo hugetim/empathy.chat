@@ -21,8 +21,9 @@ class MenuForm(MenuFormTemplate):
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
-  
-    if self.item['trust_level'] < 0:
+    
+    self.trust_level = self.item['trust_level']
+    if self.trust_level < 0:
       alert('This account is not yet authorized, but '
             + 'it can be used to test things out. Your actions will not impact '
             + 'or be visible to other users. '
