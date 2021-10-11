@@ -11,7 +11,14 @@ from .Relationship import Relationship
 class Profile(ProfileTemplate):
   item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
                'seeking', 'how_empathy', 'profile', 'trust_label'}
-  
+  trust_tooltip = {"Visitor": "Has not yet confirmed an email address",
+                   "Guest": "Has not yet confirmed a phone number",
+                   "Confirmed": "Has not yet matched with a Member who is a close connection",
+                   "Member": ("Has confirmed an email address and phone number" 
+                              "and matched with a Member who is a close connection"),
+                   "Partner": "Confirmed url and has contributed at least a half hour's worth",
+                   "Admin": "empathy.chat admin"
+                  }
   def __init__(self, user_id="", **properties):
     # Set Form properties and Data Bindings.
     self.item = anvil.server.call('init_profile', user_id)

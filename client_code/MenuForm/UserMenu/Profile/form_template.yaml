@@ -58,6 +58,7 @@ components:
         grid_position: MCBRGZ,BHOBVB
       data_bindings:
       - {property: text, code: 'f"({self.item[''trust_label'']})"'}
+      - {property: tooltip, code: 'self.trust_tooltip[self.item[''trust_label'']]'}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: Connect, border: '',
         enabled: true, foreground: '', visible: false, text: '', font_size: null,
