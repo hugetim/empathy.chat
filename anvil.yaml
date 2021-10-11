@@ -11,8 +11,8 @@ services:
   server_config:
     user_table: 18972
     email_content:
-      confirm_address: {html: '<p>Thanks for registering your account with us. Please
-          click the following link to confirm that this is your account:
+      confirm_address: {html: '<p>Thanks for registering your account with empathy.chat.
+          Please click the following link to confirm that this is your account:
 
 
           </p><p>{{confirm_link}}
@@ -20,7 +20,7 @@ services:
 
           </p><p>Thanks,
 
-          </p><p>The team</p>'}
+          </p><p>Tim</p>'}
       reset_password: {html: '<p>Hi there,
 
 
