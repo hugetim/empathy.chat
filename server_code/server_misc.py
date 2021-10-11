@@ -64,17 +64,19 @@ def update_trust_level(user):
   
   Side-effect: update user['trust_level']"""
   def matched_with_degree1_member():
-    degree1s = _get_connections(user, 1)[1]
+    import connections as c
+    degree1s = c._get_connections(user, 1)[1]
     for user2 in degree1s:
-      user2_matches = app_tables.matches.search(users=[user,user2])
-      for match in user2_matches:
-        both_present = 1
-        for i, u in enumerate(match['users']):
-          if u in [user, user2] and match['present'][i] == 0:
-            both_present = 0
-            break
-        if both_present:
-          return True
+      if c.distance(user2, user, 1) == 1:
+        user2_matches = app_tables.matches.search(users=[user,user2])
+        for match in user2_matches:
+          both_present = 1
+          for i, u in enumerate(match['users']):
+            if u in [user, user2] and match['present'][i] == 0:
+              both_present = 0
+              break
+          if both_present:
+            return True
     return False
   trust = user['trust_level']
   if not trust:
