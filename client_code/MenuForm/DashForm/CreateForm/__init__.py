@@ -16,7 +16,8 @@ class CreateForm(CreateFormTemplate):
   
   def __init__(self, item, **properties):
     # Set Form properties and Data Bindings.
-    item['user_items'] = anvil.server.call('get_create_user_items')
+    if 'user_items' not in item:
+      item['user_items'] = anvil.server.call('get_create_user_items')
     item['group_items'] = []
     self.top_form = get_open_form()
     self.init_components(item=item, **properties)

@@ -126,16 +126,24 @@ def confirm_wait_helper(user, proptime=None):
 
 @authenticated_callable
 @anvil.tables.in_transaction
+def get_proposals_upcomings(user_id=""):
+  user = sm.get_user(user_id)
+  proposals = Proposal.get_port_proposals(user)
+  upcomings = _get_upcomings(user)
+  return proposals, upcomings
+
+
+@authenticated_callable
+@anvil.tables.in_transaction
 def get_status(user_id=""):
   user = sm.get_user(user_id)
   return _get_status(user)
 
 
 def _get_status(user):
-  """Returns current_status, seconds_left, proposals
+  """Returns status dict
   ping_start: accept_date or, for "matched", match_commence
   assumes 2-person matches only
-  assumes now proposals only
   Side effects: prune proposals when status in ["requesting", None]
   """
   if sm.DEBUG:

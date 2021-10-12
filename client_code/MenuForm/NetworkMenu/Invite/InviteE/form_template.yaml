@@ -1,0 +1,70 @@
+container:
+  type: ColumnPanel
+  properties: {col_widths: '{}'}
+components:
+- type: LinearPanel
+  properties: {}
+  name: linear_panel_1
+  layout_properties: {grid_position: 'OKNTWI,DGYOXJ'}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'Your new connection will, at first, be able to chat only
+        with you (and any other direct connections they are able to form). In order
+        to become a full Member and be able to chat with others, they will need to
+        first participate in an empathy chat with you (or another direct connection).
+        To help them along, you may propose some times to chat with them now, enabling
+        them to hit the ground running as soon as your connection is confirmed.',
+      font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: ''}
+    name: label_1
+    layout_properties: {grid_position: 'YBAGYL,ALDORO'}
+  - type: FlowPanel
+    properties: {role: null, spacing: small, align: center, tooltip: '', border: '',
+      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
+    name: flow_panel_1
+    layout_properties: {grid_position: 'XZVHWQ,WPZXNU'}
+    components:
+    - type: Button
+      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat at a scheduled future time,
+        border: '', enabled: true, foreground: '', visible: true, text: Propose an Empathy Chat,
+        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
+        italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
+      name: propose_button
+      layout_properties:
+        col_widths: {}
+        grid_position: VPXCJV,DJOKOM
+      event_bindings: {click: propose_button_click}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: with your, font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: label_2
+      layout_properties: {}
+    - type: TextBox
+      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
+        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14,
+        font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false}
+      name: relationship_text_box
+      layout_properties:
+        col_widths: {}
+        grid_position: ITGASP,WNEYXQ
+        width: 438
+        expand: false
+      data_bindings:
+      - {property: text, code: 'self.item[''relationship'']', writeback: true}
+  - type: Spacer
+    properties: {height: 32}
+    name: spacer_1
+    layout_properties: {grid_position: 'ZXRRRO,YWCCOW'}
+  - type: Button
+    properties: {role: primary-color, align: right, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Not Now, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: not_now_button
+    layout_properties: {grid_position: 'NIRKMP,ANSBKA'}
+    event_bindings: {click: not_now_button_click}
+is_package: true

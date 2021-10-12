@@ -2,6 +2,7 @@ from ._anvil_designer import InviteBTemplate
 from anvil import *
 import anvil.server
 from anvil_extras.utils import wait_for_writeback
+from ..InviteE import InviteE
 
 
 class InviteB(InviteBTemplate):
@@ -13,7 +14,9 @@ class InviteB(InviteBTemplate):
 
   def ok_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.parent.raise_event("x-close-alert", value=True)  
+    parent = self.parent
+    self.remove_from_parent()
+    parent.add_component(InviteE(item=self.item))
     
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
