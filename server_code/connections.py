@@ -32,9 +32,14 @@ def get_create_user_items(user_id=""):
   user = sm.get_user(user_id)
   dset = _get_connections(user, 2)
   items = {}
-  for degree in [1, 2]:
+  degree_set = [1, 2] if user['trust_level'] >= 3 else [1]
+  for degree in degree_set:
+    # change to distance=distance(user2, user1) or equivalent once properly implement distance
     items[degree] = [sm.get_port_user(other, distance=degree).item() for other in dset[degree]]
-  return items[1] + ["---"] + items[2]
+  if user['trust_level'] >= 3:
+    return items[1] + ["---"] + items[2] 
+  else:
+    return items[1]
 
 
 def _get_connections(user, up_to_degree=3, include_zero=False):

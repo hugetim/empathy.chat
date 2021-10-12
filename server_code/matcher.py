@@ -778,6 +778,8 @@ class Proposal():
     self._prop_row['current'] = True
     self._prop_row['last_edited'] = sm.now()
     self._prop_row['eligible'] = port_prop.eligible
+    if self.proposer()['trust_level'] < 3:
+      self._prop_row['eligible'] = min(2, self._prop_row['eligible'])
     self._prop_row['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id) 
                                        for port_user in port_prop.eligible_users]
     self._prop_row['eligible_groups'] = port_prop.eligible_groups
@@ -805,6 +807,8 @@ class Proposal():
                                                 eligible_users=user_rows,
                                                 eligible_groups=port_prop.eligible_groups,
                                                )
+    if user['trust_level'] < 3:
+      new_prop_row['eligible'] = min(2, new_prop_row['eligible'])
     new_proposal = Proposal(new_prop_row)
     for port_time in port_prop.times:
       ProposalTime.add(proposal=new_proposal, port_time=port_time)

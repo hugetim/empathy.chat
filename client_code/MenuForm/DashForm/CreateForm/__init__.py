@@ -18,6 +18,7 @@ class CreateForm(CreateFormTemplate):
     # Set Form properties and Data Bindings.
     item['user_items'] = anvil.server.call('get_create_user_items')
     item['group_items'] = []
+    self.top_form = get_open_form()
     self.init_components(item=item, **properties)
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel
@@ -29,11 +30,12 @@ class CreateForm(CreateFormTemplate):
       self.drop_down_start.items = [("later at...", 0)]
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
-    self.drop_down_eligible.items = [("Anyone (up to 3 degrees separation)", 3),
-                                     ('"Friends of friends" (2 degrees separation)', 2),
-                                     ("Direct connections only (1st degree)", 1),
-                                     ("Specific user(s)...",0)
-                                    ]
+    self.drop_down_eligible.items = ([("Anyone (up to 3 degrees separation)", 3)] if self.top_form.trust_level >= 3
+                                     else [])
+    self.drop_down_eligible.items += [('"Friends of friends" (2 degrees separation)', 2),  
+                                      ("Close connections only (1st degree)", 1),
+                                      ("Specific user(s)...",0),
+                                     ]
     self.multi_select_drop_down.selected = self.item['eligible_users']
     self.normalize_initial_state()
     self.date_picker_start_initialized = False
