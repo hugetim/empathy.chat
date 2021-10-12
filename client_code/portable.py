@@ -174,7 +174,7 @@ class Proposal():
   MAX_ALT_TIMES = 4
   
   def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], 
-               eligible=1, eligible_users=[], eligible_groups=[]):
+               eligible=2, eligible_users=[], eligible_groups=[]):
     self.prop_id = prop_id
     self.own = own
     self.user = user
@@ -252,7 +252,7 @@ class Proposal():
 #                    'duration': DURATION_DEFAULT_MINUTES,
 #                    'cancel_buffer': CANCEL_DEFAULT_MINUTES,
 #                    'alt': [],
-#                    'eligible': 3,
+#                    'eligible': 2,
 #                    'eligible_users': [],
 #                    'eligible_groups': [],
 #                   }
