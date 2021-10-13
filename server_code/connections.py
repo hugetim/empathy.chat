@@ -186,14 +186,6 @@ def add_invite(item, user_id=""):
           "invite_url": f"{p.URL}#?invite={link_key}"}
 
 
-def add_invite_proposal(proposal, link_key, user):
-  row = app_tables.invites.get(link_key=link_key, user1=user, origin=True)
-  if row:
-    row['proposal'] = proposal
-  else:
-    print("Warning: no such invite to add proposal to")
-
-
 @anvil.server.callable
 def invite_visit(link_key, user_id=""):
   invite = app_tables.invites.get(origin=True, link_key=link_key)

@@ -299,10 +299,9 @@ def _add_proposal(user, port_prop, link_key=""):
   state = _get_status(user)
   status = state['status']
   if status is None or not port_prop.times[0].start_now:
-    prop = Proposal.add(user, port_prop).get_id()
+    prop = Proposal.add(user, port_prop)
     if link_key:
-      from . import connections as c
-      c.add_invite_proposal(prop, link_key, user)
+      prop.add_to_invite(link_key)
     prop_id = prop.get_id()
   else:
     prop_id = None
@@ -785,7 +784,14 @@ class Proposal():
     for proptime in ProposalTime.times_from_proposal(self):
       proptime.cancel_time_only()
     self.cancel_prop_only()    
-      
+
+  def add_to_invite(self, link_key):
+    invite_row = app_tables.invites.get(link_key=link_key, user1=self.proposer(), origin=True)
+    if invite_row:
+      invite_row['proposal'] = self._prop_row
+    else:
+      print("Warning: no such invite to add proposal to")
+
   def update(self, port_prop):
     self._prop_row['current'] = True
     self._prop_row['last_edited'] = sm.now()
