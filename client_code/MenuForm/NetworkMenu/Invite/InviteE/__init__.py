@@ -22,11 +22,12 @@ class InviteE(InviteETemplate):
     state = anvil.server.call('get_status')
     top_form = get_open_form()
     top_form.reset_status(state)
+    self.parent.raise_event("x-close-alert", value=True) 
     if state['status'] not in ["pinging", "matched"]:
       top_form.content.propose(link_key=self.item['link_key'])
     else:
       alert("Unable to propose exchange just now. Please try again later.")
-    self.parent.raise_event("x-close-alert", value=True) 
+
 #     self.linear_panel_1.visible = False
 #     new_prop = t.Proposal(times=[t.ProposalTime(start_now=False)])
 #     form_item = new_prop.create_form_item("now not allowed",

@@ -284,22 +284,26 @@ def accept_proposal(proptime_id, user_id=""):
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def add_proposal(proposal, user_id=""):
+def add_proposal(proposal, link_key="", user_id=""):
   """Return _get_status
   
   Side effect: Update proposal tables with additions, if valid
   """
   print("add_proposal", user_id)
   user = sm.get_user(user_id)
-  state, prop_id = _add_proposal(user, proposal)
+  state, prop_id = _add_proposal(user, proposal, link_key)
   return state
 
 
-def _add_proposal(user, port_prop):
+def _add_proposal(user, port_prop, link_key=""):
   state = _get_status(user)
   status = state['status']
   if status is None or not port_prop.times[0].start_now:
-    prop_id = Proposal.add(user, port_prop).get_id()
+    prop = Proposal.add(user, port_prop).get_id()
+    if link_key:
+      from . import connections as c
+      c.add_invite_proposal(prop, link_key, user)
+    prop_id = prop.get_id()
   else:
     prop_id = None
   return _get_status(user), prop_id
