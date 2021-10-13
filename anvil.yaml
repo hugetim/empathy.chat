@@ -128,9 +128,6 @@ db_schema:
     - name: link_key
       admin_ui: {width: 200}
       type: string
-    - name: prop_item
-      admin_ui: {width: 200}
-      type: simpleObject
   users:
     title: Users
     client: none

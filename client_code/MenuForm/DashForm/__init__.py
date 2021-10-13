@@ -111,11 +111,17 @@ class DashForm(DashFormTemplate):
     """This method is called when the button is clicked"""
     self.propose()
     
-  def propose(self, specified_user=""):
-    start_now = not bool(self.item['status'])
-    new_prop = t.Proposal(times=[t.ProposalTime(start_now=start_now)])
-    form_item = new_prop.create_form_item(self.item['status'],
-                                          self.get_conflict_checks())
+  def propose(self, specified_user="", link_key=""):
+    if link_key:
+      new_prop = t.Proposal(eligible=0, times=[t.ProposalTime(start_now=False)])
+      form_item = new_prop.create_form_item("now not allowed",
+                                            self.get_conflict_checks())
+      form_item['user_items'] = []
+    else:
+      start_now = not bool(self.item['status'])
+      new_prop = t.Proposal(times=[t.ProposalTime(start_now=start_now)])
+      form_item = new_prop.create_form_item(self.item['status'],
+                                            self.get_conflict_checks())
     if specified_user:
       form_item['eligible'] = 0
       form_item['eligible_users'] = [specified_user]
@@ -128,7 +134,7 @@ class DashForm(DashFormTemplate):
                 buttons=[])
     if out is True:
       proposal = content.proposal()
-      self.update_status(anvil.server.call('add_proposal', proposal))
+      self.update_status(anvil.server.call('add_proposal', proposal, link_key=link_key))
 
   def edit_proposal(self, prop_id):
     """This method is called when the button is clicked"""

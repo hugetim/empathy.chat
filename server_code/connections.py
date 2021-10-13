@@ -186,14 +186,10 @@ def add_invite(item, user_id=""):
           "invite_url": f"{p.URL}#?invite={link_key}"}
 
 
-@authenticated_callable
-@anvil.tables.in_transaction
-def add_invite_proposal(link_key, create_form_item, user_id=""):
-  user = sm.get_user(user_id)
+def add_invite_proposal(proposal, link_key, user):
   row = app_tables.invites.get(link_key=link_key, user1=user, origin=True)
   if row:
-    print(create_form_item)
-    row['prop_item'] = create_form_item
+    row['proposal'] = proposal
   else:
     print("Warning: no such invite to add proposal to")
 
