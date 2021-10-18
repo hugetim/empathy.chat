@@ -251,6 +251,11 @@ def add_invited(item):
       invite = app_tables.invites.get(origin=True, user1=user2, link_key=link_key)
       if invite:
         invite.update(user2=user)
+        if invite['proposal']:
+          from . import matcher as m
+          proposal = m.Proposal(invite['proposal'])
+          if user not in proposal.eligible_users:
+            proposal.eligible_users += [user]
     return item
   else:
     return None

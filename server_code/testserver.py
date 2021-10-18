@@ -34,7 +34,7 @@ def test_add_request(user_id, port_prop):
     state, prop_id = matcher._add_proposal(user, port_prop)
     new_prop = matcher.Proposal.get_by_id(prop_id)
     if new_prop: 
-      _add_prop_row_to_test_record(new_prop._row
+      _add_prop_row_to_test_record(new_prop._row)
 
 
 def create_tests_record():
@@ -52,7 +52,7 @@ def add_now_proposal():
     anvil.server.call('add_proposal', portable.Proposal(), tester.get_id())
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
     if tester_now_proptime:
-      _add_prop_row_to_test_record(tester_now_proptime.proposal._row
+      _add_prop_row_to_test_record(tester_now_proptime.proposal._row)
     
 
 @authenticated_callable
@@ -64,7 +64,7 @@ def accept_now_proposal(user_id):
     if tester_now_proptime:
       state = matcher.accept_proposal(tester_now_proptime.get_id(), user_id)
       if state['status'] in ['pinging', 'matched']:
-        _add_prop_row_to_test_record(tester_now_proptime.proposal._row
+        _add_prop_row_to_test_record(tester_now_proptime.proposal._row)
 
     
 def _add_prop_row_to_test_record(prop_row):

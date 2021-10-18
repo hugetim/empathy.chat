@@ -381,6 +381,11 @@ def _check_for_confirmed_invites(user):
     if invite['guess'] == user['phone'][-4:]:
       invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
       if invite_reply:
+        if invite['proposal']:
+          from . import matcher as m
+          proposal = m.Proposal(invite['proposal'])
+          if user not in proposal.eligible_users:
+            proposal.eligible_users += [user]
         _connect(invite, invite_reply)
         any_confirmed = True
   return any_confirmed

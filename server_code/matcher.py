@@ -761,6 +761,10 @@ class Proposal():
   def eligible_users(self):
     return self._prop_row['eligible_users']
   
+  @eligible_users.setter
+  def eligible_users(self, value):
+    self._prop_row['eligible_users'] = value
+  
   @property
   def proposer(self):
     return self._prop_row['user']
