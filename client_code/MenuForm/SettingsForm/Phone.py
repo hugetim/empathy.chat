@@ -43,13 +43,21 @@ class Phone(PhoneTemplate):
     if len(subscriber) == 10:
       number = "+1" + subscriber
       self.phone_text_box.text = self._format_subscriber(subscriber)
-      anvil.server.call('send_verification_sms', number)
-      self.phone_instructions_label.text = (
-        f"A text message has been sent to {number}. "
-        "Please enter the verification code it contains."
-      )
-      self.update("confirming")
-      self.phone_code_text_box.focus()
+      out = anvil.server.call('send_verification_sms', number)
+      if out == "code sent":
+        self.phone_instructions_label.text = (
+          f"A text message has been sent to {number}. "
+          "Please enter the verification code it contains."
+        )
+        self.update("confirming")
+        self.phone_code_text_box.focus()
+      elif out == "number unavailable":
+        message = ("That number is already confirmed by another account, "
+                   "and it cannot be used for a separate account.")
+        self.phone_error_label.text = message
+        self.phone_error_label.visible = True
+      else:
+        print("Warning: unhandled 'send_verification_sms' return value")
     else:
       if len(subscriber) > 10:
         message = "The number entered has too many digits."
