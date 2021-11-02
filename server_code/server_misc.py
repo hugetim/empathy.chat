@@ -413,7 +413,8 @@ def pinged_email(user, start, duration):
     name = user['first_name']
     if not name:
       name = "empathy.chat user"
-    when = (f"in {h.seconds_to_words((start-now()).seconds)} (from the time of this email)" 
+    time_in_words = h.seconds_to_words((start-now()).seconds, include_seconds=False)
+    when = (f"in {time_in_words} (from the time of this email)" 
             if start else "now")
     anvil.email.send(
       from_name="empathy.chat", 

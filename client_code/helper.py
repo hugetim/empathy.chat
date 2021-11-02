@@ -43,7 +43,7 @@ def seconds_to_digital(seconds):
   return output
 
 
-def seconds_to_words(seconds):
+def seconds_to_words(seconds, include_seconds=True):
   original = seconds
   seconds = abs(seconds)
   minutes = math.trunc(seconds / 60)
@@ -65,16 +65,16 @@ def seconds_to_words(seconds):
     else:
       output = str(hours) + " hours"
     if minutes > 0:
-      if seconds > 0:
+      if include_seconds and seconds > 0:
         output += ", " + minute_str + ", and " + second_str
       else:
         output += " and " + minute_str
     else:
-      if seconds > 0:
+      if include_seconds and seconds > 0:
         output += " and " + second_str
   else:
     if minutes > 0:
-      if seconds > 0:
+      if include_seconds and seconds > 0:
         output = minute_str + " and " + second_str
       else:
         output = minute_str
