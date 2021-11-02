@@ -46,26 +46,28 @@ class MatchForm(MatchFormTemplate):
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
     
-  def update(self):
-    old_items = self.chat_repeating_panel.items
+  def update(self): 
     new_items, their_value = anvil.server.call_s('update_match_form')
-    if len(new_items) > len(old_items):
-      self.chat_repeating_panel.items = new_items
-      self.call_js('scrollCard')
-      self.chat_display_card.scroll_into_view()   
+    self.update_messages(new_items)
     if self.slider_panel.item['status'] == "submitted" and their_value:
       self.slider_panel.receive_value(their_value)
 
   def update_messages(self, message_list):
+    old_items = self.chat_repeating_panel.items
     messages_plus = []
     for i, how_empathy in enumerate(self.how_empathy_list):
       if how_empathy:
+        mine = i == 0
+        whose = "your" if mine else "their"
         messages_plus.append({
-          "message": f"How I like to receive empathy:\n{how_empathy}\n(auto-generated, copied from profile)",
-          "me": i == 0,
+          "message": f"How I like to receive empathy:\n{how_empathy}\n[message auto-generated from {whose} profile]",
+          "me": mine,
         })
     messages_plus += message_list
-    self.chat_repeating_panel.items = temp
+    if len(messages_plus) > len(old_items):
+      self.chat_repeating_panel.items = messages_plus
+      self.call_js('scrollCard')
+      self.chat_display_card.scroll_into_view()   
   
 #   def chat_display_card_show(self, **event_args):
 #     """This method is called when the column panel is shown on the screen"""
