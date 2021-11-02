@@ -2,7 +2,7 @@ dependencies:
 - app_id: MFQJNLWQIOGGXL4W
   version: {dev: false}
 - app_id: C6ZZPAPN4YYF5NVJ
-  version: {dev: false}
+  version: {dev: true}
 services:
 - source: /runtime/services/anvil/users.yml
   client_config: {use_microsoft: false, require_secure_passwords: true, use_email: true,
