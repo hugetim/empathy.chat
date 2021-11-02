@@ -213,7 +213,7 @@ def prune_messages():
 
 
 @authenticated_callable
-def add_message(user_id="", message="[blank]"):
+def add_message(user_id="", message="[blank test message]"):
   from . import matcher
   print("add_message", "[redacted]", user_id)
   user = get_user(user_id)

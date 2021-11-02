@@ -78,10 +78,11 @@ class MatchForm(MatchFormTemplate):
     self.update() 
 
   def message_textbox_pressed_enter(self, **event_args):
-    temp = anvil.server.call('add_message', message=self.message_textbox.text)
-    self.message_textbox.text = ""
-    self.update_messages(temp)
-    self.call_js('scrollCard')
+    if self.message_textbox.text:
+      temp, _ = anvil.server.call('add_message', message=self.message_textbox.text)
+      self.message_textbox.text = ""
+      self.update_messages(temp)
+      self.call_js('scrollCard')
 
   def complete_button_click(self, **event_args):
     state = anvil.server.call('match_complete')
