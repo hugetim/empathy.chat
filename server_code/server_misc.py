@@ -334,21 +334,30 @@ def _number_already_taken(number):
   return bool(len(app_tables.users.search(phone=number)))
 
 
+def _send_sms(to, text):
+  account_sid = anvil.secrets.get_secret('account_sid')
+  auth_token = anvil.secrets.get_secret('auth_token')
+  from twilio.rest import Client
+  client = Client(account_sid, auth_token)
+  message = client.messages.create(
+    body=text,
+    from_='+12312905138',
+    to=to,
+  )
+  print("send_sms sid", message.sid)
+  return message
+    
+    
 @authenticated_callable
 def send_verification_sms(number, user_id=""):
   if _number_already_taken(number):
     return "number unavailable"
   else:
     user = get_user()
-    account_sid = anvil.secrets.get_secret('account_sid')
-    auth_token = anvil.secrets.get_secret('auth_token')
-    from twilio.rest import Client
-    client = Client(account_sid, auth_token)
     code = random_code(num_chars=6, digits_only=True)
-    message = client.messages.create(
-      body=f"{code} is your empathy.chat verification code. It expires in 10 minutes.",
-      from_='+12312905138',
-      to=number,
+    _send_sms(
+      number, 
+      f"{code} is your empathy.chat verification code. It expires in 10 minutes."
     )
     app_tables.codes.add_row(
       type="phone",
@@ -357,7 +366,6 @@ def send_verification_sms(number, user_id=""):
       user=user,
       date=now()
     )
-    print(message.sid)
     return "code sent"
   
   
