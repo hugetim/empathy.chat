@@ -48,11 +48,11 @@ class User():
     self.seeking = seeking
     self.starred = starred
 
-  def item(self):
+  def name_item(self):
     return (self.name, self.user_id)
 
   @staticmethod
-  def from_item(item):
+  def from_name_item(item):
     return User(item(1), item(0))
   
     

@@ -29,14 +29,7 @@ components:
   layout_properties: {column: NBEGGD}
   components:
   - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:plus'}
-    name: edit_button
-    layout_properties: {}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:comment'}
@@ -47,11 +40,19 @@ components:
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:chain-broken'}
+      underline: false, icon: 'fa:plus'}
+    name: edit_button
+    layout_properties: {}
+  - type: Button
+    properties: {role: null, align: center, tooltip: Remove your connection to this user,
+      border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
+      font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
+      background: '', bold: false, underline: false, icon: 'fa:chain-broken'}
     name: unconnect_button
     layout_properties: {}
     data_bindings:
     - {property: visible, code: 'self.item[''degree''] == 1'}
+    event_bindings: {click: unconnect_button_click}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
