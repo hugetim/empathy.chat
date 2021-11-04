@@ -143,7 +143,7 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
       dset_second = _get_connections(second, 1)
       firsts = dset[1] & dset_second[1]
       for first in firsts:
-        name = port.full_name(first['first_name'], first['last_name'], 1)
+        name = sm.name(first, distance=1)
         conn2 = app_tables.connections.get(user1=first, user2=second)
         conn1 = app_tables.connections.get(user1=user1, user2=first)
         out.append({"via": degree > 2,

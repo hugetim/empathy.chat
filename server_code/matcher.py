@@ -224,12 +224,15 @@ def _get_upcomings(user):
       match_dicts.append(match_dict)
     return match_dicts
 
-  
+ 
 def _cancel_match(user, match_id):
   if sm.DEBUG:
     print("_cancel_match", match_id)
   match = app_tables.matches.get_by_id(match_id)
   if match:
+    for u in match['users']:
+      if u != user:
+        sm.cancel_email(u, start=match['match_commence'], canceler_name=sm.name(user, to_user=u))
     match.delete()
   return _get_status(user)
 

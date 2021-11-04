@@ -101,17 +101,24 @@ trust_label = {0: "Visitor",
                10: "Admin",
               }
 
-def get_port_user(user2, distance=None, user1_id="", simple=False):
+
+def name(user, to_user=None, distance=None):
   if not distance:
-    from . import connections as c
-    user1 = get_user(user1_id)
-    distance = c.distance(user2, user1)
-  name = port.full_name(user2['first_name'], user2['last_name'], distance)
+    if to_user:
+      from . import connections as c
+      distance = c.distance(user, to_user)
+    else:
+      distance = 99
+  return port.full_name(user['first_name'], user['last_name'], distance)  
+
+
+def get_port_user(user2, distance=None, user1_id="", simple=False):
+  _name = name(user2, get_user(user1_id) if user1_id else None, distance)
   if simple:
-    return port.User(user2.get_id(), name)
+    return port.User(user2.get_id(), _name)
   else:
     return port.User(user2.get_id(), 
-                     name,
+                     _name,
                      confirmed=bool(user2['confirmed_url']),
                      distance=distance,
                      seeking=user2['seeking_buddy'],
@@ -412,25 +419,42 @@ def _connect(invite, invite_reply):
     item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
     app_tables.connections.add_row(starred=False, **item)
     row.delete()
+
+    
+def _email_name(user):
+  name = user['first_name']
+  if not name:
+    name = "empathy.chat user"
+  return name
+
+
+def _email_when(start):
+  if start: 
+    time_in_words = h.seconds_to_words((start-now()).seconds, include_seconds=False)
+    return f"in {time_in_words} (from the time of this email)" 
+  else: 
+    return "now"
+
   
+def _email_send(to_user, subject, text, from_name="empathy.chat"):
+  return anvil.email.send(
+    from_name=from_name, 
+    to=to_user['email'], 
+    subject=subject,
+    text=text
+  )
+
 
 def pinged_email(user, start, duration):
   """Email pinged user, if settings allow"""
   print("'pinged_email'")
   if user['pinged_em']:
-    name = user['first_name']
-    if not name:
-      name = "empathy.chat user"
-    time_in_words = h.seconds_to_words((start-now()).seconds, include_seconds=False)
-    when = (f"in {time_in_words} (from the time of this email)" 
-            if start else "now")
-    anvil.email.send(
-      from_name="empathy.chat", 
-      to=user['email'], 
+    _email_send(
+      to_user=user, 
       subject="empathy.chat - match confirmed",
-      text=(f'''Dear {name},
+      text=f'''Dear {_email_name(user)},
 
-Your proposal for a {duration} minute empathy match, starting {when}, has been accepted.
+Your proposal for a {duration} minute empathy match, starting {_email_when(start)}, has been accepted.
 
 Go to {p.URL_WITH_ALT} to be connected for the empathy exchange.
 
@@ -438,11 +462,34 @@ Thanks!
 Tim
 empathy.chat
 '''
-           )
     )
   #p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
 
+  
+def cancel_email(user, start, canceler_name=""):
+  """Email pinged user, if settings allow"""
+  print("'cancel_email'")
+  if user['pinged_em']:
+    _email_send(
+      to_user=user, 
+      subject="empathy.chat - upcoming match canceled",
+      text=f'''Dear {_email_name(user)},
 
+{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_email_when(start)}.
+
+-Tim
+empathy.chat
+'''
+    )
+
+    
+def _other_name(name):
+  if not name:
+    name = "Another empathy.chat user"
+  return name
+
+
+    
 # def users_to_email_re_notif(user=None):
 #   """Return list of users to email notifications triggered by user
 
