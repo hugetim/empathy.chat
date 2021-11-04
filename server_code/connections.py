@@ -270,3 +270,18 @@ def cancel_invited(item):
                               )
   if row:
     row.delete()
+
+    
+@anvil.server.callable
+def disconnect(user2_id, user1_id=""):
+  user1 = anvil.users.get_user(user1_id)
+  user2 = app_tables.users.get_by_id(user2_id)
+  if user2:
+    r1to2 = app_tables.connections.get(user1=user1, user2=user2)
+    r2to1 = app_tables.connections.get(user1=user2, user2=user1)
+    if r1to2 and r2to1: 
+      r1to2.delete()
+      r2to1.delete()
+      return True
+  return False
+    
