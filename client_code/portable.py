@@ -261,7 +261,7 @@ class Proposal():
 def default_cancel_date(now, start_date):
   minutes_prior = max(CANCEL_MIN_MINUTES,
                       min(CANCEL_DEFAULT_MINUTES,
-                      ((start_date - now).seconds/60)/2))
+                      ((start_date - now).total_seconds()/60)/2))
   return start_date - datetime.timedelta(minutes=minutes_prior)
 
   

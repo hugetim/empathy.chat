@@ -430,7 +430,7 @@ def _email_name(user):
 
 def _email_when(start):
   if start: 
-    time_in_words = h.seconds_to_words((start-now()).seconds, include_seconds=False)
+    time_in_words = h.seconds_to_words((start-now()).total_seconds(), include_seconds=False)
     return f"in {time_in_words} (from the time of this email)" 
   else: 
     return "now"
@@ -468,7 +468,7 @@ empathy.chat
   
 def cancel_email(user, start, canceler_name=""):
   """Email pinged user, if settings allow"""
-  print("'cancel_email'")
+  print("'cancel_email'", start, canceler_name)
   if user['pinged_em']:
     _email_send(
       to_user=user, 

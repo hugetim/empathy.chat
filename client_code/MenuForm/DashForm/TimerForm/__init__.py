@@ -28,7 +28,7 @@ class TimerForm(TimerFormTemplate):
     """This method is called Every 1 seconds. Does not trigger if [interval] is 0."""
     now = h.now()
     # Run this code once a second
-    if (now - self.last_5sec).seconds > 4.5:
+    if (now - self.last_5sec).total_seconds() > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = now
       state = anvil.server.call_s('get_status')

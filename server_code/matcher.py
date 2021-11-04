@@ -14,7 +14,7 @@ def _seconds_left(status, expire_date=None, ping_start=None):
   now = sm.now()
   if status in ["pinging", "pinged"]:
     if ping_start:
-      confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).seconds
+      confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).total_seconds()
     else:
       confirm_match = p.CONFIRM_MATCH_SECONDS
     if status == "pinging":
@@ -23,7 +23,7 @@ def _seconds_left(status, expire_date=None, ping_start=None):
       return confirm_match + p.BUFFER_SECONDS # accounts for delay in ping arriving
   elif status == "requesting":
     if expire_date:
-      return (expire_date - now).seconds
+      return (expire_date - now).total_seconds()
     else:
       return p.WAIT_SECONDS
   elif status in [None, "matched"]:
@@ -550,7 +550,7 @@ class ProposalTime():
     self.proposal.hide_unaccepted_times()
     if (self._proptime_row['expire_date'] 
         - datetime.timedelta(seconds=_seconds_left("requesting")) 
-        - now).seconds <= p.BUFFER_SECONDS:
+        - now).total_seconds() <= p.BUFFER_SECONDS:
       _match_commit(user)
     elif not self.is_now():
       _match_commit(user, self.get_id())

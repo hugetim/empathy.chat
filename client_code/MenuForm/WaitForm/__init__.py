@@ -60,7 +60,7 @@ class WaitForm(WaitFormTemplate):
     # Run this code approx. once a second
     if self.item['status'] == "pinging" and self.item['seconds_left'] <= 0:
       self.reset_status(anvil.server.call('cancel_other'))
-    if (now - self.last_5sec).seconds > 4.5:
+    if (now - self.last_5sec).total_seconds() > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = now
       if self.item['status'] == "pinging":

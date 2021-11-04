@@ -50,6 +50,8 @@ def seconds_to_words(seconds, include_seconds=True):
   seconds = int(seconds - minutes * 60)
   hours = math.trunc(minutes / 60)
   minutes = int(minutes - hours * 60)
+  #days = math.trunc(hours / 24)
+  #hours = int(hours - days * 24)
   if seconds == 1:
     second_str = "1 second"
   else:
@@ -86,7 +88,7 @@ def seconds_to_words(seconds, include_seconds=True):
 
 
 def re_hours(h, set_time):
-  hours = (3600.0*h - (now() - set_time).seconds)/3600.0
+  hours = (3600.0*h - (now() - set_time).total_seconds())/3600.0
   return hours
 
 
