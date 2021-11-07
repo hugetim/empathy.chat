@@ -168,6 +168,27 @@ def cancel_invite(link_key, user_id=""):
   if row:
     row.delete()
 
+    
+@authenticated_callable
+@anvil.tables.in_transaction
+def invite_user(item, user_id=""):
+  user1 = sm.get_user(user_id)
+  user2 = app_tables.users.get_by_id(item['user_id'])
+  now = sm.now()
+  if item['phone_last4'] == user2['phone'][-4:]:
+    app_tables.invites.add_row(date=now,
+                               origin=True,
+                               user1=user1,
+                               user2=user2,
+                               relationship2to1=item['relationship'],
+                               date_described=now,
+                               guess=item['phone_last4'],
+                               distance=1,
+                               link_key="",
+                              )
+    return item
+  else:
+    return None
 
 @authenticated_callable
 @anvil.tables.in_transaction

@@ -41,8 +41,12 @@ components:
       foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:plus'}
-    name: edit_button
+    name: connect_button
     layout_properties: {}
+    event_bindings: {click: connect_button_click}
+    data_bindings:
+    - {property: visible, code: 'self.item[''degree''] > 1 and self.top_form.trust_level
+        >= 2'}
   - type: Button
     properties: {role: null, align: center, tooltip: Remove your connection to this user,
       border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,

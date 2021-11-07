@@ -4,6 +4,7 @@ import anvil.server
 import anvil.users
 from .... import helper as h
 from .... import ui_procedures as ui
+from .... import prompts
 from .NameEdit import NameEdit
 from .TextAreaEdit import TextAreaEdit
 from .Relationship import Relationship
@@ -22,6 +23,7 @@ class Profile(ProfileTemplate):
                   }
   def __init__(self, user_id="", **properties):
     # Set Form properties and Data Bindings.
+    self.top_form = get_open_form()
     self.item = anvil.server.call('init_profile', user_id)
     self.init_components(**properties)
 
@@ -118,3 +120,8 @@ class Profile(ProfileTemplate):
   def unconnect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     ui.disconnect_flow(self.item['user_id'], self.item['name'])
+
+  def connect_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    prompts.invite_dialog(self.item['name'], self.item['user_id'])
+
