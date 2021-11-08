@@ -260,8 +260,7 @@ components:
     name: spacer_2
     layout_properties: {grid_position: 'TDUTAU,FGBSJH'}
   data_bindings:
-  - {property: visible, code: 'self.item[''user_items''] and self.top_form.trust_level
-      >= 2'}
+  - {property: visible, code: 'self.item[''user_items''] and self.trust_level >= 2'}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
     wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"JVSIPB":10}',

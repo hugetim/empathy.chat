@@ -17,6 +17,7 @@ class CreateForm(CreateFormTemplate):
   
   def __init__(self, item, **properties):
     # Set Form properties and Data Bindings.
+    self.trust_level = glob.trust_level
     if 'user_items' not in item:
       item['user_items'] = anvil.server.call('get_create_user_items')
     item['group_items'] = []
@@ -33,7 +34,7 @@ class CreateForm(CreateFormTemplate):
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     self.drop_down_eligible.items = (
-      [("Anyone (up to 3 degrees separation)", 3)] if glob.trust_level >= 3
+      [("Anyone (up to 3 degrees separation)", 3)] if self.trust_level >= 3
       else []
     )
     self.drop_down_eligible.items += [('"Friends of friends" (2 degrees separation)', 2),  

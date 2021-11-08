@@ -50,8 +50,8 @@ def seconds_to_words(seconds, include_seconds=True):
   seconds = int(seconds - minutes * 60)
   hours = math.trunc(minutes / 60)
   minutes = int(minutes - hours * 60)
-  #days = math.trunc(hours / 24)
-  #hours = int(hours - days * 24)
+  days = math.trunc(hours / 24)
+  hours = int(hours - days * 24)
   if seconds == 1:
     second_str = "1 second"
   else:
@@ -80,8 +80,12 @@ def seconds_to_words(seconds, include_seconds=True):
         output = minute_str + " and " + second_str
       else:
         output = minute_str
-    else:
+    elif include_seconds:
       output = second_str
+    else:
+      output = "0 minutes"
+  if days > 0:
+    output = str(days) + (" days, " if days > 1 else " day, ") + output
   if original < abs(original):
     output = "minus " + output
   return output
