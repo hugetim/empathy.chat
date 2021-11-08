@@ -79,6 +79,7 @@ def _degree(user2, user1, up_to_degree=3):
 def distance(user2, user1, up_to_distance=3):
   return _degree(user2, user1, up_to_distance)
 
+
 @authenticated_callable
 def get_connections(user_id):
   print("get_connections", user_id)
