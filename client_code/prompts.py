@@ -66,7 +66,7 @@ def get(spec_dict):
                          "with a broader network beyond your direct connections, "
                          "please complete an empathy chat with a Member like: "
                          f"{', '.join([portu.name for portu in spec_dict['members']])}"), 
-            "tooltip": "We require this to verify identity and foster trust",
+            "tooltip": "We require this to verify identity and foster trust. Click to propose an empathy exchange.",
             "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Blue",
             "click_fn": propose_members,
