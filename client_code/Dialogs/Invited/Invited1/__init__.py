@@ -3,6 +3,7 @@ from anvil import *
 import anvil.server
 from ..Invited2 import Invited2
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPrompt import RelationshipPrompt
+from .... import ui_procedures as ui
 
 
 class Invited1(Invited1Template):
@@ -32,12 +33,19 @@ class Invited1(Invited1Template):
     elif len(self.item['relationship']) < 3:
       self.error("Please add a description of your relationship.")
     else:
-      invited_item = anvil.server.call('add_invited', self.item)
-      if invited_item:
+      if self.item['link_key']:
+        invited_item = anvil.server.call('add_invited', self.item)
+      else:
+        invited_item = anvil.server.call('connect_invited', self.item)
+      if invited_item and self.item['link_key']:
         parent = self.parent
         self.remove_from_parent()
         self.item.update(invited_item)
         parent.add_component(Invited2(item=self.item))
+      elif invited_item: # connecting already-registered users
+        Notification("You have been successfully connected.", style="success").show()
+        self.parent.raise_event("x-close-alert", value=True)
+        ui.reload()
       else:
         self.error(f"The last 4 digits you provided do not match {self.item['inviter']}'s phone number.")
 

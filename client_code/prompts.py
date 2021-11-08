@@ -1,5 +1,7 @@
 from anvil import *
 from .MenuForm.NetworkMenu.Invite import Invite
+from .Dialogs.Invited import Invited
+from functools import partial
 
 
 def invite_dialog(name="", user_id=""):
@@ -10,6 +12,16 @@ def invite_dialog(name="", user_id=""):
         title="Invite a close connection to empathy.chat", 
         buttons=[], large=True, dismissible=False)
 
+  
+def invited_dialog(inviter, inviter_id, rel):
+  item = {"relationship": "", "phone_last4": "", "name": inviter, "inviter_id": inviter_id,
+          "relationship1to2": rel, "inviter": inviter, "link_key": ""}
+  top_form = get_open_form()
+  top_form.invited_alert = Invited(item=item)
+  alert(content=top_form.invited_alert,
+        title="Accept this invitation to connect?",
+        buttons=[], large=True, dismissible=False)
+  
   
 def get(spec_dict):
   def add_phone():
@@ -30,6 +42,14 @@ def get(spec_dict):
             "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Blue",
             "click_fn": add_phone,
+           }
+  elif spec_dict["name"] == "invited":
+    return {"markdown": (f"{spec_dict['inviter']} has requested to add you as a close connection. "
+                         "Click to confirm and complete this connection."), 
+            "tooltip": f"Connect to {spec_dict['inviter']} and their network",
+            "dismissable": False, ################### TEMPORARY
+            "background": "theme:Light Mint",
+            "click_fn": partial(invited_dialog, spec_dict["inviter"], spec_dict["inviter_id"], spec_dict["rel"]),
            }
   elif spec_dict["name"] == "invite_close":
     return {"markdown": "Invite a new close connection to join you on empathy.chat", 

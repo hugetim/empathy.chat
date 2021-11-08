@@ -251,6 +251,10 @@ def invite_visit_register(link_key, user):
 @anvil.tables.in_transaction
 def add_invited(item):
   user = anvil.users.get_user()
+  return _add_invited(item, user)
+
+
+def _add_invited(item, user):
   user2 = app_tables.users.get_by_id(item['inviter_id'])
   if item['phone_last4'] == user2['phone'][-4:]:
     now = sm.now()
@@ -283,7 +287,35 @@ def add_invited(item):
   else:
     return None
 
-
+  
+@authenticated_callable
+@anvil.tables.in_transaction
+def connect_invited(item, user_id=""):
+  user = sm.get_user(user_id)
+  phone_match = _add_invited(item, user)
+  if phone_match:
+    user2 = app_tables.users.get_by_id(item['inviter_id'])
+    invite = app_tables.invites.get(origin=True, user1=user2, user2=user, link_key="")
+    invite_reply = app_tables.invites.get(origin=False, user1=user, user2=user2, link_key="")
+    if invite and invite_reply:
+      connect(invite, invite_reply)
+      return phone_match
+  return False
+  
+        
+def connect(invite, invite_reply):
+  if invite['proposal']:
+    from . import matcher as m
+    proposal = m.Proposal(invite['proposal'])
+    invited = invite['user2']
+    if invited not in proposal.eligible_users:
+      proposal.eligible_users += [invited]
+  for row in [invite, invite_reply]:
+    item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
+    app_tables.connections.add_row(starred=False, **item)
+    row.delete()  
+  
+  
 @anvil.server.callable
 def cancel_invited(item):
   row = app_tables.invites.get(link_key=item['link_key'],

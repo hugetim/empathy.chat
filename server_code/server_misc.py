@@ -67,7 +67,7 @@ def update_trust_level(user):
     import connections as c
     degree1s = c._get_connections(user, 1)[1]
     for user2 in degree1s:
-      if c.distance(user2, user, 1) == 1:
+      if user2['trust_level'] >= 3 and c.distance(user2, user, 1) == 1:
         user2_matches = app_tables.matches.search(users=[user,user2])
         for match in user2_matches:
           both_present = 1
@@ -139,12 +139,15 @@ def _latest_invited(user, return_all=False):
 
 def get_prompts(user):
   out = []
+  invited = _latest_invited(user)
   if not user['phone']:
-    invited = _latest_invited(user)
     if invited:
-      out.append({"name": "phone-invited", "inviter": invited['user1']['first_name']})
+      out.append({"name": "phone-invited", "inviter": name(invited['user1'], to_user=user)})
     else:
       out.append({"name": "phone"})
+  elif invited:
+    out.append({"name": "invited", "inviter": name(invited['user1'], to_user=user), 
+                "inviter_id": invited['user1'].get_id(), "rel": invited['relationship2to1']})
   else:
     out.append({"name": "invite_close"})
   return out
@@ -404,21 +407,10 @@ def _check_for_confirmed_invites(user):
     if invite['guess'] == user['phone'][-4:]:
       invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
       if invite_reply:
-        if invite['proposal']:
-          from . import matcher as m
-          proposal = m.Proposal(invite['proposal'])
-          if user not in proposal.eligible_users:
-            proposal.eligible_users += [user]
-        _connect(invite, invite_reply)
+        from . import connections as c
+        c.connect(invite, invite_reply)
         any_confirmed = True
   return any_confirmed
-
-        
-def _connect(invite, invite_reply):
-  for row in [invite, invite_reply]:
-    item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
-    app_tables.connections.add_row(starred=False, **item)
-    row.delete()
 
     
 def _email_name(user):

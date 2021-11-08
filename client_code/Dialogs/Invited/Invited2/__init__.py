@@ -27,7 +27,7 @@ class Invited2(Invited2Template):
         self.parent.raise_event("x-close-alert", value=True)
       else:
         if confirm("Proceed without confirming a phone number? "
-                   "If so, you may add a phone number later, in which case you will "
+                   "If so, you may add a phone number later, in which case you will be "
                    f"connected to {self.item['inviter']} if the last 4 digits they "
                    "entered match your confirmed number."):
           self.parent.raise_event("x-close-alert", value=False)

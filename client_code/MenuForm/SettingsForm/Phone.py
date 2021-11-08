@@ -2,6 +2,7 @@ from ._anvil_designer import PhoneTemplate
 from anvil import *
 import anvil.server
 from ... import helper as h
+from ... import ui_procedures as ui
 from anvil_extras.utils import auto_refreshing, wait_for_writeback
 
 
@@ -81,6 +82,7 @@ class Phone(PhoneTemplate):
     if code_matches:
       alert("Phone number verification successful.")
       self.update("confirmed")
+      ui.reload()
     else:
       self.phone_error_label.text = "The code submitted does not match (or is expired)."
       self.phone_error_label.visible = True
