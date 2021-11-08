@@ -3,6 +3,7 @@ from anvil import *
 import anvil.server
 from .... import helper as h
 from .... import portable as t
+from .... import glob
 from datetime import timedelta
 
 
@@ -32,7 +33,7 @@ class CreateForm(CreateFormTemplate):
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     self.drop_down_eligible.items = (
-      [("Anyone (up to 3 degrees separation)", 3)] if self.top_form.trust_level >= 3
+      [("Anyone (up to 3 degrees separation)", 3)] if glob.trust_level >= 3
       else []
     )
     self.drop_down_eligible.items += [('"Friends of friends" (2 degrees separation)', 2),  

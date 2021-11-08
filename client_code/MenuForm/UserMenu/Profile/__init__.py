@@ -5,6 +5,7 @@ import anvil.users
 from .... import helper as h
 from .... import ui_procedures as ui
 from .... import prompts
+from .... import glob
 from .NameEdit import NameEdit
 from .TextAreaEdit import TextAreaEdit
 from .Relationship import Relationship
@@ -23,7 +24,6 @@ class Profile(ProfileTemplate):
                   }
   def __init__(self, user_id="", **properties):
     # Set Form properties and Data Bindings.
-    self.top_form = get_open_form()
     self.item = anvil.server.call('init_profile', user_id)
     self.init_components(**properties)
 

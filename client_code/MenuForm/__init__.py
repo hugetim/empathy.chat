@@ -15,6 +15,7 @@ from .. import parameters as p
 from .. import helper as h
 from .. import portable as t
 from .. import auto_test
+from .. import glob
 
 
 class MenuForm(MenuFormTemplate):
@@ -22,8 +23,8 @@ class MenuForm(MenuFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
-    self.trust_level = self.item['trust_level']
-    if self.trust_level < 0:
+    glob.trust_level = self.item['trust_level']
+    if glob.trust_level < 0:
       alert('This account is not yet authorized, but '
             + 'it can be used to test things out. Your actions will not impact '
             + 'or be visible to other users. '

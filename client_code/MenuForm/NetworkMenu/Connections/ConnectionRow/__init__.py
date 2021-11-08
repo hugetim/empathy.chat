@@ -3,12 +3,12 @@ from anvil import *
 from ..... import helper as h
 from ..... import ui_procedures as ui
 from ..... import prompts
+from ..... import glob
 
 
 class ConnectionRow(ConnectionRowTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
-    self.top_form = get_open_form()
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
