@@ -75,7 +75,7 @@ components:
       layout_properties: {}
       data_bindings:
       - {property: visible, code: '(not self.item[''me'']) and (self.item[''degree'']
-          == 1 or (glob.trust_level >= 3 and self.item[''distance''] == 2))'}
+          == 1 or (self.trust_level >= 3 and self.item[''distance''] == 2))'}
       event_bindings: {click: propose_button_click}
     - type: Button
       properties: {role: null, align: center, tooltip: Connect, border: '', enabled: true,
@@ -85,7 +85,7 @@ components:
       name: connect_button
       layout_properties: {}
       data_bindings:
-      - {property: visible, code: 'self.item[''degree''] > 1 and glob.trust_level
+      - {property: visible, code: 'self.item[''degree''] > 1 and self.trust_level
           >= 2'}
       event_bindings: {click: connect_button_click}
     - type: Button

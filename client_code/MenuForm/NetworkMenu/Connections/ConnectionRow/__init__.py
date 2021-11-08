@@ -9,6 +9,7 @@ from ..... import glob
 class ConnectionRow(ConnectionRowTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
+    self.trust_level = glob.trust_level
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.

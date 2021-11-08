@@ -24,6 +24,7 @@ class Profile(ProfileTemplate):
                   }
   def __init__(self, user_id="", **properties):
     # Set Form properties and Data Bindings.
+    self.trust_level = glob.trust_level
     self.item = anvil.server.call('init_profile', user_id)
     self.init_components(**properties)
 
