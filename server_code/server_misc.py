@@ -63,20 +63,18 @@ def update_trust_level(user):
   """Return trust level based on other info
   
   Side-effect: update user['trust_level']"""
-  def matched_with_degree1_member():
+  def matched_with_distance1_member():
     import connections as c
-    degree1s = c._get_connections(user, 1)[1]
-    for user2 in degree1s:
-      if user2['trust_level'] >= 3 and c.distance(user2, user, 1) == 1:
-        user2_matches = app_tables.matches.search(users=[user,user2])
-        for match in user2_matches:
-          both_present = 1
-          for i, u in enumerate(match['users']):
-            if u in [user, user2] and match['present'][i] == 0:
-              both_present = 0
-              break
-          if both_present:
-            return True
+    for user2 in c.member_close_connections(user):
+      user2_matches = app_tables.matches.search(users=[user,user2])
+      for match in user2_matches:
+        both_present = 1
+        for i, u in enumerate(match['users']):
+          if u in [user, user2] and match['present'][i] == 0:
+            both_present = 0
+            break
+        if both_present:
+          return True
     return False
   trust = user['trust_level']
   if not trust:
@@ -85,7 +83,7 @@ def update_trust_level(user):
     trust = 1 # Guest
   if (trust >= 1 and trust < 2) and user['phone']:
     trust = 2 # Confirmed
-  if (trust >= 2 and trust < 3) and matched_with_degree1_member():
+  if (trust >= 2 and trust < 3) and matched_with_distance1_member():
     trust = 3 # Member
   if (trust >= 3 and trust < 4) and user['confirmed_url']:
     trust = 4 # Partner
@@ -146,10 +144,17 @@ def get_prompts(user):
     else:
       out.append({"name": "phone"})
   elif invited:
-    out.append({"name": "invited", "inviter": name(invited['user1'], to_user=user), 
-                "inviter_id": invited['user1'].get_id(), "rel": invited['relationship2to1']})
+    all_inviteds = _latest_invited(user, return_all=True)
+    for invite in all_inviteds:
+      out.append({"name": "invited", "inviter": name(invite['user1'], to_user=user), 
+                  "inviter_id": invite['user1'].get_id(), "rel": invite['relationship2to1']})
   else:
     out.append({"name": "invite_close"})
+  if user['trust_level'] == 2:
+    import connections as c
+    members = c.member_close_connections(user)
+    if members:
+      out.append({"name": "member-chat", "members": [get_port_user(m, distance=1, simple=True) for m in members]})
   return out
 
 

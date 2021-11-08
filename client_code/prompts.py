@@ -58,6 +58,19 @@ def get(spec_dict):
             "background": "theme:Light Mint",
             "click_fn": invite_dialog,
            }
+  elif spec_dict["name"] == "member-chat":
+    def propose_members():
+      top_form = get_open_form()
+      top_form.content.propose(specified_users=[portu.user_id for portu in spec_dict["members"]])
+    return {"markdown": ("To become a full empathy.chat Member, which allows you to chat "
+                         "with a broader network beyond your direct connections, "
+                         "please complete an empathy chat with a Member like: "
+                         f"{', '.join([portu.name for portu in spec_dict['members']])}"), 
+            "tooltip": "We require this to verify identity and foster trust",
+            "dismissable": False, ################### TEMPORARY
+            "background": "theme:Light Blue",
+            "click_fn": propose_members,
+           }
   else:
     print("Warning: No prompt matches that spec_dict")
     return None

@@ -62,7 +62,14 @@ def _get_connections(user, up_to_degree=3, include_zero=False):
   if not include_zero:
     del out[0]
   return out
-    
+
+
+def member_close_connections(user):
+  """Returns list of users"""
+  degree1s = _get_connections(user, 1)[1]
+  return [user2 for user2 in degree1s
+          if user2['trust_level'] >= 3 and distance(user2, user, 1) == 1]
+  
     
 def _degree(user2, user1, up_to_degree=3):
   """Returns 99 if no degree <= up_to_degree found"""

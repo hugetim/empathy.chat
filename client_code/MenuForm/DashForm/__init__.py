@@ -111,7 +111,7 @@ class DashForm(DashFormTemplate):
     """This method is called when the button is clicked"""
     self.propose()
     
-  def propose(self, specified_user="", link_key=""):
+  def propose(self, specified_users=[], link_key=""):
     if link_key:
       new_prop = t.Proposal(eligible=0, times=[t.ProposalTime(start_now=False)])
       form_item = new_prop.create_form_item("now not allowed",
@@ -122,9 +122,9 @@ class DashForm(DashFormTemplate):
       new_prop = t.Proposal(times=[t.ProposalTime(start_now=start_now)])
       form_item = new_prop.create_form_item(self.item['status'],
                                             self.get_conflict_checks())
-    if specified_user:
+    if specified_users:
       form_item['eligible'] = 0
-      form_item['eligible_users'] = [specified_user]
+      form_item['eligible_users'] = specified_users
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
