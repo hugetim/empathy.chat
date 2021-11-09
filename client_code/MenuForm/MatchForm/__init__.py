@@ -1,6 +1,7 @@
 from ._anvil_designer import MatchFormTemplate
 from anvil import *
 import anvil.server
+from ... import ui_procedures as ui
 from .MyJitsi import MyJitsi
 from .SliderPanel import SliderPanel
 
@@ -86,4 +87,5 @@ class MatchForm(MatchFormTemplate):
 
   def complete_button_click(self, **event_args):
     state = anvil.server.call('match_complete')
-    self.top_form.reset_status(state)   
+    ui.reload()
+    #self.top_form.reset_status(state)   
