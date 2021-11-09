@@ -1,4 +1,11 @@
-container: {type: DataRowPanel}
+container:
+  type: DataRowPanel
+  data_bindings:
+  - {property: background, code: '"theme:Light Yellow" if self.item[''status''] else
+      None'}
+  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', auto_display_data: true,
+    visible: true, font_size: null, font: '', spacing_above: none, spacing_below: none,
+    italic: false, background: '', bold: false, underline: false}
 components:
 - type: Label
   properties: {role: null, align: left, tooltip: 'Yes, currently seeking a regular
@@ -37,6 +44,17 @@ components:
     layout_properties: {}
     data_bindings: []
   - type: Button
+    properties: {role: primary-color, align: center, tooltip: 'This user has invited
+        you to connect, awaiting your confirmation', border: '', enabled: true, foreground: '',
+      visible: false, text: 'Confirm?', font_size: null, font: '', spacing_above: none,
+      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
+      underline: false, icon: 'fa:plus'}
+    name: confirm_button
+    layout_properties: {}
+    data_bindings:
+    - {property: visible, code: 'self.item[''status''] == "invited"'}
+    event_bindings: {click: confirm_button_click}
+  - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
@@ -46,7 +64,7 @@ components:
     event_bindings: {click: connect_button_click}
     data_bindings:
     - {property: visible, code: 'self.item[''degree''] > 1 and self.trust_level >=
-        2'}
+        2 and not self.item[''status'']'}
   - type: Button
     properties: {role: null, align: center, tooltip: Remove your connection to this user,
       border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,

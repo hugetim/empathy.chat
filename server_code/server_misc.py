@@ -159,6 +159,15 @@ def get_prompts(user):
 
 
 @authenticated_callable
+def invited_item(inviter_id, user_id=""):
+  user = get_user(user_id)
+  inviter_user = get_user(inviter_id, require_auth=False)
+  inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user1=inviter_user, user2=user)
+  return {"inviter": name(inviter_user, to_user=user), 
+          "inviter_id": inviter_id, "rel": inviteds[0]['relationship2to1']}
+
+
+@authenticated_callable
 def init_profile(user_id=""):
   from . import connections as c
   user = get_user(user_id, require_auth=False)

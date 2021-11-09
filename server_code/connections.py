@@ -117,11 +117,23 @@ def connection_record(user2, user1):
   record = vars(sm.get_port_user(user2, _distance))
   record.update({'degree': degree, 
                  'last_active': user2['last_login'].strftime(p.DATE_FORMAT),
-                 'status': "", # invited, invite
+                 'status': _invite_status(user2, user1),
                  'unread_message': None, # True/False
                 })
   return record
 
+
+def _invite_status(user2, user1):
+  invites = app_tables.invites.search(user1=user1, user2=user2, origin=True)
+  if len(invites) > 0:
+    return "invite"
+  else:
+    inviteds = app_tables.invites.search(user1=user2, user2=user1, origin=True)
+    if len(inviteds) > 0:
+      return "invited"
+    else:
+      return ""
+    
 
 def get_relationships(user2, user1_id="", up_to_degree=3):
   """Returns ordered list of dictionaries"""
