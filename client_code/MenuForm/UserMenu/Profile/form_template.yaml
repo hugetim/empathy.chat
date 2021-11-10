@@ -78,6 +78,17 @@ components:
           == 1 or (self.trust_level >= 3 and self.item[''distance''] == 2))'}
       event_bindings: {click: propose_button_click}
     - type: Button
+      properties: {role: primary-color, align: center, tooltip: 'This user has invited
+          you to connect, awaiting your confirmation', border: '', enabled: true,
+        foreground: '', visible: false, text: 'Confirm?', font_size: null, font: '',
+        spacing_above: small, icon_align: left, spacing_below: none, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:plus'}
+      name: confirm_button
+      layout_properties: {}
+      data_bindings:
+      - {property: visible, code: 'self.item[''status''] == "invited"'}
+      event_bindings: {click: confirm_button_click}
+    - type: Button
       properties: {role: null, align: center, tooltip: Connect, border: '', enabled: true,
         foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: small,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
@@ -86,7 +97,7 @@ components:
       layout_properties: {}
       data_bindings:
       - {property: visible, code: 'self.item[''degree''] > 1 and self.trust_level
-          >= 2'}
+          >= 2 and not self.item[''status'']'}
       event_bindings: {click: connect_button_click}
     - type: Button
       properties: {role: null, align: center, tooltip: Remove your connection to this user,

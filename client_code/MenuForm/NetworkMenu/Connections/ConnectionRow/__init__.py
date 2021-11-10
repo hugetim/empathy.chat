@@ -25,11 +25,13 @@ class ConnectionRow(ConnectionRowTemplate):
 
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    prompts.invite_dialog(self.item['name'], self.item['user_id'])
+    if prompts.invite_dialog(self.item['name'], self.item['user_id']):
+      self.parent.raise_event('x-reset')
 
   def confirm_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     invited_item = anvil.server.call('invited_item', self.item['user_id'])
-    prompts.invited_dialog(**invited_item)
+    if prompts.invited_dialog(**invited_item):
+      self.parent.raise_event('x-reset')
 
 

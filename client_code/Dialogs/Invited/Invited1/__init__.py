@@ -24,6 +24,7 @@ class Invited1(Invited1Template):
       f"at which {self.item['inviter']} can receive text messages "
       "to verify your close connection:"
     )
+    self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
     
   def continue_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -52,6 +53,7 @@ class Invited1(Invited1Template):
   def error(self, text):
     self.error_label.text = text
     self.error_label.visible = True
-    
 
-
+  def cancel_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.parent.raise_event("x-close-alert", value=False)

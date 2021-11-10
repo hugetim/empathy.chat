@@ -13,7 +13,7 @@ from .Relationship import Relationship
 
 class Profile(ProfileTemplate):
   item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
-               'seeking', 'how_empathy', 'profile', 'trust_label'}
+               'seeking', 'how_empathy', 'profile', 'trust_label', 'status'}
   trust_tooltip = {"Visitor": "Has not yet confirmed an email address",
                    "Guest": "Has not yet confirmed a phone number",
                    "Confirmed": "Has not yet matched with a Member who is a close connection",
@@ -42,6 +42,8 @@ class Profile(ProfileTemplate):
       get_open_form().title_label.text = f"{self.item['first']}'s Profile"
     self.name_label.text = self.item['name']
     self.degree_label.text = h.add_num_suffix(self.item['distance'])
+    if self.item['status'] == "invite":
+      self.degree_label.text += " (pending invite)"
     name_likes = ("I like" if self.item['me'] 
                   else self.item['first'] + " likes")
     self.how_empathy_label.text = f"How {name_likes} to receive empathy:"
@@ -125,5 +127,13 @@ class Profile(ProfileTemplate):
 
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    prompts.invite_dialog(self.item['name'], self.item['user_id'])
+    if prompts.invite_dialog(self.item['name'], self.item['user_id']):
+      get_open_form().go_profile(self.item['user_id'])
+
+  def confirm_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    invited_item = anvil.server.call('invited_item', self.item['user_id'])
+    if prompts.invited_dialog(**invited_item):
+      get_open_form().go_profile(self.item['user_id'])
+
 
