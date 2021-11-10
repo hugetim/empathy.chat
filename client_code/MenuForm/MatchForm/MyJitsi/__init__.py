@@ -1,5 +1,6 @@
 from ._anvil_designer import MyJitsiTemplate
 from anvil import *
+import anvil.server
 
 
 class MyJitsi(MyJitsiTemplate):

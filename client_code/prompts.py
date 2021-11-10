@@ -1,4 +1,5 @@
 from anvil import *
+import anvil.server
 from .MenuForm.NetworkMenu.Invite import Invite
 from .Dialogs.Invited import Invited
 from functools import partial

@@ -1,3 +1,4 @@
+import anvil.server
 from anvil import app
 
 

@@ -1,5 +1,6 @@
 from ._anvil_designer import NameTemplate
 from anvil import *
+import anvil.server
 from .. import helper as h
 
 class Name(NameTemplate):

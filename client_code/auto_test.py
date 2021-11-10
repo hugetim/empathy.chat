@@ -33,13 +33,6 @@ def client_auto_tests():
 #   FullNameTest().main()
   
   
-def server_auto_tests(verbosity=0):
-  #unittest.main(exit=False)
-  import sys
-  test_modules = ['auto_test']
-  test = unittest.TestLoader().loadTestsFromNames(test_modules)
-  unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity).run(test)
-    
 class TestNow():
 
   def setUp(self):
