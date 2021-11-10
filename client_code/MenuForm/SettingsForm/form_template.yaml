@@ -16,6 +16,30 @@ components:
     background: ''}
   name: phone_panel
   layout_properties: {grid_position: 'YOCASF,HQKTBA'}
+- type: LinearPanel
+  properties: {}
+  name: notifications_panel
+  layout_properties: {grid_position: 'WLNJQT,TCUMHW'}
+  components:
+  - type: Label
+    properties: {role: headline, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: Notifications, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: label_3
+    layout_properties:
+      col_widths: {}
+      grid_position: DJBSEF,KHMJVY
+    event_bindings: {}
+  - type: form:C6ZZPAPN4YYF5NVJ:Switch
+    properties: {tooltip: '', enabled: true, foreground: null, text_post: 'Send essential
+        notifications via SMS, rather than email (e.g., someone accepted my proposed
+        time or cancelled our scheduled exchange)', visible: true, font_size: 14,
+      spacing_above: small, checked_color: null, spacing_below: small, italic: null,
+      text_pre: '', background: null, bold: null, checked: true}
+    name: pinged_sms_switch
+    layout_properties: {grid_position: 'QRAAGN,NVCYYV'}
+    event_bindings: {change: pinged_sms_switch_change}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
     wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"JACWUL":5,"VVAILZ":55}',
@@ -24,16 +48,6 @@ components:
   layout_properties: {grid_position: 'HCWJAV,RRWPII'}
   event_bindings: {}
   components:
-  - type: Label
-    properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Notifications, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: label_3
-    layout_properties:
-      col_widths: {}
-      grid_position: LZIXQU,SNGWFY
-    event_bindings: {}
   - type: form:C6ZZPAPN4YYF5NVJ:Switch
     properties: {tooltip: '', enabled: true, foreground: null, text_post: Notify me of requests by email,
       visible: true, font_size: 12, spacing_above: small, checked_color: null, spacing_below: small,

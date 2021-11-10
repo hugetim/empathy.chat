@@ -13,7 +13,7 @@ from . import helper as h
 from . import portable as port
 
 
-DEBUG = False
+DEBUG = False #p.DEBUG_MODE
 TEST_TRUST_LEVEL = 10
 authenticated_callable = anvil.server.callable(require_user=True)
 
@@ -51,7 +51,7 @@ def get_user_info(user):
   """Return user info, initializing info for new users & updating trust_level"""
   if user['trust_level'] is None:
     user['request_em'] = False
-    user['pinged_em'] = False
+    user['pinged_sms'] = True
     user['request_em_settings'] = {"fixed": 0, "hours": 2}
     user['first_name'] = ""
     user['last_name'] = ""
@@ -304,15 +304,14 @@ def _emails_equal(a, b):
 
 
 @authenticated_callable
-def get_settings(user1_id=""):
+def get_settings(user_id=""):
   """Return user settings displayed on SettingsForm"""
-  user = get_user(user1_id)
-  re_opts = user['request_em_settings']
-  if (user['request_em'] == True and re_opts["fixed"]
-      and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
-    user['request_em'] = False
-  return (user['request_em'], user['request_em_settings'],
-          user['request_em_set_time'], user['phone'])
+  user = get_user(user_id)
+#   re_opts = user['request_em_settings']
+#   if (user['request_em'] == True and re_opts["fixed"]
+#       and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
+#     user['request_em'] = False
+  return (user['phone'], user['pinged_sms']) #user['request_em'], user['request_em_settings'], user['request_em_set_time'], 
 
 
 def _prune_request_em():
@@ -324,14 +323,12 @@ def _prune_request_em():
       u['request_em'] = False
 
 
-#@authenticated_callable
-#@anvil.tables.in_transaction
-#def set_pinged_em(pinged_em_checked):
-#  print("set_pinged_em", pinged_em_checked)
-#  from . import matcher
-#  user = anvil.server.session['user']
-#  user['pinged_em'] = pinged_em_checked
-#  return matcher.confirm_wait_helper(user)
+@authenticated_callable
+@anvil.tables.in_transaction
+def set_pinged_sms(pinged_sms_checked, user_id=""):
+  print("set_pinged_sms", pinged_sms_checked)
+  user = get_user(user_id)
+  user['pinged_sms'] = pinged_sms_checked
 
 
 @authenticated_callable
@@ -362,7 +359,7 @@ def _number_already_taken(number):
   return bool(len(app_tables.users.search(phone=number)))
 
 
-def _send_sms(to, text):
+def _send_sms(to_number, text):
   account_sid = anvil.secrets.get_secret('account_sid')
   auth_token = anvil.secrets.get_secret('auth_token')
   from twilio.rest import Client
@@ -370,7 +367,7 @@ def _send_sms(to, text):
   message = client.messages.create(
     body=text,
     from_='+12312905138',
-    to=to,
+    to=to_number,
   )
   print("send_sms sid", message.sid)
   return message
@@ -431,17 +428,19 @@ def _check_for_confirmed_invites(user):
   return any_confirmed
 
     
-def _email_name(user):
+def _addressee_name(user):
   name = user['first_name']
-  if not name:
-    name = "empathy.chat user"
-  return name
+  return name if name else "empathy.chat user"
 
 
-def _email_when(start):
+def _other_name(name):
+  return name if name else "Another empathy.chat user"
+
+  
+def _message_when(start):
   if start: 
     time_in_words = h.seconds_to_words((start-now()).total_seconds(), include_seconds=False)
-    return f"in {time_in_words} (from the time of this email)" 
+    return f"in {time_in_words} (from the time of this message)" 
   else: 
     return "now"
 
@@ -455,18 +454,23 @@ def _email_send(to_user, subject, text, from_name="empathy.chat"):
   )
 
 
-def pinged_email(user, start, duration):
+def ping(user, start, duration):
   """Email pinged user, if settings allow"""
-  print("'pinged_email'")
-  if user['pinged_em']:
+  print("'ping'", start, duration)
+  subject = "empathy.chat - match confirmed"
+  content1 = f"Your proposal for a {duration} minute empathy match, starting {_message_when(start)}, has been accepted."
+  content2 = f"Go to {p.URL_WITH_ALT} to be connected for the empathy exchange."
+  if user['phone'] and user['pinged_sms']:
+    _send_sms(user['phone'], f"{subject}: {content1} {content2}")
+  else:
     _email_send(
       to_user=user, 
-      subject="empathy.chat - match confirmed",
-      text=f'''Dear {_email_name(user)},
+      subject=subject,
+      text=f'''Dear {_addressee_name(user)},
 
-Your proposal for a {duration} minute empathy match, starting {_email_when(start)}, has been accepted.
+{content1}
 
-Go to {p.URL_WITH_ALT} to be connected for the empathy exchange.
+{content2}
 
 Thanks!
 Tim
@@ -476,16 +480,20 @@ empathy.chat
   #p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
 
   
-def cancel_email(user, start, canceler_name=""):
+def notify_cancel(user, start, canceler_name=""):
   """Email pinged user, if settings allow"""
-  print("'cancel_email'", start, canceler_name)
-  if user['pinged_em']:
+  print("'notify_cancel'", start, canceler_name)
+  subject = "empathy.chat - upcoming match canceled"
+  content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_message_when(start)}."
+  if user['phone'] and user['pinged_sms']:
+    _send_sms(user['phone'], f"{subject}: {content}")
+  else:
     _email_send(
       to_user=user, 
-      subject="empathy.chat - upcoming match canceled",
-      text=f'''Dear {_email_name(user)},
+      subject=subject,
+      text=f'''Dear {_addressee_name(user)},
 
-{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_email_when(start)}.
+{content}
 
 -Tim
 empathy.chat
@@ -493,12 +501,6 @@ empathy.chat
     )
 
     
-def _other_name(name):
-  if not name:
-    name = "Another empathy.chat user"
-  return name
-
-
     
 # def users_to_email_re_notif(user=None):
 #   """Return list of users to email notifications triggered by user

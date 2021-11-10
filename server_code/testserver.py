@@ -8,8 +8,8 @@ from . import portable
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def test_add_user(em, level=1, r_em=False, p_em=False):
-  print("test_add_user", em, level, r_em, p_em)
+def test_add_user(em, level=1, r_em=False, p_sms=True):
+  print("test_add_user", em, level, r_em, p_sms)
   if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
     if not anvil.server.session['test_record']:
       anvil.server.session['test_record'] = create_tests_record()
@@ -18,7 +18,7 @@ def test_add_user(em, level=1, r_em=False, p_em=False):
                                         enabled=True,
                                         trust_level=level,
                                         request_em=r_em,
-                                        pinged_em = p_em
+                                        pinged_sms = p_sms
                                        )
     test_users = anvil.server.session['test_record']['test_users']
     anvil.server.session['test_record']['test_users'] = test_users + [new_user]

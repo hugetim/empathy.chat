@@ -169,7 +169,7 @@ db_schema:
     - name: trust_level
       admin_ui: {width: 86}
       type: number
-    - name: pinged_em
+    - name: pinged_sms
       admin_ui: {width: 113}
       type: bool
     - name: seeking_buddy

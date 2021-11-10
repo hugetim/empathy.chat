@@ -232,7 +232,7 @@ def _cancel_match(user, match_id):
   if match:
     for u in match['users']:
       if u != user:
-        sm.cancel_email(u, start=match['match_commence'], canceler_name=sm.name(user, to_user=u))
+        sm.notify_cancel(u, start=match['match_commence'], canceler_name=sm.name(user, to_user=u))
     match.delete()
   return _get_status(user)
 
@@ -416,7 +416,7 @@ def _match_commit(user, proptime_id=None):
       proposal = current_proptime.proposal
       proposal.cancel_all_times()
       if not current_proptime.is_now():
-        current_proptime.pinged_email()
+        current_proptime.ping()
   return _get_status(user)
 
 
@@ -428,9 +428,10 @@ def match_complete(user_id=""):
   user = sm.get_user(user_id)
   # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   this_match, i = current_match_i(user)
-  temp = this_match['complete']
-  temp[i] = 1
-  this_match['complete'] = temp
+  if this_match:
+    temp = this_match['complete']
+    temp[i] = 1
+    this_match['complete'] = temp
   return _get_status(user)
 
 
@@ -548,20 +549,20 @@ class ProposalTime():
     self._proptime_row['accept_date'] = now
     self._proptime_row['jitsi_code'] = sm.new_jitsi_code()
     self.proposal.hide_unaccepted_times()
-    if (self._proptime_row['expire_date'] 
-        - datetime.timedelta(seconds=_seconds_left("requesting")) 
-        - now).total_seconds() <= p.BUFFER_SECONDS:
-      _match_commit(user)
-    elif not self.is_now():
+    if not self.is_now():
       _match_commit(user, self.get_id())
+    elif (now - (self._proptime_row['expire_date']
+                 - datetime.timedelta(seconds=_seconds_left("requesting"))) # wait time elapsed
+         ).total_seconds() <= p.BUFFER_SECONDS:
+      _match_commit(user)
     else:
-      self.pinged_email()
+      self.ping()
  
-  def pinged_email(self):   
-    sm.pinged_email(user=self.proposal.proposer,
-                    start=None if self.is_now() else self.start_date,
-                    duration=self.duration,
-                   )    
+  def ping(self):   
+    sm.ping(user=self.proposal.proposer,
+            start=None if self.is_now() else self.start_date,
+            duration=self.duration,
+           )    
       
   def in_users_accepting(self, user):
     return self._proptime_row['users_accepting'] and user in self._proptime_row['users_accepting']
@@ -704,7 +705,7 @@ class ProposalTime():
   @staticmethod
   def old_to_prune(now):
     if sm.DEBUG:
-      print("old_prop_times")
+      print("old_prop_times_to_prune")
     for row in app_tables.proposal_times.search(cancelled=False, 
                                                 jitsi_code="",
                                                 expire_date=q.less_than(now),
@@ -715,11 +716,9 @@ class ProposalTime():
   def old_ping_to_prune(now):
     # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
     if sm.DEBUG:
-      print("timeout")
+      print("old_ping_to_prune")
     timeout = datetime.timedelta(seconds=p.WAIT_SECONDS + p.CONFIRM_MATCH_SECONDS + 2*p.BUFFER_SECONDS)
     cutoff_r = now - timeout
-    if sm.DEBUG:
-      print("old_ping_prop_times")
     for row in app_tables.proposal_times.search(cancelled=False, 
                                                 start_now=True,
                                                 jitsi_code=q.not_(""),
@@ -883,18 +882,8 @@ class Proposal():
       proptime.cancel_time_only()
       proposals_to_check.add(proptime.proposal)
     # now proposals, after proposal times so they get removed if all times are
-    if sm.DEBUG:
-      print("old_ping_prop_times2")
     for proptime in ProposalTime.old_ping_to_prune(now):
-      if sm.DEBUG:
-        print("old_ping_prop_times3")
       proptime.cancel_time_only()
-      if sm.DEBUG:
-        print("old_ping_prop_times4")
       proposals_to_check.add(proptime.proposal)
-    if sm.DEBUG:
-      print("old_proposals")
     for proposal in proposals_to_check:
-      if sm.DEBUG:
-        print("old_proposals2")
       proposal.cancel_if_no_times()
