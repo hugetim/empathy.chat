@@ -13,6 +13,9 @@ class Connections(ConnectionsTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    def event_update(**event_args):
+      return self.update()                    
+    self.repeating_panel_1.set_event_handler('x-reset', event_update)
     self.update()
     
   def update(self):

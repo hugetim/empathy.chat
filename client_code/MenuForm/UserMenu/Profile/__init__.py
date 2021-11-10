@@ -120,7 +120,8 @@ class Profile(ProfileTemplate):
 
   def unconnect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    ui.disconnect_flow(self.item['user_id'], self.item['name'])
+    if ui.disconnect_flow(self.item['user_id'], self.item['name']):
+      get_open_form().go_profile(self.item['user_id'])
 
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""

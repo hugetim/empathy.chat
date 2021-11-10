@@ -1,5 +1,6 @@
 from ._anvil_designer import ConnectionRowTemplate
 from anvil import *
+import anvil.server
 from ..... import helper as h
 from ..... import ui_procedures as ui
 from ..... import prompts
@@ -19,7 +20,8 @@ class ConnectionRow(ConnectionRowTemplate):
 
   def unconnect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    ui.disconnect_flow(self.item['user_id'], self.item['name'])
+    if ui.disconnect_flow(self.item['user_id'], self.item['name']):
+      self.parent.raise_event('x-reset')
 
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
