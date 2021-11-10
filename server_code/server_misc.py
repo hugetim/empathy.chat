@@ -143,18 +143,19 @@ def get_prompts(user):
       out.append({"name": "phone-invited", "inviter": name(invited['user1'], to_user=user)})
     else:
       out.append({"name": "phone"})
-  elif invited:
-    all_inviteds = _latest_invited(user, return_all=True)
-    for invite in all_inviteds:
-      out.append({"name": "invited", "inviter": name(invite['user1'], to_user=user), 
-                  "inviter_id": invite['user1'].get_id(), "rel": invite['relationship2to1']})
   else:
-    out.append({"name": "invite_close"})
-  if user['trust_level'] == 2:
-    import connections as c
-    members = c.member_close_connections(user)
-    if members:
-      out.append({"name": "member-chat", "members": [get_port_user(m, distance=1, simple=True) for m in members]})
+    if invited:
+      all_inviteds = _latest_invited(user, return_all=True)
+      for invite in all_inviteds:
+        out.append({"name": "invited", "inviter": name(invite['user1'], to_user=user), 
+                    "inviter_id": invite['user1'].get_id(), "rel": invite['relationship2to1']})
+    if user['trust_level'] == 2:
+      import connections as c
+      members = c.member_close_connections(user)
+      if members:
+        out.append({"name": "member-chat", "members": [get_port_user(m, distance=1, simple=True) for m in members]})
+    elif not invited:
+      out.append({"name": "invite-close"})
   return out
 
 

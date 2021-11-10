@@ -52,7 +52,7 @@ def get(spec_dict):
             "background": "theme:Light Mint",
             "click_fn": partial(invited_dialog, spec_dict["inviter"], spec_dict["inviter_id"], spec_dict["rel"]),
            }
-  elif spec_dict["name"] == "invite_close":
+  elif spec_dict["name"] == "invite-close":
     return {"markdown": "Invite a new close connection to join you on empathy.chat", 
             "tooltip": "Do you have an empathy buddy you haven't invited yet?",
             "dismissable": False, ################### TEMPORARY
@@ -65,7 +65,7 @@ def get(spec_dict):
       top_form.content.propose(specified_users=[portu.user_id for portu in spec_dict["members"]])
     return {"markdown": ("To become a full empathy.chat Member, which allows you to chat "
                          "with a broader network beyond your direct connections, "
-                         "please complete an empathy chat with a Member like: "
+                         "please complete an empathy chat with a current Member like: "
                          f"{', '.join([portu.name for portu in spec_dict['members']])}"), 
             "tooltip": "We require this to verify identity and foster trust. Click to propose an empathy exchange.",
             "dismissable": False, ################### TEMPORARY
