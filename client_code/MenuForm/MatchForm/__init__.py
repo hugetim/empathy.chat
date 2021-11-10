@@ -61,7 +61,7 @@ class MatchForm(MatchFormTemplate):
         mine = i == 0
         whose = "your" if mine else "their"
         messages_plus.append({
-          "message": f"How I like to receive empathy:\n{how_empathy}\n[message auto-generated from {whose} profile]",
+          "message": f"How I like to receive empathy:\n{how_empathy}\n[message auto-generated from profile]",
           "me": mine,
         })
     messages_plus += message_list
