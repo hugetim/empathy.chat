@@ -25,11 +25,20 @@ class FullNameTest(unittest.TestCase):
         port.full_name("first", "last", distance),
         "first last" if distance <= 2 else "first"
       )
-    
-def run_auto_tests():
-  Seconds2WordsTest().main()
-  FullNameTest().main()
   
+  
+def client_auto_tests():
+  pass
+#   Seconds2WordsTest().main()
+#   FullNameTest().main()
+  
+  
+def server_auto_tests(verbosity=0):
+  #unittest.main(exit=False)
+  import sys
+  test_modules = ['auto_test']
+  test = unittest.TestLoader().loadTestsFromNames(test_modules)
+  unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity).run(test)
     
 class TestNow():
 

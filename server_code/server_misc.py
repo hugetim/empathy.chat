@@ -31,6 +31,9 @@ def initialize_session():
   anvil.server.session['user'] = user
   anvil.server.session['trust_level'] = user['trust_level']
   anvil.server.session['test_record'] = None
+  if p.DEBUG_MODE and anvil.server.session['trust_level'] >= TEST_TRUST_LEVEL:
+    from . import auto_test
+    auto_test.server_auto_tests()
 
 
 def get_user(user_id="", require_auth=True):

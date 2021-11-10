@@ -32,7 +32,7 @@ class MenuForm(MenuFormTemplate):
             dismissible=False)
     self.test_mode.visible = self.item['test_mode']
     if p.DEBUG_MODE and self.item['test_mode']:
-      auto_test.run_auto_tests()
+      auto_test.client_auto_tests()
     self.set_test_link()
     self.reset_status(self.item['state'])
 
