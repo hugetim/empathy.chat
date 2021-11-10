@@ -20,7 +20,7 @@ class LoginForm(LoginFormTemplate):
       anvil.users.login_with_form(show_signup_option=False)
     self.card_1.visible = True
     self.init_dict = anvil.server.call('init')
-    if parameters.TEST_MODE:
+    if parameters.DEBUG_MODE:
       self.enter_button_click()
     else:
       self.enter_button.visible = True

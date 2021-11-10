@@ -31,6 +31,8 @@ class MenuForm(MenuFormTemplate):
             + 'For help, contact: ' + p.CONTACT_EMAIL,
             dismissible=False)
     self.test_mode.visible = self.item['test_mode']
+    if p.DEBUG_MODE and self.item['test_mode']:
+      auto_test.run_auto_tests()
     self.set_test_link()
     self.reset_status(self.item['state'])
 
@@ -206,5 +208,5 @@ class MenuForm(MenuFormTemplate):
 
   def autotest_butten_click(self, **event_args):
     """This method is called when the button is clicked"""
-    auto_test.run_tests()
+    auto_test.run_now_test()
 

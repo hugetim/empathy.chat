@@ -2,11 +2,36 @@ from anvil import *
 import anvil.server
 import unittest
 import time
+from . import helper as h
+from . import portable as port
 # from .MenuForm import MenuForm
 # from .MenuForm.DashForm import DashForm
 
+class Seconds2WordsTest(unittest.TestCase):
+  def test_day(self):
+    self.assertEqual(h.seconds_to_words(3600*24), "1 day, 0 seconds")
+  
+  def test_day_no_seconds(self):
+    self.assertEqual(h.seconds_to_words(3600*24, include_seconds=False), "1 day, 0 minutes")
+    
+  def test_minus(self):
+    self.assertEqual(h.seconds_to_words(-1), "minus 1 second")
 
-class TestNow(unittest.TestCase):
+    
+class FullNameTest(unittest.TestCase):
+  def test_distance(self):
+    for distance in range(1, 5):
+      self.assertEqual(
+        port.full_name("first", "last", distance),
+        "first last" if distance <= 2 else "first"
+      )
+    
+def run_auto_tests():
+  Seconds2WordsTest().main()
+  FullNameTest().main()
+  
+    
+class TestNow():
 
   def setUp(self):
     self.top_form = get_open_form()
@@ -32,7 +57,7 @@ class TestNow(unittest.TestCase):
     time.sleep(5)
     self.top_form.proposal_alert.save_button_click()
 
-def run_tests():
+def run_now_test():
   #unittest.main()
   #print("run manually")
   test = TestNow()
