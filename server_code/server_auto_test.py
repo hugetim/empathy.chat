@@ -13,7 +13,7 @@ class NotifyConnectedTest(unittest.TestCase):
   def test_notify_connected(self):
     class FakeUser(dict):
       def get_id(self):
-        return "42"
+        return [42,42]
     invite_dict = {'user1': FakeUser(), 'user2': FakeUser(first_name="first", last_name="last"), 'distance': 1}
     invite_reply_dict = {'relationship2to1': "spouse"}
     self.assertEqual(c._connected_prompt(invite_dict, invite_reply_dict)['spec'], 
