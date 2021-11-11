@@ -3,7 +3,7 @@ from anvil import app
 
 
 BUFFER_SECONDS = 7
-if getattr(app.environment, "name", "") in {"Production", "Staging"}:
+if getattr(app.environment, "name", "") in {"Published", "Production", "Staging"}:
     DEBUG_MODE = False
 else:
     # Probably a personal debug environment
