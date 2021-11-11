@@ -17,7 +17,7 @@ class NotifyConnectedTest(unittest.TestCase):
     invite_dict = {'user1': FakeUser(), 'user2': FakeUser(first_name="first", last_name="last"), 'distance': 1}
     invite_reply_dict = {'relationship2to1': "spouse"}
     self.assertEqual(c._connected_prompt(invite_dict, invite_reply_dict)['spec'], 
-                     dict(name="connected", to_name="first last", to_id="42", rel="spouse"),
+                     dict(name="connected", to_name="first last", to_id=[42,42], rel="spouse"),
                     )
 
     
