@@ -73,6 +73,17 @@ def get(spec_dict):
             "background": "theme:Light Blue",
             "click_fn": propose_members,
            }
+  elif spec_dict["name"] == "connected":
+    def go_to_their_profile():
+      get_open_form().go_profile(spec_dict['to_id'])
+    return {"markdown": (f"You are now connected to {spec_dict['to_name']}, "
+                         "who described you as their {spec_dict['rel']}."
+                        ), 
+            "tooltip": "",
+            "dismissable": spec_dict['prompt_id'], ################### TEMPORARY
+            "background": "theme:Light Mint",
+            "click_fn": go_to_their_profile,
+           }
   else:
     print("Warning: No prompt matches that spec_dict")
     return None

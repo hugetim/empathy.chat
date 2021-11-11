@@ -134,6 +134,24 @@ db_schema:
       admin_ui: {width: 200}
       type: link_single
       target: proposals
+  prompts:
+    title: Prompts
+    client: none
+    server: full
+    columns:
+    - name: date
+      admin_ui: {width: 200}
+      type: datetime
+    - name: user
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: spec
+      admin_ui: {width: 200}
+      type: simpleObject
+    - name: dismissed
+      admin_ui: {width: 200}
+      type: bool
   users:
     title: Users
     client: none

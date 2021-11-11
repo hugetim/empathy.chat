@@ -333,9 +333,26 @@ def connect(invite, invite_reply):
   for row in [invite, invite_reply]:
     item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
     app_tables.connections.add_row(starred=False, **item)
-    row.delete()  
+    row.delete()
+  app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
+
+
+def _connected_prompt(invite, invite_reply):
+  return dict(user=invite['user1'],
+              spec={"name": "connected", "to_name": sm.name(invite['user2'], distance=invite['distance']), 
+                    "to_id": invite['user2'].get_id(), "rel": invite_reply['relationship2to1'],},
+              date=sm.now(),
+              dismissed=False,
+             )
+
+
+@authenticated_callable
+@anvil.tables.in_transaction
+def dismiss_prompt(prompt_id):
+  prompt = app_tables.prompts.get_by_id(prompt_id)
+  prompt['dismissed'] = True
   
-  
+
 @anvil.server.callable
 def cancel_invited(item):
   row = app_tables.invites.get(link_key=item['link_key'],
