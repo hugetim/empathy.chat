@@ -77,7 +77,7 @@ def get(spec_dict):
     def go_to_their_profile():
       get_open_form().go_profile(spec_dict['to_id'])
     return {"markdown": (f"You are now connected to {spec_dict['to_name']}, "
-                         "who described you as their {spec_dict['rel']}."
+                         f"who described you as their {spec_dict['rel']}."
                         ), 
             "tooltip": "",
             "dismissable": spec_dict['prompt_id'], ################### TEMPORARY
