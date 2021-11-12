@@ -35,6 +35,8 @@ roles:
   components: [Label]
 - name: card-scroll
   components: [ColumnPanel]
+- name: card-scroll-long
+  components: [ColumnPanel]
 color_scheme:
   preset_groups:
   - name: Primary Colour

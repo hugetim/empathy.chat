@@ -698,6 +698,29 @@ body>div[data-notify="container"].alert-warning>span[data-notify="title"]{
   margin-bottom: -8px;
 }
 
+.anvil-role-card-scroll-long {
+  height: 500px;
+  overflow: auto;
+  border-radius: 2px;
+  background-color: white;
+  padding: 8px 12px;
+  /* 2dp */  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+/* full_width_row sections go full bleed */
+.column-panel.anvil-role-card-scroll-long > .anvil-panel-section > .anvil-panel-section-container.full-width-row {
+  margin-left: -12px;
+  margin-right: -12px;
+  width: initial;
+  max-width: initial;
+}
+/* If the first row of a card is a full_width_row, it goes to the top */
+.column-panel.anvil-role-card-scroll-long > .anvil-panel-section:first-child > .anvil-panel-section-container.full-width-row {
+  margin-top: -8px;
+}
+.column-panel.anvil-role-card-scroll-long > .anvil-panel-section:last-child > .anvil-panel-section-container.full-width-row {
+  margin-bottom: -8px;
+}
+
 /* Component: TextBox + TextArea */
 
 input.anvil-component, textarea.anvil-component, .anvil-component select, .anvil-datepicker input {
