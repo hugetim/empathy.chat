@@ -15,14 +15,14 @@ components:
     components:
     - type: Button
       properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: small,
+        foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
         underline: false, icon: 'fa:star-o'}
       name: star_button
       layout_properties: {column: NBEGGD, grid_position: 'CWBUWZ,JUFLNG'}
     - type: Label
       properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: small,
+        visible: true, text: '', font_size: null, font: '', spacing_above: medium,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
         underline: false, icon: ''}
       name: name_label
@@ -30,7 +30,7 @@ components:
       data_bindings: []
     - type: Button
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
+        foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
         underline: false, icon: 'fa:pencil'}
       name: edit_name_button
@@ -47,29 +47,17 @@ components:
       layout_properties: {grid_position: 'CWBUWZ,PZTEKG'}
       data_bindings:
       - {property: visible, code: 'not self.item[''me'']'}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: 12, font: '', spacing_above: medium, icon_align: left,
-        spacing_below: none, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
-      name: trust_label
-      layout_properties:
-        col_widths: {}
-        grid_position: MCBRGZ,BHOBVB
-      data_bindings:
-      - {property: text, code: 'f"({self.item[''trust_label'']})"'}
-      - {property: tooltip, code: 'self.trust_tooltip[self.item[''trust_label'']]'}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: Message, border: '',
         enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
+        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:comment'}
       name: message_button
       layout_properties: {}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: Propose Exchange,
         border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
+        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:child'}
       name: propose_button
       layout_properties: {}
@@ -81,7 +69,7 @@ components:
       properties: {role: primary-color, align: center, tooltip: 'This user has invited
           you to connect, awaiting your confirmation', border: '', enabled: true,
         foreground: '', visible: false, text: 'Confirm?', font_size: null, font: '',
-        spacing_above: small, icon_align: left, spacing_below: none, italic: false,
+        spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:plus'}
       name: confirm_button
       layout_properties: {}
@@ -90,7 +78,7 @@ components:
       event_bindings: {click: confirm_button_click}
     - type: Button
       properties: {role: null, align: center, tooltip: Connect, border: '', enabled: true,
-        foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: small,
+        foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
         underline: false, icon: 'fa:plus'}
       name: connect_button
@@ -102,7 +90,7 @@ components:
     - type: Button
       properties: {role: null, align: center, tooltip: Remove your connection to this user,
         border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
+        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:chain-broken'}
       name: unconnect_button
       layout_properties: {}
@@ -116,7 +104,7 @@ components:
     layout_properties: {grid_position: 'BVAHNH,TKZZYQ'}
     components:
     - type: Spacer
-      properties: {visible: true, spacing_above: small, spacing_below: small, height: 32,
+      properties: {visible: true, spacing_above: none, spacing_below: small, height: 32,
         tooltip: ''}
       name: spacer_2
       layout_properties: {width: 40, expand: false}
@@ -128,6 +116,33 @@ components:
       layout_properties: {grid_position: 'UBZMDW,UKHAPU', expand: true, width: null}
     data_bindings:
     - {property: visible, code: 'not self.item[''me'']'}
+  - type: FlowPanel
+    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
+      foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
+    name: flow_panel_4
+    layout_properties: {grid_position: 'IBGVDS,QXUMBH'}
+    components:
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: '', font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: label_3
+      layout_properties: {grid_position: 'IBGVDS,ZRRCBX'}
+      data_bindings:
+      - {property: text, code: '"  Last Active: " + self.item[''last_active'']'}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: '', font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: trust_label
+      layout_properties:
+        col_widths: {}
+        grid_position: IBGVDS,QXUMBH EXKOPS,PUHOSB
+      data_bindings:
+      - {property: text, code: 'f"({self.item[''trust_label'']})"'}
+      - {property: tooltip, code: 'self.trust_tooltip[self.item[''trust_label'']]'}
   - type: FlowPanel
     properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '',
       foreground: '', visible: true, spacing_above: large, spacing_below: large, background: ''}
@@ -176,7 +191,7 @@ components:
       - {property: visible, code: '(not self.item[''me'']) and self.item[''seeking'']'}
   - type: FlowPanel
     properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: large, spacing_below: medium,
+      foreground: '', visible: true, spacing_above: medium, spacing_below: medium,
       background: ''}
     name: flow_panel_3
     layout_properties: {grid_position: 'SUCHPK,PSRLXY'}
