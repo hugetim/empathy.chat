@@ -12,3 +12,10 @@ class Relationship(RelationshipTemplate):
     self.row_spacing = 0
     if self.item['child']:
       self.child_column_panel.add_component(Relationship(item=self.item['child']))
+    else:
+      their = self.item.get('their')
+      if their:
+        self.spacer_1.visible = False
+        text = f" (and describes you as their {their})"
+        tooltip = f"description last edited {self.item['their_date']}"
+        self.child_column_panel.add_component(Label(text=text, tooltip=tooltip, spacing_above="none"))

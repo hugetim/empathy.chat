@@ -151,11 +151,15 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
       return []
     elif degree == 1:
       conn = app_tables.connections.get(user1=user1, user2=user2)
+      their_conn = app_tables.connections.get(user1=user2, user2=user1)
       return [{"via": False, 
                "whose": "my", 
                "desc": conn['relationship2to1'], 
                "date": conn['date_described'].strftime(p.DATE_FORMAT), 
-               "child": None}]
+               "child": None,
+               "their": their_conn['relationship2to1'],
+               "their_date": their_conn['date_described'].strftime(p.DATE_FORMAT),
+              }]
     #[{"via": True, "whose": "", "desc": "", "date": ""}] if degree <= 2 else 
     out = []
     dset2 = _get_connections(user2, degree-2, include_zero=True)

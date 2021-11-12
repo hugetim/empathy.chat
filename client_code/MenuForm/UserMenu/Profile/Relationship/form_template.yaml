@@ -85,5 +85,5 @@ components:
         name: child_column_panel
         layout_properties: {expand: true, width: null}
       data_bindings:
-      - {property: visible, code: 'self.item[''child'']'}
+      - {property: visible, code: 'self.item[''child''] or self.item.get(''their'')'}
 is_package: true
