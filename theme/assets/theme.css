@@ -699,7 +699,7 @@ body>div[data-notify="container"].alert-warning>span[data-notify="title"]{
 }
 
 .anvil-role-card-scroll-long {
-  height: 500px;
+  height: 350px;
   overflow: auto;
   border-radius: 2px;
   background-color: white;

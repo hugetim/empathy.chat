@@ -19,11 +19,12 @@ class UserMenu(UserMenuTemplate):
       self.item['user_id']
       and self.item['user_id'] != anvil.users.get_user().get_id()
     )
+    self.history_tab_button.visible = self.connections_tab_button.visible ## TEMPORARY
     self.top_form = get_open_form()
     init_content_selector = {'profile': self.go_profile,
-                     'connections': self.go_connections,
-                     'history': self.go_history,
-                    }
+                             'connections': self.go_connections,
+                             'history': self.go_history,
+                            }
     init_content_selector[self.item['tab']]()
     
   def clear_page(self):
@@ -38,19 +39,19 @@ class UserMenu(UserMenuTemplate):
     self.content_column_panel.add_component(self.content)  
 
   def go_profile(self):
-    content = Profile(self.item['user_id'])
-    self.load_component(content)
+    self.content = Profile(self.item['user_id'])
+    self.load_component(self.content)
     self.profile_tab_button.background = p.SELECTED_TAB_COLOR    
     
   def go_connections(self):
     assert self.item['user_id'] != anvil.users.get_user().get_id()
-    content = Connections(item={'user_id': self.item['user_id']})
-    self.load_component(content)
+    self.content = Connections(item={'user_id': self.item['user_id']})
+    self.load_component(self.content)
     self.connections_tab_button.background = p.SELECTED_TAB_COLOR
 
   def go_history(self):
-    content = History()
-    self.load_component(content)
+    self.content = History(item={'user_id': self.item['user_id']})
+    self.load_component(self.content)
     self.history_tab_button.background = p.SELECTED_TAB_COLOR
     
   def profile_tab_button_click(self, **event_args):

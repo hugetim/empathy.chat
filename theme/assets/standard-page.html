@@ -35,6 +35,11 @@
     var $card = this.find('.anvil-role-card-scroll');
     $card.scrollTop($card[0].scrollHeight);
   }
+  
+  var scrollCardLong = function() {
+    var $card = this.find('.anvil-role-card-scroll-long');
+    $card.scrollTop($card[0].scrollHeight);
+  }
 
   function hideSidebar() {
     var ln = $('.structure > .nav-holder > .left-nav');

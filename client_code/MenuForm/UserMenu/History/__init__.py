@@ -14,3 +14,33 @@ class History(HistoryTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.timer_2.interval = 30
+    
+  def form_show(self, **event_args):
+    """This method is called when the HTML panel is shown on the screen"""
+    self.top_form = get_open_form()
+    self.chat_repeating_panel.items = []
+    self.update()
+       
+  def update(self): 
+    new_items = anvil.server.call_s('update_history_form', self.item['user_id'])
+    self.update_messages(new_items)
+
+  def update_messages(self, message_list):
+    old_items = self.chat_repeating_panel.items
+    if len(message_list) > len(old_items):
+      self.chat_repeating_panel.items = message_list
+      self.call_js('scrollCardLong') 
+  
+  def timer_2_tick(self, **event_args):
+    """This method is called approx. once every 5 seconds, checking for messages"""
+    self.update() 
+
+  def message_textbox_pressed_enter(self, **event_args):
+    if self.message_textbox.text:
+      temp = anvil.server.call('add_message', self.item['user_id'], message=self.message_textbox.text)
+      self.message_textbox.text = ""
+      self.update_messages(temp)
+      self.call_js('scrollCardLong')
+
+  

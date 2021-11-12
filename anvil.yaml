@@ -320,6 +320,25 @@ db_schema:
     - name: slider_values
       admin_ui: {width: 200}
       type: simpleObject
+  messages:
+    title: Table 12
+    client: none
+    server: full
+    columns:
+    - name: from_user
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: to_user
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: message
+      admin_ui: {width: 200}
+      type: string
+    - name: timestamp
+      admin_ui: {width: 200}
+      type: datetime
   test_data:
     title: Test Data
     client: none

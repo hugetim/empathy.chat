@@ -84,6 +84,16 @@ def get(spec_dict):
             "background": "theme:Light Mint",
             "click_fn": go_to_their_profile,
            }
+  elif spec_dict["name"] == "message":
+    def go_to_message():
+      get_open_form().go_profile(spec_dict['from_id'])
+      get_open_form().content.go_history()
+    return {"markdown": f"You have a new message from {spec_dict['from_name']}.", 
+            "tooltip": "Click to see the new message",
+            "dismissable": spec_dict['prompt_id'], ################### TEMPORARY
+            "background": "",
+            "click_fn": go_to_message,
+           }
   else:
     print("Warning: No prompt matches that spec_dict")
     return None

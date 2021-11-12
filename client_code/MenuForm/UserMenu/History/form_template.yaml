@@ -2,7 +2,12 @@ container:
   type: HtmlTemplate
   properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
     role: null, html: ''}
+  event_bindings: {show: form_show}
 components:
+- type: Timer
+  properties: {interval: 30}
+  name: timer_2
+  event_bindings: {tick: timer_2_tick}
 - type: ColumnPanel
   properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
     wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,

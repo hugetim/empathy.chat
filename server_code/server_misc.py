@@ -246,11 +246,67 @@ def prune_messages():
       for row in app_tables.chat.search(match=match):
         row.delete()
 
+        
+@authenticated_callable
+def update_history_form(user2_id, user_id=""):
+  """
+  Return (iterable of dictionaries with keys: 'me', 'message'), their_value
+  """
+  user = get_user(user_id)
+  user2 = get_user(user2_id, require_auth=False)
+  return _update_history_form(user2, user)
+
+
+def _update_history_form(user2, user1):
+  messages = app_tables.messages.search(
+    anvil.tables.order_by("time_stamp", ascending=True),
+    q.any_of(q.all_of(from_user=user2, to_user=user1),
+             q.all_of(from_user=user1, to_user=user2),
+            )
+  )
+  if messages:
+    return [{'me': (user1 == m['from_user']),
+             'message': anvil.secrets.decrypt_with_key("new_key", m['message']),
+             'time_stamp': m['time_stamp'],
+            } for m in messages]
+  else:
+    return []
+
+  
+@authenticated_callable
+def add_message(user2_id, user_id="", message="[blank test message]"):
+  print("add_message", "[redacted]", user_id)
+  user = get_user(user_id)
+  user2 = get_user(user2_id, require_auth=False)
+  app_tables.messages.add_row(from_user=user,
+                              to_user=user2,
+                              message=anvil.secrets.encrypt_with_key("new_key", message),
+                              time_stamp=now())
+  _add_message_prompt(user2, user)
+  return _update_history_form(user2, user)
+
+  
+def _add_message_prompt(user2, user1):
+  such_prompts = app_tables.prompts.search(user=user2, dismissed=False, spec={"name": "message", "from_id": user1.get_id()})
+  if len(such_prompts) == 0:
+    app_tables.prompts.add_row(user=user2, date=now(), dismissed=False,
+                             spec={"name": "message", "from_name": name(user1, to_user=user2), "from_id": user1.get_id()}
+                            )
+    
+
+def _connected_prompt(invite, invite_reply):
+  return dict(user=invite['user1'],
+              spec={"name": "connected", "to_name": sm.name(invite['user2'], distance=invite['distance']), 
+                    "to_id": invite['user2'].get_id(), "rel": invite_reply['relationship2to1'],},
+              date=sm.now(),
+              dismissed=False,
+             )
+
 
 @authenticated_callable
-def add_message(user_id="", message="[blank test message]"):
+def add_chat_message(user_id="", message="[blank test message]"):
   from . import matcher
-  print("add_message", "[redacted]", user_id)
+  print("add_chat_message", "[redacted]", user_id)
   user = get_user(user_id)
   this_match = matcher.current_match(user)
   app_tables.chat.add_row(match=this_match,
@@ -274,7 +330,7 @@ def _update_match_form(user):
   this_match, i = matcher.current_match_i(user)
   if this_match:
     their_value = _their_value(this_match['slider_values'], i)
-    messages = app_tables.chat.search(match=this_match)
+    messages = app_tables.chat.search(anvil.tables.order_by("time_stamp", ascending=True), match=this_match)
     if messages:
       return ([{'me': (user == m['user']),
                 'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}

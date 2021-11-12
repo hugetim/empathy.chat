@@ -57,6 +57,11 @@ class Profile(ProfileTemplate):
     else:
       get_open_form().content.go_connections()
 
+  def message_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    get_open_form().content.go_history()
+    get_open_form().content.content.message_textbox.scroll_into_view()
+
   def edit_name_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     name_item = {'first': self.item['first'],
@@ -136,5 +141,4 @@ class Profile(ProfileTemplate):
     invited_item = anvil.server.call('invited_item', self.item['user_id'])
     if prompts.invited_dialog(**invited_item):
       get_open_form().go_profile(self.item['user_id'])
-
 
