@@ -140,7 +140,7 @@ class DashForm(DashFormTemplate):
   def edit_proposal(self, prop_id):
     """This method is called when the button is clicked"""
     props_to_edit = [prop_item['prop'] for prop_item in self.item['proposals'] 
-                      if prop_item['prop'].prop_id == prop_id]
+                     if prop_item['prop'].prop_id == prop_id]
     prop_to_edit = props_to_edit[0]
     form_item = prop_to_edit.create_form_item(self.item['status'],
                                               self.get_conflict_checks())
