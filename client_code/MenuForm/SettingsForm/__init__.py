@@ -14,7 +14,7 @@ class SettingsForm(SettingsFormTemplate):
     phone, p_sms = anvil.server.call('get_settings') #re, re_opts, re_st, 
     #self.init_request_em_opts(re, re_opts, re_st)
     self.timer_2.interval = 0 #5
-    self.phone_form = Phone(item={"phone": phone[2:], # removing "+1" 
+    self.phone_form = Phone(item={"phone": phone[2:] if phone else "", # removing "+1" 
                                   "status": "confirmed" if phone else None,
                                  })
     self.phone_panel.add_component(self.phone_form)
