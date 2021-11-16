@@ -157,6 +157,8 @@ def get_prompts(user):
       members = c.member_close_connections(user)
       if members:
         out.append({"name": "member-chat", "members": [get_port_user(m, distance=1, simple=True) for m in members]})
+      else:
+        out.append({"name": "invite-close"})
     elif not invited:
       out.append({"name": "invite-close"})
   other_prompts = app_tables.prompts.search(user=user)
