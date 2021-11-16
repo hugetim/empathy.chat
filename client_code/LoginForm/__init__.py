@@ -1,7 +1,6 @@
 from ._anvil_designer import LoginFormTemplate
 from anvil import *
 import anvil.server
-import anvil.users
 from .. import rosenberg
 from datetime import date
 from .. import parameters

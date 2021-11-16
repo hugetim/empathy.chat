@@ -1,7 +1,6 @@
 from ._anvil_designer import UserMenuTemplate
 from anvil import *
 import anvil.server
-import anvil.users
 from .Profile import Profile
 from ..NetworkMenu.Connections import Connections
 from .History import History

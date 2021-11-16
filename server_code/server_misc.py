@@ -1,4 +1,3 @@
-import anvil.users
 import anvil.server
 import anvil.tables
 from anvil.tables import app_tables, order_by

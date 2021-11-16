@@ -1,7 +1,6 @@
 from ._anvil_designer import Invited2Template
 from anvil import *
 import anvil.server
-import anvil.users
 from ....MenuForm.SettingsForm.Phone import Phone
 
 

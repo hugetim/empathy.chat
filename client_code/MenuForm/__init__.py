@@ -1,7 +1,6 @@
 from ._anvil_designer import MenuFormTemplate
 from anvil import *
 import anvil.server
-import anvil.users
 from .DashForm import DashForm
 from .WaitForm import WaitForm
 from .MatchForm import MatchForm

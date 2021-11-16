@@ -1,7 +1,6 @@
 from ._anvil_designer import ConnectionsTemplate
 from anvil import *
 import anvil.server
-import anvil.users
 from .... import helper as h
 
 
