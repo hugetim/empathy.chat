@@ -1,4 +1,5 @@
 from anvil import *
+import anvil.users
 import anvil.server
 import unittest
 import time

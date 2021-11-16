@@ -1,5 +1,6 @@
 from ._anvil_designer import ChatTemplateTemplate
 from anvil import *
+import anvil.users
 import anvil.server
 
 

@@ -1,5 +1,6 @@
 from ._anvil_designer import Invited1Template
 from anvil import *
+import anvil.users
 import anvil.server
 from ..Invited2 import Invited2
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPrompt import RelationshipPrompt

@@ -1,5 +1,6 @@
 from ._anvil_designer import InviteATemplate
 from anvil import *
+import anvil.users
 import anvil.server
 from ..InviteB import InviteB
 from .RelationshipPrompt import RelationshipPrompt

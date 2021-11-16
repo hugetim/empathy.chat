@@ -1,5 +1,6 @@
 from ._anvil_designer import GroupsMenuTemplate
 from anvil import *
+import anvil.users
 import anvil.server
 from .Groups import Groups
 from .Members import Members

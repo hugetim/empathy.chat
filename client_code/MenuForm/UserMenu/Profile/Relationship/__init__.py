@@ -1,5 +1,6 @@
 from ._anvil_designer import RelationshipTemplate
 from anvil import *
+import anvil.users
 import anvil.server
 
 

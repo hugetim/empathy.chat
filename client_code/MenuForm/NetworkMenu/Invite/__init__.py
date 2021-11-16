@@ -1,5 +1,6 @@
 from ._anvil_designer import InviteTemplate
 from anvil import *
+import anvil.users
 import anvil.server
 import anvil.google.auth, anvil.google.drive
 from anvil.google.drive import app_files
