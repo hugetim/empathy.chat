@@ -127,15 +127,16 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
                     )
 
   
-def _latest_invited(user, return_all=False):
-  inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user)
+def _latest_invited(user):
+  inviteds = _inviteds(user)
   if len(inviteds) == 0:
     return None
   else:
-    if return_all:
-      return inviteds
-    else:
-      return inviteds[0]
+    return inviteds[0]
+
+  
+def _inviteds(user):
+  return app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user)
 
 
 def get_prompts(user):
@@ -148,8 +149,7 @@ def get_prompts(user):
       out.append({"name": "phone"})
   else:
     if invited:
-      all_inviteds = _latest_invited(user, return_all=True)
-      for invite in all_inviteds:
+      for invite in _inviteds(user):
         out.append({"name": "invited", "inviter": name(invite['user1'], to_user=user), 
                     "inviter_id": invite['user1'].get_id(), "rel": invite['relationship2to1']})
     if user['trust_level'] == 2:
@@ -479,9 +479,8 @@ def check_phone_code(code, user_id=""):
  
 
 def _check_for_confirmed_invites(user):
-  inviteds = _latest_invited(user, return_all=True)
   any_confirmed = False
-  for invite in inviteds:
+  for invite in _inviteds(user):
     if invite['guess'] == user['phone'][-4:]:
       invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
       if invite_reply:
