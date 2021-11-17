@@ -5,25 +5,18 @@ container:
     wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
     spacing_below: none, background: ''}
 components:
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-  name: flow_panel_1
-  layout_properties: {grid_position: 'ZOCAPF,KREJCX'}
-  event_bindings: {}
-  components:
-  - type: Label
-    properties: {role: bubble-left, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
-      spacing_below: none, italic: false, background: '', bold: false, underline: false,
-      icon: ''}
-    name: label_1
-    layout_properties: {}
-    event_bindings: {}
-    data_bindings:
-    - {property: text, code: 'self.item[''message'']'}
-  data_bindings:
-  - {property: visible, code: 'not self.item[''me'']'}
+- type: form:HorizontalRule
+  properties: {}
+  name: horizontal_rule_1
+  layout_properties: {grid_position: 'MTKAKC,ZLUNKO'}
+- type: Label
+  properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+    visible: false, text: 'Saturday, Nov. 2nd, 2020', font_size: 12, font: '', spacing_above: none,
+    icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
+    underline: false, icon: ''}
+  name: day_label
+  layout_properties: {grid_position: 'RRENPU,IXGFSA'}
+  data_bindings: []
 - type: FlowPanel
   properties: {role: null, spacing: medium, align: right, tooltip: '', border: '',
     foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
@@ -42,18 +35,24 @@ components:
         visible: true, text: '', font_size: 10, font: '', spacing_above: none, icon_align: left,
         spacing_below: none, italic: false, background: '', bold: false, underline: false,
         icon: ''}
-      name: label_2_above
+      name: meta_label
       layout_properties: {}
       event_bindings: {}
+      data_bindings:
+      - {property: align, code: '"right" if self.item[''me''] else "left"'}
     - type: Label
       properties: {role: bubble-right, align: right, tooltip: '', border: '', foreground: '',
         visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
         spacing_below: none, italic: false, background: '', bold: false, underline: false,
         icon: ''}
-      name: label_2
+      name: message_label
       layout_properties: {}
       data_bindings:
       - {property: text, code: 'self.item[''message'']'}
+      - {property: role, code: '"bubble-right" if self.item[''me''] else "bubble-left"'}
+      - {property: align, code: '"right" if self.item[''me''] else "left"'}
+    data_bindings:
+    - {property: tooltip, code: '"me" if self.item[''me''] else "them"'}
   data_bindings:
-  - {property: visible, code: 'self.item[''me'']'}
+  - {property: align, code: '"right" if self.item[''me''] else "left"'}
 is_package: true
