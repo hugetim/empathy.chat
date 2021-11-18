@@ -11,7 +11,7 @@ if isinstance(h, dict) and 'invite' in h:
   if item:
     invited_alert = Invited(item=item)
     if anvil.alert(content=invited_alert, 
-                   title="You have been invited to empathy.chat", 
+                   title="", 
                    buttons=[], large=True, dismissible=False):
       if not user:
         new_user = anvil.users.signup_with_form()

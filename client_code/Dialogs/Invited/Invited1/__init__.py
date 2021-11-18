@@ -22,9 +22,8 @@ class Invited1(Invited1Template):
     )
     self.linear_panel_1.add_component(self.relationship_prompt)
     self.relationship_prompt.label_4.text = (
-      "Please also provide the last 4 digits of a phone number "
-      f"at which {self.item['inviter']} can receive text messages "
-      "to verify your close connection:"
+      f"Please provide the last 4 digits of {self.item['inviter']}'s phone number "
+      "(to verify your close connection):"
     )
     self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
     
