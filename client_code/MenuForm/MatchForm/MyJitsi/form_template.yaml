@@ -9,17 +9,19 @@ container:
       \             enableWelcomePage: false,\n                               prejoinPageEnabled:\
       \ false,\n                               enableClosePage: true,\n          \
       \                     disableThirdPartyRequests: true,\n                   \
-      \            localRecording: { enabled: false,},  \n                       \
-      \       };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
-      \ 'empathy.chat partner',\n                                        TOOLBAR_BUTTONS:\
-      \ ['microphone', 'camera', 'fullscreen',\n        \t\t\t\t\t\t\t\t\t\t\t\t \
-      \ 'fodeviceselection', 'info', 'chat',\n        \t\t\t\t\t\t\t\t\t\t\t\t  'settings',\
-      \ 'videoquality', \n                                                       \
-      \   'videobackgroundblur'\n                                                \
-      \         ],\n                                        SETTINGS_SECTIONS: [ 'devices',\
-      \ 'language' ],\n                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
-      \ 60000,\n                                        SHOW_POWERED_BY: true,\n \
-      \                                      };\n    window.japi = new JitsiMeetExternalAPI(domain,\
+      \            localRecording: { enabled: false,},\n                         \
+      \      enableNoisyMicDetection: true,\n                               readOnlyName:\
+      \ true,\n                               toolbarButtons: ['microphone', 'camera',\
+      \ //'fullscreen', \n                                                'chat',\n\
+      \                                                'settings', 'videoquality',\n\
+      \                                                'select-background',\n    \
+      \                                           ],\n                           \
+      \    hideConferenceTimer: false,\n                              };\n    options.interfaceConfigOverwrite\
+      \ = {DEFAULT_REMOTE_DISPLAY_NAME: '', //empathy.chat partner\n             \
+      \                           SETTINGS_SECTIONS: [ 'devices', 'language' ],\n\
+      \                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
+      \ 60000,\n                                        SHOW_CHROME_EXTENSION_BANNER:\
+      \ false,\n                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
       \ options);\n    window.japi.executeCommand('subject', ' ');\n  }\n</script>\n\
       \n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n    border: none;\n  }\n</style>\n"}
   event_bindings: {show: form_show}
