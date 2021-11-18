@@ -394,7 +394,7 @@ a:hover, a:active {
 
 /* Components: App Bar */
 .app-bar {
-  min-height: 56px;
+  min-height: 40px;
   line-height: 40px;
   padding: 0 16px 0 72px;
 
