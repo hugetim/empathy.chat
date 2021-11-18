@@ -17,6 +17,6 @@ class Relationship(RelationshipTemplate):
       their = self.item.get('their')
       if their:
         self.spacer_1.visible = False
-        text = f" (and describes you as their {their})"
+        text = f' (and describes you as their "{their}")'
         tooltip = f"description last edited {self.item['their_date']}"
         self.child_column_panel.add_component(Label(text=text, tooltip=tooltip, spacing_above="none"))
