@@ -5,6 +5,7 @@ import anvil.server
 from .. import rosenberg
 from datetime import date
 from .. import parameters
+from ..MenuForm.MatchForm import MatchForm
 
 
 class LoginForm(LoginFormTemplate):
@@ -28,5 +29,9 @@ class LoginForm(LoginFormTemplate):
 
   def enter_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    open_form('MenuForm', item=self.init_dict)
+    if self.init_dict['state']['status'] == "matched":
+      item = {k: self.init_dict['state'][k] for k in MatchForm.state_keys}
+      open_form(MatchForm(item=item))
+    else:
+      open_form('MenuForm', item=self.init_dict)
 

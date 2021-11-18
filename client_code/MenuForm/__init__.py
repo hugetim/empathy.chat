@@ -3,7 +3,6 @@ from anvil import *
 import anvil.users
 import anvil.server
 import anvil.js
-from anvil.js.window import hideSidebar, hideAppbar
 from .DashForm import DashForm
 from .WaitForm import WaitForm
 from .MatchForm import MatchForm
@@ -25,6 +24,7 @@ class MenuForm(MenuFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
+    glob.name = self.item['name']
     glob.trust_level = self.item['trust_level']
     if glob.trust_level < 0:
       alert('This account is not yet authorized, but '
@@ -70,15 +70,17 @@ class MenuForm(MenuFormTemplate):
     self.home_link.role = "selected"
 
   def go_match(self, state):
-    self.title_label.text = "Empathy Chat"
+#     from anvil.js.window import hideSidebar, hideAppbar
+#     self.title_label.text = "Empathy Chat"
     item = {k: state[k] for k in MatchForm.state_keys}
-    self.reset_and_load(MatchForm(item=item))
-    self.link_bar_home.visible = False
-    self.link_bar_profile.visible = False
-    self.nav_panel.visible = False
-    self.test_link.visible = False
-    anvil.js.call(hideSidebar)
-    anvil.js.call(hideAppbar)
+    open_form(MatchForm(item=item))
+#     self.reset_and_load(MatchForm(item=item))
+#     self.link_bar_home.visible = False
+#     self.link_bar_profile.visible = False
+#     self.nav_panel.visible = False
+#     self.test_link.visible = False
+#     anvil.js.call(hideSidebar)
+#     anvil.js.call(hideAppbar)
 #     title_bar = document.getElementsByClassName("app-bar")[0]
 #     title_bar.css("display", "none") #style.display = 'none'
 

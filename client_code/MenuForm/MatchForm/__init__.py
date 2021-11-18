@@ -3,6 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from ... import ui_procedures as ui
+from ... import glob
 from .MyJitsi import MyJitsi
 from .SliderPanel import SliderPanel
 
@@ -19,7 +20,6 @@ class MatchForm(MatchFormTemplate):
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    self.top_form = get_open_form()
     jitsi_code, duration, my_value, self.how_empathy_list = (
       anvil.server.call('init_match_form')
     )
@@ -34,7 +34,7 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_link.text = jitsi_code
     self.jitsi_link.visible = True
     if not self.jitsi_embed:
-      self.jitsi_embed = MyJitsi(item={'room_name': jitsi_code, 'name': self.top_form.item['name']})
+      self.jitsi_embed = MyJitsi(item={'room_name': jitsi_code, 'name': glob.name})
       self.jitsi_column_panel.add_component(self.jitsi_embed)
     self.jitsi_column_panel.visible = True
 
