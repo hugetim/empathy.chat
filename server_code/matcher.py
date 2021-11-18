@@ -263,7 +263,9 @@ def init_match_form(user_id=""):
   else:
     this_match, i = current_match_i(user)
     if this_match:
-      this_match['present'][i] = 1
+      temp = this_match['present']
+      temp[i] = 1
+      this_match['present'] = temp
       jitsi_code, duration = ProposalTime(this_match['proposal_time']).get_match_info()
       how_empathy_list = ([user['how_empathy']]
                           + [u['how_empathy'] for u in this_match['users']
