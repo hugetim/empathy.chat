@@ -2,6 +2,8 @@ from ._anvil_designer import MenuFormTemplate
 from anvil import *
 import anvil.users
 import anvil.server
+import anvil.js
+from anvil.js.window import hideSidebar
 from .DashForm import DashForm
 from .WaitForm import WaitForm
 from .MatchForm import MatchForm
@@ -68,22 +70,24 @@ class MenuForm(MenuFormTemplate):
     self.home_link.role = "selected"
 
   def go_match(self, state):
-    self.title_label.text = "Chat"
-    self.link_bar_home.visible = False
-    self.link_bar_profile.visible = False
-    self.nav_panel.visible = False
-    self.test_link.visible = False
+    self.title_label.text = "Empathy Chat"
     item = {k: state[k] for k in MatchForm.state_keys}
     self.reset_and_load(MatchForm(item=item))
-
-  def go_wait(self, state):
-    self.title_label.text = "Chat"
     self.link_bar_home.visible = False
     self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
+    anvil.js.call(hideSidebar)
+
+  def go_wait(self, state):
+    self.title_label.text = "Empathy Chat"
     item = {k: state[k] for k in WaitForm.state_keys}
     self.reset_and_load(WaitForm(item=item))
+    self.link_bar_home.visible = False
+    self.link_bar_profile.visible = False
+    self.nav_panel.visible = False
+    self.test_link.visible = False
+    anvil.js.call(hideSidebar)
 
   def go_connections(self, user_id=""):
     if h.not_me(user_id):
