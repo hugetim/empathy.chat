@@ -334,11 +334,11 @@ def connect(invite, invite_reply):
     invited = invite['user2']
     if invited not in proposal.eligible_users:
       proposal.eligible_users += [invited]
+  app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
   for row in [invite, invite_reply]:
     item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
     app_tables.connections.add_row(starred=False, **item)
     row.delete()
-  app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
 
 
 def _connected_prompt(invite, invite_reply):
