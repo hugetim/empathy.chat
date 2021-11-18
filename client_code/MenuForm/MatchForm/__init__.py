@@ -87,6 +87,7 @@ class MatchForm(MatchFormTemplate):
       self.call_js('scrollCard')
 
   def complete_button_click(self, **event_args):
+    self.timer_2.interval = 0
     state = anvil.server.call('match_complete')
     ui.reload()
     #self.top_form.reset_status(state)   

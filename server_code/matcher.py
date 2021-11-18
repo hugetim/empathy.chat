@@ -450,7 +450,7 @@ def current_match(user):
 
 
 def current_match_i(user):
-  this_match = None
+  this_match, i = None, None
   now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
   current_matches = app_tables.matches.search(users=[user], complete=[0],
                                               match_commence=q.less_than_or_equal_to(now_plus))
