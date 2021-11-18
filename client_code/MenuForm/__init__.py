@@ -3,7 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 import anvil.js
-from anvil.js.window import hideSidebar
+from anvil.js.window import hideSidebar, hideAppbar
 from .DashForm import DashForm
 from .WaitForm import WaitForm
 from .MatchForm import MatchForm
@@ -78,6 +78,9 @@ class MenuForm(MenuFormTemplate):
     self.nav_panel.visible = False
     self.test_link.visible = False
     anvil.js.call(hideSidebar)
+    anvil.js.call(hideAppbar)
+#     title_bar = document.getElementsByClassName("app-bar")[0]
+#     title_bar.css("display", "none") #style.display = 'none'
 
   def go_wait(self, state):
     self.title_label.text = "Empathy Chat"

@@ -40,7 +40,10 @@
     var $card = this.find('.anvil-role-card-scroll-long');
     $card.scrollTop($card[0].scrollHeight);
   }
-
+  function hideAppbar() {
+    var ln = $('.structure > .app-bar');
+    ln.css("display", "none");
+  }
   function hideSidebar() {
     var ln = $('.structure > .nav-holder > .left-nav');
     ln.animate({left: -ln.outerWidth()}, function() {
