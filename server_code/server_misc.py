@@ -84,7 +84,7 @@ def update_trust_level(user):
     trust = 0
   if trust < 1 and user['confirmed_email']:
     trust = 1 # Guest
-  if (trust >= 1 and trust < 2) and user['phone']:
+  if (trust < 2) and user['phone']: # even if not yet confirmed email
     trust = 2 # Confirmed
   if (trust >= 2 and trust < 3) and matched_with_distance1_member():
     trust = 3 # Member
