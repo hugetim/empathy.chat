@@ -13,13 +13,13 @@ container:
       \      enableNoisyMicDetection: true,\n                               readOnlyName:\
       \ true,\n                               toolbarButtons: ['microphone', 'camera',\
       \ //'fullscreen', \n                                                'chat',\n\
-      \                                                'settings', 'videoquality',\n\
-      \                                                'select-background',\n    \
-      \                                           ],\n                           \
-      \    hideConferenceTimer: false,\n                              };\n    options.interfaceConfigOverwrite\
-      \ = {DEFAULT_REMOTE_DISPLAY_NAME: '', //empathy.chat partner\n             \
-      \                           SETTINGS_SECTIONS: [ 'devices', 'language' ],\n\
-      \                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
+      \                                                'settings',\n             \
+      \                                   'select-background',\n                 \
+      \                              ],\n                               hideConferenceTimer:\
+      \ false,\n                               disablePolls: true,\n             \
+      \                 };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
+      \ '', //empathy.chat partner\n                                        SETTINGS_SECTIONS:\
+      \ [ 'devices', 'language' ],\n                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
       \ 60000,\n                                        SHOW_CHROME_EXTENSION_BANNER:\
       \ false,\n                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
       \ options);\n    window.japi.executeCommand('subject', ' ');\n  }\n</script>\n\
