@@ -4,6 +4,7 @@ import anvil.users
 import anvil.server
 from ..InviteB import InviteB
 from .RelationshipPrompt import RelationshipPrompt
+from anvil_extras.utils import wait_for_writeback
 
 class InviteA(InviteATemplate):
   def __init__(self, **properties):
@@ -21,6 +22,7 @@ class InviteA(InviteATemplate):
     """This method is called when the button is clicked"""
     self.parent.raise_event("x-close-alert", value=False)
   
+  @wait_for_writeback
   def continue_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if self.continue_button.enabled:

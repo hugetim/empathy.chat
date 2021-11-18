@@ -5,6 +5,7 @@ import anvil.server
 from ..Invited2 import Invited2
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPrompt import RelationshipPrompt
 from .... import ui_procedures as ui
+from anvil_extras.utils import wait_for_writeback
 
 
 class Invited1(Invited1Template):
@@ -27,6 +28,7 @@ class Invited1(Invited1Template):
     )
     self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
     
+  @wait_for_writeback
   def continue_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item.update(self.relationship_prompt.item)
