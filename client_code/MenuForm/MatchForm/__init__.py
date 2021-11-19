@@ -98,7 +98,7 @@ class MatchForm(MatchFormTemplate):
   def message_textbox_pressed_enter(self, **event_args):
     text = self.message_textbox.text
     if text:
-      self.jitsi_embed.call_js('sendMessage', text)
+      window.japi.executeCommand("sendChatMessage", text)
       temp, _ = anvil.server.call('add_chat_message', message=text)
       self.message_textbox.text = ""
       self.update_messages(temp)
