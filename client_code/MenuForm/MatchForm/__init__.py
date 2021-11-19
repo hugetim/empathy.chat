@@ -2,6 +2,7 @@ from ._anvil_designer import MatchFormTemplate
 from anvil import *
 import anvil.users
 import anvil.server
+from anvil.js import window
 from ... import ui_procedures as ui
 from ... import glob
 from .MyJitsi import MyJitsi
@@ -27,7 +28,7 @@ class MatchForm(MatchFormTemplate):
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
     self.first_update = True
-    self.update()
+    self.update()   
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
