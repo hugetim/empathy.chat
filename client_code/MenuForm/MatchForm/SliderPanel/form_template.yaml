@@ -22,34 +22,72 @@ components:
     layout_properties: {grid_position: 'AAYMHE,CYJTDJ'}
     event_bindings: {}
     components:
-    - type: form:MFQJNLWQIOGGXL4W:slider
-      properties:
-        value: 5
-        minval: 0
-        maxval: 10
-        step: 0.2
-        labels: [Empty, '', Full]
-      name: my_slider
-      layout_properties: {grid_position: 'MJQSPQ,NXGKFS'}
-      event_bindings: {}
-      data_bindings:
-      - {property: value, code: 'self.item[''my_value'']', writeback: true}
-      - {property: enabled, code: 'not self.item[''status'']'}
-    - type: form:MFQJNLWQIOGGXL4W:slider
-      properties:
-        value: 5
-        minval: 0
-        maxval: 10
-        step: 0.2
-        labels: ['']
-        is_visible: true
-        enabled: false
-      name: their_slider
-      layout_properties: {grid_position: 'QXZSDK,RMGHHG'}
-      data_bindings:
-      - {property: is_visible, code: 'self.item[''status''] == "received"'}
-      - {property: value, code: 'self.item[''their_value'']', writeback: true}
-      event_bindings: {}
+    - type: Label
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+        visible: true, text: 'How full is your "empathy tank"? (Empty: furious/distant,
+          Full: joyful/open)', font_size: null, font: '', spacing_above: small, icon_align: left,
+        spacing_below: small, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
+      name: label_4
+      layout_properties: {grid_position: 'WTCGOB,HQDPBG'}
+    - type: FlowPanel
+      properties: {}
+      name: flow_panel_1
+      layout_properties: {grid_position: 'XAZDVY,TFCBJU'}
+      components:
+      - type: Label
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+          visible: true, text: '   me:', font_size: null, font: '', spacing_above: small,
+          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+          underline: false, icon: ''}
+        name: label_2
+        layout_properties: {grid_position: 'QXZSDK,KQZMAO'}
+        data_bindings:
+        - {property: visible, code: 'self.item[''status''] == "received"'}
+      - type: form:MFQJNLWQIOGGXL4W:slider
+        properties:
+          value: 5
+          minval: 0
+          maxval: 10
+          step: 0.2
+          labels: [Empty, '', Full]
+          is_visible: true
+          enabled: true
+        name: my_slider
+        layout_properties: {grid_position: 'MJQSPQ,NXGKFS', expand: true, width: null}
+        event_bindings: {}
+        data_bindings:
+        - {property: value, code: 'self.item[''my_value'']', writeback: true}
+        - {property: enabled, code: 'not self.item[''status'']'}
+    - type: FlowPanel
+      properties: {}
+      name: flow_panel_2
+      layout_properties: {grid_position: 'DZZAIZ,TAXJNW'}
+      components:
+      - type: Label
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+          visible: true, text: 'them:', font_size: null, font: '', spacing_above: small,
+          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+          underline: false, icon: ''}
+        name: label_3
+        layout_properties: {width: null, expand: false}
+        data_bindings:
+        - {property: visible, code: 'self.item[''status''] == "received"'}
+      - type: form:MFQJNLWQIOGGXL4W:slider
+        properties:
+          value: 5
+          minval: 0
+          maxval: 10
+          step: 0.2
+          labels: ['']
+          is_visible: true
+          enabled: false
+        name: their_slider
+        layout_properties: {grid_position: 'QXZSDK,RMGHHG', expand: true, width: null}
+        data_bindings:
+        - {property: is_visible, code: 'self.item[''status''] == "received"'}
+        - {property: value, code: 'self.item[''their_value'']', writeback: true}
+        event_bindings: {}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
