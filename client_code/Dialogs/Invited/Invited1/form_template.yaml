@@ -5,11 +5,11 @@ container:
 components:
 - type: RichText
   properties: {role: null, align: center, tooltip: '', enable_slots: true, border: '',
-    foreground: '', visible: true, font_size: null, content: '### Welcome!
-
-      You have been invited by {inviter}, who described you as their {relationship1to2}. ',
-    font: '', spacing_above: small, spacing_below: small, data: null, background: '',
-    format: markdown}
+    foreground: '', visible: true, font_size: null, content: "### Welcome!\nTo foster\
+      \ trust, empathy.chat membership is currently limited to \"close connections\"\
+      \ of existing members, we aim to create \n\nYou have been invited by {inviter},\
+      \ who described you as their {relationship1to2}. ", font: '', spacing_above: small,
+    spacing_below: small, data: null, background: '', format: markdown}
   name: rich_text_1
   layout_properties: {grid_position: 'NBHBNT,RCQAHT'}
   data_bindings:
