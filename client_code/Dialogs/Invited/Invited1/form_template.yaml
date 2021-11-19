@@ -5,19 +5,73 @@ container:
 components:
 - type: RichText
   properties: {role: null, align: center, tooltip: '', enable_slots: true, border: '',
-    foreground: '', visible: true, font_size: null, content: "### Welcome!\nTo foster\
-      \ trust, empathy.chat membership is currently limited to \"close connections\"\
-      \ of existing members, we aim to create \n\nYou have been invited by {inviter},\
-      \ who described you as their {relationship1to2}. ", font: '', spacing_above: small,
-    spacing_below: small, data: null, background: '', format: markdown}
+    foreground: '', visible: true, font_size: null, content: "### Welcome!\nBecause\
+      \ receiving empathy\nrequires authenticity and trust, \nempathy.chat takes a\
+      \ \"slow\" approach\nto linking in new members. \n\nFull membership is currently\
+      \ limited\nto \"close connections\" of existing members,\nthose who know a member's\
+      \ personal\nphone number (and vice versa), at minimum.", font: '', spacing_above: small,
+    spacing_below: none, data: null, background: '', format: markdown}
   name: rich_text_1
   layout_properties: {grid_position: 'NBHBNT,RCQAHT'}
   data_bindings:
-  - {property: data, code: self.item}
+  - {property: visible, code: 'self.item[''link_key'']'}
 - type: LinearPanel
   properties: {}
   name: linear_panel_1
   layout_properties: {grid_position: 'QLZNBW,VYQTAB'}
+  components:
+  - type: Label
+    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'Please provide the last 4 digits of their phone number:',
+      font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
+      italic: false, background: '', bold: false, underline: false, icon: ''}
+    name: phone_request_label
+    layout_properties:
+      col_widths: {}
+      grid_position: NACBXV,JNZJOE
+  - type: FlowPanel
+    properties: {role: null, spacing: none, align: center, tooltip: '', border: '',
+      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
+    name: flow_panel_2
+    layout_properties:
+      col_widths: {}
+      grid_position: CCYELS,HYJONB
+    components:
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: 'Mobile: (XXX)XXX-', font_size: 14, font: '', spacing_above: none,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: label_5
+      layout_properties: {}
+    - type: TextBox
+      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
+        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14,
+        font: '', spacing_above: none, type: text, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false}
+      name: phone_last4_text_box
+      layout_properties: {width: 38.400000000000006}
+      event_bindings: {pressed_enter: phone_last4_text_box_pressed_enter}
+      data_bindings:
+      - {property: text, code: 'self.item[''phone_last4'']', writeback: true}
+- type: RichText
+  properties: {role: null, align: center, tooltip: '', enable_slots: true, border: '',
+    foreground: '', visible: true, font_size: null, content: 'We also ask members
+      to "virtually" introduce their close connections to each other.
+
+      For example, {inviter} described you as
+
+      their {relationship1to2}. ', font: '', spacing_above: small, spacing_below: none,
+    data: null, background: '', format: markdown}
+  name: rich_text_1_copy
+  layout_properties: {grid_position: 'DTOLPY,RZYZCT'}
+  data_bindings:
+  - {property: data, code: self.item}
+- type: LinearPanel
+  properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
+    border: '', visible: true, role: null, tooltip: ''}
+  name: linear_panel_2
+  layout_properties: {grid_position: 'XKWMFP,PHKPIT'}
 - type: Label
   properties: {role: null, align: center, tooltip: '', border: '', foreground: 'theme:Red',
     visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,

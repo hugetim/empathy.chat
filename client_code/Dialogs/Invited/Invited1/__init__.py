@@ -3,7 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from ..Invited2 import Invited2
-from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPrompt import RelationshipPrompt
+from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPromptOnly import RelationshipPromptOnly
 from .... import ui_procedures as ui
 from anvil_extras.utils import wait_for_writeback
 
@@ -17,20 +17,22 @@ class Invited1(Invited1Template):
 
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
-    self.relationship_prompt = RelationshipPrompt(
-      item={k: self.item[k] for k in {'relationship', 'phone_last4'}}
+    self.phone_request_label.text = (
+      f"Please provide the last 4 digits of {self.item['inviter']}'s phone number:"
     )
-    self.linear_panel_1.add_component(self.relationship_prompt)
-    self.relationship_prompt.label_4.text = (
-      f"Please provide the last 4 digits of {self.item['inviter']}'s phone number "
-      "(to verify your close connection):"
-    )
+    item = {'relationship': self.item['relationship'], 'name': self.item['inviter']}
+    self.relationship_prompt = RelationshipPromptOnly(item=item)
+    self.linear_panel_2.add_component(self.relationship_prompt)
     self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
-    
+
+  def phone_last4_text_box_pressed_enter(self, **event_args):
+    """This method is called when the user presses Enter in this text box"""
+    self.relationship_prompt.relationship_text_box.focus()
+  
   @wait_for_writeback
   def continue_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.item.update(self.relationship_prompt.item)
+    self.item.update({'relationship': self.relationship_prompt.item['relationship']})
     if len(self.item['phone_last4']) != 4:
       self.error("Wrong number of digits entered.")
     elif len(self.item['relationship']) < 3:
