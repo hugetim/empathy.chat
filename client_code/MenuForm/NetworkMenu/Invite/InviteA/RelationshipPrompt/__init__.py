@@ -19,12 +19,12 @@ class RelationshipPrompt(RelationshipPromptTemplate):
     """This method is called when the column panel is shown on the screen"""
     name = self.item.get('name')
     if name:
-      self.label_1.text = (
-        f"Briefly describe your relationship to {name} "
-        "and their current experience level with NVC empathy, if you know:"
+      self.label_1.text = (   
+        f"Imagine {name} were about to exchange empathy with another close connection "
+        f"at an NVC meetup.\nWho would you introduce {name} as?"
       )
       self.label_4.text = (
-        "Please provide the last 4 digits of the phone number {name} has provided to empathy.chat "
+        f"Please provide the last 4 digits of {name}'s phone number "
         "to confirm your close connection:"
       )
   

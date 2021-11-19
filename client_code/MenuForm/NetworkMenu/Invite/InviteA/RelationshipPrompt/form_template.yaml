@@ -14,14 +14,15 @@ components:
     grid_position: ISYVRT,TSGBQG
   components:
   - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Briefly describe your relationship to this person and
-        their current experience level with NVC empathy, if you know:', font_size: null,
-      font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-      background: '', bold: false, underline: false, icon: ''}
+    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'Imagine they were about to exchange empathy with another
+        close connection at an NVC meetup.
+
+        Who would you introduce them as?', font_size: null, font: '', spacing_above: none,
+      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
     name: label_1
     layout_properties: {grid_position: 'OXRGOZ,JHFFDF'}
-    event_bindings: {}
   - type: FlowPanel
     properties: {role: null, spacing: small, align: center, tooltip: '', border: '',
       foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
@@ -35,41 +36,21 @@ components:
         underline: false, icon: ''}
       name: label_2
       layout_properties: {}
-    - type: LinearPanel
-      properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
-        border: '', visible: true, role: null, tooltip: 'How would you introduce this
-          person to a friend paired up with them to exchange empathy at an NVC meetup?'}
-      name: linear_panel_2
-      layout_properties: {width: 438}
-      components:
-      - type: TextBox
-        properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-          border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14,
-          font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
-          background: '', bold: false, underline: false}
-        name: relationship_text_box
-        layout_properties: {width: 542.4}
-        event_bindings: {pressed_enter: relationship_text_box_pressed_enter}
-        data_bindings:
-        - {property: text, code: 'self.item[''relationship'']', writeback: true}
-      - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: "e.g. weekly empathy buddy\n       sister-in-law with\
-            \ a regular empathy buddy\n       friend who recently read Marshall's\
-            \ NVC book", font_size: null, font: '', spacing_above: small, icon_align: left,
-          spacing_below: small, italic: false, background: '', bold: false, underline: false,
-          icon: ''}
-        name: label_3
-        layout_properties: {}
-    - type: form:Why
-      properties: {}
-      name: why_1
-      layout_properties: {}
+    - type: TextBox
+      properties: {role: null, align: left, hide_text: false, tooltip: e.g. weekly empathy buddy        sister-in-law with a regular empathy buddy        friend who recently read Marshall's NVC book,
+        placeholder: '', border: '', enabled: true, foreground: '', visible: true,
+        text: '', font_size: 14, font: '', spacing_above: small, type: text, spacing_below: none,
+        italic: false, background: '', bold: false, underline: false}
+      name: relationship_text_box
+      layout_properties: {width: 491.4}
+      event_bindings: {pressed_enter: relationship_text_box_pressed_enter}
+      data_bindings:
+      - {property: text, code: 'self.item[''relationship'']', writeback: true}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: (This relationship description will be displayed only to your close connections.),
-      font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: true, underline: false, icon: ''}
+      visible: true, text: (This introduction/description will only be visible to your other close connections.),
+      font_size: 12, font: '', spacing_above: none, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: ''}
     name: label_6
     layout_properties: {}
 - type: Spacer
@@ -114,13 +95,5 @@ components:
     event_bindings: {pressed_enter: phone_last4_text_box_pressed_enter}
     data_bindings:
     - {property: text, code: 'self.item[''phone_last4'']', writeback: true}
-  - type: Spacer
-    properties: {height: 32}
-    name: spacer_2
-    layout_properties: {width: 16}
-  - type: form:Why
-    properties: {}
-    name: why_2
-    layout_properties: {}
 is_package: true
 custom_component: true
