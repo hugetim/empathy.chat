@@ -31,15 +31,15 @@ components:
     components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: my, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+        visible: true, text: my, font_size: null, font: '', spacing_above: none, icon_align: left,
+        spacing_below: none, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
       name: label_2
       layout_properties: {}
     - type: TextBox
       properties: {role: null, align: left, hide_text: false, tooltip: e.g. weekly empathy buddy        sister-in-law with a regular empathy buddy        friend who recently read Marshall's NVC book,
         placeholder: '', border: '', enabled: true, foreground: '', visible: true,
-        text: '', font_size: 14, font: '', spacing_above: small, type: text, spacing_below: none,
+        text: '', font_size: 14, font: '', spacing_above: none, type: text, spacing_below: none,
         italic: false, background: '', bold: false, underline: false}
       name: relationship_text_box
       layout_properties: {width: 491.4}
