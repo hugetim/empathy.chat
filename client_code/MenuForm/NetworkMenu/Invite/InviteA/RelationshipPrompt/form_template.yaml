@@ -60,10 +60,10 @@ components:
     col_widths: {}
     grid_position: ZPSIWZ,VWJAHA
 - type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: 'Please also provide the last 4 digits of their phone number (so that your
-      connection may be automatically verified once they confirm ownership of the
-      number):', font_size: null, font: '', spacing_above: small, icon_align: left,
+  properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+    visible: true, text: 'Please also provide the last 4 digits of their phone number
+      (so that your connection may be automatically verified once they confirm ownership
+      of the number):', font_size: null, font: '', spacing_above: small, icon_align: left,
     spacing_below: none, italic: false, background: '', bold: false, underline: false,
     icon: ''}
   name: label_4
