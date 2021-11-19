@@ -2,8 +2,8 @@ container:
   type: ColumnPanel
   event_bindings: {}
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"HWTLHD":10}',
-    spacing_below: small, background: ''}
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{"HWTLHD":10}',
+    spacing_below: none, background: ''}
 components:
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
@@ -23,21 +23,22 @@ components:
     event_bindings: {}
     components:
     - type: Label
-      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
         visible: true, text: 'How full is your "empathy tank"? (Empty: furious/distant,
           Full: joyful/open)', font_size: null, font: '', spacing_above: small, icon_align: left,
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
+        spacing_below: small, italic: false, background: '', bold: true, underline: false,
         icon: ''}
       name: label_4
       layout_properties: {grid_position: 'WTCGOB,HQDPBG'}
     - type: FlowPanel
-      properties: {}
+      properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+        foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
       name: flow_panel_1
       layout_properties: {grid_position: 'XAZDVY,TFCBJU'}
       components:
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: '   me:', font_size: null, font: '', spacing_above: small,
+          visible: true, text: '   me:', font_size: null, font: '', spacing_above: medium,
           icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
           underline: false, icon: ''}
         name: label_2
@@ -60,13 +61,14 @@ components:
         - {property: value, code: 'self.item[''my_value'']', writeback: true}
         - {property: enabled, code: 'not self.item[''status'']'}
     - type: FlowPanel
-      properties: {}
+      properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+        foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
       name: flow_panel_2
       layout_properties: {grid_position: 'DZZAIZ,TAXJNW'}
       components:
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: 'them:', font_size: null, font: '', spacing_above: small,
+          visible: true, text: 'them:', font_size: null, font: '', spacing_above: medium,
           icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
           underline: false, icon: ''}
         name: label_3

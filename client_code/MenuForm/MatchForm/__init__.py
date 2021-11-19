@@ -41,13 +41,15 @@ class MatchForm(MatchFormTemplate):
 
   def init_slider_panel(self, my_value):
     if my_value:
-      slider_item = {'visible': False, 'status': "submitted", 
+      slider_item = {'visible': True, 'status': "submitted", 
                      'my_value': my_value, 'their_value': 5}
     else:
       slider_item = {'visible': True, 'status': None, 
                      'my_value': 5, 'their_value': 5}
+      self.slider_button_click()
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
+    self.slider_panel.set_event_handler('x-hide', self.hide_slider)
     
   def update(self): 
     new_items, their_value = anvil.server.call_s('update_match_form')
@@ -76,11 +78,13 @@ class MatchForm(MatchFormTemplate):
     messages_plus += message_list
     if len(messages_plus) > len(old_items):
       self.chat_repeating_panel.items = messages_plus
+      self.message_card.visible = True
+      self.message_button.role = None
       self.call_js('scrollCard')
       if self.first_update:
         self.first_update = False
       else:
-        self.chat_display_card.scroll_into_view()   
+        self.chat_display_card.scroll_into_view()
   
 #   def chat_display_card_show(self, **event_args):
 #     """This method is called when the column panel is shown on the screen"""
@@ -102,3 +106,22 @@ class MatchForm(MatchFormTemplate):
     state = anvil.server.call('match_complete')
     ui.reload()
     #self.top_form.reset_status(state)   
+
+  def slider_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.slider_card.visible = not self.slider_card.visible
+    self.slider_button.role = None if self.slider_card.visible else "raised"
+
+  def hide_slider(self, **event_args):
+    self.slider_card.visible = False
+    self.slider_button.role = "raised"
+
+  def message_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.message_card.visible = not self.message_card.visible
+    self.message_button.role = None if self.message_button.role else "raised"
+
+
+
+
+

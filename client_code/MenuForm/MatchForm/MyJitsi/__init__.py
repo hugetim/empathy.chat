@@ -15,7 +15,7 @@ class MyJitsi(MyJitsiTemplate):
     """This method is called when the HTML panel is shown on the screen"""
     if not self.alreadyinit:
       self.alreadyinit += 1
-      self.call_js("initJitsi", "meet.jit.si", {"roomName": self.item['room_name'], "height": 500,
+      self.call_js("initJitsi", "meet.jit.si", {"roomName": self.item['room_name'], "height": 400,
                                                "userInfo": {"displayName": ""}}) #self.item['name']
 
 

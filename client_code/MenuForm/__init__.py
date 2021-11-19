@@ -90,7 +90,7 @@ class MenuForm(MenuFormTemplate):
     self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
-    anvil.js.call(hideSidebar)
+#     anvil.js.call(hideSidebar)
 
   def go_connections(self, user_id=""):
     if h.not_me(user_id):

@@ -5,7 +5,9 @@ components:
   layout_properties: {slot: default}
   components:
   - type: ColumnPanel
-    properties: {role: card, col_widths: '{}'}
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
+      wrap_on: mobile, col_spacing: small, spacing_above: small, col_widths: '{"FPKEGW":30,"LIOMWJ":30}',
+      spacing_below: small, background: ''}
     name: card_1
     layout_properties: {grid_position: 'APRVOR,LSQCPI'}
     components:
@@ -25,25 +27,106 @@ components:
       name: timer_label
       layout_properties: {grid_position: 'HHXUVE,NPWRYW'}
       event_bindings: {}
-    - type: ColumnPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
-        wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-        spacing_below: small, background: ''}
-      name: jitsi_column_panel
-      layout_properties: {grid_position: 'NNVOAA,WHQCIL'}
+    - type: FlowPanel
+      properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+        foreground: '', visible: true, spacing_above: small, spacing_below: none,
+        background: ''}
+      name: flow_panel_1
+      layout_properties: {grid_position: 'HLRERV,BACULC'}
+      components:
+      - type: LinearPanel
+        properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
+          border: '', visible: true, role: null, tooltip: ''}
+        name: linear_panel_2
+        layout_properties: {width: 105, expand: false}
+      - type: ColumnPanel
+        properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
+          wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
+          spacing_below: small, background: ''}
+        name: jitsi_column_panel
+        layout_properties: {grid_position: 'HLRERV,RJGGOX', expand: true, width: null}
+        event_bindings: {}
+        components: []
+      - type: LinearPanel
+        properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
+          border: '', visible: true, role: null, tooltip: ''}
+        name: linear_panel_1
+        layout_properties: {width: 105, grid_position: 'HLRERV,OWFYUN', expand: false}
+        components:
+        - type: Button
+          properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
+            foreground: '', visible: true, text: '  Slider   ', font_size: null, font: '',
+            spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+            background: '', bold: false, underline: false, icon: ''}
+          name: slider_button
+          layout_properties: {}
+          event_bindings: {click: slider_button_click}
+        - type: Button
+          properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
+            foreground: '', visible: true, text: Message, font_size: null, font: '',
+            spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+            background: '', bold: false, underline: false, icon: ''}
+          name: message_button
+          layout_properties: {}
+          event_bindings: {click: message_button_click}
+        - type: Spacer
+          properties: {visible: true, spacing_above: small, spacing_below: small,
+            height: '276', tooltip: ''}
+          name: spacer_2
+          layout_properties: {}
+        - type: Button
+          properties: {role: secondary-color, align: right, tooltip: '', border: '',
+            enabled: true, foreground: '', visible: true, text: End Chat, font_size: null,
+            font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: ''}
+          name: complete_button
+          layout_properties: {grid_position: 'NLWDED,PWPLEY'}
+          event_bindings: {click: complete_button_click}
+    - type: Label
+      properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
+        visible: true, text: 'If video does not appear above, try this link:', font_size: 12,
+        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: true,
+        background: '', bold: false, underline: false, icon: ''}
+      name: note_label
+      layout_properties: {grid_position: 'WOLXYM,FPKEGW'}
       event_bindings: {}
-      components: []
+    - type: Link
+      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
+        visible: false, text: jitsi_link, font_size: 12, wrap_on: mobile, font: '',
+        col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '',
+        spacing_below: none, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
+      name: jitsi_link
+      layout_properties: {grid_position: 'WOLXYM,LIOMWJ'}
+      event_bindings: {}
+    event_bindings: {}
+  - type: ColumnPanel
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
+      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
+      spacing_below: small, background: ''}
+    name: slider_card
+    layout_properties: {grid_position: 'MUNTHE,RRZPVI'}
+    components:
     - type: ColumnPanel
-      properties: {col_widths: '{}'}
+      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+        wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
+        spacing_below: none, background: ''}
       name: slider_column_panel
-      layout_properties: {grid_position: 'UYFDVH,LVXAXL'}
+      layout_properties: {grid_position: 'UATIWX,QHMTDV'}
       components: []
+  - type: ColumnPanel
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
+      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
+      spacing_below: small, background: ''}
+    name: message_card
+    layout_properties: {grid_position: 'DMNLEV,YIZNLS'}
+    components:
     - type: ColumnPanel
       properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
         spacing_below: none, background: 'theme:Gray 100'}
       name: chat_display_card
-      layout_properties: {grid_position: 'XQKFGR,QIHFHW'}
+      layout_properties: {grid_position: 'XFYUCJ,NLVKYN'}
       components:
       - type: RepeatingPanel
         properties: {item_template: MenuForm.MatchForm.ChatTemplate}
@@ -56,7 +139,7 @@ components:
         wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
         spacing_below: small, background: ''}
       name: chat_send_card
-      layout_properties: {grid_position: 'BACCUO,RPNXOU'}
+      layout_properties: {grid_position: 'JKFCWM,NASNYH'}
       event_bindings: {}
       components:
       - type: TextBox
@@ -67,42 +150,11 @@ components:
         name: message_textbox
         layout_properties: {grid_position: 'IXQTHC,HCFYRM'}
         event_bindings: {pressed_enter: message_textbox_pressed_enter}
-    - type: Button
-      properties: {role: secondary-color, align: center, tooltip: '', border: '',
-        enabled: true, foreground: '', visible: true, text: End Chat, font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:stop'}
-      name: complete_button
-      layout_properties: {grid_position: 'NLWDED,PWPLEY'}
-      event_bindings: {click: complete_button_click}
-    - type: Label
-      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'Note: If video does not appear above, try clicking the
-          link below.', font_size: 12, font: '', spacing_above: small, icon_align: left,
-        spacing_below: none, italic: true, background: '', bold: false, underline: false,
-        icon: ''}
-      name: note_label
-      layout_properties: {grid_position: 'WOLXYM,FPKEGW'}
-      event_bindings: {}
-    - type: Link
-      properties: {role: null, url: '', align: center, tooltip: '', border: '', foreground: '',
-        visible: false, text: jitsi_link, font_size: 12, wrap_on: mobile, font: '',
-        col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '',
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
-      name: jitsi_link
-      layout_properties: {grid_position: 'FDVHBQ,FAJUSC'}
-      event_bindings: {}
-    event_bindings: {}
   event_bindings: {}
 - name: timer_2
   type: Timer
   properties: {interval: 0}
   event_bindings: {tick: timer_2_tick}
-- type: Spacer
-  properties: {height: 32}
-  name: spacer_1_copy
-  layout_properties: {grid_position: 'MYOOEQ,KEDGKD'}
 - type: Spacer
   properties: {height: 649}
   name: spacer_1

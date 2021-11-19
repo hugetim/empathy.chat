@@ -10,7 +10,7 @@ container:
       \ false,\n                               enableClosePage: true,\n          \
       \                     disableThirdPartyRequests: true,\n                   \
       \            localRecording: { enabled: false,},\n                         \
-      \      enableNoisyMicDetection: true,\n                               readOnlyName:\
+      \      enableNoisyMicDetection: false,\n                               readOnlyName:\
       \ true,\n                               toolbarButtons: ['microphone', 'camera',\
       \ //'fullscreen', \n                                                'chat',\n\
       \                                                'settings',\n             \

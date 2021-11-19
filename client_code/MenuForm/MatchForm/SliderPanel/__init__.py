@@ -19,8 +19,9 @@ class SliderPanel(SliderPanelTemplate):
 
   def hide_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.item['visible'] = False
-    self.refresh_data_bindings()
+    self.raise_event('x-hide')
+#     self.item['visible'] = False
+#     self.refresh_data_bindings()
 
   def submit_button_click(self, **event_args):
     """This method is called when the button is clicked"""
