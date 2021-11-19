@@ -54,21 +54,29 @@ components:
         layout_properties: {width: 105, grid_position: 'HLRERV,OWFYUN', expand: false}
         components:
         - type: Button
-          properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-            foreground: '', visible: true, text: '  Slider   ', font_size: null, font: '',
-            spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-            background: '', bold: false, underline: false, icon: ''}
+          properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
+            border: '', enabled: true, foreground: '', visible: true, text: '  Slider   ',
+            font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: ''}
           name: slider_button
           layout_properties: {}
           event_bindings: {click: slider_button_click}
         - type: Button
-          properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-            foreground: '', visible: true, text: Message, font_size: null, font: '',
-            spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-            background: '', bold: false, underline: false, icon: ''}
+          properties: {role: raised, align: center, tooltip: Toggle text chat card,
+            border: '', enabled: true, foreground: '', visible: true, text: Message,
+            font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: ''}
           name: message_button
           layout_properties: {}
           event_bindings: {click: message_button_click}
+        - type: Button
+          properties: {role: raised, align: center, tooltip: Toggle full-screen mode (not just the video chat),
+            border: '', enabled: true, foreground: '', visible: true, text: FLSCR,
+            font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: 'fa:arrows-alt'}
+          name: full_screen_button
+          layout_properties: {}
+          event_bindings: {click: full_screen_button_click}
         - type: Spacer
           properties: {visible: true, spacing_above: small, spacing_below: small,
             height: '276', tooltip: ''}

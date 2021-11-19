@@ -2,7 +2,7 @@ from ._anvil_designer import MatchFormTemplate
 from anvil import *
 import anvil.users
 import anvil.server
-from anvil.js import window
+from anvil.js import window, ExternalError
 from ... import ui_procedures as ui
 from ... import glob
 from .MyJitsi import MyJitsi
@@ -29,9 +29,6 @@ class MatchForm(MatchFormTemplate):
     self.init_slider_panel(my_value)
     self.first_update = True
     self.update()
-    if not window.document.fullscreenElement:
-      if confirm("Enter full screen mode?"):
-        window.document.body.requestFullscreen()
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
@@ -99,8 +96,10 @@ class MatchForm(MatchFormTemplate):
     self.update() 
 
   def message_textbox_pressed_enter(self, **event_args):
-    if self.message_textbox.text:
-      temp, _ = anvil.server.call('add_chat_message', message=self.message_textbox.text)
+    text = self.message_textbox.text
+    if text:
+      self.jitsi_embed.call_js('sendMessage', text)
+      temp, _ = anvil.server.call('add_chat_message', message=text)
       self.message_textbox.text = ""
       self.update_messages(temp)
       self.call_js('scrollCard')
@@ -124,6 +123,24 @@ class MatchForm(MatchFormTemplate):
     """This method is called when the button is clicked"""
     self.message_card.visible = not self.message_card.visible
     self.message_button.role = None if self.message_button.role else "raised"
+
+  def full_screen_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+#     if not window.document.fullscreenElement:
+#       if confirm("Enter full-screen mode?", dismissible=True):
+    try:
+      window.document.documentElement.requestFullscreen()
+      if window.document.fullscreenElement:
+        Notification("Exit full-screen by pressing ESC or F11.", timeout=3).show()
+    except AttributeError as e:
+      Notification("Full screen not allowed by browser")
+      self.full_screen_button.visible = False
+      print(e)
+    except ExternalError as e:
+      Notification("Full screen not allowed by browser")
+      self.full_screen_button.visible = False
+      print(e)
+
 
 
 
