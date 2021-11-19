@@ -31,7 +31,7 @@ components:
     layout_properties: {width: null, expand: false}
     components:
     - type: Label
-      properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: '', font_size: 10, font: '', spacing_above: none, icon_align: left,
         spacing_below: none, italic: false, background: '', bold: false, underline: false,
         icon: ''}

@@ -67,6 +67,12 @@ class MatchForm(MatchFormTemplate):
           "message": f"How {who} likes to receive empathy:\n{how_empathy}",
           "me": mine,
         })
+    first_message = {True: True, False: True}
+    for message in message_list:
+      mine = message['me']
+      if first_message[mine]:
+        message['label'] = glob.name if mine else self.their_name
+        first_message[mine] = False
     messages_plus += message_list
     if len(messages_plus) > len(old_items):
       self.chat_repeating_panel.items = messages_plus
