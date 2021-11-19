@@ -2,6 +2,7 @@ from ._anvil_designer import MatchFormTemplate
 from anvil import *
 import anvil.users
 import anvil.server
+from anvil.js import window
 from ... import ui_procedures as ui
 from ... import glob
 from .MyJitsi import MyJitsi
@@ -28,6 +29,9 @@ class MatchForm(MatchFormTemplate):
     self.init_slider_panel(my_value)
     self.first_update = True
     self.update()
+    if not window.document.fullscreenElement:
+      if confirm("Enter full screen mode?"):
+        window.document.body.requestFullscreen()
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
