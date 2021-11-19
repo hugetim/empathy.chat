@@ -55,9 +55,9 @@ components:
       data_bindings:
       - {property: text, code: 'self.item[''phone_last4'']', writeback: true}
 - type: RichText
-  properties: {role: null, align: center, tooltip: '', enable_slots: true, border: '',
-    foreground: '', visible: true, font_size: null, content: 'We also ask members
-      to virtually introduce their close connections to each other.
+  properties: {role: richtext-text, align: center, tooltip: '', enable_slots: true,
+    border: '', foreground: '', visible: true, font_size: null, content: 'We also
+      ask members to virtually introduce their close connections to each other.
 
       For example, {inviter} described you as their *{relationship1to2}*. ', font: '',
     spacing_above: small, spacing_below: none, data: null, background: '', format: markdown}
