@@ -20,12 +20,13 @@ class MatchForm(MatchFormTemplate):
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    jitsi_code, duration, my_value, self.how_empathy_list = (
+    jitsi_code, duration, my_value, self.how_empathy_list, self.their_name = (
       anvil.server.call('init_match_form')
     )
     self.set_jitsi_link(jitsi_code)
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
+    self.first_update = True
     self.update()
       
   def set_jitsi_link(self, jitsi_code):
@@ -60,16 +61,20 @@ class MatchForm(MatchFormTemplate):
     for i, how_empathy in enumerate(self.how_empathy_list):
       if how_empathy:
         mine = i == 0
-        whose = "your" if mine else "their"
+        who = glob.name if mine else self.their_name
         messages_plus.append({
-          "message": f"How I like to receive empathy:\n{how_empathy}\n[message auto-generated from profile]",
+          "label": f"[from {who}'s profile]",
+          "message": f"How {who} likes to receive empathy:\n{how_empathy}",
           "me": mine,
         })
     messages_plus += message_list
     if len(messages_plus) > len(old_items):
       self.chat_repeating_panel.items = messages_plus
       self.call_js('scrollCard')
-      self.chat_display_card.scroll_into_view()   
+      if self.first_update:
+        self.first_update = False
+      else:
+        self.chat_display_card.scroll_into_view()   
   
 #   def chat_display_card_show(self, **event_args):
 #     """This method is called when the column panel is shown on the screen"""

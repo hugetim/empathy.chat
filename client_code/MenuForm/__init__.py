@@ -24,8 +24,6 @@ class MenuForm(MenuFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
-    glob.name = self.item['name']
-    glob.trust_level = self.item['trust_level']
     if glob.trust_level < 0:
       alert('This account is not yet authorized, but '
             + 'it can be used to test things out. Your actions will not impact '
