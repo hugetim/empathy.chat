@@ -79,7 +79,7 @@ components:
           event_bindings: {click: full_screen_button_click}
         - type: Spacer
           properties: {visible: true, spacing_above: small, spacing_below: small,
-            height: '276', tooltip: ''}
+            height: '240', tooltip: ''}
           name: spacer_2
           layout_properties: {}
         - type: Button

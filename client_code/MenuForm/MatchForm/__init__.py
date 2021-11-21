@@ -131,11 +131,11 @@ class MatchForm(MatchFormTemplate):
       if window.document.fullscreenElement:
         Notification("Exit full-screen by pressing ESC or F11.", timeout=3).show()
     except AttributeError as e:
-      Notification("Full screen not allowed by browser")
+      Notification("Full screen not allowed by browser").show()
       self.full_screen_button.visible = False
       print(e)
     except ExternalError as e:
-      Notification("Full screen not allowed by browser")
+      Notification("Full screen not allowed by browser").show()
       self.full_screen_button.visible = False
       print(e)
 
