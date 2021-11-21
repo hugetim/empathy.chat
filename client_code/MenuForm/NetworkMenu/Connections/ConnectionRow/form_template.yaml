@@ -8,7 +8,7 @@ container:
     italic: false, background: '', bold: false, underline: false}
 components:
 - type: Label
-  properties: {role: null, align: left, tooltip: 'Yes, currently seeking a regular
+  properties: {role: null, align: center, tooltip: 'Yes, currently seeking a regular
       empathy buddy', border: '', foreground: '', visible: true, text: '', font_size: null,
     font: '', spacing_above: medium, icon_align: left, spacing_below: small, italic: false,
     background: '', bold: false, underline: false, icon: 'fa:hand-paper-o'}
@@ -82,4 +82,11 @@ components:
       underline: false, icon: 'fa:ban'}
     name: block_button
     layout_properties: {}
+- type: Label
+  properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
+    visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+    spacing_below: small, italic: false, background: '', bold: false, underline: false,
+    icon: ''}
+  name: last_active_label
+  layout_properties: {column: VWXCEI}
 is_package: true

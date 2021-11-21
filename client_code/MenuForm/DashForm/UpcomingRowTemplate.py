@@ -21,8 +21,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     # assumes only dyads allowed
     self.users_flow_panel.add_component(Name(item=self.item.pop('port_users')[0].__dict__))
     self.item['duration'] = DURATION_TEXT[self.item.pop('duration_minutes')]
-    start = self.item.pop('start_date').astimezone(anvil.tz.tzlocal())
-    self.item['start_time'] = h.day_time_str(start)
+    self.item['start_time'] = h.day_time_str(self.item.pop('start_date'))
     self.top_form = get_open_form()
 
   def update_dash(self, state):

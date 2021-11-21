@@ -16,6 +16,7 @@ class ConnectionRow(ConnectionRowTemplate):
 
     # Any code you write here will run when the form opens.
     self.degree_label.text = h.add_num_suffix(self.item['distance'])
+    self.last_active_label.text = h.short_date_str(self.item['last_active'])
     if self.item['status'] == "invite":
       self.degree_label.text += " (pending invite)"
 

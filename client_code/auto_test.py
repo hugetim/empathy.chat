@@ -35,14 +35,14 @@ class DatetimeFormatTest(unittest.TestCase):
     self.assertEqual(h.time_str(dt), "1:01AM")
     self.assertEqual(h.dow_date_str(dt), "Friday, Jan 1, 2021")
     self.assertEqual(h.day_time_str(dt), "Fri, Jan 1 1:01AM")
-    self.assertEqual(h.short_date(dt), "1/1/2021")
+    self.assertEqual(h.short_date_str(dt), "1/1/2021")
     
   def test_no_change(self):
     dt = datetime(2020, 12, 31, 10, 10)
     self.assertEqual(h.time_str(dt), "10:10AM")
     self.assertEqual(h.dow_date_str(dt), "Thursday, Dec 31, 2020")
     self.assertEqual(h.day_time_str(dt), "Thu, Dec 31 10:10AM")
-    self.assertEqual(h.short_date(dt), "12/31/2020")
+    self.assertEqual(h.short_date_str(dt), "12/31/2020")
   
   
 def client_auto_tests():

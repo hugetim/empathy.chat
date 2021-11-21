@@ -13,7 +13,8 @@ from .Relationship import Relationship
 
 class Profile(ProfileTemplate):
   item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
-               'seeking', 'how_empathy', 'profile', 'trust_label', 'status', 'last_active'}
+               'seeking', 'how_empathy', 'profile', 'trust_label', 'status', 'last_active',
+               'confirmed_url', 'confirmed_date',}
   trust_tooltip = {"Visitor": "Has not yet confirmed an email address",
                    "Guest": "Has not yet confirmed a phone number",
                    "Confirmed": "Has not yet matched with a Member who is a close connection",
@@ -30,7 +31,13 @@ class Profile(ProfileTemplate):
 
     # Any code you write here will run when the form opens.
     self.relationship_repeating_panel.items = self.item['relationships']
+    self.last_active_label.text = f"  Last Active: {h.short_date_str(self.item['last_active'])}"
     self.column_panel_1.row_spacing = 0
+    if self.item['confirmed_date']:
+      self.web_page_link.tooltip = (
+        f"{self.item['first']}'s ownership of this web page "
+        f"was confirmed on {h.short_date_str(self.item['confirmed_date'])}."
+      )
     
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""

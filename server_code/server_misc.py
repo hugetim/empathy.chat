@@ -185,10 +185,7 @@ def init_profile(user_id=""):
   from . import connections as c
   user = get_user(user_id, require_auth=False)
   record = c.connection_record(user, get_user())
-  confirmed_url_date = (
-    h.short_date(user['confirmed_url_date']) if user['confirmed_url']
-    else ""
-  )
+  confirmed_url_date = user['confirmed_url_date'] if user['confirmed_url'] else None
   is_me = user == anvil.server.session['user']
   record.update({'me': is_me,
                  'first': user['first_name'],

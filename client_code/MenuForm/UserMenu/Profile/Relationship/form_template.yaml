@@ -65,8 +65,7 @@ components:
         layout_properties: {}
         data_bindings:
         - {property: text, code: 'self.item[''desc'']'}
-      data_bindings:
-      - {property: tooltip, code: 'f"description last edited {self.item[''date'']}"'}
+      data_bindings: []
     - type: FlowPanel
       properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
         foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
