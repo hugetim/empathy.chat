@@ -7,6 +7,7 @@ from . import server_misc as sm
 from .server_misc import authenticated_callable
 from . import portable as port
 from . import parameters as p
+from . import helper as h
 
 
 def is_visible(user2, user1=None): # Currently unused
@@ -116,7 +117,7 @@ def connection_record(user2, user1):
   _distance = distance(user2, user1)
   record = vars(sm.get_port_user(user2, _distance))
   record.update({'degree': degree, 
-                 'last_active': user2['last_login'].strftime(p.DATE_FORMAT),
+                 'last_active': h.short_date(user2['last_login']),
                  'status': _invite_status(user2, user1),
                  'unread_message': None, # True/False
                 })
@@ -155,10 +156,10 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
       return [{"via": False, 
                "whose": "my", 
                "desc": conn['relationship2to1'], 
-               "date": conn['date_described'].strftime(p.DATE_FORMAT), 
+               "date": h.short_date(conn['date_described']), 
                "child": None,
                "their": their_conn['relationship2to1'],
-               "their_date": their_conn['date_described'].strftime(p.DATE_FORMAT),
+               "their_date": h.short_date(their_conn['date_described']),
               }]
     #[{"via": True, "whose": "", "desc": "", "date": ""}] if degree <= 2 else 
     out = []
@@ -174,11 +175,11 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
         out.append({"via": degree > 2,
                     "whose": f"{name}'s", 
                     "desc": conn2['relationship2to1'],
-                    "date": conn2['date_described'].strftime(p.DATE_FORMAT),
+                    "date": h.short_date(conn2['date_described']),
                     "child": {"via": False,
                               "whose": "my", 
                               "desc": conn1['relationship2to1'],
-                              "date": conn1['date_described'].strftime(p.DATE_FORMAT),
+                              "date": h.short_date(conn1['date_described']),
                               "child": None,
                              },
                    })

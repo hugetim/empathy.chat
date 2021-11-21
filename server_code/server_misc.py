@@ -186,7 +186,7 @@ def init_profile(user_id=""):
   user = get_user(user_id, require_auth=False)
   record = c.connection_record(user, get_user())
   confirmed_url_date = (
-    user['confirmed_url_date'].strftime(p.DATE_FORMAT) if user['confirmed_url']
+    h.short_date(user['confirmed_url_date']) if user['confirmed_url']
     else ""
   )
   is_me = user == anvil.server.session['user']

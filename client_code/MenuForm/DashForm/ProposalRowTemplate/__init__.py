@@ -34,7 +34,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.item['start_time'] = "now"  
     else:
       start = time.start_date.astimezone(anvil.tz.tzlocal())
-      self.item['start_time'] = start.strftime("%a, %b %d %I:%M%p")
+      self.item['start_time'] = h.day_time_str(start)
     self.top_form = get_open_form()
 
   def update_expire_seconds(self, time_left):

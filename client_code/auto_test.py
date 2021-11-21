@@ -5,6 +5,7 @@ import unittest
 import time
 from . import helper as h
 from . import portable as port
+from datetime import datetime
 # from .MenuForm import MenuForm
 # from .MenuForm.DashForm import DashForm
 
@@ -26,6 +27,22 @@ class FullNameTest(unittest.TestCase):
         port.full_name("first", "last", distance),
         "first last" if distance <= 2 else "first"
       )
+
+      
+class DatetimeFormatTest(unittest.TestCase):
+  def test_remove_zeros(self):
+    dt = datetime(2021, 1, 1, 1, 1)
+    self.assertEqual(h.time_str(dt), "1:01AM")
+    self.assertEqual(h.dow_date_str(dt), "Friday, Jan 1, 2021")
+    self.assertEqual(h.day_time_str(dt), "Fri, Jan 1 1:01AM")
+    self.assertEqual(h.short_date(dt), "1/1/2021")
+    
+  def test_no_change(self):
+    dt = datetime(2020, 12, 31, 10, 10)
+    self.assertEqual(h.time_str(dt), "10:10AM")
+    self.assertEqual(h.dow_date_str(dt), "Thursday, Dec 31, 2020")
+    self.assertEqual(h.day_time_str(dt), "Thu, Dec 31 10:10AM")
+    self.assertEqual(h.short_date(dt), "12/31/2020")
   
   
 def client_auto_tests():

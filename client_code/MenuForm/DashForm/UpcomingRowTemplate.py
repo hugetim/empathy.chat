@@ -4,6 +4,7 @@ import anvil.users
 import anvil.server
 import anvil.tz
 import datetime
+from ... import helper as h
 from ...portable import DURATION_TEXT
 from ...Name import Name
 
@@ -21,7 +22,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     self.users_flow_panel.add_component(Name(item=self.item.pop('port_users')[0].__dict__))
     self.item['duration'] = DURATION_TEXT[self.item.pop('duration_minutes')]
     start = self.item.pop('start_date').astimezone(anvil.tz.tzlocal())
-    self.item['start_time'] = start.strftime("%a, %b %d %I:%M%p")
+    self.item['start_time'] = h.day_time_str(start)
     self.top_form = get_open_form()
 
   def update_dash(self, state):
