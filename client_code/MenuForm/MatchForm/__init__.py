@@ -38,6 +38,7 @@ class MatchForm(MatchFormTemplate):
     if not self.jitsi_embed:
       self.jitsi_embed = MyJitsi(item={'room_name': jitsi_code, 'name': glob.name})
       self.jitsi_column_panel.add_component(self.jitsi_embed)
+      self.jitsi_embed.set_event_handler('x-incoming', self.incoming_jitsi_message)
     self.jitsi_column_panel.visible = True
 
   def init_slider_panel(self, my_value):
@@ -82,10 +83,9 @@ class MatchForm(MatchFormTemplate):
       self.message_card.visible = True
       self.message_button.role = None
       self.call_js('scrollCard')
-      if self.first_update:
-        self.first_update = False
-      else:
+      if not self.first_update:
         self.chat_display_card.scroll_into_view()
+      self.first_update = False
   
 #   def chat_display_card_show(self, **event_args):
 #     """This method is called when the column panel is shown on the screen"""
@@ -98,12 +98,16 @@ class MatchForm(MatchFormTemplate):
   def message_textbox_pressed_enter(self, **event_args):
     text = self.message_textbox.text
     if text:
-      window.japi.executeCommand("sendChatMessage", text)
       temp, _ = anvil.server.call('add_chat_message', message=text)
       self.message_textbox.text = ""
       self.update_messages(temp)
-      self.call_js('scrollCard')
+      window.japi.executeCommand("sendChatMessage", text)
+      #self.call_js('scrollCard')
 
+  def incoming_jitsi_message(self, message, **event_args):
+    temp, _ = anvil.server.call('incoming_chat_message', message)
+    self.update_messages(temp)
+      
   def complete_button_click(self, **event_args):
     self.timer_2.interval = 0
     state = anvil.server.call('match_complete')

@@ -63,14 +63,14 @@ def _prune_matches():
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def init():
+def init(browser_now):
   """
   Runs upon initializing app
   Side effects: prunes old proposals/matches,
                 updates expire_date if currently requesting/ping
   """
   print("('init')")
-  sm.initialize_session()
+  sm.initialize_session(browser_now)
   # Initialize user info
   user = anvil.server.session['user']
   print(user['email'])

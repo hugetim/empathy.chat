@@ -3,7 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from .. import rosenberg
-from datetime import date
+from datetime import date, datetime
 from .. import parameters
 from ..MenuForm.MatchForm import MatchForm
 from .. import glob
@@ -22,7 +22,7 @@ class LoginForm(LoginFormTemplate):
     while not anvil.users.get_user():
       anvil.users.login_with_form(show_signup_option=False)
     self.card_1.visible = True
-    self.init_dict = anvil.server.call('init')
+    self.init_dict = anvil.server.call('init', datetime.now())
     if parameters.DEBUG_MODE:
       self.enter_button_click()
     else:

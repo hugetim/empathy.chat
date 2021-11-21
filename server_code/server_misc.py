@@ -23,11 +23,12 @@ def now():
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 
-def initialize_session():
+def initialize_session(browser_now):
   """initialize session state: user_id, user, and current_row"""
   user_id = anvil.users.get_user().get_id()
   anvil.server.session['user_id'] = user_id
   user = app_tables.users.get_by_id(user_id)
+  user['browser_now'] = browser_now
   anvil.server.session['user'] = user
   anvil.server.session['trust_level'] = user['trust_level']
   anvil.server.session['test_record'] = None
@@ -312,6 +313,23 @@ def add_chat_message(user_id="", message="[blank test message]"):
                           user=user,
                           message=anvil.secrets.encrypt_with_key("new_key", message),
                           time_stamp=now())
+  return _update_match_form(user)
+
+
+@authenticated_callable
+def incoming_chat_message(message, user_id=""):
+  from . import matcher
+  print("incoming_chat_message", "[redacted]", user_id)
+  user = get_user(user_id)
+  this_match = matcher.current_match(user)
+  other_user = [u for u in this_match['users'] if u != user][0]
+  existing_messages = app_tables.chat.search(match=this_match, user=other_user, 
+                                             message=anvil.secrets.encrypt_with_key("new_key", message))
+  if len(existing_messages) == 0:
+    app_tables.chat.add_row(match=this_match,
+                            user=other_user,
+                            message=anvil.secrets.encrypt_with_key("new_key", message),
+                            time_stamp=now())
   return _update_match_form(user)
 
 
