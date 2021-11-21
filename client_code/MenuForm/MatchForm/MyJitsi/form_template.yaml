@@ -23,8 +23,8 @@ container:
       \ 60000,\n                                        SHOW_CHROME_EXTENSION_BANNER:\
       \ false,\n                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
       \ options);\n    window.japi.executeCommand('subject', ' ');\n    function messageListener(e)\
-      \ {\n      console.log(e)\n      anvil.call(this, 'incoming_jitsi_message',\
-      \ e.data.message); \n    }\n    window.japi.addListener('incomingMessage', messageListener);\
+      \ {\n      console.log(e.message)\n      anvil.call(this, \"incoming_jitsi_message\"\
+      , e.message); \n    }\n    window.japi.addListener('incomingMessage', messageListener);\
       \       \n  }\n</script>\n\n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n \
       \   border: none;\n  }\n</style>\n"}
   event_bindings: {show: form_show}

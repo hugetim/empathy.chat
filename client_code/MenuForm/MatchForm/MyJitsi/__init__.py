@@ -19,5 +19,6 @@ class MyJitsi(MyJitsiTemplate):
                                                "userInfo": {"displayName": ""}}) #self.item['name']
       
   def incoming_jitsi_message(self, message):
+    print('incoming_jitsi_message', message)
     self.raise_event('x-incoming', message=message)
     
