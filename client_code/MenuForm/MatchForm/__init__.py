@@ -124,23 +124,17 @@ class MatchForm(MatchFormTemplate):
 
   def full_screen_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-#     if not window.document.fullscreenElement:
-#       if confirm("Enter full-screen mode?", dismissible=True):
     try:
-      window.document.documentElement.requestFullscreen()
       if window.document.fullscreenElement:
-        Notification("Exit full-screen by pressing ESC or F11.", timeout=3).show()
+          window.document.exitFullscreen()
+      else:
+          window.document.documentElement.requestFullscreen()
     except AttributeError as e:
-      Notification("Full screen not allowed by browser").show()
+      Notification("Full screen toggle blocked by browser. Try F11.").show()
       self.full_screen_button.visible = False
-      print(e)
+      print(repr(e))
     except ExternalError as e:
-      Notification("Full screen not allowed by browser").show()
+      Notification("Full screen toggle blocked by browser. Try F11.").show()
       self.full_screen_button.visible = False
-      print(e)
-
-
-
-
-
+      print(repr(e))
 
