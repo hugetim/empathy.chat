@@ -3,6 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from ..InviteB import InviteB
+from ..... import parameters as p
 from .RelationshipPrompt import RelationshipPrompt
 from anvil_extras.utils import wait_for_writeback
 
@@ -29,7 +30,7 @@ class InviteA(InviteATemplate):
       self.item.update(self.relationship_prompt.item)
       if len(self.item['phone_last4']) != 4:
         self.error("Wrong number of digits entered.")
-      elif len(self.item['relationship']) < 3:
+      elif len(self.item['relationship']) < p.MIN_RELATIONSHIP_LENGTH:
         self.error("Please add a description of your relationship.")
       else:
         if self.item.get('user_id'): #existing user

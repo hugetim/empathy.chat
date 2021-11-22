@@ -173,6 +173,13 @@ def get_prompts(user):
 
 
 @authenticated_callable
+@anvil.tables.in_transaction
+def dismiss_prompt(prompt_id):
+  prompt = app_tables.prompts.get_by_id(prompt_id)
+  prompt['dismissed'] = True
+  
+
+@authenticated_callable
 def invited_item(inviter_id, user_id=""):
   user = get_user(user_id)
   inviter_user = get_user(inviter_id, require_auth=False)

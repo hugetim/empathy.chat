@@ -160,6 +160,8 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
                "child": None,
                "their": their_conn['relationship2to1'],
                "their_date": their_conn['date_described'],
+               "their_name": user2['first_name'],
+               "their_id": user2.get_id(),
               }]
     #[{"via": True, "whose": "", "desc": "", "date": ""}] if degree <= 2 else 
     out = []
@@ -340,7 +342,7 @@ def connect(invite, invite_reply):
     item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
     app_tables.connections.add_row(starred=False, **item)
     row.delete()
-
+ 
 
 def _connected_prompt(invite, invite_reply):
   return dict(user=invite['user1'],
@@ -353,11 +355,15 @@ def _connected_prompt(invite, invite_reply):
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def dismiss_prompt(prompt_id):
-  prompt = app_tables.prompts.get_by_id(prompt_id)
-  prompt['dismissed'] = True
-  
+def save_relationship(item, user_id=""):
+  user1 = sm.get_user(user_id)
+  user2 = sm.get_user(item['user2_id'], require_auth=False)
+  row = app_tables.connections.get(user1=user1, user2=user2)
+  row['relationship2to1'] = item['relationship']
+  row['date_described'] = sm.now()
+  return row['date_described']
 
+  
 @anvil.server.callable
 def cancel_invited(item):
   row = app_tables.invites.get(link_key=item['link_key'],
@@ -368,10 +374,11 @@ def cancel_invited(item):
     row.delete()
 
     
-@anvil.server.callable
+@authenticated_callable
+@anvil.tables.in_transaction
 def disconnect(user2_id, user1_id=""):
-  user1 = anvil.users.get_user(user1_id)
-  user2 = app_tables.users.get_by_id(user2_id)
+  user1 = sm.get_user(user1_id)
+  user2 = sm.get_user(user2_id, require_auth=False)
   if user2:
     r1to2 = app_tables.connections.get(user1=user1, user2=user2)
     r2to1 = app_tables.connections.get(user1=user2, user2=user1)

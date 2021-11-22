@@ -3,6 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from ..... import helper as h
+from ..RelEdit import RelEdit
 
 
 class Relationship(RelationshipTemplate):
@@ -12,7 +13,7 @@ class Relationship(RelationshipTemplate):
 
     # Any code you write here will run when the form opens.
     self.row_spacing = 0
-    self.flow_panel_1.tooltip = f"description last edited {h.short_date_str(self.item['date'])}"
+    self.update()
     if self.item['child']:
       self.child_column_panel.add_component(Relationship(item=self.item['child']))
     else:
@@ -22,3 +23,23 @@ class Relationship(RelationshipTemplate):
         text = f' (and describes you as their "{their}")'
         tooltip = f"description last edited {h.short_date_str(self.item['their_date'])}"
         self.child_column_panel.add_component(Label(text=text, tooltip=tooltip, spacing_above="none"))
+
+  def update(self):
+    self.flow_panel_1.tooltip = f"description last edited {h.short_date_str(self.item['date'])}"
+        
+  def edit_rel_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    rel_item = {'name': self.item['their_name'],
+                'user2_id': self.item['their_id'],
+                'relationship': self.item['desc'],
+                }
+    edit_form = RelEdit(item=rel_item)
+    out = alert(content=edit_form,
+                large=True,
+                dismissible=False,
+                buttons=[])
+    if out is True:
+      self.item['date'] = anvil.server.call('save_relationship', edit_form.item)
+      self.item['desc'] = edit_form.item['relationship']
+      self.refresh_data_bindings()
+      self.update()
