@@ -15,3 +15,4 @@ URL = "https://empathy.chat"
 SELECTED_TAB_COLOR = "theme:White"
 NONSELECTED_TAB_COLOR = "theme:Gray 200"
 START_EARLY_MINUTES = 5
+REL_EXAMPLES = 
