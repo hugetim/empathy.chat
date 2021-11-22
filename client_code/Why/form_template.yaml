@@ -18,3 +18,4 @@ custom_component: true
 properties:
 - {name: tooltip, type: string, default_value: 'At empathy.chat, we want "connection"
     to really mean something, to foster trust.', default_binding_prop: true}
+- {name: text, type: string, default_value: '(Why?)', default_binding_prop: false}

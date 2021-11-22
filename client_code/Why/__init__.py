@@ -17,3 +17,11 @@ class Why(WhyTemplate):
   @tooltip.setter
   def tooltip(self, value):
     self.link_1.tooltip = value
+
+  @property
+  def text(self):
+    return self.link_1.text
+  
+  @text.setter
+  def text(self, value):
+    self.link_1.text = value

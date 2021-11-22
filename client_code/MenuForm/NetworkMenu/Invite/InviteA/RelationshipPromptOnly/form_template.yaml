@@ -35,7 +35,7 @@ components:
       name: label_2
       layout_properties: {}
     - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: e.g. weekly empathy buddy        sister-in-law with a regular empathy buddy        friend who recently read Marshall's NVC book,
+      properties: {role: null, align: left, hide_text: false, tooltip: e.g. weekly empathy buddy; sister-in-law with a regular empathy buddy; or friend who recently read Marshall's NVC book,
         placeholder: '', border: '', enabled: true, foreground: '', visible: true,
         text: '', font_size: 14, font: '', spacing_above: none, type: text, spacing_below: none,
         italic: false, background: '', bold: false, underline: false}
@@ -44,6 +44,11 @@ components:
       event_bindings: {pressed_enter: relationship_text_box_pressed_enter}
       data_bindings:
       - {property: text, code: 'self.item[''relationship'']', writeback: true}
+    - type: form:Why
+      properties: {tooltip: e.g. weekly empathy buddy; sister-in-law with a regular empathy buddy; or friend who recently read Marshall's NVC book,
+        text: (examples)}
+      name: why_1
+      layout_properties: {}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
       visible: true, text: (This introduction/description will only be visible to your other close connections.),
