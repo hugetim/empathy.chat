@@ -20,8 +20,7 @@ class RelationshipPromptOnly(RelationshipPromptOnlyTemplate):
     name = self.item.get('name')
     if name:
       self.label_1.text = (   
-        f"Imagine {name} were about to exchange empathy with another close connection "
-        f"at an NVC meetup.\nWho would you introduce {name} as?"
+        f"Who would you introduce {name} as?"
       )
 
   def relationship_text_box_pressed_enter(self, **event_args):

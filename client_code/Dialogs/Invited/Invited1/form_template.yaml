@@ -7,10 +7,10 @@ components:
   properties: {role: null, align: center, tooltip: '', enable_slots: true, border: '',
     foreground: '', visible: true, font_size: null, content: "### Welcome!\nBecause\
       \ receiving empathy\nrequires authenticity and trust, \nempathy.chat takes a\
-      \ \"slow\" approach\nto linking in new members. \n\nFull membership is currently\
-      \ limited\nto \"close connections\" of existing members,\nthose who know a member's\
-      \ personal\nphone number (and vice versa), at minimum.", font: '', spacing_above: small,
-    spacing_below: none, data: null, background: '', format: markdown}
+      \ \"slow\" approach\nto linking in new members. \n\nTo complete your \"connection\"\
+      \ with {inviter},\nwe ask that you demonstrate you know each other's personal\
+      \ phone number.", font: '', spacing_above: small, spacing_below: none, data: null,
+    background: '', format: markdown}
   name: rich_text_1
   layout_properties: {grid_position: 'NBHBNT,RCQAHT'}
   data_bindings:
