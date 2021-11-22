@@ -43,10 +43,10 @@ class MatchForm(MatchFormTemplate):
   def init_slider_panel(self, my_value):
     if my_value:
       slider_item = {'visible': True, 'status': "submitted", 
-                     'my_value': my_value, 'their_value': 5}
+                     'my_value': my_value, 'their_value': 5, 'their_name': self.their_name}
     else:
       slider_item = {'visible': True, 'status': None, 
-                     'my_value': 5, 'their_value': 5}
+                     'my_value': 5, 'their_value': 5, 'their_name': self.their_name}
       self.slider_button_click()
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
