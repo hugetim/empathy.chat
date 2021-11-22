@@ -131,10 +131,10 @@ class MatchForm(MatchFormTemplate):
           window.document.documentElement.requestFullscreen()
     except AttributeError as e:
       Notification("Full screen toggle blocked by browser. Try F11.").show()
-      self.full_screen_button.visible = False
+      self.full_screen_button.enabled = False
       print(repr(e))
     except ExternalError as e:
       Notification("Full screen toggle blocked by browser. Try F11.").show()
-      self.full_screen_button.visible = False
+      self.full_screen_button.enabled = False
       print(repr(e))
 
