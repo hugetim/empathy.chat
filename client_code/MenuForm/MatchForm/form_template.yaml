@@ -129,6 +129,14 @@ components:
     name: message_card
     layout_properties: {grid_position: 'DMNLEV,YIZNLS'}
     components:
+    - type: Label
+      properties: {role: null, align: center, tooltip: 'Note: Text chat here is distinct
+          from chat messages within the Jitsi video chat client', border: '', foreground: '',
+        visible: true, text: Text Chat, font_size: null, font: '', spacing_above: small,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: ''}
+      name: label_1
+      layout_properties: {grid_position: 'FZHJWV,TBCRHI'}
     - type: ColumnPanel
       properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
