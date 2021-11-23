@@ -5,6 +5,7 @@ import anvil.server
 from .Connections import Connections
 from .Blocks import Blocks
 from ... import parameters as p
+from ... import glob
 
 class NetworkMenu(NetworkMenuTemplate):
   def __init__(self, **properties):
@@ -13,6 +14,7 @@ class NetworkMenu(NetworkMenuTemplate):
    
     # Any code you write here will run when the form opens.
     self.top_form = get_open_form()
+    self.invites_tab_button.visible = glob.trust_level >= 2
     self.go_connections()
     
   def clear_page(self):
@@ -36,6 +38,11 @@ class NetworkMenu(NetworkMenuTemplate):
     self.load_component(content)
     self.blocks_tab_button.background = p.SELECTED_TAB_COLOR
     
+  def go_invites(self):
+    content = Invites()
+    self.load_component(content)
+    self.invites_tab_button.background = p.SELECTED_TAB_COLOR
+    
   def network_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.go_connections()
@@ -43,5 +50,10 @@ class NetworkMenu(NetworkMenuTemplate):
   def blocks_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.go_blocks()
+
+  def invites_tab_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.go_invites()
+
 
 

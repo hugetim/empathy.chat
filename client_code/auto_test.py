@@ -6,6 +6,7 @@ import time
 from . import helper as h
 from . import portable as port
 from datetime import datetime
+from . import glob
 # from .MenuForm import MenuForm
 # from .MenuForm.DashForm import DashForm
 
@@ -43,7 +44,13 @@ class DatetimeFormatTest(unittest.TestCase):
     self.assertEqual(h.dow_date_str(dt), "Thursday, Dec 31, 2020")
     self.assertEqual(h.day_time_str(dt), "Thu, Dec 31 10:10AM")
     self.assertEqual(h.short_date_str(dt), "12/31/2020")
-  
+
+
+class InvitesTest(unittest.TestCase):
+  def test_client(self):
+    invite = glob.Invite({'link_key': 'test'})
+    self.assertequal(invite.url, anvil.server.get_app_origin() + "#?invite=test")
+    
   
 def client_auto_tests():
   pass

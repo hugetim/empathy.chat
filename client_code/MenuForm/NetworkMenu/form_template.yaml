@@ -19,6 +19,14 @@ components:
     event_bindings: {click: network_tab_button_click}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Invites, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray
+        200', bold: false, underline: false, icon: ''}
+    name: invites_tab_button
+    layout_properties: {}
+    event_bindings: {click: invites_tab_button_click}
+  - type: Button
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: Blocks, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray
         200', bold: false, underline: false, icon: ''}
