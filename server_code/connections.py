@@ -245,7 +245,7 @@ def load_invites(user_id=""):
   for row in rows:
     item = {k: row[k] for k in ['date', 'relationship2to1', 'date_described', 'guess', 'link_key', 'distance']}
     if row['user2']:
-      item['user2'] = sm.get_port_user(user2, user1_id=user.get_id(), simple=False)
+      item['user2'] = sm.get_port_user(row['user2'], user1_id=user.get_id(), simple=False)
     if row['proposal']:
       item['proposal'] = m.Proposal(row['proposal']).portable(user)
     out.append(item)
