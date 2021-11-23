@@ -30,12 +30,18 @@ class MenuForm(MenuFormTemplate):
             + 'or be visible to other users. '
             + 'For help, contact: ' + p.CONTACT_EMAIL,
             dismissible=False)
+    else:
+      self.set_help_link("https://www.loomio.org/join/group/G537YtVTZmNTW1S1KTJnDvUb/")
     self.test_mode.visible = self.item['test_mode']
     if p.DEBUG_MODE and self.item['test_mode']:
       auto_test.client_auto_tests()
     self.set_test_link()
     self.reset_status(self.item['state'])
 
+  def set_help_link(self, url):
+    self.side_help_link.url = url
+    self.link_bar_help.url = url
+    
   def reset_status(self, state):
     """Update form according to current state variables"""
     if state['status'] in ["pinging"]:
@@ -48,7 +54,7 @@ class MenuForm(MenuFormTemplate):
 
   def clear_page(self):
     self.link_bar_home.visible = True
-    self.link_bar_profile.visible = True
+#     self.link_bar_profile.visible = True
     self.nav_panel.visible = True
     self.test_link.visible = True 
     for link in self.nav_panel.get_components():
@@ -87,7 +93,7 @@ class MenuForm(MenuFormTemplate):
     item = {k: state[k] for k in WaitForm.state_keys}
     self.reset_and_load(WaitForm(item=item))
     self.link_bar_home.visible = False
-    self.link_bar_profile.visible = False
+#     self.link_bar_profile.visible = False
     self.nav_panel.visible = False
     self.test_link.visible = False
 #     anvil.js.call(hideSidebar)
