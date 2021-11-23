@@ -7,20 +7,15 @@ components:
   layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
   event_bindings: {}
   components:
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: New Invite, font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:user-plus'}
-    name: invite_button
-    layout_properties: {grid_position: 'WILOYK,IOCQJK'}
   - type: DataGrid
     properties:
       role: null
       columns:
-      - {id: KXBOMI, title: Invite, data_key: user_or_url, $$hashKey: 'object:16209'}
-      - {id: JMODSU, title: Description, data_key: relationship2to1, $$hashKey: 'object:16210'}
-      - {id: SQRIZT, title: Guess, data_key: guess, $$hashKey: 'object:16211'}
+      - {title: Name, id: TCRDJP, data_key: name, expand: true, width: '80'}
+      - {title: Degree, id: CKNKJL, data_key: degree}
+      - {id: PGULWY, title: 'Seeking Buddy?', data_key: seeking}
+      - {title: Last Active, id: VWXCEI, data_key: last_active}
+      - {title: '', id: NBEGGD, data_key: buttons}
       auto_header: true
       tooltip: ''
       border: ''
@@ -32,12 +27,14 @@ components:
       spacing_above: small
       spacing_below: small
       background: ''
-    name: invites_data_grid
-    layout_properties: {grid_position: 'VHHLHC,YJAMKH'}
+    name: data_grid_1
+    layout_properties:
+      col_widths: {}
+      grid_position: RPUZJA,HVLYLM
     components:
     - type: RepeatingPanel
-      properties: {spacing_above: none, spacing_below: none, item_template: RowTemplate1}
-      name: invites_repeating_panel
+      properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.NetworkMenu.Connections.ConnectionRow}
+      name: repeating_panel_1
       layout_properties: {}
 container:
   type: ColumnPanel
@@ -45,3 +42,4 @@ container:
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
     wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
     background: ''}
+is_package: true
