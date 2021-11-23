@@ -7,7 +7,7 @@ import anvil.server
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-from ... import glob
+from .... import glob
 
 
 class Invites(InvitesTemplate):
@@ -16,5 +16,17 @@ class Invites(InvitesTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    glob.invites.load()
+    self.update()
     
+  def update(self):
+    glob.invites.load()
+    self.invites_data_grid.visible = glob.invites
+    if glob.invites:
+      self.invites_repeating_panel.items = glob.invites.to_data()
+
+  def invite_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    from .... import prompts
+    prompts.invite_dialog()
+    self.update()
+

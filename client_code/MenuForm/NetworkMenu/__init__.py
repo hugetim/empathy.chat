@@ -4,6 +4,7 @@ import anvil.users
 import anvil.server
 from .Connections import Connections
 from .Blocks import Blocks
+from .Invites import Invites
 from ... import parameters as p
 from ... import glob
 

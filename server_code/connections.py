@@ -243,9 +243,9 @@ def load_invites(user_id=""):
   rows = app_tables.invites.search(origin=True, user1=user)
   out = []
   for row in rows:
-    item = {k: row['k'] for keys in ['date', 'relationship2to1', 'date_described', 'guess', 'link_key', 'distance']}
+    item = {k: row[k] for k in ['date', 'relationship2to1', 'date_described', 'guess', 'link_key', 'distance']}
     if row['user2']:
-      item['user2'] = sm.get_port_user(user2, user1_id=user.get_id(), simple=True)
+      item['user2'] = sm.get_port_user(user2, user1_id=user.get_id(), simple=False)
     if row['proposal']:
       item['proposal'] = m.Proposal(row['proposal']).portable(user)
     out.append(item)

@@ -5,6 +5,7 @@ import unittest
 import time
 from . import helper as h
 from . import portable as port
+from . import parameters as p
 from datetime import datetime
 from . import glob
 # from .MenuForm import MenuForm
@@ -49,7 +50,7 @@ class DatetimeFormatTest(unittest.TestCase):
 class InvitesTest(unittest.TestCase):
   def test_client(self):
     invite = glob.Invite({'link_key': 'test'})
-    self.assertequal(invite.url, anvil.server.get_app_origin() + "#?invite=test")
+    self.assertequal(invite.url, p.URL + "#?invite=test")
     
   
 def client_auto_tests():
