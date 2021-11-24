@@ -9,12 +9,13 @@ components:
   components:
   - type: Button
     properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: New Invite, font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      foreground: '', visible: true, text: Invite New Close Connection, font_size: null,
+      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: 'fa:user-plus'}
     name: invite_button
     layout_properties: {grid_position: 'WILOYK,IOCQJK'}
     event_bindings: {click: invite_button_click}
+    data_bindings: []
   - type: DataGrid
     properties:
       role: null

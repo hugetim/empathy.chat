@@ -19,6 +19,7 @@ class Invites(InvitesTemplate):
     self.update()
     
   def update(self):
+    self.invite_button.visible = glob.trust_level >= 3
     glob.invites.load()
     self.invites_data_grid.visible = glob.invites
     if glob.invites:
