@@ -50,7 +50,7 @@ class DatetimeFormatTest(unittest.TestCase):
 class InvitesTest(unittest.TestCase):
   def test_client(self):
     invite = glob.Invite({'link_key': 'test'})
-    self.assertequal(invite.url, p.URL + "#?invite=test")
+    self.assertEqual(invite.url, p.URL + "#?invite=test")
     
   
 def client_auto_tests():
