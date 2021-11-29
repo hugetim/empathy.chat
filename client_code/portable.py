@@ -55,18 +55,18 @@ class User():
   @staticmethod
   def from_name_item(item):
     return User(item(1), item(0))
-  
+
     
 @anvil.server.portable_class
 class ProposalTime():
 
-  def __init__(self, time_id=None, start_now=True, start_date=None, #status=None, 
+  def __init__(self, time_id=None, start_now=False, start_date=None, #status=None, 
                duration=DURATION_DEFAULT_MINUTES, expire_date=None,
                accept_date=None, users_accepting=None, jitsi_code=None):
     self.time_id = time_id
     self.start_now = start_now 
     self.start_date = (start_date if (start_date or start_now)
-                       else h.now() + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES))
+                       else h.round_up_datetime(h.now() + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES)))
     self.duration = duration
     if expire_date or start_now:
       self.expire_date = expire_date

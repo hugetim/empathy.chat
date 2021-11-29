@@ -47,6 +47,13 @@ class DatetimeFormatTest(unittest.TestCase):
     self.assertEqual(h.short_date_str(dt), "12/31/2020")
 
 
+class RoundUpDatetimeTest(unittest.TestCase):
+  def test_round_up(self):
+    dt = datetime(2021, 1, 1, 1, 1, 1)
+    self.assertEqual(h.round_up_datetime(dt), datetime(2021, 1, 1, 1, 15))
+    self.assertEqual(h.round_up_datetime(dt, 30), datetime(2021, 1, 1, 1, 30))
+    
+
 class InvitesTest(unittest.TestCase):
   def test_client(self):
     invite = glob.Invite({'link_key': 'test'})
@@ -90,8 +97,8 @@ def run_now_test():
   #print("run manually")
   test = TestNow()
   test.setUp()
-  #test.test_repeat_now_proposal()
-  test.test_multiple_proposal_times()
+  test.test_repeat_now_proposal()
+  #test.test_multiple_proposal_times()
 
 # class TestNow(unittest.TestCase):
 

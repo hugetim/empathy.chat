@@ -50,7 +50,7 @@ def add_now_proposal():
   print("add_now_proposal")
   if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
     tester = sm.get_user()
-    anvil.server.call('add_proposal', portable.Proposal(), tester.get_id())
+    anvil.server.call('add_proposal', portable.Proposal(times=[portable.ProposalTime(start_now=True)]), user_id=tester.get_id())
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
     if tester_now_proptime:
       _add_prop_row_to_test_record(tester_now_proptime.proposal._row)

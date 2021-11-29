@@ -114,13 +114,12 @@ class DashForm(DashFormTemplate):
     
   def propose(self, specified_users=[], link_key=""):
     if link_key:
-      new_prop = t.Proposal(eligible=0, times=[t.ProposalTime(start_now=False)])
+      new_prop = t.Proposal(eligible=0)
       form_item = new_prop.create_form_item("now not allowed",
                                             self.get_conflict_checks())
       form_item['user_items'] = []
     else:
-      start_now = not bool(self.item['status'])
-      new_prop = t.Proposal(times=[t.ProposalTime(start_now=start_now)])
+      new_prop = t.Proposal()
       form_item = new_prop.create_form_item(self.item['status'],
                                             self.get_conflict_checks())
     if specified_users:

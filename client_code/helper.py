@@ -115,7 +115,13 @@ def day_time_str(_datetime):
 
 def short_date_str(_datetime):
   return local_tz(_datetime).strftime("X%m/X%d/%Y").replace('X0','X').replace('X','')
-  
+
+
+def round_up_datetime(dt, minutes_res=15):
+  new_minute = (dt.minute // minutes_res + 1) * minutes_res
+  new_dt = dt + datetime.timedelta(minutes = new_minute - dt.minute)
+  return new_dt.replace(second=0, microsecond=0)
+    
 
 class PausedTimer:
   def __init__(self, timer):
