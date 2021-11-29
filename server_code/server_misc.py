@@ -584,7 +584,7 @@ def _notify_message(user, from_name=""):
   subject = f"empathy.chat - {_other_name(from_name)} sent you a message"
   content = f"{_other_name(from_name)} has sent you a message on {p.URL}"
   if user['phone'] and user['message_sms']:
-    _send_sms(user['phone'], f"{subject}")
+    _send_sms(user['phone'], f"empathy.chat - {content}")
   else:
     _email_send(
       to_user=user, 
