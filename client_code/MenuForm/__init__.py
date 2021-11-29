@@ -49,7 +49,8 @@ class MenuForm(MenuFormTemplate):
     elif state['status'] == "matched":   
       self.go_match(state)
     else:
-      assert state['status'] in [None, "requesting", "pinged"]
+      if state['status'] not in [None, "requesting", "pinged"]:
+        print(f'Warning: {state["status"]} not in [None, "requesting", "pinged"]')
       self.go_dash(state) 
 
   def clear_page(self):

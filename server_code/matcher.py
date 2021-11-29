@@ -487,7 +487,8 @@ class ProposalTime():
 #       row_dict['status'] = "cancelled"
 #     else:
 #       row_dict['status'] = "hidden"
-    assert row_dict['current'] and not row_dict['cancelled']
+    if (not row_dict['current']) or row_dict['cancelled']:
+      print("Warning: unexpected m.ProposalTime.portable()")
     del row_dict['current']
     del row_dict['cancelled']
     del row_dict['missed_pings']
@@ -614,7 +615,8 @@ class ProposalTime():
     self._proptime_row['current'] = False
 
   def unhide(self):
-    assert self._proptime_row['cancelled'] == False
+    if self._proptime_row['cancelled'] != False:
+      print("Warning: self._proptime_row['cancelled'] != False")
     self._proptime_row['current'] = True
     
   def confirm_wait(self, start_now=True):
@@ -749,7 +751,8 @@ class Proposal():
                          in ProposalTime.times_from_proposal(self, require_current=True)]
     eligible_users = row_dict.pop('eligible_users')
     row_dict['eligible_users'] = [sm.get_port_user(user, simple=True) for user in eligible_users]
-    assert row_dict['current']
+    if not row_dict['current']:
+      print("Warning: m.Proposal.portable() called on a not-current Proposal")
     del row_dict['current']
     del row_dict['created']
     del row_dict['last_edited']

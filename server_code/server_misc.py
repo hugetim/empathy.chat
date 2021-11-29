@@ -364,7 +364,8 @@ def submit_slider(value, user_id=""):
 def _their_value(values, my_i):
   temp_values = [value for value in values]
   temp_values.pop(my_i)
-  assert len(temp_values) == 1              # assumes dyads only
+  if len(temp_values) != 1:
+   print("Warning: len(temp_values) != 1, but this function assumes dyads only")
   return temp_values[0]                     # return the remaining value
 
 

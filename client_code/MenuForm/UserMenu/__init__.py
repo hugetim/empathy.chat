@@ -44,7 +44,8 @@ class UserMenu(UserMenuTemplate):
     self.profile_tab_button.background = p.SELECTED_TAB_COLOR    
     
   def go_connections(self):
-    assert self.item['user_id'] != anvil.users.get_user().get_id()
+    if self.item['user_id'] == anvil.users.get_user().get_id():
+      print("Warning: UserMenu.go_connections called on current user")
     self.content = Connections(item={'user_id': self.item['user_id']})
     self.load_component(self.content)
     self.connections_tab_button.background = p.SELECTED_TAB_COLOR

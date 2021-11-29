@@ -46,10 +46,12 @@ def get_create_user_items(user_id=""):
 
 def _get_connections(user, up_to_degree=3, include_zero=False):
   """Return dictionary from degree to set of connections"""
-  assert (up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)
+  if not ((up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)):
+    print(f"Warning: _get_connections(user, {up_to_degree}, {include_zero}) not expected")
   degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user)])
   out = {0: {user}, 1: degree1s}
-  assert user not in out[1]
+  if user in out[1]:
+    print("Warning: user in out[1]")
   prev = set()
   for d in range(up_to_degree):
     current = set()

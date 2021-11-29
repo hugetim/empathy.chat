@@ -20,7 +20,8 @@ class WaitForm(WaitFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
-    assert self.item['status'] == "pinging"
+    if self.item['status'] != "pinging":
+      print(f"Warning: {self.item['status']} != 'pinging'")
     self.status_label.text = ("Potential match available. Time left for them "
                               + "to confirm:  "
                               + h.seconds_to_digital(self.item['seconds_left']))

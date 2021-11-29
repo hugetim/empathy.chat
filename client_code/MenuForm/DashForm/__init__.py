@@ -173,9 +173,8 @@ class DashForm(DashFormTemplate):
                 + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
                 dismissible=False)
       else:
-        if out:
-          print("out:", out)
-          assert out == "requesting"
+        if out and out != "requesting":
+          print("DashForm.confirm_match out:", out)
         state = anvil.server.call_s('get_status')
       self.update_status(state)
   
