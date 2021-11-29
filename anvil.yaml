@@ -178,6 +178,9 @@ db_schema:
     - name: pinged_sms
       admin_ui: {width: 113}
       type: bool
+    - name: message_sms
+      admin_ui: {width: 200}
+      type: bool
     - name: seeking_buddy
       admin_ui: {width: 133}
       type: bool

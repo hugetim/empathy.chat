@@ -296,9 +296,11 @@ def add_message(user2_id, user_id="", message="[blank test message]"):
 def _add_message_prompt(user2, user1):
   such_prompts = app_tables.prompts.search(user=user2, dismissed=False, spec={"name": "message", "from_id": user1.get_id()})
   if len(such_prompts) == 0:
+    from_name = name(user1, to_user=user2)
     app_tables.prompts.add_row(user=user2, date=now(), dismissed=False,
-                             spec={"name": "message", "from_name": name(user1, to_user=user2), "from_id": user1.get_id()}
+                             spec={"name": "message", "from_name": from_name, "from_id": user1.get_id()}
                             )
+    _notify_message(user2, from_name)
     
 
 def _connected_prompt(invite, invite_reply):
@@ -381,7 +383,7 @@ def get_settings(user_id=""):
 #   if (user['request_em'] == True and re_opts["fixed"]
 #       and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
 #     user['request_em'] = False
-  return (user['phone'], user['pinged_sms']) #user['request_em'], user['request_em_settings'], user['request_em_set_time'], 
+  return (user['phone'], user['pinged_sms'], user['message_sms']) #user['request_em'], user['request_em_settings'], user['request_em_set_time'], 
 
 
 def _prune_request_em():
@@ -399,6 +401,14 @@ def set_pinged_sms(pinged_sms_checked, user_id=""):
   print("set_pinged_sms", pinged_sms_checked)
   user = get_user(user_id)
   user['pinged_sms'] = pinged_sms_checked
+
+  
+@authenticated_callable
+@anvil.tables.in_transaction
+def set_message_sms(message_sms_checked, user_id=""):
+  print("set_message_sms", message_sms_checked)
+  user = get_user(user_id)
+  user['message_sms'] = message_sms_checked
 
 
 @authenticated_callable
@@ -524,7 +534,7 @@ def _email_send(to_user, subject, text, from_name="empathy.chat"):
 
 
 def ping(user, start, duration):
-  """Email pinged user, if settings allow"""
+  """Notify pinged user"""
   print("'ping'", start, duration)
   subject = "empathy.chat - match confirmed"
   content1 = f"Your proposal for a {duration} minute empathy match, starting {_message_when(start)}, has been accepted."
@@ -542,15 +552,14 @@ def ping(user, start, duration):
 {content2}
 
 Thanks!
-Tim
-empathy.chat
+-empathy.chat
 '''
     )
   #p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
 
   
 def notify_cancel(user, start, canceler_name=""):
-  """Email pinged user, if settings allow"""
+  """Notify canceled-on user"""
   print("'notify_cancel'", start, canceler_name)
   subject = "empathy.chat - upcoming match canceled"
   content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_message_when(start)}."
@@ -564,11 +573,29 @@ def notify_cancel(user, start, canceler_name=""):
 
 {content}
 
--Tim
-empathy.chat
+-empathy.chat
 '''
     )
 
+    
+def _notify_message(user, from_name=""):
+  """Notify messaged user"""
+  print("'_notify_message'", user.get_id(), from_name)
+  subject = f"empathy.chat - {_other_name(from_name)} sent you a message"
+  content = f"{_other_name(from_name)} has sent you a message on {p.URL}"
+  if user['phone'] and user['message_sms']:
+    _send_sms(user['phone'], f"{subject}")
+  else:
+    _email_send(
+      to_user=user, 
+      subject=subject,
+      text=f'''Dear {_addressee_name(user)},
+
+{content}
+
+-empathy.chat
+'''
+    )
     
     
 # def users_to_email_re_notif(user=None):

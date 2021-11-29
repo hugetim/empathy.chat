@@ -11,7 +11,7 @@ class SettingsForm(SettingsFormTemplate):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
     
-    phone, p_sms = anvil.server.call('get_settings') #re, re_opts, re_st, 
+    phone, p_sms, m_sms = anvil.server.call('get_settings') #re, re_opts, re_st, 
     #self.init_request_em_opts(re, re_opts, re_st)
     self.timer_2.interval = 0 #5
     self.phone_form = Phone(item={"phone": phone[2:] if phone else "", # removing "+1" 
@@ -20,6 +20,7 @@ class SettingsForm(SettingsFormTemplate):
     self.phone_panel.add_component(self.phone_form)
     self.notifications_panel.visible = bool(phone)
     self.pinged_sms_switch.checked = p_sms
+    self.message_sms_switch.checked = m_sms
     
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
@@ -28,6 +29,11 @@ class SettingsForm(SettingsFormTemplate):
   def pinged_sms_switch_change(self, **event_args):
     """This method is called when this switch is checked or unchecked"""
     anvil.server.call('set_pinged_sms', self.pinged_sms_switch.checked) 
+
+  def message_sms_switch_change(self, **event_args):
+    """This method is called when this switch is checked or unchecked"""
+    anvil.server.call('set_message_sms', self.pinged_sms_switch.checked)
+  
     
   def request_em_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
@@ -120,4 +126,3 @@ class SettingsForm(SettingsFormTemplate):
         self.request_em_set_time = re_st
       else:
         self.text_box_hours.text = "{:.1f}".format(hours_left)
-
