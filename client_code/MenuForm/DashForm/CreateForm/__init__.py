@@ -74,13 +74,17 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel_initialized = True
 
   def update_times(self):
-    self.button_add_alternate.visible = len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES
+    self.button_add_alternate.visible = (not self.item['start_now']
+                                         and len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES)
+    self.drop_down_start.enabled = not self.item['alt']
+    self.drop_down_start.tooltip = 'To switch to "now", first remove the Alternate Times'
     if self.item['start_now']:
       self.date_picker_start.visible = False
       if not self.item['alt']:
         self.column_panel_cancel.visible = False
       else:
         # this keeps the "Cancel" column heading for the alternatives
+        print("Warning: alts should no longer be allowed for start_now")
         self.column_panel_cancel.visible = True
         self.drop_down_cancel.visible = False
         self.date_picker_cancel.visible = False      
