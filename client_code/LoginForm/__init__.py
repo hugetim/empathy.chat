@@ -2,6 +2,7 @@ from ._anvil_designer import LoginFormTemplate
 from anvil import *
 import anvil.users
 import anvil.server
+import time
 from .. import rosenberg
 from datetime import date, datetime
 from .. import parameters
@@ -20,7 +21,12 @@ class LoginForm(LoginFormTemplate):
   def form_show(self, **event_args):
     # Do the code here to show this blank form.
     while not anvil.users.get_user():
-      anvil.users.login_with_form(show_signup_option=False)
+      user = anvil.users.login_with_form(show_signup_option=False)
+      if user and (not user['password_hash']) and (not user['browser_now']):
+        anvil.users.logout()
+        with Notification("Creating a new account requires an invite link."):
+          anvil.server.call_s('remove_user', user)
+          time.sleep(2)  
     self.card_1.visible = True
     self.init_dict = anvil.server.call('init', datetime.now())
     if parameters.DEBUG_MODE:

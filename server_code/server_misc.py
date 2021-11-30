@@ -37,6 +37,13 @@ def initialize_session(browser_now):
     server_auto_test.server_auto_tests()
 
 
+@anvil.server.callable
+def remove_user(user):
+  """Remove new user created via Google sign-in"""
+  if user and (not user['password_hash']) and (not user['browser_now']):
+    user.delete()
+
+    
 def get_user(user_id="", require_auth=True):
   if DEBUG:
     print("get_user", user_id)
