@@ -12,19 +12,21 @@ class Invited2(Invited2Template):
 
     # Any code you write here will run when the form opens.
     self.logged_in = anvil.users.get_user()
+    if self.logged_in['phone']:
+      self.parent.raise_event("x-close-alert", value=True)
     self.user_linear_panel.visible = self.logged_in
     self.new_linear_panel.visible = not self.logged_in
 
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
     if self.logged_in:
-      self.phone_form = Phone()
+      self.phone_form = Phone(item={"phone": ""})
       self.user_linear_panel.add_component(self.phone_form)
     
   def ok_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if self.logged_in:
-      if self.phone_form.item['status'] == "confirmed":
+      if self.logged_in['phone']:
         self.parent.raise_event("x-close-alert", value=True)
       else:
         if confirm("Proceed without confirming a phone number? "
