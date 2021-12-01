@@ -282,13 +282,18 @@ def save_invites(items, user_id=""):
 
 
 @anvil.server.callable
-def invite_visit(link_key, user_id=""):
+def invite_visit(link_key, user2):
+  """Return invited item if invite matching link_key exists
+  
+  Side effects: set invite['user2'] if visitor is logged in,
+    likewise for invite_reply['user1'] if it exists"""
   invite = app_tables.invites.get(origin=True, link_key=link_key)
   if invite:
-    user2 = app_tables.users.get_by_id(user_id) if user_id else None
     if user2:
       invite['user2'] = user2
-    anvil.server.session['invite_link_key'] = link_key
+      if invite['user2'] and invite['user2'] != user2:
+        print("Warning: invite['user2'] being overwritten")
+#     anvil.server.session['invite_link_key'] = link_key
     item = {'link_key': link_key}
     item['relationship1to2'] = invite['relationship2to1']
     item['inviter'] = invite['user1']['first_name']
@@ -303,16 +308,19 @@ def invite_visit(link_key, user_id=""):
       item['phone_last4'] = ""
     return item
   else:
-    return False
+    return None
 
   
 @anvil.server.callable
 @anvil.tables.in_transaction
 def invite_visit_register(link_key, user):
+  """Side effects: """
   invite = app_tables.invites.get(origin=True, link_key=link_key)
   invite_reply = app_tables.invites.get(origin=False, link_key=link_key)
   if invite and invite_reply:
     anvil.users.force_login(user)
+    if invite['user2'] and invite['user2'] != user:
+      print("Warning: invite['user2'] being overwritten (register)")
     invite.update(user2=user)
     invite_reply.update(user1=user)
   else:

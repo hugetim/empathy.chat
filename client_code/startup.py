@@ -3,11 +3,11 @@ import anvil.server
 import anvil
 from .Dialogs.Invited import Invited
 
+
 h = anvil.get_url_hash()
 if isinstance(h, dict) and 'invite' in h:
   user = anvil.users.get_user()
-  user_id = user.get_id() if user else ""
-  item = anvil.server.call('invite_visit', h['invite'], user_id=user_id)
+  item = anvil.server.call('invite_visit', h['invite'], user2=user)
   if item:
     invited_alert = Invited(item=item)
     if anvil.alert(content=invited_alert, 

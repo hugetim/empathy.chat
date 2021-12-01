@@ -15,6 +15,12 @@ class Invited1(Invited1Template):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    if self.item['link_key']: # from a link invite
+      self.welcome_rich_text.visible = True
+      self.cancel_button.visible = False
+    else:
+      self.welcome_rich_text.visible = False
+      self.cancel_button.visible = True
 
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
@@ -39,7 +45,7 @@ class Invited1(Invited1Template):
     elif len(self.item['relationship']) < p.MIN_RELATIONSHIP_LENGTH:
       self.error("Please add a description of your relationship.")
     else:
-      if self.item['link_key']:
+      if self.item['link_key']: # from a link invite
         invited_item = anvil.server.call('add_invited', self.item)
       else:
         invited_item = anvil.server.call('connect_invited', self.item)
