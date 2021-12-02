@@ -149,6 +149,13 @@ def _inviteds(user):
 
 def get_prompts(user):
   out = []
+  other_prompts = app_tables.prompts.search(user=user)
+  if len(other_prompts) > 0:
+    for prompt in other_prompts:
+      if prompt['dismissed']: continue
+      spec = prompt['spec']
+      spec['prompt_id'] = prompt.get_id() 
+      out.append(spec)
   invited = _latest_invited(user)
   if not user['phone']:
     if invited:
@@ -167,15 +174,8 @@ def get_prompts(user):
         out.append({"name": "member-chat", "members": [get_port_user(m, distance=1, simple=True) for m in members]})
 #       else:
 #         out.append({"name": "invite-close"})
-    elif not invited:
+    elif not invited and not [s for s in out if s['name'] == "connected"]:
       out.append({"name": "invite-close"})
-  other_prompts = app_tables.prompts.search(user=user)
-  if len(other_prompts) > 0:
-    for prompt in other_prompts:
-      if prompt['dismissed']: continue
-      spec = prompt['spec']
-      spec['prompt_id'] = prompt.get_id() 
-      out.append(spec)
   return out
 
 
