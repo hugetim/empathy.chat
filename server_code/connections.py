@@ -358,12 +358,16 @@ def submit_invited(item, user_id=""):
     if user and user['phone']:
       invite = app_tables.invites.get(origin=True, user1=user2, user2=user, link_key=item['link_key'])
       if invite:
-        try_connect(invite, invite_reply)
+        if not try_connect(invite, invite_reply):
+          return (
+            f"The last 4 digits you provided match {item['inviter']}'s phone number, "
+            f"but {item['inviter']} did not correctly provide the last 4 digits of your phone number."
+          )
       else:
         print("Warning: invite not found", item, user_id)
-    return True
+    return None
   else:
-    return False
+    return f"The last 4 digits you provided do not match {item['inviter']}'s phone number."
   
 
 def phone_match(last4, user):
@@ -401,8 +405,10 @@ def try_connect(invite, invite_reply):
       item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
       app_tables.connections.add_row(starred=False, **item)
       i_row.delete()
+    return True
   else:
     print("Warning: invite['guess'] doesn't match", dict(invite), invite['user2']['phone'])
+    return False
  
 
 def _connected_prompt(invite, invite_reply):
@@ -414,18 +420,8 @@ def _connected_prompt(invite, invite_reply):
              )
 
 
-@authenticated_callable
-@anvil.tables.in_transaction
-def save_relationship(item, user_id=""):
-  user1 = sm.get_user(user_id)
-  user2 = sm.get_user(item['user2_id'], require_auth=False)
-  row = app_tables.connections.get(user1=user1, user2=user2)
-  row['relationship2to1'] = item['relationship']
-  row['date_described'] = sm.now()
-  return row['date_described']
-
-  
 @anvil.server.callable
+@anvil.tables.in_transaction
 def cancel_invited(item):
   if item['inviter_id'] and item['link_key']:
     row = app_tables.invites.get(origin=False,
@@ -438,7 +434,40 @@ def cancel_invited(item):
   else:
     print("Warning: cancel_invited called on ambiguous item", item)
 
-    
+ 
+@authenticated_callable
+@anvil.tables.in_transaction
+def cancel_invite_and_invited(item, user_id=""):
+  user = sm.get_user(user_id)
+  if item['inviter_id'] and user:
+    row1 = app_tables.invites.get(origin=False,
+                                 user1=user,
+                                 user2=app_tables.users.get_by_id(item['inviter_id']),
+                                )
+    row0 = app_tables.invites.get(origin=True,
+                                 user2=user,
+                                 user1=app_tables.users.get_by_id(item['inviter_id']),
+                                )
+    for i, row in enumerate([row0, row1]):
+      if row:
+        row.delete()
+      else:
+        print("Warning: row to delete not found", i, item)
+  else:
+    print("Warning: cancel_invite_and_invited called on ambiguous item", item)
+
+ 
+@authenticated_callable
+@anvil.tables.in_transaction
+def save_relationship(item, user_id=""):
+  user1 = sm.get_user(user_id)
+  user2 = sm.get_user(item['user2_id'], require_auth=False)
+  row = app_tables.connections.get(user1=user1, user2=user2)
+  row['relationship2to1'] = item['relationship']
+  row['date_described'] = sm.now()
+  return row['date_described']
+
+  
 @authenticated_callable
 @anvil.tables.in_transaction
 def disconnect(user2_id, user1_id=""):

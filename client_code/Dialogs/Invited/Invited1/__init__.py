@@ -2,6 +2,7 @@ from ._anvil_designer import Invited1Template
 from anvil import *
 import anvil.users
 import anvil.server
+import time
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPromptOnly import RelationshipPromptOnly
 from .... import ui_procedures as ui
 from .... import invited
@@ -40,13 +41,19 @@ class Invited1(Invited1Template):
     """This method is called when the button is clicked"""
     self.item.update({'relationship': self.relationship_prompt.item['relationship']})
     error_message = invited.submit_invite_reply(self.item)
-    if error_message:
+    if error_message and error_message[:36] == "The last 4 digits you provided match":
+      invited.cancel_both(self.item)
+      Notification(error_message, title="Mistaken Invite", style="info", timeout=None).show()
+      self.parent.raise_event("x-close-alert", value=False)
+    elif error_message:
       self.error(error_message)
     else:
       user = anvil.users.get_user()
       has_phone = user['phone'] if user else None
-      if self.item['link_key'] and not has_phone:
+      if self.item['link_key'] and not user:
         self.parent.go_invited2(self.item)
+      elif self.item['link_key'] and not has_phone:
+        self.parent.raise_event("x-close-alert", value=True)
       else: # connecting already-registered users
         Notification("You have been successfully connected.", style="success").show()
         self.parent.raise_event("x-close-alert", value=True)

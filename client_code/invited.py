@@ -48,12 +48,13 @@ def submit_invite_reply(item):
   elif len(item['relationship']) < p.MIN_RELATIONSHIP_LENGTH:
     return "Please add a description of your relationship."
   else:
-    phone_match = anvil.server.call('submit_invited', item)
-    if phone_match:
-      return None
-    else:
-      return f"The last 4 digits you provided do not match {item['inviter']}'s phone number."
+    return anvil.server.call('submit_invited', item)
 
 
 def cancel(item):
   anvil.server.call('cancel_invited', item)
+  
+  
+def cancel_both(item):
+  anvil.server.call('cancel_invite_and_invited', item)
+  
