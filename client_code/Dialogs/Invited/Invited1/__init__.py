@@ -2,7 +2,6 @@ from ._anvil_designer import Invited1Template
 from anvil import *
 import anvil.users
 import anvil.server
-from ..Invited2 import Invited2
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPromptOnly import RelationshipPromptOnly
 from .... import ui_procedures as ui
 from .... import invited
@@ -44,10 +43,10 @@ class Invited1(Invited1Template):
     if error_message:
       self.error(error_message)
     else:
-      if self.item['link_key']:
-        parent = self.parent
-        self.remove_from_parent()
-        parent.add_component(Invited2(item=self.item))
+      user = anvil.users.get_user()
+      phone = user['phone'] if user else None
+      if self.item['link_key'] and not phone:
+        self.parent.go_invited2(self.item)
       else: # connecting already-registered users
         Notification("You have been successfully connected.", style="success").show()
         self.parent.raise_event("x-close-alert", value=True)

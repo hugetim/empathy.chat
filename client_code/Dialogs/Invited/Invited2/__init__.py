@@ -3,6 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from ....MenuForm.SettingsForm.Phone import Phone
+from .... import invited
 
 
 class Invited2(Invited2Template):
@@ -12,43 +13,33 @@ class Invited2(Invited2Template):
 
     # Any code you write here will run when the form opens.
     self.logged_in = anvil.users.get_user()
-    if self.logged_in['phone']:
-      self.parent.raise_event("x-close-alert", value=True)
-    self.user_linear_panel.visible = self.logged_in
     self.new_linear_panel.visible = not self.logged_in
+    self.user_linear_panel.visible = self.logged_in
 
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
     if self.logged_in:
+      if self.logged_in['phone']:
+        print("Warning: user already has 'phone'")
       self.phone_form = Phone(item={"phone": ""})
       self.user_linear_panel.add_component(self.phone_form)
     
   def ok_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    if self.logged_in:
-      if self.logged_in['phone']:
-        self.parent.raise_event("x-close-alert", value=True)
-      else:
-        if confirm("Proceed without confirming a phone number? "
-                   "If so, you may add a phone number later, in which case you will be "
-                   f"connected to {self.item['inviter']} if the last 4 digits they "
-                   "entered match your confirmed number."):
-          self.parent.raise_event("x-close-alert", value=False)
-    else:
-      self.parent.raise_event("x-close-alert", value=True)
+    if self.logged_in and not self.logged_in['phone']:
+      if confirm("Proceed without confirming a phone number? "
+                 "If so, you may add a phone number later, in which case you will be "
+                 f"connected to {self.item['inviter']} if the last 4 digits they "
+                 "entered match your confirmed number."):
+        return
+    self.parent.raise_event("x-close-alert", value=True)
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    anvil.server.call('cancel_invited', self.item)
+    invited.cancel(self.item)
     self.parent.raise_event("x-close-alert", value=False)
 
   def back_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    anvil.server.call('cancel_invited', self.item)
-    parent = self.parent
-    self.remove_from_parent()
-    from ..Invited1 import Invited1
-    parent.add_component(Invited1(item=self.item))
-
-
-
+    invited.cancel(self.item)
+    self.parent.go_invited1(self.item)

@@ -4,7 +4,7 @@ container:
 components:
 - type: form:Dialogs.Invited.Invited1
   properties: {}
-  name: invited1
+  name: _content
   layout_properties: {grid_position: 'DXSCUD,INYXAI'}
   data_bindings:
   - {property: item, code: self.item}

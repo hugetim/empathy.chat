@@ -6,6 +6,7 @@ from ..... import helper as h
 from ..... import ui_procedures as ui
 from ..... import prompts
 from ..... import glob
+from ..... import invited
 
 
 class ConnectionRow(ConnectionRowTemplate):
@@ -33,7 +34,7 @@ class ConnectionRow(ConnectionRowTemplate):
   def confirm_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     invited_item = anvil.server.call('invited_item', self.item['user_id'])
-    if prompts.invited_dialog(**invited_item):
+    if invited.invited_dialog(**invited_item):
       self.parent.raise_event('x-reset')
 
 

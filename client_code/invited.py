@@ -9,6 +9,17 @@ import anvil
 from . import parameters as p
 
 
+def invited_dialog(inviter, inviter_id, rel):
+  item = {"relationship": "", "phone_last4": "", "name": inviter, "inviter_id": inviter_id,
+          "relationship1to2": rel, "inviter": inviter, "link_key": ""}
+  top_form = get_open_form()
+  from .Dialogs.Invited import Invited
+  top_form.invited_alert = Invited(item=item)
+  return alert(content=top_form.invited_alert,
+               title="Accept this invitation to connect?",
+               buttons=[], large=True, dismissible=False)
+  
+
 def handle_link(link_key):
   user = anvil.users.get_user()
   item = anvil.server.call('invite_visit', link_key, user2=user)
@@ -43,3 +54,7 @@ def submit_invite_reply(item):
       return None
     else:
       return f"The last 4 digits you provided do not match {item['inviter']}'s phone number."
+
+
+def cancel(item):
+  anvil.server.call('cancel_invited', item)
