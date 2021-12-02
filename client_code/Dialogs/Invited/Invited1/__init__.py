@@ -42,7 +42,6 @@ class Invited1(Invited1Template):
     self.item.update({'relationship': self.relationship_prompt.item['relationship']})
     error_message = invited.submit_invite_reply(self.item)
     if error_message and error_message[:36] == "The last 4 digits you provided match":
-      invited.cancel_both(self.item)
       Notification(error_message, title="Mistaken Invite", style="info", timeout=None).show()
       self.parent.raise_event("x-close-alert", value=False)
     elif error_message:

@@ -359,6 +359,9 @@ def submit_invited(item, user_id=""):
       invite = app_tables.invites.get(origin=True, user1=user2, user2=user, link_key=item['link_key'])
       if invite:
         if not try_connect(invite, invite_reply):
+          _try_removing_from_invite_proposal(invite, user)
+          invite.delete()
+          invite_reply.delete()
           return (
             f"The last 4 digits you provided match {item['inviter']}'s phone number, "
             f"but {item['inviter']} did not correctly provide the last 4 digits of your phone number."
@@ -396,6 +399,16 @@ def _try_adding_to_invite_proposal(invite, user):
     if user not in proposal.eligible_users:
       proposal.eligible_users += [user]
 
+      
+def _try_removing_from_invite_proposal(invite, user):
+  if invite['proposal']:
+    from . import matcher as m
+    proposal = m.Proposal(invite['proposal'])
+    if user in proposal.eligible_users:
+      temp = proposal.eligible_users
+      temp.remove(user)
+      proposal.eligible_users = temp
+      
   
 def try_connect(invite, invite_reply):
   if phone_match(invite['guess'], invite['user2']):
@@ -433,28 +446,6 @@ def cancel_invited(item):
       row.delete()
   else:
     print("Warning: cancel_invited called on ambiguous item", item)
-
- 
-@authenticated_callable
-@anvil.tables.in_transaction
-def cancel_invite_and_invited(item, user_id=""):
-  user = sm.get_user(user_id)
-  if item['inviter_id'] and user:
-    row1 = app_tables.invites.get(origin=False,
-                                 user1=user,
-                                 user2=app_tables.users.get_by_id(item['inviter_id']),
-                                )
-    row0 = app_tables.invites.get(origin=True,
-                                 user2=user,
-                                 user1=app_tables.users.get_by_id(item['inviter_id']),
-                                )
-    for i, row in enumerate([row0, row1]):
-      if row:
-        row.delete()
-      else:
-        print("Warning: row to delete not found", i, item)
-  else:
-    print("Warning: cancel_invite_and_invited called on ambiguous item", item)
 
  
 @authenticated_callable

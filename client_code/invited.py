@@ -54,7 +54,3 @@ def submit_invite_reply(item):
 def cancel(item):
   anvil.server.call('cancel_invited', item)
   
-  
-def cancel_both(item):
-  anvil.server.call('cancel_invite_and_invited', item)
-  
