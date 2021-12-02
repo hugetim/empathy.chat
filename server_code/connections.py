@@ -419,12 +419,16 @@ def save_relationship(item, user_id=""):
   
 @anvil.server.callable
 def cancel_invited(item):
-  row = app_tables.invites.get(link_key=item['link_key'],
-                               relationship2to1=item['relationship'],
-                               user2=app_tables.users.get_by_id(item['inviter_id']),
-                              )
-  if row:
-    row.delete()
+  if item['inviter_id'] and item['link_key']:
+    row = app_tables.invites.get(origin=False,
+                                 link_key=item['link_key'],
+                                 relationship2to1=item['relationship'],
+                                 user2=app_tables.users.get_by_id(item['inviter_id']),
+                                )
+    if row:
+      row.delete()
+  else:
+    print("Warning: cancel_invited called on ambiguous item", item)
 
     
 @authenticated_callable
