@@ -2,23 +2,12 @@ import anvil.users
 import anvil.server
 import anvil
 from .Dialogs.Invited import Invited
+from . import invited
 
 
 h = anvil.get_url_hash()
 if isinstance(h, dict) and 'invite' in h:
-  user = anvil.users.get_user()
-  item = anvil.server.call('invite_visit', h['invite'], user2=user)
-  if item:
-    invited_alert = Invited(item=item)
-    if anvil.alert(content=invited_alert, 
-                   title="", 
-                   buttons=[], large=True, dismissible=False):
-      if not user:
-        new_user = anvil.users.signup_with_form()
-        anvil.server.call('invite_visit_register', h['invite'], new_user)
-      anvil.open_form('LoginForm')
-  else:
-    anvil.alert("This is not a valid invite link.")
+  invited.handle_link(h['invite'])
 else:
   anvil.open_form('LoginForm')
 
