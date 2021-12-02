@@ -12,15 +12,14 @@ from anvil.tables import app_tables
 class Invited(InvitedTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
-    print("Invited", properties['item'])
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self._content = self.spacer_1
     self.go_invited1(self.item)
 
   def _reset_and_load(self, component):
     self._content.remove_from_parent()
-    self._content.
     self._content = component
     self.add_component(self._content)
     

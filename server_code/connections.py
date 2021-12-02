@@ -343,19 +343,19 @@ def submit_invited(item, user_id=""):
                                           origin=False, user2=user2)
     if invite_reply:
       if ((invite_reply['user1'] and invite_reply['user1'] != user)
-          or (invite_reply['link_key'] and invite_reply['link_key'] != link_key)):
+          or (invite_reply['link_key'] and invite_reply['link_key'] != item['link_key'])):
         print("Warning: overwriting invited info", item, user.get_id())
       invite_reply.update(**info)
     else:
       invite_reply = app_tables.invites.add_row(**info)
     if user and item['link_key']:
-      invite = app_tables.invites.get(origin=True, user1=user2, link_key=link_key)
+      invite = app_tables.invites.get(origin=True, user1=user2, link_key=item['link_key'])
       if invite:
         invite.update(user2=user)
         _try_adding_to_invite_proposal(invite, user)
       else:
         print("Warning: invite not found by link_key", item, user_id)
-    if user['phone']:
+    if user and user['phone']:
       invite = app_tables.invites.get(origin=True, user1=user2, user2=user, link_key=item['link_key'])
       if invite:
         try_connect(invite, invite_reply)

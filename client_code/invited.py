@@ -30,7 +30,9 @@ def handle_link(link_key):
                    title="", 
                    buttons=[], large=True, dismissible=False):
       if not user:
-        new_user = anvil.users.signup_with_form()
+        new_user = anvil.users.signup_with_form(allow_cancel=True)
+        if not new_user:
+          new_user = anvil.users.login_with_form()
         anvil.server.call('invite_visit_register', link_key, new_user)
       anvil.open_form('LoginForm')
   else:
