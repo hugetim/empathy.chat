@@ -14,6 +14,7 @@ class Invited1(Invited1Template):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    print(self.item)
     if self.item['link_key']: # from a link invite
       self.welcome_rich_text.visible = True
       self.cancel_button.visible = False
