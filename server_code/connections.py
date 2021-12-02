@@ -329,72 +329,80 @@ def invite_visit_register(link_key, user):
   
 @anvil.server.callable
 @anvil.tables.in_transaction
-def add_invited(item):
-  user = anvil.users.get_user()
-  return _add_invited(item, user)
-
-
-def _add_invited(item, user):
+def submit_invited(item, user_id=""):
+  """Returns True if phone guess matches, assumes link_key and no user['phone']
+  
+  Side effects: add/update invited table row,
+    add user to invite table row if applicable,
+    connect if applicable"""
+  user = sm.get_user(user_id)
   user2 = app_tables.users.get_by_id(item['inviter_id'])
-  if item['phone_last4'] == user2['phone'][-4:]:
-    now = sm.now()
-    link_key = item['link_key']
-    info = dict(date=now,
-                origin=False,
-                user1=user,
-                user2=user2,
-                relationship2to1=item['relationship'],
-                date_described=now,
-                guess=item['phone_last4'],
-                distance=1,
-                link_key=link_key,
-               )
-    invite_reply = app_tables.invites.get(origin=False, link_key=link_key)
+  if phone_match(item['phone_last4'], user2):
+    info = _invited_item_to_row_dict(item, user)
+    invite_reply = app_tables.invites.get(q.any_of(user1=user, link_key=item['link_key']), 
+                                          origin=False, user2=user2)
     if invite_reply:
+      if ((invite_reply['user1'] and invite_reply['user1'] != user)
+          or (invite_reply['link_key'] and invite_reply['link_key'] != link_key)):
+        print("Warning: overwriting invited info", item, user.get_id())
       invite_reply.update(**info)
     else:
-      app_tables.invites.add_row(**info)
-    if user:
+      invite_reply = app_tables.invites.add_row(**info)
+    if user and item['link_key']:
       invite = app_tables.invites.get(origin=True, user1=user2, link_key=link_key)
       if invite:
         invite.update(user2=user)
-        if invite['proposal']:
-          from . import matcher as m
-          proposal = m.Proposal(invite['proposal'])
-          if user not in proposal.eligible_users:
-            proposal.eligible_users += [user]
-    return item
+        _try_adding_to_invite_proposal(invite, user)
+      else:
+        print("Warning: invite not found by link_key", item, user_id)
+    if user['phone']:
+      invite = app_tables.invites.get(origin=True, user1=user2, user2=user, link_key=item['link_key'])
+      if invite:
+        try_connect(invite, invite_reply)
+      else:
+        print("Warning: invite not found", item, user_id)
+    return True
   else:
-    return None
+    return False
+  
 
-  
-@authenticated_callable
-@anvil.tables.in_transaction
-def connect_invited(item, user_id=""):
-  user = sm.get_user(user_id)
-  phone_match = _add_invited(item, user)
-  if phone_match:
-    user2 = app_tables.users.get_by_id(item['inviter_id'])
-    invite = app_tables.invites.get(origin=True, user1=user2, user2=user, link_key="")
-    invite_reply = app_tables.invites.get(origin=False, user1=user, user2=user2, link_key="")
-    if invite and invite_reply:
-      connect(invite, invite_reply)
-      return phone_match
-  return False
-  
-        
-def connect(invite, invite_reply):
+def phone_match(last4, user):
+  return last4 == user['phone'][-4:]
+
+
+def _invited_item_to_row_dict(invited_item, user, distance=1):
+  user2 = app_tables.users.get_by_id(invited_item['inviter_id'])
+  now = sm.now()
+  return dict(date=now,
+              origin=False,
+              user1=user,
+              user2=user2,
+              relationship2to1=invited_item['relationship'],
+              date_described=now,
+              guess=invited_item['phone_last4'],
+              distance=distance,
+              link_key=invited_item['link_key'],
+             ) 
+
+
+def _try_adding_to_invite_proposal(invite, user):
   if invite['proposal']:
     from . import matcher as m
     proposal = m.Proposal(invite['proposal'])
-    invited = invite['user2']
-    if invited not in proposal.eligible_users:
-      proposal.eligible_users += [invited]
-  app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
-  for row in [invite, invite_reply]:
-    item = {k: row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
-    app_tables.connections.add_row(starred=False, **item)
-    row.delete()
+    if user not in proposal.eligible_users:
+      proposal.eligible_users += [user]
+
+  
+def try_connect(invite, invite_reply):
+  if phone_match(invite['guess'], invite['user2']):
+    _try_adding_to_invite_proposal(invite, invite['user2'])
+    app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
+    for i_row in [invite, invite_reply]:
+      item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
+      app_tables.connections.add_row(starred=False, **item)
+      i_row.delete()
+  else:
+    print("Warning: invite['guess'] doesn't match", dict(invite), invite['user2']['phone'])
  
 
 def _connected_prompt(invite, invite_reply):

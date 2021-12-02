@@ -44,8 +44,8 @@ class Invited1(Invited1Template):
       self.error(error_message)
     else:
       user = anvil.users.get_user()
-      phone = user['phone'] if user else None
-      if self.item['link_key'] and not phone:
+      has_phone = user['phone'] if user else None
+      if self.item['link_key'] and not has_phone:
         self.parent.go_invited2(self.item)
       else: # connecting already-registered users
         Notification("You have been successfully connected.", style="success").show()

@@ -19,7 +19,7 @@ class Invited2(Invited2Template):
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
     if self.logged_in:
-      if self.logged_in['phone']:
+      if self.logged_in['phone']: #prior to opportunity to confirm phone here
         print("Warning: user already has 'phone'")
       self.phone_form = Phone(item={"phone": ""})
       self.user_linear_panel.add_component(self.phone_form)

@@ -48,7 +48,7 @@ def get_user(user_id="", require_auth=True):
   if DEBUG:
     print("get_user", user_id)
   if user_id == "" or anvil.server.session['user_id'] == user_id:
-    return anvil.server.session['user']
+    return anvil.users.get_user()
   elif (require_auth and anvil.server.session['trust_level'] < TEST_TRUST_LEVEL):
     raise RuntimeError("User not authorized to access this information")
   else:
@@ -506,12 +506,13 @@ def check_phone_code(code, user_id=""):
 def _check_for_confirmed_invites(user):
   any_confirmed = False
   for invite in _inviteds(user):
-    if invite['guess'] == user['phone'][-4:]:
-      invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
-      if invite_reply:
-        from . import connections as c
-        c.connect(invite, invite_reply)
-        any_confirmed = True
+    invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
+    if invite_reply:
+      from . import connections as c
+      c.try_connect(invite, invite_reply)
+      any_confirmed = True
+    else:
+      print("Warning: invite_reply not found", dict(invite))
   return any_confirmed
 
     

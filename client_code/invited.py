@@ -37,20 +37,16 @@ def handle_link(link_key):
 
 
 def submit_invite_reply(item):
-  """Returns error_message
+  """Returns error_message if item not well-formatted or doesn't match phone number
   
-  Side effects: submits well-formatted item to server, updates input item"""
+  Side effects: submits well-formatted item to server"""
   if len(item['phone_last4']) != 4:
     return "Wrong number of digits entered."
   elif len(item['relationship']) < p.MIN_RELATIONSHIP_LENGTH:
     return "Please add a description of your relationship."
   else:
-    if item['link_key']: # from a link invite
-      invited_item = anvil.server.call('add_invited', item)
-    else:
-      invited_item = anvil.server.call('connect_invited', item)
-    if invited_item:
-      item.update(invited_item)
+    phone_match = anvil.server.call('submit_invited', item)
+    if phone_match:
       return None
     else:
       return f"The last 4 digits you provided do not match {item['inviter']}'s phone number."
