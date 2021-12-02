@@ -7,8 +7,6 @@ from anvil.google.drive import app_files
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-from .Invited1 import Invited1
-from .Invited2 import Invited2
 
 
 class Invited(InvitedTemplate):
@@ -24,8 +22,10 @@ class Invited(InvitedTemplate):
     self.add_component(self._content)
     
   def go_invited2(self, item):
+    from .Invited2 import Invited2
     self._reset_and_load(Invited2(item=item))
     
   def go_invited1(self, item):
+    from .Invited1 import Invited1
     self._reset_and_load(Invited1(item=item))
 
