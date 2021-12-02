@@ -24,6 +24,7 @@ def handle_link(link_key):
   user = anvil.users.get_user()
   item = anvil.server.call('invite_visit', link_key, user2=user)
   if item:
+    from .Dialogs.Invited import Invited
     invited_alert = Invited(item=item)
     if anvil.alert(content=invited_alert, 
                    title="", 
