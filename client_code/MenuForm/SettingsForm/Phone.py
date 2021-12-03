@@ -59,6 +59,8 @@ class Phone(PhoneTemplate):
         self.phone_error_label.text = message
         self.phone_error_label.visible = True
       else:
+        self.phone_error_label.text = out
+        self.phone_error_label.visible = True
         print("Warning: unhandled 'send_verification_sms' return value")
     else:
       if len(subscriber) > 10:

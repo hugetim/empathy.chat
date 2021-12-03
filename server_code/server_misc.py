@@ -25,9 +25,9 @@ def now():
 
 def initialize_session(browser_now):
   """initialize session state: user_id, user, and current_row"""
-  user_id = anvil.users.get_user().get_id()
+  user = anvil.users.get_user()
+  user_id = user.get_id()
   anvil.server.session['user_id'] = user_id
-  user = app_tables.users.get_by_id(user_id)
   user['browser_now'] = browser_now
   anvil.server.session['user'] = user
   anvil.server.session['trust_level'] = user['trust_level']
@@ -452,13 +452,19 @@ def _send_sms(to_number, text):
   auth_token = anvil.secrets.get_secret('auth_token')
   from twilio.rest import Client
   client = Client(account_sid, auth_token)
-  message = client.messages.create(
-    body=text,
-    from_='+12312905138',
-    to=to_number,
-  )
-  print("send_sms sid", message.sid)
-  return message
+  try:
+    message = client.messages.create(
+      body=text,
+      from_='+12312905138',
+      to=to_number,
+    )
+    print("send_sms sid", message.sid)
+    return None
+  except anvil.server.AnvilWrappedError as exc:
+    print(exc)
+    print(exc.message)
+    return exc.message
+  
     
     
 @authenticated_callable
@@ -468,18 +474,21 @@ def send_verification_sms(number, user_id=""):
   else:
     user = get_user()
     code = random_code(num_chars=6, digits_only=True)
-    _send_sms(
+    error_message = _send_sms(
       number, 
       f"{code} is your empathy.chat verification code. It expires in 10 minutes."
     )
-    app_tables.codes.add_row(
-      type="phone",
-      address=number,
-      code=code,
-      user=user,
-      date=now()
-    )
-    return "code sent"
+    if error_message:
+      return error_message
+    else:
+      app_tables.codes.add_row(
+        type="phone",
+        address=number,
+        code=code,
+        user=user,
+        date=now()
+      )
+      return "code sent"
   
   
 @authenticated_callable
@@ -509,8 +518,11 @@ def _check_for_confirmed_invites(user):
     invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
     if invite_reply:
       from . import connections as c
-      c.try_connect(invite, invite_reply)
-      any_confirmed = True
+      if c.try_connect(invite, invite_reply):
+        any_confirmed = True
+      else:
+        c.remove_invite_pair(invite, invite_reply)
+        print("Warning: remove_invite_pair without notifying invited")
     else:
       print("Warning: invite_reply not found", dict(invite))
   return any_confirmed

@@ -70,11 +70,12 @@ def init(browser_now):
                 updates expire_date if currently requesting/ping
   """
   print("('init')")
-  sm.initialize_session(browser_now)
   # Initialize user info
-  user = anvil.server.session['user']
+  user = anvil.users.get_user()
   print(user['email'])
   trust_level = sm.get_user_info(user)
+  sm.initialize_session(browser_now)
+
   print("Warning: distance not yet implemented. Returning _degree instead.")
   # Prune expired items for all users
   Proposal.prune_all()
