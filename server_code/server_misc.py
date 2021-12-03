@@ -460,10 +460,9 @@ def _send_sms(to_number, text):
     )
     print("send_sms sid", message.sid)
     return None
-  except anvil.server.AnvilWrappedError as exc:
-    print(exc)
-    print(exc.message)
-    return exc.message
+  except Exception as exc:
+    print(repr(exc))
+    return str(exc)
   
     
     
@@ -521,7 +520,7 @@ def _check_for_confirmed_invites(user):
       if c.try_connect(invite, invite_reply):
         any_confirmed = True
       else:
-        c.remove_invite_pair(invite, invite_reply)
+        c.remove_invite_pair(invite, invite_reply, user)
         print("Warning: remove_invite_pair without notifying invited")
     else:
       print("Warning: invite_reply not found", dict(invite))

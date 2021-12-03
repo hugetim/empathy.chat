@@ -359,7 +359,7 @@ def submit_invited(item, user_id=""):
       invite = app_tables.invites.get(origin=True, user1=user2, user2=user, link_key=item['link_key'])
       if invite:
         if not try_connect(invite, invite_reply):
-          remove_invite_pair(invite, invite_reply)
+          remove_invite_pair(invite, invite_reply, user)
           return (
             f"The last 4 digits you provided match {item['inviter']}'s phone number, "
             f"but {item['inviter']} did not correctly provide the last 4 digits of your phone number."
@@ -371,7 +371,7 @@ def submit_invited(item, user_id=""):
     return f"The last 4 digits you provided do not match {item['inviter']}'s phone number."
  
 
-def remove_invite_pair(invite, invite_reply):
+def remove_invite_pair(invite, invite_reply, user):
   _try_removing_from_invite_proposal(invite, user)
   invite.delete()
   invite_reply.delete()
