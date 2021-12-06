@@ -24,8 +24,8 @@ components:
     components:
     - type: Label
       properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'How full is your "empathy tank"? (Empty: furious/distant,
-          Full: joyful/open)', font_size: null, font: '', spacing_above: small, icon_align: left,
+        visible: true, text: 'How full is your "empathy tank"? (Empty: angry/distant,
+          Full: content/open)', font_size: null, font: '', spacing_above: small, icon_align: left,
         spacing_below: small, italic: false, background: '', bold: true, underline: false,
         icon: ''}
       name: label_4
