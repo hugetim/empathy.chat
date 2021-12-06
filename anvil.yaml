@@ -25,23 +25,16 @@ services:
     email_content:
       confirm_address: {html: '<p>Thanks for registering your account with empathy.chat.
           Please click the following link to confirm that this is your account:</p><p><br></p><p>{{confirm_link}}</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
-        subject: 'empathy.chat: Confirm your email address'}
+        subject: empathy.chat - Confirm your email address}
       reset_password: {html: '<p>Hi there,</p><p><br></p><p>You have requested a password
           reset for your empathy.chat account {{email}}. To reset your password, click
           the link below:</p><p><br></p><p>{{reset_link}}</p><p><br></p><p>This link
           will expire in ten minutes.</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
-        subject: 'empathy.chat: Reset your password'}
-      token_login: {html: '<p>Hi there,
-
-
-          </p><p>A login request was received for your account ({{email}}). To log
-          in, click the link below:
-
-
-          </p><p>{{login_link}}
-
-
-          </p><p>This link will expire in ten minutes.</p>'}
+        subject: empathy.chat - Reset your password}
+      token_login: {html: '<p>Hi there,</p><p><br></p><p>A login request was received
+          for your empathy.chat account ({{email}}). To log in, click the link below:</p><p><br></p><p>{{login_link}}</p><p><br></p><p>This
+          link will expire in ten minutes.</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
+        subject: empathy.chat - Login}
 startup: {type: module, module: startup}
 package_name: empathy_chat
 allow_embedding: true
