@@ -1,5 +1,6 @@
 from ._anvil_designer import InvitedTemplate
 from anvil import *
+import anvil.facebook.auth
 import anvil.users
 import anvil.server
 import anvil.google.auth, anvil.google.drive

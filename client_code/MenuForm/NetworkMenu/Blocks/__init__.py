@@ -1,5 +1,6 @@
 from ._anvil_designer import BlocksTemplate
 from anvil import *
+import anvil.facebook.auth
 import anvil.users
 import anvil.server
 import anvil.tables as tables

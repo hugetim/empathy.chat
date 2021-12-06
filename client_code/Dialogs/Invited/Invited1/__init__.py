@@ -1,5 +1,6 @@
 from ._anvil_designer import Invited1Template
 from anvil import *
+import anvil.facebook.auth
 import anvil.users
 import anvil.server
 import time

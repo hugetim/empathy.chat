@@ -1,5 +1,6 @@
 from ._anvil_designer import ProposalRowTemplateTemplate
 from anvil import *
+import anvil.facebook.auth
 import anvil.users
 import anvil.server
 import anvil.tz

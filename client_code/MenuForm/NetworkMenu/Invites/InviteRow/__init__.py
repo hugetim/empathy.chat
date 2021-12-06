@@ -1,5 +1,6 @@
 from ._anvil_designer import InviteRowTemplate
 from anvil import *
+import anvil.facebook.auth
 import anvil.server
 import anvil.users
 import anvil.google.auth, anvil.google.drive

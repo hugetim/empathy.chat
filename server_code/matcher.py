@@ -1,3 +1,4 @@
+import anvil.facebook.auth
 import anvil.users
 import anvil.tables
 from anvil.tables import app_tables
