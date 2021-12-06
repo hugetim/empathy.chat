@@ -66,6 +66,10 @@ def client_auto_tests():
 #   FullNameTest().main()
   
   
+def test_alert(content, handler):
+  content.set_event_handler('x-close-alert', handler)
+  
+  
 class TestNow():
 
   def setUp(self):
