@@ -39,5 +39,5 @@ container:
   type: HtmlTemplate
   properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
     role: null, html: ''}
-  event_bindings: {hide: form_hide, show: form_show}
+  event_bindings: {show: form_show}
 is_package: true

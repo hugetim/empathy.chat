@@ -722,6 +722,7 @@ class ProposalTime():
                                                 start_now=True,
                                                 users_accepting=q.not_(q.any_of(None, [])),
                                                 accept_date=q.less_than(cutoff_r),
+                                                expire_date=q.less_than(cutoff_r),
                                                ):
       yield ProposalTime(row)
   

@@ -117,7 +117,7 @@ class MatchForm(MatchFormTemplate):
   def message_textbox_pressed_enter(self, **event_args):
     text = self.message_textbox.text
     if text:
-      _, _, temp, _ = anvil.server.call('add_chat_message', message=text)
+      _, _, _, temp, _ = anvil.server.call('add_chat_message', message=text)
       self.message_textbox.text = ""
       self.update_messages(temp)
       #self.call_js('scrollCard')

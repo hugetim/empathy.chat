@@ -29,7 +29,7 @@ class CreateForm(CreateFormTemplate):
     
     # Any code you write here will run when the form opens.
     if self.item['now_allowed']:
-      self.drop_down_start.items = [("now", 1), ("later at...", 0)]
+      self.drop_down_start.items = [("later at...", 0), ("Ready now", 1)]
     else:
       self.drop_down_start.items = [("later at...", 0)]
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))

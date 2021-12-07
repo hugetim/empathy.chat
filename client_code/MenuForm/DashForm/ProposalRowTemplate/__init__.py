@@ -31,7 +31,8 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.item.update({'duration': t.DURATION_TEXT[time.duration],
                       'expire_date': time.expire_date,})
     if time.start_now:
-      self.item['start_time'] = "now"  
+      self.item['start_time'] = "Ready now"
+      self.accept_button.text = "Join"
     else:
       self.item['start_time'] = h.day_time_str(time.start_date)
     self.top_form = get_open_form()
@@ -47,17 +48,22 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     return diff if diff.total_seconds() > zero.total_seconds() else zero
     
   def update(self):
-    time_left = self.time_left()
-    if time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
-      self.update_expire_seconds(time_left)
-      self.timer_1.interval = 1
-    else:
+    if self.item['prop_time'].start_now:
       self.timer_1.interval = 0
-      days_and_hours, minutes, *rest = str(time_left).split(':')
-      self.item['expires_in'] = f"{days_and_hours}:{minutes}"
+      self.item['expires_in'] = "n/a"
+      self.renew_button.visible = self.item['own'] # should never be seen
+    else:
+      self.renew_button.visible = False
+      time_left = self.time_left()
+      if time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
+        self.update_expire_seconds(time_left)
+        self.timer_1.interval = 1
+      else:
+        self.timer_1.interval = 0
+        days_and_hours, minutes, *rest = str(time_left).split(':')
+        self.item['expires_in'] = f"{days_and_hours}:{minutes}"
     self.accept_button.visible = not self.item['own']
     self.edit_button.visible = self.item['own']
-    self.renew_button.visible = self.item['own'] and self.item['prop_time'].start_now
     self.cancel_button.visible = self.item['own']
 
   def update_dash(self, state):
