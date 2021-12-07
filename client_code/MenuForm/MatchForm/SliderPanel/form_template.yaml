@@ -102,6 +102,7 @@ components:
           - {property: is_visible, code: 'self.item[''status''] == "received"'}
           - {property: value, code: 'self.item[''their_value'']', writeback: true}
           event_bindings: {}
+      data_bindings: []
     - type: FlowPanel
       properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
         foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
@@ -119,6 +120,8 @@ components:
     data_bindings:
     - {property: enabled, code: 'not self.item[''status'']'}
     - {property: visible, code: 'self.item[''status''] != "received"'}
+    - {property: tooltip, code: '"Please wait to submit until the other user has joined"
+        if self.item[''status''] == "waiting" else ""'}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: 'Hide Slider

@@ -81,7 +81,7 @@ class DashForm(DashFormTemplate):
   
   def update_status(self, state):
     self.set_seconds_left(state['status'], state['seconds_left'])
-    if self.item['status'] in [None, "requesting", "pinged"]:
+    if self.item['status'] in [None]:
       self.item['proposals'] = state['proposals']
       self.item['upcomings'] = state['upcomings']
       self.update_form()

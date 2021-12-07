@@ -10,7 +10,7 @@ from .SliderPanel import SliderPanel
 
 
 class MatchForm(MatchFormTemplate):
-  state_keys = {}
+  state_keys = {'status'}
   
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -21,12 +21,15 @@ class MatchForm(MatchFormTemplate):
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    jitsi_code, duration, my_value, self.how_empathy_list, self.their_name = (
+    jitsi_code, duration, my_value = (
       anvil.server.call('init_match_form')
     )
+    self.how_empathy_list = []
     self.set_jitsi_link(jitsi_code)
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
+    self.status = None
+    self.update_status(self.item['status'])
     self.first_update = True
     self.update()
       
@@ -43,21 +46,38 @@ class MatchForm(MatchFormTemplate):
   def init_slider_panel(self, my_value):
     if my_value:
       slider_item = {'visible': True, 'status': "submitted", 
-                     'my_value': my_value, 'their_value': 5, 'their_name': self.their_name}
+                     'my_value': my_value, 'their_value': 5, 'their_name': ""}
     else:
-      slider_item = {'visible': True, 'status': None, 
-                     'my_value': 5, 'their_value': 5, 'their_name': self.their_name}
+      slider_item = {'visible': True, 'status': "waiting", 
+                     'my_value': 5, 'their_value': 5, 'their_name': ""}
       self.slider_button_click()
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
     self.slider_panel.set_event_handler('x-hide', self.hide_slider)
     
-  def update(self): 
-    new_items, their_value = anvil.server.call_s('update_match_form')
+  def update(self):
+    status, self.how_empathy_list, their_name, new_items, their_value = (
+      anvil.server.call_s('update_match_form')
+    )
+    self.update_status(status)
+    self.slider_panel.update_name(their_name)
     self.update_messages(new_items)
     if self.slider_panel.item['status'] == "submitted" and their_value:
       self.slider_panel.receive_value(their_value)
 
+  def update_status(self, status):
+    if status != self.status:
+      prev = self.status
+      self.status = status
+      matched = status == "matched"
+      self.message_textbox.enabled = matched
+      self.message_textbox.tooltip = (
+        "" if matched else "Please wait until the other has joined before sending a message"
+      )
+      if prev != "matched" and self.status == "matched":
+        self.slider_panel.item['status'] = None
+        self.slider_panel.refresh_data_bindings()  
+      
   def update_messages(self, message_list):
     old_items = self.chat_repeating_panel.items
     messages_plus = []
@@ -97,7 +117,7 @@ class MatchForm(MatchFormTemplate):
   def message_textbox_pressed_enter(self, **event_args):
     text = self.message_textbox.text
     if text:
-      temp, _ = anvil.server.call('add_chat_message', message=text)
+      _, _, temp, _ = anvil.server.call('add_chat_message', message=text)
       self.message_textbox.text = ""
       self.update_messages(temp)
       #self.call_js('scrollCard')

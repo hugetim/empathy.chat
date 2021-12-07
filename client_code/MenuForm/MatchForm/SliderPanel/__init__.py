@@ -10,15 +10,18 @@ class SliderPanel(SliderPanelTemplate):
     'visible',
     'their_value', default 5
     'my_value', default 5
-    'status' in [None, 'submitted', 'received']
+    'status' in [None, 'submitted', 'received', 'waiting']
     """
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
     if self.item.get('their_name'):
-      self.their_label.text = self.item.get('their_name') + ":"
+      self.update_name(self.item.get('their_name'))
 
+  def update_name(self, their_name):
+    self.their_label.text = f"{their_name}:"
+      
   def hide_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.raise_event('x-hide')

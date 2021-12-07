@@ -47,11 +47,11 @@ class MenuForm(MenuFormTemplate):
     """Update form according to current state variables"""
     if state['status'] in ["pinging"]:
       self.go_wait(state)
-    elif state['status'] == "matched":   
+    elif state['status'] in ["matched", "requesting", "pinged"]:   
       self.go_match(state)
     else:
-      if state['status'] not in [None, "requesting", "pinged"]:
-        print(f'Warning: {state["status"]} not in [None, "requesting", "pinged"]')
+      if state['status'] not in [None]:
+        print(f'Warning: {state["status"]} not in [None]')
       self.go_dash(state) 
 
   def clear_page(self):

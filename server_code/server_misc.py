@@ -335,7 +335,7 @@ def add_chat_message(user_id="", message="[blank test message]"):
 @authenticated_callable
 def update_match_form(user_id=""):
   """
-  Return (iterable of dictionaries with keys: 'me', 'message'), their_value
+  Return how_empathy_list, their_name, (iterable of dictionaries with keys: 'me', 'message'), their_value
   """
   user = get_user(user_id)
   return _update_match_form(user)
@@ -346,13 +346,19 @@ def _update_match_form(user):
   this_match, i = matcher.current_match_i(user)
   if this_match:
     their_value = _their_value(this_match['slider_values'], i)
+    how_empathy_list = ([user['how_empathy']]
+                        + [u['how_empathy'] for u in this_match['users']
+                           if u != user]
+                       )
     messages = app_tables.chat.search(anvil.tables.order_by("time_stamp", ascending=True), match=this_match)
-    if messages:
-      return ([{'me': (user == m['user']),
-                'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
-               for m in messages],
-              their_value)
-  return [], None
+    messages_out = [{'me': (user == m['user']),
+                     'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
+                    for m in messages]
+    [their_name] = [u['first_name'] for u in this_match['users'] if u != user]
+    return "matched", how_empathy_list, their_name, messages_out, their_value
+  else:
+    state = matcher._get_status(user)
+    return state['status'], [], "", [], None
 
   
 @authenticated_callable
