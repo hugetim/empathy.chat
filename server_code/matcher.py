@@ -527,7 +527,7 @@ class ProposalTime():
     return Proposal(self._proptime_row['proposal'])
 
   def is_accepted(self):
-    return bool(self._proptime_row['jitsi_code'])
+    return bool(self._proptime_row['users_accepting'])
 
   def all_users(self):
     return [self.proposal.proposer] + list(self._proptime_row['users_accepting'])
@@ -553,7 +553,6 @@ class ProposalTime():
         ProposalTime(own_now_proposal_time).proposal.cancel_all_times()
     self._proptime_row['users_accepting'] = [user]
     self._proptime_row['accept_date'] = now
-    self._proptime_row['jitsi_code'] = sm.new_jitsi_code()
     self.proposal.hide_unaccepted_times()
     if not self.is_now():
       _match_commit(user, self.get_id())
@@ -577,7 +576,6 @@ class ProposalTime():
     # below code assumes only dyads allowed
     self._proptime_row['users_accepting'] = []
     self._proptime_row['accept_date'] = None
-    self._proptime_row['jitsi_code'] = ""
     self.proposal.unhide_times()
 
   def cancel_other(self, user):
@@ -645,7 +643,7 @@ class ProposalTime():
                                                           current=True,
                                                           cancelled=False,
                                                           users_accepting=[],
-                                                          jitsi_code="",
+                                                          jitsi_code=sm.new_jitsi_code(),
                                                           missed_pings=0,
                                                          )).confirm_wait(port_time.start_now)
 
@@ -714,7 +712,7 @@ class ProposalTime():
     if sm.DEBUG:
       print("old_prop_times_to_prune")
     for row in app_tables.proposal_times.search(cancelled=False, 
-                                                jitsi_code="",
+                                                users_accepting=q.any_of(None, []),
                                                 expire_date=q.less_than(now),
                                                ):
       yield ProposalTime(row)
@@ -728,7 +726,7 @@ class ProposalTime():
     cutoff_r = now - timeout
     for row in app_tables.proposal_times.search(cancelled=False, 
                                                 start_now=True,
-                                                jitsi_code=q.not_(""),
+                                                users_accepting=q.not_(q.any_of(None, [])),
                                                 accept_date=q.less_than(cutoff_r),
                                                ):
       yield ProposalTime(row)
