@@ -237,7 +237,7 @@ def save_user_item(item_name, text, user_id=""):
 def new_jitsi_code():
   if DEBUG:
     print("server_misc.new_jitsi_code()")
-  return "empathyspot-" + random_code()
+  return "empathy-chat-" + random_code()
 
 
 def random_code(num_chars=5, digits_only=False):
@@ -660,7 +660,7 @@ def _notify_message(user, from_name=""):
 #     if not name:
 #       name = "empathy.chat user"
 #     #anvil.google.mail.send(to=u['email'],
-#     #                       subject="Empathy Spot - Request active",
+#     #                       subject="empathy.chat - Request active",
 #     text=(
 # "Dear " + name + ''',
 

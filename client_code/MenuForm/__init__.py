@@ -162,12 +162,12 @@ class MenuForm(MenuFormTemplate):
     
   def set_test_link(self):
     import random
-    num_chars = 4
+    num_chars = 5
     charset = "abcdefghijkmnopqrstuvwxyz23456789"
     random.seed()
     rand_code = "".join([random.choice(charset) for i in range(num_chars)])
-    code = "test-" + rand_code
-    self.test_link.url = "https://meet.jit.si/" + code
+    code = "empathy-test-" + rand_code
+    self.test_link.url = "https://meet.jit.si/" + code + "#config.prejoinPageEnabled=false"
     return code          
     
   def logout_button_click(self, **event_args):
