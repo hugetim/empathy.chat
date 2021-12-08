@@ -5,6 +5,7 @@ import anvil.server
 from anvil.js import window, ExternalError
 from ... import ui_procedures as ui
 from ... import glob
+from ... import helper as h
 from .MyJitsi import MyJitsi
 from .SliderPanel import SliderPanel
 
@@ -24,6 +25,7 @@ class MatchForm(MatchFormTemplate):
     jitsi_code, duration, my_value = (
       anvil.server.call('init_match_form')
     )
+    self.their_name = ""
     self.how_empathy_list = []
     self.set_jitsi_link(jitsi_code)
     self.chat_repeating_panel.items = []
@@ -56,11 +58,11 @@ class MatchForm(MatchFormTemplate):
     self.slider_panel.set_event_handler('x-hide', self.hide_slider)
     
   def update(self):
-    status, self.how_empathy_list, their_name, new_items, their_value = (
+    status, self.how_empathy_list, self.their_name, new_items, their_value = (
       anvil.server.call_s('update_match_form')
     )
     self.update_status(status)
-    self.slider_panel.update_name(their_name)
+    self.slider_panel.update_name(self.their_name)
     self.update_messages(new_items)
     if self.slider_panel.item['status'] == "submitted" and their_value:
       self.slider_panel.receive_value(their_value)
@@ -76,7 +78,18 @@ class MatchForm(MatchFormTemplate):
       )
       if prev != "matched" and self.status == "matched":
         self.slider_panel.item['status'] = None
-        self.slider_panel.refresh_data_bindings()  
+        self.slider_panel.refresh_data_bindings()
+      if self.status == "pinged":
+        with h.PausedTimer(self.timer_2):
+          if confirm("Someone has asked to join your empathy chat. Are you ready?"):
+            state = anvil.server.call('match_commit')
+            self.update_status(state['status'])
+          else:
+            state = anvil.server.call('cancel')
+            ui.reload()
+      if not self.status:
+        ui.reload()
+          
       
   def update_messages(self, message_list):
     old_items = self.chat_repeating_panel.items
