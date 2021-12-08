@@ -550,9 +550,7 @@ class ProposalTime():
     self.proposal.hide_unaccepted_times()
     if not self.is_now():
       _match_commit(user, self.get_id())
-    elif (now - (self._proptime_row['expire_date']
-                 - datetime.timedelta(seconds=_seconds_left("requesting"))) # wait time elapsed
-         ).total_seconds() <= p.BUFFER_SECONDS:
+    elif (now - (self._proptime_row['start_date'])).total_seconds() <= p.BUFFER_SECONDS:
       _match_commit(user)
     else:
       self.ping()
@@ -617,8 +615,13 @@ class ProposalTime():
       self._proptime_row['expire_date'] = sm.now() + datetime.timedelta(seconds=_seconds_left("requesting"))
       
   def update(self, port_time):
-    self._proptime_row['start_now'] = port_time.start_now
-    self._proptime_row['start_date'] = port_time.start_date
+    if self._proptime_row['start_now'] and port_time.start_now:
+      pass #self._proptime_row['start_date'] = self._proptime_row['start_date']
+    elif port_time.start_now:
+      self._proptime_row['start_date'] = sm.now()
+    else:
+      self._proptime_row['start_date'] = port_time.start_date
+    self._proptime_row['start_now'] = port_time.start_now # order: after 'start_date' set
     self._proptime_row['duration'] = port_time.duration
     if port_time.start_now:
       self.confirm_wait()
@@ -631,7 +634,7 @@ class ProposalTime():
   def add(proposal, port_time):
     return ProposalTime(app_tables.proposal_times.add_row(proposal=proposal._row,
                                                           start_now=port_time.start_now,
-                                                          start_date=port_time.start_date,
+                                                          start_date=sm.now() if port_time.start_now else port_time.start_date,
                                                           duration=port_time.duration,
                                                           expire_date=port_time.expire_date,
                                                           current=True,

@@ -78,17 +78,19 @@ class TestNow():
 
   def test_repeat_now_proposal(self):
     for email, user_id in self.top_form.test_requestuser_drop_down.items:
-      if email == "A":
+      if email == "hugetim@alumni.rice.edu":
         accept_user_id = user_id
     for i in range(2):
       anvil.server.call('add_now_proposal')
       time.sleep(15)
       anvil.server.call('accept_now_proposal', user_id=accept_user_id)
-      time.sleep(5)
+      time.sleep(10)
       anvil.server.call('cancel', user_id=accept_user_id)
-      time.sleep(5)
+      time.sleep(10)
       anvil.server.call('cancel')
-
+      time.sleep(15)
+      
+      
   def test_multiple_proposal_times(self):
     self.top_form.content.propose_button_click()
     time.sleep(5)
