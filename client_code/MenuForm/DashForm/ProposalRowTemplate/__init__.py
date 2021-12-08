@@ -31,7 +31,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.item.update({'duration': t.DURATION_TEXT[time.duration],
                       'expire_date': time.expire_date,})
     if time.start_now:
-      self.item['start_time'] = "Ready now"
+      self.item['start_time'] = "Now"
       self.accept_button.text = "Join"
     else:
       self.item['start_time'] = h.day_time_str(time.start_date)

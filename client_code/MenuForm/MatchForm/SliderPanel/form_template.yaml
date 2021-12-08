@@ -86,7 +86,7 @@ components:
           event_bindings: {}
           data_bindings:
           - {property: value, code: 'self.item[''my_value'']', writeback: true}
-          - {property: enabled, code: 'not self.item[''status'']'}
+          - {property: enabled, code: 'self.item[''status''] in [None, "waiting"]'}
         - type: form:MFQJNLWQIOGGXL4W:slider
           properties:
             value: 5

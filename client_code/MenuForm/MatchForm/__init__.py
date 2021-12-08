@@ -30,7 +30,7 @@ class MatchForm(MatchFormTemplate):
     self.set_jitsi_link(jitsi_code)
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
-    self.status = None
+    self.status = "init"
     self.update_status(self.item['status'])
     self.first_update = True
     self.update()
@@ -76,20 +76,22 @@ class MatchForm(MatchFormTemplate):
       self.message_textbox.tooltip = (
         "" if matched else "Please wait until the other has joined before sending a message"
       )
-      if prev != "matched" and self.status == "matched":
-        self.slider_panel.item['status'] = None
-        self.slider_panel.refresh_data_bindings()
+      self.status_label.visible = self.status == "requesting"
       if self.status == "pinged":
         with h.PausedTimer(self.timer_2):
-          if confirm("Someone has asked to join your empathy chat. Are you ready?"):
+          with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
+            ready = confirm("Someone has asked to join your empathy chat. Ready?")
+          if ready:
             state = anvil.server.call('match_commit')
             self.update_status(state['status'])
           else:
             state = anvil.server.call('cancel')
             ui.reload()
+      if prev != "matched" and self.status == "matched":
+        self.slider_panel.item['status'] = None
+        self.slider_panel.refresh_data_bindings()
       if not self.status:
         ui.reload()
-          
       
   def update_messages(self, message_list):
     old_items = self.chat_repeating_panel.items

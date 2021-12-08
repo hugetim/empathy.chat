@@ -13,8 +13,8 @@ components:
     components:
     - type: Label
       properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-        visible: false, text: Waiting for other to join..., font_size: null, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        visible: false, text: Waiting for someone else to join..., font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       name: status_label
       layout_properties: {grid_position: 'YOJCEM,HURPQL'}
