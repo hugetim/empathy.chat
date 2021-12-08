@@ -16,3 +16,6 @@ def reload():
   init_dict = anvil.server.call('init', datetime.now())
   open_form('MenuForm', item=init_dict)
   
+def set_document_title(text):
+  from anvil.js import window
+  window.document.title = text
