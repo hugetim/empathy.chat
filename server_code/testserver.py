@@ -88,16 +88,18 @@ def test_clear():
   if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
     test_records = app_tables.test_data.search()
     test_matches = set()
+    test_times = set()
+    test_proposals = set()
     for test_row in test_records:
       for user in test_row['test_users']:
         user.delete()
       for time in test_row['test_times']:
         print("time", time['expire_date'])
         test_matches.add(app_tables.matches.get(proposal_time=time))
-        time.delete()
+        test_times.add(time)
       for proposal in set(test_row['test_proposals']):
         print("proposal", proposal['created'])
-        proposal.delete()
+        test_proposals.add(proposal)
       test_row.delete()
     for match in test_matches:
       if match is not None:
@@ -105,6 +107,10 @@ def test_clear():
         for chat_row in app_tables.chat.search(match=match):
           chat_row.delete()
         match.delete()
+    for time in test_times:
+      time.delete()
+    for proposal in test_proposals:
+      proposal.delete()
     anvil.server.session['test_record'] = None
 
 
