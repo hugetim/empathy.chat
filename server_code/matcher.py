@@ -431,6 +431,10 @@ def match_complete(user_id=""):
     temp = this_match['complete']
     temp[i] = 1
     this_match['complete'] = temp
+  else:
+    current_proptime = ProposalTime.get_now(user)
+    if current_proptime:
+      _cancel(user, current_proptime.get_id())
   return _get_status(user)
 
 
