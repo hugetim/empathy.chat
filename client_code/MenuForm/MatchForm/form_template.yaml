@@ -62,6 +62,14 @@ components:
           layout_properties: {}
           event_bindings: {click: slider_button_click}
         - type: Button
+          properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
+            border: '', enabled: true, foreground: '', visible: true, text: '   Timer   ',
+            font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: ''}
+          name: timer_button
+          layout_properties: {slot: default}
+          event_bindings: {click: timer_button_click}
+        - type: Button
           properties: {role: raised, align: center, tooltip: Toggle text chat card,
             border: '', enabled: true, foreground: '', visible: true, text: Message,
             font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
@@ -79,7 +87,7 @@ components:
           event_bindings: {click: full_screen_button_click}
         - type: Spacer
           properties: {visible: true, spacing_above: small, spacing_below: small,
-            height: '240', tooltip: ''}
+            height: 201, tooltip: ''}
           name: spacer_2
           layout_properties: {}
         - type: Button
@@ -122,6 +130,18 @@ components:
       name: slider_column_panel
       layout_properties: {grid_position: 'UATIWX,QHMTDV'}
       components: []
+  - type: ColumnPanel
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
+      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
+      spacing_below: small, background: ''}
+    name: timer_card
+    layout_properties: {grid_position: 'ODNWIY,XMNGNB'}
+    components:
+    - type: form:WAF7GWYZ3PTOPDNF:MyTimer
+      properties: {}
+      name: my_timer_1
+      layout_properties: {grid_position: 'PGYFGE,FTMBCC'}
+      data_bindings: []
   - type: ColumnPanel
     properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
       wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',

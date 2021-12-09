@@ -27,6 +27,7 @@ class MatchForm(MatchFormTemplate):
     )
     self.their_name = ""
     self.how_empathy_list = []
+    self.my_timer_1.minutes = (duration - 5)/2
     self.set_jitsi_link(jitsi_code)
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
@@ -152,7 +153,12 @@ class MatchForm(MatchFormTemplate):
   def hide_slider(self, **event_args):
     self.slider_card.visible = False
     self.slider_button.role = "raised"
-
+    
+  def timer_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.timer_card.visible = not self.timer_card.visible
+    self.timer_button.role = None if self.timer_button.role else "raised"
+  
   def message_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.message_card.visible = not self.message_card.visible
@@ -173,4 +179,3 @@ class MatchForm(MatchFormTemplate):
       Notification("Full screen toggle blocked by browser. Try F11.").show()
       self.full_screen_button.enabled = False
       print(repr(e))
-
