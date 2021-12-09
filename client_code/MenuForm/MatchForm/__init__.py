@@ -20,7 +20,6 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_embed = None
     self._info_clicked = False
     self.info_button.role = ""
-    self.timer_2.interval = 5
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
@@ -37,6 +36,7 @@ class MatchForm(MatchFormTemplate):
     self.update_status(self.item['status'])
     self.first_update = True
     self.update()
+    self.timer_2.interval = 5
       
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
