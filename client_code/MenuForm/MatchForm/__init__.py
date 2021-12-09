@@ -140,6 +140,7 @@ class MatchForm(MatchFormTemplate):
       
   def complete_button_click(self, **event_args):
     self.timer_2.interval = 0
+    self.jitsi_embed.visible = False
     window.japi.executeCommand('hangup')
     state = anvil.server.call('match_complete')
     ui.reload()
