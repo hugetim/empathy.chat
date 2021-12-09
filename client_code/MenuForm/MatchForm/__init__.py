@@ -19,6 +19,7 @@ class MatchForm(MatchFormTemplate):
     #
     self.jitsi_embed = None
     self._info_clicked = False
+    self.info_button.role = ""
     self.timer_2.interval = 5
 
   def form_show(self, **event_args):
