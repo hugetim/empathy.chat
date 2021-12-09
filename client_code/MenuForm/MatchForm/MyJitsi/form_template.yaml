@@ -23,7 +23,10 @@ container:
       \ 60000,\n                                        SHOW_CHROME_EXTENSION_BANNER:\
       \ false,\n                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
       \ options);\n    window.japi.executeCommand('subject', ' ');   \n  }\n</script>\n\
-      \n<style>\n  #jitsi iframe {\n  \twidth: 100%;\n    border: none;\n  }\n</style>\n"}
+      \n<style>\n  #jitsi iframe {\n    border: none;\n  }\n  #jitsi {\n    padding:\
+      \ 0px 5px 5px 0px;\n    border: thin ridge;\n    height: 400px;\n    resize:\
+      \ vertical;\n    overflow: hidden;\n    min-height: 100px;\n    max-height:\
+      \ 500px;\n  }\n</style>\n"}
   event_bindings: {show: form_show}
 components: []
 is_package: true
