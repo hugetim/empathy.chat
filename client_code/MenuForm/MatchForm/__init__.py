@@ -18,6 +18,7 @@ class MatchForm(MatchFormTemplate):
     self.init_components(**properties)
     #
     self.jitsi_embed = None
+    self._info_clicked = False
     self.timer_2.interval = 5
 
   def form_show(self, **event_args):
@@ -180,3 +181,14 @@ class MatchForm(MatchFormTemplate):
       Notification("Full screen toggle blocked by browser. Try F11.").show()
       self.full_screen_button.enabled = False
       print(repr(e))
+
+  def info_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.info_flow_panel.visible = not self.info_flow_panel.visible
+    self.info_button.role = None if self.info_button.role else "raised"
+    self._info_clicked = True
+
+  def info_timer_tick(self, **event_args):
+    """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
+    if not self._info_clicked and self.info_flow_panel.visible:
+      self.info_button_click()
