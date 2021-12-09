@@ -25,8 +25,8 @@ container:
       \ options);\n    window.japi.executeCommand('subject', ' ');   \n  }\n</script>\n\
       \n<style>\n  #jitsi iframe {\n    border: none;\n    width: 100%;\n    min-width:\
       \ 150px;\n  }\n  #jitsi {\n    padding: 0px 5px 5px 0px;\n    border: thin ridge;\n\
-      \    height: 400px;\n    resize: vertical;\n    overflow: hidden;\n    min-height:\
-      \ 100px;\n    max-height: 500px;\n  }\n</style>\n"}
+      \    height: 550px;\n    resize: vertical;\n    overflow: hidden;\n    min-height:\
+      \ 150px;\n    max-height: 700px;\n  }\n</style>\n"}
   event_bindings: {show: form_show}
 components: []
 is_package: true
