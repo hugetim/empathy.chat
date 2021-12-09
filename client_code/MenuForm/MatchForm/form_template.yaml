@@ -36,7 +36,7 @@ components:
       components:
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
-          border: '', enabled: true, foreground: '', visible: true, text: '  Slider   ',
+          border: '', enabled: true, foreground: '', visible: true, text: Slider,
           font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: ''}
         name: slider_button
@@ -44,8 +44,8 @@ components:
         event_bindings: {click: slider_button_click}
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
-          border: '', enabled: true, foreground: '', visible: true, text: '   Timer   ',
-          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          border: '', enabled: true, foreground: '', visible: true, text: Timer, font_size: null,
+          font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: ''}
         name: timer_button
         layout_properties: {slot: default}
@@ -68,8 +68,8 @@ components:
         event_bindings: {click: full_screen_button_click}
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
-          border: '', enabled: true, foreground: '', visible: true, text: 'Info   ',
-          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          border: '', enabled: true, foreground: '', visible: true, text: Info, font_size: null,
+          font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:info-circle'}
         name: info_button
         layout_properties: {}
