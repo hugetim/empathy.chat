@@ -87,6 +87,11 @@ db_schema:
     - name: time_stamp
       admin_ui: {width: 200}
       type: datetime
+  files:
+    title: files
+    client: none
+    server: full
+    columns: []
   invites:
     title: Invites
     client: none

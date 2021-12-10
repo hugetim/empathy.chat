@@ -623,7 +623,18 @@ def _notify_message(user, from_name=""):
 '''
     )
     
-    
+  
+@anvil.server.http_endpoint('/:name')
+def get_doc(name):
+  return app_tables.files.get(name=name)['file']
+
+
+@anvil.server.callable
+def get_url(name):
+  url = anvil.server.get_api_origin() +'/'+name
+  return url
+
+
 # def users_to_email_re_notif(user=None):
 #   """Return list of users to email notifications triggered by user
 

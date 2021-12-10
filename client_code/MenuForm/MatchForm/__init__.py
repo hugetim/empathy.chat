@@ -3,6 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from anvil.js import window, ExternalError
+from pdf_viewer import pdf_viewer
 from ... import ui_procedures as ui
 from ... import glob
 from ... import helper as h
@@ -32,6 +33,8 @@ class MatchForm(MatchFormTemplate):
     self.set_jitsi_link(jitsi_code)
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
+    url = anvil.server.call('get_url', 'nycnvc_feelings_needs')
+    self.lists_card.add_component(pdf_viewer(url=url))
     self.status = "init"
     self.update_status(self.item['status'])
     self.first_update = True
@@ -150,8 +153,7 @@ class MatchForm(MatchFormTemplate):
 
   def slider_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.slider_card.visible = not self.slider_card.visible
-    self.slider_button.role = None if self.slider_card.visible else "raised"
+    toggle_button_card(self.slider_button, self.slider_card)
 
   def hide_slider(self, **event_args):
     self.slider_card.visible = False
@@ -159,13 +161,11 @@ class MatchForm(MatchFormTemplate):
     
   def timer_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.timer_card.visible = not self.timer_card.visible
-    self.timer_button.role = None if self.timer_button.role else "raised"
+    toggle_button_card(self.timer_button, self.timer_card)
   
   def message_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.message_card.visible = not self.message_card.visible
-    self.message_button.role = None if self.message_button.role else "raised"
+    toggle_button_card(self.message_button, self.message_card)
 
   def full_screen_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -185,11 +185,19 @@ class MatchForm(MatchFormTemplate):
 
   def info_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.info_flow_panel.visible = not self.info_flow_panel.visible
-    self.info_button.role = None if self.info_button.role else "raised"
+    toggle_button_card(self.info_button, self.info_flow_panel)
     self._info_clicked = True
 
   def info_timer_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     if not self._info_clicked and self.info_flow_panel.visible:
       self.info_button_click()
+
+  def lists_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    toggle_button_card(self.lists_button, self.lists_card)
+
+
+def toggle_button_card(button, card):
+  card.visible = not card.visible
+  button.role = None if card.visible else "raised"
