@@ -34,6 +34,9 @@ class MatchForm(MatchFormTemplate):
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
     url = anvil.server.call('get_url', 'nycnvc_feelings_needs')
+    dom_node = js.get_dom_node(self.lists_card)
+    dom_node.style.height = "300px"
+    dom_node.style.resize = "vertical"
     self.lists_card.add_component(pdf_viewer(url=url))
     self.status = "init"
     self.update_status(self.item['status'])
