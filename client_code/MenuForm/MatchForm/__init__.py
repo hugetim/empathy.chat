@@ -18,6 +18,7 @@ class MatchForm(MatchFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     #
+    self.timer_2.interval = 0
     self.jitsi_embed = None
     self._info_clicked = False
     self.info_button.role = ""
@@ -33,12 +34,11 @@ class MatchForm(MatchFormTemplate):
     self.set_jitsi_link(jitsi_code)
     self.chat_repeating_panel.items = []
     self.init_slider_panel(my_value)
-    url = anvil.server.call('get_url', 'nycnvc_feelings_needs')
-    self.lists_card.add_component(pdf_viewer(url=url))
     self.status = "init"
     self.update_status(self.item['status'])
     self.first_update = True
     self.update()
+    self._first_tick = True
     self.timer_2.interval = 5
       
   def set_jitsi_link(self, jitsi_code):
@@ -133,7 +133,11 @@ class MatchForm(MatchFormTemplate):
     
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
-    self.update() 
+    if self._first_tick:
+      url = anvil.server.call('get_url', 'nycnvc_feelings_needs')
+      self.lists_card.add_component(pdf_viewer(url=url))
+      self._first_tick = False
+    self.update()
 
   def message_textbox_pressed_enter(self, **event_args):
     text = self.message_textbox.text
