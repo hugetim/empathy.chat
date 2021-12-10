@@ -29,7 +29,6 @@ def change_favicon(url):
   # change its href to the given link.
   old_hrefs = []
   for favicon in favicons:
-    print(favicon.href)
     if favicon:
       old_hrefs.append(favicon.href)
       favicon.href = url

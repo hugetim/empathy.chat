@@ -3,7 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from anvil.js import window, ExternalError
-from pdf_viewer import pdf_viewer
+from pdf_viewer.pdf_viewer import pdf_viewer
 from ... import ui_procedures as ui
 from ... import glob
 from ... import helper as h
