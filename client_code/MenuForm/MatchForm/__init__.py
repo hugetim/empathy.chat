@@ -95,7 +95,7 @@ class MatchForm(MatchFormTemplate):
             ui.reload()
       if prev != "matched" and self.status == "matched":
         self.slider_panel.item['status'] = None
-        self.slider_panel.refresh_data_bindings()
+        self.slider_panel.update_status()
       if not self.status:
         ui.reload()
       

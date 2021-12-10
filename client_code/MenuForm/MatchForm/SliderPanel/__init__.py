@@ -18,7 +18,20 @@ class SliderPanel(SliderPanelTemplate):
     # Any code you write here will run when the form opens.
     if self.item.get('their_name'):
       self.update_name(self.item.get('their_name'))
+    self.update_status()
 
+  def update_status(self):
+    if self.item['status'] in [None, 'waiting']:
+      self.title_label.text = 'How full is your "empathy tank"? (Empty: angry/distant, Full: content/open)'
+      self.title_label.bold = True
+      self.left_column_panel.tooltip = "The idea is to compare values (after you both submit) to help you decide who gives empathy first."
+    else:
+      self.title_label.text = 'Use to help decide who gives empathy first (Empty: angry/distant, Full: content/open)'
+      self.title_label.bold = False
+      self.left_column_panel.tooltip = ('It may be that neither of you is "full" enough to feel willing/able to give empathy first. '
+                                        'If so, consider cancelling or rescheduling.')
+    self.refresh_data_bindings()
+      
   def update_name(self, their_name):
     self.their_label.text = f"{their_name}:"
       
@@ -26,12 +39,12 @@ class SliderPanel(SliderPanelTemplate):
     """This method is called when the button is clicked"""
     self.raise_event('x-hide')
 #     self.item['visible'] = False
-#     self.refresh_data_bindings()
+#     self.update_status()
 
   def submit_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item['status'] = "submitted"
-    self.refresh_data_bindings()
+    self.update_status()
     their_value = anvil.server.call('submit_slider', 
                                     self.my_slider.value)
     if their_value:
@@ -40,11 +53,11 @@ class SliderPanel(SliderPanelTemplate):
   def receive_value(self, their_value):
     self.item['their_value'] = their_value
     self.item['status'] = "received"
-    self.refresh_data_bindings()
+    self.update_status()
     self.their_slider.scroll_into_view()
       
   def show_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item['visible'] = True
-    self.refresh_data_bindings()
+    self.update_status()
 
