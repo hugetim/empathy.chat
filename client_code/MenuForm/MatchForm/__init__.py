@@ -166,7 +166,11 @@ class MatchForm(MatchFormTemplate):
   def timer_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.timer_button, self.timer_card)
-  
+
+  def my_timer_1_elapsed(self, **event_args):
+    if not self.timer_card.visible:
+      self.timer_button_click()
+      
   def message_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.message_button, self.message_card)

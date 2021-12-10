@@ -141,9 +141,11 @@ components:
       layout_properties: {grid_position: 'UATIWX,QHMTDV'}
       components: []
   - type: ColumnPanel
-    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
+    properties: {role: card, tooltip: 'This is a private timer, the time not shown
+        to the other user. Note: If you hide a running timer, it will reappear when
+        the time elapses.', border: '', foreground: '', visible: false, wrap_on: mobile,
+      col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small,
+      background: ''}
     name: timer_card
     layout_properties: {grid_position: 'ODNWIY,XMNGNB'}
     components:
@@ -152,6 +154,7 @@ components:
       name: my_timer_1
       layout_properties: {grid_position: 'PGYFGE,FTMBCC'}
       data_bindings: []
+      event_bindings: {elapsed: my_timer_1_elapsed}
   - type: ColumnPanel
     properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
       wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
