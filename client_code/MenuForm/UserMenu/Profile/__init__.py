@@ -18,9 +18,9 @@ class Profile(ProfileTemplate):
                'confirmed_url', 'confirmed_date',}
   trust_tooltip = {"Visitor": "Has not yet confirmed an email address",
                    "Guest": "Has not yet confirmed a phone number",
-                   "Confirmed": "Has not yet matched with a Member who is a close connection",
+                   "Confirmed": "Has not yet had an empathy chat with a Member (who can verify their identity)",
                    "Member": ("Has confirmed an email address and phone number" 
-                              "and matched with a Member who is a close connection"),
+                              "and matched with a Member who can verify their identity"),
                    "Partner": "Confirmed url and has contributed at least a half hour's worth",
                    "Admin": "empathy.chat admin"
                   }
