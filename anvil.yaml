@@ -90,10 +90,16 @@ db_schema:
       admin_ui: {width: 200}
       type: datetime
   files:
-    title: files
+    title: Files
     client: none
     server: full
-    columns: []
+    columns:
+    - name: name
+      admin_ui: {width: 200}
+      type: string
+    - name: file
+      admin_ui: {width: 200}
+      type: media
   invites:
     title: Invites
     client: none
