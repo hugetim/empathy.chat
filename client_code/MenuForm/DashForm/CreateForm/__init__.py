@@ -28,7 +28,10 @@ class CreateForm(CreateFormTemplate):
     #alert buttons: OK, Cancel
     
     # Any code you write here will run when the form opens.
-    if not self.item['now_allowed']:
+    if self.item['now_allowed']:
+      self.now_radio_button.selected = self.item['start_now']
+      self.later_radio_button.selected = not self.item['start_now']
+    else:
       self.item['start_now'] = False
       self.now_radio_button.visible = False
       self.later_radio_button.visible = False
@@ -74,8 +77,12 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel_initialized = True
 
   def update_times(self):
-    self.now_radio_button.enabled = not self.item['alt']
-    self.now_radio_button.tooltip = 'To switch to "now", first remove the Alternate Times'
+    if self.item['alt']:
+      self.now_radio_button.enabled = False
+      self.now_radio_button.tooltip = 'To switch to "now", first remove the Alternate Times'
+    else:
+      self.now_radio_button.enabled = True
+      self.now_radio_button.tooltip = ''
     if self.item['start_now']:
       self.date_picker_start.visible = False
       self.button_add_alternate.visible = False
@@ -88,10 +95,10 @@ class CreateForm(CreateFormTemplate):
         self.drop_down_cancel.visible = False
         self.date_picker_cancel.visible = False      
     else: # Later...
-      self.button_add_alternate.visible = len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES
       if not self.date_picker_start_initialized:
         self.init_date_picker_start()
-      self.date_picker_start.visible = True 
+      self.date_picker_start.visible = True
+      self.button_add_alternate.visible = len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES
       self.column_panel_cancel.visible = True
       self.drop_down_cancel.visible = True
       if self.item['cancel_buffer'] == "custom":
@@ -115,7 +122,9 @@ class CreateForm(CreateFormTemplate):
 
   def radio_start_change(self, **event_args):
     """This method is called when an item is selected"""
-    self.item['start_now'] = self.now_radio_button.get_group_value()
+    sender = event_args.get('sender')
+    if sender:
+      self.item['start_now'] = bool(int(sender.get_group_value()))
     self.update_times()
 
   def drop_down_cancel_change(self, **event_args):
