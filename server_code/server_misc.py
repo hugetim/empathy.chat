@@ -649,7 +649,7 @@ def get_url(name):
   #cutoff_e = now - assume_inactive
   #### comprehension below should probably be converted to loop
   #return [u for u in app_tables.users.search(enabled=True, request_em=True)
-  #                if (u['last_login'] > cutoff_e
+  #                if (u['browser_now'] > cutoff_e
   #                    and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
   #                    and u != user
   #                    and c.is_visible(u, user)
