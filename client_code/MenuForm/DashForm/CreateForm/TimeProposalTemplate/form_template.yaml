@@ -94,7 +94,7 @@ components:
         font_size: null
         font: ''
         spacing_above: small
-        spacing_below: small
+        spacing_below: none
         italic: false
         background: theme:Gray 200
         bold: false
@@ -108,7 +108,7 @@ components:
     - type: DatePicker
       properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
         placeholder: '', border: '', enabled: true, foreground: '', visible: false,
-        font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
+        font_size: null, font: '', spacing_above: none, spacing_below: small, italic: false,
         date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
         format: ''}
       name: date_picker_cancel

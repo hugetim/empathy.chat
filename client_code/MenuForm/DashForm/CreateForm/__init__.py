@@ -28,10 +28,10 @@ class CreateForm(CreateFormTemplate):
     #alert buttons: OK, Cancel
     
     # Any code you write here will run when the form opens.
-    if self.item['now_allowed']:
-      self.drop_down_start.items = [("Later at...", 0), ("Now", 1)]
-    else:
-      self.drop_down_start.items = [("Later at...", 0)]
+    if not self.item['now_allowed']:
+      self.item['start_now'] = False
+      self.now_radio_button.visible = False
+      self.later_radio_button.visible = False
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     self.drop_down_eligible.items = (
@@ -74,12 +74,11 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel_initialized = True
 
   def update_times(self):
-    self.button_add_alternate.visible = (not self.item['start_now']
-                                         and len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES)
-    self.drop_down_start.enabled = not self.item['alt']
-    self.drop_down_start.tooltip = 'To switch to "now", first remove the Alternate Times'
+    self.now_radio_button.enabled = not self.item['alt']
+    self.now_radio_button.tooltip = 'To switch to "now", first remove the Alternate Times'
     if self.item['start_now']:
       self.date_picker_start.visible = False
+      self.button_add_alternate.visible = False
       if not self.item['alt']:
         self.column_panel_cancel.visible = False
       else:
@@ -88,7 +87,8 @@ class CreateForm(CreateFormTemplate):
         self.column_panel_cancel.visible = True
         self.drop_down_cancel.visible = False
         self.date_picker_cancel.visible = False      
-    else:
+    else: # Later...
+      self.button_add_alternate.visible = len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES
       if not self.date_picker_start_initialized:
         self.init_date_picker_start()
       self.date_picker_start.visible = True 
@@ -113,9 +113,10 @@ class CreateForm(CreateFormTemplate):
     self.update_times()
     self.update_eligible()
 
-  def drop_down_start_change(self, **event_args):
+  def radio_start_change(self, **event_args):
     """This method is called when an item is selected"""
-    self.update()
+    self.item['start_now'] = self.now_radio_button.get_group_value()
+    self.update_times()
 
   def drop_down_cancel_change(self, **event_args):
     """This method is called when an item is selected"""
