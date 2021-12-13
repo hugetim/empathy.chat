@@ -84,6 +84,7 @@ class CreateForm(CreateFormTemplate):
       self.now_radio_button.enabled = True
       self.now_radio_button.tooltip = ''
     if self.item['start_now']:
+      self.save_button.text = "START"
       self.date_picker_start.visible = False
       self.button_add_alternate.visible = False
       if not self.item['alt']:
@@ -95,6 +96,7 @@ class CreateForm(CreateFormTemplate):
         self.drop_down_cancel.visible = False
         self.date_picker_cancel.visible = False      
     else: # Later...
+      self.save_button.text = "SAVE"
       if not self.date_picker_start_initialized:
         self.init_date_picker_start()
       self.date_picker_start.visible = True
