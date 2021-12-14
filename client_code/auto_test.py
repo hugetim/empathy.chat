@@ -7,7 +7,7 @@ from . import helper as h
 from . import portable as port
 from . import parameters as p
 from datetime import datetime
-from . import glob
+from . import invites
 # from .MenuForm import MenuForm
 # from .MenuForm.DashForm import DashForm
 
@@ -56,10 +56,17 @@ class RoundUpDatetimeTest(unittest.TestCase):
 
 class InvitesTest(unittest.TestCase):
   def test_client(self):
-    invite = glob.Invite({'link_key': 'test'})
+    invite = invites.Invite({'link_key': 'test'})
     self.assertEqual(invite.url, p.URL + "#?invite=test")
+
+  def test_new(self):
+    invite = invites.Invite(rel_to_inviter='test subject', inviter_guess="6666")
+    invite.s_add()
+    self.assertEqual(invite.inviter_id, anvil.users.get_user().get_id())
+    self.assertTrue(invite.link_key)
+    #invite.s_visit()
     
-  
+
 def client_auto_tests():
   pass
 #   Seconds2WordsTest().main()

@@ -131,3 +131,30 @@ class PausedTimer:
     self.timer.interval = 0
   def __exit__(self, type, value, tb):
     self.timer.interval = self.orig_interval
+    
+    
+class AttributeToKey:
+  def __getitem__(self, key):
+    return self.__getattr__(key)
+
+  def __setitem__(self, key, item):
+    self.__setattr__(key, item)
+
+
+class ItemWrapped(AttributeToKey):
+  def __init__(self, item):
+    self.item = item
+ 
+  def to_data(self):
+    return self.item
+
+  def __getattr__(self, key):
+    return self.item[key]
+  
+  def get(self, key, default=None):
+    return self.item.get(key, default)
+  
+#   def __setattr__(self, key, value):
+#     self.item[key] = value
+
+    
