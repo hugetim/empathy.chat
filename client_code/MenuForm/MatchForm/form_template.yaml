@@ -89,7 +89,7 @@ components:
         layout_properties: {width: null, expand: true}
       - type: Button
         properties: {role: secondary-color, align: right, tooltip: '', border: '',
-          enabled: true, foreground: '', visible: true, text: End Chat, font_size: null,
+          enabled: true, foreground: '', visible: true, text: Cancel, font_size: null,
           font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: ''}
         name: complete_button

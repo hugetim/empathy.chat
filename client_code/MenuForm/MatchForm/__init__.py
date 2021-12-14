@@ -82,6 +82,7 @@ class MatchForm(MatchFormTemplate):
       self.message_textbox.tooltip = (
         "" if matched else "Please wait until the other has joined before sending a message"
       )
+      self.complete_button.text = "End Chat" if matched else "Cancel"
       self.status_label.visible = self.status == "requesting"
       if self.status == "pinged":
         with h.PausedTimer(self.timer_2):
