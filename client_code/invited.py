@@ -5,7 +5,7 @@ from anvil.google.drive import app_files
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-import anvil
+from anvil import *
 from . import parameters as p
 
 
@@ -26,7 +26,7 @@ def handle_link(link_key):
   if item:
     from .Dialogs.Invited import Invited
     invited_alert = Invited(item=item)
-    if anvil.alert(content=invited_alert, 
+    if alert(content=invited_alert, 
                    title="", 
                    buttons=[], large=True, dismissible=False):
       if not user:
@@ -34,9 +34,9 @@ def handle_link(link_key):
         if not new_user:
           new_user = anvil.users.login_with_form()
         anvil.server.call('invite_visit_register', link_key, new_user)
-      anvil.open_form('LoginForm')
+      open_form('LoginForm')
   else:
-    anvil.alert("This is not a valid invite link.")
+    alert("This is not a valid invite link.")
 
 
 def submit_invite_reply(item):
