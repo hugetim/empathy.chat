@@ -60,11 +60,17 @@ class InvitesTest(unittest.TestCase):
     self.assertEqual(invite.url, p.URL + "#?invite=test")
 
   def test_new(self):
-    invite = invites.Invite(rel_to_inviter='test subject', inviter_guess="6666")
-    invite.s_add()
-    self.assertEqual(invite.inviter_id, anvil.users.get_user().get_id())
-    self.assertTrue(invite.link_key)
-    #invite.s_visit()
+    invite1 = invites.Invite(rel_to_inviter='test subject', inviter_guess="6666")
+    invite1.s_add()
+    self.assertEqual(invite1.inviter_id, anvil.users.get_user().get_id())
+    self.assertTrue(invite1.link_key)
+    
+    invite2 = invites.Invite.from_key(invite1.link_key)
+    poptibo = app_tables.users.get(email="poptibo@yahoo.com")
+    errors = invite2.s_visit(user_id=poptibo.get_id())
+    self.assertEqual(invite2.invitee_id, poptibo.get_id())
+    self.assertTrue(errors)
+    self.assertEqual(errors[0], "The inviter did not accurately provide the last 4 digits of your phone number.")
     
 
 def client_auto_tests():
