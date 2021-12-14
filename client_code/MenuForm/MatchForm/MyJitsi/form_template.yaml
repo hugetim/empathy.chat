@@ -12,16 +12,17 @@ container:
       \            localRecording: { enabled: false,},\n                         \
       \      enableNoisyMicDetection: false,\n                               readOnlyName:\
       \ true,\n                               toolbarButtons: ['microphone', 'camera',\
-      \ 'fullscreen', \n                                                'chat',\n\
-      \                                                'settings',\n             \
-      \                                   'select-background',\n                 \
-      \                              ],\n                               hideConferenceTimer:\
-      \ false,\n                               disablePolls: true,\n             \
-      \                 };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
+      \ \n                                                'chat',\n              \
+      \                                  'settings',\n                           \
+      \                     'select-background',\n                               \
+      \                ],\n                               hideConferenceTimer: false,\n\
+      \                               disablePolls: true,\n                      \
+      \        };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
       \ ' ', //empathy.chat partner\n                                        SETTINGS_SECTIONS:\
       \ [ 'devices', 'language' ],\n                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
       \ 60000,\n                                        SHOW_CHROME_EXTENSION_BANNER:\
-      \ false,\n                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
+      \ false,\n                                        MOBILE_APP_PROMO: false,\n\
+      \                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
       \ options);\n    window.japi.executeCommand('subject', ' ');   \n  }\n</script>\n\
       \n<style>\n  #jitsi iframe {\n    border: none;\n    width: 100%;\n    min-width:\
       \ 150px;\n  }\n  #jitsi {\n    padding: 0px 5px 5px 0px;\n    border: thin ridge;\n\
