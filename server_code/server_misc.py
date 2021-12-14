@@ -191,7 +191,7 @@ def invited_item(inviter_id, user_id=""):
   user = get_user(user_id)
   inviter_user = get_user(inviter_id, require_auth=False)
   inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user1=inviter_user, user2=user)
-  return {"inviter": name(inviter_user, to_user=user), 
+  return {"inviter": name(inviter_user, to_user=user), "link_key": inviteds[0]['link_key'],
           "inviter_id": inviter_id, "rel": inviteds[0]['relationship2to1']}
 
 

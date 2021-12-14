@@ -9,9 +9,9 @@ from anvil import *
 from . import parameters as p
 
 
-def invited_dialog(inviter, inviter_id, rel):
+def invited_dialog(inviter, inviter_id, rel, link_key):
   item = {"relationship": "", "phone_last4": "", "name": inviter, "inviter_id": inviter_id,
-          "relationship1to2": rel, "inviter": inviter, "link_key": ""}
+          "relationship1to2": rel, "inviter": inviter, "link_key": link_key}
   top_form = get_open_form()
   from .Dialogs.Invited import Invited
   top_form.invited_alert = Invited(item=item)
