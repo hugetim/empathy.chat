@@ -110,8 +110,11 @@ class Profile(ProfileTemplate):
 
   def edit_profile_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    prompt = ("What would meet a potential empathy buddy's need for trust? "
-              "Share as much or as little as you'd like.")
+    prompt = (
+      "Share as much or as little as you'd like. "
+      "(One suggestion: describing your experience level with NVC might help "
+      "meet a potential empathy buddy's needs for trust or partnership.)"
+    )
     area_item = {'prompt': prompt, 'text': self.item['profile']}
     edit_form = TextAreaEdit(item=area_item)
     out = alert(content=edit_form,
