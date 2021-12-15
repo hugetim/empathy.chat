@@ -60,18 +60,20 @@ class InvitesTest(unittest.TestCase):
     self.user = anvil.users.get_user()
     self.invite1 = invites.Invite(rel_to_inviter='test subject 1', inviter_guess="6666")
     self.invite1.relay('add')
+    print(self.invite1.link_key)
     self.poptibo = app_tables.users.get(email="poptibo@yahoo.com")
     
-  def test_url(self):
-    invite = invites.Invite(link_key='test')
-    self.assertEqual(invite.url, p.URL + "#?invite=test")
+#   def test_url(self):
+#     invite = invites.Invite(link_key='test')
+#     self.assertEqual(invite.url, p.URL + "#?invite=test")
 
-  def test_new(self):
-    self.assertEqual(self.invite1.inviter.user_id, self.user.get_id())
-    self.assertTrue(self.invite1.link_key)
+#   def test_new(self):
+#     self.assertEqual(self.invite1.inviter.user_id, self.user.get_id())
+#     self.assertTrue(self.invite1.link_key)
 
   def test_logged_in_visit(self):
     invite2a = invites.Invite(link_key=self.invite1.link_key)
+    print(invite2a.link_key)
     errors = invite2a.relay('visit', {'user': self.poptibo})
     self.assertTrue(errors)
     self.assertEqual(errors[0], "The inviter did not accurately provide the last 4 digits of your phone number.")
@@ -114,9 +116,9 @@ class InvitesTest(unittest.TestCase):
 #     self.assertTrue([r for r in connection_records if r.user_id == self.poptibo.get_id()])
 #     anvil.server.call('disconnect', self.poptibo.get_id())
 
-  def tearDown(self):
-    self.invite1.relay('cancel')
-    self.assertFalse(self.invite1.inviter)
+#   def tearDown(self):
+#     self.invite1.relay('cancel')
+#     self.assertFalse(self.invite1.inviter)
 
 
 def client_auto_tests():

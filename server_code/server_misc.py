@@ -47,7 +47,7 @@ def remove_user(user):
 def get_user(user_id="", require_auth=True):
   if DEBUG:
     print("get_user", user_id)
-  if user_id == "" or anvil.server.session['user_id'] == user_id:
+  if user_id == "" or anvil.users.get_user().get_id() == user_id:
     return anvil.users.get_user()
   elif (require_auth and anvil.server.session['trust_level'] < TEST_TRUST_LEVEL):
     raise RuntimeError("User not authorized to access this information")
@@ -321,7 +321,11 @@ def _connected_prompt(invite, invite_reply):
 
 
 def add_invite_guess_fail_prompt(port_invite):
-  app_tables.prompts.add_row(**_invite_guess_fail_prompt(port_invite))
+  prompt_dict = _invite_guess_fail_prompt(port_invite)
+  if not app_tables.prompts.get(user=prompt_dict['user'], spec={"name": "invite_guess_fail", 
+                                                                "guess": prompt_dict['spec']['guess'],
+                                                                "to_id": prompt_dict['spec']['to_id']}):
+    app_tables.prompts.add_row(**prompt_dict)
 
 
 def _invite_guess_fail_prompt(port_invite):
@@ -614,8 +618,7 @@ def notify_cancel(user, start, canceler_name=""):
 {content}
 
 -empathy.chat
-'''
-    )
+''')
 
     
 def _notify_message(user, from_name=""):

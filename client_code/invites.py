@@ -69,7 +69,11 @@ class Invite(h.AttributeToKey):
       
   @property                   
   def ready_to_add(self):
-    return self.inviter_guess and self.rel_to_inviter                      
+    return self.inviter_guess and self.rel_to_inviter
+  
+  @property                   
+  def response_ready(self):
+    return self.invitee_guess and self.rel_to_invitee 
   
   def relay(self, sc_method=None, kwargs=None):
     if not sc_method:
@@ -100,24 +104,63 @@ class Invite(h.AttributeToKey):
       print("Warning: not enough information to retrieve invites row.")
       return None
 
-  def _s_sync_invite(self, invite_row):
-    """Returns list of error strings"""
-    import server_misc as sm
+  def _s_sync_invite(self, invite_row, check_auth=True, load_only=False):
+    """Returns list of error strings
+    
+    Assumes invite_row exists (is not None)"""
+    if load_only:
+      check_auth = False
+    errors = []
+    print("4a")
     self.invite_id = invite_row.get_id()
-    if self.inviter:
-      invite_row['user1'] = self.inviter.s_user
-    elif invite_row['user1']:
-      self.inviter = sm.get_port_user(invite_row['user1'])
-    h._s_sync(self.inviter)
-    if self.inviter_guess:
-      invite_row['guess'] = self.inviter_guess
-    elif invite_row['guess']:
-      self.inviter_guess = invite_row['guess']
-    if self.rel_to_inviter:
-      invite_row['relationship2to1'] = self.rel_to_inviter
-    elif invite_row['relationship2to1']:
-      self.rel_to_inviter = invite_row['relationship2to1']  
+    h._s_sync_user(self.inviter, invite_row, 'user1', load_only=load_only, check_auth=check_auth)
+    print("4b")
+    h._s_sync_user(self.invitee, invite_row, 'user2', load_only=load_only)
+    h._s_sync(self.inviter_guess, invite_row, 'guess', load_only=load_only)
+    print("4c")
+    h._s_sync(self.rel_to_inviter, invite_row, 'relationship2to1', load_only=load_only, date_updated_column_name='date_described')
+    h._s_sync(self.link_key, invite_row, 'link_key', load_only=load_only)
+    print("4d")
+    return errors
  
+  def _s_sync_response(self, response_row, check_auth=True, load_only=False):
+    """Returns list of error strings
+    
+    Assumes response_row exists (is not None)"""
+    if load_only:
+      check_auth = False
+    errors = []
+    self.response_id = response_row.get_id()
+    h._s_sync_user(self.invitee, response_row, 'user1', load_only=load_only, check_auth=check_auth)
+    h._s_sync_user(self.inviter, response_row, 'user2', load_only=load_only)
+    h._s_sync(self.invitee_guess, response_row, 'guess', load_only=load_only)
+    h._s_sync(self.rel_to_invitee, response_row, 'relationship2to1', load_only=load_only, date_updated_column_name='date_described')
+    h._s_sync(self.link_key, invite_row, 'link_key', load_only=load_only)
+    return errors
+    
+  def _s_add_response(self):
+    """Returns list of error strings"""
+    raise(NotImplemented)
+
+  def _s_try_adding_invitee(self, user, invite_row):
+    """Returns list of error strings
+    
+    Assumes invite_row exists (is not None)"""
+    errors = []
+    import server_misc as sm
+    self.invitee = sm.get_port_user(user, distance=0)
+    import connections as c
+    if user['phone'] and not c.phone_match(self.inviter_guess, user):
+      errors.append("The inviter did not accurately provide the last 4 digits of your phone number.")
+      sm.add_invite_guess_fail_prompt(self)
+      new_self, cancel_errors = self.sc_cancel()
+      errors += cancel_errors
+    else:
+      if invite_row['user2'] and invite_row['user2'] != user:
+        print("Warning: invite['user2'] being overwritten")
+      invite_row['user2'] = user
+    return errors
+    
   def sc_serve(self):
     errors = []
     invite_row = self.s_invite_row()
@@ -126,6 +169,10 @@ class Invite(h.AttributeToKey):
       response_row = self.s_response_row()
       if response_row:
         errors += self._s_sync_response(response_row)
+      elif not self.response_id and self.response_ready:
+        errors += self._s_add_response()
+      elif self.response_id:
+        errors.append("Response row not found")
     elif self.not_yet_added and self.ready_to_add:
       new_self, add_errors = self.sc_add(self.inviter.user_id if self.inviter else "")
       self.update(new_self)
@@ -143,16 +190,12 @@ class Invite(h.AttributeToKey):
     self.link_key = sm.random_code(num_chars=7)
     new_row = app_tables.invites.add_row(date=now,
                                          origin=True,
-                                         user1=self.inviter.s_user,
-                                         user2=self.invitee.s_user if self.invitee else None,
-                                         relationship2to1=self.rel_to_inviter,
                                          date_described=now,
-                                         guess=self.inviter_guess,
                                          distance=1,
-                                         link_key=self.link_key,
                                         )
-    self.invite_id = new_row.get_id()
-    return self, []
+    errors = self._s_sync_invite(new_row)
+    print(5)
+    return self, errors
   
   def sc_visit(self, user):
     """Assumes only self.link_key known
@@ -161,31 +204,19 @@ class Invite(h.AttributeToKey):
        likewise for invite_reply['user1'] if it exists"""
     errors = []
     import server_misc as sm
-    invite = self.s_invite_row()
-    if not self.invite_id:
-      invite = app_tables.invites.get(origin=True, link_key=self.link_key)
-    if invite:
-      self.invite_id = invite.get_id()
-      self.rel_to_inviter = invite['relationship2to1']
-      self.inviter_guess = invite['guess']
-      self.inviter = sm.get_port_user(invite['user1'], distance=99)
+    invite_row = self.s_invite_row()
+    print("A")
+    if invite_row:
+      print(self.inviter)
+      errors += self._s_sync_invite(invite_row, load_only=True)
+      print("B")
       if user:
-        self.invitee = sm.get_port_user(user, distance=0)
-        import connections as c
-        if user['phone'] and not c.phone_match(self.inviter_guess, user):
-          errors.append("The inviter did not accurately provide the last 4 digits of your phone number.")
-          sm.add_invite_guess_fail_prompt(self)
-          new_self, cancel_errors = self.sc_cancel()
-          return new_self, errors + cancel_errors
-        else:
-          invite['user2'] = user
-          if invite['user2'] and invite['user2'] != user:
-            print("Warning: invite['user2'] being overwritten")
-      invite_reply = app_tables.invites.get(origin=False, link_key=self.link_key)
-      if invite_reply:
-        self.rel_to_invitee = invite_reply['relationship2to1']
-        self.invitee_guess = invite_reply['guess']
-        invite_reply['user1'] = user
+        print(self.inviter)
+        errors += self._s_try_adding_invitee(user, invite_row)
+      print("C")
+      response_row = app_tables.invites.get(origin=False, link_key=self.link_key)
+      if response_row:
+        errors += self._s_sync_response(response_row, load_only=True)
     else:
       errors.append("Invalid invite link")
     return self, errors
