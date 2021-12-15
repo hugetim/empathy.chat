@@ -63,6 +63,14 @@ class Invite(h.AttributeToKey):
   def url(self):
     return f"{p.URL}#?invite={self.link_key}"    
   
+  @property
+  def not_yet_added(self):
+    return not self.invite_id and not (self.response_id or self.invitee_guess or self.rel_to_invitee)
+      
+  @property                   
+  def ready_to_add(self):
+    return self.inviter_guess and self.rel_to_inviter                      
+  
   def relay(self, sc_method=None, kwargs=None):
     if not sc_method:
       sc_method = "serve"
@@ -72,9 +80,60 @@ class Invite(h.AttributeToKey):
     self.update(new_object)
     return errors
 
-  def sc_serve(self):
-    pass
+  def s_invite_row(self):
+    return self._s_row(origin=True)
   
+  def s_response_row(self):
+    return self._s_row(origin=False)
+ 
+  def _s_row(self, origin):
+    row_id = self.invite_id if origin else self.response_id
+    if row_id:
+      return app_tables.invites.get_by_id(row_id)
+    elif self.link_key:
+      return app_tables.invites.get(origin=origin, link_key=self.link_key)
+    elif self.inviter and self.invitee:
+      port_user1 = self.inviter if origin else self.invitee
+      port_user2 = self.invitee if origin else self.inviter
+      return app_tables.invites.get(origin=origin, user1=port_user1.s_user, user2=port_user2.s_user)
+    else:
+      print("Warning: not enough information to retrieve invites row.")
+      return None
+
+  def _s_sync_invite(self, invite_row):
+    """Returns list of error strings"""
+    import server_misc as sm
+    self.invite_id = invite_row.get_id()
+    if self.inviter:
+      invite_row['user1'] = self.inviter.s_user
+    elif invite_row['user1']:
+      self.inviter = sm.get_port_user(invite_row['user1'])
+    h._s_sync(self.inviter)
+    if self.inviter_guess:
+      invite_row['guess'] = self.inviter_guess
+    elif invite_row['guess']:
+      self.inviter_guess = invite_row['guess']
+    if self.rel_to_inviter:
+      invite_row['relationship2to1'] = self.rel_to_inviter
+    elif invite_row['relationship2to1']:
+      self.rel_to_inviter = invite_row['relationship2to1']  
+ 
+  def sc_serve(self):
+    errors = []
+    invite_row = self.s_invite_row()
+    if invite_row:
+      errors += self._s_sync_invite(invite_row)
+      response_row = self.s_response_row()
+      if response_row:
+        errors += self._s_sync_response(response_row)
+    elif self.not_yet_added and self.ready_to_add:
+      new_self, add_errors = self.sc_add(self.inviter.user_id if self.inviter else "")
+      self.update(new_self)
+      errors += add_errors
+    else:
+      errors += "No matching invite found."
+    return self, errors
+
   def sc_add(self, user_id=""):
     """Side effect: Add invites row"""
     import server_misc as sm
@@ -85,6 +144,7 @@ class Invite(h.AttributeToKey):
     new_row = app_tables.invites.add_row(date=now,
                                          origin=True,
                                          user1=self.inviter.s_user,
+                                         user2=self.invitee.s_user if self.invitee else None,
                                          relationship2to1=self.rel_to_inviter,
                                          date_described=now,
                                          guess=self.inviter_guess,
@@ -101,12 +161,11 @@ class Invite(h.AttributeToKey):
        likewise for invite_reply['user1'] if it exists"""
     errors = []
     import server_misc as sm
+    invite = self.s_invite_row()
     if not self.invite_id:
       invite = app_tables.invites.get(origin=True, link_key=self.link_key)
-      self.invite_id = invite.get_id()
-    else:
-      invite = app_tables.invites.get_by_id(self.invite_id)
     if invite:
+      self.invite_id = invite.get_id()
       self.rel_to_inviter = invite['relationship2to1']
       self.inviter_guess = invite['guess']
       self.inviter = sm.get_port_user(invite['user1'], distance=99)

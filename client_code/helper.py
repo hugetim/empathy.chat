@@ -159,3 +159,8 @@ class ItemWrapped(AttributeToKey):
 #     self.item[key] = value
 
     
+def _s_sync(attr, row, column_name):
+  if attr:
+    row[column_name] = attr
+  elif row[column_name]:
+    attr = row[column_name]
