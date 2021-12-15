@@ -1,6 +1,7 @@
 from anvil import *
 import anvil.users
 import anvil.server
+from anvil.tables import app_tables
 import unittest
 import time
 from . import helper as h
@@ -55,34 +56,68 @@ class RoundUpDatetimeTest(unittest.TestCase):
     
 
 class InvitesTest(unittest.TestCase):
-  def test_client(self):
-    invite = invites.Invite({'link_key': 'test'})
+  def setUp(self):
+    self.user = anvil.users.get_user()
+    self.invite1 = invites.Invite(rel_to_inviter='test subject 1', inviter_guess="6666")
+    self.invite1.relay('add')
+    self.poptibo = app_tables.users.get(email="poptibo@yahoo.com")
+    
+  def test_url(self):
+    invite = invites.Invite(link_key='test')
     self.assertEqual(invite.url, p.URL + "#?invite=test")
 
   def test_new(self):
-    user = anvil.users.get_user()
-    invite1 = invites.Invite(rel_to_inviter='test subject', inviter_guess="6666")
-    invite1.sc_add()
-    self.assertEqual(invite1.inviter_id, user.get_id())
-    self.assertTrue(invite1.link_key)
-    
-    invite2 = invites.Invite.from_key(invite1.link_key)
-    poptibo = app_tables.users.get(email="poptibo@yahoo.com")
-    errors = invite2.sc_visit(user_id=poptibo.get_id())
-    self.assertEqual(invite2.invitee_id, poptibo.get_id())
+    self.assertEqual(self.invite1.inviter.user_id, self.user.get_id())
+    self.assertTrue(self.invite1.link_key)
+
+  def test_logged_in_visit(self):
+    invite2a = invites.Invite(link_key=self.invite1.link_key)
+    errors = invite2a.relay('visit', {'user': self.poptibo})
     self.assertTrue(errors)
     self.assertEqual(errors[0], "The inviter did not accurately provide the last 4 digits of your phone number.")
-    invite2.update(inviter_guess=poptibo['phone'][-4:])
-    errors = invite2.sc_visit(user_id=poptibo.get_id())
+
+    self.invite1.inviter_guess = self.poptibo['phone'][-4:]
+    self.invite1.relay()
+    invite2b = invites.Invite(link_key=invite1.link_key)
+    errors = invite2b.relay('visit', {'user': self.poptibo})
+    self.assertEqual(invite2a.invitee.user_id, self.poptibo.get_id())
     self.assertFalse(errors)
-    invite2.cancel_response()
-    invite2.s_save()
+#     errors = invite2b.relay('sc_cancel_response')
+#     invite2b.assertFalse(invite2b.invitee)
+#     self.assertFalse(errors)
+
+#   def test_new_visit(self):
+#     invite2c = invites.Invite(link_key=invite1.link_key)
+#     errors = self.invite2c.relay('visit', {'user': None})
+#     self.assertFalse(errors)
+#     self.invite2c.assertFalse(invite2c.invitee)
+#     self.invite2c.cancel_response()
+#     errors = self.invite2c.relay()
+#     self.assertFalse(errors)
     
-    port_user = anvil.server.call('get_port_user', user, 0)
-    port_invitee = anvil.server.call('get_port_user', poptibo, user1_id=user.get_id())
-    invite3 = invites.Invite(inviter=port_user, rel_to_inviter='test subject', inviter_guess="6666", invitee=port_invitee)
+#   def test_connect_invite(self):
+#     port_user = anvil.server.call('get_port_user', self.user, 0)
+#     port_invitee = anvil.server.call('get_port_user', self.poptibo, user1_id=self.user.get_id())
+#     invite3 = invites.Invite(inviter=port_user, rel_to_inviter='test subject 3', inviter_guess="5555", invitee=port_invitee)
+#     errors = invite3.relay()
+#     self.assertFalse(errors)
     
-    
+#   def test_connect_response(self):
+#     self.test_connect_invite()
+#     invite3 = invites.Invite.from_inviter(inviter_id=self.user.get_id(), user_id=self.poptibo.get_id())
+#     self.assertTrue(invite3)
+#     invite3['invitee_guess'] = "6688"
+#     invite3['rel_to_invitee'] = "tester 3"
+#     errors = invite3.relay()
+#     self.assertFalse(errors)
+#     connection_records = anvil.server.call('get_connections')
+#     self.assertTrue([r for r in connection_records if r.user_id == self.poptibo.get_id()])
+#     anvil.server.call('disconnect', self.poptibo.get_id())
+
+  def tearDown(self):
+    self.invite1.relay('cancel')
+    self.assertFalse(self.invite1.inviter)
+
 
 def client_auto_tests():
   pass

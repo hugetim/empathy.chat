@@ -1,5 +1,8 @@
 import anvil.users
 import anvil.server
+import anvil.tables as tables
+import anvil.tables.query as q
+from anvil.tables import app_tables
 import datetime
 import anvil.tz
 from . import helper as h
@@ -52,6 +55,10 @@ class User():
   def name_item(self):
     return (self.name, self.user_id)
 
+  @property
+  def s_user(self):
+    return app_tables.users.get_by_id(self.user_id)
+  
   @staticmethod
   def from_name_item(item):
     return User(item(1), item(0))

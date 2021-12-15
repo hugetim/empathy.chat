@@ -313,9 +313,22 @@ def _add_message_prompt(user2, user1):
 
 def _connected_prompt(invite, invite_reply):
   return dict(user=invite['user1'],
-              spec={"name": "connected", "to_name": sm.name(invite['user2'], distance=invite['distance']), 
+              spec={"name": "connected", "to_name": name(invite['user2'], distance=invite['distance']), 
                     "to_id": invite['user2'].get_id(), "rel": invite_reply['relationship2to1'],},
-              date=sm.now(),
+              date=now(),
+              dismissed=False,
+             )
+
+
+def add_invite_guess_fail_prompt(port_invite):
+  app_tables.prompts.add_row(**_invite_guess_fail_prompt(port_invite))
+
+
+def _invite_guess_fail_prompt(port_invite):
+  return dict(user=port_invite.inviter.s_user,
+              spec={"name": "invite_guess_fail", "rel": port_invite.rel_to_inviter, "guess": port_invite.inviter_guess,
+                    "to_name": port_invite.invitee.name, "to_id": port_invite.invitee.user_id, },
+              date=now(),
               dismissed=False,
              )
 
@@ -634,6 +647,13 @@ def get_doc(name):
 def get_url(name):
   url = anvil.server.get_api_origin() +'/'+name
   return url
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def serve(port_object, sc_method, kwargs):
+  returned = getattr(port_object, f"sc_{sc_method}")(**kwargs)
+  return returned
 
 
 # def users_to_email_re_notif(user=None):

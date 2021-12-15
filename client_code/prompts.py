@@ -73,6 +73,16 @@ def get(spec_dict):
             "background": "theme:Light Mint",
             "click_fn": go_to_their_profile,
            }
+  elif spec_dict["name"] == "invite_guess_fail":
+    def go_to_their_profile():
+      get_open_form().go_profile(spec_dict['to_id'])
+    return {"markdown": ('Your invitation to your "' + spec_dict['rel'] + '" has been cancelled because ' + spec_dict['guess']
+                         + f" did not match the last four digits of {spec_dict['to_name']}'s confirmed phone number."),
+            "tooltip": "",
+            "dismissable": spec_dict['prompt_id'], ################### TEMPORARY
+            "background": "theme:Light Mint",
+            "click_fn": go_to_their_profile,
+           }
   elif spec_dict["name"] == "message":
     def go_to_message():
       get_open_form().go_profile(spec_dict['from_id'])

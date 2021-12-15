@@ -132,7 +132,7 @@ class PausedTimer:
   def __exit__(self, type, value, tb):
     self.timer.interval = self.orig_interval
     
-    
+@anvil.server.portable_class    
 class AttributeToKey:
   def __getitem__(self, key):
     return self.__getattr__(key)
@@ -141,6 +141,7 @@ class AttributeToKey:
     self.__setattr__(key, item)
 
 
+@anvil.server.portable_class    
 class ItemWrapped(AttributeToKey):
   def __init__(self, item):
     self.item = item

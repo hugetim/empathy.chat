@@ -62,7 +62,6 @@ def _prune_matches():
 
 
 @authenticated_callable
-@anvil.tables.in_transaction
 def init(browser_now):
   """
   Runs upon initializing app
@@ -71,11 +70,14 @@ def init(browser_now):
   """
   print("('init')")
   # Initialize user info
+  sm.initialize_session(browser_now)
+  return _init()
+
+@anvil.tables.in_transaction
+def _init():
   user = anvil.users.get_user()
   print(user['email'])
   trust_level = sm.get_user_info(user)
-  sm.initialize_session(browser_now)
-
   print("Warning: distance not yet implemented. Returning _degree instead.")
   # Prune expired items for all users
   Proposal.prune_all()

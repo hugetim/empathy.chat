@@ -204,7 +204,7 @@ def invite_user(item, user_id=""):
   user1 = sm.get_user(user_id)
   user2 = app_tables.users.get_by_id(item['user_id'])
   now = sm.now()
-  if item['phone_last4'] == user2['phone'][-4:]:
+  if phone_match(item['phone_last4'], user2):
     app_tables.invites.add_row(date=now,
                                origin=True,
                                user1=user1,
