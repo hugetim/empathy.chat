@@ -60,17 +60,28 @@ class InvitesTest(unittest.TestCase):
     self.assertEqual(invite.url, p.URL + "#?invite=test")
 
   def test_new(self):
+    user = anvil.users.get_user()
     invite1 = invites.Invite(rel_to_inviter='test subject', inviter_guess="6666")
-    invite1.s_add()
-    self.assertEqual(invite1.inviter_id, anvil.users.get_user().get_id())
+    invite1.sc_add()
+    self.assertEqual(invite1.inviter_id, user.get_id())
     self.assertTrue(invite1.link_key)
     
     invite2 = invites.Invite.from_key(invite1.link_key)
     poptibo = app_tables.users.get(email="poptibo@yahoo.com")
-    errors = invite2.s_visit(user_id=poptibo.get_id())
+    errors = invite2.sc_visit(user_id=poptibo.get_id())
     self.assertEqual(invite2.invitee_id, poptibo.get_id())
     self.assertTrue(errors)
     self.assertEqual(errors[0], "The inviter did not accurately provide the last 4 digits of your phone number.")
+    invite2.update(inviter_guess=poptibo['phone'][-4:])
+    errors = invite2.sc_visit(user_id=poptibo.get_id())
+    self.assertFalse(errors)
+    invite2.cancel_response()
+    invite2.s_save()
+    
+    port_user = anvil.server.call('get_port_user', user, 0)
+    port_invitee = anvil.server.call('get_port_user', poptibo, user1_id=user.get_id())
+    invite3 = invites.Invite(inviter=port_user, rel_to_inviter='test subject', inviter_guess="6666", invitee=port_invitee)
+    
     
 
 def client_auto_tests():

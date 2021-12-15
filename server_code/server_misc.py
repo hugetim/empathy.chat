@@ -121,6 +121,7 @@ def name(user, to_user=None, distance=None):
   return port.full_name(user['first_name'], user['last_name'], distance)  
 
 
+@authenticated_callable
 def get_port_user(user2, distance=None, user1_id="", simple=False):
   _name = name(user2, get_user(user1_id) if user1_id else None, distance)
   if simple:
