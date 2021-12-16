@@ -43,21 +43,6 @@ class Invite(h.AttributeToKey):
   def update(self, new_self):
     for key, value in vars(new_self).items():
       self[key] = value
-
-  def sc_cancel(self):
-    errors = []
-    if self.invite_id:
-      row = app_tables.invites.get_by_id(self.invite_id)
-      if row:
-        row.delete()
-      else:
-        errors.append(f"Invites row not found with id {self.invite_id}")
-    for key, value in vars(self).items():
-      if key in ['inviter', 'invitee']:
-        self[key] = None
-      else:
-        self[key] = ""
-    return self, errors
     
   @property
   def url(self):
@@ -159,7 +144,15 @@ class Invite(h.AttributeToKey):
     
   def _s_add_response(self):
     """Returns list of error strings"""
-    raise(NotImplemented)
+    import server_misc as sm
+    now = sm.now()
+    new_row = app_tables.invites.add_row(date=now,
+                                     origin=False,
+                                     date_described=now,
+                                     distance=1,
+                                    )
+    self._s_sync_response(new_row)
+    return []
 
   def _s_try_adding_invitee(self, user, invite_row):
     """Returns list of error strings
@@ -185,19 +178,19 @@ class Invite(h.AttributeToKey):
     invite_row = self.s_invite_row()
     if invite_row:
       errors += self._s_sync_invite(invite_row)
-      response_row = self.s_response_row()
-      if response_row:
-        errors += self._s_sync_response(response_row)
-      elif not self.response_id and self.response_ready:
-        errors += self._s_add_response()
-      elif self.response_id:
-        errors.append("Response row not found")
     elif self.not_yet_added and self.ready_to_add:
       new_self, add_errors = self.sc_add(self.inviter.user_id if self.inviter else "")
       self.update(new_self)
       errors += add_errors
     else:
       errors += "No matching invite found."
+    response_row = self.s_response_row()
+    if response_row:
+      errors += self._s_sync_response(response_row)
+    elif not self.response_id and self.response_ready:
+      errors += self._s_add_response()
+    elif self.response_id:
+      errors.append("Response row not found")
     return self, errors
 
   def sc_add(self, user_id=""):
@@ -214,6 +207,25 @@ class Invite(h.AttributeToKey):
                                         )
     errors = self._s_sync_invite(new_row)
     return self, errors
+ 
+  def sc_cancel(self):
+    errors = []
+    invite_row = self.s_invite_row()
+    if invite_row:
+      invite_row.delete()
+    else:
+      errors.append(f"Invites row not found with id {self.invite_id}")
+    new_self, other_errors = self.sc_cancel_response()
+    errors += other_errors
+    self._clear()
+    return self, errors
+
+  def _clear(self):
+    for key, value in vars(self).items():
+      if key in ['inviter', 'invitee']:
+        self[key] = None
+      else:
+        self[key] = ""
   
   def sc_visit(self, user):
     """Assumes only self.link_key known
@@ -234,6 +246,16 @@ class Invite(h.AttributeToKey):
       errors.append("Invalid invite link")
     return self, errors
 
+  def sc_cancel_response(self):
+    errors = []
+    response_row = self.s_response_row()
+    if response_row:
+      response_row.delete()
+    else:
+      errors.append(f"Response row not found")
+    self._clear()
+    return self, errors
+  
   @staticmethod
   def from_invited(self, inviter_id, user_id=""):
     pass

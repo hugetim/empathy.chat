@@ -92,9 +92,8 @@ class InvitesTest(unittest.TestCase):
     errors = invite2c.relay('visit', {'user': None})
     self.assertFalse(errors)
     self.assertFalse(invite2c.invitee)
-#     invite2c.cancel_response()
-#     errors = invite2c.relay()
-#     self.assertFalse(errors)
+    errors = invite2c.relay('cancel_response')
+    self.assertFalse(errors)
     
   def test_connect_invite(self):
     port_user = anvil.server.call('get_port_user', self.user, 0)
@@ -102,18 +101,20 @@ class InvitesTest(unittest.TestCase):
     invite3 = invites.Invite(inviter=port_user, rel_to_inviter='test subject 3', inviter_guess="5555", invitee=port_invitee)
     errors = invite3.relay()
     self.assertFalse(errors)
+    return port_user, port_invitee
     
-#   def test_connect_response(self):
-#     self.test_connect_invite()
-#     invite3 = invites.Invite.from_inviter(inviter_id=self.user.get_id(), user_id=self.poptibo.get_id())
-#     self.assertTrue(invite3)
-#     invite3['invitee_guess'] = "6688"
-#     invite3['rel_to_invitee'] = "tester 3"
-#     errors = invite3.relay()
-#     self.assertFalse(errors)
-#     connection_records = anvil.server.call('get_connections')
-#     self.assertTrue([r for r in connection_records if r.user_id == self.poptibo.get_id()])
-#     anvil.server.call('disconnect', self.poptibo.get_id())
+  def test_connect_response(self):
+    port_user, port_invitee = self.test_connect_invite()
+    invite3 = invites.Invite(inviter=port_user, invitee=port_invitee)
+    errors = invite3.relay()
+    self.assertFalse(errors)
+    invite3['invitee_guess'] = "6688"
+    invite3['rel_to_invitee'] = "tester 3"
+    errors = invite3.relay()
+    self.assertFalse(errors)
+    connection_records = anvil.server.call('get_connections')
+    self.assertTrue([r for r in connection_records if r.user_id == self.poptibo.get_id()])
+    anvil.server.call('disconnect', self.poptibo.get_id())
 
   def tearDown(self):
     self.invite1.relay('cancel')
