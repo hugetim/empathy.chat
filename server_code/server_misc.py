@@ -123,17 +123,20 @@ def name(user, to_user=None, distance=None):
 
 @authenticated_callable
 def get_port_user(user2, distance=None, user1_id="", simple=False):
-  _name = name(user2, get_user(user1_id) if user1_id else None, distance)
-  if simple:
-    return port.User(user2.get_id(), _name)
+  if user2:
+    _name = name(user2, get_user(user1_id) if user1_id else None, distance)
+    if simple:
+      return port.User(user2.get_id(), _name)
+    else:
+      return port.User(user2.get_id(), 
+                       _name,
+                       confirmed=bool(user2['confirmed_url']),
+                       distance=distance,
+                       seeking=user2['seeking_buddy'],
+                       starred=None, #True/False
+                      )
   else:
-    return port.User(user2.get_id(), 
-                     _name,
-                     confirmed=bool(user2['confirmed_url']),
-                     distance=distance,
-                     seeking=user2['seeking_buddy'],
-                     starred=None, #True/False
-                    )
+    return None
 
   
 def _latest_invited(user):
@@ -650,13 +653,6 @@ def get_doc(name):
 def get_url(name):
   url = anvil.server.get_api_origin() +'/'+name
   return url
-
-
-@anvil.server.callable
-@anvil.tables.in_transaction
-def serve(port_object, sc_method, kwargs):
-  returned = getattr(port_object, f"sc_{sc_method}")(**kwargs)
-  return returned
 
 
 # def users_to_email_re_notif(user=None):

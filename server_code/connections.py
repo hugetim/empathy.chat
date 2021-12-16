@@ -204,7 +204,8 @@ def invite_user(item, user_id=""):
   user1 = sm.get_user(user_id)
   user2 = app_tables.users.get_by_id(item['user_id'])
   now = sm.now()
-  if phone_match(item['phone_last4'], user2):
+  from .invites_server import Invite
+  if Invite.phone_match(item['phone_last4'], user2):
     app_tables.invites.add_row(date=now,
                                origin=True,
                                user1=user1,
@@ -337,7 +338,8 @@ def submit_invited(item, user_id=""):
     connect if applicable"""
   user = sm.get_user(user_id)
   user2 = app_tables.users.get_by_id(item['inviter_id'])
-  if phone_match(item['phone_last4'], user2):
+  from .invites_server import Invite
+  if Invite.phone_match(item['phone_last4'], user2):
     info = _invited_item_to_row_dict(item, user)
     invite_reply = app_tables.invites.get(q.any_of(user1=user, link_key=item['link_key']), 
                                           origin=False, user2=user2)
@@ -377,10 +379,6 @@ def remove_invite_pair(invite, invite_reply, user):
   invite_reply.delete()
 
   
-def phone_match(last4, user):
-  return last4 == user['phone'][-4:]
-
-
 def _invited_item_to_row_dict(invited_item, user, distance=1):
   user2 = app_tables.users.get_by_id(invited_item['inviter_id'])
   now = sm.now()
@@ -415,7 +413,8 @@ def _try_removing_from_invite_proposal(invite, user):
       
   
 def try_connect(invite, invite_reply):
-  if phone_match(invite['guess'], invite['user2']):
+  from .invites_server import Invite
+  if Invite.phone_match(invite['guess'], invite['user2']):
     _try_adding_to_invite_proposal(invite, invite['user2'])
     app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
     for i_row in [invite, invite_reply]:
