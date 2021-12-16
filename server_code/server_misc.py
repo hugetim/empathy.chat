@@ -323,18 +323,18 @@ def _connected_prompt(invite, invite_reply):
              )
 
 
-def add_invite_guess_fail_prompt(port_invite):
-  prompt_dict = _invite_guess_fail_prompt(port_invite)
+def add_invite_guess_fail_prompt(s_invite):
+  prompt_dict = _invite_guess_fail_prompt(s_invite)
   if not app_tables.prompts.get(user=prompt_dict['user'], spec={"name": "invite_guess_fail", 
                                                                 "guess": prompt_dict['spec']['guess'],
                                                                 "to_id": prompt_dict['spec']['to_id']}):
     app_tables.prompts.add_row(**prompt_dict)
 
 
-def _invite_guess_fail_prompt(port_invite):
-  return dict(user=port_invite.inviter.s_user,
-              spec={"name": "invite_guess_fail", "rel": port_invite.rel_to_inviter, "guess": port_invite.inviter_guess,
-                    "to_name": port_invite.invitee.name, "to_id": port_invite.invitee.user_id, },
+def _invite_guess_fail_prompt(s_invite):
+  return dict(user=s_invite.inviter,
+              spec={"name": "invite_guess_fail", "rel": s_invite.rel_to_inviter, "guess": s_invite.inviter_guess,
+                    "to_name": name(s_invite.invitee), "to_id": s_invite.invitee.get_id(), },
               date=now(),
               dismissed=False,
              )

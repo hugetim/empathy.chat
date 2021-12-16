@@ -91,11 +91,14 @@ class InvitesTest(unittest.TestCase):
     errors = s_invite2.add()
     self.assertTrue(errors)
      
-#   def test_logged_in_visit1(self):
-#     invite2a = invites.Invite(link_key=self.invite1.link_key)
-#     errors = invite2a.relay('visit', {'user': self.poptibo})
-#     self.assertTrue(errors)
-#     self.assertEqual(errors[0], "The inviter did not accurately provide the last 4 digits of your phone number.")
+  def test_logged_in_visit1(self):
+    self.add_link_invite()
+    invite2a = invites.Invite(link_key=self.invite1.link_key)
+#     s_invite2a = invites_server.Invite(invite2a)
+#     errors = s_invite2a.visit(user=self.poptibo)
+    errors = invite2a.relay('visit', {'user': self.poptibo})
+    self.assertTrue(errors)
+    self.assertEqual(errors[0], "The inviter did not accurately provide the last 4 digits of your phone number.")
 
 #   def test_logged_in_visit2(self):
 #     self.invite1.inviter_guess = self.poptibo['phone'][-4:]

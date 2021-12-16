@@ -43,7 +43,10 @@ class Invite(invites.Invite):
     self.inviter = user
     errors = self.invalid_invite()
     if self.invitee:
-      errors += self._check_invite_guess()
+      if not self.invitee['phone']:
+        errors.append(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
+      elif not Invite.phone_match(self.inviter_guess, self.invitee):
+        errors.append(f"You did not accurately provide the last 4 digits of {sm.name(self.invitee)}'s confirmed phone number.")
     if not errors:
       self.link_key = "" if self.invitee else sm.random_code(num_chars=7)
       if not self.invite_row():
@@ -61,14 +64,6 @@ class Invite(invites.Invite):
         errors.append("This invite already exists.")
     return errors
 
-  def _check_invite_guess(self):
-    errors = []
-    if not self.invitee['phone']:
-      errors.append(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
-    elif not Invite.phone_match(self.inviter_guess, self.invitee):
-      errors.append(f"You did not accurately provide the last 4 digits of {sm.name(self.invitee)}'s confirmed phone number.")
-    return errors
-  
   @staticmethod
   def phone_match(last4, user):
     return last4 == user['phone'][-4:]
@@ -128,27 +123,46 @@ class Invite(invites.Invite):
       print(f"Warning: not enough information to retrieve {'invite' if origin else 'response'} row.")
       return None
 
-     
   def visit(self, user):
     """Assumes only self.link_key known
     
        Side effects: set invite['user2'] if visitor is logged in,
        likewise for invite_reply['user1'] if it exists"""
     errors = []
-    import server_misc as sm
     invite_row = self.invite_row()
     if invite_row:
-      errors += self._sync_invite(invite_row, load_only=True)
+      errors += self._load_invite(invite_row)
       if user:
         errors += self._try_adding_invitee(user, invite_row)
       response_row = app_tables.invites.get(origin=False, link_key=self.link_key)
       if response_row:
-        errors += self._sync_response(response_row, load_only=True)
+        errors += self._load_response(response_row)
     else:
       errors.append("Invalid invite link")
-    return self, errors
+    return errors
+        
+  def _load_invite(self, invite_row):
+    errors = []
+    self.invite_id = invite_row.get_id()
+    self.inviter = invite_row['user1']
+    self.inviter_guess = invite_row['guess']
+    self.rel_to_inviter = invite_row['relationship2to1']
+    return errors
 
-      
+  def _try_adding_invitee(self, user, invite_row):
+    errors = []
+    self.invitee = user
+    if user['phone'] and not Invite.phone_match(self.inviter_guess, user):
+      errors.append("The inviter did not accurately provide the last 4 digits of your phone number.")
+      sm.add_invite_guess_fail_prompt(self)
+      cancel_errors = self.cancel()
+      errors += cancel_errors
+    else:
+      if invite_row['user2'] and invite_row['user2'] != user:
+        print("Warning: invite['user2'] being overwritten")
+      invite_row['user2'] = user
+    return errors
+  
   def _add_response(self):
     """Returns list of error strings"""
     import server_misc as sm
@@ -160,23 +174,6 @@ class Invite(invites.Invite):
                                     )
     self._sync_response(new_row)
     return []
-
-  def _try_adding_invitee(self, user, invite_row):
-    """Returns list of error strings
-    
-    Assumes invite_row exists (is not None)"""
-    errors = []
-    self.invitee = user
-    if user['phone'] and not Invite.phone_match(self.inviter_guess, user):
-      errors.append("The inviter did not accurately provide the last 4 digits of your phone number.")
-      sm.add_invite_guess_fail_prompt(self)
-      new_self, cancel_errors = self.cancel()
-      errors += cancel_errors
-    else:
-      if invite_row['user2'] and invite_row['user2'] != user:
-        print("Warning: invite['user2'] being overwritten")
-      invite_row['user2'] = user
-    return errors
   
 #   def _sync_user(self, attr_port_user_name, row, column_name, check_auth=False, load_only=False):
 #     import server_misc as sm
@@ -200,21 +197,6 @@ class Invite(invites.Invite):
 #           row[date_updated_column_name] = sm.now()
 #     elif row[column_name]:
 #       setattr(self, attr_name, row[column_name])
-      
-#   def _sync_invite(self, invite_row, check_auth=True, load_only=False):
-#     """Returns list of error strings
-    
-#     Assumes invite_row exists (is not None)"""
-#     if load_only:
-#       check_auth = False
-#     errors = []
-#     self.invite_id = invite_row.get_id()
-#     self._sync_user('inviter', invite_row, 'user1', load_only=load_only, check_auth=check_auth)
-#     self._sync_user('invitee', invite_row, 'user2', load_only=load_only)
-#     self._sync('inviter_guess', invite_row, 'guess', load_only=load_only)
-#     self._sync('rel_to_inviter', invite_row, 'relationship2to1', load_only=load_only, date_updated_column_name='date_described')
-#     self._sync('link_key', invite_row, 'link_key', load_only=load_only)
-#     return errors
  
 #   def _sync_response(self, response_row, check_auth=True, load_only=False):
 #     """Returns list of error strings
