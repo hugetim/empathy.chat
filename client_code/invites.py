@@ -104,6 +104,18 @@ class Invite(h.AttributeToKey):
       print("Warning: not enough information to retrieve invites row.")
       return None
 
+  def _s_sync_user(self, attr_port_user_name, row, column_name, check_auth=False, load_only=False):
+    import server_misc as sm
+    attr_port_user = getattr(self, attr_port_user_name)
+    if check_auth:
+      user_to_check = attr_port_user.s_user if attr_port_user else row[column_name]
+      if user_to_check:
+        sm.get_user(user_to_check.get_id(), require_auth=True)
+    if attr_port_user and not load_only:
+      row[column_name] = attr_port_user.s_user
+    elif row[column_name]:
+      setattr(self, attr_port_user_name, sm.get_port_user(row[column_name]))
+    
   def _s_sync_invite(self, invite_row, check_auth=True, load_only=False):
     """Returns list of error strings
     
@@ -111,16 +123,14 @@ class Invite(h.AttributeToKey):
     if load_only:
       check_auth = False
     errors = []
-    print("4a")
     self.invite_id = invite_row.get_id()
-    h._s_sync_user(self.inviter, invite_row, 'user1', load_only=load_only, check_auth=check_auth)
-    print("4b")
-    h._s_sync_user(self.invitee, invite_row, 'user2', load_only=load_only)
+    print(self.inviter, invite_row['user1'])
+    self._s_sync_user('inviter', invite_row, 'user1', load_only=load_only, check_auth=check_auth)
+    print(self.inviter, invite_row['user1'])
+    self._s_sync_user('invitee', invite_row, 'user2', load_only=load_only)
     h._s_sync(self.inviter_guess, invite_row, 'guess', load_only=load_only)
-    print("4c")
     h._s_sync(self.rel_to_inviter, invite_row, 'relationship2to1', load_only=load_only, date_updated_column_name='date_described')
     h._s_sync(self.link_key, invite_row, 'link_key', load_only=load_only)
-    print("4d")
     return errors
  
   def _s_sync_response(self, response_row, check_auth=True, load_only=False):

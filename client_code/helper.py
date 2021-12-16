@@ -170,18 +170,4 @@ def _s_sync(attr, row, column_name, date_updated_column_name="", load_only=False
     attr = row[column_name]
     
     
-def _s_sync_user(attr_port_user, row, column_name, check_auth=False, load_only=False):
-  import server_misc as sm
-  print("4a1")
-  if check_auth:
-    user_to_check = attr_port_user.s_user if attr_port_user else row[column_name]
-    print("4a2")
-    if user_to_check:
-      sm.get_user(user_to_check.get_id(), require_auth=True)
-  print("4a3")
-  if attr_port_user and not load_only:
-    row[column_name] = attr_port_user.s_user
-    print("4a4")
-  elif row[column_name]:
-    attr_port_user = sm.get_port_user(row[column_name])
-  print("4a5")
+

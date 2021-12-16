@@ -80,7 +80,7 @@ class InvitesTest(unittest.TestCase):
 
     self.invite1.inviter_guess = self.poptibo['phone'][-4:]
     self.invite1.relay()
-    invite2b = invites.Invite(link_key=invite1.link_key)
+    invite2b = invites.Invite(link_key=self.invite1.link_key)
     errors = invite2b.relay('visit', {'user': self.poptibo})
     self.assertEqual(invite2a.invitee.user_id, self.poptibo.get_id())
     self.assertFalse(errors)
