@@ -28,6 +28,8 @@ class Invites(h.AttributeToKey):
    
 @anvil.server.portable_class
 class Invite(h.AttributeToKey):
+  no_auth_methods = ['visit', 'register', 'respond']
+  
   def __init__(self, invite_id="", inviter=None, rel_to_inviter="", inviter_guess="", link_key="", 
                response_id="", invitee=None, rel_to_invitee="", invitee_guess=""):
     self.invite_id = invite_id
@@ -39,6 +41,7 @@ class Invite(h.AttributeToKey):
     self.invitee = invitee
     self.rel_to_invitee = rel_to_invitee
     self.invitee_guess = invitee_guess
+    self.connection_c
  
   def update(self, new_self):
     for key, value in vars(new_self).items():
@@ -78,13 +81,13 @@ class Invite(h.AttributeToKey):
   def response_ready(self):
     return not self.invalid_response()
   
-  def relay(self, method, kwargs=None, auth=True):
+  def relay(self, method, kwargs=None):
     if not kwargs:
       kwargs = {}
-    if auth:
-      new_object, errors = anvil.server.call('serve_invite', self, method, kwargs)
-    else:
+    if method in self.no_auth_methods:
       new_object, errors = anvil.server.call('serve_invite_unauth', self, method, kwargs)
+    else:
+      new_object, errors = anvil.server.call('serve_invite', self, method, kwargs)
     self.update(new_object)
     return errors
 
