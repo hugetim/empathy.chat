@@ -41,14 +41,14 @@ class Invite(h.AttributeToKey):
     self.invitee = invitee
     self.rel_to_invitee = rel_to_invitee
     self.invitee_guess = invitee_guess
-    self.connection_c
+    self.connection_successful = False
  
   def update(self, new_self):
     for key, value in vars(new_self).items():
       setattr(self, key, value)
 
   def __str__(self):
-    return vars(self)      
+    return str(vars(self))     
       
   @property
   def url(self):

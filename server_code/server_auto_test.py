@@ -50,6 +50,7 @@ class InvitesTest(unittest.TestCase):
     self.s_invite2 = invites_server.Invite(self.invite2)
     errors = self.s_invite2.add()
     self.assertFalse(errors)
+    self.assertEqual(self.s_invite2.inviter, self.user)
     self.invite2 = self.s_invite2.portable()    
  
   def cancel_connect_invite(self): 
@@ -90,6 +91,12 @@ class InvitesTest(unittest.TestCase):
     s_invite2 = invites_server.Invite(invite2)
     errors = s_invite2.add()
     self.assertTrue(errors)
+    test_prompts = app_tables.prompts.search(user=self.user, 
+                                             spec={'name': 'invite_guess_fail', 'to_id': self.poptibo.get_id()})
+    print({'name': 'invite_guess_fail', 'to_id': self.poptibo.get_id()})
+    self.assertEqual(len(test_prompts), 1)
+    for test_prompt in test_prompts:
+      test_prompt.delete()
      
   def test_logged_in_visit1(self):
     self.add_link_invite()
@@ -120,13 +127,17 @@ class InvitesTest(unittest.TestCase):
     
   def test_connect_response(self):
     self.add_connect_invite()
-    self.invite2['invitee_guess'] = "6688"
-    self.invite2['rel_to_invitee'] = "tester 3"
-    errors = self.invite2.relay('respond')
+#     self.invite2['invitee_guess'] = "6688"
+#     self.invite2['rel_to_invitee'] = "tester 3"
+#     errors = self.invite2.relay('respond')
+    self.s_invite2['invitee_guess'] = "6688"
+    self.s_invite2['rel_to_invitee'] = "tester 3"
+    self.assertEqual(self.s_invite2.inviter, self.user)
+    errors = self.s_invite2.relay('respond', {'user_id': self.poptibo.get_id()})
     self.assertFalse(errors)
-    connection_records = anvil.server.call('get_connections', self.user.get_id())
-    self.assertTrue([r for r in connection_records if r.user_id == self.poptibo.get_id()])
-    anvil.server.call('disconnect', self.poptibo.get_id())
+    connection_records = c.get_connections(self.user.get_id())
+    self.assertTrue([r for r in connection_records if r['user_id'] == self.poptibo.get_id()])
+    c.disconnect(self.poptibo.get_id())
 
   def tearDown(self):
     test_invites = app_tables.invites.search(user1=q.any_of(self.user, self.poptibo), date=q.greater_than(self.start_time))

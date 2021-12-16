@@ -102,18 +102,27 @@ class Invite(invites.Invite):
       self._edit_row(invite_row, self.inviter_guess, self.rel_to_inviter, sm.now())
     return errors
     
-  def cancel(self):
-    invite_row, errors = self._invite_row()
+  def cancel(self, invite_row=None):
+    if not invite_row:
+      invite_row, errors = self._invite_row()
+    else:
+      errors = []
     if invite_row:
+      if self.invitee:
+        from . import connections as c
+        c.try_removing_from_invite_proposal(invite_row, self.invitee)
       invite_row.delete()
     else:
       errors.append(f"Invites row not found with id {self.invite_id}")
-    other_errors = self.cancel_response()
-    errors += other_errors
+    self.cancel_response() # Not finding a response_row is not an error here
     self._clear()
     return errors
 
   def cancel_response(self):
+    from . import connections as c
+    invite_row, _ = self._invite_row()
+    if invite_row and self.invitee:
+      c.try_removing_from_invite_proposal(invite_row, self.invitee)
     response_row, errors = self._response_row()
     if response_row:
       response_row.delete()
@@ -151,11 +160,12 @@ class Invite(invites.Invite):
       errors.append(f"Not enough information to retrieve {'invite' if origin else 'response'} row.")
     return row, errors
 
-  def visit(self, user):
-    """Assumes only self.link_key known
+  def visit(self, user, register=False):
+    """Assumes only self.link_key known (unless register)
     
        Side effects: set invite['user2'] if visitor is logged in,
-       likewise for invite_reply['user1'] if it exists"""
+       likewise for invite_reply['user1'] if it exists;
+       force_login if register and both rows found"""
     invite_row, errors = self._invite_row()
     if invite_row:
       errors += self._load_invite(invite_row)
@@ -163,6 +173,10 @@ class Invite(invites.Invite):
         errors += self._try_adding_invitee(user, invite_row)
       response_row = app_tables.invites.get(origin=False, link_key=self.link_key)
       if response_row:
+        if self.invitee:
+          response_row['user1'] = self.invitee
+          if register:
+            anvil.users.force_login(user)
         errors += self._load_response(response_row)
     else:
       errors.append("Invalid invite link")
@@ -175,32 +189,44 @@ class Invite(invites.Invite):
     self.inviter_guess = invite_row['guess']
     self.rel_to_inviter = invite_row['relationship2to1']
     return errors
+  
+  def _load_response(self, response_row):
+    errors = []
+    self.response_id = response_row.get_id()
+    self.invitee = response_row['user1']
+    self.invitee_guess = response_row['guess']
+    self.rel_to_invitee = response_row['relationship2to1']
+    return errors
 
   def _try_adding_invitee(self, user, invite_row):
+    from . import connections as c
     errors = []
     self.invitee = user
     if user['phone'] and not Invite.phone_match(self.inviter_guess, user):
       errors += ["The inviter did not accurately provide the last 4 digits of your phone number."]
       sm.add_invite_guess_fail_prompt(self)
-      errors += self.cancel()
+      errors += self.cancel(invite_row)
     else:
-      if invite_row['user2'] and invite_row['user2'] != user:
+      if invite_row['user2'] and invite_row['user2'] != self.invitee:
         print("Warning: invite['user2'] being overwritten")
-      invite_row['user2'] = user
+      invite_row['user2'] = self.invitee
+      c.try_adding_to_invite_proposal(invite_row, self.invitee)
     return errors
-  
+
   def respond(self, user_id=""):
     """Returns list of error strings"""
     user = sm.get_user(user_id)
     invite_row, errors = self._invite_row()
-    errors += invite_errors
     if user:
-      errors += _try_adding_invitee(self, user, invite_row)
+      errors += self._try_adding_invitee(user, invite_row)
+      if errors:
+        return errors
     now = sm.now()
     errors += self.invalid_response()
+    if errors:
+      return errors
     if not Invite.phone_match(self.invitee_guess, self.inviter):
       errors.append(f"You did not accurately provide the last 4 digits of {sm.name(self.inviter)}'s confirmed phone number.")
-    if errors:
       return errors
     response_row, errors = self._response_row()
     if not response_row:
@@ -214,7 +240,7 @@ class Invite(invites.Invite):
     self._edit_row(response_row, self.invitee_guess, self.rel_to_invitee, now)
     from . import connections as c
     if self.invitee['phone']:
-      c.try_connect(invite_row, response_row)
+      self.connection_successful = c.try_connect(invite_row, response_row)
 #       name = sm.name(self.inviter)
 #       errors.append(f"The last 4 digits you provided match {name}'s phone number, "
 #                     f"but {name} did not correctly provide the last 4 digits of your phone number.")

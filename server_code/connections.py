@@ -315,7 +315,7 @@ def invite_visit(link_key, user2):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def invite_visit_register(link_key, user):
-  """Side effects: """
+  """Side effects: force_login, update rows with invitee"""
   invite = app_tables.invites.get(origin=True, link_key=link_key)
   invite_reply = app_tables.invites.get(origin=False, link_key=link_key)
   if invite and invite_reply:
@@ -354,7 +354,6 @@ def submit_invited(item, user_id=""):
       invite = app_tables.invites.get(origin=True, user1=user2, link_key=item['link_key'])
       if invite:
         invite.update(user2=user)
-        _try_adding_to_invite_proposal(invite, user)
       else:
         print("Warning: invite not found by link_key", item, user_id)
     if user and user['phone']:
@@ -374,7 +373,7 @@ def submit_invited(item, user_id=""):
  
 
 def remove_invite_pair(invite, invite_reply, user):
-  _try_removing_from_invite_proposal(invite, user)
+  try_removing_from_invite_proposal(invite, user)
   invite.delete()
   invite_reply.delete()
 
@@ -394,7 +393,7 @@ def _invited_item_to_row_dict(invited_item, user, distance=1):
              ) 
 
 
-def _try_adding_to_invite_proposal(invite, user):
+def try_adding_to_invite_proposal(invite, user):
   if invite['proposal']:
     from . import matcher as m
     proposal = m.Proposal(invite['proposal'])
@@ -402,7 +401,7 @@ def _try_adding_to_invite_proposal(invite, user):
       proposal.eligible_users += [user]
 
       
-def _try_removing_from_invite_proposal(invite, user):
+def try_removing_from_invite_proposal(invite, user):
   if invite['proposal']:
     from . import matcher as m
     proposal = m.Proposal(invite['proposal'])
@@ -415,7 +414,11 @@ def _try_removing_from_invite_proposal(invite, user):
 def try_connect(invite, invite_reply):
   from .invites_server import Invite
   if Invite.phone_match(invite['guess'], invite['user2']):
-    _try_adding_to_invite_proposal(invite, invite['user2'])
+    try_adding_to_invite_proposal(invite, invite['user2'])
+    already = app_tables.connections.search(user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']))
+    if len(already) > 0:
+      print("Warning: connection already exists", dict(invite))
+      return True
     app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
     for i_row in [invite, invite_reply]:
       item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
@@ -473,6 +476,16 @@ def disconnect(user2_id, user1_id=""):
     if r1to2 and r2to1: 
       r1to2.delete()
       r2to1.delete()
+      _remove_connection_prompts(user1, user2)
       return True
   return False
+    
+  
+def _remove_connection_prompts(user1, user2):
+  prompts = app_tables.prompts.search(user=user1, spec={'name': 'connected', 'to_id': user2.get_id()})
+  for prompt in prompts:
+    prompt.delete()
+  prompts = app_tables.prompts.search(user=user2, spec={'name': 'connected', 'to_id': user1.get_id()})
+  for prompt in prompts:
+    prompt.delete()
     
