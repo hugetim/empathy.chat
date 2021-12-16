@@ -157,17 +157,3 @@ class ItemWrapped(AttributeToKey):
   
 #   def __setattr__(self, key, value):
 #     self.item[key] = value
-
-    
-def _s_sync(attr, row, column_name, date_updated_column_name="", load_only=False):
-  import server_misc as sm
-  if attr and not load_only:
-    if row[column_name] != attr:
-      row[column_name] = attr
-      if date_updated_column_name:
-        row[date_updated_column_name] = sm.now()
-  elif row[column_name]:
-    attr = row[column_name]
-    
-    
-

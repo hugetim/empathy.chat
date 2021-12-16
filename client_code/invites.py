@@ -115,7 +115,18 @@ class Invite(h.AttributeToKey):
       row[column_name] = attr_port_user.s_user
     elif row[column_name]:
       setattr(self, attr_port_user_name, sm.get_port_user(row[column_name]))
-    
+ 
+  def _s_sync(self, attr_name, row, column_name, date_updated_column_name="", load_only=False):
+    import server_misc as sm
+    attr = getattr(self, attr_name)
+    if attr and not load_only:
+      if row[column_name] != attr:
+        row[column_name] = attr
+        if date_updated_column_name:
+          row[date_updated_column_name] = sm.now()
+    elif row[column_name]:
+      setattr(self, attr_name, row[column_name])
+      
   def _s_sync_invite(self, invite_row, check_auth=True, load_only=False):
     """Returns list of error strings
     
@@ -124,13 +135,11 @@ class Invite(h.AttributeToKey):
       check_auth = False
     errors = []
     self.invite_id = invite_row.get_id()
-    print(self.inviter, invite_row['user1'])
     self._s_sync_user('inviter', invite_row, 'user1', load_only=load_only, check_auth=check_auth)
-    print(self.inviter, invite_row['user1'])
     self._s_sync_user('invitee', invite_row, 'user2', load_only=load_only)
-    h._s_sync(self.inviter_guess, invite_row, 'guess', load_only=load_only)
-    h._s_sync(self.rel_to_inviter, invite_row, 'relationship2to1', load_only=load_only, date_updated_column_name='date_described')
-    h._s_sync(self.link_key, invite_row, 'link_key', load_only=load_only)
+    self._s_sync('inviter_guess', invite_row, 'guess', load_only=load_only)
+    self._s_sync('rel_to_inviter', invite_row, 'relationship2to1', load_only=load_only, date_updated_column_name='date_described')
+    self._s_sync('link_key', invite_row, 'link_key', load_only=load_only)
     return errors
  
   def _s_sync_response(self, response_row, check_auth=True, load_only=False):
@@ -141,11 +150,11 @@ class Invite(h.AttributeToKey):
       check_auth = False
     errors = []
     self.response_id = response_row.get_id()
-    h._s_sync_user(self.invitee, response_row, 'user1', load_only=load_only, check_auth=check_auth)
-    h._s_sync_user(self.inviter, response_row, 'user2', load_only=load_only)
-    h._s_sync(self.invitee_guess, response_row, 'guess', load_only=load_only)
-    h._s_sync(self.rel_to_invitee, response_row, 'relationship2to1', load_only=load_only, date_updated_column_name='date_described')
-    h._s_sync(self.link_key, invite_row, 'link_key', load_only=load_only)
+    self._s_sync_user('invitee', response_row, 'user1', load_only=load_only, check_auth=check_auth)
+    self._s_sync_user('inviter', response_row, 'user2', load_only=load_only)
+    self._s_sync('invitee_guess', response_row, 'guess', load_only=load_only)
+    self._s_sync('rel_to_invitee', response_row, 'relationship2to1', load_only=load_only, date_updated_column_name='date_described')
+    self._s_sync('link_key', invite_row, 'link_key', load_only=load_only)
     return errors
     
   def _s_add_response(self):
@@ -204,7 +213,6 @@ class Invite(h.AttributeToKey):
                                          distance=1,
                                         )
     errors = self._s_sync_invite(new_row)
-    print(5)
     return self, errors
   
   def sc_visit(self, user):
@@ -215,15 +223,10 @@ class Invite(h.AttributeToKey):
     errors = []
     import server_misc as sm
     invite_row = self.s_invite_row()
-    print("A")
     if invite_row:
-      print(self.inviter)
       errors += self._s_sync_invite(invite_row, load_only=True)
-      print("B")
       if user:
-        print(self.inviter)
         errors += self._s_try_adding_invitee(user, invite_row)
-      print("C")
       response_row = app_tables.invites.get(origin=False, link_key=self.link_key)
       if response_row:
         errors += self._s_sync_response(response_row, load_only=True)
