@@ -13,7 +13,17 @@ from . import server_misc as sm
 
 @anvil.server.callable
 @anvil.tables.in_transaction
+def serve_invite_unauth(port_invite, method, kwargs):
+  return _serve_invite(port_invite, method, kwargs)
+
+
+@sm.authenticated_callable
+@anvil.tables.in_transaction
 def serve_invite(port_invite, method, kwargs):
+  return _serve_invite(port_invite, method, kwargs)
+
+
+def _serve_invite(port_invite, method, kwargs):
   invite = Invite(port_invite)
   errors = getattr(invite, method)(**kwargs)
   return invite.portable(), errors
@@ -74,6 +84,13 @@ class Invite(invites.Invite):
                       date_described=now,
                      )
 
+  def edit_invite(self):
+    errors = self.invalid_invite()
+    if not errors:
+      _edit_invite_row(self, self.invite_row(), sm.now())
+    return errors
+    
+    
   def cancel(self):
     errors = []
     invite_row = self.invite_row()

@@ -96,20 +96,21 @@ class InvitesTest(unittest.TestCase):
     invite2a = invites.Invite(link_key=self.invite1.link_key)
 #     s_invite2a = invites_server.Invite(invite2a)
 #     errors = s_invite2a.visit(user=self.poptibo)
-    errors = invite2a.relay('visit', {'user': self.poptibo})
+    errors = invite2a.relay('visit', {'user': self.poptibo}, auth=False)
     self.assertTrue(errors)
     self.assertEqual(errors[0], "The inviter did not accurately provide the last 4 digits of your phone number.")
 
-#   def test_logged_in_visit2(self):
-#     self.invite1.inviter_guess = self.poptibo['phone'][-4:]
-#     self.invite1.relay()
-#     invite2b = invites.Invite(link_key=self.invite1.link_key)
-#     errors = invite2b.relay('visit', {'user': self.poptibo})
+  def test_logged_in_visit2(self):
+    self.add_link_invite()
+    self.s_invite1.inviter_guess = self.poptibo['phone'][-4:]
+    self.s_invite1.edit_invite()
+    invite2b = invites.Invite(link_key=self.s_invite1.link_key)
+    errors = invite2b.relay('visit', {'user': self.poptibo}, auth=False)
+    self.assertFalse(errors)
+    self.assertEqual(invite2b.invitee.user_id, self.poptibo.get_id())
+#     errors = invite2b.relay('cancel_response')
+#     invite2b.assertFalse(invite2b.invitee)
 #     self.assertFalse(errors)
-#     self.assertEqual(invite2b.invitee.user_id, self.poptibo.get_id())
-# #     errors = invite2b.relay('cancel_response')
-# #     invite2b.assertFalse(invite2b.invitee)
-# #     self.assertFalse(errors)
 
 #   def test_new_visit(self):
 #     invite2c = invites.Invite(link_key=self.invite1.link_key)

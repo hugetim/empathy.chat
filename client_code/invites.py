@@ -78,10 +78,13 @@ class Invite(h.AttributeToKey):
   def response_ready(self):
     return not self.invalid_response()
   
-  def relay(self, method, kwargs=None):
+  def relay(self, method, kwargs=None, auth=True):
     if not kwargs:
       kwargs = {}
-    new_object, errors = anvil.server.call('serve_invite', self, method, kwargs)
+    if auth:
+      new_object, errors = anvil.server.call('serve_invite', self, method, kwargs)
+    else:
+      new_object, errors = anvil.server.call('serve_invite_unauth', self, method, kwargs)
     self.update(new_object)
     return errors
 
