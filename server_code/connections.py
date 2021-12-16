@@ -15,7 +15,7 @@ def is_visible(user2, user1=None): # Currently unused
   if sm.DEBUG:
     print("server_misc.is_visible")
   if user1 is None:
-    user1 = anvil.server.session['user']
+    user1 = anvil.users.get_user()
   trust1 = user1['trust_level']
   trust2 = user2['trust_level']
   if trust1 is None:
@@ -94,23 +94,24 @@ def distance(user2, user1, up_to_distance=3):
 def get_connections(user_id):
   print("get_connections", user_id)
   user = sm.get_user(user_id, require_auth=False)
-  is_me = user == anvil.server.session['user']
+  logged_in_user = anvil.users.get_user()
+  is_me = user == logged_in_user
   up_to_degree = 3
-  dset = _get_connections(anvil.server.session['user'], up_to_degree, include_zero=True)
+  dset = _get_connections(logged_in_user, up_to_degree, include_zero=True)
   if is_me:
     user2s = []
     for d in range(1, up_to_degree+1):
       user2s += dset[d]
     return [connection_record(user2, user) for user2 in user2s]
-  elif (anvil.server.session['trust_level'] < sm.TEST_TRUST_LEVEL
-        and _degree(user, anvil.server.session['user']) > 1):
+  elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
+        and _degree(user, logged_in_user) > 1):
     return []
   else:
     dset2 = _get_connections(user, 1)
     user2s = []
     for d in range(0, up_to_degree+1):
       user2s += dset[d] & dset2[1]
-    return [connection_record(user2, anvil.server.session['user']) for user2 in user2s]
+    return [connection_record(user2, logged_in_user) for user2 in user2s]
 
 
 def connection_record(user2, user1):

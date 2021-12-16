@@ -11,7 +11,7 @@ from . import portable
 @anvil.tables.in_transaction
 def test_add_user(em, level=1, r_em=False, p_sms=True):
   print("test_add_user", em, level, r_em, p_sms)
-  if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     if not anvil.server.session['test_record']:
       anvil.server.session['test_record'] = create_tests_record()
     new_user = app_tables.users.add_row(email=em,
@@ -30,7 +30,7 @@ def test_add_user(em, level=1, r_em=False, p_sms=True):
 @anvil.tables.in_transaction
 def test_add_request(user_id, port_prop):
   print("test_add_request", user_id)
-  if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     user = app_tables.users.get_by_id(user_id)
     state, prop_id = matcher._add_proposal(user, port_prop)
     new_prop = matcher.Proposal.get_by_id(prop_id)
@@ -48,7 +48,7 @@ def create_tests_record():
 @authenticated_callable
 def add_now_proposal():
   print("add_now_proposal")
-  if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     tester = sm.get_user()
     anvil.server.call('add_proposal', portable.Proposal(times=[portable.ProposalTime(start_now=True)]), user_id=tester.get_id())
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
@@ -59,7 +59,7 @@ def add_now_proposal():
 @authenticated_callable
 def accept_now_proposal(user_id):
   print("accept_now_proposal", user_id)
-  if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     tester = sm.get_user()
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
     if tester_now_proptime:
@@ -85,7 +85,7 @@ def _add_prop_row_to_test_record(prop_row):
 @anvil.tables.in_transaction
 def test_clear():
   print("('test_clear')")
-  if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     test_records = app_tables.test_data.search()
     test_matches = set()
     test_times = set()
@@ -117,7 +117,7 @@ def test_clear():
 @authenticated_callable
 def test_get_user_list():
   print("('test_get_user_list')")
-  if anvil.server.session['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     users = app_tables.users.search()
     to_return = []
     for user in users:

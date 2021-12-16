@@ -26,13 +26,9 @@ def now():
 def initialize_session(browser_now):
   """initialize session state: user_id, user, and current_row"""
   user = anvil.users.get_user()
-  user_id = user.get_id()
-  anvil.server.session['user_id'] = user_id
   user['browser_now'] = browser_now
-  anvil.server.session['user'] = user
-  anvil.server.session['trust_level'] = user['trust_level']
   anvil.server.session['test_record'] = None
-  if p.DEBUG_MODE and anvil.server.session['trust_level'] >= TEST_TRUST_LEVEL:
+  if p.DEBUG_MODE and user['trust_level'] >= TEST_TRUST_LEVEL:
     from . import server_auto_test
     server_auto_test.server_auto_tests()
 
@@ -47,9 +43,10 @@ def remove_user(user):
 def get_user(user_id="", require_auth=True):
   if DEBUG:
     print("get_user", user_id)
-  if user_id == "" or anvil.users.get_user().get_id() == user_id:
+  logged_in_user = anvil.users.get_user()
+  if user_id == "" or logged_in_user.get_id() == user_id:
     return anvil.users.get_user()
-  elif (require_auth and anvil.server.session['trust_level'] < TEST_TRUST_LEVEL):
+  elif (require_auth and logged_in_user['trust_level'] < TEST_TRUST_LEVEL):
     raise RuntimeError("User not authorized to access this information")
   else:
     return app_tables.users.get_by_id(user_id)
@@ -205,7 +202,7 @@ def init_profile(user_id=""):
   user = get_user(user_id, require_auth=False)
   record = c.connection_record(user, get_user())
   confirmed_url_date = user['confirmed_url_date'] if user['confirmed_url'] else None
-  is_me = user == anvil.server.session['user']
+  is_me = user == anvil.users.get_user()
   record.update({'me': is_me,
                  'first': user['first_name'],
                  'last': port.last_name(user['last_name'], record['degree']),
