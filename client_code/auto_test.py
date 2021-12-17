@@ -92,11 +92,11 @@ class InviteTest(unittest.TestCase):
     item1 = invite1.rel_item(for_response=False)
     self.assertEqual(item1['relationship'], invite1.rel_to_inviter)
     self.assertEqual(item1['phone_last4'], invite1.inviter_guess)
-    self.assertEqual(item1['name'], invite1.invitee.name)
+    self.assertEqual(item1['name'], invite1.invitee.name if invite1.invitee else "")
     item2 = invite1.rel_item(for_response=True)
     self.assertEqual(item2['relationship'], invite1.rel_to_invitee)
     self.assertEqual(item2['phone_last4'], invite1.invitee_guess)
-    self.assertEqual(item2['name'], invite1.inviter.name)
+    self.assertEqual(item2['name'], invite1.inviter.name if invite1.inviter else "")
     
     item1['relationship'] = "abcdefgh"
     item2['phone_last4'] = "4321"
