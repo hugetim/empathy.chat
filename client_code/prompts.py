@@ -3,14 +3,17 @@ import anvil.users
 import anvil.server
 from functools import partial
 from . import invited
+from . import invites
+from . import portable as port
 
 
-def invite_dialog(name="", user_id=""):
+def invite_dialog(invitee=None, user_id=""):
   """Specifying a `name` leads to connect-existing-user dialog"""
-  item = {"relationship": "", "phone_last4": "", "name": name, "user_id": user_id}
+  invite = invites.Invite(inviter=port.User.from_logged_in(), invitee=invitee)
+  #item = {"relationship": "", "phone_last4": "", "name": name, "user_id": user_id}
   top_form = get_open_form()
   from .MenuForm.NetworkMenu.Invite import Invite
-  top_form.invite_alert = Invite(item=item)
+  top_form.invite_alert = Invite(item=invite)
   return alert(content=top_form.invite_alert,
                title="Invite a close connection to empathy.chat",
                buttons=[], large=True, dismissible=False)

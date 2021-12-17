@@ -14,8 +14,7 @@ class InviteA(InviteATemplate):
     
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
-    self.relationship_prompt = RelationshipPrompt(item={k:self.item.get(k) 
-                                                        for k in {'relationship', 'phone_last4', 'name'}})
+    self.relationship_prompt = RelationshipPrompt(item=self.item.rel_item(for_response=False))
     self.linear_panel_1.add_component(self.relationship_prompt)
     self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
 
@@ -27,7 +26,7 @@ class InviteA(InviteATemplate):
   def continue_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if self.continue_button.enabled:
-      self.item.update(self.relationship_prompt.item)
+      self.item.update_from_rel_item(self.relationship_prompt.item, for_response=False)
       if len(self.item['phone_last4']) != 4:
         self.error("Wrong number of digits entered.")
       elif len(self.item['relationship']) < p.MIN_RELATIONSHIP_LENGTH:

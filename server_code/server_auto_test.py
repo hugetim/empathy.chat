@@ -11,16 +11,15 @@ from . import invites_server
 from . import server_misc as sm
 
 
-class InvitesBasicTest(unittest.TestCase):
+class InviteBasicTest(unittest.TestCase):
   def test_conversion(self):
     invite1 = invites.Invite(rel_to_inviter='test subject 1', inviter_guess="6666")
     s_invite1 = invites_server.Invite(invite1)
     self.assertEqual(s_invite1.inviter_guess, "6666")
     invite2 = s_invite1.portable()
     self.assertEqual(invite2.rel_to_inviter, 'test subject 1')
-
-
-class InvitesTest(unittest.TestCase):
+    
+class InviteTest(unittest.TestCase):
   def setUp(self):
     self.start_time = sm.now()
     self.user = anvil.users.get_user()

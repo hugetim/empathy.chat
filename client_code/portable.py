@@ -44,10 +44,10 @@ def full_name(first, last, distance=3):
 @anvil.server.portable_class
 class User():
   
-  def __init__(self, user_id=None, name=None, confirmed=None, distance=None, seeking=None, starred=None):
+  def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None):
     self.user_id = user_id
     self.name = name
-    self.confirmed = confirmed
+    self.confirmed_url = confirmed_url
     self.distance = distance
     self.seeking = seeking
     self.starred = starred
@@ -62,6 +62,18 @@ class User():
   @staticmethod
   def from_name_item(item):
     return User(item(1), item(0))
+  
+  @staticmethod
+  def from_logged_in():
+    logged_in_user = anvil.users.get_user()
+    distance = 0
+    return User(user_id=logged_in_user.get_id(), 
+                name=full_name(logged_in_user['first_name'], logged_in_user['last_name'], distance=distance),
+                confirmed=bool(logged_in_user['confirmed_url']),
+                distance=0,
+                seeking=logged_in_user['seeking_buddy'],
+                starred=None,
+               )
 
     
 @anvil.server.portable_class

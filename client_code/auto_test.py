@@ -32,6 +32,14 @@ class FullNameTest(unittest.TestCase):
       )
 
       
+class PortUserTest(unittest.TestCase):
+  def test_from_logged_in(self):
+    port_user = port.User.from_logged_in()
+    user = anvil.users.get_user()
+    port_user.user_id = user.get_id()
+    port_user.distance = 0
+      
+      
 class DatetimeFormatTest(unittest.TestCase):
   def test_remove_zeros(self):
     dt = datetime(2021, 1, 1, 1, 1)
@@ -55,7 +63,7 @@ class RoundUpDatetimeTest(unittest.TestCase):
     self.assertEqual(h.round_up_datetime(dt, 30), datetime(2021, 1, 1, 1, 30))
     
 
-class InvitesTest(unittest.TestCase):
+class InviteTest(unittest.TestCase):
   def test_url(self):
     invite = invites.Invite(link_key='test')
     self.assertEqual(invite.url, p.URL + "#?invite=test")
@@ -79,6 +87,25 @@ class InvitesTest(unittest.TestCase):
     self.assertTrue(invite4.invalid_response())
     self.assertFalse(invite5.invalid_response())
 
+  def test_rel_item(self):
+    invite1 = invites.Invite(rel_to_inviter="12345678", inviter_guess="1234", invitee=port.User.from_logged_in())
+    item1 = invite1.rel_item(for_response=False)
+    self.assertEqual(item1['relationship'], invite1.rel_to_inviter)
+    self.assertEqual(item1['phone_last4'], invite1.inviter_guess)
+    self.assertEqual(item1['name'], invite1.invitee.name)
+    item2 = invite1.rel_item(for_response=True)
+    self.assertEqual(item2['relationship'], invite1.rel_to_invitee)
+    self.assertEqual(item2['phone_last4'], invite1.invitee_guess)
+    self.assertEqual(item2['name'], invite1.inviter.name)
+    
+    item1['relationship'] = "abcdefgh"
+    item2['phone_last4'] = "4321"
+    invite1.update_from_rel_item(item1, for_response=False)
+    invite1.update_from_rel_item(item2, for_response=True)
+    self.assertEqual(invite1.rel_to_inviter, item1['relationship'])
+    self.assertEqual(invite1.invitee_guess, item2['phone_last4'])
+    
+    
 def client_auto_tests():
   pass
 #   Seconds2WordsTest().main()

@@ -18,7 +18,7 @@ class InviteRow(InviteRowTemplate):
     user2 = self.item.get('user2')
     if user2:
       self.link.visible = False
-      name_item = {'name': user2.name, 'confirmed': user2.confirmed, 'user_id': user2.user_id}
+      name_item = {'name': user2.name, 'confirmed_url': user2.confirmed_url, 'user_id': user2.user_id}
       self.name = Name(item=name_item)
       self.name_or_url_flow_panel.add_component(self.name)
     else:

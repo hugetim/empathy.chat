@@ -80,7 +80,25 @@ class Invite(h.AttributeToKey):
   @property                   
   def response_ready(self):
     return not self.invalid_response()
-  
+
+  def rel_item(self, for_response):
+    if for_response:
+      name = self.inviter.name if self.inviter else ""
+    else:
+      name = self.invitee.name if self.invitee else ""
+    return dict(relationship=self.rel_to_invitee if for_response else self.rel_to_inviter,
+                phone_last4=self.invitee_guess if for_response else self.inviter_guess,
+                name=name,
+               )
+
+  def update_from_rel_item(self, item, for_response):
+    if for_response:
+      self.rel_to_invitee = item['relationship']
+      self.invitee_guess = item['phone_last4']
+    else:
+      self.rel_to_inviter = item['relationship']
+      self.inviter_guess = item['phone_last4']
+      
   def relay(self, method, kwargs=None):
     if not kwargs:
       kwargs = {}
