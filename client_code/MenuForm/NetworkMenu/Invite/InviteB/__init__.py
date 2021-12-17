@@ -21,12 +21,12 @@ class InviteB(InviteBTemplate):
     
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    anvil.server.call('cancel_invite', self.item['link_key'])
+    self.item.relay('cancel')
     self.parent.raise_event("x-close-alert", value=False)
 
   def back_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    anvil.server.call('cancel_invite', self.item['link_key'])
+    self.item.relay('cancel')
     parent = self.parent
     self.remove_from_parent()
     from ..InviteA import InviteA

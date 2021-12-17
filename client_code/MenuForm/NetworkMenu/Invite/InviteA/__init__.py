@@ -27,26 +27,20 @@ class InviteA(InviteATemplate):
     """This method is called when the button is clicked"""
     if self.continue_button.enabled:
       self.item.update_from_rel_item(self.relationship_prompt.item, for_response=False)
-      if len(self.item['phone_last4']) != 4:
-        self.error("Wrong number of digits entered.")
-      elif len(self.item['relationship']) < p.MIN_RELATIONSHIP_LENGTH:
-        self.error("Please add a description of your relationship.")
+      validation_errors = self.item.invalid_invite()
+      if validation_errors:
+        self.error(" ".join(validation_errors))
       else:
-        if self.item.get('user_id'): #existing user
-          invite_item = anvil.server.call('invite_user', self.item)
-          success = bool(invite_item)
-          name = self.item.get('name', "this user")
-          if success:
-            message = f"You will be connected once {name} confirms."
-          else:
-            message = f"Sorry, the digits you entered did not match {name}'s confirmed phone number."
+        errors = self.item.relay('add')
+        if errors:
+          self.error(" ".join(errors))
+        elif self.item.invitee: #existing user
+          message = f"You will be connected once {self.item.invitee.name} confirms."
           self.parent.raise_event("x-close-alert", value=success)
           alert(message)
         else:
-          invite_item = anvil.server.call('add_invite', self.item)
           parent = self.parent
           self.remove_from_parent()
-          self.item.update(invite_item)
           parent.add_component(InviteB(item=self.item))
     
   def error(self, text):

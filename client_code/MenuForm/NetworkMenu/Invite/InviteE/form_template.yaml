@@ -54,7 +54,7 @@ components:
         width: 438
         expand: false
       data_bindings:
-      - {property: text, code: 'self.item[''relationship'']', writeback: true}
+      - {property: text, code: 'self.item[''rel_to_inviter'']', writeback: true}
   - type: Spacer
     properties: {height: 32}
     name: spacer_1
