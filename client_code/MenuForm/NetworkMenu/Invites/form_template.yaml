@@ -22,9 +22,8 @@ components:
       columns:
       - {id: KXBOMI, title: Invite, data_key: user_or_url, $$hashKey: 'object:22731',
         expand: true}
-      - {id: SQRIZT, title: Phone (last 4 digits), data_key: guess, $$hashKey: 'object:22733'}
-      - {id: JMODSU, title: Introduction/Description, data_key: relationship2to1,
-        $$hashKey: 'object:22732'}
+      - {id: SQRIZT, title: Phone (last 4 digits), data_key: inviter_guess, $$hashKey: 'object:22733'}
+      - {id: JMODSU, title: Introduction/Description, data_key: rel_to_inviter, $$hashKey: 'object:22732'}
       auto_header: true
       tooltip: ''
       border: ''
