@@ -255,6 +255,7 @@ class Invite(invites.Invite):
                                  link_key=invite_row['link_key'],
                                 invitee=sm.get_port_user(invite_row['user2'], user1_id=user_id),
                                )
+    return port_invite if portable else Invite(port_invite)
 
 #   def serve(self):
 #     errors = []

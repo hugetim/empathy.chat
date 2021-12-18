@@ -22,7 +22,5 @@ class InviteRow(InviteRowTemplate):
       self.name = Name(item=name_item)
       self.name_or_url_flow_panel.add_component(self.name)
     else:
-      self.link.url = self.item.invite_url
+      self.link.url = self.item.url
       self.link.text = "Invite Link"
-    print(self.item['inviter_guess'])
-

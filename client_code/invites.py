@@ -49,12 +49,8 @@ class Invite(h.AttributeToKey):
     return str(self.__dict__)     
       
   @property
-  def invite_url(self):
+  def url(self):
     return f"{p.URL}#?invite={self.link_key}"   
-  
-  @property
-  def url_or_user(self):
-    return self
   
   @property
   def not_yet_added(self):
