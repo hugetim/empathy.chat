@@ -21,7 +21,7 @@ components:
   name: name
   layout_properties: {column: TCRDJP}
   data_bindings:
-  - {property: item, code: '{k: self.item[k] for k in {''name'', ''confirmed'', ''user_id''}}'}
+  - {property: item, code: self.item}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
