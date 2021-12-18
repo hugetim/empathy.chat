@@ -7,6 +7,7 @@ from .... import ui_procedures as ui
 from .... import prompts
 from .... import glob
 from .... import invited
+from .... import portable as port
 from .NameEdit import NameEdit
 from .TextAreaEdit import TextAreaEdit
 from .Relationship import Relationship
@@ -144,7 +145,7 @@ class Profile(ProfileTemplate):
 
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    if prompts.invite_dialog(self.item['name'], self.item['user_id']):
+    if prompts.invite_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
       get_open_form().go_profile(self.item['user_id'])
 
   def confirm_button_click(self, **event_args):

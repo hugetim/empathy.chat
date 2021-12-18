@@ -18,12 +18,10 @@ class Invites(h.AttributeToKey):
     return len(self.invites)
     
   def save(self):
-    invites_data = [invite.to_data() for invite_data in self.invites]
-    anvil.server.call('save_invites', invites_data)
+    anvil.server.call('save_invites', self.invites)
     
   def load(self):
-    invites_data = anvil.server.call('load_invites')
-    self.invites = [Invite(invite_data) for invite_data in invites_data]
+    self.invites = anvil.server.call('load_invites')
 
    
 @anvil.server.portable_class
@@ -44,11 +42,11 @@ class Invite(h.AttributeToKey):
     self.connection_successful = False
  
   def update(self, new_self):
-    for key, value in vars(new_self).items():
+    for key, value in new_self.__dict__.items():
       setattr(self, key, value)
 
   def __str__(self):
-    return str(vars(self))     
+    return str(self.__dict__)     
       
   @property
   def url(self):

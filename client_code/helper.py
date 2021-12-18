@@ -135,25 +135,33 @@ class PausedTimer:
 @anvil.server.portable_class    
 class AttributeToKey:
   def __getitem__(self, key):
-    return self.__getattr__(key)
+    try:
+      return self.__getattribute__(key)
+    except AttributeError:
+      raise KeyError(str(key))
 
   def __setitem__(self, key, item):
     self.__setattr__(key, item)
 
-
-@anvil.server.portable_class    
-class ItemWrapped(AttributeToKey):
-  def __init__(self, item):
-    self.item = item
- 
-  def to_data(self):
-    return self.item
-
-  def __getattr__(self, key):
-    return self.item[key]
-  
   def get(self, key, default=None):
-    return self.item.get(key, default)
+    try:
+      return self.__getattribute__(key)
+    except AttributeError:
+      return default
+
+# @anvil.server.portable_class    
+# class ItemWrapped(AttributeToKey):
+#   def __init__(self, item):
+#     self.item = item
+ 
+#   def to_data(self):
+#     return self.item
+
+#   def __getattr__(self, key):
+#     return self.item[key]
+  
+#   def get(self, key, default=None):
+#     return self.item.get(key, default)
   
 #   def __setattr__(self, key, value):
 #     self.item[key] = value

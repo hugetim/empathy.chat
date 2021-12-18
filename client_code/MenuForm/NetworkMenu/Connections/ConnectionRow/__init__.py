@@ -7,6 +7,7 @@ from ..... import ui_procedures as ui
 from ..... import prompts
 from ..... import glob
 from ..... import invited
+from ..... import portable as port
 
 
 class ConnectionRow(ConnectionRowTemplate):
@@ -28,7 +29,7 @@ class ConnectionRow(ConnectionRowTemplate):
 
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    if prompts.invite_dialog(self.item['name'], self.item['user_id']):
+    if prompts.invite_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
       self.parent.raise_event('x-reset')
 
   def confirm_button_click(self, **event_args):

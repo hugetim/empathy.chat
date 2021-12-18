@@ -242,45 +242,49 @@ def add_invite(item, user_id=""):
 
 @authenticated_callable
 def load_invites(user_id=""):
-  from . import matcher as m
+#   from . import matcher as m
+  from . import invites_server
   user = sm.get_user(user_id)
   rows = app_tables.invites.search(origin=True, user1=user)
   out = []
   for row in rows:
-    item = {k: row[k] for k in ['date', 'relationship2to1', 'date_described', 'guess', 'link_key', 'distance']}
-    if row['user2']:
-      item['user2'] = sm.get_port_user(row['user2'], user1_id=user.get_id(), simple=False)
-    if row['proposal']:
-      item['proposal'] = m.Proposal(row['proposal']).portable(user)
-    out.append(item)
+#     item = {k: row[k] for k in ['date', 'relationship2to1', 'date_described', 'guess', 'link_key', 'distance']}
+#     if row['user2']:
+#       item['user2'] = sm.get_port_user(row['user2'], user1_id=user.get_id(), simple=False)
+#     if row['proposal']:
+#       item['proposal'] = m.Proposal(row['proposal']).portable(user)
+    out.append(invites_server.Invite.from_invite_row(row, portable=True, user_id=user.get_id()))
   return out
 
 @authenticated_callable
 @anvil.tables.in_transaction
 def save_invites(items, user_id=""):
-  from . import matcher as m
+#   from . import matcher as m
+  from . import invites_server
   user = sm.get_user(user_id)
-  link_keys = [item['link_key'] for item in items]
-  unmatched_rows = app_tables.invites.search(origin=True, user1=user, link_key=q.none_of(*link_keys))
-  for row in unmatched_rows:
-    row.delete()
-  for item in items:
-    if item.get('proposal'):
-      proposal = m.Proposal.get_by_id(item['proposal'].prop_id)
-      if proposal:
-        proposal.update(item['proposal'])   
-      else:
-        proposal = m.Proposal.add(user, item['proposal'])
-      item['proposal'] = proposal._row
-    if item.get('user2'):
-      item['user2'] = sm.get_user(item.get('user2').user_id, require_auth=False)
-    row = app_tables.invites.get(origin=True, user1=user, link_key=item['link_key'])
-    if row:
-      row.update(**item)
-    else:
-      new_item = {'origin': True, 'user1': user}
-      new_item.update(item)
-      app_tables.invites.add_row(**new_item)
+  for port_invite in items:
+    invites_server.Invite(item).edit_invite()
+#   link_keys = [item['link_key'] for item in items]
+#   unmatched_rows = app_tables.invites.search(origin=True, user1=user, link_key=q.none_of(*link_keys))
+#   for row in unmatched_rows:
+#     row.delete()
+#   for item in items:
+#     if item.get('proposal'):
+#       proposal = m.Proposal.get_by_id(item['proposal'].prop_id)
+#       if proposal:
+#         proposal.update(item['proposal'])   
+#       else:
+#         proposal = m.Proposal.add(user, item['proposal'])
+#       item['proposal'] = proposal._row
+#     if item.get('user2'):
+#       item['user2'] = sm.get_user(item.get('user2').user_id, require_auth=False)
+#     row = app_tables.invites.get(origin=True, user1=user, link_key=item['link_key'])
+#     if row:
+#       row.update(**item)
+#     else:
+#       new_item = {'origin': True, 'user1': user}
+#       new_item.update(item)
+#       app_tables.invites.add_row(**new_item)
 
 
 @anvil.server.callable

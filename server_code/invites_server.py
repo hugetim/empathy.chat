@@ -90,10 +90,10 @@ class Invite(invites.Invite):
     return last4 == user['phone'][-4:]
   
   def _edit_row(self, row, guess, rel, now):
-    row.update(guess=guess,
-               relationship2to1=rel,
-               date_described=now,
-              )
+    row['guess'] = guess
+    if rel != row['relationship2to1']:
+      row['relationship2to1'] = rel
+      row['date_described'] = now
 
   def edit_invite(self):
     errors = self.invalid_invite()
@@ -245,6 +245,16 @@ class Invite(invites.Invite):
 #       errors.append(f"The last 4 digits you provided match {name}'s phone number, "
 #                     f"but {name} did not correctly provide the last 4 digits of your phone number.")
     return errors
+
+  @staticmethod
+  def from_invite_row(invite_row, portable=False, user_id=""):
+    port_invite = invites.Invite(invite_id=invite_row.get_id(),
+                                 inviter=sm.get_port_user(invite_row['user1']),
+                                 rel_to_inviter=invite_row['relationship2to1'],
+                                 inviter_guess=invite_row['guess'],
+                                 link_key=invite_row['link_key'],
+                                invitee=sm.get_port_user(invite_row['user2'], user1_id=user_id),
+                               )
 
 #   def serve(self):
 #     errors = []

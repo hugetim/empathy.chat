@@ -7,7 +7,7 @@ from . import invites
 from . import portable as port
 
 
-def invite_dialog(invitee=None, user_id=""):
+def invite_dialog(invitee=None):
   """Specifying a `name` leads to connect-existing-user dialog"""
   invite = invites.Invite(inviter=port.User.from_logged_in(), invitee=invitee)
   #item = {"relationship": "", "phone_last4": "", "name": name, "user_id": user_id}
