@@ -19,7 +19,6 @@ class Connections(ConnectionsTemplate):
     self.update()
     
   def update(self):
-    self.repeating_panel_1.items = (
-      anvil.server.call('get_connections', self.item['user_id'])
-    )
+    items = anvil.server.call('get_connections', self.item['user_id'])
+    self.repeating_panel_1.items = items
     self.refresh_data_bindings()

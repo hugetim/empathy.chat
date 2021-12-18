@@ -13,6 +13,7 @@ class ConnectionRow(ConnectionRowTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.trust_level = glob.trust_level
+    print(properties['item'])
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.

@@ -7,6 +7,7 @@ from .. import helper as h
 class Name(NameTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
+    print(properties['item'])
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
