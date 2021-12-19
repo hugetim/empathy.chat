@@ -55,6 +55,9 @@ class User():
   def name_item(self):
     return (self.name, self.user_id)
 
+  def __str__(self):
+    return self.name
+  
   @property
   def s_user(self):
     return app_tables.users.get_by_id(self.user_id)

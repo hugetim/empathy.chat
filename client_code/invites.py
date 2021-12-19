@@ -45,7 +45,7 @@ class Invite(h.AttributeToKey):
     for key, value in new_self.__dict__.items():
       setattr(self, key, value)
 
-  def __str__(self):
+  def __repr__(self):
     return str(self.__dict__)     
       
   @property

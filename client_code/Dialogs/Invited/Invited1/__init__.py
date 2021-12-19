@@ -25,9 +25,9 @@ class Invited1(Invited1Template):
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
     self.phone_request_label.text = (
-      f"Please provide the last 4 digits of {self.item['inviter']}'s phone number:"
+      f"Please provide the last 4 digits of {self.item['inviter'].name}'s phone number:"
     )
-    item = {'relationship': self.item['relationship'], 'name': self.item['inviter']}
+    item = self.item.rel_item(for_response=True) #{'relationship': self.item['relationship'], 'name': self.item['inviter']}
     self.relationship_prompt = RelationshipPromptOnly(item=item)
     self.linear_panel_2.add_component(self.relationship_prompt)
     self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
@@ -39,24 +39,30 @@ class Invited1(Invited1Template):
   @wait_for_writeback
   def continue_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.item.update({'relationship': self.relationship_prompt.item['relationship']})
-    error_message = invited.submit_invite_reply(self.item)
-    if error_message and error_message[:36] == "The last 4 digits you provided match":
-      Notification(error_message, title="Mistaken Invite", style="info", timeout=None).show()
-      self.parent.raise_event("x-close-alert", value=False)
-    elif error_message:
-      self.error(error_message)
+    #self.item.update({'relationship': self.relationship_prompt.item['relationship']})
+    self.item.update_from_rel_item(self.relationship_prompt.item, for_response=True)
+    #error_message = invited.submit_invite_reply(self.item)
+    validation_errors = self.item.invalid_response()
+    if validation_errors:
+      self.error(" ".join(validation_errors))
     else:
-      user = anvil.users.get_user()
-      has_phone = user['phone'] if user else None
-      if self.item['link_key'] and not user:
-        self.parent.go_invited2(self.item)
-      elif self.item['link_key'] and not has_phone:
-        self.parent.raise_event("x-close-alert", value=True)
-      else: # connecting already-registered users
-        Notification("You have been successfully connected.", style="success").show()
-        self.parent.raise_event("x-close-alert", value=True)
-        ui.reload()
+      errors = self.item.relay('respond')
+      if error_message and error_message[:36] == "The last 4 digits you provided match":
+        Notification(error_message, title="Mistaken Invite", style="info", timeout=None).show()
+        self.parent.raise_event("x-close-alert", value=False)
+      elif error_message:
+        self.error(error_message)
+      else:
+        user = anvil.users.get_user()
+        has_phone = user['phone'] if user else None
+        if self.item['link_key'] and not user:
+          self.parent.go_invited2(self.item)
+        elif self.item['link_key'] and not has_phone:
+          self.parent.raise_event("x-close-alert", value=True)
+        else: # connecting already-registered users
+          Notification("You have been successfully connected.", style="success").show()
+          self.parent.raise_event("x-close-alert", value=True)
+          ui.reload()
 
   def error(self, text):
     self.error_label.text = text
