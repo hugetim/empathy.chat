@@ -246,6 +246,15 @@ class Invite(invites.Invite):
 #                     f"but {name} did not correctly provide the last 4 digits of your phone number.")
     return errors
 
+  def load(self):
+    invite_row, errors = self._invite_row()
+    if invite_row:
+      errors += self._load_invite(invite_row)
+      response_row, _ = self._response_row()
+      if response_row:
+        errors += self._load_response(response_row)
+    return errors
+
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):
     port_invite = invites.Invite(invite_id=invite_row.get_id(),
@@ -257,16 +266,6 @@ class Invite(invites.Invite):
                                 )
     return port_invite if portable else Invite(port_invite)
 
-  @sm.authenticated_callable
-  @anvil.server.callable
-  @staticmethod
-  def from_invited(inviter_id, user_id=""):
-    user = sm.get_user(user_id)
-    inviter_user = sm.get_user(inviter_id, require_auth=False)
-    inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user1=inviter_user, user2=user)
-    invite_row = inviteds[0]
-    return Invite.from_invite_row(invite_row, portable=True, user_id=user_id)
- 
   
 #   def serve(self):
 #     errors = []

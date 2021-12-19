@@ -34,7 +34,7 @@ class ConnectionRow(ConnectionRowTemplate):
 
   def confirm_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    if invited.invited_dialog(self.item['user_id']):
+    if invited.invited_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
       self.parent.raise_event('x-reset')
 
 

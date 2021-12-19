@@ -150,6 +150,6 @@ class Profile(ProfileTemplate):
 
   def confirm_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    if invited.invited_dialog(self.item['user_id']):
+    if invited.invited_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
       get_open_form().go_profile(self.item['user_id'])
 

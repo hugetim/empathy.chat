@@ -10,8 +10,9 @@ from . import parameters as p
 from . import invites
 
 
-def invited_dialog(inviter_id):
-  invite = anvil.server.call('Invite.from_invited', inviter_id) 
+def invited_dialog(inviter):
+  invite = invites.Invite(inviter=inviter, invitee=anvil.users.get_user())
+  errors = invite.relay('load')
   top_form = get_open_form()
   from .Dialogs.Invited import Invited
   top_form.invited_alert = Invited(item=invite)
