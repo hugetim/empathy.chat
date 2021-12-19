@@ -253,10 +253,21 @@ class Invite(invites.Invite):
                                  rel_to_inviter=invite_row['relationship2to1'],
                                  inviter_guess=invite_row['guess'],
                                  link_key=invite_row['link_key'],
-                                invitee=sm.get_port_user(invite_row['user2'], user1_id=user_id),
-                               )
+                                 invitee=sm.get_port_user(invite_row['user2'], user1_id=user_id),
+                                )
     return port_invite if portable else Invite(port_invite)
 
+  @sm.authenticated_callable
+  @anvil.server.callable
+  @staticmethod
+  def from_invited(inviter_id, user_id=""):
+    user = sm.get_user(user_id)
+    inviter_user = sm.get_user(inviter_id, require_auth=False)
+    inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user1=inviter_user, user2=user)
+    invite_row = inviteds[0]
+    return Invite.from_invite_row(invite_row, portable=True, user_id=user_id)
+ 
+  
 #   def serve(self):
 #     errors = []
 #     invite_row = self._invite_row()
@@ -278,7 +289,5 @@ class Invite(invites.Invite):
 #     return self, errors
 
   
-#   @staticmethod
-#   def from_invited(self, inviter_id, user_id=""):
-#     pass
+
   

@@ -45,7 +45,7 @@ def get(spec_dict):
             "tooltip": f"Connect to {spec_dict['inviter']} and their network",
             "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Mint",
-            "click_fn": partial(invited.invited_dialog, spec_dict["inviter"], spec_dict["inviter_id"], spec_dict["rel"]),
+            "click_fn": partial(invited.invited_dialog, spec_dict["inviter_id"]), ## spec_dict["inviter"], spec_dict["rel"]
            }
   elif spec_dict["name"] == "invite-close":
     return {"markdown": "Invite a new close connection to join you on empathy.chat", 

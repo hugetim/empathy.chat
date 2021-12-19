@@ -7,14 +7,14 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from anvil import *
 from . import parameters as p
+from . import invites
 
 
-def invited_dialog(inviter, inviter_id, rel, link_key):
-  item = {"relationship": "", "phone_last4": "", "name": inviter, "inviter_id": inviter_id,
-          "relationship1to2": rel, "inviter": inviter, "link_key": link_key}
+def invited_dialog(inviter_id):
+  invite = anvil.server.call('Invite.from_invited', inviter_id) 
   top_form = get_open_form()
   from .Dialogs.Invited import Invited
-  top_form.invited_alert = Invited(item=item)
+  top_form.invited_alert = Invited(item=invite)
   return alert(content=top_form.invited_alert,
                title="Accept this invitation to connect?",
                buttons=[], large=True, dismissible=False)
