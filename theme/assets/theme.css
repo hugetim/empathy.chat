@@ -87,6 +87,12 @@ body {
   background-color: #fafafa;
 }
 
+@media print {
+  body {
+    background-color: white;
+  }
+}
+
 a, a:focus {
   text-decoration: none;
   color: %color:Primary 700%;
@@ -108,11 +114,6 @@ a:hover, a:active {
 .anvil-role-headline {
   font-size: 24px;
   line-height: 32px;
-}
-
-.anvil-role-input-prompt {
-  font-size: 16px;
-  line-height: 1.5;
 }
 
 .anvil-role-input-prompt {
@@ -184,6 +185,7 @@ a:hover, a:active {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: calc(100vh - %anvil-banner-height%);
   height: 0; /* To make flex-grow work in IE */
 }
 
@@ -244,8 +246,6 @@ a:hover, a:active {
 .nav-shield {
   display: none;
 }
-
-/* Mobile: Nav bar is a modal overlay */
 
 /* Mobile: Nav bar is a modal overlay */
 
@@ -754,6 +754,7 @@ textarea.anvil-component {
   border: 1px solid rgba(0,0,0,0.42);
   border-radius: 2px;
   transition: border 0.2s, padding 0.2s;
+  -moz-transition: none; /* Firefox is jumpy, so disable transitions */
 }
 
 .anvil-dropdown select.form-control {
