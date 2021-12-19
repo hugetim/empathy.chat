@@ -1,4 +1,4 @@
-<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet" rel="preload" as="font" crossorigin="anonymous">
 
 <div class="structure">
   <div class="app-bar" anvil-drop-container=".anvil-container" anvil-drop-redirect=".placeholder">
@@ -15,21 +15,21 @@
   </div>
 
   <div class="nav-holder">
-    <div class="left-nav" anvil-slot-repeat="left-nav" anvil-drop-container=">.anvil-container">
+    <div class="left-nav anvil-measure-this" anvil-slot-repeat="left-nav" anvil-drop-container=">.anvil-container">
     </div>
     <div class="left-nav-placeholder anvil-designer-only" anvil-if-slot-empty="left-nav" anvil-drop-slot="left-nav">
       <div class="prompt">To add a sidebar, drop a ColumnPanel here.</div>
     </div>
 
     <div class="content">
-      <div anvil-slot-repeat="default"></div>
+      <div anvil-slot-repeat="default" class="anvil-measure-this"></div>
       <div class="placeholder drop-here" anvil-if-slot-empty="default" anvil-drop-slot="default">Drop a ColumnPanel here.</div>
     </div>
   </div>
   <div class="nav-shield"></div>
 </div>
 <div anvil-drop-default anvil-drop-redirect=".placeholder" anvil-drop-container=".anvil-container"></div>
- 
+
 <script>
   var scrollCard = function() {
     var $card = this.find('.anvil-role-card-scroll');
@@ -48,7 +48,8 @@
     var ln = $('.structure > .nav-holder > .left-nav');
     ln.animate({left: -ln.outerWidth()}, function() {
       ln.removeClass("in-transition shown").addClass("hidden");
-    $('.nav-shield').removeClass("shown");
+      $('.nav-shield').removeClass("shown");
+      $(window).trigger('resize');
     });
   }
   function showSidebar() {
@@ -57,6 +58,7 @@
     ln.addClass("shown").removeClass("hidden").css({left: "-100%"}).css({left: -ln.outerWidth()}).animate({left: 0}, function() {
       ln.removeClass("in-transition");
     });
+    $(window).trigger('resize');
   }
   $('.sidebar-toggle, .nav-shield').off('click').on('click', function() {
     var ln = $('.structure > .nav-holder > .left-nav');
