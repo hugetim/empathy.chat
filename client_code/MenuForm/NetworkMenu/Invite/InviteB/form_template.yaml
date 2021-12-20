@@ -48,8 +48,8 @@ components:
       name: link_1
       layout_properties: {}
       data_bindings:
-      - {property: text, code: 'self.item[''invite_url'']'}
-      - {property: url, code: 'self.item[''invite_url'']'}
+      - {property: text, code: 'self.item[''url'']'}
+      - {property: url, code: 'self.item[''url'']'}
       components: []
     - type: Button
       properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,

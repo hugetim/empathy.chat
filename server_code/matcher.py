@@ -77,7 +77,7 @@ def init(browser_now):
 def _init():
   user = anvil.users.get_user()
   print(user['email'])
-  trust_level = sm.get_user_info(user)
+  trust_level = sm.init_user_info(user)
   print("Warning: distance not yet implemented. Returning _degree instead.")
   # Prune expired items for all users
   Proposal.prune_all()

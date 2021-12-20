@@ -34,5 +34,8 @@ class InviteB(InviteBTemplate):
     parent.add_component(InviteA(item=self.item))
 
   def copy_button_click(self, **event_args):
-    navigator.clipboard.writeText(self.link_1.text)
+    try:
+      navigator.clipboard.writeText(self.link_1.text)
+    except anvil.js.ExternalError as err:
+      Notification(err).show()
 

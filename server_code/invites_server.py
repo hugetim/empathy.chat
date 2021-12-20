@@ -177,6 +177,7 @@ class Invite(invites.Invite):
           response_row['user1'] = self.invitee
           if register:
             anvil.users.force_login(user)
+            sm.init_user_info(user)
         errors += self._load_response(response_row)
     else:
       errors.append("Invalid invite link")
@@ -238,8 +239,8 @@ class Invite(invites.Invite):
                                                 link_key=self.link_key,
                                                )
     self._edit_row(response_row, self.invitee_guess, self.rel_to_invitee, now)
-    from . import connections as c
-    if self.invitee['phone']:
+    if self.invitee and self.invitee['phone']:
+      from . import connections as c
       self.connection_successful = c.try_connect(invite_row, response_row)
 #       name = sm.name(self.inviter)
 #       errors.append(f"The last 4 digits you provided match {name}'s phone number, "

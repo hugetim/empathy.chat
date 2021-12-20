@@ -50,7 +50,7 @@ class Invite(h.AttributeToKey):
       
   @property
   def url(self):
-    return f"{p.URL}#?invite={self.link_key}"   
+    return f"{p.URL}#?invite={self.link_key}"
   
   @property
   def not_yet_added(self):

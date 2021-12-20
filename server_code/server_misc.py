@@ -52,8 +52,8 @@ def get_user(user_id="", require_auth=True):
     return app_tables.users.get_by_id(user_id)
 
 
-def get_user_info(user):
-  """Return user info, initializing info for new users & updating trust_level"""
+def init_user_info(user):
+  """Return trust, initializing info for new users & updating trust_level"""
   if user['trust_level'] is None:
     user['request_em'] = False
     user['pinged_sms'] = True
