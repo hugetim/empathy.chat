@@ -36,10 +36,10 @@ class Invited2(Invited2Template):
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    invited.cancel(self.item)
+    self.item.relay('cancel_response')
     self.parent.raise_event("x-close-alert", value=False)
 
   def back_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    invited.cancel(self.item)
+    self.item.relay('cancel_response')
     self.parent.go_invited1(self.item)
