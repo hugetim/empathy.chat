@@ -23,21 +23,24 @@ def invited_dialog(inviter):
 
 def handle_link(link_key):
   user = anvil.users.get_user()
-  item = anvil.server.call('invite_visit', link_key, user2=user)
-  if item:
+  invite = invites.Invite(link_key=link_key)
+  errors = invite.relay('visit', {'user': user})
+  #item = anvil.server.call('invite_visit', link_key, user2=user)
+  if not errors:
     from .Dialogs.Invited import Invited
-    invited_alert = Invited(item=item)
+    invited_alert = Invited(item=invite)
     if alert(content=invited_alert, 
-                   title="", 
-                   buttons=[], large=True, dismissible=False):
+             title="", 
+             buttons=[], large=True, dismissible=False):
       if not user:
         new_user = anvil.users.signup_with_form(allow_cancel=True)
         if not new_user:
           new_user = anvil.users.login_with_form()
-        anvil.server.call('invite_visit_register', link_key, new_user)
+        invite.relay('visit', dict(user=new_user, register=True))
+        #anvil.server.call('invite_visit_register', link_key, new_user)
       open_form('LoginForm')
   else:
-    alert("This is not a valid invite link.")
+    alert(" ".join(errors)) #This is not a valid invite link."
 
 
 def submit_invite_reply(item):

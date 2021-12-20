@@ -47,11 +47,12 @@ class Invited1(Invited1Template):
       self.error(" ".join(validation_errors))
     else:
       errors = self.item.relay('respond')
-      if error_message and error_message[:36] == "The last 4 digits you provided match":
-        Notification(error_message, title="Mistaken Invite", style="info", timeout=None).show()
+      if p.mistaken_inviter_guess_error in errors:
+        errors.remove(p.mistaken_inviter_guess_error)
+        Notification(p.mistaken_inviter_guess_error, title="Mistaken Invite", style="info", timeout=None).show()
         self.parent.raise_event("x-close-alert", value=False)
-      elif error_message:
-        self.error(error_message)
+      if errors:
+        self.error(" ".join(validation_errors))
       else:
         user = anvil.users.get_user()
         has_phone = user['phone'] if user else None

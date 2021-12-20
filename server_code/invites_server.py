@@ -9,7 +9,7 @@ from anvil.tables import app_tables
 import anvil.server
 from . import invites
 from . import server_misc as sm
-
+from . import parameters as p
 
 @anvil.server.callable
 @anvil.tables.in_transaction
@@ -203,7 +203,7 @@ class Invite(invites.Invite):
     errors = []
     self.invitee = user
     if user['phone'] and not Invite.phone_match(self.inviter_guess, user):
-      errors += ["The inviter did not accurately provide the last 4 digits of your phone number."]
+      errors += [p.MISTAKEN_INVITER_GUESS_ERROR]
       sm.add_invite_guess_fail_prompt(self)
       errors += self.cancel(invite_row)
     else:
