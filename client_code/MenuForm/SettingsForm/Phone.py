@@ -27,6 +27,8 @@ class Phone(PhoneTemplate):
       if status == "editing":
         self.phone_button.enabled = True
       elif status == "confirming":
+        self.item['phone'] = self._format_subscriber(self.item['phone'])
+        self.refresh_data_bindings()
         self.phone_text_box.enabled = False
         self.phone_instructions_label.visible = True
         self.phone_code_panel.visible = True
