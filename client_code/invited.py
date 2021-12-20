@@ -8,10 +8,11 @@ from anvil.tables import app_tables
 from anvil import *
 from . import parameters as p
 from . import invites
+from . import portable as port
 
 
 def invited_dialog(inviter):
-  invite = invites.Invite(inviter=inviter, invitee=anvil.users.get_user())
+  invite = invites.Invite(inviter=inviter, invitee=port.User.from_logged_in())
   errors = invite.relay('load')
   top_form = get_open_form()
   from .Dialogs.Invited import Invited

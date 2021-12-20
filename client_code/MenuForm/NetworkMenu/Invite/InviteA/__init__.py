@@ -3,7 +3,6 @@ from anvil import *
 import anvil.users
 import anvil.server
 from ..InviteB import InviteB
-from ..... import parameters as p
 from .RelationshipPrompt import RelationshipPrompt
 from anvil_extras.utils import wait_for_writeback
 
@@ -29,11 +28,11 @@ class InviteA(InviteATemplate):
       self.item.update_from_rel_item(self.relationship_prompt.item, for_response=False)
       validation_errors = self.item.invalid_invite()
       if validation_errors:
-        self.error(" ".join(validation_errors))
+        self.error("\n".join(validation_errors))
       else:
         errors = self.item.relay('add')
         if errors:
-          self.error(" ".join(errors))
+          self.error("\n".join(errors))
         elif self.item.invitee: #existing user
           message = f"You will be connected once {self.item.invitee.name} confirms."
           self.parent.raise_event("x-close-alert", value=success)

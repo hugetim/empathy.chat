@@ -13,8 +13,7 @@ components:
     data: null, background: '', format: markdown}
   name: welcome_rich_text
   layout_properties: {grid_position: 'NBHBNT,RCQAHT'}
-  data_bindings:
-  - {property: data, code: self.item}
+  data_bindings: []
 - type: LinearPanel
   properties: {}
   name: linear_panel_1
@@ -63,8 +62,7 @@ components:
     spacing_above: small, spacing_below: none, data: null, background: '', format: markdown}
   name: rich_text_1_copy
   layout_properties: {grid_position: 'DTOLPY,RZYZCT'}
-  data_bindings:
-  - {property: data, code: self.item}
+  data_bindings: []
 - type: LinearPanel
   properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
     border: '', visible: true, role: null, tooltip: ''}

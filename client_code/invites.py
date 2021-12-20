@@ -91,8 +91,7 @@ class Invite(h.AttributeToKey):
 
   def update_from_rel_item(self, item, for_response):
     if for_response:
-      self.rel_to_invitee = item['relationship']
-      self.invitee_guess = item['phone_last4']
+      self.rel_to_invitee = item['relationship'] #RelationshipOnly
     else:
       self.rel_to_inviter = item['relationship']
       self.inviter_guess = item['phone_last4']

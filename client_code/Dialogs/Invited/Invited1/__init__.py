@@ -6,6 +6,7 @@ import time
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPromptOnly import RelationshipPromptOnly
 from .... import ui_procedures as ui
 from .... import invited
+from .... import parameters as p
 from anvil_extras.utils import wait_for_writeback
 
 
@@ -15,6 +16,8 @@ class Invited1(Invited1Template):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.welcome_rich_text.data = dict(inviter=self.item.inviter)
+    self.rich_text_1_copy.data = dict(inviter=self.item.inviter, rel_to_inviter=self.item.rel_to_inviter)
     if self.item['link_key']: # from a link invite
       self.welcome_rich_text.visible = True
       self.cancel_button.visible = False
@@ -44,15 +47,15 @@ class Invited1(Invited1Template):
     #error_message = invited.submit_invite_reply(self.item)
     validation_errors = self.item.invalid_response()
     if validation_errors:
-      self.error(" ".join(validation_errors))
+      self.error("\n".join(validation_errors))
     else:
       errors = self.item.relay('respond')
-      if p.mistaken_inviter_guess_error in errors:
-        errors.remove(p.mistaken_inviter_guess_error)
-        Notification(p.mistaken_inviter_guess_error, title="Mistaken Invite", style="info", timeout=None).show()
+      if p.MISTAKEN_INVITER_GUESS_ERROR in errors:
+        errors.remove(p.MISTAKEN_INVITER_GUESS_ERROR)
+        Notification(p.MISTAKEN_INVITER_GUESS_ERROR, title="Mistaken Invite", style="info", timeout=None).show()
         self.parent.raise_event("x-close-alert", value=False)
       if errors:
-        self.error(" ".join(validation_errors))
+        self.error("\n".join(errors))
       else:
         user = anvil.users.get_user()
         has_phone = user['phone'] if user else None
