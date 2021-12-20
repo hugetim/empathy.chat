@@ -39,7 +39,7 @@ def handle_link(link_key):
           new_user = anvil.users.login_with_form()
         invite.relay('visit', dict(user=new_user, register=True))
         #anvil.server.call('invite_visit_register', link_key, new_user)
-      open_form('LoginForm')
+      #open_form('LoginForm')
   else:
     alert(" ".join(errors)) #This is not a valid invite link."
 

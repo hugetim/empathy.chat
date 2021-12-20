@@ -176,7 +176,7 @@ class Invite(invites.Invite):
         if self.invitee:
           response_row['user1'] = self.invitee
           if register:
-            anvil.users.force_login(user)
+            #anvil.users.force_login(user)
             sm.init_user_info(user)
         errors += self._load_response(response_row)
     else:
