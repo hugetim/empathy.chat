@@ -8,6 +8,7 @@ from ..UserMenu.Profile.NameEdit import NameEdit
 from ... import portable as t
 from ... import helper as h
 from ... import parameters as p
+from ... import glob
 from datetime import timedelta
 from copy import deepcopy
 
@@ -18,6 +19,7 @@ class DashForm(DashFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
+    self.proposals_card.visible = glob.trust_level >= 2 # add in group membership once implemented
     self.timer_2.interval = 5
        
   def form_show(self, **event_args):

@@ -39,6 +39,8 @@ class CreateForm(CreateFormTemplate):
       self.date_picker_start.spacing_above = "small"
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
+    self.eligible_network_column_panel.visible = self.item['user_items'] and self.trust_level >= 2
+    self.eligible_label.visible = (self.item['user_items'] and self.trust_level >= 2) or self.item['group_items']
     self.drop_down_eligible.items = (
       [("Anyone (up to 3 degrees separation)", 3)] if self.trust_level >= 3
       else []
