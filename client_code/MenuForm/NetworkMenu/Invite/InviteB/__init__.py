@@ -36,6 +36,7 @@ class InviteB(InviteBTemplate):
   def copy_button_click(self, **event_args):
     try:
       navigator.clipboard.writeText(self.link_1.text)
+      self.copy_button.icon = "fa:check-circle"
     except anvil.js.ExternalError as err:
       Notification(err).show()
 
