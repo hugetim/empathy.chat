@@ -151,7 +151,7 @@ db_schema:
       type: link_single
       target: users
     - name: spec
-      admin_ui: {width: 200}
+      admin_ui: {width: 622}
       type: simpleObject
     - name: dismissed
       admin_ui: {width: 200}
@@ -236,6 +236,9 @@ db_schema:
     - name: n_password_failures
       admin_ui: {width: 178}
       type: number
+    - name: Column25
+      admin_ui: {width: 200}
+      type: bool
   proposal_times:
     title: Proposal Times
     client: none
