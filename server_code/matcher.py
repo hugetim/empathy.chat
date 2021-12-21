@@ -96,20 +96,13 @@ def _init():
     state = _cancel_other(user)
   if state['status'] in ('requesting', 'pinged', 'pinging'):
     state = confirm_wait_helper(user)
+  anvil.server.session['status'] = state
+  propagate_update_needed(user)
   return {'test_mode': test_mode,
           'trust_level': trust_level,
           'name': name,
           'state': state,
          }
-
-
-@authenticated_callable
-@anvil.tables.in_transaction
-def confirm_wait(user_id=""):
-  """updates expire_date for current request, returns _get_status(user)"""
-  print("confirm_wait", user_id)
-  user = sm.get_user(user_id)
-  return confirm_wait_helper(user)
 
 
 def confirm_wait_helper(user, proptime=None):
@@ -137,11 +130,22 @@ def get_proposals_upcomings(user_id=""):
   return proposals, upcomings
 
 
+def propagate_update_needed(user=None):
+  all_users = app_tables.users.search()
+  for u in all_users:
+    if u != user:
+      u['update_needed'] = True
+
+      
 @authenticated_callable
 @anvil.tables.in_transaction
 def get_status(user_id=""):
   user = sm.get_user(user_id)
-  return _get_status(user)
+  saved_status = anvil.server.session.get('status')
+  if user['update_needed'] or not saved_status:
+    anvil.server.session['status'] = _get_status(user)
+    user['update_needed'] = False
+  return anvil.server.session['status']
 
 
 def _get_status(user):
@@ -249,13 +253,16 @@ def cancel_match(match_id, user_id=""):
   """
   print("cancel", match_id, user_id)
   user = sm.get_user(user_id)
+  propagate_update_needed()
   return _cancel_match(user, match_id)  
   
   
 @authenticated_callable
 @anvil.tables.in_transaction
 def init_match_form(user_id=""):
-  """Return jitsi_code, duration (or Nones), my_slider_value"""
+  """Return jitsi_code, duration (or Nones), my_slider_value
+  
+  Side effect: set this_match['present']"""
   print("init_match_form", user_id)
   user = sm.get_user(user_id)
   current_proptime = ProposalTime.get_now(user)
@@ -269,6 +276,7 @@ def init_match_form(user_id=""):
       temp[i] = 1
       this_match['present'] = temp
       jitsi_code, duration = ProposalTime(this_match['proposal_time']).get_match_info()
+      propagate_update_needed()
       return jitsi_code, duration, this_match['slider_values'][i]
   return None, None, None
 
@@ -283,6 +291,7 @@ def accept_proposal(proptime_id, user_id=""):
   print("accept_proposal", proptime_id, user_id)
   user = sm.get_user(user_id)
   ProposalTime.get_by_id(proptime_id).attempt_accept(user)
+  propagate_update_needed()
   return _get_status(user)
 
 
@@ -295,6 +304,7 @@ def add_proposal(proposal, link_key="", user_id=""):
   """
   print("add_proposal", user_id)
   user = sm.get_user(user_id)
+  propagate_update_needed()
   state, prop_id = _add_proposal(user, proposal, link_key)
   return state
 
@@ -321,6 +331,7 @@ def edit_proposal(proposal, user_id=""):
   """
   print("edit_proposal", user_id)
   user = sm.get_user(user_id)
+  propagate_update_needed()
   return _edit_proposal(user, proposal)
 
     
@@ -350,6 +361,7 @@ def cancel(proptime_id=None, user_id=""):
   """
   print("cancel", proptime_id, user_id)
   user = sm.get_user(user_id)
+  propagate_update_needed()
   return _cancel(user, proptime_id)
 
 
@@ -374,6 +386,7 @@ def cancel_other(proptime_id=None, user_id=""):
   """
   print("cancel_other", proptime_id, user_id)
   user = sm.get_user(user_id)
+  propagate_update_needed()
   return _cancel_other(user, proptime_id)
 
 
@@ -386,6 +399,7 @@ def match_commit(proptime_id=None, user_id=""):
   """
   print("match_commit", proptime_id, user_id)
   user = sm.get_user(user_id)
+  propagate_update_needed()
   return _match_commit(user, proptime_id)
 
 
@@ -437,6 +451,7 @@ def match_complete(user_id=""):
     current_proptime = ProposalTime.get_now(user)
     if current_proptime:
       _cancel(user, current_proptime.get_id())
+  propagate_update_needed()
   return _get_status(user)
 
 

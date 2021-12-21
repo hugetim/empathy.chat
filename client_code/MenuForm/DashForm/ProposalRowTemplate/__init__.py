@@ -51,9 +51,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     if self.item['prop_time'].start_now:
       self.timer_1.interval = 0
       self.item['expires_in'] = "n/a"
-      self.renew_button.visible = self.item['own'] # should never be seen
     else:
-      self.renew_button.visible = False
       time_left = self.time_left()
       if time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
         self.update_expire_seconds(time_left)
@@ -73,10 +71,6 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     """This method is called when the button is clicked"""
     self.update_dash(anvil.server.call('accept_proposal', 
                                        self.item['prop_time'].time_id))
-
-  def renew_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    self.update_dash(anvil.server.call('confirm_wait'))
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""

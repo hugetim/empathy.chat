@@ -28,14 +28,6 @@ components:
     layout_properties: {}
     event_bindings: {click: edit_button_click}
   - type: Button
-    properties: {role: null, align: center, tooltip: Renew your "now" proposal, border: '',
-      enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '',
-      spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
-      bold: false, underline: false, icon: 'fa:refresh'}
-    name: renew_button
-    layout_properties: {column: PHQQNP, grid_position: 'LKJQFF,HNLNSJ'}
-    event_bindings: {click: renew_button_click}
-  - type: Button
     properties: {role: null, align: center, tooltip: Cancel this proposal time, border: '',
       enabled: true, foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null,
       font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,

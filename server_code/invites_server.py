@@ -14,12 +14,16 @@ from . import parameters as p
 @anvil.server.callable
 @anvil.tables.in_transaction
 def serve_invite_unauth(port_invite, method, kwargs):
+  from . import matcher
+  matcher.propagate_update_needed()
   return _serve_invite(port_invite, method, kwargs, auth=False)
 
 
 @sm.authenticated_callable
 @anvil.tables.in_transaction
 def serve_invite(port_invite, method, kwargs):
+  from . import matcher
+  matcher.propagate_update_needed()
   return _serve_invite(port_invite, method, kwargs, auth=True)
 
 

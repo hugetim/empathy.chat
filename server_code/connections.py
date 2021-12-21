@@ -192,55 +192,6 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
 
   
 @authenticated_callable
-def cancel_invite(link_key, user_id=""):
-  user = sm.get_user(user_id)
-  row = app_tables.invites.get(link_key=link_key, user1=user)
-  if row:
-    row.delete()
-
-    
-@authenticated_callable
-@anvil.tables.in_transaction
-def invite_user(item, user_id=""):
-  user1 = sm.get_user(user_id)
-  user2 = app_tables.users.get_by_id(item['user_id'])
-  now = sm.now()
-  from .invites_server import Invite
-  if Invite.phone_match(item['phone_last4'], user2):
-    app_tables.invites.add_row(date=now,
-                               origin=True,
-                               user1=user1,
-                               user2=user2,
-                               relationship2to1=item['relationship'],
-                               date_described=now,
-                               guess=item['phone_last4'],
-                               distance=1,
-                               link_key="",
-                              )
-    return item
-  else:
-    return None
-
-@authenticated_callable
-@anvil.tables.in_transaction
-def add_invite(item, user_id=""):
-  user = sm.get_user(user_id)
-  now = sm.now()
-  link_key = sm.random_code(num_chars=7)
-  app_tables.invites.add_row(date=now,
-                             origin=True,
-                             user1=user,
-                             relationship2to1=item['relationship'],
-                             date_described=now,
-                             guess=item['phone_last4'],
-                             distance=1,
-                             link_key=link_key,
-                            )
-  return {"link_key": link_key,
-          "invite_url": f"{p.URL}#?invite={link_key}"}
-
-
-@authenticated_callable
 def load_invites(user_id=""):
 #   from . import matcher as m
   from . import invites_server
@@ -261,7 +212,9 @@ def load_invites(user_id=""):
 def save_invites(items, user_id=""):
 #   from . import matcher as m
   from . import invites_server
+  from . import matcher
   user = sm.get_user(user_id)
+  matcher.propagate_update_needed(user)
   for port_invite in items:
     invites_server.Invite(item).edit_invite()
 #   link_keys = [item['link_key'] for item in items]
@@ -286,96 +239,6 @@ def save_invites(items, user_id=""):
 #       new_item.update(item)
 #       app_tables.invites.add_row(**new_item)
 
-
-@anvil.server.callable
-def invite_visit(link_key, user2):
-  """Return invited item if invite matching link_key exists
-  
-  Side effects: set invite['user2'] if visitor is logged in,
-    likewise for invite_reply['user1'] if it exists"""
-  invite = app_tables.invites.get(origin=True, link_key=link_key)
-  if invite:
-    if user2:
-      invite['user2'] = user2
-      if invite['user2'] and invite['user2'] != user2:
-        print("Warning: invite['user2'] being overwritten")
-#     anvil.server.session['invite_link_key'] = link_key
-    item = {'link_key': link_key}
-    item['relationship1to2'] = invite['relationship2to1']
-    item['inviter'] = invite['user1']['first_name']
-    item['inviter_id'] = invite['user1'].get_id()
-    invite_reply = app_tables.invites.get(origin=False, link_key=link_key)
-    if invite_reply:
-      item['relationship'] = invite_reply['relationship2to1']
-      item['phone_last4'] = invite_reply['guess']
-      invite_reply['user1'] = user2
-    else:
-      item['relationship'] = ""
-      item['phone_last4'] = ""
-    return item
-  else:
-    return None
-
-  
-@anvil.server.callable
-@anvil.tables.in_transaction
-def invite_visit_register(link_key, user):
-  """Side effects: force_login, update rows with invitee"""
-  invite = app_tables.invites.get(origin=True, link_key=link_key)
-  invite_reply = app_tables.invites.get(origin=False, link_key=link_key)
-  if invite and invite_reply:
-    anvil.users.force_login(user)
-    if invite['user2'] and invite['user2'] != user:
-      print("Warning: invite['user2'] being overwritten (register)")
-    invite.update(user2=user)
-    invite_reply.update(user1=user)
-  else:
-    print("Warning: invite_visit_register failed", link_key, user.get_id())
-
-  
-@anvil.server.callable
-@anvil.tables.in_transaction
-def submit_invited(item, user_id=""):
-  """Returns True if phone guess matches, assumes link_key and no user['phone']
-  
-  Side effects: add/update invited table row,
-    add user to invite table row if applicable,
-    connect if applicable"""
-  user = sm.get_user(user_id)
-  user2 = app_tables.users.get_by_id(item['inviter_id'])
-  from .invites_server import Invite
-  if Invite.phone_match(item['phone_last4'], user2):
-    info = _invited_item_to_row_dict(item, user)
-    invite_reply = app_tables.invites.get(q.any_of(user1=user, link_key=item['link_key']), 
-                                          origin=False, user2=user2)
-    if invite_reply:
-      if ((invite_reply['user1'] and invite_reply['user1'] != user)
-          or (invite_reply['link_key'] and invite_reply['link_key'] != item['link_key'])):
-        print("Warning: overwriting invited info", item, user.get_id())
-      invite_reply.update(**info)
-    else:
-      invite_reply = app_tables.invites.add_row(**info)
-    if user and item['link_key']:
-      invite = app_tables.invites.get(origin=True, user1=user2, link_key=item['link_key'])
-      if invite:
-        invite.update(user2=user)
-      else:
-        print("Warning: invite not found by link_key", item, user_id)
-    if user and user['phone']:
-      invite = app_tables.invites.get(origin=True, user1=user2, user2=user, link_key=item['link_key'])
-      if invite:
-        if not try_connect(invite, invite_reply):
-          remove_invite_pair(invite, invite_reply, user)
-          return (
-            f"The last 4 digits you provided match {item['inviter']}'s phone number, "
-            f"but {item['inviter']} did not correctly provide the last 4 digits of your phone number."
-          )
-      else:
-        print("Warning: invite not found", item, user_id)
-    return None
-  else:
-    return f"The last 4 digits you provided do not match {item['inviter']}'s phone number."
- 
 
 def remove_invite_pair(invite, invite_reply, user):
   try_removing_from_invite_proposal(invite, user)
@@ -444,21 +307,6 @@ def _connected_prompt(invite, invite_reply):
              )
 
 
-@anvil.server.callable
-@anvil.tables.in_transaction
-def cancel_invited(item):
-  if item['inviter_id'] and item['link_key']:
-    row = app_tables.invites.get(origin=False,
-                                 link_key=item['link_key'],
-                                 relationship2to1=item['relationship'],
-                                 user2=app_tables.users.get_by_id(item['inviter_id']),
-                                )
-    if row:
-      row.delete()
-  else:
-    print("Warning: cancel_invited called on ambiguous item", item)
-
- 
 @authenticated_callable
 @anvil.tables.in_transaction
 def save_relationship(item, user_id=""):
@@ -474,6 +322,8 @@ def save_relationship(item, user_id=""):
 @anvil.tables.in_transaction
 def disconnect(user2_id, user1_id=""):
   user1 = sm.get_user(user1_id)
+  from . import matcher
+  matcher.propagate_update_needed()
   user2 = sm.get_user(user2_id, require_auth=False)
   if user2:
     r1to2 = app_tables.connections.get(user1=user1, user2=user2)

@@ -27,7 +27,6 @@ def initialize_session(browser_now):
   """initialize session state: user_id, user, and current_row"""
   user = anvil.users.get_user()
   user['browser_now'] = browser_now
-  anvil.server.session['test_record'] = None
   if p.DEBUG_MODE and user['trust_level'] >= TEST_TRUST_LEVEL:
     from . import server_auto_test
     server_auto_test.server_auto_tests()
@@ -183,6 +182,8 @@ def get_prompts(user):
 @authenticated_callable
 @anvil.tables.in_transaction
 def dismiss_prompt(prompt_id):
+  from . import matcher
+  matcher.propagate_update_needed()
   prompt = app_tables.prompts.get_by_id(prompt_id)
   prompt['dismissed'] = True
   
@@ -219,12 +220,16 @@ def init_profile(user_id=""):
 @authenticated_callable
 def set_seeking_buddy(seeking, user_id=""):
   user = get_user(user_id)
+  from . import matcher
+  matcher.propagate_update_needed(user)
   user['seeking_buddy'] = seeking
   
   
 @authenticated_callable
 def save_name(name_item, user_id=""):
   user = get_user(user_id)
+  from . import matcher
+  matcher.propagate_update_needed(user)
   user['first_name'] = name_item['first']
   user['last_name'] = name_item['last']
   
@@ -298,6 +303,8 @@ def add_message(user2_id, user_id="", message="[blank test message]"):
                               message=anvil.secrets.encrypt_with_key("new_key", message),
                               time_stamp=now())
   _add_message_prompt(user2, user)
+  from . import matcher
+  matcher.propagate_update_needed(user)
   return _update_history_form(user2, user)
 
   
@@ -376,6 +383,7 @@ def _update_match_form(user):
     return "matched", how_empathy_list, their_name, messages_out, their_value
   else:
     state = matcher.confirm_wait_helper(user)
+    matcher.propagate_update_needed(user)
     return state['status'], [], "", [], None
 
   
@@ -489,7 +497,6 @@ def _send_sms(to_number, text):
     return str(exc)
   
     
-    
 @authenticated_callable
 def send_verification_sms(number, user_id=""):
   if _number_already_taken(number):
@@ -518,6 +525,8 @@ def send_verification_sms(number, user_id=""):
 @anvil.tables.in_transaction
 def check_phone_code(code, user_id=""):
   user = get_user(user_id)
+  from . import matcher
+  matcher.propagate_update_needed()
   # first expunge old codes
   _now = now()
   for code_row in app_tables.codes.search():

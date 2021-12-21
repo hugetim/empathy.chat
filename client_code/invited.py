@@ -26,7 +26,6 @@ def handle_link(link_key):
   user = anvil.users.get_user()
   invite = invites.Invite(link_key=link_key)
   errors = invite.relay('visit', {'user': user})
-  #item = anvil.server.call('invite_visit', link_key, user2=user)
   if not errors:
     from .Dialogs.Invited import Invited
     invited_alert = Invited(item=invite)
@@ -38,21 +37,6 @@ def handle_link(link_key):
         if not new_user:
           new_user = anvil.users.login_with_form()
         invite.relay('visit', dict(user=new_user, register=True))
-        #anvil.server.call('invite_visit_register', link_key, new_user)
       open_form('LoginForm')
   else:
     alert(" ".join(errors)) #This is not a valid invite link."
-
-
-def submit_invite_reply(item):
-  """Returns error_message if item not well-formatted or doesn't match phone number
-  
-  Side effects: submits well-formatted item to server"""
-  if len(item['phone_last4']) != 4:
-    return "Wrong number of digits entered."
-  elif len(item['relationship']) < p.MIN_RELATIONSHIP_LENGTH:
-    return "Please add a description of your relationship."
-  else:
-    return anvil.server.call('submit_invited', item)
-
-  

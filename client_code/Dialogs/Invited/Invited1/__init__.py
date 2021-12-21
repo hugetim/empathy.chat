@@ -44,7 +44,6 @@ class Invited1(Invited1Template):
     """This method is called when the button is clicked"""
     #self.item.update({'relationship': self.relationship_prompt.item['relationship']})
     self.item.update_from_rel_item(self.relationship_prompt.item, for_response=True)
-    #error_message = invited.submit_invite_reply(self.item)
     validation_errors = self.item.invalid_response()
     if validation_errors:
       self.error("\n".join(validation_errors))

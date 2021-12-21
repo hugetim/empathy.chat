@@ -12,7 +12,7 @@ from . import portable
 def test_add_user(em, level=1, r_em=False, p_sms=True):
   print("test_add_user", em, level, r_em, p_sms)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
-    if not anvil.server.session['test_record']:
+    if not anvil.server.session.get('test_record'):
       anvil.server.session['test_record'] = create_tests_record()
     new_user = app_tables.users.add_row(email=em,
                                         first_name = em,
@@ -32,6 +32,7 @@ def test_add_request(user_id, port_prop):
   print("test_add_request", user_id)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     user = app_tables.users.get_by_id(user_id)
+    matcher.propagate_update_needed()
     state, prop_id = matcher._add_proposal(user, port_prop)
     new_prop = matcher.Proposal.get_by_id(prop_id)
     if new_prop: 
@@ -50,6 +51,7 @@ def add_now_proposal():
   print("add_now_proposal")
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     tester = sm.get_user()
+    matcher.propagate_update_needed()
     anvil.server.call('add_proposal', portable.Proposal(times=[portable.ProposalTime(start_now=True)]), user_id=tester.get_id())
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
     if tester_now_proptime:
@@ -61,6 +63,7 @@ def accept_now_proposal(user_id):
   print("accept_now_proposal", user_id)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     tester = sm.get_user()
+    matcher.propagate_update_needed()
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
     if tester_now_proptime:
       state = matcher.accept_proposal(tester_now_proptime.get_id(), user_id)
@@ -70,7 +73,7 @@ def accept_now_proposal(user_id):
     
 def _add_prop_row_to_test_record(prop_row):
   print("_add_prop_row_to_test_record", prop_row['created'])
-  if not anvil.server.session['test_record']:
+  if not anvil.server.session.get('test_record'):
     anvil.server.session['test_record'] = create_tests_record()
   test_proposals = anvil.server.session['test_record']['test_proposals']
   if prop_row not in test_proposals:
