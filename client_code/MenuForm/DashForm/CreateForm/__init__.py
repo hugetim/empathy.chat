@@ -35,6 +35,8 @@ class CreateForm(CreateFormTemplate):
       self.item['start_now'] = False
       self.now_radio_button.visible = False
       self.later_radio_button.visible = False
+      self.start_label.spacing_below = "small"
+      self.date_picker_start.spacing_above = "small"
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     self.drop_down_eligible.items = (
