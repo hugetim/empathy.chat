@@ -798,8 +798,9 @@ class Proposal():
   
   def is_visible(self, user):
     from . import connections as c
-    return (c.distance(self._prop_row['user'], user) <= self.eligible
-            or (self.eligible == 0 and user in self.eligible_users)
+    distance = c.distance(self._prop_row['user'], user)
+    return (distance <= self.eligible
+            or (self.eligible == 0 and user in self.eligible_users and distance < 99)
            )
 
   def hide_unaccepted_times(self):
