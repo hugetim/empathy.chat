@@ -3,6 +3,7 @@ import anvil.tables
 from anvil.tables import app_tables, order_by
 import anvil.tables.query as q
 import unittest
+from anvil_extras.server_utils import timed
 from . import matcher as m
 from . import parameters as p
 from . import connections as c
@@ -30,7 +31,7 @@ class InviteTest(unittest.TestCase):
     s_invite1 = invites_server.Invite(invite1)
     errors = s_invite1.add()
     self.assertTrue(errors)
-    
+
   def add_link_invite(self):
     self.invite1 = invites.Invite(rel_to_inviter='test subject 1', inviter_guess="6666")
     self.s_invite1 = invites_server.Invite(self.invite1)
@@ -62,21 +63,15 @@ class InviteTest(unittest.TestCase):
     self.assertTrue(self.invite1.link_key)
     self.cancel_link_invite()
 
-  def test_new_link2(self):
-    self.test_new_link()
+#   def test_new_link2(self):
+#     self.test_new_link()
 
   def test_new_connect1(self):
     self.add_connect_invite()
     self.assertEqual(self.invite2.inviter.user_id, self.user.get_id())
     self.assertFalse(self.invite2.link_key)
     self.assertTrue(self.invite2.invitee)
-    self.cancel_connect_invite()   
- 
-  def test_new_connect2(self):
-    self.test_new_connect1()
-  
-  def test_new_connect_dup(self):
-    self.add_connect_invite()
+    #test_new_connect_dup
     port_invitee = sm.get_port_user(self.poptibo, user1_id=self.user.get_id())
     invite2dup = invites.Invite(rel_to_inviter='test subject 1 dup', inviter_guess="5555", invitee=port_invitee)
     s_invite2dup = invites_server.Invite(invite2dup)
@@ -97,6 +92,7 @@ class InviteTest(unittest.TestCase):
     for test_prompt in test_prompts:
       test_prompt.delete()
      
+  @timed
   def test_logged_in_visit1(self):
     self.add_link_invite()
     invite2a = invites.Invite(link_key=self.invite1.link_key)
@@ -124,6 +120,7 @@ class InviteTest(unittest.TestCase):
     self.assertFalse(errors)
     self.assertFalse(invite2c.invitee)
     
+  @timed
   def test_connect_response(self):
     self.add_connect_invite()
 #     self.invite2['invitee_guess'] = "6688"
@@ -134,8 +131,7 @@ class InviteTest(unittest.TestCase):
     self.assertEqual(self.s_invite2.inviter, self.user)
     errors = self.s_invite2.relay('respond', {'user_id': self.poptibo.get_id()})
     self.assertFalse(errors)
-    connection_records = c.get_connections(self.user.get_id())
-    self.assertTrue([r for r in connection_records if r['user_id'] == self.poptibo.get_id()])
+    self.assertEqual(c.distance(self.user, self.poptibo, up_to_distance=1), 1)
     c.disconnect(self.poptibo.get_id())
 
   def tearDown(self):

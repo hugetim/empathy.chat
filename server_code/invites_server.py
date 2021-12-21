@@ -11,6 +11,7 @@ from . import invites
 from . import server_misc as sm
 from . import parameters as p
 
+
 @anvil.server.callable
 @anvil.tables.in_transaction
 def serve_invite_unauth(port_invite, method, kwargs):
