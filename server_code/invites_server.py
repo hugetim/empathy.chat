@@ -72,6 +72,8 @@ class Invite(invites.Invite):
         errors.append(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
       elif not Invite.phone_match(self.inviter_guess, self.invitee):
         errors.append(f"Sorry, the digits you entered did not match {sm.name(self.invitee)}'s confirmed phone number.")
+    else:
+      user['last_invite'] = sm.now()
     if not errors:
       self.link_key = "" if self.invitee else sm.random_code(num_chars=7)
       invite_row, errors = self._invite_row()

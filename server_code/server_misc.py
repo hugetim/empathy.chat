@@ -174,7 +174,8 @@ def get_prompts(user):
         out.append({"name": "member-chat", "members": [get_port_user(m, distance=1, simple=True) for m in members]})
 #       else:
 #         out.append({"name": "invite-close"})
-    elif not invited and not [s for s in out if s['name'] == "connected"]:
+    elif (not invited and not [s for s in out if s['name'] == "connected"]
+          and (not user['last_invite'] or user['last_invite'] < now() - datetime.timedelta(days=90))):
       out.append({"name": "invite-close"})
   return out
 

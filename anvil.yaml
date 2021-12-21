@@ -239,6 +239,9 @@ db_schema:
     - name: update_needed
       admin_ui: {width: 200}
       type: bool
+    - name: last_invite
+      admin_ui: {width: 200}
+      type: datetime
   proposal_times:
     title: Proposal Times
     client: none
