@@ -54,14 +54,9 @@ def _get_connections(user, up_to_degree=3, include_zero=False):
     print("Warning: user in out[1]")
   prev = set()
   for d in range(up_to_degree):
-    current = set()
     prev.update(out[d])
-    current.update(
-      {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]))
-        if row['user2'] not in prev
-      }
-    )
-    out[d+1] = current
+    current = {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]))}
+    out[d+1] = current - prev
   if not include_zero:
     del out[0]
   return out
@@ -119,7 +114,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
   if degree is None:
     degree = _degree(user2, user1)
   if _distance is None:
-    _distance = distance(user2, user1)
+    _distance = degree # distance(user2, user1)
   record = vars(sm.get_port_user(user2, _distance))
   record.update({'degree': degree, 
                  'last_active': user2['browser_now'],
