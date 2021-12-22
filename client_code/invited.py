@@ -56,7 +56,7 @@ def invited_signup(invite):
 #         d.signup_err_lbl.text = "An account already exists for that user, so sign up is unnecessary. Instead, please login now."
 #         d.signup_err_lbl.visible = True
 #         new_user = anvil.users.login_with_google()
-      new_user = anvil.users.login_with_google()
+      new_user = d.new_user
       print(anvil.users.get_user())
     elif method == "email":
       try:

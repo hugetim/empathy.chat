@@ -14,6 +14,7 @@ class Signup(SignupTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.new_user = None
 
   def email_box_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""
@@ -21,7 +22,14 @@ class Signup(SignupTemplate):
 
   def google_link_click(self, **event_args):
     """This method is called when the link is clicked"""
-    self.new_user = anvil.users.signup_with_google()
-    #self.raise_event('x-close-alert', value="google")
+#     new_user = anvil.users.signup_with_google()
+    try:
+      self.new_user = anvil.users.signup_with_google()
+    except anvil.users.UserExists:
+      print("UserExists: Calling login_with_google")
+      d.signup_err_lbl.text = "An account already exists for that user, so sign up is unnecessary. Instead, please login now."
+      d.signup_err_lbl.visible = True
+      self.new_user = anvil.users.login_with_google()
+    self.raise_event('x-close-alert', value="google")
 
 
