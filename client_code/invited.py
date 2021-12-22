@@ -34,7 +34,7 @@ def handle_link(link_key):
              title="", 
              buttons=[], large=True, dismissible=False):
       if not user:
-        new_user = invited_signup(invite)
+        method = invited_signup(invite)
       if anvil.users.get_user():
         open_form('LoginForm')
   else:
@@ -46,18 +46,7 @@ def invited_signup(invite):
   while not new_user:
     method = alert(d, title="Sign Up", buttons=[("Sign Up", "email", 'primary')])
     if method == "google":
-#       anvil.google.auth.login()
-#       email = anvil.google.auth.get_user_email()
-#       new_user = anvil.server.call('do_google_signup', email)
-#       try:
-#         new_user = anvil.users.signup_with_google()
-#       except anvil.users.UserExists:
-#         print("UserExists: Calling login_with_google")
-#         d.signup_err_lbl.text = "An account already exists for that user, so sign up is unnecessary. Instead, please login now."
-#         d.signup_err_lbl.visible = True
-#         new_user = anvil.users.login_with_google()
       new_user = d.new_user
-      print(anvil.users.get_user())
     elif method == "email":
       try:
         new_user = anvil.server.call('do_signup', d.email_box.text)
