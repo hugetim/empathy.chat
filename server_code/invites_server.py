@@ -171,8 +171,7 @@ class Invite(invites.Invite):
     """Assumes only self.link_key known (unless register)
     
        Side effects: set invite['user2'] if visitor is logged in,
-       likewise for invite_reply['user1'] if it exists;
-       force_login if register and both rows found"""
+       likewise for invite_reply['user1'] if it exists"""
     invite_row, errors = self._invite_row()
     if invite_row:
       errors += self._load_invite(invite_row)
@@ -183,7 +182,6 @@ class Invite(invites.Invite):
         if self.invitee:
           response_row['user1'] = self.invitee
           if register:
-            #anvil.users.force_login(user)
             sm.init_user_info(user)
         errors += self._load_response(response_row)
     else:

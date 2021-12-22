@@ -2,6 +2,7 @@ import anvil.users
 import anvil.server
 import anvil.tables
 from anvil.tables import app_tables, order_by
+import anvil.google.auth
 import anvil.tables.query as q
 import anvil.secrets
 import anvil.email
@@ -49,6 +50,35 @@ def get_user(user_id="", require_auth=True):
     raise RuntimeError("User not authorized to access this information")
   else:
     return app_tables.users.get_by_id(user_id)
+
+
+@anvil.server.callable
+@anvil.tables.in_transaction
+def do_signup(email):
+  user = app_tables.users.get(email=email)
+  if not user:
+    if _email_invalid(email):
+      print("Invalid email")
+      raise(anvil.users.AuthenticationFailed())
+    all_users = app_tables.users.search()
+    for u in all_users:
+      if _emails_equal(email, u['email']):
+        user = u
+  if not user:
+    user = app_tables.users.add_row(email=email, enabled=True, signed_up=now())
+    anvil.users.send_token_login_email(user['email']) # This can also raise AuthenticationFailed, but shouldn't
+  return user
+  
+  
+@anvil.server.callable
+@anvil.tables.in_transaction
+def do_google_signup(email):
+  if anvil.google.auth.get_user_email() == email:
+    user = app_tables.users.get(email=email)
+    if not user:
+      user = app_tables.users.add_row(email=email, enabled=True, signed_up=now())
+      anvil.users.force_login(user)
+    return user
 
 
 def init_user_info(user):
@@ -408,6 +438,12 @@ def _their_value(values, my_i):
    print("Warning: len(temp_values) != 1, but this function assumes dyads only")
   return temp_values[0]                     # return the remaining value
 
+
+def _email_invalid(email):
+  # pattern source: https://stackoverflow.com/revisions/201378/26
+  pattern = r"""(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
+  return not bool(re.match(pattern, email))
+  
 
 def _emails_equal(a, b):
   em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
