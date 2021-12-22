@@ -76,10 +76,10 @@ def member_close_connections(user):
     
 def _degree(user2, user1, up_to_degree=3):
   """Returns 99 if no degree <= up_to_degree found"""
-  dset = _get_connections(user1, up_to_degree)
   if user2 == user1:
     return 0
   else:
+    dset = _get_connections(user1, up_to_degree)
     for d in range(1, up_to_degree+1):
       if user2 in dset[d]:
         return d

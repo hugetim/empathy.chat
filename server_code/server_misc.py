@@ -45,7 +45,7 @@ def get_user(user_id="", require_auth=True):
     print("get_user", user_id)
   logged_in_user = anvil.users.get_user()
   if user_id == "" or logged_in_user.get_id() == user_id:
-    return anvil.users.get_user()
+    return logged_in_user
   elif (require_auth and logged_in_user['trust_level'] < TEST_TRUST_LEVEL):
     raise RuntimeError("User not authorized to access this information")
   else:
@@ -70,15 +70,15 @@ def do_signup(email):
   return user
   
   
-@anvil.server.callable
-@anvil.tables.in_transaction
-def do_google_signup(email):
-  if anvil.google.auth.get_user_email() == email:
-    user = app_tables.users.get(email=email)
-    if not user:
-      user = app_tables.users.add_row(email=email, enabled=True, signed_up=now())
-      anvil.users.force_login(user)
-    return user
+# @anvil.server.callable
+# @anvil.tables.in_transaction
+# def do_google_signup(email):
+#   if anvil.google.auth.get_user_email() == email:
+#     user = app_tables.users.get(email=email)
+#     if not user:
+#       user = app_tables.users.add_row(email=email, enabled=True, signed_up=now())
+#       anvil.users.force_login(user)
+#     return user
 
 
 def init_user_info(user):
@@ -138,7 +138,7 @@ trust_label = {0: "Visitor",
 
 
 def name(user, to_user=None, distance=None):
-  if not distance:
+  if distance is None:
     if to_user:
       from . import connections as c
       distance = c.distance(user, to_user)
@@ -154,8 +154,8 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
     if simple:
       return port.User(user2.get_id(), _name)
     else:
-      return port.User(user2.get_id(), 
-                       _name,
+      return port.User(user_id=user2.get_id(), 
+                       name=_name,
                        confirmed_url=bool(user2['confirmed_url']),
                        distance=distance,
                        seeking=user2['seeking_buddy'],
@@ -233,11 +233,12 @@ def init_profile(user_id=""):
   from . import connections as c
   user = get_user(user_id, require_auth=False)
   record = c.connection_record(user, get_user())
+  print(record)
   confirmed_url_date = user['confirmed_url_date'] if user['confirmed_url'] else None
   is_me = user == anvil.users.get_user()
   record.update({'me': is_me,
                  'first': user['first_name'],
-                 'last': port.last_name(user['last_name'], record['degree']),
+                 'last': port.last_name(user['last_name'], record['distance']),
                  'relationships': [] if is_me else c.get_relationships(user),
                  'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
