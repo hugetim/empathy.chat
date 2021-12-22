@@ -99,25 +99,27 @@ def get_connections(user_id):
   up_to_degree = 3
   dset = _get_connections(logged_in_user, up_to_degree, include_zero=True)
   if is_me:
-    user2s = []
+    records = []
     for d in range(1, up_to_degree+1):
-      user2s += dset[d]
-    return [connection_record(user2, user) for user2 in user2s]
+      records += [connection_record(user2, user, d, d) for user2 in dset[d]]
+    return records
   elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
         and _degree(user, logged_in_user) > 1):
     return []
   else:
     dset2 = _get_connections(user, 1)
-    user2s = []
+    records = []
     for d in range(0, up_to_degree+1):
-      user2s += dset[d] & dset2[1]
-    return [connection_record(user2, logged_in_user) for user2 in user2s]
+      records += [connection_record(user2, logged_in_user, d, d) for user2 in (dset[d] & dset2[1])]
+    return records
 
 
-def connection_record(user2, user1):
+def connection_record(user2, user1, _distance=None, degree=None):
   """Returns dict w/ port.User attrs as str keys, plus: degree, last_active, status, unread_message"""
-  degree = _degree(user2, user1)
-  _distance = distance(user2, user1)
+  if degree is None:
+    degree = _degree(user2, user1)
+  if _distance is None:
+    _distance = distance(user2, user1)
   record = vars(sm.get_port_user(user2, _distance))
   record.update({'degree': degree, 
                  'last_active': user2['browser_now'],
