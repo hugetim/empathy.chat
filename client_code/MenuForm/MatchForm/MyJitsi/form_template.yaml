@@ -9,14 +9,15 @@ container:
       \             enableWelcomePage: false,\n                               prejoinPageEnabled:\
       \ false,\n                               enableClosePage: true,\n          \
       \                     disableThirdPartyRequests: true,\n                   \
-      \            localRecording: { enabled: false,},\n                         \
-      \      enableNoisyMicDetection: false,\n                               readOnlyName:\
-      \ true,\n                               toolbarButtons: ['microphone', 'camera',\
-      \ \n                                                'settings',\n          \
-      \                                      'select-background',\n              \
-      \                                 ],\n                               hideConferenceTimer:\
-      \ false,\n                               disablePolls: true,\n             \
-      \                 };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
+      \            disableDeepLinking: true,\n                               localRecording:\
+      \ { enabled: false,},\n                               enableNoisyMicDetection:\
+      \ false,\n                               readOnlyName: true,\n             \
+      \                  toolbarButtons: ['microphone', 'camera', \n             \
+      \                                   'settings',\n                          \
+      \                      'select-background',\n                              \
+      \                 ],\n                               hideConferenceTimer: false,\n\
+      \                               disablePolls: true,\n                      \
+      \        };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
       \ ' ', //empathy.chat partner\n                                        SETTINGS_SECTIONS:\
       \ [ 'devices', 'language' ],\n                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
       \ 60000,\n                                        SHOW_CHROME_EXTENSION_BANNER:\
