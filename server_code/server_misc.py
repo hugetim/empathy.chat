@@ -233,7 +233,6 @@ def init_profile(user_id=""):
   from . import connections as c
   user = get_user(user_id, require_auth=False)
   record = c.connection_record(user, get_user())
-  print(record)
   confirmed_url_date = user['confirmed_url_date'] if user['confirmed_url'] else None
   is_me = user == anvil.users.get_user()
   record.update({'me': is_me,

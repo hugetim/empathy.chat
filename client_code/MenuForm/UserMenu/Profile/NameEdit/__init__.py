@@ -19,7 +19,8 @@ class NameEdit(NameEditTemplate):
 
   def save_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.raise_event("x-close-alert", value=True)
+    if self.save_button.enabled:
+      self.raise_event("x-close-alert", value=True)
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""

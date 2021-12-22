@@ -52,7 +52,7 @@ components:
       layout_properties: {}
       data_bindings:
       - {property: text, code: 'self.item[''last'']', writeback: true}
-      event_bindings: {change: text_box_change}
+      event_bindings: {change: text_box_change, pressed_enter: save_button_click}
   - type: Button
     properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: false,
       foreground: '', visible: true, text: Save, font_size: null, font: '', spacing_above: small,
