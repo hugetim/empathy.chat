@@ -312,20 +312,22 @@ def _add_proposal(user, port_prop, link_key=""):
   state = _get_status(user)
   status = state['status']
   prop = Proposal.add(user, port_prop)
-  if (port_prop.start_now 
-      and (status is not None or _match_overlapping_now_proposal(user, prop, state))):
-    prop.cancel_all_times()
-    return _get_status(user), None
+  if port_prop.start_now:
+    duration = port_prop.times[0].duration
+    if (status is not None or _match_overlapping_now_proposal(user, prop, duration, state)):
+      prop.cancel_all_times()
+      return _get_status(user), None
   if link_key:
     prop.add_to_invite(link_key)
   return _get_status(user), prop.get_id()
 
 
-def _match_overlapping_now_proposal(user, my_now_proposal, state):
+def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
   current_port_props = port.Proposal.props_from_view_items(state['proposals'])
   now_port_props = [p for p in current_port_props if p.start_now and not p.own]
   for other_port_prop in now_port_props:
-    if my_now_proposal.is_visible(other_port_prop.user.s_user):
+    if (my_now_proposal.is_visible(other_port_prop.user.s_user)
+        and my_duration == other_port_prop.times[0].duration):
       other_prop_time = ProposalTime.get_by_id(other_port_prop.times[0].time_id)
       other_prop_time.accept(user, state['status'])
       return True
@@ -351,10 +353,11 @@ def _edit_proposal(user, port_prop):
   status = state['status']
   prop = Proposal.get_by_id(port_prop.prop_id)
   prop.update(port_prop)
-  if (port_prop.start_now 
-      and (status is not None or _match_overlapping_now_proposal(user, prop, state))):
-    prop.cancel_all_times()
-    return _get_status(user), None
+  if port_prop.start_now:
+    duration = port_prop.times[0].duration
+    if (status is not None or _match_overlapping_now_proposal(user, prop, duration, state)):
+      prop.cancel_all_times()
+      return _get_status(user), None
   return _get_status(user), prop.get_id()
 
 
