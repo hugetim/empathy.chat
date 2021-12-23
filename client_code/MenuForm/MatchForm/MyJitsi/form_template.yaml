@@ -15,8 +15,7 @@ container:
       \                  toolbarButtons: ['microphone', 'camera', \n             \
       \                                   'settings',\n                          \
       \                      'select-background',\n                              \
-      \                  'closedcaptions',\n                                     \
-      \          ],\n                               hideConferenceTimer: false,\n\
+      \                 ],\n                               hideConferenceTimer: false,\n\
       \                               disablePolls: true,\n                      \
       \        };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
       \ ' ', //empathy.chat partner\n                                        SETTINGS_SECTIONS:\
