@@ -24,10 +24,10 @@ def now():
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 
-def initialize_session(browser_now, time_zone):
+def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
   user = anvil.users.get_user()
-  user['browser_now'] = browser_now
+  user['init_date'] = now()
   user['time_zone'] = time_zone
   if p.DEBUG_MODE and user['trust_level'] >= TEST_TRUST_LEVEL:
     from . import server_auto_test
@@ -37,7 +37,7 @@ def initialize_session(browser_now, time_zone):
 @anvil.server.callable
 def remove_user(user):
   """Remove new user created via Google sign-in"""
-  if user and (not user['password_hash']) and (not user['browser_now']):
+  if user and (not user['password_hash']) and (not user['init_date']):
     user.delete()
 
     
@@ -713,7 +713,7 @@ def get_url(name):
   #cutoff_e = now - assume_inactive
   #### comprehension below should probably be converted to loop
   #return [u for u in app_tables.users.search(enabled=True, request_em=True)
-  #                if (u['browser_now'] > cutoff_e
+  #                if (u['init_date'] > cutoff_e
   #                    and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
   #                    and u != user
   #                    and c.is_visible(u, user)

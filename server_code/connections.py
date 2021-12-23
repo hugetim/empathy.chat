@@ -117,7 +117,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
     _distance = degree # distance(user2, user1)
   record = vars(sm.get_port_user(user2, _distance))
   record.update({'degree': degree, 
-                 'last_active': user2['browser_now'],
+                 'last_active': user2['init_date'],
                  'status': _invite_status(user2, user1),
                  'unread_message': None, # True/False
                 })

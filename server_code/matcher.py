@@ -62,7 +62,7 @@ def _prune_matches():
 
 
 @authenticated_callable
-def init(browser_now, time_zone):
+def init(time_zone):
   """
   Runs upon initializing app
   Side effects: prunes old proposals/matches,
@@ -70,7 +70,7 @@ def init(browser_now, time_zone):
   """
   print("('init')")
   # Initialize user info
-  sm.initialize_session(browser_now, time_zone)
+  sm.initialize_session(time_zone)
   return _init()
 
 @anvil.tables.in_transaction

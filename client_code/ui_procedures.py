@@ -30,7 +30,7 @@ def get_init():
     from anvil.js.window import Intl 
     time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
     now = datetime.now()
-    return anvil.server.call('init', datetime.now(), time_zone)
+    return anvil.server.call('init', time_zone)
     
   
 def set_document_title(text):

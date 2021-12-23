@@ -22,7 +22,7 @@ class LoginForm(LoginFormTemplate):
     # Do the code here to show this blank form.
     while not anvil.users.get_user():
       user = anvil.users.login_with_form(show_signup_option=False)
-      if user and (not user['password_hash']) and (not user['browser_now']):
+      if user and (not user['password_hash']) and (not user['init_date']):
         anvil.users.logout()
         with Notification("Creating a new account requires an invite link."):
           anvil.server.call_s('remove_user', user)

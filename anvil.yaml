@@ -188,7 +188,7 @@ db_schema:
     - name: last_login
       admin_ui: {width: 146}
       type: datetime
-    - name: browser_now
+    - name: init_date
       admin_ui: {width: 200}
       type: datetime
     - name: time_zone
