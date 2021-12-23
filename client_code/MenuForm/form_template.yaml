@@ -184,7 +184,7 @@ components:
     event_bindings: {click: logout_button_click}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Version 0.3.8, last updated 12/22/2021', font_size: 10,
+      visible: true, text: 'Version 0.3.9, last updated 12/23/2021', font_size: 10,
       font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     name: version_label
