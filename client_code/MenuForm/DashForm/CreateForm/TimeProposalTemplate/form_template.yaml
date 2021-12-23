@@ -45,7 +45,7 @@ components:
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
       spacing_below: small, background: ''}
     name: column_panel_1
-    layout_properties: {width: 155}
+    layout_properties: {width: 200, expand: false}
     event_bindings: {}
     components:
     - type: DropDown
