@@ -18,11 +18,11 @@ components:
       role: null
       columns:
       - {title: Name, id: TCRDJP, data_key: name, expand: false, width: '', $$hashKey: 'object:43677'}
-      - {title: Degree, id: CKNKJL, data_key: degree, $$hashKey: 'object:43678', width: '100'}
+      - {title: Degree, id: CKNKJL, data_key: degree, $$hashKey: 'object:43678', width: '65'}
       - {id: PGULWY, title: 'Seeking Buddy?', data_key: seeking, $$hashKey: 'object:43679',
-        width: '125'}
+        width: '65'}
       - {title: Last Active, id: VWXCEI, data_key: last_active, $$hashKey: 'object:43680',
-        width: '90'}
+        width: '80'}
       - {title: '', id: NBEGGD, data_key: buttons, $$hashKey: 'object:43681', expand: false,
         width: ''}
       auto_header: true
