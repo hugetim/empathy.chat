@@ -298,15 +298,14 @@ def accept_proposal(proptime_id, user_id=""):
 @authenticated_callable
 @anvil.tables.in_transaction
 def add_proposal(proposal, link_key="", user_id=""):
-  """Return _get_status
+  """Return _get_status, prop_id (none if matching with another proposal)
   
-  Side effect: Update proposal tables with additions, if valid
+  Side effects: Update proposal tables with additions, if valid; match if appropriate
   """
   print("add_proposal", user_id)
   user = sm.get_user(user_id)
   propagate_update_needed()
-  state, prop_id = _add_proposal(user, proposal, link_key)
-  return state, prop_id
+  return _add_proposal(user, proposal, link_key)
 
 
 def _add_proposal(user, port_prop, link_key=""):
@@ -319,8 +318,7 @@ def _add_proposal(user, port_prop, link_key=""):
     return _get_status(user), None
   if link_key:
     prop.add_to_invite(link_key)
-  prop_id = prop.get_id()
-  return _get_status(user), prop_id
+  return _get_status(user), prop.get_id()
 
 
 def _match_overlapping_now_proposal(user, my_now_proposal, state):
@@ -337,9 +335,9 @@ def _match_overlapping_now_proposal(user, my_now_proposal, state):
 @authenticated_callable
 @anvil.tables.in_transaction
 def edit_proposal(proposal, user_id=""):
-  """Return _get_status
+  """Return _get_status, prop_id (none if matching with another proposal)
   
-  Side effect: Update proposal tables with revision, if valid
+  Side effects: Update proposal tables with revision, if valid; match if appropriate
   """
   print("edit_proposal", user_id)
   user = sm.get_user(user_id)
@@ -347,10 +345,17 @@ def edit_proposal(proposal, user_id=""):
   return _edit_proposal(user, proposal)
 
     
-def _edit_proposal(user, port_proposal):
+def _edit_proposal(user, port_prop):
   print("Not yet preventing editing from making multiple now proposals")
-  Proposal.get_by_id(port_proposal.prop_id).update(port_proposal)
-  return _get_status(user)
+  state = _get_status(user)
+  status = state['status']
+  prop = Proposal.get_by_id(port_prop.prop_id)
+  prop.update(port_prop)
+  if (port_prop.start_now 
+      and (status is not None or _match_overlapping_now_proposal(user, prop, state))):
+    prop.cancel_all_times()
+    return _get_status(user), None
+  return _get_status(user), prop.get_id()
 
 
 def _cancel(user, proptime_id=None):
