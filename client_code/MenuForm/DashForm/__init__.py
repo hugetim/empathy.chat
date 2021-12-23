@@ -137,9 +137,9 @@ class DashForm(DashFormTemplate):
                 buttons=[])
     if out is True:
       proposal = content.proposal()
-      self._handle_prop_call(anvil.server.call('add_proposal', proposal, link_key=link_key))
+      self._handle_prop_call(*anvil.server.call('add_proposal', proposal, link_key=link_key))
       
-  def handle_prop_call(self, state, prop_id):
+  def _handle_prop_call(self, state, prop_id):
     if prop_id is None:
       Notification("Matching you with another user ready to start an empathy chat now...",timeout=5).show()
     self.update_status(state)
@@ -160,7 +160,7 @@ class DashForm(DashFormTemplate):
                 buttons=[])
     if out is True:
       proposal = content.proposal()
-      self._handle_prop_call(anvil.server.call('edit_proposal', proposal))
+      self._handle_prop_call(*anvil.server.call('edit_proposal', proposal))
       
   def confirm_match(self, seconds):
     with h.PausedTimer(self.timer_2):
