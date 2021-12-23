@@ -15,7 +15,7 @@ def disconnect_flow(user2_id, user2_name, user1_id=""):
 def reload(init_dict=None):
   """Resest app after any potential change to trust_level or prompts"""
   if not init_dict:
-    init_dict = anvil.server.call('init', datetime.now())
+    init_dict = get_init()
   glob.name = init_dict['name']
   glob.trust_level = init_dict['trust_level']
   if init_dict['state']['status'] == "matched":
@@ -24,7 +24,14 @@ def reload(init_dict=None):
     open_form(MatchForm(item=item))
   else:
     open_form('MenuForm', item=init_dict)
-  
+
+    
+def get_init():
+    from anvil.js.window import Intl 
+    time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    now = datetime.now()
+    return anvil.server.call('init', datetime.now(), time_zone)
+    
   
 def set_document_title(text):
   from anvil.js import window

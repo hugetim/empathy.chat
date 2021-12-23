@@ -28,7 +28,7 @@ class LoginForm(LoginFormTemplate):
           anvil.server.call_s('remove_user', user)
           time.sleep(2)  
     self.card_1.visible = True
-    self.init_dict = anvil.server.call('init', datetime.now())
+    self.init_dict = ui.get_init()
     if parameters.DEBUG_MODE:
       self.enter_button_click()
     else:

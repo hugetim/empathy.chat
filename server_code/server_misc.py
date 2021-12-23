@@ -24,10 +24,11 @@ def now():
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 
-def initialize_session(browser_now):
+def initialize_session(browser_now, time_zone):
   """initialize session state: user_id, user, and current_row"""
   user = anvil.users.get_user()
   user['browser_now'] = browser_now
+  user['time_zone'] = time_zone
   if p.DEBUG_MODE and user['trust_level'] >= TEST_TRUST_LEVEL:
     from . import server_auto_test
     server_auto_test.server_auto_tests()

@@ -191,6 +191,9 @@ db_schema:
     - name: browser_now
       admin_ui: {width: 200}
       type: datetime
+    - name: time_zone
+      admin_ui: {width: 200}
+      type: string
     - name: trust_level
       admin_ui: {width: 86}
       type: number
