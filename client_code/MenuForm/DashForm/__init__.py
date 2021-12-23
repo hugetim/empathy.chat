@@ -137,7 +137,10 @@ class DashForm(DashFormTemplate):
                 buttons=[])
     if out is True:
       proposal = content.proposal()
-      self.update_status(anvil.server.call('add_proposal', proposal, link_key=link_key))
+      state, prop_id = anvil.server.call('add_proposal', proposal, link_key=link_key)
+      if prop_id is None:
+        Notification("Connecting you now to a matching empathy chat...")
+      self.update_status(state)
 
   def edit_proposal(self, prop_id):
     """This method is called when the button is clicked"""

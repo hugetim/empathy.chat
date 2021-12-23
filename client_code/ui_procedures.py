@@ -19,6 +19,7 @@ def reload(init_dict=None):
   glob.name = init_dict['name']
   glob.trust_level = init_dict['trust_level']
   if init_dict['state']['status'] == "matched":
+    from .MenuForm.MatchForm import MatchForm
     item = {k: init_dict['state'][k] for k in MatchForm.state_keys}
     open_form(MatchForm(item=item))
   else:

@@ -208,7 +208,11 @@ class Proposal():
     self.eligible = eligible
     self.eligible_users = eligible_users
     self.eligible_groups = eligible_groups
-        
+
+  @property
+  def start_now(self):
+    return self.times[0].start_now
+  
   def __serialize__(self, global_data):
     dict_rep = self.__dict__
     dict_rep['own'] = int(self.own)

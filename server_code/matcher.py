@@ -162,7 +162,7 @@ def _get_status(user):
   proposals = []
   upcomings = []
   prompts = []
-  if current_proptime and current_proptime.is_now():
+  if current_proptime and current_proptime.start_now:
     expire_date = current_proptime.expire_date
     if current_proptime.is_accepted():
       status = "pinged"
@@ -306,21 +306,33 @@ def add_proposal(proposal, link_key="", user_id=""):
   user = sm.get_user(user_id)
   propagate_update_needed()
   state, prop_id = _add_proposal(user, proposal, link_key)
-  return state
+  return state, prop_id
 
 
 def _add_proposal(user, port_prop, link_key=""):
   state = _get_status(user)
   status = state['status']
-  if status is None or not port_prop.times[0].start_now:
-    prop = Proposal.add(user, port_prop)
-    if link_key:
-      prop.add_to_invite(link_key)
-    prop_id = prop.get_id()
-  else:
-    prop_id = None
+  prop = Proposal.add(user, port_prop)
+  if (port_prop.start_now 
+      and (status is not None or _match_overlapping_now_proposal(user, prop, state))):
+    prop.cancel_all_times()
+    return _get_status(user), None
+  if link_key:
+    prop.add_to_invite(link_key)
+  prop_id = prop.get_id()
   return _get_status(user), prop_id
 
+
+def _match_overlapping_now_proposal(user, my_now_proposal, state):
+  current_port_props = port.Proposal.props_from_view_items(state['proposals'])
+  now_port_props = [p for p in current_port_props if p.start_now and not p.own]
+  for other_port_prop in now_port_props:
+    if my_now_proposal.is_visible(other_port_prop.user.s_user):
+      other_prop_time = ProposalTime.get_by_id(other_port_prop.times[0].time_id)
+      other_prop_time.accept(user, state['status'])
+      return True
+  return False
+  
 
 @authenticated_callable
 @anvil.tables.in_transaction
@@ -416,7 +428,7 @@ def _match_commit(user, proptime_id=None):
     print("current_proptime")
     if current_proptime.is_accepted():
       print("'accepted'")
-      if current_proptime.is_now():
+      if current_proptime.start_now:
         match_start = sm.now()
       else:
         match_start = current_proptime.start_date
@@ -430,7 +442,7 @@ def _match_commit(user, proptime_id=None):
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal
       proposal.cancel_all_times()
-      if not current_proptime.is_now():
+      if not current_proptime.start_now:
         current_proptime.ping()
   return _get_status(user)
 
@@ -515,7 +527,8 @@ class ProposalTime():
   def _row(self):
     return self._proptime_row
 
-  def is_now(self):
+  @property
+  def start_now(self):
     return self._proptime_row['start_now']
 
   @property
@@ -556,20 +569,20 @@ class ProposalTime():
         and self._proptime_row['current'] 
         and (not self.is_accepted())
         and self.proposal.is_visible(user)):
-      self._accept(user, status)
+      self.accept(user, status)
    
-  def _accept(self, user, status):
+  def accept(self, user, status):
     if sm.DEBUG:
-      print("_accept_proptime")
+      print("accept_proptime")
     now = sm.now()
-    if self.is_now() and status == "requesting":
+    if self.start_now and status == "requesting":
       own_now_proposal_time = ProposalTime.get_now_proposing(user)
       if own_now_proposal_time:
         ProposalTime(own_now_proposal_time).proposal.cancel_all_times()
     self._proptime_row['users_accepting'] = [user]
     self._proptime_row['accept_date'] = now
     self.proposal.hide_unaccepted_times()
-    if not self.is_now():
+    if not self.start_now:
       _match_commit(user, self.get_id())
     elif (now - (self._proptime_row['start_date'])).total_seconds() <= p.BUFFER_SECONDS:
       _match_commit(user)
@@ -578,7 +591,7 @@ class ProposalTime():
  
   def ping(self):   
     sm.ping(user=self.proposal.proposer,
-            start=None if self.is_now() else self.start_date,
+            start=None if self.start_now else self.start_date,
             duration=self.duration,
            )    
       
@@ -653,17 +666,17 @@ class ProposalTime():
     
   @staticmethod
   def add(proposal, port_time):
-    return ProposalTime(app_tables.proposal_times.add_row(proposal=proposal._row,
-                                                          start_now=port_time.start_now,
-                                                          start_date=sm.now() if port_time.start_now else port_time.start_date,
-                                                          duration=port_time.duration,
-                                                          expire_date=port_time.expire_date,
-                                                          current=True,
-                                                          cancelled=False,
-                                                          users_accepting=[],
-                                                          jitsi_code=sm.new_jitsi_code(),
-                                                          missed_pings=0,
-                                                         )).confirm_wait(port_time.start_now)
+    ProposalTime(app_tables.proposal_times.add_row(proposal=proposal._row,
+                                                   start_now=port_time.start_now,
+                                                   start_date=sm.now() if port_time.start_now else port_time.start_date,
+                                                   duration=port_time.duration,
+                                                   expire_date=port_time.expire_date,
+                                                   current=True,
+                                                   cancelled=False,
+                                                   users_accepting=[],
+                                                   jitsi_code=sm.new_jitsi_code(),
+                                                   missed_pings=0,
+                                                  )).confirm_wait(port_time.start_now)
 
   
   @staticmethod
@@ -885,7 +898,7 @@ class Proposal():
   
   @staticmethod
   def get_port_proposals(user):
-    """Return list of Proposals visible to user
+    """Return list of Proposal view items visible to user
     
     Side effects: prune proposals
     """
