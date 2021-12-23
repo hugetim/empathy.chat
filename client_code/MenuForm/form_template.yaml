@@ -168,7 +168,7 @@ components:
     components:
     - type: Button
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: 'Help / Feedback ', font_size: 13, font: '',
+        foreground: '', visible: true, text: 'Help / Feedback  ', font_size: 13, font: '',
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:question-circle'}
       name: help_button
@@ -176,7 +176,7 @@ components:
       event_bindings: {}
   - type: Button
     properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: 'theme:Secondary 500', visible: true, text: 'Log out                  ',
+      foreground: 'theme:Secondary 500', visible: true, text: 'Log out                   ',
       font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
       italic: false, background: '', bold: false, underline: false, icon: 'fa:sign-out'}
     name: logout_button
