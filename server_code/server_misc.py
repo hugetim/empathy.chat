@@ -52,6 +52,22 @@ def get_user(user_id="", require_auth=True):
   else:
     return app_tables.users.get_by_id(user_id)
 
+  
+@anvil.server.callable
+def report_error(err_repr, app_repr):
+  admin = app_tables.users.get(email="hugetim@gmail.com")
+  current_user = anvil.users.get_user()
+  if admin != current_user:
+    content = (
+      f"""{err_repr}
+      user: {current_user['email']}
+      app: {app_repr}
+      context: {repr(anvil.server.context)}
+      app_origin: {anvil.server.get_app_origin()}
+      """
+    )
+    _email_send(admin, subject="Error", text=content, from_name="Error Handling")
+
 
 @anvil.server.callable
 @anvil.tables.in_transaction
