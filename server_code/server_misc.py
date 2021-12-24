@@ -66,7 +66,7 @@ def report_error(err_repr, app_repr):
       app_origin: {anvil.server.get_app_origin()}
       """
     )
-    _email_send(admin, subject="Error", text=content, from_name="Error Handling")
+    _email_send(admin, subject="empathy.chat error", text=content, from_name="empathy.chat error handling")
 
 
 @anvil.server.callable
