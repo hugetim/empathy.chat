@@ -85,6 +85,8 @@ class Profile(ProfileTemplate):
     if out is True:
       anvil.server.call('save_name', edit_form.item)
       self.item['first'] = edit_form.item['first']
+      glob.name = self.item['first']
+      get_open_form().name = glob.name
       self.item['last'] = edit_form.item['last']
       self.item['name'] = f"{self.item['first']} {self.item['last']}"
       self.update()
