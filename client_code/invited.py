@@ -56,7 +56,6 @@ def invited_signup(invite):
         d.signup_err_lbl.visible = True
   invite.relay('visit', dict(user=new_user, register=True))
   if method == "email":
-    anvil.users.send_token_login_email(new_user['email'])
     alert(f"We have sent a login email to {new_user['email']}.\n\nCheck your email, and click on the link.\n\nYou can now close this window.")
   return method
     

@@ -72,6 +72,7 @@ def report_error(err_repr, app_repr):
 @anvil.server.callable
 @anvil.tables.in_transaction
 def do_signup(email):
+  """Returns user (existing user if existing email, else creates new user and sends login email)"""
   user = app_tables.users.get(email=email)
   if not user:
     if _email_invalid(email):
@@ -82,6 +83,7 @@ def do_signup(email):
       if _emails_equal(email, u['email']):
         user = u
   if not user:
+    print(f"do_signup adding new user: {email}")
     user = app_tables.users.add_row(email=email, enabled=True, signed_up=now())
     anvil.users.send_token_login_email(user['email']) # This can also raise AuthenticationFailed, but shouldn't
   return user
