@@ -29,6 +29,7 @@ def serve_invite(port_invite, method, kwargs):
 
 
 def _serve_invite(port_invite, method, kwargs, auth):
+  print(f"invites_server: {method}({kwargs}) called on {port_invite}")
   invite = Invite(port_invite)
   errors = invite.relay(method, kwargs, auth=auth)
   return invite.portable(), errors

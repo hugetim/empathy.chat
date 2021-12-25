@@ -24,6 +24,7 @@ def invited_dialog(inviter):
   
 
 def handle_link(link_key):
+  print(f"handle_link: {link_key}")
   user = anvil.users.get_user()
   invite = invites.Invite(link_key=link_key)
   errors = invite.relay('visit', {'user': user})
@@ -55,6 +56,7 @@ def invited_signup(invite):
         d.signup_err_lbl.visible = True
   invite.relay('visit', dict(user=new_user, register=True))
   if method == "email":
-    alert(f"We have sent a login email to {d.email_box.text}.\n\nCheck your email, and click on the link.\n\nYou can now close this window.")
+    anvil.users.send_token_login_email(new_user['email'])
+    alert(f"We have sent a login email to {new_user['email']}.\n\nCheck your email, and click on the link.\n\nYou can now close this window.")
   return method
     

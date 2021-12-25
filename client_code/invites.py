@@ -46,7 +46,7 @@ class Invite(h.AttributeToKey):
       setattr(self, key, value)
 
   def __repr__(self):
-    return str(self.__dict__)     
+    return "invites.Invite: " + str(self.__dict__)     
       
   @property
   def url(self):
