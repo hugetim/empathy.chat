@@ -2,6 +2,7 @@ from ._anvil_designer import PartnerCheckTemplate
 from anvil import *
 import anvil.users
 import anvil.server
+from ... import parameters as p
 
 
 class PartnerCheck(PartnerCheckTemplate):
@@ -10,3 +11,4 @@ class PartnerCheck(PartnerCheckTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.label_1.tooltip = f"Partner: {p.TRUST_TOOLTIP['Partner'].lower()}"

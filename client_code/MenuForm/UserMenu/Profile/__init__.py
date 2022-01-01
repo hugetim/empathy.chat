@@ -8,6 +8,7 @@ from .... import prompts
 from .... import glob
 from .... import invited
 from .... import portable as port
+from .... import parameters as p
 from .NameEdit import NameEdit
 from .TextAreaEdit import TextAreaEdit
 from .Relationship import Relationship
@@ -17,14 +18,8 @@ class Profile(ProfileTemplate):
   item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
                'seeking', 'how_empathy', 'profile', 'trust_label', 'status', 'last_active',
                'confirmed_url', 'confirmed_date',}
-  trust_tooltip = {"Visitor": "Has not yet confirmed an email address",
-                   "Guest": "Has not yet confirmed a phone number",
-                   "Confirmed": "Has not yet had an empathy chat with a Member (who can verify their identity)",
-                   "Member": ("Has confirmed an email address and phone number" 
-                              "and matched with a Member who can verify their identity"),
-                   "Partner": "Confirmed url and has contributed at least a half hour's worth",
-                   "Admin": "empathy.chat admin"
-                  }
+  trust_tooltip = p.TRUST_TOOLTIP
+  
   def __init__(self, user_id="", **properties):
     # Set Form properties and Data Bindings.
     self.trust_level = glob.trust_level

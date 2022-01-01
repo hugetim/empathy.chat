@@ -19,3 +19,11 @@ MIN_RELATIONSHIP_LENGTH = 3
 MISTAKEN_INVITER_GUESS_ERROR = (
   "The inviter did not accurately provide the last 4 digits of your phone number."
 )
+TRUST_TOOLTIP = {"Visitor": "Has not yet confirmed an email address",
+                 "Guest": "Has not yet confirmed a phone number",
+                 "Confirmed": "Has not yet had an empathy chat with a Member (who can verify their identity)",
+                 "Member": ("Has confirmed an email address and phone number" 
+                            "and matched with a Member who can verify their identity"),
+                 "Partner": "Confirmed url and has contributed in some way",
+                 "Admin": "empathy.chat admin"
+                }
