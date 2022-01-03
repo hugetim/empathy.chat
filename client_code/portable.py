@@ -101,7 +101,7 @@ class ProposalTime():
     self.accept_date = accept_date
     self.users_accepting = users_accepting
     self.jitsi_code = jitsi_code
-      
+
   def __serialize__(self, global_data):
     dict_rep = self.__dict__
     dict_rep['start_now'] = int(self.start_now)

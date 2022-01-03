@@ -157,6 +157,12 @@ trust_label = {0: "Visitor",
               }
 
 
+def dt_to_str(dt_in, user):
+  tz_user = pytz.timezone(user['time_zone'])
+  dt_out = dt.astimezone(tz_user)
+  return h.day_time_str(dt_out)
+
+
 def name(user, to_user=None, distance=None):
   if distance is None:
     if to_user:
