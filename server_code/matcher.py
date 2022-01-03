@@ -93,6 +93,7 @@ def _init_user_status(user):
     state = confirm_wait_helper(user)
   anvil.server.session['status'] = state
   propagate_update_needed(user)
+  return state
 
   
 def confirm_wait_helper(user):
