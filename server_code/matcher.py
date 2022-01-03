@@ -105,10 +105,7 @@ def confirm_wait_helper(user, proptime=None):
     current_proptime = ProposalTime.get_now_proposing(user)
   if current_proptime:
     current_proptime.confirm_wait()
-  if user:
-    return _get_status(user)
-  else:
-    return None
+  return _get_status(user) if user else None
 
 
 @authenticated_callable
