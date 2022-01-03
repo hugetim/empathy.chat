@@ -17,19 +17,19 @@ class SettingsForm(SettingsFormTemplate):
                                  })
     self.phone_panel.add_component(self.phone_form)
     self.notifications_panel.visible = bool(phone)
-    self.essential_drop_down.items += [("SMS (default)", "sms"),
-                                       ("email", "email"),
-                                      ]
+    self.essential_drop_down.items = [("SMS (default)", "sms"),
+                                      ("email", "email"),
+                                     ]
     self.essential_drop_down.selected_value = notif_settings.get('essential')
-    self.message_drop_down.items += [("SMS", "sms"),
+    self.message_drop_down.items = [("SMS", "sms"),
+                                    ("email (default)", "email"),
+                                    ("don't notify", None),
+                                   ]
+    self.message_drop_down.selected_value = notif_settings.get('message')
+    self.specific_drop_down.items = [("SMS", "sms"),
                                      ("email (default)", "email"),
                                      ("don't notify", None),
                                     ]
-    self.message_drop_down.selected_value = notif_settings.get('message')
-    self.specific_drop_down.items += [("SMS", "sms"),
-                                      ("email (default)", "email"),
-                                      ("don't notify", None),
-                                     ]
     self.specific_drop_down.selected_value = notif_settings.get('specific')
     
   def form_show(self, **event_args):
@@ -40,7 +40,7 @@ class SettingsForm(SettingsFormTemplate):
     notif_settings = {}
     for notif_type in ['essential', 'message', 'specific']:
       drop_down = getattr(self, notif_type + "_drop_down")
-      notif_settings['notif_type'] = drop_down.selected_value
+      notif_settings[notif_type] = drop_down.selected_value
     anvil.server.call('set_notif_settings', notif_settings)
     
   def pinged_sms_switch_change(self, **event_args):
@@ -49,7 +49,7 @@ class SettingsForm(SettingsFormTemplate):
 
   def message_sms_switch_change(self, **event_args):
     """This method is called when this switch is checked or unchecked"""
-    anvil.server.call('set_message_sms', self.pinged_sms_switch.checked)
+    anvil.server.call('set_message_sms', self.message_sms_switch.checked)
   
     
 #   def request_em_check_box_change(self, **event_args):

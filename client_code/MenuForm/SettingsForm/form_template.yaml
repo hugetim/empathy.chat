@@ -58,6 +58,7 @@ components:
         include_placeholder: false
       name: essential_drop_down
       layout_properties: {width: null, expand: false}
+      event_bindings: {change: set_notif_settings}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: me for essential notifications (such as when someone accepts my empathy chat request),
@@ -101,6 +102,7 @@ components:
         include_placeholder: false
       name: message_drop_down
       layout_properties: {}
+      event_bindings: {change: set_notif_settings}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: me when someone sends me a message, font_size: null,
@@ -147,6 +149,7 @@ components:
         include_placeholder: false
       name: specific_drop_down
       layout_properties: {}
+      event_bindings: {change: set_notif_settings}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: me about empathy chat requests specifically directed to (only) me,

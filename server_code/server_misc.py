@@ -491,6 +491,14 @@ def get_settings(user_id=""):
 
 @authenticated_callable
 @anvil.tables.in_transaction
+def set_notif_settings(notif_settings, user_id=""):
+  print("set_notif_settings", notif_settings)
+  user = get_user(user_id)
+  user['notif_settings'] = notif_settings
+
+
+@authenticated_callable
+@anvil.tables.in_transaction
 def set_pinged_sms(pinged_sms_checked, user_id=""):
   print("set_pinged_sms", pinged_sms_checked)
   user = get_user(user_id)
