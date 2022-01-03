@@ -25,6 +25,10 @@ class SettingsForm(SettingsFormTemplate):
                                      ("email (default)", "email"),
                                      ("don't notify", None),
                                     ]
+    self.specific_request_drop_down.items += [("SMS", "sms"),
+                                 ("email (default)", "email"),
+                                 ("don't notify", None),
+                                ]
     self.pinged_sms_switch.checked = p_sms
     self.message_sms_switch.checked = m_sms
     

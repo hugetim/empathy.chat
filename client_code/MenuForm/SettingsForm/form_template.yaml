@@ -119,6 +119,40 @@ components:
       col_widths: {}
       grid_position: IYUQCF,LFNVJN
     event_bindings: {change: message_sms_switch_change}
+  - type: FlowPanel
+    properties: {}
+    name: flow_panel_3_copy
+    layout_properties: {}
+    components:
+    - type: DropDown
+      properties:
+        role: null
+        align: full
+        tooltip: ''
+        placeholder: ''
+        border: ''
+        enabled: true
+        foreground: ''
+        items: [SMS, email (default), don't notify]
+        visible: true
+        font_size: null
+        font: ''
+        spacing_above: small
+        spacing_below: small
+        italic: false
+        background: ''
+        bold: false
+        underline: false
+        include_placeholder: false
+      name: specific_request_drop_down
+      layout_properties: {}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: 'me about empathy chat requests for (only) me, specifically',
+        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+        italic: false, background: '', bold: false, underline: false, icon: ''}
+      name: label_6_copy
+      layout_properties: {expand: true, width: null}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
     wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"JACWUL":5,"VVAILZ":55}',
