@@ -178,21 +178,6 @@ def _get_status(user):
          }
 
 
-def has_status(user):
-  """
-  returns bool(current_status)
-  """
-  return bool(_get_status(user))
-#   current_proptime = ProposalTime.get_now(user)
-#   if current_proptime:
-#     return True
-#   else:
-#     this_match = current_match(user)
-#     if this_match:
-#       return True
-#   return False
-
-
 def _get_upcomings(user):
     """Return list of user's upcoming matches
     
