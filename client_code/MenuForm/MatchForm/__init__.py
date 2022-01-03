@@ -40,7 +40,7 @@ class MatchForm(MatchFormTemplate):
     self.update()
     self._first_tick = True
     self.timer_2.interval = 5
-      
+
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
     # https://jitsi.github.io/handbook/docs/user-guide/user-guide-advanced

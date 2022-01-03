@@ -37,6 +37,8 @@ class MenuForm(MenuFormTemplate):
     if p.DEBUG_MODE and self.item['test_mode']:
       auto_test.client_auto_tests()
     self.set_test_link()
+    
+  def form_show(self, **event_args):
     self.reset_status(self.item['state'])
 
   def set_help_link(self, url):
