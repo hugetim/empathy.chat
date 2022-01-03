@@ -10,7 +10,7 @@ from . import portable
 @authenticated_callable
 @anvil.tables.in_transaction
 def test_add_user(em, level=1):
-  print("test_add_user", em, level, r_em, p_sms)
+  print("test_add_user", em, level)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     if not anvil.server.session.get('test_record'):
       anvil.server.session['test_record'] = create_tests_record()

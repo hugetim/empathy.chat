@@ -497,22 +497,6 @@ def set_notif_settings(notif_settings, user_id=""):
   user['notif_settings'] = notif_settings
 
 
-@authenticated_callable
-@anvil.tables.in_transaction
-def set_pinged_sms(pinged_sms_checked, user_id=""):
-  print("set_pinged_sms", pinged_sms_checked)
-  user = get_user(user_id)
-  user['pinged_sms'] = pinged_sms_checked
-
-  
-@authenticated_callable
-@anvil.tables.in_transaction
-def set_message_sms(message_sms_checked, user_id=""):
-  print("set_message_sms", message_sms_checked)
-  user = get_user(user_id)
-  user['message_sms'] = message_sms_checked
-
-
 # @authenticated_callable
 # @anvil.tables.in_transaction
 # def set_request_em(request_em_checked, user_id=""):
@@ -654,9 +638,9 @@ def ping(user, start, duration):
   subject = "empathy.chat - match confirmed"
   content1 = f"Your proposal for a {duration} minute empathy match, starting {_message_when(start)}, has been accepted."
   content2 = f"Go to {p.URL_WITH_ALT} to be connected for the empathy exchange."
-  if user['phone'] and user['pinged_sms']:
+  if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
-  else:
+  elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     _email_send(
       to_user=user, 
       subject=subject,
@@ -678,9 +662,9 @@ def notify_cancel(user, start, canceler_name=""):
   print("'notify_cancel'", start, canceler_name)
   subject = "empathy.chat - upcoming match canceled"
   content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_message_when(start)}."
-  if user['phone'] and user['pinged_sms']:
+  if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content}")
-  else:
+  elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     _email_send(
       to_user=user, 
       subject=subject,
@@ -697,9 +681,9 @@ def _notify_message(user, from_name=""):
   print("'_notify_message'", user.get_id(), from_name)
   subject = f"empathy.chat - {_other_name(from_name)} sent you a message"
   content = f"{_other_name(from_name)} has sent you a message on {p.URL}"
-  if user['phone'] and user['message_sms']:
+  if user['phone'] and user['notif_settings'].get('message') == 'sms':
     _send_sms(user['phone'], f"empathy.chat - {content}")
-  else:
+  elif user['notif_settings'].get('message'): # includes case of 'sms' and not user['phone']
     _email_send(
       to_user=user, 
       subject=subject,

@@ -16,7 +16,6 @@ class SettingsForm(SettingsFormTemplate):
     self.phone_form = Phone(item={"phone": phone[2:] if phone else "", # removing "+1" 
                                  })
     self.phone_panel.add_component(self.phone_form)
-    self.notifications_panel.visible = bool(phone)
     self.essential_drop_down.items = [("SMS (default)", "sms"),
                                       ("email", "email"),
                                      ]
@@ -25,11 +24,11 @@ class SettingsForm(SettingsFormTemplate):
                                     ("email (default)", "email"),
                                     ("don't notify", None),
                                    ]
+    if not phone: #order of these lines relative to those above and below matters
+      self.essential_flow_panel.visible = False
+      self.message_drop_down.items = self.message_drop_down.items[1:3]
     self.message_drop_down.selected_value = notif_settings.get('message')
-    self.specific_drop_down.items = [("SMS", "sms"),
-                                     ("email (default)", "email"),
-                                     ("don't notify", None),
-                                    ]
+    self.specific_drop_down.items = self.message_drop_down.items
     self.specific_drop_down.selected_value = notif_settings.get('specific')
     
   def form_show(self, **event_args):
@@ -43,15 +42,7 @@ class SettingsForm(SettingsFormTemplate):
       notif_settings[notif_type] = drop_down.selected_value
     anvil.server.call('set_notif_settings', notif_settings)
     
-  def pinged_sms_switch_change(self, **event_args):
-    """This method is called when this switch is checked or unchecked"""
-    anvil.server.call('set_pinged_sms', self.pinged_sms_switch.checked) 
-
-  def message_sms_switch_change(self, **event_args):
-    """This method is called when this switch is checked or unchecked"""
-    anvil.server.call('set_message_sms', self.message_sms_switch.checked)
-  
-    
+   
 #   def request_em_check_box_change(self, **event_args):
 #     """This method is called when this checkbox is checked or unchecked"""
 #     checked = self.request_em_check_box.checked

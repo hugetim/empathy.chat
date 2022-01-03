@@ -33,7 +33,7 @@ components:
     event_bindings: {}
   - type: FlowPanel
     properties: {}
-    name: flow_panel_2
+    name: essential_flow_panel
     layout_properties: {}
     components:
     - type: DropDown
@@ -66,15 +66,6 @@ components:
         italic: false, background: '', bold: false, underline: false, icon: ''}
       name: label_5
       layout_properties: {expand: true, width: null}
-  - type: form:C6ZZPAPN4YYF5NVJ:Switch
-    properties: {tooltip: '', enabled: true, foreground: null, text_post: 'Send essential
-        notifications via SMS, rather than email (e.g., someone accepted my proposed
-        time or cancelled our scheduled exchange)', visible: false, font_size: 14,
-      spacing_above: small, checked_color: null, spacing_below: small, italic: null,
-      text_pre: '', background: null, bold: null, checked: true}
-    name: pinged_sms_switch
-    layout_properties: {grid_position: 'QRAAGN,NVCYYV'}
-    event_bindings: {change: pinged_sms_switch_change}
   - type: FlowPanel
     properties: {}
     name: flow_panel_3
@@ -110,16 +101,6 @@ components:
         background: '', bold: false, underline: false, icon: ''}
       name: label_6
       layout_properties: {expand: true, width: null}
-  - type: form:C6ZZPAPN4YYF5NVJ:Switch
-    properties: {tooltip: '', enabled: true, foreground: null, text_post: 'Send message
-        notifications via SMS, rather than email', visible: false, font_size: 14,
-      spacing_above: small, checked_color: null, spacing_below: small, italic: null,
-      text_pre: '', background: null, bold: null, checked: true}
-    name: message_sms_switch
-    layout_properties:
-      col_widths: {}
-      grid_position: IYUQCF,LFNVJN
-    event_bindings: {change: message_sms_switch_change}
   - type: FlowPanel
     properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
       foreground: '', visible: false, spacing_above: small, spacing_below: small,
