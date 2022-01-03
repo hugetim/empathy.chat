@@ -9,7 +9,7 @@ from . import portable
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def test_add_user(em, level=1, r_em=False, p_sms=True):
+def test_add_user(em, level=1):
   print("test_add_user", em, level, r_em, p_sms)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     if not anvil.server.session.get('test_record'):
@@ -17,10 +17,9 @@ def test_add_user(em, level=1, r_em=False, p_sms=True):
     new_user = app_tables.users.add_row(email=em,
                                         first_name = em,
                                         enabled=True,
-                                        trust_level=level,
-                                        request_em=r_em,
-                                        pinged_sms = p_sms
                                        )
+    sm.init_user_info(new_user)
+    new_user['trust_level'] = level
     test_users = anvil.server.session['test_record']['test_users']
     anvil.server.session['test_record']['test_users'] = test_users + [new_user]
     return new_user.get_id()

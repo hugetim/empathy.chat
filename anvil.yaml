@@ -197,12 +197,9 @@ db_schema:
     - name: trust_level
       admin_ui: {width: 86}
       type: number
-    - name: pinged_sms
-      admin_ui: {width: 113}
-      type: bool
-    - name: message_sms
-      admin_ui: {width: 200}
-      type: bool
+    - name: notif_settings
+      admin_ui: {width: 181}
+      type: simpleObject
     - name: seeking_buddy
       admin_ui: {width: 133}
       type: bool
@@ -220,15 +217,6 @@ db_schema:
       type: string
     - name: confirmed_url_date
       admin_ui: {width: 200}
-      type: datetime
-    - name: request_em
-      admin_ui: {width: 118}
-      type: bool
-    - name: request_em_settings
-      admin_ui: {width: 181}
-      type: simpleObject
-    - name: request_em_set_time
-      admin_ui: {width: 165}
       type: datetime
     - name: last_request_em
       admin_ui: {width: 150}

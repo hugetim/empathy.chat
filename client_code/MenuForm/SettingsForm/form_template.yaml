@@ -56,7 +56,7 @@ components:
         bold: false
         underline: false
         include_placeholder: false
-      name: pinged_drop_down
+      name: essential_drop_down
       layout_properties: {width: null, expand: false}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
@@ -69,7 +69,7 @@ components:
   - type: form:C6ZZPAPN4YYF5NVJ:Switch
     properties: {tooltip: '', enabled: true, foreground: null, text_post: 'Send essential
         notifications via SMS, rather than email (e.g., someone accepted my proposed
-        time or cancelled our scheduled exchange)', visible: true, font_size: 14,
+        time or cancelled our scheduled exchange)', visible: false, font_size: 14,
       spacing_above: small, checked_color: null, spacing_below: small, italic: null,
       text_pre: '', background: null, bold: null, checked: true}
     name: pinged_sms_switch
@@ -111,16 +111,18 @@ components:
       layout_properties: {expand: true, width: null}
   - type: form:C6ZZPAPN4YYF5NVJ:Switch
     properties: {tooltip: '', enabled: true, foreground: null, text_post: 'Send message
-        notifications via SMS, rather than email', visible: true, font_size: 14, spacing_above: small,
-      checked_color: null, spacing_below: small, italic: null, text_pre: '', background: null,
-      bold: null, checked: true}
+        notifications via SMS, rather than email', visible: false, font_size: 14,
+      spacing_above: small, checked_color: null, spacing_below: small, italic: null,
+      text_pre: '', background: null, bold: null, checked: true}
     name: message_sms_switch
     layout_properties:
       col_widths: {}
       grid_position: IYUQCF,LFNVJN
     event_bindings: {change: message_sms_switch_change}
   - type: FlowPanel
-    properties: {}
+    properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+      foreground: '', visible: false, spacing_above: small, spacing_below: small,
+      background: ''}
     name: flow_panel_3_copy
     layout_properties: {}
     components:
@@ -144,7 +146,7 @@ components:
         bold: false
         underline: false
         include_placeholder: false
-      name: specific_request_drop_down
+      name: specific_drop_down
       layout_properties: {}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
@@ -234,8 +236,4 @@ components:
     background: '', bold: false, underline: false}
   name: email_text_box
   layout_properties: {grid_position: 'ZEPIXP,ZCDLYH'}
-- type: Timer
-  properties: {interval: 0}
-  name: timer_2
-  event_bindings: {tick: timer_2_tick}
 is_package: true
