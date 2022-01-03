@@ -95,14 +95,11 @@ def _init_user_status(user):
   propagate_update_needed(user)
 
   
-def confirm_wait_helper(user, proptime=None):
+def confirm_wait_helper(user):
   """updates expire_date for current request, returns _get_status(user)"""
   if sm.DEBUG:
     print("confirm_wait_helper")
-  if proptime:
-    current_proptime = proptime
-  else:
-    current_proptime = ProposalTime.get_now_proposing(user)
+  current_proptime = ProposalTime.get_now_proposing(user)
   if current_proptime:
     current_proptime.confirm_wait()
   return _get_status(user) if user else None
