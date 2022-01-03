@@ -27,7 +27,7 @@ components:
     components:
     - type: Button
       properties: {role: primary-color, align: center, tooltip: Propose an empathy chat at a scheduled future time,
-        border: '', enabled: true, foreground: '', visible: true, text: Propose an Empathy Chat,
+        border: '', enabled: true, foreground: '', visible: true, text: Request an Empathy Chat,
         font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
         italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
       name: propose_button

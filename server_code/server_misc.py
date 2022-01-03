@@ -103,9 +103,7 @@ def do_signup(email):
 def init_user_info(user):
   """Return trust, initializing info for new users & updating trust_level"""
   if user['trust_level'] is None:
-    user['request_em'] = False
-    user['pinged_sms'] = True
-    user['request_em_settings'] = {"fixed": 0, "hours": 2}
+    user['notif_settings'] = {"essential": "sms", "message": "email", "specific": "email"}
     user['first_name'] = ""
     user['last_name'] = ""
     user['how_empathy'] = ""
@@ -479,56 +477,48 @@ def get_settings(user_id=""):
 #   if (user['request_em'] == True and re_opts["fixed"]
 #       and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
 #     user['request_em'] = False
-  return (user['phone'], user['pinged_sms'], user['message_sms']) #user['request_em'], user['request_em_settings'], user['request_em_set_time'], 
+  return (user['phone'], user['notif_settings'])
 
 
-def _prune_request_em():
-  """Switch expired request_em to false"""
-  expired_rem_users = []
-  for u in app_tables.users.search(request_em=True):
-    if (u['request_em_settings']['fixed']
-        and h.re_hours(u['request_em_settings']['hours'], u['request_em_set_time']) <= 0):
-      u['request_em'] = False
-
-
-@authenticated_callable
-@anvil.tables.in_transaction
-def set_pinged_sms(pinged_sms_checked, user_id=""):
-  print("set_pinged_sms", pinged_sms_checked)
-  user = get_user(user_id)
-  user['pinged_sms'] = pinged_sms_checked
-
-  
-@authenticated_callable
-@anvil.tables.in_transaction
-def set_message_sms(message_sms_checked, user_id=""):
-  print("set_message_sms", message_sms_checked)
-  user = get_user(user_id)
-  user['message_sms'] = message_sms_checked
+# def _prune_request_em():
+#   """Switch expired request_em to false"""
+#   expired_rem_users = []
+#   for u in app_tables.users.search(request_em=True):
+#     if (u['request_em_settings']['fixed']
+#         and h.re_hours(u['request_em_settings']['hours'], u['request_em_set_time']) <= 0):
+#       u['request_em'] = False
 
 
 @authenticated_callable
 @anvil.tables.in_transaction
-def set_request_em(request_em_checked, user_id=""):
-  print("set_request_em", request_em_checked)
+def set_notif_settings(notif_settings, user_id=""):
+  print("set_notif_settings", notif_settings)
   user = get_user(user_id)
-  user['request_em'] = request_em_checked
-  if request_em_checked:
-    user['request_em_set_time'] = now()
-  return user['request_em_set_time']
+  user['notif_settings'] = notif_settings
 
 
-@authenticated_callable
-@anvil.tables.in_transaction
-def set_request_em_opts(fixed, hours, user_id=""):
-  print("set_request_em_opts", fixed, hours)
-  user = get_user(user_id)
-  re_opts = user['request_em_settings']
-  re_opts["fixed"] = int(fixed)
-  re_opts["hours"] = hours
-  user['request_em_settings'] = re_opts
-  user['request_em_set_time'] = now()
-  return user['request_em_set_time']
+# @authenticated_callable
+# @anvil.tables.in_transaction
+# def set_request_em(request_em_checked, user_id=""):
+#   print("set_request_em", request_em_checked)
+#   user = get_user(user_id)
+#   user['request_em'] = request_em_checked
+#   if request_em_checked:
+#     user['request_em_set_time'] = now()
+#   return user['request_em_set_time']
+
+
+# @authenticated_callable
+# @anvil.tables.in_transaction
+# def set_request_em_opts(fixed, hours, user_id=""):
+#   print("set_request_em_opts", fixed, hours)
+#   user = get_user(user_id)
+#   re_opts = user['request_em_settings']
+#   re_opts["fixed"] = int(fixed)
+#   re_opts["hours"] = hours
+#   user['request_em_settings'] = re_opts
+#   user['request_em_set_time'] = now()
+#   return user['request_em_set_time']
 
 
 def _number_already_taken(number):
@@ -648,9 +638,9 @@ def ping(user, start, duration):
   subject = "empathy.chat - match confirmed"
   content1 = f"Your proposal for a {duration} minute empathy match, starting {_message_when(start)}, has been accepted."
   content2 = f"Go to {p.URL_WITH_ALT} to be connected for the empathy exchange."
-  if user['phone'] and user['pinged_sms']:
+  if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
-  else:
+  elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     _email_send(
       to_user=user, 
       subject=subject,
@@ -672,9 +662,9 @@ def notify_cancel(user, start, canceler_name=""):
   print("'notify_cancel'", start, canceler_name)
   subject = "empathy.chat - upcoming match canceled"
   content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_message_when(start)}."
-  if user['phone'] and user['pinged_sms']:
+  if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content}")
-  else:
+  elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     _email_send(
       to_user=user, 
       subject=subject,
@@ -691,9 +681,9 @@ def _notify_message(user, from_name=""):
   print("'_notify_message'", user.get_id(), from_name)
   subject = f"empathy.chat - {_other_name(from_name)} sent you a message"
   content = f"{_other_name(from_name)} has sent you a message on {p.URL}"
-  if user['phone'] and user['message_sms']:
+  if user['phone'] and user['notif_settings'].get('message') == 'sms':
     _send_sms(user['phone'], f"empathy.chat - {content}")
-  else:
+  elif user['notif_settings'].get('message'): # includes case of 'sms' and not user['phone']
     _email_send(
       to_user=user, 
       subject=subject,

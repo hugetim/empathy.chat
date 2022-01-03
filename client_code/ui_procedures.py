@@ -59,7 +59,6 @@ def return_favicons(old_hrefs):
   # If a <link rel="icon"> element already exists,
   # change its href to the given link.
   for favicon, old_href in zip(favicons, old_hrefs):
-    print(favicon.href)
     if favicon:
       favicon.href = old_href
 

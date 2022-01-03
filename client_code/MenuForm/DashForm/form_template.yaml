@@ -218,7 +218,7 @@ components:
     data_bindings: []
   - type: Button
     properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time,
-      border: '', enabled: true, foreground: '', visible: true, text: Initiate An Empathy Chat,
+      border: '', enabled: true, foreground: '', visible: true, text: Request An Empathy Chat,
       font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
       italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
     name: propose_button
