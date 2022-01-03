@@ -31,6 +31,41 @@ components:
       col_widths: {}
       grid_position: DJBSEF,KHMJVY
     event_bindings: {}
+  - type: FlowPanel
+    properties: {}
+    name: flow_panel_2
+    layout_properties: {}
+    components:
+    - type: DropDown
+      properties:
+        role: null
+        align: full
+        tooltip: ''
+        placeholder: ''
+        border: ''
+        enabled: true
+        foreground: ''
+        items: [SMS (default), email]
+        visible: true
+        font_size: null
+        font: ''
+        spacing_above: small
+        spacing_below: small
+        italic: false
+        background: ''
+        bold: false
+        underline: false
+        include_placeholder: false
+      name: pinged_drop_down
+      layout_properties: {width: null, expand: false}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: 'for essential notifications (e.g., someone accepted
+          my proposed time)', font_size: null, font: '', spacing_above: small, icon_align: left,
+        spacing_below: small, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
+      name: label_5
+      layout_properties: {expand: true, width: null}
   - type: form:C6ZZPAPN4YYF5NVJ:Switch
     properties: {tooltip: '', enabled: true, foreground: null, text_post: 'Send essential
         notifications via SMS, rather than email (e.g., someone accepted my proposed
@@ -40,6 +75,40 @@ components:
     name: pinged_sms_switch
     layout_properties: {grid_position: 'QRAAGN,NVCYYV'}
     event_bindings: {change: pinged_sms_switch_change}
+  - type: FlowPanel
+    properties: {}
+    name: flow_panel_3
+    layout_properties: {}
+    components:
+    - type: DropDown
+      properties:
+        role: null
+        align: full
+        tooltip: ''
+        placeholder: ''
+        border: ''
+        enabled: true
+        foreground: ''
+        items: [SMS, email (default), don't notify]
+        visible: true
+        font_size: null
+        font: ''
+        spacing_above: small
+        spacing_below: small
+        italic: false
+        background: ''
+        bold: false
+        underline: false
+        include_placeholder: false
+      name: message_drop_down
+      layout_properties: {}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: me when someone sends me a message, font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
+      name: label_6
+      layout_properties: {expand: true, width: null}
   - type: form:C6ZZPAPN4YYF5NVJ:Switch
     properties: {tooltip: '', enabled: true, foreground: null, text_post: 'Send message
         notifications via SMS, rather than email', visible: true, font_size: 14, spacing_above: small,

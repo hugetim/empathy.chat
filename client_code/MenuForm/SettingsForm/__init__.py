@@ -18,6 +18,13 @@ class SettingsForm(SettingsFormTemplate):
                                  })
     self.phone_panel.add_component(self.phone_form)
     self.notifications_panel.visible = bool(phone)
+    self.pinged_drop_down.items += [("SMS (default)", "sms"),  
+                                    ("email", "email"),
+                                   ]
+    self.message_drop_down.items += [("SMS", "sms"),
+                                     ("email (default)", "email"),
+                                     ("don't notify", None),
+                                    ]
     self.pinged_sms_switch.checked = p_sms
     self.message_sms_switch.checked = m_sms
     
