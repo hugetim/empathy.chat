@@ -140,25 +140,22 @@ def _get_status(user):
   """
   if sm.DEBUG:
     print("_get_status")
-  current_proptime = ProposalTime.get_now_proposing(user)
   expire_date = None
   ping_start = None
   proposals = []
   upcomings = []
   prompts = []
-  if current_proptime and current_proptime.start_now:
+  current_proptime = ProposalTime.get_now_proposing(user)
+  if current_proptime:
     expire_date = current_proptime.expire_date
     if current_proptime.is_accepted():
       status = "pinged"
       ping_start = current_proptime.ping_start
     else:
       status = "requesting"
-      proposals = Proposal.get_port_proposals(user)
-      upcomings = _get_upcomings(user)
-      prompts = sm.get_prompts(user)
   else:
     current_accept_time = ProposalTime.get_now_accepting(user)
-    if current_accept_time and current_accept_time.is_accepted():
+    if current_accept_time:
       status = "pinging"
       ping_start = current_accept_time.ping_start
       expire_date = current_accept_time.expire_date
