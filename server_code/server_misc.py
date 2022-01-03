@@ -30,7 +30,7 @@ def initialize_session(time_zone):
   print(user['email'])
   user['init_date'] = now()
   user['time_zone'] = time_zone
-  trust_level = sm.init_user_info(user)
+  trust_level = init_user_info(user)
   if p.DEBUG_MODE and trust_level >= TEST_TRUST_LEVEL:
     from . import server_auto_test
     server_auto_test.server_auto_tests()

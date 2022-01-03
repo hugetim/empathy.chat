@@ -63,16 +63,25 @@ def init(time_zone):
   user = sm.initialize_session(time_zone)
   return _init(user)
 
+
 @anvil.tables.in_transaction
-def _init():
-  # Prune expired items for all users
+def _init(user):
+  _prune_all_expired_items()
+  state = _init_user_status(user)
+  return {'trust_level': user['trust_level'],
+          'test_mode': user['trust_level'] >= sm.TEST_TRUST_LEVEL,
+          'name': user['first_name'],
+          'state': state,
+         }
+
+
+def _prune_all_expired_items():
   Proposal.prune_all()
   _prune_matches()
   sm.prune_messages()
-  trust_level = user['trust_level']
-  name = user['first_name']
-  test_mode = trust_level >= sm.TEST_TRUST_LEVEL
-  # Initialize user status
+
+  
+def _init_user_status(user):
   state = _get_status(user)
   if state['status'] == 'pinged' and state['seconds_left'] <= 0:
     state = _cancel(user)
@@ -84,13 +93,8 @@ def _init():
     state = confirm_wait_helper(user)
   anvil.server.session['status'] = state
   propagate_update_needed(user)
-  return {'test_mode': test_mode,
-          'trust_level': trust_level,
-          'name': name,
-          'state': state,
-         }
 
-
+  
 def confirm_wait_helper(user, proptime=None):
   """updates expire_date for current request, returns _get_status(user)"""
   if sm.DEBUG:
