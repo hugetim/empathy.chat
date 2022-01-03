@@ -34,7 +34,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.item['start_time'] = "Now"
       self.accept_button.text = "Join"
     else:
-      self.item['start_time'] = h.day_time_str(time.start_date)
+      self.item['start_time'] = h.day_time_str(h.as_local_tz(time.start_date))
     self.top_form = get_open_form()
 
   def update_expire_seconds(self, time_left):

@@ -28,12 +28,12 @@ class Profile(ProfileTemplate):
 
     # Any code you write here will run when the form opens.
     self.relationship_repeating_panel.items = self.item['relationships']
-    self.last_active_label.text = f"  Last Active: {h.short_date_str(self.item['last_active'])}"
+    self.last_active_label.text = f"  Last Active: {h.short_date_str(h.as_local_tz(self.item['last_active']))}"
     self.column_panel_1.row_spacing = 0
     if self.item['confirmed_date']:
       self.web_page_link.tooltip = (
         f"{self.item['first']}'s ownership of this web page "
-        f"was confirmed on {h.short_date_str(self.item['confirmed_date'])}."
+        f"was confirmed on {h.short_date_str(h.as_local_tz(self.item['confirmed_date']))}."
       )
     
   def form_show(self, **event_args):

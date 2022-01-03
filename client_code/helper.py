@@ -97,24 +97,24 @@ def re_hours(h, set_time):
   return hours
 
 
-def local_tz(_datetime):
+def as_local_tz(_datetime):
   return _datetime.astimezone(anvil.tz.tzlocal())
 
 
 def time_str(_datetime):
-  return local_tz(_datetime).strftime("X%I:%M%p").replace('X0','X').replace('X','')
+  return _datetime.strftime("X%I:%M%p").replace('X0','X').replace('X','')
 
 
 def dow_date_str(_datetime):
-  return local_tz(_datetime).strftime("%A, %b X%d, %Y").replace('X0','X').replace('X','')
+  return _datetime.strftime("%A, %b X%d, %Y").replace('X0','X').replace('X','')
 
 
 def day_time_str(_datetime):
-  return local_tz(_datetime).strftime("%a, %b X%d X%I:%M%p").replace('X0','X').replace('X','')
+  return _datetime.strftime("%a, %b X%d X%I:%M%p").replace('X0','X').replace('X','')
 
 
 def short_date_str(_datetime):
-  return local_tz(_datetime).strftime("X%m/X%d/%Y").replace('X0','X').replace('X','')
+  return _datetime.strftime("X%m/X%d/%Y").replace('X0','X').replace('X','')
 
 
 def round_up_datetime(dt, minutes_res=15):

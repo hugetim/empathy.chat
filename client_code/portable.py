@@ -111,6 +111,9 @@ class ProposalTime():
     self.__dict__.update(data)
     self.start_now = bool(self.start_now)
 
+  def __repr__(self):
+    return str(self.__dict__)
+    
   def has_conflict(self, conflict_checks):
     this = self.get_check_item()
     for check_item in conflict_checks:
@@ -222,6 +225,9 @@ class Proposal():
     self.__dict__.update(data)
     self.own = bool(self.own)
 
+  def __repr__(self):
+    return str(self.__dict__)  
+    
   def get_check_items(self):
     items = []
     if self.own:

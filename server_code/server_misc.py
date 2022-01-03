@@ -157,10 +157,9 @@ trust_label = {0: "Visitor",
               }
 
 
-def dt_to_str(dt_in, user):
+def as_user_tz(dt_in, user):
   tz_user = pytz.timezone(user['time_zone'])
-  dt_out = dt.astimezone(tz_user)
-  return h.day_time_str(dt_out)
+  return dt.astimezone(tz_user)
 
 
 def name(user, to_user=None, distance=None):
@@ -624,10 +623,19 @@ def _other_name(name):
   return name if name else "Another empathy.chat user"
 
   
-def _message_when(start):
-  if start: 
-    time_in_words = h.seconds_to_words((start-now()).total_seconds(), include_seconds=False)
-    return f"in {time_in_words} (from the time of this message)" 
+def _notify_when(start, user):
+  if start:
+    start_user_tz = as_user_tz(start, user)
+    now_user_tz = as_user_tz(now(), user)
+    if start_user_tz.date() == now_user_tz.date():
+      out = f"today at {h.time_str(start_user_tz)}"
+    else:
+      out = h.day_time_str(start_user_tz)
+    seconds_away = (start-now()).total_seconds()
+    if seconds_away < 60*15:
+      time_in_words = h.seconds_to_words(seconds_away, include_seconds=False)
+      out += f" (in {time_in_words})"
+    return out
   else: 
     return "now"
 
@@ -645,7 +653,7 @@ def ping(user, start, duration):
   """Notify pinged user"""
   print("'ping'", start, duration)
   subject = "empathy.chat - match confirmed"
-  content1 = f"Your proposal for a {duration} minute empathy match, starting {_message_when(start)}, has been accepted."
+  content1 = f"Your proposal for a {duration} minute empathy match, starting {_notify_when(start, user)}, has been accepted."
   content2 = f"Go to {p.URL_WITH_ALT} to be connected for the empathy exchange."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
@@ -670,7 +678,7 @@ def notify_cancel(user, start, canceler_name=""):
   """Notify canceled-on user"""
   print("'notify_cancel'", start, canceler_name)
   subject = "empathy.chat - upcoming match canceled"
-  content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_message_when(start)}."
+  content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_notify_when(start, user)}."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
@@ -683,6 +691,25 @@ def notify_cancel(user, start, canceler_name=""):
 
 -empathy.chat
 ''')
+    
+
+def notify_specific(user, proposal):
+  """Notify recipient of specific proposal"""
+  print("'notify_specific'", proposal)
+  subject = "empathy.chat - new empathy request"
+#   content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_notify_when(start, user)}."
+#   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
+#     _send_sms(user['phone'], f"{subject}: {content}")
+#   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
+#     _email_send(
+#       to_user=user, 
+#       subject=subject,
+#       text=f'''Dear {_addressee_name(user)},
+
+# {content}
+#
+# -empathy.chat
+# ''')    
 
     
 def _notify_message(user, from_name=""):

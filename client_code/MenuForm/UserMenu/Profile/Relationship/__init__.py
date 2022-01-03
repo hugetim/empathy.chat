@@ -21,11 +21,11 @@ class Relationship(RelationshipTemplate):
       if their:
         self.spacer_1.visible = False
         text = f' (and introduces you as their "{their}")'
-        tooltip = f"description last edited {h.short_date_str(self.item['their_date'])}"
+        tooltip = f"description last edited {h.short_date_str(h.as_local_tz(self.item['their_date']))}"
         self.child_column_panel.add_component(Label(text=text, tooltip=tooltip, spacing_above="none"))
 
   def update(self):
-    self.flow_panel_1.tooltip = f"description last edited {h.short_date_str(self.item['date'])}"
+    self.flow_panel_1.tooltip = f"description last edited {h.short_date_str(h.as_local_tz(self.item['date']))}"
         
   def edit_rel_button_click(self, **event_args):
     """This method is called when the button is clicked"""

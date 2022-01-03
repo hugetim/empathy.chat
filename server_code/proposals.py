@@ -40,6 +40,9 @@ class ProposalTime():
     del row_dict['proposal']
     return port.ProposalTime(**row_dict)
 
+  def __repr__(self):
+    return repr(self.portable())
+  
   @property
   def _row(self):
     return self._proptime_row
@@ -302,7 +305,10 @@ class Proposal():
     del row_dict['created']
     del row_dict['last_edited']
     return port.Proposal(**row_dict)
-
+  
+  def __repr__(self):
+    return repr(self.portable())
+  
   @property
   def _row(self):
     return self._prop_row
