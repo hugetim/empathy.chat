@@ -37,27 +37,17 @@ def _prune_matches():
   """Complete old commenced matches for all users"""
   if sm.DEBUG:
     print("_prune_matches")
-  assume_complete = datetime.timedelta(hours=4)
+  assume_complete = datetime.timedelta(hours=p.ASSUME_COMPLETE_HOURS)
   cutoff_m = sm.now() - assume_complete
-  if sm.DEBUG:
-    print("_prune_matches2")
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
   old_matches = app_tables.matches.search(complete=[0],
                                           match_commence=q.less_than(cutoff_m),
                                          )
-  if sm.DEBUG:
-    print("_prune_matches3")
   for row in old_matches:
-    if sm.DEBUG:
-      print("_prune_matches4")
     temp = row['complete']
     for i in range(len(temp)):
-      if sm.DEBUG:
-        print("_prune_matches5")
       # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
       temp[i] = 1
-    if sm.DEBUG:
-      print("_prune_matches6")
     row['complete'] = temp
 
 
@@ -70,19 +60,16 @@ def init(time_zone):
   """
   print("('init')")
   # Initialize user info
-  sm.initialize_session(time_zone)
-  return _init()
+  user = sm.initialize_session(time_zone)
+  return _init(user)
 
 @anvil.tables.in_transaction
 def _init():
-  user = anvil.users.get_user()
-  print(user['email'])
-  trust_level = sm.init_user_info(user)
   # Prune expired items for all users
   Proposal.prune_all()
   _prune_matches()
   sm.prune_messages()
-  
+  trust_level = user['trust_level']
   name = user['first_name']
   test_mode = trust_level >= sm.TEST_TRUST_LEVEL
   # Initialize user status

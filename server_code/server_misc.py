@@ -27,11 +27,14 @@ def now():
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
   user = anvil.users.get_user()
+  print(user['email'])
   user['init_date'] = now()
   user['time_zone'] = time_zone
-  if p.DEBUG_MODE and user['trust_level'] >= TEST_TRUST_LEVEL:
+  trust_level = sm.init_user_info(user)
+  if p.DEBUG_MODE and trust_level >= TEST_TRUST_LEVEL:
     from . import server_auto_test
     server_auto_test.server_auto_tests()
+  return user
 
 
 @anvil.server.callable
