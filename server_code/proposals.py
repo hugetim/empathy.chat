@@ -67,6 +67,11 @@ class ProposalTime():
   def duration(self):
     return self._proptime_row['duration']
   
+  def duration_start_str(self, user):
+    out = port.DURATION_TEXT[self.duration]
+    if self.start_now:
+      out += ""
+  
   def get_match_info(self):
     return self._proptime_row['jitsi_code'], self._proptime_row['duration']
   
