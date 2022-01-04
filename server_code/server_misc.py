@@ -655,7 +655,7 @@ def ping(user, start, duration):
   print("'ping'", start, duration)
   subject = "empathy.chat - match confirmed"
   content1 = f"Your proposal for a {duration} minute empathy match, starting {_notify_when(start, user)}, has been accepted."
-  content2 = f"Go to {p.URL} to be connected for the empathy exchange."
+  content2 = f"Go to {p.URL}for the empathy chat."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
@@ -679,7 +679,7 @@ def notify_cancel(user, start, canceler_name=""):
   """Notify canceled-on user"""
   print("'notify_cancel'", start, canceler_name)
   subject = "empathy.chat - upcoming match canceled"
-  content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_notify_when(start, user)}."
+  content = f"{_other_name(canceler_name)} has canceled your empathy chat, previously scheduled to start {_notify_when(start, user)}."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
@@ -707,7 +707,7 @@ def notify_specific(user, proposal):
   else:
     times_str = "\n " + proptimes[0].duration_start_str(user)
     content2 = f"Login to {p.URL} to accept."
-  content1 = f"{_other_name(proposer_name)} has requested an empathy match with you, specifically:{times_str}."
+  content1 = f"{_other_name(proposer_name)} has directed an empathy chat request specifically to you:{times_str}."
   if user['phone'] and user['notif_settings'].get('specific') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('specific'):  # includes case of 'sms' and not user['phone']
