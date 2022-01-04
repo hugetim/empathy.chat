@@ -392,7 +392,11 @@ class Proposal():
         ProposalTime.get_by_id(port_time.time_id).update(port_time)
       else:
         ProposalTime.add(proposal=self, port_time=port_time)
-             
+
+  def notify_add(self):
+    if self.eligible == 0 and len(self.eligible_users) == 1:
+      sm.notify_specific(self.eligible_users[0], self)
+        
   @staticmethod
   def add(user, port_prop):
     now = sm.now()

@@ -286,6 +286,7 @@ def _add_proposal(user, port_prop, link_key=""):
     if (status is not None or _match_overlapping_now_proposal(user, prop, duration, state)):
       prop.cancel_all_times()
       return _get_status(user), None
+  prop.notify_add()
   if link_key:
     prop.add_to_invite(link_key)
   return _get_status(user), prop.get_id()
