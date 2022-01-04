@@ -315,7 +315,7 @@ class Proposal():
     return port.Proposal(**row_dict)
   
   def __repr__(self):
-    return repr(self.portable())
+    return repr(self.portable(anvil.users.get_user()))
   
   @property
   def _row(self):
