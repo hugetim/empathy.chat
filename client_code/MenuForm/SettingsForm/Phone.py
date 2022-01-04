@@ -89,6 +89,7 @@ class Phone(PhoneTemplate):
       alert("Phone number verification successful.")
       self.update("confirmed")
       ui.reload()
+      get_open_form().go_settings()
     else:
       self.phone_error_label.text = "The code submitted does not match (or is expired)."
       self.phone_error_label.visible = True
