@@ -696,6 +696,7 @@ def notify_cancel(user, start, canceler_name=""):
 def notify_specific(user, proposal):
   """Notify recipient of specific proposal"""
   print("'notify_specific'", proposal)
+  from
   subject = "empathy.chat - new empathy request"
   proposer_name = name(proposal.proposer, to_user=user)
   proptimes = ProposalTime.times_from_proposal(proposal, require_current=True)
