@@ -12,7 +12,6 @@ ASSUME_COMPLETE_HOURS = 4
 MIN_BETWEEN_R_EM = 20
 CONTACT_EMAIL = "support@empathy.chat"
 URL = "https://e6hfysk4hhri7btc.anvil.app/VRLRQKFZAS4J7LXXZPU2FWPI" if DEBUG_MODE else "https://empathy.chat"
-URL_WITH_ALT = URL
 SELECTED_TAB_COLOR = "theme:White"
 NONSELECTED_TAB_COLOR = "theme:Gray 200"
 START_EARLY_MINUTES = 5

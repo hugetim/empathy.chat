@@ -654,7 +654,7 @@ def ping(user, start, duration):
   print("'ping'", start, duration)
   subject = "empathy.chat - match confirmed"
   content1 = f"Your proposal for a {duration} minute empathy match, starting {_notify_when(start, user)}, has been accepted."
-  content2 = f"Go to {p.URL_WITH_ALT} to be connected for the empathy exchange."
+  content2 = f"Go to {p.URL} to be connected for the empathy exchange."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
@@ -698,21 +698,28 @@ def notify_specific(user, proposal):
   print("'notify_specific'", proposal)
   subject = "empathy.chat - new empathy request"
   proposer_name = name(proposal.proposer, to_user=user)
-  # if multiple times: either {proptime.duration_and_start_str()} /n or ...
-  # else 
-#   content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_notify_when(start, user)}."
-#   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
-#     _send_sms(user['phone'], f"{subject}: {content}")
-#   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
-#     _email_send(
-#       to_user=user, 
-#       subject=subject,
-#       text=f'''Dear {_addressee_name(user)},
+  proptimes = ProposalTime.times_from_proposal(proposal, require_current=True)
+  if len(proptimes) > 1:
+    times_str = "\neither " + "\n or ".join([pt.duration_start_str() for pt in proptimes])
+    content2 = f"Login to {p.URL} to accept one."
+  else:
+    times_str = "\n " + proptimes[0].duration_start_str()
+    content2 = f"Login to {p.URL} to accept."
+  content1 = f"{_other_name(proposer_name)} has requested an empathy match with you, specifically:{times_str}."
+  if user['phone'] and user['notif_settings'].get('specific') == 'sms':
+    _send_sms(user['phone'], f"{subject}: {content1} {content2}")
+  elif user['notif_settings'].get('specific'):  # includes case of 'sms' and not user['phone']
+    _email_send(
+      to_user=user, 
+      subject=subject,
+      text=f'''Dear {_addressee_name(user)},
 
-# {content}
-#
-# -empathy.chat
-# ''')    
+{content1}
+
+{content2}
+
+-empathy.chat
+''')    
 
     
 def _notify_message(user, from_name=""):
@@ -788,7 +795,7 @@ def get_url(name):
 
 # Someone has requested ''' + request_type_text + '''
 
-# Return to ''' + p.URL_WITH_ALT + ''' and request empathy to be connected for an empathy exchange (if you are first to do so).
+# Return to ''' + p.URL + ''' and request empathy to be connected for an empathy exchange (if you are first to do so).
 
 # Thanks!
 # Tim
