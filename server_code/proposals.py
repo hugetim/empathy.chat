@@ -66,7 +66,15 @@ class ProposalTime():
   @property
   def duration(self):
     return self._proptime_row['duration']
-  
+ 
+  def duration_start_str(self, user):
+    out = port.DURATION_TEXT[self.duration]
+    if self.start_now:
+      out += ", starting now"
+    else:
+      out += f", {sm._notify_when(self.start_date, user)}"
+    return out
+
   def get_match_info(self):
     return self._proptime_row['jitsi_code'], self._proptime_row['duration']
   
