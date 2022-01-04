@@ -157,7 +157,8 @@ trust_label = {0: "Visitor",
               }
 
 
-def as_user_tz(dt_in, user):
+def as_user_tz(dt, user):
+  import pytz
   tz_user = pytz.timezone(user['time_zone'])
   return dt.astimezone(tz_user)
 
@@ -699,7 +700,7 @@ def notify_specific(user, proposal):
   from .proposals import ProposalTime
   subject = "empathy.chat - new empathy request"
   proposer_name = name(proposal.proposer, to_user=user)
-  proptimes = ProposalTime.times_from_proposal(proposal, require_current=True)
+  proptimes = list(ProposalTime.times_from_proposal(proposal, require_current=True))
   if len(proptimes) > 1:
     times_str = "\neither " + "\n or ".join([pt.duration_start_str(user) for pt in proptimes])
     content2 = f"Login to {p.URL} to accept one."
