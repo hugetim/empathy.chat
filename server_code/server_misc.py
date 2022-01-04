@@ -700,10 +700,10 @@ def notify_specific(user, proposal):
   proposer_name = name(proposal.proposer, to_user=user)
   proptimes = ProposalTime.times_from_proposal(proposal, require_current=True)
   if len(proptimes) > 1:
-    times_str = "\neither " + "\n or ".join([pt.duration_start_str() for pt in proptimes])
+    times_str = "\neither " + "\n or ".join([pt.duration_start_str(user) for pt in proptimes])
     content2 = f"Login to {p.URL} to accept one."
   else:
-    times_str = "\n " + proptimes[0].duration_start_str()
+    times_str = "\n " + proptimes[0].duration_start_str(user)
     content2 = f"Login to {p.URL} to accept."
   content1 = f"{_other_name(proposer_name)} has requested an empathy match with you, specifically:{times_str}."
   if user['phone'] and user['notif_settings'].get('specific') == 'sms':
