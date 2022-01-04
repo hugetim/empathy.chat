@@ -697,6 +697,9 @@ def notify_specific(user, proposal):
   """Notify recipient of specific proposal"""
   print("'notify_specific'", proposal)
   subject = "empathy.chat - new empathy request"
+  proposer_name = name(proposal.proposer, to_user=user)
+  # if multiple times: either {proptime.duration_and_start_str()} /n or ...
+  # else 
 #   content = f"{_other_name(canceler_name)} has canceled your empathy match, previously scheduled to start {_notify_when(start, user)}."
 #   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
 #     _send_sms(user['phone'], f"{subject}: {content}")
