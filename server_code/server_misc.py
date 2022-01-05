@@ -548,7 +548,7 @@ def _send_sms(to_number, text):
     print("send_sms sid", message.sid)
     return None
   except Exception as exc:
-    print(repr(exc))
+    print(f"Handled: {repr(exc)}")
     return str(exc)
   
     

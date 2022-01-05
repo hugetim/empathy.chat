@@ -188,11 +188,11 @@ class MatchForm(MatchFormTemplate):
     except AttributeError as e:
       Notification("Full screen toggle blocked by browser. Try F11.").show()
       self.full_screen_button.enabled = False
-      print(repr(e))
+      print(f"Handled: {repr(e)}")
     except ExternalError as e:
       Notification("Full screen toggle blocked by browser. Try F11.").show()
       self.full_screen_button.enabled = False
-      print(repr(e))
+      print(f"Handled: {repr(e)}")
 
   def info_button_click(self, **event_args):
     """This method is called when the button is clicked"""
