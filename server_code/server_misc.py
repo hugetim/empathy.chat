@@ -69,6 +69,7 @@ def report_error(err_repr, app_repr):
       app_origin: {anvil.server.get_app_origin()}
       """
     )
+    print(f"Reporting error: {content}")
     _email_send(admin, subject="empathy.chat error", text=content, from_name="empathy.chat error handling")
 
 
