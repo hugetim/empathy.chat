@@ -44,7 +44,8 @@ def remove_user(user):
     user.delete()
 
     
-def get_user(user_id="", require_auth=True):
+def get_user(user_id=""):
+  require_auth = True
   if DEBUG:
     print("get_user", user_id)
   logged_in_user = anvil.users.get_user()
@@ -251,7 +252,7 @@ def dismiss_prompt(prompt_id):
 @authenticated_callable
 def invited_item(inviter_id, user_id=""):
   user = get_user(user_id)
-  inviter_user = get_user(inviter_id, require_auth=False)
+  inviter_user = app_tables.users.get_by_id(inviter_id)
   inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user1=inviter_user, user2=user)
   return {"inviter": name(inviter_user, to_user=user), "link_key": inviteds[0]['link_key'],
           "inviter_id": inviter_id, "rel": inviteds[0]['relationship2to1']}
@@ -260,7 +261,7 @@ def invited_item(inviter_id, user_id=""):
 @authenticated_callable
 def init_profile(user_id=""):
   from . import connections as c
-  user = get_user(user_id, require_auth=False)
+  user = app_tables.users.get_by_id(user_id)
   record = c.connection_record(user, get_user())
   confirmed_url_date = user['confirmed_url_date'] if user['confirmed_url'] else None
   is_me = user == anvil.users.get_user()
@@ -333,7 +334,7 @@ def update_history_form(user2_id, user_id=""):
   Return (iterable of dictionaries with keys: 'me', 'message'), their_value
   """
   user = get_user(user_id)
-  user2 = get_user(user2_id, require_auth=False)
+  user2 = app_tables.users.get_by_id(user2_id)
   return _update_history_form(user2, user)
 
 
@@ -357,7 +358,7 @@ def _update_history_form(user2, user1):
 def add_message(user2_id, user_id="", message="[blank test message]"):
   print("add_message", "[redacted]", user_id)
   user = get_user(user_id)
-  user2 = get_user(user2_id, require_auth=False)
+  user2 = app_tables.users.get_by_id(user2_id)
   app_tables.messages.add_row(from_user=user,
                               to_user=user2,
                               message=anvil.secrets.encrypt_with_key("new_key", message),

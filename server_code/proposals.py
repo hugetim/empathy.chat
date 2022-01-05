@@ -326,7 +326,11 @@ class Proposal():
   @property
   def _row(self):
     return self._prop_row
-  
+
+  @property
+  def current(self):
+    return self._prop_row['current']
+    
   @property
   def eligible(self):
     return self._prop_row['eligible']

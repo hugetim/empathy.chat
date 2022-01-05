@@ -88,7 +88,7 @@ def distance(user2, user1, up_to_distance=3):
 @authenticated_callable
 def get_connections(user_id):
   print("get_connections", user_id)
-  user = sm.get_user(user_id, require_auth=False)
+  user = app_tables.users.get_by_id(user_id)
   logged_in_user = anvil.users.get_user()
   is_me = user == logged_in_user
   up_to_degree = 3
@@ -227,7 +227,7 @@ def save_invites(items, user_id=""):
 #         proposal = m.Proposal.add(user, item['proposal'])
 #       item['proposal'] = proposal._row
 #     if item.get('user2'):
-#       item['user2'] = sm.get_user(item.get('user2').user_id, require_auth=False)
+#       item['user2'] = app_tables.users.get_by_id(item.get('user2').user_id)
 #     row = app_tables.invites.get(origin=True, user1=user, link_key=item['link_key'])
 #     if row:
 #       row.update(**item)
@@ -262,7 +262,7 @@ def try_adding_to_invite_proposal(invite, user):
   if invite['proposal']:
     from . import matcher as m
     proposal = m.Proposal(invite['proposal'])
-    if user not in proposal.eligible_users:
+    if proposal.current and user not in proposal.eligible_users:
       proposal.eligible_users += [user]
       proposal.notify_add_specific()
 
@@ -309,7 +309,7 @@ def _connected_prompt(invite, invite_reply):
 @anvil.tables.in_transaction
 def save_relationship(item, user_id=""):
   user1 = sm.get_user(user_id)
-  user2 = sm.get_user(item['user2_id'], require_auth=False)
+  user2 = app_tables.users.get_by_id(item['user2_id'])
   row = app_tables.connections.get(user1=user1, user2=user2)
   row['relationship2to1'] = item['relationship']
   row['date_described'] = sm.now()
@@ -322,7 +322,7 @@ def disconnect(user2_id, user1_id=""):
   user1 = sm.get_user(user1_id)
   from . import matcher
   matcher.propagate_update_needed()
-  user2 = sm.get_user(user2_id, require_auth=False)
+  user2 = app_tables.users.get_by_id(user2_id)
   if user2:
     r1to2 = app_tables.connections.get(user1=user1, user2=user2)
     r2to1 = app_tables.connections.get(user1=user2, user2=user1)
