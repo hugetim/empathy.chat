@@ -143,7 +143,7 @@ components:
         col_widths: {}
         grid_position: IBGVDS,QXUMBH EXKOPS,PUHOSB
       data_bindings:
-      - {property: text, code: 'f"({self.item[''trust_label'']})"'}
+      - {property: text, code: 'f"Role: {self.item[''trust_label'']}"'}
       - {property: tooltip, code: 'self.trust_tooltip[self.item[''trust_label'']]'}
   - type: FlowPanel
     properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '',

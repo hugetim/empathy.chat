@@ -66,14 +66,14 @@ class DashForm(DashFormTemplate):
                          and any([item['prop'].own
                                   for item in self.item['proposals']]))
     if own_props_visible:
-      self.status_label.text = "Proposals:"
+      self.status_label.text = "Your current empathy chat requests:"
       self.status_label.align = "left"
       self.status_label.role = ""
       self.status_label.spacing_below = "none"
       self.status_label.visible = True
     elif others_props_visible:
       self.status_label.text = (
-        "You can accept an existing proposal for an empathy chat or propose your own.")
+        "You can accept an existing empathy chat request or create your own.")
       self.status_label.align = "center"
       self.status_label.role = "subheading"
       self.status_label.spacing_below = "small"
@@ -131,7 +131,7 @@ class DashForm(DashFormTemplate):
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
-                title="New Empathy Chat Proposal",
+                title="New Empathy Chat Request",
                 large=True,
                 dismissible=False,
                 buttons=[])
@@ -154,7 +154,7 @@ class DashForm(DashFormTemplate):
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,
-                title="Edit Empathy Chat Proposal",
+                title="Edit Empathy Chat Request",
                 large=True,
                 dismissible=False,
                 buttons=[])

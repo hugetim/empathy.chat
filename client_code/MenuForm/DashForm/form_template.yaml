@@ -137,7 +137,7 @@ components:
   components:
   - type: Label
     properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: You can accept an existing proposal for an empathy chat or propose your own.,
+      visible: true, text: You can accept an existing empathy chat request or create your own.,
       font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
       italic: false, background: '', bold: false, underline: false, icon: ''}
     name: status_label
