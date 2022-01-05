@@ -597,7 +597,7 @@ def check_phone_code(code, user_id=""):
     code_matches = code == latest_code_row['code']
     if code_matches:
       user['phone'] = latest_code_row['address']
-      any_confirmed = _check_for_confirmed_invites(user)
+      any_confirmed, any_failed = _check_for_confirmed_invites(user)
     return code_matches
   else:
     return None
@@ -605,6 +605,7 @@ def check_phone_code(code, user_id=""):
 
 def _check_for_confirmed_invites(user):
   any_confirmed = False
+  any_failed = False
   for invite in _inviteds(user):
     invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
     if invite_reply:
@@ -612,11 +613,13 @@ def _check_for_confirmed_invites(user):
       if c.try_connect(invite, invite_reply):
         any_confirmed = True
       else:
+        any_failed = True
+        from . import invites_server
+        add_invite_guess_fail_prompt(invites_server.from_invite_row(invite))
         c.remove_invite_pair(invite, invite_reply, user)
-        print("Warning: remove_invite_pair without notifying invited")
     else:
       print("Warning: invite_reply not found", dict(invite))
-  return any_confirmed
+  return any_confirmed, any_failed
 
     
 def _addressee_name(user):

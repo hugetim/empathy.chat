@@ -248,9 +248,8 @@ class Invite(invites.Invite):
     if self.invitee and self.invitee['phone']:
       from . import connections as c
       self.connection_successful = c.try_connect(invite_row, response_row)
-#       name = sm.name(self.inviter)
-#       errors.append(f"The last 4 digits you provided match {name}'s phone number, "
-#                     f"but {name} did not correctly provide the last 4 digits of your phone number.")
+      if not self.connection_successful:
+        print("Warning: unexpected failed connect")
     return errors
 
   def load(self):

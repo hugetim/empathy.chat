@@ -17,7 +17,7 @@ NONSELECTED_TAB_COLOR = "theme:Gray 200"
 START_EARLY_MINUTES = 5
 MIN_RELATIONSHIP_LENGTH = 3
 MISTAKEN_INVITER_GUESS_ERROR = (
-  "The inviter did not accurately provide the last 4 digits of your phone number."
+  "Unfortunately, the inviter did not accurately provide the last 4 digits of your phone number."
 )
 TRUST_TOOLTIP = {"Visitor": "Has not yet confirmed an email address",
                  "Guest": "Has not yet confirmed a phone number",

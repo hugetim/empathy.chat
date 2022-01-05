@@ -4,6 +4,7 @@ import anvil.users
 import anvil.server
 from ... import helper as h
 from ... import ui_procedures as ui
+from ... import parameters as p
 from anvil_extras.utils import auto_refreshing, wait_for_writeback
 
 
@@ -82,11 +83,14 @@ class Phone(PhoneTemplate):
     self.phone_code_submit_button.enabled = bool(self.phone_code_text_box.text)
 
   def phone_code_submit_button_click(self, **event_args):
-    code_matches = anvil.server.call('check_phone_code', 
-                                     self.phone_code_text_box.text,
-                                    )
+    code_matches, any_failed = anvil.server.call('check_phone_code',
+                                                 self.phone_code_text_box.text,
+                                                )
     if code_matches:
-      alert("Phone number verification successful.")
+      text = "Phone number verification successful."
+      if any_failed:
+        text += f" {p.MISTAKEN_INVITER_GUESS_ERROR}"
+      alert(text)
       self.update("confirmed")
       ui.reload()
       get_open_form().go_settings()
