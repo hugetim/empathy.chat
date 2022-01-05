@@ -48,7 +48,7 @@ components:
       data_bindings:
       - {property: visible, code: 'not self.item[''me'']'}
     - type: Button
-      properties: {role: primary-color, align: center, tooltip: Message, border: '',
+      properties: {role: primary-color, align: center, tooltip: Messages, border: '',
         enabled: true, foreground: '', visible: false, text: '', font_size: null,
         font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:comment'}
@@ -58,7 +58,7 @@ components:
       data_bindings:
       - {property: visible, code: '(not self.item[''me''])'}
     - type: Button
-      properties: {role: primary-color, align: center, tooltip: Propose Exchange,
+      properties: {role: primary-color, align: center, tooltip: Request empathy chat,
         border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
         font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:child'}
@@ -73,17 +73,17 @@ components:
           you to connect, awaiting your confirmation', border: '', enabled: true,
         foreground: '', visible: false, text: 'Confirm?', font_size: null, font: '',
         spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:plus'}
+        background: '', bold: false, underline: false, icon: 'fa:link'}
       name: confirm_button
       layout_properties: {}
       data_bindings:
       - {property: visible, code: 'self.item[''status''] == "invited"'}
       event_bindings: {click: confirm_button_click}
     - type: Button
-      properties: {role: null, align: center, tooltip: Connect, border: '', enabled: true,
-        foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:plus'}
+      properties: {role: null, align: center, tooltip: Invite this user to be a "close connection",
+        border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
+        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:link'}
       name: connect_button
       layout_properties: {}
       data_bindings:
@@ -100,6 +100,13 @@ components:
       data_bindings:
       - {property: visible, code: 'self.item[''degree''] == 1'}
       event_bindings: {click: unconnect_button_click}
+    - type: Button
+      properties: {role: null, align: center, tooltip: Block this user, border: '',
+        enabled: true, foreground: '', visible: false, text: '', font_size: null,
+        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:ban'}
+      name: block_button
+      layout_properties: {}
   - type: FlowPanel
     properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
       foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
