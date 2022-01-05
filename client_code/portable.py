@@ -227,7 +227,11 @@ class Proposal():
 
   def __repr__(self):
     return str(self.__dict__)  
-    
+
+  @property
+  def times_notify_info(self):
+    return {(time.start_now, time.start_date, time.duration) for time in self.times}
+  
   def get_check_items(self):
     items = []
     if self.own:

@@ -205,7 +205,6 @@ class ProposalTime():
                                                    jitsi_code=sm.new_jitsi_code(),
                                                    missed_pings=0,
                                                   )).confirm_wait(port_time.start_now)
-
   
   @staticmethod
   def _return(proptime_row):
@@ -394,9 +393,25 @@ class Proposal():
         ProposalTime.add(proposal=self, port_time=port_time)
 
   def notify_add(self):
+    users_notified = self.notify_add_specific()
+    
+  def notify_add_specific(self):
+    users_notified = set()
     if self.eligible == 0 and len(self.eligible_users) == 1:
-      sm.notify_specific(self.eligible_users[0], self)
-        
+      sm.notify_proposal(self.eligible_users[0], self, f"specific empathy request", " has directed an empathy chat request specifically to you:")
+      users_notified.add(self.eligible_users[0])
+    return users_notified
+
+  def notify_edit(self, port_prop, old_port_prop):
+    old_was_specific = old_port_prop.eligible == 0 and len(old_port_prop.eligible_users) == 1
+    if old_was_specific:
+      old_specific_port_user = old_port_prop.eligible_users[0]
+      old_specific_still_eligible = old_specific_port_user.user_id in [port_user.user_id for port_user in port_prop.eligible_users] 
+      if old_specific_still_eligible and port_prop.times_notify_info != old_port_prop.times_notify_info:
+        sm.notify_proposal(old_specific_port_user.s_user, self, "specific empathy request", " has changed their empathy chat request to:")
+    elif self.eligible == 0 and len(self.eligible_users) == 1:
+      sm.notify_proposal(self.eligible_users[0], self, "specific empathy request", " has directed an empathy chat request specifically to you:")
+      
   @staticmethod
   def add(user, port_prop):
     now = sm.now()

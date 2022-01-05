@@ -694,12 +694,12 @@ def notify_cancel(user, start, canceler_name=""):
 ''')
     
 
-def notify_specific(user, proposal):
+def notify_proposal(user, proposal, title, desc):
   """Notify recipient of specific proposal"""
-  print(f"'notify_specific', {user['email']}, {proposal.get_id()}")
+  print(f"'notify_proposal', {user['email']}, {proposal.get_id()}, {title}, {desc}")
   from .proposals import ProposalTime
-  subject = "empathy.chat - new empathy request"
   proposer_name = name(proposal.proposer, to_user=user)
+  subject = f"empathy.chat - {title} from {proposer_name}"
   proptimes = list(ProposalTime.times_from_proposal(proposal, require_current=True))
   if len(proptimes) > 1:
     times_str = "\neither " + "\n or ".join([pt.duration_start_str(user) for pt in proptimes])
@@ -707,7 +707,7 @@ def notify_specific(user, proposal):
   else:
     times_str = "\n " + proptimes[0].duration_start_str(user)
     content2 = f"Login to {p.URL} to accept."
-  content1 = f"{_other_name(proposer_name)} has directed an empathy chat request specifically to you:{times_str}."
+  content1 = f"{_other_name(proposer_name)}{desc}{times_str}."
   if user['phone'] and user['notif_settings'].get('specific') == 'sms':
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('specific'):  # includes case of 'sms' and not user['phone']
@@ -721,7 +721,7 @@ def notify_specific(user, proposal):
 {content2}
 
 -empathy.chat
-''')    
+''')
 
     
 def _notify_message(user, from_name=""):

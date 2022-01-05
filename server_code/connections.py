@@ -264,6 +264,7 @@ def try_adding_to_invite_proposal(invite, user):
     proposal = m.Proposal(invite['proposal'])
     if user not in proposal.eligible_users:
       proposal.eligible_users += [user]
+      proposal.notify_add_specific()
 
       
 def try_removing_from_invite_proposal(invite, user):

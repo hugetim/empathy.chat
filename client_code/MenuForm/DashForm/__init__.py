@@ -44,11 +44,11 @@ class DashForm(DashFormTemplate):
     self.update_form()
 
   def update_form(self):
-    if self.item['status'] == "pinged":
-      self.confirm_match(self.item['seconds_left'])
-    else:
-      self.update_upcoming_table()
-      self.update_proposal_table()
+#     if self.item['status'] == "pinged":
+#       self.confirm_match(self.item['seconds_left'])
+#     else:
+    self.update_upcoming_table()
+    self.update_proposal_table()
 
   def update_upcoming_table(self):
     """Update form based on upcoming state"""
@@ -162,28 +162,28 @@ class DashForm(DashFormTemplate):
       proposal = content.proposal()
       self._handle_prop_call(*anvil.server.call('edit_proposal', proposal))
       
-  def confirm_match(self, seconds):
-    with h.PausedTimer(self.timer_2):
-      f = TimerForm(seconds, self.item['status'])
-      out = alert(content=f,
-                  title="A match is available. Are you ready?",
-                  large=False,
-                  dismissible=False,
-                  buttons=[("Yes", True), ("No", False)])
-      if out == True:
-        #self.item['status'] = "matched"
-        state = anvil.server.call('match_commit')
-      elif out in [False, "timer elapsed"]:
-        state = anvil.server.call('cancel')
-        if out == "timer elapsed":
-          alert("A match was found, but the time available for you to confirm ("
-                + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
-                dismissible=False)
-      else:
-        if out and out != "requesting":
-          print("DashForm.confirm_match out:", out)
-        state = anvil.server.call_s('get_status')
-      self.update_status(state)
+#   def confirm_match(self, seconds):
+#     with h.PausedTimer(self.timer_2):
+#       f = TimerForm(seconds, self.item['status'])
+#       out = alert(content=f,
+#                   title="A match is available. Are you ready?",
+#                   large=False,
+#                   dismissible=False,
+#                   buttons=[("Yes", True), ("No", False)])
+#       if out == True:
+#         #self.item['status'] = "matched"
+#         state = anvil.server.call('match_commit')
+#       elif out in [False, "timer elapsed"]:
+#         state = anvil.server.call('cancel')
+#         if out == "timer elapsed":
+#           alert("A match was found, but the time available for you to confirm ("
+#                 + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
+#                 dismissible=False)
+#       else:
+#         if out and out != "requesting":
+#           print("DashForm.confirm_match out:", out)
+#         state = anvil.server.call_s('get_status')
+#       self.update_status(state)
   
   def prompts_open_link_click(self, **event_args):
     """This method is called when the link is clicked"""

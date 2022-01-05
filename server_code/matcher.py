@@ -318,16 +318,17 @@ def edit_proposal(proposal, user_id=""):
 
     
 def _edit_proposal(user, port_prop):
-  print("Not yet preventing editing from making multiple now proposals")
   state = _get_status(user)
   status = state['status']
   prop = Proposal.get_by_id(port_prop.prop_id)
+  old_port_prop = prop.portable(user)
   prop.update(port_prop)
   if port_prop.start_now:
     duration = port_prop.times[0].duration
     if (status is not None or _match_overlapping_now_proposal(user, prop, duration, state)):
       prop.cancel_all_times()
       return _get_status(user), None
+  prop.notify_edit(port_prop, old_port_prop)
   return _get_status(user), prop.get_id()
 
 
