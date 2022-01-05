@@ -44,8 +44,7 @@ def remove_user(user):
     user.delete()
 
     
-def get_user(user_id=""):
-  require_auth = True
+def get_user(user_id="", require_auth=True):
   if DEBUG:
     print("get_user", user_id)
   logged_in_user = anvil.users.get_user()
@@ -261,7 +260,7 @@ def invited_item(inviter_id, user_id=""):
 @authenticated_callable
 def init_profile(user_id=""):
   from . import connections as c
-  user = app_tables.users.get_by_id(user_id)
+  user = get_user(user_id, require_auth=False)
   record = c.connection_record(user, get_user())
   confirmed_url_date = user['confirmed_url_date'] if user['confirmed_url'] else None
   is_me = user == anvil.users.get_user()

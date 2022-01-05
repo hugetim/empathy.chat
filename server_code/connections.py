@@ -88,7 +88,7 @@ def distance(user2, user1, up_to_distance=3):
 @authenticated_callable
 def get_connections(user_id):
   print("get_connections", user_id)
-  user = app_tables.users.get_by_id(user_id)
+  user = sm.get_user(user_id, require_auth=False)
   logged_in_user = anvil.users.get_user()
   is_me = user == logged_in_user
   up_to_degree = 3
