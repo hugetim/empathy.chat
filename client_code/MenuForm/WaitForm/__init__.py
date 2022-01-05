@@ -23,7 +23,6 @@ class WaitForm(WaitFormTemplate):
     self.top_form = get_open_form()
     if self.item['status'] != "pinging":
       print(f"Warning: {self.item['status']} != 'pinging'")
-    self.status_label.text = "Requesting to join empathy chat. Waiting for them to confirm they're ready..."
 
   def reset_status(self, state):
     """Reset WaitForm status, removing from parent if needed"""

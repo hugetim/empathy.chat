@@ -11,9 +11,9 @@ components:
     components:
     - type: Label
       properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-        visible: true, text: Request an empathy match whenever you're ready., font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+        visible: true, text: Requesting to join empathy chat. Waiting for them to confirm they're ready...,
+        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+        italic: false, background: '', bold: false, underline: false, icon: ''}
       name: status_label
       layout_properties: {grid_position: 'YOJCEM,HURPQL'}
       event_bindings: {}
