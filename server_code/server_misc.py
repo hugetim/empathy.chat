@@ -597,27 +597,27 @@ def check_phone_code(code, user_id=""):
     if code_matches:
       user['phone'] = latest_code_row['address']
       any_confirmed, any_failed = _check_for_confirmed_invites(user)
-    return code_matches
+    return code_matches, any_failed
   else:
-    return None
+    return None, any_failed
  
 
 def _check_for_confirmed_invites(user):
   any_confirmed = False
   any_failed = False
-  for invite in _inviteds(user):
-    invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite['link_key'])
+  for invite_row in _inviteds(user):
+    invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite_row['link_key'])
     if invite_reply:
       from . import connections as c
-      if c.try_connect(invite, invite_reply):
+      if c.try_connect(invite_row, invite_reply):
         any_confirmed = True
       else:
         any_failed = True
         from . import invites_server
-        add_invite_guess_fail_prompt(invites_server.from_invite_row(invite))
-        c.remove_invite_pair(invite, invite_reply, user)
+        add_invite_guess_fail_prompt(invites_server.Invite.from_invite_row(invite_row))
+        c.remove_invite_pair(invite_row, invite_reply, user)
     else:
-      print("Warning: invite_reply not found", dict(invite))
+      print("Warning: invite_reply not found", dict(invite_row))
   return any_confirmed, any_failed
 
     

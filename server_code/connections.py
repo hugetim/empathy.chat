@@ -264,7 +264,7 @@ def try_adding_to_invite_proposal(invite, user):
     proposal = m.Proposal(invite['proposal'])
     if proposal.current and user not in proposal.eligible_users:
       proposal.eligible_users += [user]
-      proposal.notify_add_specific()
+      # Don't try to notify new_user invitee here because missing time_zone, first_name, and notif_settings
 
       
 def try_removing_from_invite_proposal(invite, user):

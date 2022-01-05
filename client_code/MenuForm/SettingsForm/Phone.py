@@ -90,7 +90,7 @@ class Phone(PhoneTemplate):
       text = "Phone number verification successful."
       if any_failed:
         text += f" {p.MISTAKEN_INVITER_GUESS_ERROR}"
-      alert(text)
+      alert(text, dismissible=(not any_failed))
       self.update("confirmed")
       ui.reload()
       get_open_form().go_settings()
