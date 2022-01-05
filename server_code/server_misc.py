@@ -660,7 +660,7 @@ def ping(user, start, duration):
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     _email_send(
-      to_user=user, 
+      to_user=user,
       subject=subject,
       text=f'''Dear {_addressee_name(user)},
 
@@ -684,7 +684,7 @@ def notify_cancel(user, start, canceler_name=""):
     _send_sms(user['phone'], f"{subject}: {content}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     _email_send(
-      to_user=user, 
+      to_user=user,
       subject=subject,
       text=f'''Dear {_addressee_name(user)},
 
@@ -692,7 +692,28 @@ def notify_cancel(user, start, canceler_name=""):
 
 -empathy.chat
 ''')
-    
+  
+  
+def notify_proposal_cancel(user, proposal, title):
+  """Notify recipient of cancelled specific proposal"""
+  print(f"'notify_proposal_cancel', {user['email']}, {proposal.get_id()}, {title}")
+  from .proposals import ProposalTime
+  proposer_name = name(proposal.proposer, to_user=user)
+  subject = f"empathy.chat - {title} from {proposer_name}"
+  content1 = f"{_other_name(proposer_name)} has canceled their empathy chat request directed specifically to you."
+  if user['phone'] and user['notif_settings'].get('specific') == 'sms':
+    _send_sms(user['phone'], f"{subject}: {content1}")
+  elif user['notif_settings'].get('specific'):  # includes case of 'sms' and not user['phone']
+    _email_send(
+      to_user=user,
+      subject=subject,
+      text=f'''Dear {_addressee_name(user)},
+
+{content1}
+
+-empathy.chat
+''')
+
 
 def notify_proposal(user, proposal, title, desc):
   """Notify recipient of specific proposal"""
@@ -712,7 +733,7 @@ def notify_proposal(user, proposal, title, desc):
     _send_sms(user['phone'], f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('specific'):  # includes case of 'sms' and not user['phone']
     _email_send(
-      to_user=user, 
+      to_user=user,
       subject=subject,
       text=f'''Dear {_addressee_name(user)},
 

@@ -25,7 +25,7 @@ class MatchForm(MatchFormTemplate):
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    jitsi_code, duration, my_value = (
+    self.proptime_id, jitsi_code, duration, my_value = (
       anvil.server.call('init_match_form')
     )
     self.their_name = ""
@@ -94,7 +94,7 @@ class MatchForm(MatchFormTemplate):
             state = anvil.server.call('match_commit')
             self.update_status(state['status'])
           else:
-            state = anvil.server.call('cancel')
+            state = anvil.server.call('cancel', self.proptime_id)
             ui.reload()
       if prev != "matched" and self.status == "matched":
         self.slider_panel.item['status'] = None

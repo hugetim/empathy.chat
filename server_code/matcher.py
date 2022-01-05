@@ -236,17 +236,19 @@ def init_match_form(user_id=""):
   current_proptime = ProposalTime.get_now(user)
   if current_proptime:
     jitsi_code, duration = current_proptime.get_match_info()
-    return jitsi_code, duration, None
+    return current_proptime.get_id(), jitsi_code, duration, None
   else:
     this_match, i = current_match_i(user)
     if this_match:
       temp = this_match['present']
       temp[i] = 1
       this_match['present'] = temp
-      jitsi_code, duration = ProposalTime(this_match['proposal_time']).get_match_info()
+      proptime = ProposalTime(this_match['proposal_time'])
+      jitsi_code, duration = proptime.get_match_info()
       propagate_update_needed()
-      return jitsi_code, duration, this_match['slider_values'][i]
-  return None, None, None
+      return proptime.get_id(), jitsi_code, duration, this_match['slider_values'][i]
+    else:
+      return None, None, None, None
 
 
 @authenticated_callable
@@ -352,6 +354,22 @@ def cancel(proptime_id=None, user_id=""):
   """
   print("cancel", proptime_id, user_id)
   user = sm.get_user(user_id)
+  if proptime_id:
+    proptime = ProposalTime.get_by_id(proptime_id)
+    if proptime:
+      proptime.notify_cancel()
+  propagate_update_needed()
+  return _cancel(user, proptime_id)
+
+
+@authenticated_callable
+@anvil.tables.in_transaction
+def cancel_accept(proptime_id=None, user_id=""):
+  """Remove user accepting
+  Return _get_status
+  """
+  print("cancel", proptime_id, user_id)
+  user = sm.get_user(user_id)
   propagate_update_needed()
   return _cancel(user, proptime_id)
 
@@ -441,6 +459,7 @@ def match_complete(user_id=""):
   else:
     current_proptime = ProposalTime.get_now(user)
     if current_proptime:
+      current_proptime.notify_cancel()
       _cancel(user, current_proptime.get_id())
   propagate_update_needed()
   return _get_status(user)

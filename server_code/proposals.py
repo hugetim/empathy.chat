@@ -151,7 +151,14 @@ class ProposalTime():
 
   def is_expired(self):
     return sm.now() > self._proptime_row['expire_date']
-    
+
+  def notify_cancel(self):
+    if len(list(ProposalTime.times_from_proposal(self.proposal))) == 1:
+      self.proposal.notify_cancel()
+#     else:
+#       old_port_prop = self.proposal.
+#       self.proposal.notify_edit()
+  
   def cancel_time_only(self, missed_ping=None):
     if self.is_accepted():
       self.proposal.unhide_times()
@@ -398,8 +405,9 @@ class Proposal():
   def notify_add_specific(self):
     users_notified = set()
     if self.eligible == 0 and len(self.eligible_users) == 1:
-      sm.notify_proposal(self.eligible_users[0], self, f"specific empathy request", " has directed an empathy chat request specifically to you:")
-      users_notified.add(self.eligible_users[0])
+      specific_user = self.eligible_users[0]
+      sm.notify_proposal(specific_user, self, f"specific empathy request", " has directed an empathy chat request specifically to you:")
+      users_notified.add(specific_user)
     return users_notified
 
   def notify_edit(self, port_prop, old_port_prop):
@@ -409,8 +417,15 @@ class Proposal():
       old_specific_still_eligible = old_specific_port_user.user_id in [port_user.user_id for port_user in port_prop.eligible_users] 
       if old_specific_still_eligible and port_prop.times_notify_info != old_port_prop.times_notify_info:
         sm.notify_proposal(old_specific_port_user.s_user, self, "specific empathy request", " has changed their empathy chat request to:")
-    elif self.eligible == 0 and len(self.eligible_users) == 1:
-      sm.notify_proposal(self.eligible_users[0], self, "specific empathy request", " has directed an empathy chat request specifically to you:")
+      elif not old_specific_still_eligible:
+        sm.notify_proposal_cancel(old_specific_port_user.s_user, self, "specific empathy request")
+    else:
+      self.notify_add_specific()
+
+  def notify_cancel(self):
+    if self.eligible == 0 and len(self.eligible_users) == 1:
+      specific_user = self.eligible_users[0]
+      sm.notify_proposal_cancel(specific_user, self, "specific empathy request")
       
   @staticmethod
   def add(user, port_prop):
