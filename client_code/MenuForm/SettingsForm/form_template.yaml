@@ -45,7 +45,7 @@ components:
         border: ''
         enabled: true
         foreground: ''
-        items: [SMS (default), email]
+        items: [(set at runtime)]
         visible: true
         font_size: null
         font: ''
@@ -80,7 +80,7 @@ components:
         border: ''
         enabled: true
         foreground: ''
-        items: [SMS, email (default), don't notify]
+        items: [(set at runtime)]
         visible: true
         font_size: null
         font: ''
@@ -116,7 +116,7 @@ components:
         border: ''
         enabled: true
         foreground: ''
-        items: [SMS, email (default), don't notify]
+        items: [(set at runtime)]
         visible: true
         font_size: null
         font: ''
