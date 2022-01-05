@@ -4,7 +4,11 @@ import anvil
 
 
 def error_handler(err):
-  anvil.server.call('report_error', repr(err), repr(anvil.app))
+  app_info_dict = {'id': anvil.app.id,
+                   'branch': anvil.app.branch,
+                   'environment.name': anvil.app.environment.name,
+                  }
+  anvil.server.call('report_error', repr(err), app_info_dict)
   raise(err)
 
 

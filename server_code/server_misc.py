@@ -57,14 +57,16 @@ def get_user(user_id="", require_auth=True):
 
   
 @anvil.server.callable
-def report_error(err_repr, app_repr):
+def report_error(err_repr, app_info_dict):
   admin = app_tables.users.get(email="hugetim@gmail.com")
   current_user = anvil.users.get_user()
+
   if admin != current_user:
+    current_user_email = current_user['email'] if current_user else ""
     content = (
       f"""{err_repr}
-      user: {current_user['email']}
-      app: {app_repr}
+      user: {current_user_email}
+      app: {app_info_dict}
       context: {repr(anvil.server.context)}
       app_origin: {anvil.server.get_app_origin()}
       """
