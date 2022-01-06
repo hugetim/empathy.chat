@@ -61,7 +61,6 @@ def get_user(user_id="", require_auth=True):
 def report_error(err_repr, app_info_dict):
   admin = app_tables.users.get(email="hugetim@gmail.com")
   current_user = anvil.users.get_user()
-
   if admin != current_user:
     current_user_email = current_user['email'] if current_user else ""
     content = (
@@ -76,6 +75,24 @@ def report_error(err_repr, app_info_dict):
     _email_send(admin, subject="empathy.chat error", text=content, from_name="empathy.chat error handling")
 
 
+@anvil.server.callable
+def warning(warning_str, app_info_dict=None):
+  admin = app_tables.users.get(email="hugetim@gmail.com")
+  current_user = anvil.users.get_user()
+  if admin != current_user:
+    current_user_email = current_user['email'] if current_user else ""
+    content = (
+      f"""{warning_str}
+      user: {current_user_email}
+      app: {app_info_dict}
+      context: {repr(anvil.server.context)}
+      app_origin: {anvil.server.get_app_origin()}
+      """
+    )
+    print(f"Reporting warning: {warning_str}")
+    _email_send(admin, subject="empathy.chat warning", text=content, from_name="empathy.chat error handling")
+    
+    
 @anvil.server.callable
 @anvil.tables.in_transaction
 def do_signup(email):
@@ -356,7 +373,7 @@ def _update_history_form(user2, user1):
   
 @authenticated_callable
 def add_message(user2_id, user_id="", message="[blank test message]"):
-  print("add_message", "[redacted]", user_id)
+  print(f"add_message, '[redacted]', {user_id}")
   user = get_user(user_id)
   user2 = app_tables.users.get_by_id(user2_id)
   app_tables.messages.add_row(from_user=user,
@@ -408,7 +425,7 @@ def _invite_guess_fail_prompt(s_invite):
 @authenticated_callable
 def add_chat_message(user_id="", message="[blank test message]"):
   from . import matcher
-  print("add_chat_message", "[redacted]", user_id)
+  print(f"add_chat_message, '[redacted]', {user_id}")
   user = get_user(user_id)
   this_match = matcher.current_match(user)
   app_tables.chat.add_row(match=this_match,
@@ -452,7 +469,7 @@ def _update_match_form(user):
 def submit_slider(value, user_id=""):
   """Return their_value"""
   from . import matcher
-  print("submit_slider", "[redacted]", user_id)
+  print(f"submit_slider, '[redacted]', {user_id}")
   user = get_user(user_id)
   this_match, i = matcher.current_match_i(user)
   temp_values = this_match['slider_values']
@@ -465,7 +482,7 @@ def _their_value(values, my_i):
   temp_values = [value for value in values]
   temp_values.pop(my_i)
   if len(temp_values) != 1:
-   print("Warning: len(temp_values) != 1, but this function assumes dyads only")
+    sm.warning(f"len(temp_values) != 1, but this function assumes dyads only")
   return temp_values[0]                     # return the remaining value
 
 
@@ -505,7 +522,7 @@ def get_settings(user_id=""):
 @authenticated_callable
 @anvil.tables.in_transaction
 def set_notif_settings(notif_settings, user_id=""):
-  print("set_notif_settings", notif_settings)
+  print(f"set_notif_settings, {notif_settings}")
   user = get_user(user_id)
   user['notif_settings'] = notif_settings
 
@@ -549,7 +566,7 @@ def _send_sms(to_number, text):
       from_='+12312905138',
       to=to_number,
     )
-    print("send_sms sid", message.sid)
+    print(f"send_sms sid, {message.sid}")
     return None
   except Exception as exc:
     print(f"Handled: {repr(exc)}")
@@ -618,7 +635,7 @@ def _check_for_confirmed_invites(user):
         add_invite_guess_fail_prompt(invites_server.Invite.from_invite_row(invite_row))
         c.remove_invite_pair(invite_row, invite_reply, user)
     else:
-      print("Warning: invite_reply not found", dict(invite_row))
+      sm.warning(f"invite_reply not found, {dict(invite_row)}")
   return any_confirmed, any_failed
 
     
@@ -659,7 +676,7 @@ def _email_send(to_user, subject, text, from_name="empathy.chat"):
 
 def ping(user, start, duration):
   """Notify pinged user"""
-  print("'ping'", start, duration)
+  print(f"'ping', {start}, {duration}")
   subject = "empathy.chat - match confirmed"
   content1 = f"Your proposal for a {duration} minute empathy match, starting {_notify_when(start, user)}, has been accepted."
   content2 = f"Go to {p.URL}for the empathy chat."
@@ -684,7 +701,7 @@ Thanks!
   
 def notify_cancel(user, start, canceler_name=""):
   """Notify canceled-on user"""
-  print("'notify_cancel'", start, canceler_name)
+  print(f"'notify_cancel', {start}, {canceler_name}")
   subject = "empathy.chat - upcoming match canceled"
   content = f"{_other_name(canceler_name)} has canceled your empathy chat, previously scheduled to start {_notify_when(start, user)}."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
@@ -754,7 +771,7 @@ def notify_proposal(user, proposal, title, desc):
     
 def _notify_message(user, from_name=""):
   """Notify messaged user"""
-  print("'_notify_message'", user.get_id(), from_name)
+  print(f"'_notify_message', {user.get_id()}, {from_name}")
   subject = f"empathy.chat - {_other_name(from_name)} sent you a message"
   content = f"{_other_name(from_name)} has sent you a message on {p.URL}"
   if user['phone'] and user['notif_settings'].get('message') == 'sms':

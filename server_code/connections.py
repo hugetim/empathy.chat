@@ -29,7 +29,7 @@ def is_visible(user2, user1=None): # Currently unused
 @authenticated_callable
 def get_create_user_items(user_id=""):
   """Return list with 1st---2nd""" # add pending connections to front
-  print("get_create_user_items", user_id)
+  print(f"get_create_user_items, {user_id}")
   user = sm.get_user(user_id)
   dset = _get_connections(user, 2)
   items = {}
@@ -47,11 +47,11 @@ def get_create_user_items(user_id=""):
 def _get_connections(user, up_to_degree=3, include_zero=False):
   """Return dictionary from degree to set of connections"""
   if not ((up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)):
-    print(f"Warning: _get_connections(user, {up_to_degree}, {include_zero}) not expected")
+    sm.warning(f"_get_connections(user, {up_to_degree}, {include_zero}) not expected")
   degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user, current=True)])
   out = {0: {user}, 1: degree1s}
   if user in out[1]:
-    print("Warning: user in out[1]")
+    sm.warning(f"user in out[1]")
   prev = set()
   for d in range(up_to_degree):
     prev.update(out[d])
@@ -87,7 +87,7 @@ def distance(user2, user1, up_to_distance=3):
 
 @authenticated_callable
 def get_connections(user_id):
-  print("get_connections", user_id)
+  print(f"get_connections, {user_id}")
   user = sm.get_user(user_id, require_auth=False)
   logged_in_user = anvil.users.get_user()
   is_me = user == logged_in_user
@@ -283,7 +283,7 @@ def try_connect(invite, invite_reply):
     try_adding_to_invite_proposal(invite, invite['user2'])
     already = app_tables.connections.search(user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']), current=True)
     if len(already) > 0:
-      print("Warning: connection already exists", dict(invite))
+      sm.warning(f"connection already exists, {dict(invite)}")
       return True
     app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
     for i_row in [invite, invite_reply]:
@@ -292,7 +292,7 @@ def try_connect(invite, invite_reply):
       i_row['current'] = False
     return True
   else:
-    print("Warning: invite['guess'] doesn't match", dict(invite), invite['user2']['phone'])
+    print(f"invite['guess'] doesn't match, {dict(invite)}, {invite['user2']['phone']}")
     return False
  
 

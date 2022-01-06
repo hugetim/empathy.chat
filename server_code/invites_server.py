@@ -216,7 +216,7 @@ class Invite(invites.Invite):
       errors += self.cancel(invite_row)
     else:
       if invite_row['user2'] and invite_row['user2'] != self.invitee:
-        print("Warning: invite['user2'] being overwritten")
+        sm.warning(f"invite['user2'] being overwritten, {user['email']}, {dict(invite_row)}, {self.invite_id}")
       invite_row['user2'] = self.invitee
       c.try_adding_to_invite_proposal(invite_row, self.invitee)
     return errors
@@ -251,7 +251,7 @@ class Invite(invites.Invite):
       from . import connections as c
       self.connection_successful = c.try_connect(invite_row, response_row)
       if not self.connection_successful:
-        print("Warning: unexpected failed connect")
+        sm.warning(f"unexpected failed connect, {self.invitee['email']}, {self.invite_id}")
     return errors
 
   def load(self):

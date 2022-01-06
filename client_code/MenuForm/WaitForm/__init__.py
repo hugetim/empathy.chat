@@ -2,6 +2,7 @@ from ._anvil_designer import WaitFormTemplate
 from anvil import *
 import anvil.users
 import anvil.server
+from ... import helper as h
 
 
 class WaitForm(WaitFormTemplate):
@@ -17,7 +18,7 @@ class WaitForm(WaitFormTemplate):
     """This method is called when the HTML panel is shown on the screen"""
     self.top_form = get_open_form()
     if self.item['status'] != "pinging":
-      print(f"Warning: {self.item['status']} != 'pinging'")
+      h.warning(f"{self.item['status']} != 'pinging'")
 
   def reset_status(self, state):
     """Reset WaitForm status, removing from parent if needed"""

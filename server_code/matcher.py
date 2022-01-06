@@ -203,7 +203,7 @@ def _get_upcomings(user):
  
 def _cancel_match(user, match_id):
   if sm.DEBUG:
-    print("_cancel_match", match_id)
+    print(f"_cancel_match, {match_id}")
   match = app_tables.matches.get_by_id(match_id)
   if match:
     for u in match['users']:
@@ -219,7 +219,7 @@ def cancel_match(match_id, user_id=""):
   """Cancel pending match
   Return _get_status
   """
-  print("cancel", match_id, user_id)
+  print(f"cancel_match, {match_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
   return _cancel_match(user, match_id)  
@@ -231,7 +231,7 @@ def init_match_form(user_id=""):
   """Return jitsi_code, duration (or Nones), my_slider_value
   
   Side effect: set this_match['present']"""
-  print("init_match_form", user_id)
+  print(f"init_match_form, {user_id}")
   user = sm.get_user(user_id)
   current_proptime = ProposalTime.get_now(user)
   if current_proptime:
@@ -258,7 +258,7 @@ def accept_proposal(proptime_id, user_id=""):
   
   Side effect: update proptime table with acceptance, if available
   """
-  print("accept_proposal", proptime_id, user_id)
+  print(f"accept_proposal, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   state = _get_status(user)
   ProposalTime.get_by_id(proptime_id).attempt_accept(user, state)
@@ -273,7 +273,7 @@ def add_proposal(proposal, link_key="", user_id=""):
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate
   """
-  print("add_proposal", user_id)
+  print(f"add_proposal, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
   return _add_proposal(user, proposal, link_key)
@@ -313,7 +313,7 @@ def edit_proposal(proposal, user_id=""):
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate
   """
-  print("edit_proposal", user_id)
+  print(f"edit_proposal, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
   return _edit_proposal(user, proposal)
@@ -340,7 +340,7 @@ def cancel_time(proptime_id, user_id=""):
   """Remove proptime
   Return _get_status
   """
-  print("cancel_time", proptime_id, user_id)
+  print(f"cancel_time, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
   proptime = ProposalTime.get_by_id(proptime_id)
@@ -357,7 +357,7 @@ def cancel_time(proptime_id, user_id=""):
 
 def _cancel(user, proptime_id=None):
   if sm.DEBUG:
-    print("_cancel", proptime_id)
+    print(f"_cancel, {proptime_id}")
   if proptime_id:
     proptime = ProposalTime.get_by_id(proptime_id)
   else:
@@ -373,7 +373,7 @@ def cancel_accept(proptime_id=None, user_id=""):
   """Remove user accepting
   Return _get_status
   """
-  print("cancel_accept", proptime_id, user_id)
+  print(f"cancel_accept, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
   return _cancel(user, proptime_id)
@@ -385,7 +385,7 @@ def cancel_now(proptime_id=None, user_id=""):
   """Remove proptime and cancel pending match (if applicable)
   Return _get_status
   """
-  print("cancel_now", proptime_id, user_id)
+  print(f"cancel_now, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   if proptime_id:
     proptime = ProposalTime.get_by_id(proptime_id)
@@ -414,7 +414,7 @@ def cancel_other(proptime_id=None, user_id=""):
   Upon failure of other to confirm match
   cancel match (if applicable)--and cancel their request
   """
-  print("cancel_other", proptime_id, user_id)
+  print(f"cancel_other, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
   return _cancel_other(user, proptime_id)
@@ -427,7 +427,7 @@ def match_commit(proptime_id=None, user_id=""):
   Upon first commence of "now", copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
-  print("match_commit", proptime_id, user_id)
+  print(f"match_commit, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
   return _match_commit(user, proptime_id)
@@ -469,7 +469,7 @@ def _match_commit(user, proptime_id=None):
 @anvil.tables.in_transaction
 def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user, return status."""
-  print("match_complete", user_id)
+  print(f"match_complete, {user_id}")
   user = sm.get_user(user_id)
   # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   this_match, i = current_match_i(user)

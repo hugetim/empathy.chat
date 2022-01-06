@@ -6,6 +6,7 @@ from .Profile import Profile
 from ..NetworkMenu.Connections import Connections
 from .History import History
 from ... import parameters as p
+from ... import helper as h
 
 class UserMenu(UserMenuTemplate):
   item_keys = {'user_id', 'tab'}
@@ -45,7 +46,7 @@ class UserMenu(UserMenuTemplate):
     
   def go_connections(self):
     if self.item['user_id'] == anvil.users.get_user().get_id():
-      print("Warning: UserMenu.go_connections called on current user")
+      h.warning(f"UserMenu.go_connections called on current user")
     self.content = Connections(item={'user_id': self.item['user_id']})
     self.load_component(self.content)
     self.connections_tab_button.background = p.SELECTED_TAB_COLOR

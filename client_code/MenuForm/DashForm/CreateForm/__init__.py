@@ -95,7 +95,7 @@ class CreateForm(CreateFormTemplate):
         self.column_panel_cancel.visible = False
       else:
         # this keeps the "Cancel" column heading for the alternatives
-        print("Warning: alts should no longer be allowed for start_now")
+        h.warning(f"alts should no longer be allowed for start_now")
         self.column_panel_cancel.visible = True
         self.drop_down_cancel.visible = False
         self.date_picker_cancel.visible = False      

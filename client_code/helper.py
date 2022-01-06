@@ -122,6 +122,14 @@ def round_up_datetime(dt, minutes_res=15):
   new_dt = dt + datetime.timedelta(minutes = new_minute - dt.minute)
   return new_dt.replace(second=0, microsecond=0)
     
+  
+def warning(warning_str):
+  app_info_dict = {'id': anvil.app.id,
+                   'branch': anvil.app.branch,
+                   'environment.name': anvil.app.environment.name,
+                  }
+  anvil.server.call('warning', warning_str, app_info_dict)
+
 
 class PausedTimer:
   def __init__(self, timer):

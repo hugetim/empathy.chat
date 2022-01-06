@@ -5,6 +5,7 @@ from functools import partial
 from . import invited
 from . import invites
 from . import portable as port
+from . import helper as h
 
 
 def invite_dialog(invitee=None):
@@ -97,6 +98,6 @@ def get(spec_dict):
             "click_fn": go_to_message,
            }
   else:
-    print("Warning: No prompt matches that spec_dict")
+    h.warning(f"No prompt matches that spec_dict")
     return None
 

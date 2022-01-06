@@ -53,7 +53,7 @@ class MenuForm(MenuFormTemplate):
       self.go_match(state)
     else:
       if state['status'] not in [None]:
-        print(f'Warning: {state["status"]} not in [None]')
+        h.warning(f'{state["status"]} not in [None]')
       self.go_dash(state) 
 
   def clear_page(self):

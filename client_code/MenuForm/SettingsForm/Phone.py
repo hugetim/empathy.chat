@@ -38,7 +38,7 @@ class Phone(PhoneTemplate):
         self.phone_text_box.enabled = False
         self.phone_button.visible = False
       else:
-        print("Warning: unknown Phone status")
+        h.warning(f"unknown Phone status")
   
   def phone_text_box_change(self, **event_args):
     self.phone_button.enabled = bool(self.phone_text_box.text)
@@ -65,7 +65,7 @@ class Phone(PhoneTemplate):
       else:
         self.phone_error_label.text = out
         self.phone_error_label.visible = True
-        print("Warning: unhandled 'send_verification_sms' return value")
+        h.warning(f"unhandled 'send_verification_sms' return value")
     else:
       if len(subscriber) > 10:
         message = "The number entered has too many digits."
@@ -76,7 +76,7 @@ class Phone(PhoneTemplate):
 
   def _format_subscriber(self, number):
     if len(number) != 10:
-      print("Warning: not 10 subscriber number digits")
+      h.warning(f"not 10 subscriber number digits")
     return f"({number[:3]}){number[3:6]}-{number[6:10]}"
     
   def phone_code_text_box_change(self, **event_args):
