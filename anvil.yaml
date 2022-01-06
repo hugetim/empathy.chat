@@ -49,6 +49,44 @@ metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:favic
 startup_form: MenuForm
 native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
 db_schema:
+  group_members:
+    title: Group Members
+    client: none
+    server: full
+    columns:
+    - name: user
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: group
+      admin_ui: {width: 200}
+      type: link_single
+      target: groups
+    - name: invite
+      admin_ui: {width: 200}
+      type: link_single
+      target: group_invites
+  group_invites:
+    title: Group Invites
+    client: none
+    server: full
+    columns:
+    - name: url
+      admin_ui: {width: 200}
+      type: string
+    - name: group
+      admin_ui: {width: 200}
+      type: link_single
+      target: groups
+    - name: created
+      admin_ui: {width: 200}
+      type: datetime
+    - name: expire_date
+      admin_ui: {width: 200}
+      type: datetime
+    - name: spec
+      admin_ui: {width: 200}
+      type: simpleObject
   codes:
     title: Codes
     client: none
@@ -370,7 +408,17 @@ db_schema:
     title: Groups
     client: none
     server: full
-    columns: []
+    columns:
+    - name: name
+      admin_ui: {width: 200}
+      type: string
+    - name: hosts
+      admin_ui: {width: 200}
+      type: link_multiple
+      target: users
+    - name: created
+      admin_ui: {width: 200}
+      type: datetime
   connections:
     title: Connections
     client: none
