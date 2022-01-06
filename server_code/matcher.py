@@ -333,6 +333,27 @@ def _edit_proposal(user, port_prop):
   prop.notify_edit(port_prop, old_port_prop)
   return _get_status(user), prop.get_id()
 
+  
+@authenticated_callable
+@anvil.tables.in_transaction
+def cancel_time(proptime_id, user_id=""):
+  """Remove proptime
+  Return _get_status
+  """
+  print("cancel_time", proptime_id, user_id)
+  user = sm.get_user(user_id)
+  propagate_update_needed()
+  proptime = ProposalTime.get_by_id(proptime_id)
+  port_prop = proptime.proposal.portable(user)
+  if len(port_prop.times) > 1:
+    [port_time_to_cancel] = [port_time for port_time in port_prop.times if port_time.time_id == proptime_id]
+    port_prop.times.remove(port_time_to_cancel)
+    state, prop_id = _edit_proposal(user, port_prop) # can ignore prop_id because not port_prop.start_now
+    return state
+  else:
+    proptime.notify_cancel()
+    return _cancel(user, proptime_id)
+
 
 def _cancel(user, proptime_id=None):
   if sm.DEBUG:
@@ -345,22 +366,6 @@ def _cancel(user, proptime_id=None):
     proptime.cancel_this(user)
   return _get_status(user)
 
-  
-@authenticated_callable
-@anvil.tables.in_transaction
-def cancel(proptime_id=None, user_id=""):
-  """Remove proptime and cancel pending match (if applicable)
-  Return _get_status
-  """
-  print("cancel", proptime_id, user_id)
-  user = sm.get_user(user_id)
-  if proptime_id:
-    proptime = ProposalTime.get_by_id(proptime_id)
-    if proptime:
-      proptime.notify_cancel()
-  propagate_update_needed()
-  return _cancel(user, proptime_id)
-
 
 @authenticated_callable
 @anvil.tables.in_transaction
@@ -368,8 +373,24 @@ def cancel_accept(proptime_id=None, user_id=""):
   """Remove user accepting
   Return _get_status
   """
-  print("cancel", proptime_id, user_id)
+  print("cancel_accept", proptime_id, user_id)
   user = sm.get_user(user_id)
+  propagate_update_needed()
+  return _cancel(user, proptime_id)
+
+
+@authenticated_callable
+@anvil.tables.in_transaction
+def cancel_now(proptime_id=None, user_id=""):
+  """Remove proptime and cancel pending match (if applicable)
+  Return _get_status
+  """
+  print("cancel_now", proptime_id, user_id)
+  user = sm.get_user(user_id)
+  if proptime_id:
+    proptime = ProposalTime.get_by_id(proptime_id)
+    if proptime:
+      proptime.notify_cancel()
   propagate_update_needed()
   return _cancel(user, proptime_id)
 

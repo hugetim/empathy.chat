@@ -94,7 +94,7 @@ class MatchForm(MatchFormTemplate):
             state = anvil.server.call('match_commit')
             self.update_status(state['status'])
           else:
-            state = anvil.server.call('cancel', self.proptime_id)
+            state = anvil.server.call('cancel_now', self.proptime_id)
             ui.reload()
       if prev != "matched" and self.status == "matched":
         self.slider_panel.item['status'] = None
@@ -152,9 +152,12 @@ class MatchForm(MatchFormTemplate):
       
   def complete_button_click(self, **event_args):
     self.timer_2.interval = 0
-    self.jitsi_embed.visible = False
-    window.japi.executeCommand('hangup')
-    state = anvil.server.call('match_complete')
+    if self.status == "matched":
+      self.jitsi_embed.visible = False
+      window.japi.executeCommand('hangup')
+      state = anvil.server.call('match_complete')
+    else:
+      state = anvil.server.call('cancel_now', self.proptime_id)
     ui.reload()
     #self.top_form.reset_status(state)   
 

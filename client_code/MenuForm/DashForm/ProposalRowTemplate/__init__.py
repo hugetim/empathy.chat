@@ -75,7 +75,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.update_dash(anvil.server.call('cancel', 
+    self.update_dash(anvil.server.call('cancel_time', 
                                        self.item['prop_time'].time_id))
 
   def timer_1_tick(self, **event_args):
