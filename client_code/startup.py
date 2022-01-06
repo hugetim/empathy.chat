@@ -1,4 +1,3 @@
-import anvil.users
 import anvil.server
 import anvil
 

@@ -135,7 +135,7 @@ class InviteTest(unittest.TestCase):
     c.disconnect(self.poptibo.get_id())
 
   def tearDown(self):
-    test_invites = app_tables.invites.search(user1=q.any_of(self.user, self.poptibo), date=q.greater_than(self.start_time))
+    test_invites = app_tables.invites.search(user1=q.any_of(self.user, self.poptibo), date=q.greater_than(self.start_time), current=True)
     for test_invite in test_invites:
       test_invite.delete()
 

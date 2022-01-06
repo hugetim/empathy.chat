@@ -138,6 +138,9 @@ db_schema:
       admin_ui: {width: 200}
       type: link_single
       target: proposals
+    - name: current
+      admin_ui: {width: 200}
+      type: bool
   prompts:
     title: Prompts
     client: none
@@ -394,6 +397,9 @@ db_schema:
       admin_ui: {width: 200}
       type: number
     - name: starred
+      admin_ui: {width: 200}
+      type: bool
+    - name: current
       admin_ui: {width: 200}
       type: bool
 secrets:

@@ -35,7 +35,7 @@ class InviteA(InviteATemplate):
           self.error("\n".join(errors))
         elif self.item.invitee: #existing user
           message = f"You will be connected once {self.item.invitee.name} confirms."
-          self.parent.raise_event("x-close-alert", value=success)
+          self.parent.raise_event("x-close-alert", value="success")
           alert(message)
         else:
           parent = self.parent

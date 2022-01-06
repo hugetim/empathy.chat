@@ -72,7 +72,7 @@ class Invite(invites.Invite):
       if not self.invitee['phone']:
         errors.append(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
       elif not Invite.phone_match(self.inviter_guess, self.invitee):
-        errors.append(f"Sorry, the digits you entered did not match {sm.name(self.invitee)}'s confirmed phone number.")
+        errors.append(f"The digits you entered do not match {sm.name(self.invitee)}'s confirmed phone number.")
     else:
       user['last_invite'] = sm.now()
     if not errors:
@@ -86,6 +86,7 @@ class Invite(invites.Invite):
                                              user1=self.inviter,
                                              user2=self.invitee,
                                              link_key=self.link_key,
+                                             current=True,
                                             )
         self.invite_id = new_row.get_id()
         self._edit_row(new_row, self.inviter_guess, self.rel_to_inviter, now)
@@ -119,7 +120,7 @@ class Invite(invites.Invite):
       if self.invitee:
         from . import connections as c
         c.try_removing_from_invite_proposal(invite_row, self.invitee)
-      invite_row.delete()
+      invite_row['current'] = False
     else:
       errors.append(f"Invites row not found with id {self.invite_id}")
     self.cancel_response() # Not finding a response_row is not an error here
@@ -133,7 +134,7 @@ class Invite(invites.Invite):
       c.try_removing_from_invite_proposal(invite_row, self.invitee)
     response_row, errors = self._response_row()
     if response_row:
-      response_row.delete()
+      response_row['current'] = False
     else:
       errors.append(f"Response row not found")
     self._clear()
@@ -159,11 +160,11 @@ class Invite(invites.Invite):
     if row_id:
       row = app_tables.invites.get_by_id(row_id)
     elif self.link_key:
-      row = app_tables.invites.get(origin=origin, link_key=self.link_key)
+      row = app_tables.invites.get(origin=origin, link_key=self.link_key, current=True)
     elif self.inviter and self.invitee:
       user1 = self.inviter if origin else self.invitee
       user2 = self.invitee if origin else self.inviter
-      row = app_tables.invites.get(origin=origin, user1=user1, user2=user2)
+      row = app_tables.invites.get(origin=origin, user1=user1, user2=user2, current=True)
     else:
       errors.append(f"Not enough information to retrieve {'invite' if origin else 'response'} row.")
     return row, errors
@@ -178,7 +179,7 @@ class Invite(invites.Invite):
       errors += self._load_invite(invite_row)
       if user:
         errors += self._try_adding_invitee(user, invite_row)
-      response_row = app_tables.invites.get(origin=False, link_key=self.link_key)
+      response_row = app_tables.invites.get(origin=False, link_key=self.link_key, current=True)
       if response_row:
         if self.invitee:
           response_row['user1'] = self.invitee
@@ -243,6 +244,7 @@ class Invite(invites.Invite):
                                                 user1=self.invitee,
                                                 user2=self.inviter,
                                                 link_key=self.link_key,
+                                                current=True,
                                                )
     self._edit_row(response_row, self.invitee_guess, self.rel_to_invitee, now)
     if self.invitee and self.invitee['phone']:

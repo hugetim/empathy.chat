@@ -48,14 +48,14 @@ def _get_connections(user, up_to_degree=3, include_zero=False):
   """Return dictionary from degree to set of connections"""
   if not ((up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)):
     print(f"Warning: _get_connections(user, {up_to_degree}, {include_zero}) not expected")
-  degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user)])
+  degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user, current=True)])
   out = {0: {user}, 1: degree1s}
   if user in out[1]:
     print("Warning: user in out[1]")
   prev = set()
   for d in range(up_to_degree):
     prev.update(out[d])
-    current = {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]))}
+    current = {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]), current=True)}
     out[d+1] = current - prev
   if not include_zero:
     del out[0]
@@ -125,11 +125,11 @@ def connection_record(user2, user1, _distance=None, degree=None):
 
 
 def _invite_status(user2, user1):
-  invites = app_tables.invites.search(user1=user1, user2=user2, origin=True)
+  invites = app_tables.invites.search(user1=user1, user2=user2, origin=True, current=True)
   if len(invites) > 0:
     return "invite"
   else:
-    inviteds = app_tables.invites.search(user1=user2, user2=user1, origin=True)
+    inviteds = app_tables.invites.search(user1=user2, user2=user1, origin=True, current=True)
     if len(inviteds) > 0:
       return "invited"
     else:
@@ -151,8 +151,8 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
     if not degree: 
       return []
     elif degree == 1:
-      conn = app_tables.connections.get(user1=user1, user2=user2)
-      their_conn = app_tables.connections.get(user1=user2, user2=user1)
+      conn = app_tables.connections.get(user1=user1, user2=user2, current=True)
+      their_conn = app_tables.connections.get(user1=user2, user2=user1, current=True)
       return [{"via": False, 
                "whose": "my", 
                "desc": conn['relationship2to1'], 
@@ -172,8 +172,8 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
       firsts = dset[1] & dset_second[1]
       for first in firsts:
         name = sm.name(first, distance=1)
-        conn2 = app_tables.connections.get(user1=first, user2=second)
-        conn1 = app_tables.connections.get(user1=user1, user2=first)
+        conn2 = app_tables.connections.get(user1=first, user2=second, current=True)
+        conn1 = app_tables.connections.get(user1=user1, user2=first, current=True)
         out.append({"via": degree > 2,
                     "whose": f"{name}'s", 
                     "desc": conn2['relationship2to1'],
@@ -193,7 +193,7 @@ def load_invites(user_id=""):
 #   from . import matcher as m
   from . import invites_server
   user = sm.get_user(user_id)
-  rows = app_tables.invites.search(origin=True, user1=user)
+  rows = app_tables.invites.search(origin=True, user1=user, current=True)
   out = []
   for row in rows:
 #     item = {k: row[k] for k in ['date', 'relationship2to1', 'date_described', 'guess', 'link_key', 'distance']}
@@ -215,9 +215,9 @@ def save_invites(items, user_id=""):
   for port_invite in items:
     invites_server.Invite(item).edit_invite()
 #   link_keys = [item['link_key'] for item in items]
-#   unmatched_rows = app_tables.invites.search(origin=True, user1=user, link_key=q.none_of(*link_keys))
+#   unmatched_rows = app_tables.invites.search(origin=True, user1=user, link_key=q.none_of(*link_keys), current=True)
 #   for row in unmatched_rows:
-#     row.delete()
+#     row['current'] = False
 #   for item in items:
 #     if item.get('proposal'):
 #       proposal = m.Proposal.get_by_id(item['proposal'].prop_id)
@@ -228,19 +228,19 @@ def save_invites(items, user_id=""):
 #       item['proposal'] = proposal._row
 #     if item.get('user2'):
 #       item['user2'] = app_tables.users.get_by_id(item.get('user2').user_id)
-#     row = app_tables.invites.get(origin=True, user1=user, link_key=item['link_key'])
+#     row = app_tables.invites.get(origin=True, user1=user, link_key=item['link_key'], current=True)
 #     if row:
 #       row.update(**item)
 #     else:
 #       new_item = {'origin': True, 'user1': user}
 #       new_item.update(item)
-#       app_tables.invites.add_row(**new_item)
+#       app_tables.invites.add_row(**new_item, current=True)
 
 
 def remove_invite_pair(invite, invite_reply, user):
   try_removing_from_invite_proposal(invite, user)
-  invite.delete()
-  invite_reply.delete()
+  invite['current'] = False
+  invite_reply['current'] = False
 
   
 def _invited_item_to_row_dict(invited_item, user, distance=1):
@@ -281,15 +281,15 @@ def try_connect(invite, invite_reply):
   from .invites_server import Invite
   if Invite.phone_match(invite['guess'], invite['user2']):
     try_adding_to_invite_proposal(invite, invite['user2'])
-    already = app_tables.connections.search(user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']))
+    already = app_tables.connections.search(user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']), current=True)
     if len(already) > 0:
       print("Warning: connection already exists", dict(invite))
       return True
     app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
     for i_row in [invite, invite_reply]:
-      item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance"}}
+      item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance", "current"}}
       app_tables.connections.add_row(starred=False, **item)
-      i_row.delete()
+      i_row['current'] = False
     return True
   else:
     print("Warning: invite['guess'] doesn't match", dict(invite), invite['user2']['phone'])
@@ -310,7 +310,7 @@ def _connected_prompt(invite, invite_reply):
 def save_relationship(item, user_id=""):
   user1 = sm.get_user(user_id)
   user2 = app_tables.users.get_by_id(item['user2_id'])
-  row = app_tables.connections.get(user1=user1, user2=user2)
+  row = app_tables.connections.get(user1=user1, user2=user2, current=True)
   row['relationship2to1'] = item['relationship']
   row['date_described'] = sm.now()
   return row['date_described']
@@ -324,11 +324,11 @@ def disconnect(user2_id, user1_id=""):
   matcher.propagate_update_needed()
   user2 = app_tables.users.get_by_id(user2_id)
   if user2:
-    r1to2 = app_tables.connections.get(user1=user1, user2=user2)
-    r2to1 = app_tables.connections.get(user1=user2, user2=user1)
+    r1to2 = app_tables.connections.get(user1=user1, user2=user2, current=True)
+    r2to1 = app_tables.connections.get(user1=user2, user2=user1, current=True)
     if r1to2 and r2to1: 
-      r1to2.delete()
-      r2to1.delete()
+      r1to2['current'] = False
+      r2to1['current'] = False
       _remove_connection_prompts(user1, user2)
       return True
   return False

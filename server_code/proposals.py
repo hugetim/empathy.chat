@@ -376,7 +376,7 @@ class Proposal():
     self.cancel_prop_only()    
 
   def add_to_invite(self, link_key):
-    invite_row = app_tables.invites.get(link_key=link_key, user1=self.proposer, origin=True)
+    invite_row = app_tables.invites.get(link_key=link_key, user1=self.proposer, origin=True, current=True)
     if invite_row:
       invite_row['proposal'] = self._prop_row
     else:

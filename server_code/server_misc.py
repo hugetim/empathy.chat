@@ -203,7 +203,7 @@ def _latest_invited(user):
 
   
 def _inviteds(user):
-  return app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user)
+  return app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user, current=True)
 
 
 def get_prompts(user):
@@ -252,7 +252,7 @@ def dismiss_prompt(prompt_id):
 def invited_item(inviter_id, user_id=""):
   user = get_user(user_id)
   inviter_user = app_tables.users.get_by_id(inviter_id)
-  inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user1=inviter_user, user2=user)
+  inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user1=inviter_user, user2=user, current=True)
   return {"inviter": name(inviter_user, to_user=user), "link_key": inviteds[0]['link_key'],
           "inviter_id": inviter_id, "rel": inviteds[0]['relationship2to1']}
 
@@ -606,7 +606,7 @@ def _check_for_confirmed_invites(user):
   any_confirmed = False
   any_failed = False
   for invite_row in _inviteds(user):
-    invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite_row['link_key'])
+    invite_reply = app_tables.invites.get(origin=False, user1=user, link_key=invite_row['link_key'], current=True)
     if invite_reply:
       from . import connections as c
       if c.try_connect(invite_row, invite_reply):
