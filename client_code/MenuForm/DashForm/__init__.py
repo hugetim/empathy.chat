@@ -3,7 +3,6 @@ from anvil import *
 import anvil.users
 import anvil.server
 from .CreateForm import CreateForm
-from .TimerForm import TimerForm
 from ..UserMenu.Profile.NameEdit import NameEdit
 from ... import portable as t
 from ... import helper as h
@@ -13,7 +12,7 @@ from datetime import timedelta
 from copy import deepcopy
 
 class DashForm(DashFormTemplate):
-  state_keys = {'status', 'seconds_left', 'proposals', 'upcomings', 'prompts'}
+  state_keys = {'status', 'proposals', 'upcomings', 'prompts'}
   
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -44,9 +43,6 @@ class DashForm(DashFormTemplate):
     self.update_form()
 
   def update_form(self):
-#     if self.item['status'] == "pinged":
-#       self.confirm_match(self.item['seconds_left'])
-#     else:
     self.update_upcoming_table()
     self.update_proposal_table()
 
@@ -82,20 +78,13 @@ class DashForm(DashFormTemplate):
       self.status_label.visible = False
   
   def update_status(self, state):
-    self.set_seconds_left(state['status'], state['seconds_left'])
+    self.item['status'] = state['status']
     if self.item['status'] in [None]:
       self.item['proposals'] = state['proposals']
       self.item['upcomings'] = state['upcomings']
       self.update_form()
     else:
       self.top_form.reset_status(state)
-    
-  def set_seconds_left(self, new_status=None, new_seconds_left=None):
-    """Set status and related time variables"""
-    if new_status and new_status != "matched":
-      self.item['seconds_left'] = new_seconds_left
-    #print('before status change: ', self.item['seconds_left'])
-    self.item['status'] = new_status    
  
   def timer_2_tick(self, **event_args):
     """This method is called every 5 seconds, checking for status changes"""

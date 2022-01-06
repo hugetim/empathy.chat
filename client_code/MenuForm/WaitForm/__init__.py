@@ -7,7 +7,7 @@ from ... import helper as h
 
 
 class WaitForm(WaitFormTemplate):
-  state_keys = {'status', 'seconds_left'}
+  state_keys = {'status'} #, 'seconds_left'}
   
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
