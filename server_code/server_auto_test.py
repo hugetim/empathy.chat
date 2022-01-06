@@ -1,4 +1,5 @@
 import anvil.users
+import anvil.server
 import anvil.tables
 from anvil.tables import app_tables, order_by
 import anvil.tables.query as q
@@ -155,7 +156,8 @@ class NotifyConnectedTest(unittest.TestCase):
                      dict(name="connected", to_name="first last", to_id=[42,42], rel="spouse"),
                     )
 
-    
+
+@anvil.server.background_task
 def server_auto_tests(verbosity=2):
   #unittest.main(exit=False)
   import sys

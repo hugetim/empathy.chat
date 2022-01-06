@@ -34,6 +34,7 @@ def initialize_session(time_zone):
   if p.DEBUG_MODE and trust_level >= TEST_TRUST_LEVEL:
     from . import server_auto_test
     server_auto_test.server_auto_tests()
+    #anvil.server.launch_background_task('server_auto_tests')
   return user
 
 
