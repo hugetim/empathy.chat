@@ -151,29 +151,6 @@ class DashForm(DashFormTemplate):
       proposal = content.proposal()
       self._handle_prop_call(*anvil.server.call('edit_proposal', proposal))
       
-#   def confirm_match(self, seconds):
-#     with h.PausedTimer(self.timer_2):
-#       f = TimerForm(seconds, self.item['status'])
-#       out = alert(content=f,
-#                   title="A match is available. Are you ready?",
-#                   large=False,
-#                   dismissible=False,
-#                   buttons=[("Yes", True), ("No", False)])
-#       if out == True:
-#         #self.item['status'] = "matched"
-#         state = anvil.server.call('match_commit')
-#       elif out in [False, "timer elapsed"]:
-#         state = anvil.server.call('cancel')
-#         if out == "timer elapsed":
-#           alert("A match was found, but the time available for you to confirm ("
-#                 + h.seconds_to_words(p.CONFIRM_MATCH_SECONDS) + ") elapsed.",
-#                 dismissible=False)
-#       else:
-#         if out and out != "requesting":
-#           print("DashForm.confirm_match out:", out)
-#         state = anvil.server.call_s('get_status')
-#       self.update_status(state)
-  
   def prompts_open_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     current = self.prompts_repeating_panel.visible
@@ -181,21 +158,4 @@ class DashForm(DashFormTemplate):
     if current:
       self.prompts_open_link.icon = "fa:chevron-right"
     else:
-      self.prompts_open_link.icon = "fa:chevron-down" 
-      
-### Legacy code to be possibly repurposed ###
-  def emailed_notification(self, num):
-    """Return Notification (assumes num>0)"""
-    if num == 1:
-      message = ('Someone has been sent a '
-                 + 'notification email about your request.')
-      headline = 'Email notification sent'
-    else:
-      message = (str(num) + ' others have been sent '
-                 + 'notification emails about your request.')
-      headline = 'Email notifications sent'
-    return Notification(message,
-                        title=headline,
-                        timeout=10)
-###                                                        ###
-    
+      self.prompts_open_link.icon = "fa:chevron-down"     

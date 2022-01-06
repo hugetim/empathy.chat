@@ -12,7 +12,7 @@ components:
   layout_properties: {column: PHQQNP}
   components:
   - type: Button
-    properties: {role: primary-color, align: center, tooltip: Accept this proposal to meet here at the time specified and exchange empathy for the duration listed,
+    properties: {role: primary-color, align: center, tooltip: Accept this request to meet here at the time specified and exchange empathy for the duration listed,
       border: '', enabled: true, foreground: '', visible: true, text: ACCEPT, font_size: 10,
       font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
       background: '', bold: false, underline: false, icon: ''}
