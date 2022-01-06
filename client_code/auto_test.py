@@ -135,7 +135,7 @@ class TestNow():
       time.sleep(10)
       anvil.server.call('cancel_accept', user_id=accept_user_id)
       time.sleep(10)
-      anvil.server.call('cancel')
+      anvil.server.call('cancel_now')
       time.sleep(15)
       
       
