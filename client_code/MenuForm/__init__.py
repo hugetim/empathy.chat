@@ -8,7 +8,7 @@ from .WaitForm import WaitForm
 from .MatchForm import MatchForm
 from .NetworkMenu import NetworkMenu
 from .GroupsMenu import GroupsMenu
-from .MyGroupsForm import MyGroupsForm
+from .MyGroupsMenu import MyGroupsMenu
 from .UserMenu import UserMenu
 from .SettingsForm import SettingsForm
 from .DashForm.CreateForm import CreateForm
@@ -32,7 +32,8 @@ class MenuForm(MenuFormTemplate):
             dismissible=False)
     else:
       self.set_help_link("https://www.loomio.org/join/group/G537YtVTZmNTW1S1KTJnDvUb/")
-    self.connections_link.visible = glob.trust_level >= 2
+    self.connections_link.visible = glob.trust_level >= 2 # should only be for level 2 if have connections
+    self.my_groups_link.visible = glob.trust_level >= 4
     self.test_mode.visible = self.item['test_mode']
     if p.DEBUG_MODE and self.item['test_mode']:
       auto_test.client_auto_tests()
@@ -119,7 +120,7 @@ class MenuForm(MenuFormTemplate):
     
   def go_my_groups(self):
     self.title_label.text = "My Groups"
-    self.reset_and_load(MyGroupsForm())   
+    self.reset_and_load(MyGroupsMenu())   
     self.my_groups_link.role = "selected" 
     
   def go_profile(self, user_id=""):

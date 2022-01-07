@@ -1,0 +1,70 @@
+components:
+- type: ColumnPanel
+  properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
+    background: ''}
+  name: content_column_panel
+  layout_properties: {grid_position: 'QZKEDX,JHASIM'}
+  event_bindings: {}
+  components:
+  - type: DropDown
+    properties:
+      role: null
+      align: center
+      tooltip: ''
+      placeholder: ''
+      border: ''
+      enabled: true
+      foreground: ''
+      items: []
+      visible: true
+      font_size: null
+      font: ''
+      spacing_above: small
+      spacing_below: small
+      italic: false
+      background: ''
+      bold: false
+      underline: false
+      include_placeholder: false
+    name: drop_down_groups
+    layout_properties:
+      col_widths: {}
+      grid_position: EGZBQC,TAURKO
+  - type: DataGrid
+    properties:
+      role: null
+      columns:
+      - {title: '', id: RKBTGY, data_key: host}
+      - {title: Name, id: TCRDJP, data_key: name}
+      - {title: Degree, id: CKNKJL, data_key: degree}
+      - {title: Last Active, id: VWXCEI, data_key: last_active}
+      - {title: '', id: NBEGGD, data_key: buttons}
+      auto_header: true
+      tooltip: ''
+      border: ''
+      foreground: ''
+      rows_per_page: 20
+      visible: true
+      show_page_controls: true
+      spacing_above: small
+      spacing_below: small
+      background: ''
+    name: data_grid_1
+    layout_properties:
+      col_widths: {}
+      grid_position: PLFXZS,NAEYWZ
+    components:
+    - type: RepeatingPanel
+      properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
+        visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.MyGroupsMenu.MyGroupMembers.MyGroupsRow,
+        background: ''}
+      name: repeating_panel_1
+      layout_properties: {}
+container:
+  type: ColumnPanel
+  event_bindings: {}
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
+    background: ''}
+is_package: true

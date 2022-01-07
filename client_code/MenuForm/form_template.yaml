@@ -96,6 +96,7 @@ components:
       layout_properties: {}
       components: []
       event_bindings: {click: my_groups_link_click}
+      data_bindings: []
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
           500', visible: true, text: My Profile, font_size: null, wrap_on: mobile,
