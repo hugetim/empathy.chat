@@ -41,12 +41,12 @@ components:
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
           visible: true, text: ' ', font_size: null, font: '', spacing_above: none,
           icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
-          underline: false, icon: 'fa:arrow-up'}
+          underline: false, icon: 'fa:link'}
         name: via_label
         layout_properties: {}
         data_bindings:
         - {property: text, code: '"Via " if self.item[''via''] else " "'}
-        - {property: icon, code: '"" if self.item[''via''] else "fa:arrow-up"'}
+        - {property: icon, code: '"" if self.item[''via''] else "fa:link"'}
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
           visible: true, text: '', font_size: null, font: '', spacing_above: none,

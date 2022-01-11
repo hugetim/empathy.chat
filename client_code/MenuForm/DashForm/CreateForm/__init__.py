@@ -46,7 +46,7 @@ class CreateForm(CreateFormTemplate):
       else []
     )
     self.drop_down_eligible.items += [('"Friends of friends" (2 degrees separation)', 2),  
-                                      ("Close connections only (1st degree)", 1),
+                                      ("Close links only (1st degree)", 1),
                                       ("Specific user(s)...",0),
                                      ]
     self.multi_select_drop_down.selected = self.item['eligible_users']

@@ -109,7 +109,7 @@ class MenuForm(MenuFormTemplate):
       item = {'user_id': user_id, 'tab': 'connections'}
       self.reset_and_load(UserMenu(item=item)) 
     else:
-      self.title_label.text = "My Connections"
+      self.title_label.text = "My Network"
       self.reset_and_load(NetworkMenu())
       self.connections_link.role = "selected"   
 

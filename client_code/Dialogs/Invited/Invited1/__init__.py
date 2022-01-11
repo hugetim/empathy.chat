@@ -63,7 +63,7 @@ class Invited1(Invited1Template):
         elif self.item['link_key'] and not has_phone:
           self.parent.raise_event("x-close-alert", value=True)
         else: # connecting already-registered users
-          Notification("You have been successfully connected.", style="success").show()
+          Notification("You have been successfully linked.", style="success").show()
           self.parent.raise_event("x-close-alert", value=True)
           ui.reload()
 

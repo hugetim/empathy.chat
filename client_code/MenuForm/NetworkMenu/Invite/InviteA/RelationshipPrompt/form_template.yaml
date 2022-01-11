@@ -16,7 +16,7 @@ components:
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
       visible: true, text: 'Imagine they were about to exchange empathy with another
-        close connection at an NVC meetup.
+        close link at an NVC meetup.
 
         Who would you introduce them as?', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
@@ -53,7 +53,7 @@ components:
       layout_properties: {}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: (This introduction/description will only be visible to your other close connections.),
+      visible: true, text: (This introduction/description will only be visible to your other close links.),
       font_size: 12, font: '', spacing_above: none, icon_align: left, spacing_below: small,
       italic: false, background: '', bold: false, underline: false, icon: ''}
     name: label_6
@@ -67,7 +67,7 @@ components:
 - type: Label
   properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
     visible: true, text: 'Please also provide the last 4 digits of their phone number
-      (so that your connection may be automatically verified once they confirm ownership
+      (so that your link may be automatically verified once they confirm ownership
       of the number):', font_size: null, font: '', spacing_above: small, icon_align: left,
     spacing_below: none, italic: false, background: '', bold: false, underline: false,
     icon: ''}

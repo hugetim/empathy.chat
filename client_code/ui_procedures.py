@@ -6,7 +6,7 @@ from . import glob
 
 
 def disconnect_flow(user2_id, user2_name, user1_id=""):
-  if confirm(f"Really remove your connection to {user2_name}? This cannot be undone."):
+  if confirm(f"Really remove your link to {user2_name}? This cannot be undone."):
     return anvil.server.call('disconnect', user2_id, user1_id)
   else:
     return False

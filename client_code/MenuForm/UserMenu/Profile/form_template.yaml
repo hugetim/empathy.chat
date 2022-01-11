@@ -166,9 +166,9 @@ components:
       components:
       - type: Button
         properties: {role: primary-color, align: left, tooltip: '', border: '', enabled: true,
-          foreground: '', visible: true, text: Connections, font_size: null, font: '',
-          spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-          background: '', bold: false, underline: false, icon: 'fa:users'}
+          foreground: '', visible: true, text: Links, font_size: null, font: '', spacing_above: small,
+          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+          underline: false, icon: 'fa:users'}
         name: connections_button
         layout_properties: {grid_position: 'NNIROM,EQPMHG'}
         event_bindings: {click: connections_button_click}

@@ -19,7 +19,7 @@ def invited_dialog(inviter):
   from .Dialogs.Invited import Invited
   top_form.invited_alert = Invited(item=invite)
   return alert(content=top_form.invited_alert,
-               title="Accept this invitation to connect?",
+               title="Accept this invitation to link?",
                buttons=[], large=True, dismissible=False)
   
 

@@ -51,7 +51,7 @@ components:
       layout_properties: {}
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: (This introduction/description will only be visible to your other close connections.),
+      visible: true, text: (This introduction/description will only be visible to your other close links.),
       font_size: 12, font: '', spacing_above: none, icon_align: left, spacing_below: small,
       italic: false, background: '', bold: false, underline: false, icon: ''}
     name: label_6

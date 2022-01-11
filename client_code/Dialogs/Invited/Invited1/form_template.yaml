@@ -8,7 +8,7 @@ components:
     foreground: '', visible: true, font_size: null, content: "### Welcome!\nBecause\
       \ receiving empathy\nrequires authenticity and trust, \nempathy.chat takes a\
       \ *slow* approach\nto linking in new members. \n\nTo verify that you and {inviter}\
-      \ are \"close connections,\"\nwe ask that you demonstrate you know each other's\
+      \ are \"closely linked,\"\nwe ask that you demonstrate you know each other's\
       \ personal phone number.", font: '', spacing_above: small, spacing_below: none,
     data: null, background: '', format: markdown}
   name: welcome_rich_text
@@ -56,7 +56,7 @@ components:
 - type: RichText
   properties: {role: richtext-text, align: center, tooltip: '', enable_slots: true,
     border: '', foreground: '', visible: true, font_size: null, content: 'We also
-      ask members to virtually introduce their close connections to each other.
+      ask members to virtually introduce their close links to each other.
 
       For example, {inviter} described you as their *{rel_to_inviter}*. ', font: '',
     spacing_above: small, spacing_below: none, data: null, background: '', format: markdown}
