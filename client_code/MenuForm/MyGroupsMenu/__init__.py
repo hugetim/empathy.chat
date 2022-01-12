@@ -11,6 +11,7 @@ from .MyGroupSettings import MyGroupSettings
 from .MyGroupMembers import MyGroupMembers
 from .MyGroupInvites import MyGroupInvites
 from ... import parameters as p
+from ... import glob
 
 class MyGroupsMenu(MyGroupsMenuTemplate):
   def __init__(self, **properties):
@@ -19,6 +20,7 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
 
     # Any code you write here will run when the form opens.
     self.top_form = get_open_form()
+    glob.my_groups.relay('load')
     self.go_group_settings()
 
   def clear_page(self):
