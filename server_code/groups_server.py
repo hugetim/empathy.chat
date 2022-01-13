@@ -41,20 +41,31 @@ def serve_group_invite(port_invite, method, kwargs):
 
 class MyGroups(sm.ServerItem, groups.MyGroups): 
   def __init__(self, port_my_groups):
-    self.groups = [MyGroup(port_group) for port_group in port_my_groups.groups]
+    self._groups = [MyGroup(port_group) for port_group in port_my_groups]
+    self.update_names_taken()
 
   def portable(self):
     port = groups.MyGroups()
-    port.groups = [group.portable() for group in self.groups]
+    port._groups = [group.portable() for group in self]
+    port.names_taken = self.names_taken
     return port  
     
   def load(self, user_id=""):
     user = sm.get_user(user_id)
-    rows = app_tables.groups.search(hosts=user)
-    self.groups = []
-    for row in rows:
-      self.groups.append(groups_server.Group.from_group_row(row, portable=True))
+    rows = app_tables.groups.search(hosts=[user])
+    self._groups = [MyGroup.from_group_row(row) for row in rows]
+    
+  def update_names_taken(self):
+    self.names_taken = [row['name'] for row in app_tables.groups.search()]
 
+  def add(self, user_id=""):
+    user = sm.get_user(user_id)
+    new_row = app_tables.groups.add_row(hosts=[user],
+                                        created=sm.now(),
+                                        name="",
+                                       )
+    self._groups.append(MyGroup.from_group_row(new_row))
+    
       
 class MyGroup(sm.ServerItem, groups.MyGroup): 
   def __init__(self, port_my_group):
@@ -67,7 +78,17 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
     port.update(self)
     port.members = [sm.get_port_user(member) for member in self.members]
     port.invites = [invite.portable() for invite in self.invites]
-    return port 
+    return port
+  
+  def save_settings(self, user_id=""):
+    user = sm.get_user(user_id)
+    group_row = app_tables.groups.get_by_id(self.group_id)
+    group_row['name'] = self.name
+    
+  def delete(self, user_id=""):
+    user = sm.get_user(user_id)
+    group_row = app_tables.groups.get_by_id(self.group_id)
+    group_row.delete()
   
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):

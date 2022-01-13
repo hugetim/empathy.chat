@@ -1,4 +1,50 @@
 components:
+- type: ColumnPanel
+  properties: {role: card, col_widths: '{}'}
+  name: card_1
+  layout_properties: {grid_position: 'ZABEKU,SRASAI'}
+  components:
+  - type: FlowPanel
+    properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
+      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
+    name: flow_panel_1
+    layout_properties: {grid_position: 'QNABFA,ZNHECW'}
+    components:
+    - type: DropDown
+      properties:
+        role: null
+        align: center
+        tooltip: ''
+        placeholder: ''
+        border: ''
+        enabled: true
+        foreground: ''
+        items: ['']
+        visible: true
+        font_size: null
+        font: ''
+        spacing_above: small
+        spacing_below: small
+        italic: false
+        background: ''
+        bold: false
+        underline: false
+        include_placeholder: false
+      name: groups_drop_down
+      layout_properties:
+        col_widths: {}
+        grid_position: RGPSEB,BMPPFJ
+      event_bindings: {change: groups_drop_down_change}
+    - type: Button
+      properties: {role: primary-color, align: left, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: true, text: Create New Group, font_size: null, font: '',
+        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:plus'}
+      name: create_button
+      layout_properties:
+        col_widths: {}
+        grid_position: RGPSEB,OEDFTS
+      event_bindings: {click: create_button_click}
 - type: FlowPanel
   properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
     visible: true, spacing_above: small, spacing_below: none, background: ''}
@@ -7,9 +53,9 @@ components:
   components:
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Group Settings, font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-      background: 'theme:White', bold: false, underline: false, icon: ''}
+      foreground: '', visible: true, text: Settings, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: none, italic: false, background: 'theme:White',
+      bold: false, underline: false, icon: ''}
     name: group_settings_tab_button
     layout_properties: {}
     event_bindings: {click: group_settings_tab_button_click}
@@ -23,7 +69,7 @@ components:
     event_bindings: {click: members_tab_button_click}
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Invite Links, font_size: null, font: '',
+      foreground: '', visible: false, text: Invite Links, font_size: null, font: '',
       spacing_above: small, icon_align: left, spacing_below: none, italic: false,
       background: 'theme:Gray 200', bold: false, underline: false, icon: ''}
     name: invites_tab_button

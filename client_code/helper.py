@@ -158,7 +158,7 @@ class AttributeToKey:
       return default
 
 @anvil.server.portable_class    
-class PortItem(AttributeToKey):
+class PortItem:
   def update(self, new_self):
     for key, value in new_self.__dict__.items():
       setattr(self, key, value)

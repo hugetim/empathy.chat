@@ -25,7 +25,7 @@ class Invites(h.AttributeToKey):
 
    
 @anvil.server.portable_class
-class Invite(h.PortItem):
+class Invite(h.PortItem, h.AttributeToKey):
   no_auth_methods = ['visit', 'register', 'respond']
   repr_desc = "invites.Invite: "
   def __init__(self, invite_id="", inviter=None, rel_to_inviter="", inviter_guess="", link_key="", 

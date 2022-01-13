@@ -11,16 +11,24 @@ from . import parameters as p
 class MyGroups(h.PortItem):
   repr_desc = "groups.MyGroups: "
   server_fn_name = 'serve_my_groups'
-  def __init__(self, name="New Group", group_id=None, groups=None):
-    self.name = name
-    self.group_id = group_id
-    self.groups = groups if groups else []
+  
+  def __init__(self, groups=None, names_taken=None):
+    self._groups = list(groups) if groups else []
+    self.names_taken = names_taken if names_taken else []
 
+  def __getitem__(self, position):
+    return self._groups[position]
+  
+  def __len__(self):
+    return len(self._groups)
+  
    
 @anvil.server.portable_class
-class MyGroup(h.PortItem):
+class MyGroup(h.PortItem, h.AttributeToKey):
   repr_desc = "groups.MyGroup: "
   server_fn_name = 'serve_my_group'
+  default_name = "New Group"
+  
   def __init__(self, name="", group_id="", members=None, invites=None):
     self.name = name
     self.group_id = group_id
@@ -29,7 +37,7 @@ class MyGroup(h.PortItem):
 
 
 @anvil.server.portable_class
-class Invite(h.PortItem):
+class Invite(h.PortItem, h.AttributeToKey):
   repr_desc = "groups.Invite: "
   server_fn_name = 'serve_group_invite'
   def __init__(self, link_key="", invite_id="", expire_date=None, spec=None):
