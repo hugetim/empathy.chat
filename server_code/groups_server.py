@@ -21,13 +21,22 @@ def serve_my_groups(port_my_groups, method, kwargs):
   return my_groups.portable()
 
 
+@sm.authenticated_callable
+@anvil.tables.in_transaction
+def serve_my_group(port_my_group, method, kwargs):
+  print(f"group_server: {method}({kwargs}) called on {port_my_group}")
+  my_group = MyGroup(port_my_group)
+  my_group.relay(method, kwargs)
+  return my_group.portable()
+
+
 class MyGroups(groups.MyGroups): 
   def __init__(self, port_my_groups):
-    self.update(port_my_groups)
+    self.groups = [MyGroup(port_group) for port_group in port_my_groups.groups]
 
   def portable(self):
     port = groups.MyGroups()
-    port.update(self)
+    port.groups = [group.portable() for group in self.groups]
     return port  
     
   def relay(self, method, kwargs=None):
@@ -41,3 +50,36 @@ class MyGroups(groups.MyGroups):
     self.groups = []
     for row in rows:
       self.groups.append(groups_server.Group.from_group_row(row, portable=True))
+
+      
+class MyGroup(groups.MyGroup): 
+  def __init__(self, port_my_group):
+    self.update(port_my_group)
+    self.members = [port_member.s_user for port_member in port_my_group.members]
+    self.invites = [Invite(port_invite) for port_invite in port_my_group.invites]
+
+  def portable(self):
+    port = groups.MyGroup()
+    port.update(self)
+    port.members = [sm.get_port_user(member) for member in self.members]
+    port.invites = [invite.portable() for invite in self.invites]
+    return port
+    
+  def relay(self, method, kwargs=None):
+    if not kwargs:
+      kwargs = {}
+    return getattr(self, method)(**kwargs)      
+  
+  @staticmethod
+  def from_group_row(group_row, portable=False, user_id=""):
+    port_members = [sm.get_port_user(m['user'], user1_id=user_id)
+                    for m in app_tables.group_members.search(group=group_row)]
+    port_invites = [Invite.from_invite_row(i_row)
+                    for i_row in app_tables.group_invites.search(group=group_row)]
+    port_group = groups.MyGroup(name=group_row['name'],
+                                group_id=group_row.get_id(),
+                                members=port_members,
+                                invites=port_invites,
+                               )
+    return port_group if portable else MyGroup(port_group)
+  
