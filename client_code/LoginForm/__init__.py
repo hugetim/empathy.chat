@@ -7,6 +7,7 @@ from .. import rosenberg
 from datetime import date, datetime
 from .. import parameters
 from .. import ui_procedures as ui
+from anvil_extras import augment
 
 
 class LoginForm(LoginFormTemplate):
@@ -32,6 +33,7 @@ class LoginForm(LoginFormTemplate):
       self.enter_button_click()
     else:
       self.enter_button.visible = True
+      self.enter_button.
 
   def enter_button_click(self, **event_args):
     """This method is called when the button is clicked"""
