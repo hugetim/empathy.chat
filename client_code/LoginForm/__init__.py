@@ -33,7 +33,7 @@ class LoginForm(LoginFormTemplate):
       self.enter_button_click()
     else:
       self.enter_button.visible = True
-      self.enter_button.
+      self.enter_button.trigger('focus')
 
   def enter_button_click(self, **event_args):
     """This method is called when the button is clicked"""
