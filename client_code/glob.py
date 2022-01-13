@@ -2,6 +2,7 @@ import anvil.users
 import anvil.server
 from . import parameters as p
 from . import invites
+from . import groups
 
 
 trust_level = 0

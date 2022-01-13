@@ -25,9 +25,9 @@ class Invites(h.AttributeToKey):
 
    
 @anvil.server.portable_class
-class Invite(h.AttributeToKey):
+class Invite(h.PortItem):
   no_auth_methods = ['visit', 'register', 'respond']
-  
+  repr_desc = "invites.Invite: "
   def __init__(self, invite_id="", inviter=None, rel_to_inviter="", inviter_guess="", link_key="", 
                response_id="", invitee=None, rel_to_invitee="", invitee_guess=""):
     self.invite_id = invite_id
@@ -40,14 +40,7 @@ class Invite(h.AttributeToKey):
     self.rel_to_invitee = rel_to_invitee
     self.invitee_guess = invitee_guess
     self.connection_successful = False
- 
-  def update(self, new_self):
-    for key, value in new_self.__dict__.items():
-      setattr(self, key, value)
 
-  def __repr__(self):
-    return "invites.Invite: " + str(self.__dict__)     
-      
   @property
   def url(self):
     return f"{p.URL}#?invite={self.link_key}"

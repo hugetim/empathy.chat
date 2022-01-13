@@ -316,6 +316,13 @@ def save_name(name_item, user_id=""):
 def save_user_item(item_name, text, user_id=""):
   user = get_user(user_id)
   user[item_name] = text
+
+  
+class ServerItem:
+  def relay(self, method, kwargs=None):
+    if not kwargs:
+      kwargs = {}
+    return getattr(self, method)(**kwargs)
   
 
 def new_jitsi_code():

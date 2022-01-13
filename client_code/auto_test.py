@@ -108,18 +108,18 @@ class InviteTest(unittest.TestCase):
     self.assertEqual(invite1.rel_to_invitee, item2['relationship'])
 
     
-class MyGroupsTest(unittest.TestCase):
-  def setUp(self):
-    pass
-    #self.my_groups = groups.MyGroups()
-    #self.my_groups.relay('load')
+# class MyGroupsTest(unittest.TestCase):
+#   def setUp(self):
+#     pass
+#     #self.my_groups = groups.MyGroups()
+#     #self.my_groups.relay('load')
     
-  def test_get_items(self):
-    items = self.my_groups.drop_down_items()
+#   def test_get_items(self):
+#     items = self.my_groups.drop_down_items()
     
-  def test_add_group(self):
-    new_group = self.my_groups.add_group()
-    self.assertEqual(new_group['name'], "New Group")
+#   def test_add_group(self):
+#     new_group = self.my_groups.add_group()
+#     self.assertEqual(new_group['name'], "New Group")
     
 def client_auto_tests():
   pass

@@ -157,6 +157,22 @@ class AttributeToKey:
     except AttributeError:
       return default
 
+@anvil.server.portable_class    
+class PortItem(AttributeToKey):
+  def update(self, new_self):
+    for key, value in new_self.__dict__.items():
+      setattr(self, key, value)
+      
+  def __repr__(self):
+    return self.repr_desc + str(self.__dict__)
+  
+  def relay(self, method, kwargs=None):
+    if not kwargs:
+      kwargs = {}
+    new_object = anvil.server.call(self.server_fn_name, self, method, kwargs)
+    self.update(new_object)    
+    
+    
 # @anvil.server.portable_class    
 # class ItemWrapped(AttributeToKey):
 #   def __init__(self, item):

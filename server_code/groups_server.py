@@ -15,7 +15,7 @@ from . import parameters as p
 @sm.authenticated_callable
 @anvil.tables.in_transaction
 def serve_my_groups(port_my_groups, method, kwargs):
-  print(f"groups_server: {method}({kwargs}) called on {port_my_groups}")
+  print(f"serve_my_groups: {method}({kwargs}) called on {port_my_groups}")
   my_groups = MyGroups(port_my_groups)
   my_groups.relay(method, kwargs)
   return my_groups.portable()
@@ -24,13 +24,22 @@ def serve_my_groups(port_my_groups, method, kwargs):
 @sm.authenticated_callable
 @anvil.tables.in_transaction
 def serve_my_group(port_my_group, method, kwargs):
-  print(f"group_server: {method}({kwargs}) called on {port_my_group}")
+  print(f"serve_my_group: {method}({kwargs}) called on {port_my_group}")
   my_group = MyGroup(port_my_group)
   my_group.relay(method, kwargs)
   return my_group.portable()
 
 
-class MyGroups(groups.MyGroups): 
+@sm.authenticated_callable
+@anvil.tables.in_transaction
+def serve_group_invite(port_invite, method, kwargs):
+  print(f"serve_group_invite: {method}({kwargs}) called on {port_invite}")
+  invite = Invite(port_invite)
+  invite.relay(method, kwargs)
+  return invite.portable()
+
+
+class MyGroups(sm.ServerItem, groups.MyGroups): 
   def __init__(self, port_my_groups):
     self.groups = [MyGroup(port_group) for port_group in port_my_groups.groups]
 
@@ -39,11 +48,6 @@ class MyGroups(groups.MyGroups):
     port.groups = [group.portable() for group in self.groups]
     return port  
     
-  def relay(self, method, kwargs=None):
-    if not kwargs:
-      kwargs = {}
-    return getattr(self, method)(**kwargs)
-  
   def load(self, user_id=""):
     user = sm.get_user(user_id)
     rows = app_tables.groups.search(hosts=user)
@@ -52,7 +56,7 @@ class MyGroups(groups.MyGroups):
       self.groups.append(groups_server.Group.from_group_row(row, portable=True))
 
       
-class MyGroup(groups.MyGroup): 
+class MyGroup(sm.ServerItem, groups.MyGroup): 
   def __init__(self, port_my_group):
     self.update(port_my_group)
     self.members = [port_member.s_user for port_member in port_my_group.members]
@@ -63,12 +67,7 @@ class MyGroup(groups.MyGroup):
     port.update(self)
     port.members = [sm.get_port_user(member) for member in self.members]
     port.invites = [invite.portable() for invite in self.invites]
-    return port
-    
-  def relay(self, method, kwargs=None):
-    if not kwargs:
-      kwargs = {}
-    return getattr(self, method)(**kwargs)      
+    return port 
   
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
@@ -83,3 +82,21 @@ class MyGroup(groups.MyGroup):
                                )
     return port_group if portable else MyGroup(port_group)
   
+  
+class Invite(sm.ServerItem, groups.Invite): 
+  def __init__(self, port_invite):
+    self.update(port_invite)
+
+  def portable(self):
+    port = groups.Invite()
+    port.update(self)
+    return port 
+  
+  @staticmethod
+  def from_invite_row(invite_row, portable=False):
+    port_invite = groups.Invite(link_key=invite_row['link_key'],
+                                invite_id=invite_row.get_id(),
+                                expire_date=invite_row['expire_date'],
+                                spec=invite_row['spec'],
+                               )
+    return port_invite if portable else Invite(port_invite)
