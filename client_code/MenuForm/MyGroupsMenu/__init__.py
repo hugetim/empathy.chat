@@ -9,7 +9,6 @@ import anvil.users
 import anvil.server
 from .MyGroupSettings import MyGroupSettings
 from .MyGroupMembers import MyGroupMembers
-from .MyGroupInvites import MyGroupInvites
 from ... import parameters as p
 from ... import glob
 
@@ -65,14 +64,9 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
     self.group_settings_tab_button.background = p.SELECTED_TAB_COLOR
 
   def go_members(self):
-    content = MyGroupMembers()
+    content = MyGroupMembers(menu=self)
     self.load_component(content)
     self.members_tab_button.background = p.SELECTED_TAB_COLOR
-
-  def go_invites(self):
-    content = MyGroupInvites()
-    self.load_component(content)
-    self.invites_tab_button.background = p.SELECTED_TAB_COLOR  
     
   def group_settings_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -84,4 +78,4 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
 
   def invites_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.go_invites()
+    pass

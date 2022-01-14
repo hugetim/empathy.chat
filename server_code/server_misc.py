@@ -212,6 +212,13 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
     return None
 
   
+@authenticated_callable
+def get_port_user_full(user2, user1_id="", distance=None, degree=None):
+  from . import connections as c
+  user1 = get_user(user1_id)
+  return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree))
+  
+  
 def _latest_invited(user):
   inviteds = _inviteds(user)
   if len(inviteds) == 0:
@@ -286,7 +293,6 @@ def init_profile(user_id=""):
                  'first': user['first_name'],
                  'last': port.last_name(user['last_name'], record['distance']),
                  'relationships': [] if is_me else c.get_relationships(user),
-                 'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],

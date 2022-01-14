@@ -42,7 +42,7 @@ def full_name(first, last, distance=3):
     
 
 @anvil.server.portable_class
-class User():
+class User(h.AttributeToKey):
   
   def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None):
     self.user_id = user_id
@@ -81,6 +81,17 @@ class User():
                 starred=None,
                )
 
+  
+@anvil.server.portable_class
+class UserFull(User):
+  def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None,
+               degree=None, last_active=None, status=None, unread_message=None):
+    super().__init__(user_id=user_id, name=name, confirmed_url=confirmed_url, distance=distance, seeking=seeking, starred=starred)
+    self.degree = degree
+    self.last_active = last_active
+    self.status = status
+    self.unread_message = unread_message
+    
     
 @anvil.server.portable_class
 class ProposalTime():

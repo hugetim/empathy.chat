@@ -76,7 +76,7 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
   def portable(self):
     port = groups.MyGroup()
     port.update(self)
-    port.members = [sm.get_port_user(member) for member in self.members]
+    port.members = [sm.get_port_user_full(member) for member in self.members]
     port.invites = [invite.portable() for invite in self.invites]
     return port
   
@@ -92,7 +92,7 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
   
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
-    port_members = [sm.get_port_user(m['user'], user1_id=user_id)
+    port_members = [sm.get_port_user_full(m['user'], user1_id=user_id)
                     for m in app_tables.group_members.search(group=group_row)]
     port_invites = [Invite.from_invite_row(i_row)
                     for i_row in app_tables.group_invites.search(group=group_row)]
