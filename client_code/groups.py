@@ -48,8 +48,27 @@ class Invite(h.PortItem, h.AttributeToKey):
    
   @property
   def url(self):
-    return f"{p.URL}#?group_invite={self.link_key}"
+    return f"{p.URL}#?group={self.link_key}"
   
   @property
   def expire_date_str(self):
     return h.short_date_str(self.expire_date)
+
+  
+def handle_link(link_key):
+  print(f"groups.handle_link: {link_key}")
+  user = anvil.users.get_user()
+  invite = Invite(link_key=link_key)
+  errors = invite.relay('visit', {'user': user})
+  if not errors:
+    from .Dialogs.Invited import Invited
+    invited_alert = Invited(item=invite)
+    if alert(content=invited_alert, 
+             title="", 
+             buttons=[], large=True, dismissible=False):
+      if not user:
+        method = invited_signup(invite)
+      if anvil.users.get_user():
+        open_form('LoginForm')
+  else:
+    alert(" ".join(errors)) #This is not a valid invite link."

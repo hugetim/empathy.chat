@@ -10,6 +10,7 @@ import anvil.server
 from . import groups
 from . import server_misc as sm
 from . import parameters as p
+from .exceptions import RowMissingError
 
 
 @sm.authenticated_callable
@@ -52,17 +53,18 @@ class MyGroups(sm.ServerItem, groups.MyGroups):
     
   def load(self, user_id=""):
     user = sm.get_user(user_id)
-    rows = app_tables.groups.search(hosts=[user])
+    rows = app_tables.groups.search(hosts=[user], current=True)
     self._groups = [MyGroup.from_group_row(row) for row in rows]
     
   def update_names_taken(self):
-    self.names_taken = [row['name'] for row in app_tables.groups.search()]
+    self.names_taken = [row['name'] for row in app_tables.groups.search(current=True)]
 
   def add(self, user_id=""):
     user = sm.get_user(user_id)
     new_row = app_tables.groups.add_row(hosts=[user],
                                         created=sm.now(),
                                         name="",
+                                        current=True,
                                        )
     self._groups.append(MyGroup.from_group_row(new_row))
     
@@ -82,7 +84,7 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
 
   @property
   def group_row(self):
-    return app_tables.groups.get_by_id(self.group_id)
+    return app_tables.groups.get_by_id(self.group_id) if self.group_id else None
   
   def save_settings(self, user_id=""):
     user = sm.get_user(user_id)
@@ -98,7 +100,8 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
     new_row = app_tables.group_invites.add_row(created=now,
                                                expire_date=now+timedelta(days=30),
                                                group=self.group_row,
-                                               link_key=sm.random_code(num_chars=7)
+                                               link_key=sm.random_code(num_chars=7),
+                                               current=True,
                                               )
     self.invites.append(Invite.from_invite_row(new_row))
     
@@ -107,7 +110,7 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
     port_members = [sm.get_port_user_full(m['user'], user1_id=user_id)
                     for m in app_tables.group_members.search(group=group_row)]
     port_invites = [Invite.from_invite_row(i_row)
-                    for i_row in app_tables.group_invites.search(group=group_row)]
+                    for i_row in app_tables.group_invites.search(group=group_row, current=True)]
     port_group = groups.MyGroup(name=group_row['name'],
                                 group_id=group_row.get_id(),
                                 members=port_members,
@@ -124,6 +127,29 @@ class Invite(sm.ServerItem, groups.Invite):
     port = groups.Invite()
     port.update(self)
     return port 
+
+  def invite_row(self):
+    row = None
+    errors = []
+    if self.invite_id:
+      row = app_tables.group_invites.get_by_id(self.invite_id)
+    elif self.link_key:
+      row = app_tables.group_invites.get(link_key=self.link_key, current=True)
+    else:
+      raise(RowMissingError("Not enough information to retrieve group_invite row."))
+    return row
+  
+  def visit(self, user, register=False):
+    """Assumes only self.link_key known (unless register)
+    
+       Side effects: set invite['user2'] if visitor is logged in,
+       likewise for invite_reply['user1'] if it exists"""
+    invite_row = self.invite_row()
+    self.update(Invite.from_invite_row(invite_row))
+    if user:
+      if register:
+        sm.init_user_info(user)
+      self._try_adding_invitee(user)
   
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):
