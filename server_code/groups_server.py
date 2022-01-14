@@ -17,7 +17,10 @@ from .exceptions import RowMissingError
 @sm.authenticated_callable
 @anvil.tables.in_transaction
 def serve_my_groups(port_my_groups, method, kwargs):
-  print(f"serve_my_groups: {method}({kwargs}) called on {port_my_groups}")
+  if sm.DEBUG:
+    print(f"serve_my_groups: {method}({kwargs}) called on {port_my_groups}")
+  else:
+    print(f"serve_my_groups: {method}({kwargs})")
   my_groups = MyGroups(port_my_groups)
   my_groups.relay(method, kwargs)
   return my_groups.portable()
