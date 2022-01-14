@@ -213,10 +213,11 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
 
   
 @authenticated_callable
-def get_port_user_full(user2, user1_id="", distance=None, degree=None):
+def get_port_user_full(user2, user1_id="", distance=None, degree=None, common_group_names=None):
   from . import connections as c
   user1 = get_user(user1_id)
-  return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree))
+  return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree), 
+                       common_group_names=common_group_names)
   
   
 def _latest_invited(user):

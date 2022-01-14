@@ -134,7 +134,13 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
                                        group=invite_row['group'],
                                        invite=invite_row,
                                       )  
-  
+
+def user_groups(user):
+  memberships = {m['group'] for m in app_tables.group_members.search(user=user)}
+  hosteds = {group for group in app_tables.groups.search(hosts=[user], current=True)}
+  return memberships.union(hosteds)
+
+
 class Invite(sm.ServerItem, groups.Invite): 
   def __init__(self, port_invite):
     self.update(port_invite)

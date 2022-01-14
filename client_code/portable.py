@@ -62,6 +62,10 @@ class User(h.AttributeToKey):
     return str(self.__dict__)
   
   @property
+  def distance_str(self):
+    return h.add_num_suffix(self.degree) if self.distance and self.distance < 99 else ""
+  
+  @property
   def s_user(self):
     return app_tables.users.get_by_id(self.user_id)
   
@@ -85,12 +89,17 @@ class User(h.AttributeToKey):
 @anvil.server.portable_class
 class UserFull(User):
   def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None,
-               degree=None, last_active=None, status=None, unread_message=None):
+               degree=None, last_active=None, status=None, unread_message=None, common_group_names=None):
     super().__init__(user_id=user_id, name=name, confirmed_url=confirmed_url, distance=distance, seeking=seeking, starred=starred)
     self.degree = degree
     self.last_active = last_active
     self.status = status
     self.unread_message = unread_message
+    self.common_group_names = common_group_names if common_group_names else []
+    
+  @property
+  def distance_str_or_groups(self):
+    return self.distance_str if self.distance_str else "\n".join(self.common_group_names)
     
     
 @anvil.server.portable_class

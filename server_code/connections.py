@@ -95,9 +95,11 @@ def get_connections(user_id):
   dset = _get_connections(logged_in_user, up_to_degree, include_zero=True)
   if is_me:
     records = []
+    c_users = set()
     for d in range(1, up_to_degree+1):
-      records += [connection_record(user2, user, d, d) for user2 in dset[d]]
-    return records
+      records += [sm.get_port_user_full(user2, logged_in_user, d, d) for user2 in dset[d]]
+      c_users.update(dset[d])
+    return records + _group_member_records_exclude(logged_in_user, c_users)
   elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
         and _degree(user, logged_in_user) > 1):
     return []
@@ -105,7 +107,7 @@ def get_connections(user_id):
     dset2 = _get_connections(user, 1)
     records = []
     for d in range(0, up_to_degree+1):
-      records += [connection_record(user2, logged_in_user, d, d) for user2 in (dset[d] & dset2[1])]
+      records += [sm.get_port_user_full(user2, logged_in_user, d, d) for user2 in (dset[d] & dset2[1])]
     return records
 
 
@@ -122,6 +124,19 @@ def connection_record(user2, user1, _distance=None, degree=None):
                  'unread_message': None, # True/False
                 })
   return record
+
+
+def _group_member_records_exclude(user, excluded_users):
+  from . import groups_server as g
+  import collections
+  fellow_members_to_group_names = collections.defaultdict(list)
+  excluded_users.add(user)
+  for group_row in g.user_groups(user):
+    relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) - excluded_users
+    for user2 in relevant_group_members:
+      fellow_members_to_group_names[user2].append(group_row['name'])
+  return [sm.get_port_user_full(user2, user, 99, 99, fellow_members_to_group_names[user2]) 
+          for user2 in fellow_members_to_group_names.keys()]
 
 
 def _invite_status(user2, user1):
