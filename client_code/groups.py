@@ -49,3 +49,7 @@ class Invite(h.PortItem, h.AttributeToKey):
   @property
   def url(self):
     return f"{p.URL}#?group_invite={self.link_key}"
+  
+  @property
+  def expire_date_str(self):
+    return h.short_date_str(self.expire_date)

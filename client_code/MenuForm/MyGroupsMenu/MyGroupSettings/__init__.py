@@ -50,3 +50,9 @@ class MyGroupSettings(MyGroupSettingsTemplate):
       glob.my_groups.relay('load')
       self.my_groups_menu.reset()
 
+  def button_invite_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.group.relay('create_invite')
+    self.update()
+
+

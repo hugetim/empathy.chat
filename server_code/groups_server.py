@@ -79,17 +79,29 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
     port.members = [sm.get_port_user_full(member) for member in self.members]
     port.invites = [invite.portable() for invite in self.invites]
     return port
+
+  @property
+  def group_row(self):
+    return app_tables.groups.get_by_id(self.group_id)
   
   def save_settings(self, user_id=""):
     user = sm.get_user(user_id)
-    group_row = app_tables.groups.get_by_id(self.group_id)
-    group_row['name'] = self.name
+    self.group_row['name'] = self.name
     
   def delete(self, user_id=""):
     user = sm.get_user(user_id)
-    group_row = app_tables.groups.get_by_id(self.group_id)
-    group_row.delete()
-  
+    self.group_row.delete()
+
+  def create_invite(self):
+    from datetime import timedelta
+    now = sm.now()
+    new_row = app_tables.group_invites.add_row(created=now,
+                                               expire_date=now+timedelta(days=30),
+                                               group=self.group_row,
+                                               link_key=sm.random_code(num_chars=7)
+                                              )
+    self.invites.append(Invite.from_invite_row(new_row))
+    
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
     port_members = [sm.get_port_user_full(m['user'], user1_id=user_id)
@@ -114,10 +126,11 @@ class Invite(sm.ServerItem, groups.Invite):
     return port 
   
   @staticmethod
-  def from_invite_row(invite_row, portable=False):
+  def from_invite_row(invite_row, portable=False, user_id=""):
+    user = sm.get_user(user_id)
     port_invite = groups.Invite(link_key=invite_row['link_key'],
                                 invite_id=invite_row.get_id(),
-                                expire_date=invite_row['expire_date'],
+                                expire_date=sm.as_user_tz(invite_row['expire_date'], user),
                                 spec=invite_row['spec'],
                                )
     return port_invite if portable else Invite(port_invite)

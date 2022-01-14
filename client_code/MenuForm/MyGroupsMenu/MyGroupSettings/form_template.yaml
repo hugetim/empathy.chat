@@ -44,21 +44,13 @@ components:
         name: edit_name_button
         layout_properties: {grid_position: 'KTTXPP,TGIBIN'}
         event_bindings: {click: edit_name_button_click}
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Create Invite Link, font_size: null, font: '',
-      spacing_above: medium, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:plus'}
-    name: button_invite
-    layout_properties: {grid_position: 'BUXRRM,JBZJZF'}
-    event_bindings: {}
   - type: DataGrid
     properties:
       role: null
       columns:
       - {id: KXBOMI, title: Invite Link, data_key: url, $$hashKey: 'object:22731',
         expand: true}
-      - {id: SQRIZT, title: Expire Date, data_key: expire_date, $$hashKey: 'object:22733'}
+      - {id: SQRIZT, title: Expire Date, data_key: expire_date_str, $$hashKey: 'object:22733'}
       auto_header: true
       tooltip: ''
       border: ''
@@ -81,6 +73,18 @@ components:
         background: ''}
       name: invites_repeating_panel
       layout_properties: {}
+      data_bindings:
+      - {property: items, code: self.group.invites}
+    data_bindings:
+    - {property: visible, code: self.group.invites}
+  - type: Button
+    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Create Invite Link, font_size: null, font: '',
+      spacing_above: medium, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: 'fa:plus'}
+    name: button_invite
+    layout_properties: {grid_position: 'BFVFFA,BNBGIY'}
+    event_bindings: {click: button_invite_click}
 container:
   type: ColumnPanel
   event_bindings: {show: form_show}
