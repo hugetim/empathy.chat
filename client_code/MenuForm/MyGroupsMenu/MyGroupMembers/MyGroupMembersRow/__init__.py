@@ -22,7 +22,8 @@ class MyGroupMembersRow(MyGroupMembersRowTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    self.degree_label.text = h.add_num_suffix(self.item['distance'])
+    if self.item['distance'] < 99:
+      self.degree_label.text = h.add_num_suffix(self.item['distance'])
     self.last_active_label.text = h.short_date_str(h.as_local_tz(self.item['last_active']))
     if self.item['status'] == "invite":
       self.degree_label.text += " (pending invite)"

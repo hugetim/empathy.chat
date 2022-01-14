@@ -124,7 +124,11 @@ class ProposalTime():
 
   def __repr__(self):
     return str(self.__dict__)
-    
+ 
+  @property
+  def start_for_order(self):
+    return h.now() if self.start_now else self.start_date
+
   def has_conflict(self, conflict_checks):
     this = self.get_check_item()
     for check_item in conflict_checks:

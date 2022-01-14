@@ -135,7 +135,18 @@ def my_assert(statement):
   if not statement:
     warning(f"bool({statement}) is not True")
   
+  
+class reverse_compare:
+    def __init__(self, obj):
+        self.obj = obj
 
+    def __eq__(self, other):
+        return other.obj == self.obj
+
+    def __lt__(self, other):
+        return other.obj < self.obj
+
+      
 class PausedTimer:
   def __init__(self, timer):
     self.timer = timer

@@ -261,8 +261,8 @@ components:
         border: ''
         enabled: true
         foreground: ''
-        items: [cancel, match_commit, match_complete, accept_now_proposal, get_status,
-          get_proposals, get_code, add_chat_message]
+        items: [cancel_now, cancel_accept, match_commit, match_complete, accept_now_proposal,
+          get_status, get_proposals, get_code, add_chat_message]
         visible: true
         font_size: null
         font: ''

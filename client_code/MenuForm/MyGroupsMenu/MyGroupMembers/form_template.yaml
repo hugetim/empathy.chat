@@ -40,7 +40,8 @@ components:
       name: repeating_panel_1
       layout_properties: {}
       data_bindings:
-      - {property: items, code: self.group.members}
+      - {property: items, code: 'sorted(self.group.members, key=lambda pu: pu[''last_active''],
+          reverse=True)'}
 container:
   type: ColumnPanel
   event_bindings: {}

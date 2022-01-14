@@ -463,7 +463,7 @@ class Proposal():
     return app_tables.proposals.search(user=user, current=True)
   
   @staticmethod
-  def get_port_proposals(user):
+  def get_port_view_items(user):
     """Return list of Proposal view items visible to user
     
     Side effects: prune proposals

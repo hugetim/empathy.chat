@@ -106,20 +106,9 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
                                               )
     self.invites.append(Invite.from_invite_row(new_row))
 
-  def add_member(self, user, invite_row):
-    h.my_assert(invite_row['group'] == self.group_row)
-    if user not in self.members:
-      app_tables.group_members.add_row(user=user,
-                                       group=invite_row['group'],
-                                       invite=invite_row,
-                                      )  
-
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
-    member_set = {sm.get_port_user_full(m['user'], user1_id=user_id)
-                  for m in app_tables.group_members.search(group=group_row)}
-    member_set.update({sm.get_port_user_full(u, user1_id=user_id) for u in group_row['hosts']})
-    port_members = list(member_set)
+    port_members = [sm.get_port_user_full(u, user1_id=user_id) for u in MyGroup.members_from_group_row(group_row)]
     port_invites = [Invite.from_invite_row(i_row)
                     for i_row in app_tables.group_invites.search(group=group_row, current=True)]
     port_group = groups.MyGroup(name=group_row['name'],
@@ -129,6 +118,19 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
                                )
     return port_group if portable else MyGroup(port_group)
   
+  @staticmethod
+  def members_from_group_row(group_row):
+    member_set = {m['user'] for m in app_tables.group_members.search(group=group_row)}
+    member_set.update(set(group_row['hosts']))
+    return list(member_set)
+
+  @staticmethod
+  def add_member(user, invite_row):
+    if user not in MyGroup.members_from_group_row(invite_row['group']):
+      app_tables.group_members.add_row(user=user,
+                                       group=invite_row['group'],
+                                       invite=invite_row,
+                                      )  
   
 class Invite(sm.ServerItem, groups.Invite): 
   def __init__(self, port_invite):
@@ -164,8 +166,7 @@ class Invite(sm.ServerItem, groups.Invite):
       if register:
         sm.init_user_info(user)
       #self.update(Invite.from_invite_row(invite_row))
-      group = MyGroup.from_group_row(invite_row['group'], user_id=user.get_id())
-      group.add_member(user, invite_row)
+      MyGroup.add_member(user, invite_row)
       
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):
