@@ -133,8 +133,12 @@ class Invite(sm.ServerItem, groups.Invite):
     errors = []
     if self.invite_id:
       row = app_tables.group_invites.get_by_id(self.invite_id)
+      if not row:
+        raise(RowMissingError("Invalid group invite id."))
     elif self.link_key:
       row = app_tables.group_invites.get(link_key=self.link_key, current=True)
+      if not row:
+        raise(RowMissingError("Invalid group invite link."))
     else:
       raise(RowMissingError("Not enough information to retrieve group_invite row."))
     return row
@@ -149,8 +153,14 @@ class Invite(sm.ServerItem, groups.Invite):
     if user:
       if register:
         sm.init_user_info(user)
-      self._try_adding_invitee(user)
-  
+      self.add_visitor(user, invite_row)
+
+  def add_visitor(self, user, invite_row):
+    app_tables.group_members.add_row(user=user,
+                                     group=invite_row['group'],
+                                     invite=invite_row,
+                                    )
+      
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):
     user = sm.get_user(user_id)

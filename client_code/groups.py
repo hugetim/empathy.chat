@@ -5,6 +5,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from . import helper as h
 from . import parameters as p
+from . import invited
 
 
 @anvil.server.portable_class
@@ -59,16 +60,11 @@ def handle_link(link_key):
   print(f"groups.handle_link: {link_key}")
   user = anvil.users.get_user()
   invite = Invite(link_key=link_key)
-  errors = invite.relay('visit', {'user': user})
-  if not errors:
-    from .Dialogs.Invited import Invited
-    invited_alert = Invited(item=invite)
-    if alert(content=invited_alert, 
-             title="", 
-             buttons=[], large=True, dismissible=False):
-      if not user:
-        method = invited_signup(invite)
-      if anvil.users.get_user():
-        open_form('LoginForm')
-  else:
-    alert(" ".join(errors)) #This is not a valid invite link."
+  try:
+    invite.relay('visit', {'user': user})
+  except RowMissingError as err:
+    alert(err)
+  if not user:
+    method = invited.invited_signup(invite)
+  if anvil.users.get_user():
+    open_form('LoginForm')
