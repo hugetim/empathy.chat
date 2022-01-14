@@ -49,9 +49,9 @@ def get_user(user_id="", require_auth=True):
   if DEBUG:
     print("get_user", user_id)
   logged_in_user = anvil.users.get_user()
-  if user_id == "" or logged_in_user.get_id() == user_id:
+  if user_id == "" or (logged_in_user and logged_in_user.get_id() == user_id):
     return logged_in_user
-  elif (require_auth and logged_in_user['trust_level'] < TEST_TRUST_LEVEL):
+  elif (require_auth and (not logged_in_user or logged_in_user['trust_level'] < TEST_TRUST_LEVEL)):
     raise RuntimeError("User not authorized to access this information")
   else:
     return app_tables.users.get_by_id(user_id)

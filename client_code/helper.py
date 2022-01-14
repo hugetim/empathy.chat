@@ -131,6 +131,11 @@ def warning(warning_str):
   anvil.server.call('warning', warning_str, app_info_dict)
 
 
+def my_assert(statement):
+  if not statement:
+    warning(f"bool({statement}) is not True")
+  
+
 class PausedTimer:
   def __init__(self, timer):
     self.timer = timer

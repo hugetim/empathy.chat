@@ -10,6 +10,7 @@ import anvil.server
 from . import groups
 from . import server_misc as sm
 from . import parameters as p
+from . import helper as h
 from .exceptions import RowMissingError
 
 
@@ -31,7 +32,7 @@ def serve_my_group(port_my_group, method, kwargs):
   return my_group.portable()
 
 
-@sm.authenticated_callable
+@anvil.server.callable
 @anvil.tables.in_transaction
 def serve_group_invite(port_invite, method, kwargs):
   print(f"serve_group_invite: {method}({kwargs}) called on {port_invite}")
@@ -104,11 +105,21 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
                                                current=True,
                                               )
     self.invites.append(Invite.from_invite_row(new_row))
-    
+
+  def add_member(self, user, invite_row):
+    h.my_assert(invite_row['group'] == self.group_row)
+    if user not in self.members:
+      app_tables.group_members.add_row(user=user,
+                                       group=invite_row['group'],
+                                       invite=invite_row,
+                                      )  
+
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
-    port_members = [sm.get_port_user_full(m['user'], user1_id=user_id)
-                    for m in app_tables.group_members.search(group=group_row)]
+    member_set = {sm.get_port_user_full(m['user'], user1_id=user_id)
+                  for m in app_tables.group_members.search(group=group_row)}
+    member_set.update({sm.get_port_user_full(u, user1_id=user_id) for u in group_row['hosts']})
+    port_members = list(member_set)
     port_invites = [Invite.from_invite_row(i_row)
                     for i_row in app_tables.group_invites.search(group=group_row, current=True)]
     port_group = groups.MyGroup(name=group_row['name'],
@@ -149,17 +160,12 @@ class Invite(sm.ServerItem, groups.Invite):
        Side effects: set invite['user2'] if visitor is logged in,
        likewise for invite_reply['user1'] if it exists"""
     invite_row = self.invite_row()
-    self.update(Invite.from_invite_row(invite_row))
     if user:
       if register:
         sm.init_user_info(user)
-      self.add_visitor(user, invite_row)
-
-  def add_visitor(self, user, invite_row):
-    app_tables.group_members.add_row(user=user,
-                                     group=invite_row['group'],
-                                     invite=invite_row,
-                                    )
+      #self.update(Invite.from_invite_row(invite_row))
+      group = MyGroup.from_group_row(invite_row['group'], user_id=user.get_id())
+      group.add_member(user, invite_row)
       
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):
