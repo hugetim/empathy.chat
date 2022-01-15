@@ -257,6 +257,13 @@ class Proposal():
   def times_notify_info(self):
     return {(time.start_now, time.start_date, time.duration) for time in self.times}
   
+  @property
+  def specific_user_eligible(self):
+    if self.eligible == 0 and len(self.eligible_users) == 1 and not self.eligible_group_ids:
+      return self.eligible_users[0]
+    else:
+      return None
+  
   def get_check_items(self):
     items = []
     if self.own:
