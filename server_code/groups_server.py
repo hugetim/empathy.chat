@@ -141,6 +141,11 @@ def user_groups(user):
   return memberships.union(hosteds)
 
 
+def get_create_group_items(user):
+  group_rows = user_groups(user)
+  return [(g['name'], g.get_id()) for g in group_rows]
+  
+
 class Invite(sm.ServerItem, groups.Invite): 
   def __init__(self, port_invite):
     self.update(port_invite)

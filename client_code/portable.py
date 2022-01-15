@@ -228,14 +228,14 @@ class Proposal():
   MAX_ALT_TIMES = 4
   
   def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], 
-               eligible=2, eligible_users=[], eligible_groups=[]):
+               eligible=2, eligible_users=[], eligible_group_ids=[]):
     self.prop_id = prop_id
     self.own = own
     self.user = user
     self.times = times
     self.eligible = eligible
     self.eligible_users = eligible_users
-    self.eligible_groups = eligible_groups
+    self.eligible_group_ids = eligible_group_ids
 
   @property
   def start_now(self):
@@ -269,7 +269,7 @@ class Proposal():
     item = {'prop_id': self.prop_id, 
             'eligible': self.eligible, 
             'eligible_users': [port_user.user_id for port_user in self.eligible_users], 
-            'eligible_groups': self.eligible_groups,
+            'eligible_groups': self.eligible_group_ids,
             'conflict_checks': conflict_checks,}
     first, *alts = self.times
     item['now_allowed'] = not(status and first.start_now == False)
@@ -290,7 +290,7 @@ class Proposal():
                     times=[first_time] + alts,
                     eligible=item['eligible'],
                     eligible_users=eligible_users,
-                    eligible_groups=item['eligible_groups'],
+                    eligible_group_ids=item['eligible_groups'],
                    )
 
   @staticmethod

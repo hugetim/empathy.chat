@@ -26,11 +26,10 @@ def is_visible(user2, user1=None): # Currently unused
     return trust1 > 0 and trust2 > 0 and distance(user2, user1) <= 3
 
   
-@authenticated_callable
-def get_create_user_items(user_id=""):
+def get_create_user_items(user):
   """Return list with 1st---2nd""" # add pending connections to front
-  print(f"get_create_user_items, {user_id}")
-  user = sm.get_user(user_id)
+  if sm.DEBUG:
+    print(f"get_create_user_items, {user['email']}")
   dset = _get_connections(user, 2)
   items = {}
   degree_set = [1, 2] if user['trust_level'] >= 3 else [1]

@@ -218,6 +218,16 @@ def get_port_user_full(user2, user1_id="", distance=None, degree=None, common_gr
   user1 = get_user(user1_id)
   return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree), 
                        common_group_names=common_group_names)
+ 
+  
+@authenticated_callable
+def init_create_form(user_id=""):
+  from . import connections as c
+  from . import groups_server as g
+  user = sm.get_user(user_id)
+  create_user_items = c.get_create_user_items(user)
+  create_group_items = g.get_create_group_items(user)
+  return create_user_items, create_group_items
   
   
 def _latest_invited(user):
