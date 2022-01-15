@@ -8,7 +8,7 @@ from . import portable as port
 from . import helper as h
 
 
-def invite_dialog(invitee=None):
+def invite_dialog(invitee=None, title="Invite a close link to empathy.chat"):
   """Specifying a `name` leads to connect-existing-user dialog"""
   invite = invites.Invite(inviter=port.User.from_logged_in(), invitee=invitee)
   #item = {"relationship": "", "phone_last4": "", "name": name, "user_id": user_id}
@@ -16,7 +16,7 @@ def invite_dialog(invitee=None):
   from .MenuForm.NetworkMenu.Invite import Invite
   top_form.invite_alert = Invite(item=invite)
   return alert(content=top_form.invite_alert,
-               title="Invite a close link to empathy.chat",
+               title=title,
                buttons=[], large=True, dismissible=False)
 
   
