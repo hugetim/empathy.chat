@@ -106,9 +106,11 @@ def get_connections(user_id):
   else:
     dset2 = _get_connections(user, 1)
     records = []
+    #c_users = set()
     for d in range(0, up_to_degree+1):
+      #c_users.update(dset[d] & dset2[1])
       records += [sm.get_port_user_full(user2, logged_in_user, d, d) for user2 in (dset[d] & dset2[1])]
-    return records
+    return records #+ _group_member_records_include(logged_in_user, dset2[1] - c_users.union({logged_in_user}))
 
 
 def connection_record(user2, user1, _distance=None, degree=None):
@@ -124,6 +126,19 @@ def connection_record(user2, user1, _distance=None, degree=None):
                  'unread_message': None, # True/False
                 })
   return record
+
+
+### Not actually needed (with distance=degree) because direct connections of my direct connections will always be 2nd degree to me
+# def _group_member_records_include(user, included_users):
+#   from . import groups_server as g
+#   import collections
+#   fellow_members_to_group_names = collections.defaultdict(list)
+#   for group_row in g.user_groups(user):
+#     relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) & included_users
+#     for user2 in relevant_group_members:
+#       fellow_members_to_group_names[user2].append(group_row['name'])
+#   return [sm.get_port_user_full(user2, user, 99, 99, fellow_members_to_group_names[user2]) 
+#           for user2 in fellow_members_to_group_names.keys()]
 
 
 def _group_member_records_exclude(user, excluded_users):
