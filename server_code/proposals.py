@@ -433,7 +433,6 @@ class Proposal():
     specific_user = self.specific_user_eligible
     if specific_user:
       sm.notify_proposal(specific_user, self, f"specific empathy request", " has directed an empathy chat request specifically to you:")
-      users_notified.add(specific_user)
     return {specific_user}
 
   def notify_edit(self, port_prop, old_port_prop):
