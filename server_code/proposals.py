@@ -313,6 +313,8 @@ class Proposal():
                          in ProposalTime.times_from_proposal(self, require_current=True)]
     eligible_users = row_dict.pop('eligible_users')
     row_dict['eligible_users'] = [sm.get_port_user(user, simple=True) for user in eligible_users]
+    eligible_groups = row_dict.pop('eligible_groups')
+    row_dict['eligible_group_ids'] = [group_row.get_id() for group_row in eligible_groups]
     if not row_dict['current']:
       sm.warning(f"m.Proposal.portable() called on a not-current Proposal")
     del row_dict['current']

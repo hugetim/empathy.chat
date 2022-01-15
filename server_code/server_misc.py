@@ -224,7 +224,7 @@ def get_port_user_full(user2, user1_id="", distance=None, degree=None, common_gr
 def init_create_form(user_id=""):
   from . import connections as c
   from . import groups_server as g
-  user = sm.get_user(user_id)
+  user = get_user(user_id)
   create_user_items = c.get_create_user_items(user)
   create_group_items = g.get_create_group_items(user)
   return create_user_items, create_group_items

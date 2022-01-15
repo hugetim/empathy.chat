@@ -215,7 +215,7 @@ components:
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: ''}
     name: label_5
-    layout_properties: {grid_position: 'ZOGPKZ,NYUXLB'}
+    layout_properties: {grid_position: 'ZOGPKZ,NYUXLB', full_width_row: false}
   - type: DropDown
     properties:
       role: null
@@ -237,16 +237,16 @@ components:
       underline: false
       include_placeholder: false
     name: drop_down_eligible
-    layout_properties: {grid_position: 'ZOGPKZ,GNUIJB ZMWIVU,CZAYLY'}
+    layout_properties: {grid_position: 'ZOGPKZ,GNUIJB ZMWIVU,CZAYLY', full_width_row: false}
     event_bindings: {change: drop_down_eligible_change}
     data_bindings:
     - {property: selected_value, code: 'self.item[''eligible'']', writeback: true}
   - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
-    properties: {align: left, enable_filtering: null, placeholder: None Selected,
+    properties: {align: full, enable_filtering: null, placeholder: None Selected,
       enabled: true, items: null, visible: false, spacing_above: small, spacing_below: small,
       multiple: true}
     name: user_multi_select_drop_down
-    layout_properties: {grid_position: 'ZOGPKZ,GNUIJB PGYIAA,VZADMQ'}
+    layout_properties: {grid_position: 'ZOGPKZ,GNUIJB PGYIAA,VZADMQ', full_width_row: false}
     data_bindings:
     - {property: items, code: 'self.item[''user_items'']'}
     event_bindings: {change: user_multi_select_drop_down_change}
@@ -270,7 +270,9 @@ components:
     name: label_6
     layout_properties: {grid_position: 'JWIJWQ,JVSIPB'}
   - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
-    properties: {}
+    properties: {align: full, enable_filtering: null, placeholder: None Selected,
+      enabled: true, items: null, visible: true, spacing_above: small, spacing_below: small,
+      multiple: true}
     name: group_multi_select_drop_down
     layout_properties: {grid_position: 'JWIJWQ,TNFAHU'}
     data_bindings:

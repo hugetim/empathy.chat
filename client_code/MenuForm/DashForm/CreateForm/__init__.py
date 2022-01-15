@@ -49,6 +49,7 @@ class CreateForm(CreateFormTemplate):
                                       ("Specific user(s)...",0),
                                      ]
     self.user_multi_select_drop_down.selected = self.item['eligible_users']
+    self.group_multi_select_drop_down.selected = self.item['eligible_groups']
     self.normalize_initial_state()
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
