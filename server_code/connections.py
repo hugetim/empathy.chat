@@ -10,27 +10,26 @@ from . import parameters as p
 from . import helper as h
 
 
-def is_visible(user2, user1=None): # Currently unused
-  """Is user2 visible to user1?"""
-  if sm.DEBUG:
-    print("server_misc.is_visible")
-  if user1 is None:
-    user1 = anvil.users.get_user()
-  trust1 = user1['trust_level']
-  trust2 = user2['trust_level']
-  if trust1 is None:
-    return False
-  elif trust2 is None:
-    return False
-  else:
-    return trust1 > 0 and trust2 > 0 and distance(user2, user1) <= 3
+# def is_visible(user2, user1=None): # Currently unused
+#   """Is user2 visible to user1?"""
+#   if sm.DEBUG:
+#     print("c.is_visible")
+#   if user1 is None:
+#     user1 = anvil.users.get_user()
+#   trust1 = user1['trust_level']
+#   trust2 = user2['trust_level']
+#   if trust1 is None:
+#     return False
+#   elif trust2 is None:
+#     return False
+#   else:
+#     return trust1 > 0 and trust2 > 0 and distance(user2, user1) <= 3
 
   
-@authenticated_callable
-def get_create_user_items(user_id=""):
+def get_create_user_items(user):
   """Return list with 1st---2nd""" # add pending connections to front
-  print(f"get_create_user_items, {user_id}")
-  user = sm.get_user(user_id)
+  if sm.DEBUG:
+    print(f"get_create_user_items, {user['email']}")
   dset = _get_connections(user, 2)
   items = {}
   degree_set = [1, 2] if user['trust_level'] >= 3 else [1]
@@ -95,18 +94,22 @@ def get_connections(user_id):
   dset = _get_connections(logged_in_user, up_to_degree, include_zero=True)
   if is_me:
     records = []
+    c_users = set()
     for d in range(1, up_to_degree+1):
-      records += [connection_record(user2, user, d, d) for user2 in dset[d]]
-    return records
+      records += [sm.get_port_user_full(user2, distance=d, degree=d) for user2 in dset[d]]
+      c_users.update(dset[d])
+    return records + _group_member_records_exclude(logged_in_user, c_users)
   elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
         and _degree(user, logged_in_user) > 1):
     return []
   else:
     dset2 = _get_connections(user, 1)
     records = []
+    #c_users = set()
     for d in range(0, up_to_degree+1):
-      records += [connection_record(user2, logged_in_user, d, d) for user2 in (dset[d] & dset2[1])]
-    return records
+      #c_users.update(dset[d] & dset2[1])
+      records += [sm.get_port_user_full(user2, user_id, distance=d, degree=d) for user2 in (dset[d] & dset2[1])]
+    return records #+ _group_member_records_include(logged_in_user, dset2[1] - c_users.union({logged_in_user}))
 
 
 def connection_record(user2, user1, _distance=None, degree=None):
@@ -122,6 +125,32 @@ def connection_record(user2, user1, _distance=None, degree=None):
                  'unread_message': None, # True/False
                 })
   return record
+
+
+### Not actually needed (with distance=degree) because direct connections of my direct connections will always be 2nd degree to me
+# def _group_member_records_include(user, included_users):
+#   from . import groups_server as g
+#   import collections
+#   fellow_members_to_group_names = collections.defaultdict(list)
+#   for group_row in g.user_groups(user):
+#     relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) & included_users
+#     for user2 in relevant_group_members:
+#       fellow_members_to_group_names[user2].append(group_row['name'])
+#   return [sm.get_port_user_full(user2, user, 99, 99, fellow_members_to_group_names[user2]) 
+#           for user2 in fellow_members_to_group_names.keys()]
+
+
+def _group_member_records_exclude(user, excluded_users):
+  from . import groups_server as g
+  import collections
+  fellow_members_to_group_names = collections.defaultdict(list)
+  excluded_users.add(user)
+  for group_row in g.user_groups(user):
+    relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) - excluded_users
+    for user2 in relevant_group_members:
+      fellow_members_to_group_names[user2].append(group_row['name'])
+  return [sm.get_port_user_full(user2, user.get_id(), 99, 99, fellow_members_to_group_names[user2]) 
+          for user2 in fellow_members_to_group_names.keys()]
 
 
 def _invite_status(user2, user1):

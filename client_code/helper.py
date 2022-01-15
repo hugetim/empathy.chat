@@ -15,7 +15,7 @@ def not_me(user_id):
 
 def add_num_suffix(num):
   if num == 0:
-    return "me"
+    return " me"
   else:
     num_suffix = {1: "st", 2: "nd", 3: "rd"}
     return str(num) + num_suffix.get(num, "th")
@@ -131,6 +131,22 @@ def warning(warning_str):
   anvil.server.call('warning', warning_str, app_info_dict)
 
 
+def my_assert(statement):
+  if not statement:
+    warning(f"bool({statement}) is not True")
+  
+  
+class reverse_compare:
+    def __init__(self, obj):
+        self.obj = obj
+
+    def __eq__(self, other):
+        return other.obj == self.obj
+
+    def __lt__(self, other):
+        return other.obj < self.obj
+
+      
 class PausedTimer:
   def __init__(self, timer):
     self.timer = timer
@@ -157,6 +173,22 @@ class AttributeToKey:
     except AttributeError:
       return default
 
+@anvil.server.portable_class    
+class PortItem:
+  def update(self, new_self):
+    for key, value in new_self.__dict__.items():
+      setattr(self, key, value)
+      
+  def __repr__(self):
+    return self.repr_desc + str(self.__dict__)
+  
+  def relay(self, method, kwargs=None):
+    if not kwargs:
+      kwargs = {}
+    new_object = anvil.server.call(self.server_fn_name, self, method, kwargs)
+    self.update(new_object)    
+    
+    
 # @anvil.server.portable_class    
 # class ItemWrapped(AttributeToKey):
 #   def __init__(self, item):

@@ -46,7 +46,7 @@ class Profile(ProfileTemplate):
     if not self.item['me']:
       get_open_form().title_label.text = f"{self.item['first']}'s Profile"
     self.name_label.text = self.item['name']
-    self.degree_label.text = h.add_num_suffix(self.item['distance'])
+    self.degree_label.text = h.add_num_suffix(self.item['distance']) if self.item['distance'] < 99 else ""
     if self.item['status'] == "invite":
       self.degree_label.text += " (pending invite)"
     name_likes = ("I like" if self.item['me'] 

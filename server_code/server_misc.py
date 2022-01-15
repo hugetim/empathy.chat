@@ -49,9 +49,9 @@ def get_user(user_id="", require_auth=True):
   if DEBUG:
     print("get_user", user_id)
   logged_in_user = anvil.users.get_user()
-  if user_id == "" or logged_in_user.get_id() == user_id:
+  if user_id == "" or (logged_in_user and logged_in_user.get_id() == user_id):
     return logged_in_user
-  elif (require_auth and logged_in_user['trust_level'] < TEST_TRUST_LEVEL):
+  elif (require_auth and (not logged_in_user or logged_in_user['trust_level'] < TEST_TRUST_LEVEL)):
     raise RuntimeError("User not authorized to access this information")
   else:
     return app_tables.users.get_by_id(user_id)
@@ -212,6 +212,24 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
     return None
 
   
+@authenticated_callable
+def get_port_user_full(user2, user1_id="", distance=None, degree=None, common_group_names=None):
+  from . import connections as c
+  user1 = get_user(user1_id)
+  return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree), 
+                       common_group_names=common_group_names)
+ 
+  
+@authenticated_callable
+def init_create_form(user_id=""):
+  from . import connections as c
+  from . import groups_server as g
+  user = get_user(user_id)
+  create_user_items = c.get_create_user_items(user)
+  create_group_items = g.get_create_group_items(user)
+  return create_user_items, create_group_items
+  
+  
 def _latest_invited(user):
   inviteds = _inviteds(user)
   if len(inviteds) == 0:
@@ -286,7 +304,6 @@ def init_profile(user_id=""):
                  'first': user['first_name'],
                  'last': port.last_name(user['last_name'], record['distance']),
                  'relationships': [] if is_me else c.get_relationships(user),
-                 'confirmed_url': user['confirmed_url'],
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
@@ -316,6 +333,13 @@ def save_name(name_item, user_id=""):
 def save_user_item(item_name, text, user_id=""):
   user = get_user(user_id)
   user[item_name] = text
+
+  
+class ServerItem:
+  def relay(self, method, kwargs=None):
+    if not kwargs:
+      kwargs = {}
+    return getattr(self, method)(**kwargs)
   
 
 def new_jitsi_code():

@@ -11,7 +11,7 @@ class Name(NameTemplate):
 
     # Any code you write here will run when the form opens.
     distance = self.item.get('distance')
-    if distance:
+    if distance and distance < 99:
       self.degree_label.text = h.add_num_suffix(distance)
       self.degree_label.visible = True
     

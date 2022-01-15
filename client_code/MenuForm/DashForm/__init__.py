@@ -48,12 +48,12 @@ class DashForm(DashFormTemplate):
 
   def update_upcoming_table(self):
     """Update form based on upcoming state"""
-    self.upcoming_repeating_panel.items = deepcopy(self.item['upcomings'])
-    self.upcoming_card.visible = bool(self.item['upcomings'])    
+    self.upcoming_repeating_panel.items = sorted(deepcopy(self.item['upcomings']), key=lambda x:x['start_date'])
+    self.upcoming_card.visible = bool(self.item['upcomings'])
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
-    self.repeating_panel_1.items = deepcopy(self.item['proposals'])
+    self.repeating_panel_1.items = sorted(deepcopy(self.item['proposals']), key=lambda x:x['prop_time'].start_for_order)
     self.data_grid_1.visible = bool(self.item['proposals'])
     others_props_visible = (self.data_grid_1.visible
                             and any([not item['prop'].own

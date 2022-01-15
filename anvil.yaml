@@ -71,7 +71,7 @@ db_schema:
     client: none
     server: full
     columns:
-    - name: url
+    - name: link_key
       admin_ui: {width: 200}
       type: string
     - name: group
@@ -87,6 +87,9 @@ db_schema:
     - name: spec
       admin_ui: {width: 200}
       type: simpleObject
+    - name: current
+      admin_ui: {width: 200}
+      type: bool
   codes:
     title: Codes
     client: none
@@ -419,6 +422,9 @@ db_schema:
     - name: created
       admin_ui: {width: 200}
       type: datetime
+    - name: current
+      admin_ui: {width: 200}
+      type: bool
   connections:
     title: Connections
     client: none

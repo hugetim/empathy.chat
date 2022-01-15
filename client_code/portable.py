@@ -42,7 +42,7 @@ def full_name(first, last, distance=3):
     
 
 @anvil.server.portable_class
-class User():
+class User(h.AttributeToKey):
   
   def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None):
     self.user_id = user_id
@@ -60,6 +60,10 @@ class User():
   
   def __repr__(self):
     return str(self.__dict__)
+  
+  @property
+  def distance_str(self):
+    return h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < 99) else ""
   
   @property
   def s_user(self):
@@ -81,6 +85,23 @@ class User():
                 starred=None,
                )
 
+  
+@anvil.server.portable_class
+class UserFull(User):
+  def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None,
+               degree=None, last_active=None, status=None, unread_message=None, common_group_names=None):
+    super().__init__(user_id=user_id, name=name, confirmed_url=confirmed_url, distance=distance, seeking=seeking, starred=starred)
+    self.degree = degree
+    self.last_active = last_active
+    self.status = status
+    self.unread_message = unread_message
+    self.common_group_names = common_group_names if common_group_names else []
+    
+  @property
+  def distance_str_or_groups(self):
+    d_str = self.distance_str
+    return d_str if d_str else "\n".join(self.common_group_names)
+    
     
 @anvil.server.portable_class
 class ProposalTime():
@@ -113,7 +134,11 @@ class ProposalTime():
 
   def __repr__(self):
     return str(self.__dict__)
-    
+ 
+  @property
+  def start_for_order(self):
+    return h.now() if self.start_now else self.start_date
+
   def has_conflict(self, conflict_checks):
     this = self.get_check_item()
     for check_item in conflict_checks:
@@ -203,14 +228,14 @@ class Proposal():
   MAX_ALT_TIMES = 4
   
   def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], 
-               eligible=2, eligible_users=[], eligible_groups=[]):
+               eligible=2, eligible_users=[], eligible_group_ids=[]):
     self.prop_id = prop_id
     self.own = own
     self.user = user
     self.times = times
     self.eligible = eligible
     self.eligible_users = eligible_users
-    self.eligible_groups = eligible_groups
+    self.eligible_group_ids = eligible_group_ids
 
   @property
   def start_now(self):
@@ -244,7 +269,7 @@ class Proposal():
     item = {'prop_id': self.prop_id, 
             'eligible': self.eligible, 
             'eligible_users': [port_user.user_id for port_user in self.eligible_users], 
-            'eligible_groups': self.eligible_groups,
+            'eligible_groups': self.eligible_group_ids,
             'conflict_checks': conflict_checks,}
     first, *alts = self.times
     item['now_allowed'] = not(status and first.start_now == False)
@@ -265,7 +290,7 @@ class Proposal():
                     times=[first_time] + alts,
                     eligible=item['eligible'],
                     eligible_users=eligible_users,
-                    eligible_groups=item['eligible_groups'],
+                    eligible_group_ids=item['eligible_groups'],
                    )
 
   @staticmethod

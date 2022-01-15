@@ -313,6 +313,8 @@ class Proposal():
                          in ProposalTime.times_from_proposal(self, require_current=True)]
     eligible_users = row_dict.pop('eligible_users')
     row_dict['eligible_users'] = [sm.get_port_user(user, simple=True) for user in eligible_users]
+    eligible_groups = row_dict.pop('eligible_groups')
+    row_dict['eligible_group_ids'] = [group_row.get_id() for group_row in eligible_groups]
     if not row_dict['current']:
       sm.warning(f"m.Proposal.portable() called on a not-current Proposal")
     del row_dict['current']
@@ -344,15 +346,28 @@ class Proposal():
     self._prop_row['eligible_users'] = value
   
   @property
+  def eligible_groups(self):
+    return self._prop_row['eligible_groups']
+  
+  @eligible_groups.setter
+  def eligible_groups(self, value):
+    self._prop_row['eligible_groups'] = value
+    
+  @property
   def proposer(self):
     return self._prop_row['user']
   
   def is_visible(self, user):
     from . import connections as c
+    from . import groups_server as g
     distance = c.distance(self._prop_row['user'], user)
-    return (distance <= self.eligible
-            or (self.eligible == 0 and user in self.eligible_users and distance < 99)
-           )
+    if (distance <= self.eligible or (self.eligible == 0 and user in self.eligible_users and distance < 99)):
+      return True
+    else:
+      for group in self.eligible_groups:
+        if user in g.MyGroup.members_from_group_row(group):
+          return True
+      return False
 
   def hide_unaccepted_times(self):
     for proptime in ProposalTime.times_from_proposal(self, require_current=True):
@@ -389,8 +404,9 @@ class Proposal():
     if self.proposer['trust_level'] < 3:
       self._prop_row['eligible'] = min(2, self._prop_row['eligible'])
     self._prop_row['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id) 
-                                       for port_user in port_prop.eligible_users]
-    self._prop_row['eligible_groups'] = port_prop.eligible_groups
+                                        for port_user in port_prop.eligible_users]
+    self._prop_row['eligible_groups'] = [app_tables.groups.get_by_id(group_id) 
+                                         for group_id in port_prop.eligible_group_ids]
     ## First cancel removed rows
     new_time_ids = [port_time.time_id for port_time in port_prop.times]
     for proptime in ProposalTime.times_from_proposal(self):
@@ -435,13 +451,14 @@ class Proposal():
   def add(user, port_prop):
     now = sm.now()
     user_rows = [app_tables.users.get_by_id(port_user.user_id) for port_user in port_prop.eligible_users]
+    group_rows = [app_tables.groups.get_by_id(group_id) for group_id in port_prop.eligible_group_ids]
     new_prop_row = app_tables.proposals.add_row(user=user,
                                                 current=True,
                                                 created=now,
                                                 last_edited=now,
                                                 eligible=port_prop.eligible,
                                                 eligible_users=user_rows,
-                                                eligible_groups=port_prop.eligible_groups,
+                                                eligible_groups=group_rows,
                                                )
     if user['trust_level'] < 3:
       new_prop_row['eligible'] = min(2, new_prop_row['eligible'])
@@ -463,7 +480,7 @@ class Proposal():
     return app_tables.proposals.search(user=user, current=True)
   
   @staticmethod
-  def get_port_proposals(user):
+  def get_port_view_items(user):
     """Return list of Proposal view items visible to user
     
     Side effects: prune proposals

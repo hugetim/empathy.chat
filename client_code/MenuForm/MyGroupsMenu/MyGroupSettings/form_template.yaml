@@ -7,41 +7,6 @@ components:
   layout_properties: {grid_position: 'QZKEDX,UFTIPG'}
   event_bindings: {}
   components:
-  - type: DropDown
-    properties:
-      role: null
-      align: center
-      tooltip: ''
-      placeholder: ''
-      border: ''
-      enabled: true
-      foreground: ''
-      items: ['']
-      visible: true
-      font_size: null
-      font: ''
-      spacing_above: small
-      spacing_below: small
-      italic: false
-      background: ''
-      bold: false
-      underline: false
-      include_placeholder: false
-    name: drop_down_groups
-    layout_properties: {grid_position: 'GYVNSM,ASKPKI'}
-    event_bindings: {}
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Create New Group, font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:plus'}
-    name: button_create
-    layout_properties: {grid_position: 'DVWXTJ,EIRYFG'}
-    event_bindings: {}
-  - type: form:HorizontalRule
-    properties: {}
-    name: horizontal_rule_1
-    layout_properties: {grid_position: 'YEVOJL,YYLAVW'}
   - type: LinearPanel
     properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
       border: '', visible: true, role: null, tooltip: ''}
@@ -56,39 +21,73 @@ components:
       components:
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: 'Group Name:', font_size: null, font: '', spacing_above: none,
+          visible: true, text: 'Group Name:', font_size: null, font: '', spacing_above: small,
           icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
           underline: false, icon: ''}
         name: label_1
         layout_properties: {grid_position: 'NBQJMT,LQCUQV'}
         event_bindings: {}
-      - type: TextBox
-        properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-          border: '', enabled: false, foreground: '', visible: false, text: '', font_size: null,
-          font: '', spacing_above: none, type: text, spacing_below: small, italic: false,
-          background: '', bold: false, underline: false}
-        name: text_box_group_name
-        layout_properties: {grid_position: 'NBQJMT,AEMJXM'}
-        event_bindings: {}
+      - type: Label
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+          visible: true, text: '', font_size: null, font: '', spacing_above: small,
+          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+          underline: false, icon: ''}
+        name: group_name_label
+        layout_properties: {}
+        data_bindings:
+        - {property: text, code: 'self.group[''name'']'}
       - type: Button
         properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-          foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
+          foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
           icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
           underline: false, icon: 'fa:pencil'}
-        name: button_1
+        name: edit_name_button
         layout_properties: {grid_position: 'KTTXPP,TGIBIN'}
-        event_bindings: {}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Create Invite Link, font_size: null,
-        font: '', spacing_above: medium, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:plus'}
-      name: button_invite
-      layout_properties: {grid_position: 'HGRLKL,YVPFRW'}
-      event_bindings: {}
+        event_bindings: {click: edit_name_button_click}
+  - type: DataGrid
+    properties:
+      role: null
+      columns:
+      - {id: KXBOMI, title: Invite Link, data_key: url, $$hashKey: 'object:22731',
+        expand: true}
+      - {id: SQRIZT, title: Expire Date, data_key: expire_date_str, $$hashKey: 'object:22733'}
+      auto_header: true
+      tooltip: ''
+      border: ''
+      foreground: ''
+      rows_per_page: 20
+      visible: true
+      wrap_on: never
+      show_page_controls: true
+      spacing_above: small
+      spacing_below: small
+      background: ''
+    name: invites_data_grid
+    layout_properties:
+      col_widths: {}
+      grid_position: SAMPVL,WWRMQK
+    components:
+    - type: RepeatingPanel
+      properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
+        visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.MyGroupsMenu.MyGroupSettings.GroupInviteRow,
+        background: ''}
+      name: invites_repeating_panel
+      layout_properties: {}
+      data_bindings:
+      - {property: items, code: self.group.invites}
+    data_bindings:
+    - {property: visible, code: self.group.invites}
+  - type: Button
+    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Create Invite Link, font_size: null, font: '',
+      spacing_above: medium, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: 'fa:plus'}
+    name: button_invite
+    layout_properties: {grid_position: 'BFVFFA,BNBGIY'}
+    event_bindings: {click: button_invite_click}
 container:
   type: ColumnPanel
-  event_bindings: {}
+  event_bindings: {show: form_show}
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
     wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
     background: ''}

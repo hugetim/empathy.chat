@@ -111,7 +111,7 @@ def confirm_wait_helper(user):
 @anvil.tables.in_transaction
 def get_proposals_upcomings(user_id=""):
   user = sm.get_user(user_id)
-  proposals = Proposal.get_port_proposals(user)
+  proposals = Proposal.get_port_view_items(user)
   upcomings = _get_upcomings(user)
   return proposals, upcomings
 
@@ -168,7 +168,7 @@ def _get_status(user):
         ping_start = this_match['match_commence']
       else:
         status = None
-        proposals = Proposal.get_port_proposals(user)
+        proposals = Proposal.get_port_view_items(user)
         upcomings = _get_upcomings(user)
         prompts = sm.get_prompts(user)
   return {'status': status, 

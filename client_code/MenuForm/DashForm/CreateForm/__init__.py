@@ -20,8 +20,7 @@ class CreateForm(CreateFormTemplate):
     # Set Form properties and Data Bindings.
     self.trust_level = glob.trust_level
     if 'user_items' not in item:
-      item['user_items'] = anvil.server.call('get_create_user_items')
-    item['group_items'] = []
+      item['user_items'], item['group_items'] = anvil.server.call('init_create_form')
     self.top_form = get_open_form()
     self.init_components(item=item, **properties)
     #alert title: New Empathy Chat Proposal
@@ -49,7 +48,8 @@ class CreateForm(CreateFormTemplate):
                                       ("Close links only (1st degree)", 1),
                                       ("Specific user(s)...",0),
                                      ]
-    self.multi_select_drop_down.selected = self.item['eligible_users']
+    self.user_multi_select_drop_down.selected = self.item['eligible_users']
+    self.group_multi_select_drop_down.selected = self.item['eligible_groups']
     self.normalize_initial_state()
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
@@ -118,9 +118,9 @@ class CreateForm(CreateFormTemplate):
 
   def update_eligible(self):
     if self.drop_down_eligible.selected_value == 0:
-      self.multi_select_drop_down.visible = True
+      self.user_multi_select_drop_down.visible = True
     else:
-      self.multi_select_drop_down.visible = False
+      self.user_multi_select_drop_down.visible = False
     
   def update(self):
     self.update_times()
@@ -215,11 +215,13 @@ class CreateForm(CreateFormTemplate):
     """This method is called when the button is clicked"""
     self.raise_event("x-close-alert", value=False)
 
-  def multi_select_drop_down_change(self, **event_args):
+  def user_multi_select_drop_down_change(self, **event_args):
     """This method is called when the selected values change"""
-    self.item['eligible_users'] = self.multi_select_drop_down.selected
+    self.item['eligible_users'] = self.user_multi_select_drop_down.selected
 
-
+  def group_multi_select_drop_down_change(self, **event_args):
+    """This method is called when the selected values change"""
+    self.item['eligible_groups'] = self.group_multi_select_drop_down.selected
 
 
 
