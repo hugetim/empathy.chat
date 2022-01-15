@@ -10,20 +10,20 @@ from . import parameters as p
 from . import helper as h
 
 
-def is_visible(user2, user1=None): # Currently unused
-  """Is user2 visible to user1?"""
-  if sm.DEBUG:
-    print("server_misc.is_visible")
-  if user1 is None:
-    user1 = anvil.users.get_user()
-  trust1 = user1['trust_level']
-  trust2 = user2['trust_level']
-  if trust1 is None:
-    return False
-  elif trust2 is None:
-    return False
-  else:
-    return trust1 > 0 and trust2 > 0 and distance(user2, user1) <= 3
+# def is_visible(user2, user1=None): # Currently unused
+#   """Is user2 visible to user1?"""
+#   if sm.DEBUG:
+#     print("c.is_visible")
+#   if user1 is None:
+#     user1 = anvil.users.get_user()
+#   trust1 = user1['trust_level']
+#   trust2 = user2['trust_level']
+#   if trust1 is None:
+#     return False
+#   elif trust2 is None:
+#     return False
+#   else:
+#     return trust1 > 0 and trust2 > 0 and distance(user2, user1) <= 3
 
   
 def get_create_user_items(user):

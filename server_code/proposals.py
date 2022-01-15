@@ -346,15 +346,28 @@ class Proposal():
     self._prop_row['eligible_users'] = value
   
   @property
+  def eligible_groups(self):
+    return self._prop_row['eligible_groups']
+  
+  @eligible_groups.setter
+  def eligible_groups(self, value):
+    self._prop_row['eligible_groups'] = value
+    
+  @property
   def proposer(self):
     return self._prop_row['user']
   
   def is_visible(self, user):
     from . import connections as c
+    from . import groups_server as g
     distance = c.distance(self._prop_row['user'], user)
-    return (distance <= self.eligible
-            or (self.eligible == 0 and user in self.eligible_users and distance < 99)
-           )
+    if (distance <= self.eligible or (self.eligible == 0 and user in self.eligible_users and distance < 99)):
+      return True
+    else:
+      for group in self.eligible_groups:
+        if user in g.MyGroup.members_from_group_row(group):
+          return True
+      return False
 
   def hide_unaccepted_times(self):
     for proptime in ProposalTime.times_from_proposal(self, require_current=True):
