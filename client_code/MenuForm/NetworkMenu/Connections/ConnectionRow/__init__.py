@@ -38,4 +38,9 @@ class ConnectionRow(ConnectionRowTemplate):
     if invited.invited_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
       self.parent.raise_event('x-reset')
 
+  def unread_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    get_open_form().go_profile(self.item['user_id'], tab='history')
+
+
 

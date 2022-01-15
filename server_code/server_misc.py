@@ -299,11 +299,9 @@ def init_profile(user_id=""):
   user = get_user(user_id, require_auth=False)
   record = c.connection_record(user, get_user())
   confirmed_url_date = user['confirmed_url_date'] if user['confirmed_url'] else None
-  is_me = user == anvil.users.get_user()
-  record.update({'me': is_me,
-                 'first': user['first_name'],
+  record.update({'first': user['first_name'],
                  'last': port.last_name(user['last_name'], record['distance']),
-                 'relationships': [] if is_me else c.get_relationships(user),
+                 'relationships': [] if record['me'] else c.get_relationships(user),
                  'confirmed_date': confirmed_url_date,
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],

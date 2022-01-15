@@ -123,10 +123,10 @@ class MenuForm(MenuFormTemplate):
     self.reset_and_load(MyGroupsMenu())   
     self.my_groups_link.role = "selected" 
     
-  def go_profile(self, user_id=""):
+  def go_profile(self, user_id="", tab="profile"):
     if h.not_me(user_id):
       self.title_label.text = "" # other user's profile
-      item = {'user_id': user_id, 'tab': 'profile'}
+      item = {'user_id': user_id, 'tab': tab}
       self.reset_and_load(UserMenu(item=item)) 
     else:
       self.title_label.text = "My Profile"

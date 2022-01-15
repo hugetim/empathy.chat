@@ -27,13 +27,15 @@ components:
   layout_properties: {column: NBEGGD}
   components:
   - type: Button
-    properties: {role: primary-color, align: center, tooltip: Messages, border: '',
+    properties: {role: primary-color, align: center, tooltip: Unread message, border: '',
       enabled: true, foreground: '', visible: false, text: '', font_size: null, font: '',
       spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
       bold: false, underline: false, icon: 'fa:comment'}
     name: unread_button
     layout_properties: {}
-    data_bindings: []
+    data_bindings:
+    - {property: visible, code: 'self.item[''unread_message'']'}
+    event_bindings: {click: unread_button_click}
   - type: Button
     properties: {role: primary-color, align: center, tooltip: 'This user has invited
         you to link, awaiting your confirmation', border: '', enabled: true, foreground: '',

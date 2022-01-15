@@ -119,7 +119,9 @@ def connection_record(user2, user1, _distance=None, degree=None):
   if _distance is None:
     _distance = degree # distance(user2, user1)
   record = vars(sm.get_port_user(user2, _distance))
-  record.update({'degree': degree, 
+  is_me = user2 == user1
+  record.update({'me': is_me,
+                 'degree': degree, 
                  'last_active': user2['init_date'],
                  'status': _invite_status(user2, user1),
                  'unread_message': None, # True/False

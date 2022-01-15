@@ -89,12 +89,13 @@ class User(h.AttributeToKey):
 @anvil.server.portable_class
 class UserFull(User):
   def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None,
-               degree=None, last_active=None, status=None, unread_message=None, common_group_names=None):
+               degree=None, last_active=None, status=None, unread_message=None, me=None, common_group_names=None):
     super().__init__(user_id=user_id, name=name, confirmed_url=confirmed_url, distance=distance, seeking=seeking, starred=starred)
     self.degree = degree
     self.last_active = last_active
     self.status = status
     self.unread_message = unread_message
+    self.me = me
     self.common_group_names = common_group_names if common_group_names else []
     
   @property
