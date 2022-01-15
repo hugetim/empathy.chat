@@ -70,17 +70,17 @@ components:
       event_bindings: {click: propose_button_click}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: 'This user has invited
-          you to connect, awaiting your confirmation', border: '', enabled: true,
-        foreground: '', visible: false, text: 'Confirm?', font_size: null, font: '',
-        spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:link'}
+          you to link, awaiting your confirmation', border: '', enabled: true, foreground: '',
+        visible: false, text: 'Confirm?', font_size: null, font: '', spacing_above: none,
+        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
+        underline: false, icon: 'fa:link'}
       name: confirm_button
       layout_properties: {}
       data_bindings:
       - {property: visible, code: 'self.item[''status''] == "invited"'}
       event_bindings: {click: confirm_button_click}
     - type: Button
-      properties: {role: null, align: center, tooltip: Invite this user to be a "close connection",
+      properties: {role: null, align: center, tooltip: Invite this user to be a "close link",
         border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
         font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:link'}
@@ -91,7 +91,7 @@ components:
           >= 2 and not self.item[''status'']'}
       event_bindings: {click: connect_button_click}
     - type: Button
-      properties: {role: null, align: center, tooltip: Remove your connection to this user,
+      properties: {role: null, align: center, tooltip: Remove your link to this user,
         border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
         font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:chain-broken'}
