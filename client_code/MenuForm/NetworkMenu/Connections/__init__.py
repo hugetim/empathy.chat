@@ -20,6 +20,6 @@ class Connections(ConnectionsTemplate):
     
   def update(self):
     items = anvil.server.call('get_connections', self.item['user_id'])
-    items.sort(key=lambda pu: (pu['distance'], h.reverse_compare(pu['last_active'])))
+    items.sort(key=lambda pu: (pu.distance_str_or_groups, h.reverse_compare(pu['last_active'])))
     self.repeating_panel_1.items = items
     self.refresh_data_bindings()

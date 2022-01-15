@@ -15,7 +15,7 @@ def not_me(user_id):
 
 def add_num_suffix(num):
   if num == 0:
-    return "me"
+    return " me"
   else:
     num_suffix = {1: "st", 2: "nd", 3: "rd"}
     return str(num) + num_suffix.get(num, "th")

@@ -63,7 +63,6 @@ class User(h.AttributeToKey):
   
   @property
   def distance_str(self):
-    print(f"{self.name}: {self.distance}, {h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < 99) else ''}")
     return h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < 99) else ""
   
   @property
