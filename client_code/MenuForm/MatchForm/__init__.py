@@ -7,6 +7,7 @@ from pdf_viewer.pdf_viewer import pdf_viewer
 from ... import ui_procedures as ui
 from ... import glob
 from ... import helper as h
+from ... import parameters as p
 from .MyJitsi import MyJitsi
 from .SliderPanel import SliderPanel
 
@@ -44,7 +45,7 @@ class MatchForm(MatchFormTemplate):
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
     # https://jitsi.github.io/handbook/docs/user-guide/user-guide-advanced
-    base = "https://8x8.vc/vpaas-magic-cookie-848c456481fc4755aeb61d02b9d9dab2/" #"https://meet.jit.si/"
+    base = "https://meet.jit.si/" if p.DEBUG_MODE else "https://8x8.vc/vpaas-magic-cookie-848c456481fc4755aeb61d02b9d9dab2/"
     self.jitsi_link.url = base + jitsi_code + "#config.prejoinPageEnabled=false"
     self.jitsi_link.text = jitsi_code
     self.jitsi_link.visible = True
