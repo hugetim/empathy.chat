@@ -2,7 +2,7 @@ container:
   type: HtmlTemplate
   properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
     role: null, html: "<div anvil-slot=\"default\"></div>\n<div id=\"jitsi\"></div>\n\
-      \n<script>\n  function initJitsi(domain, options) {\n    options.parentNode\
+      \n<script>\n  function initJitsi(domain, options, alias) {\n    options.parentNode\
       \ = this.find(\"#jitsi\")[0];\n    options.configOverwrite = {fileRecordingsEnabled:\
       \ false,\n                               liveStreamingEnabled: false,\n    \
       \                           transcribingEnabled: false,\n                  \
@@ -17,9 +17,11 @@ container:
       \                      'select-background',\n                              \
       \                 ],\n                               hideConferenceTimer: false,\n\
       \                               disablePolls: true,\n                      \
-      \        };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
-      \ ' ', //empathy.chat partner\n                                        SETTINGS_SECTIONS:\
-      \ [ 'devices', 'language' ],\n                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
+      \         requireDisplayName: false,\n                               brandingRoomAlias:\
+      \ alias,\n                              };\n    options.interfaceConfigOverwrite\
+      \ = {DEFAULT_REMOTE_DISPLAY_NAME: ' ', //empathy.chat partner\n            \
+      \                            SETTINGS_SECTIONS: [ 'devices', 'language' ],\n\
+      \                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
       \ 60000,\n                                        SHOW_CHROME_EXTENSION_BANNER:\
       \ false,\n                                        MOBILE_APP_PROMO: false,\n\
       \                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\

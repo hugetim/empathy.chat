@@ -44,7 +44,8 @@ class MatchForm(MatchFormTemplate):
   def set_jitsi_link(self, jitsi_code):
     """Initialize or destroy embedded Jitsi Meet instance"""
     # https://jitsi.github.io/handbook/docs/user-guide/user-guide-advanced
-    self.jitsi_link.url = "https://meet.jit.si/" + jitsi_code + "#config.prejoinPageEnabled=false"
+    base = "https://8x8.vc/vpaas-magic-cookie-848c456481fc4755aeb61d02b9d9dab2/" #"https://meet.jit.si/"
+    self.jitsi_link.url = base + jitsi_code + "#config.prejoinPageEnabled=false"
     self.jitsi_link.text = jitsi_code
     self.jitsi_link.visible = True
     if not self.jitsi_embed:
