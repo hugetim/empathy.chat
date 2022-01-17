@@ -142,7 +142,7 @@ def robust_server_call(fn_name, *args, **kwargs):
 
   
 def _robust_server_call(n, fn_name, *args, **kwargs):
-  if n <= 1:
+  if n <= 0:
     return anvil.server.call(fn_name, *args, **kwargs)
   else:
     try:
