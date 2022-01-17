@@ -3,7 +3,6 @@ import anvil.tables
 from anvil.tables import app_tables
 import anvil.tables.query as q
 import anvil.server
-import datetime
 import anvil.tz
 from . import parameters as p
 from . import server_misc as sm
@@ -36,6 +35,7 @@ def _seconds_left(status, expire_date=None, ping_start=None):
        
 def _prune_matches():
   """Complete old commenced matches for all users"""
+  import datetime
   if sm.DEBUG:
     print("_prune_matches")
   assume_complete = datetime.timedelta(hours=p.ASSUME_COMPLETE_HOURS)
@@ -487,6 +487,7 @@ def match_complete(user_id=""):
 
 
 def current_match(user):
+  import datetime
   this_match = None
   now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
   current_matches = app_tables.matches.search(users=[user], complete=[0],
@@ -500,6 +501,7 @@ def current_match(user):
 
 
 def current_match_i(user):
+  import datetime
   this_match, i = None, None
   now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
   current_matches = app_tables.matches.search(users=[user], complete=[0],

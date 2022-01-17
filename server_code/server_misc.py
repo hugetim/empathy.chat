@@ -6,9 +6,6 @@ import anvil.google.auth
 import anvil.tables.query as q
 import anvil.secrets
 import anvil.email
-import datetime
-import random
-import re
 from . import parameters as p
 from . import helper as h
 from . import portable as port
@@ -21,6 +18,7 @@ authenticated_callable = anvil.server.callable(require_user=True)
 
 def now():
   """Return utcnow"""
+  import datetime
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 
@@ -243,6 +241,7 @@ def _inviteds(user):
 
 
 def get_prompts(user):
+  import datetime
   out = []
   other_prompts = app_tables.prompts.search(user=user)
   if len(other_prompts) > 0:
@@ -347,6 +346,7 @@ def new_jitsi_code():
 
 
 def random_code(num_chars=5, digits_only=False):
+  import random
   if digits_only:
     charset = "1234567890"
   else:
@@ -509,12 +509,14 @@ def _their_value(values, my_i):
 
 
 def _email_invalid(email):
+  import re
   # pattern source: https://stackoverflow.com/revisions/201378/26
   pattern = r"""(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
   return not bool(re.match(pattern, email))
   
 
 def _emails_equal(a, b):
+  import re
   em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
   a_match = em_re.search(a)
   b_match = em_re.search(b)
@@ -622,6 +624,7 @@ def send_verification_sms(number, user_id=""):
 @authenticated_callable
 @anvil.tables.in_transaction
 def check_phone_code(code, user_id=""):
+  import datetime
   user = get_user(user_id)
   from . import matcher
   matcher.propagate_update_needed()
@@ -828,6 +831,7 @@ def get_url(name):
 #   Side effect: prune request_em (i.e. switch expired request_em to false)
 #   """
 #   return []
+# import datetime
   #from . import matcher
   #now = now()
   #_prune_request_em()

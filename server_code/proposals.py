@@ -3,7 +3,6 @@ import anvil.tables
 from anvil.tables import app_tables
 import anvil.tables.query as q
 import anvil.server
-import datetime
 import anvil.tz
 from . import parameters as p
 from . import server_misc as sm
@@ -180,6 +179,7 @@ class ProposalTime():
     self._proptime_row['current'] = True
     
   def confirm_wait(self, start_now=True):
+    import datetime
     if start_now:
       self._proptime_row['expire_date'] = sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
       
@@ -281,6 +281,7 @@ class ProposalTime():
   
   @staticmethod
   def old_ping_to_prune(now):
+    import datetime
     # below (matched separately) ensures that no ping proposal_times left hanging by cancelling only one
     if sm.DEBUG:
       print("old_ping_to_prune")
