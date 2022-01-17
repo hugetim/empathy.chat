@@ -77,7 +77,7 @@ def _init(user):
 
 
 def _prune_all_expired_items():
-  Proposal.prune_all()
+  #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_matches()
   sm.prune_messages()
 
