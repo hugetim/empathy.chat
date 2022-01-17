@@ -66,7 +66,8 @@ components:
       layout_properties: {}
       data_bindings:
       - {property: visible, code: '(not self.item[''me'']) and (self.item[''degree'']
-          == 1 or (self.trust_level >= 3 and self.item[''distance''] == 2))'}
+          == 1 or (self.item[''distance''] == 2 and self.trust_level >= 3 and self.item[''trust_level'']
+          >= 3))'}
       event_bindings: {click: propose_button_click}
     - type: Button
       properties: {role: primary-color, align: center, tooltip: 'This user has invited

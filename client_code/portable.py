@@ -89,19 +89,35 @@ class User(h.AttributeToKey):
 @anvil.server.portable_class
 class UserFull(User):
   def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None,
-               degree=None, last_active=None, status=None, unread_message=None, me=None, common_group_names=None):
+               degree=None, last_active=None, status=None, unread_message=None, me=None, 
+               first="", last="", confirmed_date=None, trust_level=None, trust_label="",
+               common_group_names=None):
     super().__init__(user_id=user_id, name=name, confirmed_url=confirmed_url, distance=distance, seeking=seeking, starred=starred)
     self.degree = degree
     self.last_active = last_active
     self.status = status
     self.unread_message = unread_message
     self.me = me
+    self.first = first
+    self.last = last
+    self.confirmed_date = confirmed_date
+    self.trust_level = trust_level
+    self.trust_label = trust_label
     self.common_group_names = common_group_names if common_group_names else []
     
   @property
   def distance_str_or_groups(self):
     d_str = self.distance_str
     return d_str if d_str else "\n".join(self.common_group_names)
+
+
+@anvil.server.portable_class
+class UserProfile(UserFull):
+  def __init__(self, relationships=None, how_empathy="", profile="", **kwargs):
+    super().__init__(**kwargs)
+    self.relationships = relationships if relationships else []
+    self.how_empathy = how_empathy
+    self.profile = profile
     
     
 @anvil.server.portable_class

@@ -121,11 +121,17 @@ def connection_record(user2, user1, _distance=None, degree=None):
     _distance = degree # distance(user2, user1)
   record = vars(sm.get_port_user(user2, _distance))
   is_me = user2 == user1
+  confirmed_url_date = user2['confirmed_url_date'] if user2['confirmed_url'] else None
   record.update({'me': is_me,
                  'degree': degree, 
                  'last_active': user2['init_date'],
                  'status': _invite_status(user2, user1),
                  'unread_message': None, # True/False
+                 'first': user2['first_name'],
+                 'last': port.last_name(user2['last_name'], record['distance']),
+                 'confirmed_date': confirmed_url_date,
+                 'trust_level': user2['trust_level'],
+                 'trust_label': sm.trust_label[user2['trust_level']],
                 })
   return record
 

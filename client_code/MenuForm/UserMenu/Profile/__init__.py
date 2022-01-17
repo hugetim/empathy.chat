@@ -15,9 +15,10 @@ from .Relationship import Relationship
 
 
 class Profile(ProfileTemplate):
-  item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
-               'seeking', 'how_empathy', 'profile', 'trust_label', 'status', 'last_active',
-               'confirmed_url', 'confirmed_date',}
+  """item attribute is a port.UserProfile"""
+#   item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
+#                'seeking', 'how_empathy', 'profile', 'trust_label', 'status', 'last_active',
+#                'confirmed_url', 'confirmed_date', 'trust_level',}
   trust_tooltip = p.TRUST_TOOLTIP
   
   def __init__(self, user_id="", **properties):
@@ -46,7 +47,7 @@ class Profile(ProfileTemplate):
     if not self.item['me']:
       get_open_form().title_label.text = f"{self.item['first']}'s Profile"
     self.name_label.text = self.item['name']
-    self.degree_label.text = h.add_num_suffix(self.item['distance']) if self.item['distance'] < 99 else ""
+    self.degree_label.text = self.item.distance_str
     if self.item['status'] == "invite":
       self.degree_label.text += " (pending invite)"
     name_likes = ("I like" if self.item['me'] 

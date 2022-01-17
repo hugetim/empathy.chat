@@ -298,16 +298,11 @@ def init_profile(user_id=""):
   from . import connections as c
   user = get_user(user_id, require_auth=False)
   record = c.connection_record(user, get_user())
-  confirmed_url_date = user['confirmed_url_date'] if user['confirmed_url'] else None
-  record.update({'first': user['first_name'],
-                 'last': port.last_name(user['last_name'], record['distance']),
-                 'relationships': [] if record['me'] else c.get_relationships(user),
-                 'confirmed_date': confirmed_url_date,
+  record.update({'relationships': [] if record['me'] else c.get_relationships(user),
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
-                 'trust_label': trust_label[user['trust_level']],
                 })
-  return record
+  return port.UserProfile(**record)
     
   
 @authenticated_callable

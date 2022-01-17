@@ -11,6 +11,8 @@ from ..... import portable as port
 
 
 class ConnectionRow(ConnectionRowTemplate):
+  """item attribute is a port.UserFull"""
+  
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.trust_level = glob.trust_level
