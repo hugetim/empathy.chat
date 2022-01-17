@@ -31,6 +31,7 @@ def get_create_user_items(user):
   if sm.DEBUG:
     print(f"get_create_user_items, {user['email']}")
   dset = _get_connections(user, 2)
+  dset[2] = [other for other in dset[2] if other['trust_level'] >= 3]
   items = {}
   degree_set = [1, 2] if user['trust_level'] >= 3 else [1]
   for degree in degree_set:
