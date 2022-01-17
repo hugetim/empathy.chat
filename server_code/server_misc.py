@@ -276,7 +276,7 @@ def get_prompts(user):
 
 
 @authenticated_callable
-@anvil.tables.in_transaction
+@anvil.tables.in_transaction(relaxed=True)
 def dismiss_prompt(prompt_id):
   from . import matcher
   matcher.propagate_update_needed()
@@ -545,7 +545,7 @@ def get_settings(user_id=""):
 
 
 @authenticated_callable
-@anvil.tables.in_transaction
+@anvil.tables.in_transaction(relaxed=True)
 def set_notif_settings(notif_settings, user_id=""):
   print(f"set_notif_settings, {notif_settings}")
   user = get_user(user_id)

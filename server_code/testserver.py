@@ -8,7 +8,7 @@ from . import portable
 
 
 @authenticated_callable
-@anvil.tables.in_transaction
+@anvil.tables.in_transaction(relaxed=True)
 def test_add_user(em, level=1):
   print("test_add_user", em, level)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
