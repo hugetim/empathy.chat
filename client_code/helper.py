@@ -138,7 +138,7 @@ def my_assert(statement):
 
 def robust_server_call(fn_name, *args, **kwargs):
   """Re-try server call up to 5 times if raises TimeoutError"""
-  _robust_server_call(5, fn_name, *args, **kwargs)
+  return _robust_server_call(5, fn_name, *args, **kwargs)
 
   
 def _robust_server_call(n, fn_name, *args, **kwargs):

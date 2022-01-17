@@ -31,7 +31,7 @@ def get_init():
     from . import helper as h
     time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
     #now = datetime.now()
-    h.robust_server_call('init', time_zone)
+    return h.robust_server_call('init', time_zone)
     
   
 def set_document_title(text):
