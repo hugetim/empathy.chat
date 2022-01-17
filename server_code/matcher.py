@@ -65,7 +65,6 @@ def init(time_zone):
   return _init(user)
 
 
-@anvil.tables.in_transaction
 def _init(user):
   _prune_all_expired_items()
   state = _init_user_status(user)
@@ -76,12 +75,14 @@ def _init(user):
          }
 
 
+@anvil.tables.in_transaction
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_matches()
   sm.prune_messages()
 
-  
+
+@anvil.tables.in_transaction
 def _init_user_status(user):
   state = _get_status(user)
   if state['status'] == 'pinged' and state['seconds_left'] <= 0:

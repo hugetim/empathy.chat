@@ -134,8 +134,25 @@ def warning(warning_str):
 def my_assert(statement):
   if not statement:
     warning(f"bool({statement}) is not True")
+ 
+
+def robust_server_call(fn_name, *args, **kwargs):
+  """Re-try server call up to 5 times if raises TimeoutError"""
+  _robust_server_call(5, fn_name, *args, **kwargs)
+
   
-  
+def _robust_server_call(n, fn_name, *args, **kwargs):
+  if n <= 1:
+    return anvil.server.call(fn_name, *args, **kwargs)
+  else:
+    try:
+      return anvil.server.call(fn_name, *args, **kwargs)
+    except anvil.server.TimeoutError:
+      from . import helper as h
+      h.warning("Re-trying {fn_name} server call due to TimeoutError")
+      return _robust_server_call(n-1, fn_name, *args, **kwargs)
+
+    
 class reverse_compare:
     def __init__(self, obj):
         self.obj = obj

@@ -22,6 +22,7 @@ def now():
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 
+@anvil.tables.in_transaction
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
   user = anvil.users.get_user()

@@ -27,10 +27,11 @@ def reload(init_dict=None):
 
     
 def get_init():
-    from anvil.js.window import Intl 
+    from anvil.js.window import Intl
+    from . import helper as h
     time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    now = datetime.now()
-    return anvil.server.call('init', time_zone)
+    #now = datetime.now()
+    h.robust_server_call('init', time_zone)
     
   
 def set_document_title(text):
