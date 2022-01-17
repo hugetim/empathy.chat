@@ -16,11 +16,11 @@ class SettingsForm(SettingsFormTemplate):
     self.phone_form = Phone(item={"phone": phone[2:] if phone else "", # removing "+1" 
                                  })
     self.phone_panel.add_component(self.phone_form)
-    self.essential_drop_down.items = [("text (default)", "sms"),
+    self.essential_drop_down.items = [("text/SMS (default)", "sms"),
                                       ("email", "email"),
                                      ]
     self.essential_drop_down.selected_value = notif_settings.get('essential')
-    self.message_drop_down.items = [("text", "sms"),
+    self.message_drop_down.items = [("text/SMS", "sms"),
                                     ("email (default)", "email"),
                                     ("don't notify", None),
                                    ]
