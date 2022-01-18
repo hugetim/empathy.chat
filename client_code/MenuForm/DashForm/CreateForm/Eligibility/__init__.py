@@ -71,9 +71,8 @@ class Eligibility(EligibilityTemplate):
 
   def user_multi_select_drop_down_change(self, **event_args):
     """This method is called when the selected values change"""
-    if self.initialized:
-      self.specific_users_check_box.checked = self.user_multi_select_drop_down.selected
-      self.item['eligible_users'] = self.user_multi_select_drop_down.selected
+    self.specific_users_check_box.checked = self.user_multi_select_drop_down.selected
+    self.item['eligible_users'] = self.user_multi_select_drop_down.selected
 
   def network_check_box_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
