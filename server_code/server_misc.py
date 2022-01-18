@@ -332,6 +332,8 @@ def save_user_field(item_name, value, user_id=""):
 @authenticated_callable
 def save_starred(new_starred, user2_id, user_id=""):
   user = get_user(user_id)
+  from . import matcher
+  matcher.propagate_update_needed()
   user2 = app_tables.users.get_by_id(user2_id)
   _star_row = star_row(user2, user)
   if new_starred and not _star_row:

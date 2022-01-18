@@ -252,7 +252,7 @@ class Proposal():
                eligible=2, eligible_users=[], eligible_group_ids=[], eligible_starred=True):
     self.prop_id = prop_id
     self.own = own
-    self.user = user
+    self.user = user # should rename proposer
     self.times = times
     self.eligible = eligible
     self.eligible_users = eligible_users
