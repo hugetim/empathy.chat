@@ -19,7 +19,7 @@ components:
     components:
     - type: CheckBox
       properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', allow_indeterminate: false, visible: true, text: 'Specific
+        foreground: '', allow_indeterminate: false, visible: true, text: 'These specific
           users:', font_size: null, font: '', spacing_above: small, spacing_below: small,
         italic: false, background: '', bold: false, checked: false, underline: false}
       name: specific_users_check_box
@@ -34,7 +34,7 @@ components:
         expand: true, width: null}
       data_bindings:
       - {property: items, code: 'self.item[''user_items'']'}
-      event_bindings: {change: user_multi_select_drop_down_change}
+      event_bindings: {}
     data_bindings:
     - {property: visible, code: 'self.item[''user_items'']'}
 - type: CheckBox
@@ -92,9 +92,9 @@ components:
   components:
   - type: CheckBox
     properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', allow_indeterminate: false, visible: true, text: 'These groups:',
-      font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
-      background: '', bold: false, checked: false, underline: false}
+      foreground: '', allow_indeterminate: false, visible: true, text: 'Everyone in
+        these groups:', font_size: null, font: '', spacing_above: small, spacing_below: small,
+      italic: false, background: '', bold: false, checked: false, underline: false}
     name: groups_check_box
     layout_properties: {grid_position: 'AXLKKX,QXOJGY'}
     event_bindings: {change: groups_check_box_change}
@@ -106,7 +106,7 @@ components:
     layout_properties: {grid_position: 'JWIJWQ,TNFAHU', expand: true, width: null}
     data_bindings:
     - {property: items, code: 'self.item[''group_items'']'}
-    event_bindings: {change: group_multi_select_drop_down_change}
+    event_bindings: {}
   data_bindings:
   - {property: visible, code: 'self.item[''group_items'']'}
 is_package: true
