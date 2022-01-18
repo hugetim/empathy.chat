@@ -15,14 +15,18 @@ components:
     components:
     - type: Button
       properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none,
+        foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
         underline: false, icon: 'fa:star-o'}
       name: star_button
       layout_properties: {column: NBEGGD, grid_position: 'CWBUWZ,JUFLNG'}
+      data_bindings:
+      - {property: icon, code: '"fa:star" if self.item.get(''starred'') else "fa:star-o"'}
+      - {property: visible, code: 'not self.item[''me'']'}
+      event_bindings: {click: star_button_click}
     - type: Label
       properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: medium,
+        visible: true, text: '', font_size: null, font: '', spacing_above: small,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
         underline: false, icon: ''}
       name: name_label
@@ -40,7 +44,7 @@ components:
       event_bindings: {click: edit_name_button_click}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: false, text: '', font_size: null, font: '', spacing_above: small,
+        visible: false, text: '', font_size: null, font: '', spacing_above: none,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
         underline: false, icon: ''}
       name: degree_label
@@ -118,7 +122,7 @@ components:
       properties: {visible: true, spacing_above: none, spacing_below: small, height: 32,
         tooltip: ''}
       name: spacer_2
-      layout_properties: {width: 40, expand: false}
+      layout_properties: {width: 66, expand: false}
     - type: RepeatingPanel
       properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
         visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.UserMenu.Profile.Relationship,

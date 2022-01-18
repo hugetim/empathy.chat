@@ -1,0 +1,112 @@
+container:
+  type: ColumnPanel
+  event_bindings: {}
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none,
+    background: ''}
+components:
+- type: LinearPanel
+  properties: {}
+  name: linear_panel_1
+  layout_properties: {grid_position: 'GDFJGX,SGUNOC'}
+  components:
+  - type: FlowPanel
+    properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '',
+      foreground: '', visible: false, spacing_above: small, spacing_below: small,
+      background: ''}
+    name: specific_users_flow_panel
+    layout_properties: {}
+    components:
+    - type: CheckBox
+      properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
+        foreground: '', allow_indeterminate: false, visible: true, text: 'Specific
+          users:', font_size: null, font: '', spacing_above: small, spacing_below: small,
+        italic: false, background: '', bold: false, checked: false, underline: false}
+      name: specific_users_check_box
+      layout_properties: {}
+      event_bindings: {change: specific_users_check_box_change}
+    - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
+      properties: {align: full, enable_filtering: null, placeholder: None Selected,
+        enabled: true, items: null, visible: true, spacing_above: small, spacing_below: small,
+        multiple: true}
+      name: user_multi_select_drop_down
+      layout_properties: {grid_position: 'ZOGPKZ,GNUIJB PGYIAA,VZADMQ', full_width_row: false,
+        expand: true, width: null}
+      data_bindings:
+      - {property: items, code: 'self.item[''user_items'']'}
+      event_bindings: {change: user_multi_select_drop_down_change}
+    data_bindings:
+    - {property: visible, code: 'self.item[''user_items'']'}
+- type: CheckBox
+  properties: {role: null, align: left, tooltip: '', border: '', enabled: true, foreground: '',
+    allow_indeterminate: false, visible: true, text: My "starred" users, font_size: null,
+    font: '', spacing_above: small, spacing_below: small, italic: false, background: '',
+    bold: false, checked: false, underline: false}
+  name: starred_check_box
+  layout_properties: {grid_position: 'YJAJII,DMTSNU'}
+  data_bindings:
+  - {property: checked, code: 'self.item[''eligible_starred'']', writeback: true}
+- type: FlowPanel
+  properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
+    visible: false, spacing_above: small, spacing_below: small, background: ''}
+  name: network_flow_panel
+  layout_properties: {grid_position: 'VCNFUE,RGWNDL'}
+  components:
+  - type: CheckBox
+    properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
+      foreground: '', allow_indeterminate: false, visible: true, text: All, font_size: null,
+      font: '', spacing_above: small, spacing_below: small, italic: false, background: '',
+      bold: false, checked: false, underline: false}
+    name: network_check_box
+    layout_properties: {grid_position: 'EWMGJM,CFTNRT'}
+    event_bindings: {change: network_check_box_change}
+  - type: DropDown
+    properties:
+      role: null
+      align: full
+      tooltip: ''
+      placeholder: ''
+      border: ''
+      enabled: true
+      foreground: ''
+      items: [drop_down_eligible (items set at runtime)]
+      visible: true
+      font_size: null
+      font: ''
+      spacing_above: small
+      spacing_below: small
+      italic: false
+      background: theme:Gray 200
+      bold: false
+      underline: false
+      include_placeholder: false
+    name: drop_down_eligible
+    layout_properties: {grid_position: 'ZOGPKZ,GNUIJB', full_width_row: false}
+    event_bindings: {change: drop_down_eligible_change}
+    data_bindings: []
+- type: FlowPanel
+  properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '', foreground: '',
+    visible: false, spacing_above: small, spacing_below: small, background: ''}
+  name: groups_flow_panel
+  layout_properties: {grid_position: 'AJYBJR,OXTTLR'}
+  components:
+  - type: CheckBox
+    properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
+      foreground: '', allow_indeterminate: false, visible: true, text: 'These groups:',
+      font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
+      background: '', bold: false, checked: false, underline: false}
+    name: groups_check_box
+    layout_properties: {grid_position: 'AXLKKX,QXOJGY'}
+    event_bindings: {change: groups_check_box_change}
+  - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
+    properties: {align: full, enable_filtering: null, placeholder: None Selected,
+      enabled: true, items: null, visible: true, spacing_above: small, spacing_below: small,
+      multiple: true}
+    name: group_multi_select_drop_down
+    layout_properties: {grid_position: 'JWIJWQ,TNFAHU', expand: true, width: null}
+    data_bindings:
+    - {property: items, code: 'self.item[''group_items'']'}
+    event_bindings: {change: group_multi_select_drop_down_change}
+  data_bindings:
+  - {property: visible, code: 'self.item[''group_items'']'}
+is_package: true

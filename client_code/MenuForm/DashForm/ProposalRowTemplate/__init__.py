@@ -26,7 +26,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     if self.item['own']:
       self.users_flow_panel.add_component(Label(text=f"My request #{self.item['prop_num']}"))
     else:
-      self.users_flow_panel.add_component(Name(item=prop.user.__dict__))
+      self.users_flow_panel.add_component(Name(item=prop.user))
     time = self.item['prop_time']
     self.item.update({'duration': t.DURATION_TEXT[time.duration],
                       'expire_date': time.expire_date,})

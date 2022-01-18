@@ -19,3 +19,9 @@ class Name(NameTemplate):
     """This method is called when the link is clicked"""
     get_open_form().go_profile(self.item['user_id'])
 
+  def star_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.item.toggle_starred()
+    self.refresh_data_bindings()
+
+

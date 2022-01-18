@@ -104,7 +104,7 @@ class Profile(ProfileTemplate):
                 dismissible=False,
                 buttons=[])
     if out is True:
-      anvil.server.call('save_user_item', 'how_empathy', edit_form.item['text'])
+      anvil.server.call('save_user_field', 'how_empathy', edit_form.item['text'])
       self.item['how_empathy'] = edit_form.item['text']
       self.update()
 
@@ -123,7 +123,7 @@ class Profile(ProfileTemplate):
                 dismissible=False,
                 buttons=[])
     if out is True:
-      anvil.server.call('save_user_item', 'profile', edit_form.item['text'])
+      anvil.server.call('save_user_field', 'profile', edit_form.item['text'])
       self.item['profile'] = edit_form.item['text']
       self.update()
 
@@ -152,4 +152,10 @@ class Profile(ProfileTemplate):
     """This method is called when the button is clicked"""
     if invited.invited_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
       get_open_form().go_profile(self.item['user_id'])
+
+  def star_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.item.toggle_starred()
+    self.update()
+
 

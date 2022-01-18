@@ -18,7 +18,8 @@ components:
       role: null
       columns:
       - {title: Name, id: TCRDJP, data_key: name, expand: false, width: '', $$hashKey: 'object:43677'}
-      - {title: Degree, id: CKNKJL, data_key: degree, $$hashKey: 'object:43678', width: ''}
+      - {title: Degree/Group(s), id: CKNKJL, data_key: degree, $$hashKey: 'object:43678',
+        width: ''}
       - {title: Last Active, id: VWXCEI, data_key: last_active, $$hashKey: 'object:43680',
         width: '90', expand: false}
       - {title: '', id: NBEGGD, data_key: buttons, $$hashKey: 'object:43681', expand: false,

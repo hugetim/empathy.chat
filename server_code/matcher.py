@@ -9,6 +9,7 @@ from . import server_misc as sm
 from .server_misc import authenticated_callable
 from . import portable as port
 from .proposals import Proposal, ProposalTime
+from anvil_extras.server_utils import timed
 
 
 def _seconds_left(status, expire_date=None, ping_start=None):
@@ -53,6 +54,7 @@ def _prune_matches():
 
 
 @authenticated_callable
+@timed
 def init(time_zone):
   """
   Runs upon initializing app

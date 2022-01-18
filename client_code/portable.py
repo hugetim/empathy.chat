@@ -68,7 +68,11 @@ class User(h.AttributeToKey):
   @property
   def s_user(self):
     return app_tables.users.get_by_id(self.user_id)
-  
+ 
+  def toggle_starred(self):
+    self.starred = not self.starred
+    return anvil.server.call('save_starred', self.starred, self.user_id)
+    
   @staticmethod
   def from_name_item(item):
     return User(item(1), item(0))
@@ -245,14 +249,15 @@ class Proposal():
   MAX_ALT_TIMES = 4
   
   def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], 
-               eligible=2, eligible_users=[], eligible_group_ids=[]):
+               eligible=2, eligible_users=[], eligible_group_ids=[], eligible_starred=True):
     self.prop_id = prop_id
     self.own = own
-    self.user = user
+    self.user = user # should rename proposer
     self.times = times
     self.eligible = eligible
     self.eligible_users = eligible_users
     self.eligible_group_ids = eligible_group_ids
+    self.eligible_starred = eligible_starred
 
   @property
   def start_now(self):
@@ -276,7 +281,8 @@ class Proposal():
   
   @property
   def specific_user_eligible(self):
-    if self.eligible == 0 and len(self.eligible_users) == 1 and not self.eligible_group_ids:
+    if (self.eligible == 0 and len(self.eligible_users) == 1 
+        and not self.eligible_group_ids and not self.eligible_starred):
       return self.eligible_users[0]
     else:
       return None
@@ -294,7 +300,9 @@ class Proposal():
             'eligible': self.eligible, 
             'eligible_users': [port_user.user_id for port_user in self.eligible_users], 
             'eligible_groups': self.eligible_group_ids,
-            'conflict_checks': conflict_checks,}
+            'conflict_checks': conflict_checks,
+            'eligible_starred': self.eligible_starred,
+           }
     first, *alts = self.times
     item['now_allowed'] = not(status and first.start_now == False)
     item.update(first.create_form_item())
@@ -315,6 +323,7 @@ class Proposal():
                     eligible=item['eligible'],
                     eligible_users=eligible_users,
                     eligible_group_ids=item['eligible_groups'],
+                    eligible_starred=item['eligible_starred'],
                    )
 
   @staticmethod
