@@ -19,7 +19,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
 
   def init(self):
     # assumes only dyads allowed
-    self.users_flow_panel.add_component(Name(item=self.item.pop('port_users')[0].__dict__))
+    self.users_flow_panel.add_component(Name(item=self.item.pop('port_users')[0]))
     self.item['duration'] = DURATION_TEXT[self.item.pop('duration_minutes')]
     self.item['start_time'] = h.day_time_str(h.as_local_tz(self.item.pop('start_date')))
     self.top_form = get_open_form()

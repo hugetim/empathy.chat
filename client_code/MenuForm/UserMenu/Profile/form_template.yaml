@@ -15,9 +15,9 @@ components:
     components:
     - type: Button
       properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:star-o'}
+        foreground: 'theme:Gold', visible: true, text: '', font_size: null, font: '',
+        spacing_above: none, icon_align: left, spacing_below: none, italic: false,
+        background: '', bold: false, underline: false, icon: 'fa:star-o'}
       name: star_button
       layout_properties: {column: NBEGGD, grid_position: 'CWBUWZ,JUFLNG'}
       data_bindings:
