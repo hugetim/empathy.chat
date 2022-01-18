@@ -30,7 +30,6 @@ class Eligibility(EligibilityTemplate):
     
   def init(self):
     self.specific_users_check_box.checked = self.item['eligible_users']
-    print(repr(self.item['eligible_users']))
     self.user_multi_select_drop_down.selected = self.item['eligible_users']
     self.starred_check_box.visible = bool(self.item['user_items']) or bool(self.item['group_items'])
     self.network_flow_panel.visible = self.trust_level >= 2

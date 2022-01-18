@@ -380,7 +380,7 @@ class Proposal():
     distance = c.distance(self._prop_row['user'], user)
     if (distance <= self.eligible or (self.eligible == 0 and user in self.eligible_users and distance < 99)):
       return True
-    elif (self.eligible_starred and sm.starred(user, self.proposer)):
+    elif (self.eligible_starred and sm.star_row(user, self.proposer)):
       return True
     else:
       for group in self.eligible_groups:
