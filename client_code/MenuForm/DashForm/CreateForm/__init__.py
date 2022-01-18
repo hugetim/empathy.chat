@@ -4,13 +4,16 @@ import anvil.users
 import anvil.server
 from .... import helper as h
 from .... import portable as t
-from .... import glob
 from datetime import timedelta
+from .Eligibility import Eligibility
 
 
 class CreateForm(CreateFormTemplate):
   def proposal(self):
     """Convert self.item into a proposal dictionary"""
+    eligibility = {key: self.eligibility_form.item[key] 
+                   for key in self.eligibility_form.export_item_keys}
+    self.item.update(eligibility)
     return t.Proposal.from_create_form(self.item)
 
   def proptime(self):
@@ -18,13 +21,7 @@ class CreateForm(CreateFormTemplate):
   
   def __init__(self, item, **properties):
     # Set Form properties and Data Bindings.
-    self.trust_level = glob.trust_level
-    if 'user_items' not in item:
-      item['user_items'], item['group_items'] = anvil.server.call('init_create_form')
-    self.top_form = get_open_form()
     self.init_components(item=item, **properties)
-    #alert title: New Empathy Chat Proposal
-    #alert buttons: OK, Cancel
     
     # Any code you write here will run when the form opens.
     if self.item['now_allowed']:
@@ -38,22 +35,13 @@ class CreateForm(CreateFormTemplate):
       self.date_picker_start.spacing_above = "small"
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
-    self.eligible_network_column_panel.visible = self.item['user_items'] and self.trust_level >= 2
-    self.eligible_label.visible = (self.item['user_items'] and self.trust_level >= 2) or self.item['group_items']
-    self.drop_down_eligible.items = (
-      [("Anyone (up to 3 degrees separation)", 3)] if self.trust_level >= 3
-      else []
-    )
-    self.drop_down_eligible.items += [('"Friends of friends" (2 degrees separation)', 2),  
-                                      ("Close links only (1st degree)", 1),
-                                      ("Specific user(s)...",0),
-                                     ]
-    self.user_multi_select_drop_down.selected = self.item['eligible_users']
-    self.group_multi_select_drop_down.selected = self.item['eligible_groups']
     self.normalize_initial_state()
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
     self.update()
+    self.eligibility_form = Eligibility(item=item)
+    self.eligibility_linear_panel.add_component(self.eligibility_form)
+    self.eligible_label.visible = self.eligibility_form.any_visible()
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
 
   def normalize_initial_state(self):
@@ -115,16 +103,9 @@ class CreateForm(CreateFormTemplate):
         self.date_picker_cancel.visible = False
     self.check_times()
     self.refresh_data_bindings()
-
-  def update_eligible(self):
-    if self.drop_down_eligible.selected_value == 0:
-      self.user_multi_select_drop_down.visible = True
-    else:
-      self.user_multi_select_drop_down.visible = False
     
   def update(self):
     self.update_times()
-    self.update_eligible()
 
   def radio_start_change(self, **event_args):
     """This method is called when an item is selected"""
@@ -203,10 +184,6 @@ class CreateForm(CreateFormTemplate):
     self.item['alt'].remove(item_to_remove)
     self.update()
 
-  def drop_down_eligible_change(self, **event_args):
-    """This method is called when an item is selected"""
-    self.update()
-
   def save_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.raise_event("x-close-alert", value=True)
@@ -214,14 +191,3 @@ class CreateForm(CreateFormTemplate):
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.raise_event("x-close-alert", value=False)
-
-  def user_multi_select_drop_down_change(self, **event_args):
-    """This method is called when the selected values change"""
-    self.item['eligible_users'] = self.user_multi_select_drop_down.selected
-
-  def group_multi_select_drop_down_change(self, **event_args):
-    """This method is called when the selected values change"""
-    self.item['eligible_groups'] = self.group_multi_select_drop_down.selected
-
-
-

@@ -204,82 +204,11 @@ components:
   name: eligible_label
   layout_properties: {grid_position: 'YYMEXI,XTNOOT'}
   data_bindings: []
-- type: ColumnPanel
-  properties: {col_widths: '{"NYUXLB":15,"GNUIJB":45,"FGBSJH":15}'}
-  name: eligible_network_column_panel
-  layout_properties: {grid_position: 'DWTBKS,KFXKGR'}
-  components:
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'From my network:', font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: label_5
-    layout_properties: {grid_position: 'ZOGPKZ,NYUXLB', full_width_row: false}
-  - type: DropDown
-    properties:
-      role: null
-      align: full
-      tooltip: ''
-      placeholder: ''
-      border: ''
-      enabled: true
-      foreground: ''
-      items: [drop_down_eligible (items set at runtime)]
-      visible: true
-      font_size: null
-      font: ''
-      spacing_above: small
-      spacing_below: small
-      italic: false
-      background: theme:Gray 200
-      bold: false
-      underline: false
-      include_placeholder: false
-    name: drop_down_eligible
-    layout_properties: {grid_position: 'ZOGPKZ,GNUIJB ZMWIVU,CZAYLY', full_width_row: false}
-    event_bindings: {change: drop_down_eligible_change}
-    data_bindings:
-    - {property: selected_value, code: 'self.item[''eligible'']', writeback: true}
-  - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
-    properties: {align: full, enable_filtering: null, placeholder: None Selected,
-      enabled: true, items: null, visible: false, spacing_above: small, spacing_below: small,
-      multiple: true}
-    name: user_multi_select_drop_down
-    layout_properties: {grid_position: 'ZOGPKZ,GNUIJB PGYIAA,VZADMQ', full_width_row: false}
-    data_bindings:
-    - {property: items, code: 'self.item[''user_items'']'}
-    event_bindings: {change: user_multi_select_drop_down_change}
-  - type: Spacer
-    properties: {height: 32}
-    name: spacer_2
-    layout_properties: {grid_position: 'TDUTAU,FGBSJH'}
-  data_bindings: []
-- type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
-    wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"JVSIPB":10}',
-    spacing_below: small, background: ''}
-  name: eligible_groups_column_panel
-  layout_properties: {grid_position: 'TPNWHL,YVKYUS'}
-  components:
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'These groups:', font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: label_6
-    layout_properties: {grid_position: 'JWIJWQ,JVSIPB'}
-  - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
-    properties: {align: full, enable_filtering: null, placeholder: None Selected,
-      enabled: true, items: null, visible: true, spacing_above: small, spacing_below: small,
-      multiple: true}
-    name: group_multi_select_drop_down
-    layout_properties: {grid_position: 'JWIJWQ,TNFAHU'}
-    data_bindings:
-    - {property: items, code: 'self.item[''group_items'']'}
-    event_bindings: {change: group_multi_select_drop_down_change}
-  data_bindings:
-  - {property: visible, code: 'self.item[''group_items'']'}
+- type: LinearPanel
+  properties: {spacing_above: none, spacing_below: medium, background: '', foreground: '',
+    border: '', visible: true, role: null, tooltip: ''}
+  name: eligibility_linear_panel
+  layout_properties: {grid_position: 'FCKSLW,FVXABD'}
 - type: FlowPanel
   properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
     foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}

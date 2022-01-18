@@ -110,6 +110,7 @@ class DashForm(DashFormTemplate):
       form_item = new_prop.create_form_item("now not allowed",
                                             self.get_conflict_checks())
       form_item['user_items'] = []
+      form_item['group_items'] = []
     else:
       new_prop = t.Proposal()
       form_item = new_prop.create_form_item(self.item['status'],
