@@ -114,7 +114,6 @@ def get_connections(user_id):
 
 
 def connection_record(user2, user1, _distance=None, degree=None):
-  """Returns dict w/ port.User attrs as str keys, plus: degree, last_active, status, unread_message"""
   if degree is None:
     degree = _degree(user2, user1)
   if _distance is None:
@@ -326,7 +325,7 @@ def try_connect(invite, invite_reply):
     app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
     for i_row in [invite, invite_reply]:
       item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance", "current"}}
-      app_tables.connections.add_row(starred=False, **item)
+      app_tables.connections.add_row(**item)
       i_row['current'] = False
     return True
   else:

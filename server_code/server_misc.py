@@ -196,7 +196,8 @@ def name(user, to_user=None, distance=None):
 @authenticated_callable
 def get_port_user(user2, distance=None, user1_id="", simple=False):
   if user2:
-    _name = name(user2, get_user(user1_id) if user1_id else None, distance)
+    user1 = get_user(user1_id)
+    _name = name(user2, user1 if user1_id else None, distance)
     if simple:
       return port.User(user2.get_id(), _name)
     else:
@@ -205,7 +206,7 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
                        confirmed_url=bool(user2['confirmed_url']),
                        distance=distance,
                        seeking=user2['seeking_buddy'],
-                       starred=None, #True/False
+                       starred=bool(star_row(user2, user1)) if user2 != user1 else None, #True/False
                       )
   else:
     return None
@@ -323,11 +324,28 @@ def save_name(name_item, user_id=""):
   
   
 @authenticated_callable
-def save_user_item(item_name, text, user_id=""):
+def save_user_field(item_name, value, user_id=""):
   user = get_user(user_id)
-  user[item_name] = text
-
+  user[item_name] = value
   
+  
+@authenticated_callable
+def save_starred(new_starred, user2_id, user_id=""):
+  user = get_user(user_id)
+  user2 = app_tables.users.get_by_id(user2_id)
+  _star_row = star_row(user2, user)
+  if new_starred and not _star_row:
+    app_tables.stars.add_row(user1=user, user2=user2)
+  elif not new_starred and _star_row:
+    _star_row.delete()
+  else:
+    warning("Redundant save_starred call.")
+
+    
+def star_row(user2, user1):
+  return app_tables.stars.get(user1=user1, user2=user2)
+
+
 class ServerItem:
   def relay(self, method, kwargs=None):
     if not kwargs:

@@ -49,7 +49,7 @@ components:
         - {property: icon, code: '"" if self.item[''via''] else "fa:link"'}
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: '', font_size: null, font: '', spacing_above: none,
+          visible: true, text: '', font_size: null, font: '', spacing_above: small,
           icon_align: left, spacing_below: none, italic: true, background: '', bold: false,
           underline: false, icon: ''}
         name: whose_label
@@ -58,7 +58,7 @@ components:
         - {property: text, code: 'f"{self.item[''whose'']} "'}
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: '', font_size: null, font: '', spacing_above: none,
+          visible: true, text: '', font_size: null, font: '', spacing_above: small,
           icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
           underline: false, icon: ''}
         name: desc_label
@@ -71,7 +71,7 @@ components:
         layout_properties: {width: 8}
       - type: Button
         properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-          foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
+          foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
           icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
           underline: false, icon: 'fa:pencil'}
         name: edit_rel_button

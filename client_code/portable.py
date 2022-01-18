@@ -68,7 +68,11 @@ class User(h.AttributeToKey):
   @property
   def s_user(self):
     return app_tables.users.get_by_id(self.user_id)
-  
+ 
+  def toggle_starred(self):
+    self.starred = not self.starred
+    return anvil.server.call('save_starred', self.starred, self.user_id)
+    
   @staticmethod
   def from_name_item(item):
     return User(item(1), item(0))

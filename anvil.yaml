@@ -317,6 +317,19 @@ db_schema:
     - name: missed_pings
       admin_ui: {width: 142}
       type: number
+  stars:
+    title: Stars
+    client: none
+    server: full
+    columns:
+    - name: user1
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
+    - name: user2
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
   proposals:
     title: Proposals
     client: none
@@ -450,9 +463,6 @@ db_schema:
     - name: distance
       admin_ui: {width: 200}
       type: number
-    - name: starred
-      admin_ui: {width: 200}
-      type: bool
     - name: current
       admin_ui: {width: 200}
       type: bool
