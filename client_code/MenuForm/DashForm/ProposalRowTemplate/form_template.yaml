@@ -6,8 +6,8 @@ container:
     italic: false, background: '', bold: false, underline: false}
 components:
 - type: FlowPanel
-  properties: {role: null, spacing: none, align: center, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+  properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
+    visible: true, spacing_above: small, spacing_below: small, background: ''}
   name: flow_panel_1
   layout_properties: {column: PHQQNP}
   components:
