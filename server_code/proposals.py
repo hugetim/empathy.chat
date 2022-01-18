@@ -355,8 +355,17 @@ class Proposal():
     self._prop_row['eligible_groups'] = value
 
   @property
+  def eligible_starred(self):
+    return self._prop_row['eligible_starred']
+  
+  @eligible_starred.setter
+  def eligible_starred(self, value):
+    self._prop_row['eligible_starred'] = value   
+    
+  @property
   def specific_user_eligible(self):
-    if self.eligible == 0 and len(self.eligible_users) == 1 and not self.eligible_groups:
+    if (self.eligible == 0 and len(self.eligible_users) == 1 
+        and not self.eligible_groups and not self.eligible_starred):
       return self.eligible_users[0]
     else:
       return None
@@ -370,6 +379,8 @@ class Proposal():
     from . import groups_server as g
     distance = c.distance(self._prop_row['user'], user)
     if (distance <= self.eligible or (self.eligible == 0 and user in self.eligible_users and distance < 99)):
+      return True
+    elif (self.eligible_starred and sm.starred(user, self.proposer)):
       return True
     else:
       for group in self.eligible_groups:
@@ -415,6 +426,7 @@ class Proposal():
                                         for port_user in port_prop.eligible_users]
     self._prop_row['eligible_groups'] = [app_tables.groups.get_by_id(group_id) 
                                          for group_id in port_prop.eligible_group_ids]
+    self._prop_row['eligible_starred'] = port_prop.eligible_starred
     ## First cancel removed rows
     new_time_ids = [port_time.time_id for port_time in port_prop.times]
     for proptime in ProposalTime.times_from_proposal(self):
@@ -439,11 +451,12 @@ class Proposal():
   def notify_edit(self, port_prop, old_port_prop):
     old_specific_port_user = old_port_prop.specific_user_eligible
     if old_specific_port_user:
-      old_specific_still_eligible = old_specific_port_user.user_id in [port_user.user_id for port_user in port_prop.eligible_users] 
+      old_specific_user = old_specific_port_user.s_user
+      old_specific_still_eligible = self.is_visible(old_specific_user) 
       if old_specific_still_eligible and port_prop.times_notify_info != old_port_prop.times_notify_info:
-        sm.notify_proposal(old_specific_port_user.s_user, self, "specific empathy request", " has changed their empathy chat request to:")
+        sm.notify_proposal(old_specific_user, self, "specific empathy request", " has changed their empathy chat request to:")
       elif not old_specific_still_eligible:
-        sm.notify_proposal_cancel(old_specific_port_user.s_user, self, "specific empathy request")
+        sm.notify_proposal_cancel(old_specific_user, self, "specific empathy request")
         self.notify_add_specific()
     else:
       self.notify_add_specific()
@@ -465,6 +478,7 @@ class Proposal():
                                                 eligible=port_prop.eligible,
                                                 eligible_users=user_rows,
                                                 eligible_groups=group_rows,
+                                                eligible_starred=port_prop.eligible_starred,
                                                )
     if user['trust_level'] < 3:
       new_prop_row['eligible'] = min(2, new_prop_row['eligible'])

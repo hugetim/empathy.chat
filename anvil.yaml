@@ -359,6 +359,9 @@ db_schema:
       admin_ui: {width: 200}
       type: link_multiple
       target: groups
+    - name: eligible_starred
+      admin_ui: {width: 200}
+      type: bool
   matches:
     title: Matches
     client: none
