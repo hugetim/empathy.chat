@@ -87,10 +87,10 @@ class ProposalTime():
   def all_users(self):
     return [self.proposal.proposer] + list(self._proptime_row['users_accepting'])
   
-  def attempt_accept(self, user, state):
+  def attempt_accept(self, user, partial_state):
     if sm.DEBUG:
       print("_attempt_accept_proptime")
-    status = state['status']
+    status = partial_state['status']
     if (status in [None, "requesting"] 
         and self._proptime_row['current'] 
         and (not self.is_accepted())
@@ -501,7 +501,12 @@ class Proposal():
   
   @staticmethod
   def get_port_view_items(user):
-    """Return list of Proposal view items visible to user
+    port_proposals = Proposal.get_port_proposals(user)
+    return port.Proposal.create_view_items(port_proposals)
+
+  @staticmethod
+  def get_port_proposals(user):
+    """Return list of port.Proposals visible to user
     
     Side effects: prune proposals
     """
@@ -511,8 +516,8 @@ class Proposal():
       prop = Proposal(row)
       if prop.is_visible(user):
         port_proposals.append(prop.portable(user))
-    return port.Proposal.create_view_items(port_proposals)
-
+    return port_proposals
+  
   @staticmethod
   def prune_all():
     """Prune definitely outdated prop_times, unmatched then matched, then proposals"""

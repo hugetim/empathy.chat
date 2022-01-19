@@ -86,28 +86,27 @@ def _prune_all_expired_items():
 
 @anvil.tables.in_transaction
 def _init_user_status(user):
-  state = _get_status(user)
-  if state['status'] == 'pinged' and state['seconds_left'] <= 0:
-    state = _cancel(user)
-  elif state['status'] == 'pinged':
-    state = _match_commit(user)
-  elif state['status'] == 'pinging' and state['seconds_left'] <= 0:
-    state = _cancel_other(user)
-  if state['status'] in ('requesting', 'pinged', 'pinging'):
-    state = confirm_wait_helper(user)
-  anvil.server.session['status'] = state
+  partial_state = get_status(user)
+  if partial_state['status'] == 'pinged' and partial_state['seconds_left'] <= 0:
+    _cancel(user)
+  elif partial_state['status'] == 'pinged':
+    _match_commit(user)
+  elif partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
+    _cancel_other(user)
+  if partial_state['status'] in ('requesting', 'pinged', 'pinging'):
+    confirm_wait_helper(user)
+  anvil.server.session['state'] = _get_state(user)
   propagate_update_needed(user)
-  return state
+  return anvil.server.session['state']
 
   
 def confirm_wait_helper(user):
-  """updates expire_date for current request, returns _get_status(user)"""
+  """updates expire_date for current request"""
   if sm.DEBUG:
     print("confirm_wait_helper")
   current_proptime = ProposalTime.get_now_proposing(user)
   if current_proptime:
     current_proptime.confirm_wait()
-  return _get_status(user) if user else None
 
 
 @authenticated_callable
@@ -128,28 +127,36 @@ def propagate_update_needed(user=None):
       
 @authenticated_callable
 @anvil.tables.in_transaction
-def get_status(user_id=""):
+def get_state(user_id=""):
   user = sm.get_user(user_id)
-  saved_status = anvil.server.session.get('status')
-  if user['update_needed'] or not saved_status:
-    anvil.server.session['status'] = _get_status(user)
+  saved_state = anvil.server.session.get('state')
+  if user['update_needed'] or not saved_state:
+    anvil.server.session['state'] = _get_state(user)
     user['update_needed'] = False
-  return anvil.server.session['status']
+  return anvil.server.session['state']
 
 
-def _get_status(user):
-  """Returns status dict
+def _get_state(user):
+  """Returns state dict
+  
+  Side effects: prune proposals when status in [None]
+  """
+  state = get_status(user)
+  state['proposals'] = [] if state['status'] else Proposal.get_port_view_items(user)
+  state['upcomings'] = [] if state['status'] else _get_upcomings(user)
+  state['prompts'] = [] if state['status'] else sm.get_prompts(user)
+  return state
+  
+
+def get_status(user):
+  """Returns status dict (only 'status' and 'seconds_left')
   ping_start: accept_date or, for "matched", match_commence
   assumes 2-person matches only
-  Side effects: prune proposals when status in [None]
   """
   if sm.DEBUG:
     print("_get_status")
   expire_date = None
   ping_start = None
-  proposals = []
-  upcomings = []
-  prompts = []
   current_proptime = ProposalTime.get_now_proposing(user)
   if current_proptime:
     expire_date = current_proptime.expire_date
@@ -171,14 +178,8 @@ def _get_status(user):
         ping_start = this_match['match_commence']
       else:
         status = None
-        proposals = Proposal.get_port_view_items(user)
-        upcomings = _get_upcomings(user)
-        prompts = sm.get_prompts(user)
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
-          'proposals': proposals,
-          'upcomings': upcomings,
-          'prompts': prompts,
          }
 
 
@@ -213,19 +214,17 @@ def _cancel_match(user, match_id):
       if u != user:
         sm.notify_cancel(u, start=match['match_commence'], canceler_name=sm.name(user, to_user=u))
     match.delete()
-  return _get_status(user)
 
   
 @authenticated_callable
 @anvil.tables.in_transaction
 def cancel_match(match_id, user_id=""):
-  """Cancel pending match
-  Return _get_status
-  """
+  """Cancel pending match"""
   print(f"cancel_match, {match_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
-  return _cancel_match(user, match_id)  
+  _cancel_match(user, match_id)
+  return _get_state(user)
   
   
 @authenticated_callable
@@ -257,48 +256,49 @@ def init_match_form(user_id=""):
 @authenticated_callable
 @anvil.tables.in_transaction
 def accept_proposal(proptime_id, user_id=""):
-  """Return _get_status
+  """Add user_accepting
   
   Side effect: update proptime table with acceptance, if available
   """
   print(f"accept_proposal, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
-  state = _get_status(user)
-  ProposalTime.get_by_id(proptime_id).attempt_accept(user, state)
+  partial_state = get_status(user)
+  ProposalTime.get_by_id(proptime_id).attempt_accept(user, partial_state)
   propagate_update_needed()
-  return _get_status(user)
+  return _get_state(user)
 
 
 @authenticated_callable
 @anvil.tables.in_transaction
 def add_proposal(proposal, link_key="", user_id=""):
-  """Return _get_status, prop_id (none if matching with another proposal)
+  """Return state, prop_id (none if matching with another proposal)
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate
   """
   print(f"add_proposal, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
-  return _add_proposal(user, proposal, link_key)
+  prop_id = _add_proposal(user, proposal, link_key)
+  return _get_state(user), prop_id
 
 
 def _add_proposal(user, port_prop, link_key=""):
-  state = _get_status(user)
-  status = state['status']
+  partial_state = get_status(user)
+  status = partial_state['status']
   prop = Proposal.add(user, port_prop)
   if port_prop.start_now:
     duration = port_prop.times[0].duration
-    if (status is not None or _match_overlapping_now_proposal(user, prop, duration, state)):
+    if (status is not None or _match_overlapping_now_proposal(user, prop, duration, partial_state)):
       prop.cancel_all_times()
-      return _get_status(user), None
+      return None
   prop.notify_add()
   if link_key:
     prop.add_to_invite(link_key)
-  return _get_status(user), prop.get_id()
+  return prop.get_id()
 
 
 def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
-  current_port_props = port.Proposal.props_from_view_items(state['proposals'])
+  current_port_props = Proposal.get_port_proposals(user)
   now_port_props = [p for p in current_port_props if p.start_now and not p.own]
   for other_port_prop in now_port_props:
     if (my_now_proposal.is_visible(other_port_prop.user.s_user)
@@ -312,37 +312,36 @@ def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
 @authenticated_callable
 @anvil.tables.in_transaction
 def edit_proposal(proposal, user_id=""):
-  """Return _get_status, prop_id (none if matching with another proposal)
+  """Return state, prop_id (none if matching with another proposal)
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate
   """
   print(f"edit_proposal, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
-  return _edit_proposal(user, proposal)
+  prop_id = _edit_proposal(user, proposal)
+  return _get_state(user), prop_id
 
     
 def _edit_proposal(user, port_prop):
-  state = _get_status(user)
-  status = state['status']
+  partial_state = get_status(user)
+  status = partial_state['status']
   prop = Proposal.get_by_id(port_prop.prop_id)
   old_port_prop = prop.portable(user)
   prop.update(port_prop)
   if port_prop.start_now:
     duration = port_prop.times[0].duration
-    if (status is not None or _match_overlapping_now_proposal(user, prop, duration, state)):
+    if (status is not None or _match_overlapping_now_proposal(user, prop, duration, partial_state)):
       prop.cancel_all_times()
-      return _get_status(user), None
+      return None
   prop.notify_edit(port_prop, old_port_prop)
-  return _get_status(user), prop.get_id()
+  return prop.get_id()
 
   
 @authenticated_callable
 @anvil.tables.in_transaction
 def cancel_time(proptime_id, user_id=""):
-  """Remove proptime
-  Return _get_status
-  """
+  """Remove proptime"""
   print(f"cancel_time, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
@@ -351,11 +350,11 @@ def cancel_time(proptime_id, user_id=""):
   if len(port_prop.times) > 1:
     [port_time_to_cancel] = [port_time for port_time in port_prop.times if port_time.time_id == proptime_id]
     port_prop.times.remove(port_time_to_cancel)
-    state, prop_id = _edit_proposal(user, port_prop) # can ignore prop_id because not port_prop.start_now
-    return state
+    prop_id = _edit_proposal(user, port_prop) # can ignore prop_id because not port_prop.start_now
   else:
     proptime.notify_cancel()
-    return _cancel(user, proptime_id)
+    _cancel(user, proptime_id)
+    return _get_state(user)
 
 
 def _cancel(user, proptime_id=None):
@@ -367,27 +366,23 @@ def _cancel(user, proptime_id=None):
     proptime = ProposalTime.get_now(user)
   if proptime:
     proptime.cancel_this(user)
-  return _get_status(user)
 
 
 @authenticated_callable
 @anvil.tables.in_transaction
 def cancel_accept(proptime_id=None, user_id=""):
-  """Remove user accepting
-  Return _get_status
-  """
+  """Remove user accepting"""
   print(f"cancel_accept, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
-  return _cancel(user, proptime_id)
+  _cancel(user, proptime_id)
+  return _get_state(user)
 
 
 @authenticated_callable
 @anvil.tables.in_transaction
 def cancel_now(proptime_id=None, user_id=""):
-  """Remove proptime and cancel pending match (if applicable)
-  Return _get_status
-  """
+  """Remove proptime and cancel pending match (if applicable)"""
   print(f"cancel_now, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   if proptime_id:
@@ -395,7 +390,8 @@ def cancel_now(proptime_id=None, user_id=""):
     if proptime:
       proptime.notify_cancel()
   propagate_update_needed()
-  return _cancel(user, proptime_id)
+  _cancel(user, proptime_id)
+  return _get_state(user)
 
 
 def _cancel_other(user, proptime_id=None):
@@ -407,37 +403,35 @@ def _cancel_other(user, proptime_id=None):
     proptime = ProposalTime.get_now(user)
   if proptime:
     proptime.cancel_other(user)
-  return _get_status(user)
 
 
 @authenticated_callable
 @anvil.tables.in_transaction
 def cancel_other(proptime_id=None, user_id=""):
-  """Return new _get_status
-  Upon failure of other to confirm match
+  """Upon failure of other to confirm match
   cancel match (if applicable)--and cancel their request
   """
   print(f"cancel_other, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
-  return _cancel_other(user, proptime_id)
+  _cancel_other(user, proptime_id)
+  return _get_state(user)
 
 
 @authenticated_callable
 @anvil.tables.in_transaction
 def match_commit(proptime_id=None, user_id=""):
-  """Return _get_status(user)
-  Upon first commence of "now", copy row over and delete "matching" row.
+  """Upon first commence of "now", copy row over and delete "matching" row.
   Should not cause error if already commenced
   """
   print(f"match_commit, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
   propagate_update_needed()
-  return _match_commit(user, proptime_id)
+  _match_commit(user, proptime_id)
+  return _get_state(user)
 
 
 def _match_commit(user, proptime_id=None):
-  """Return _get_status(user)"""
   if sm.DEBUG:
     print("_match_commit")
   if proptime_id:
@@ -465,13 +459,12 @@ def _match_commit(user, proptime_id=None):
       proposal.cancel_all_times()
       if not current_proptime.start_now:
         current_proptime.ping()
-  return _get_status(user)
 
 
 @authenticated_callable
 @anvil.tables.in_transaction
 def match_complete(user_id=""):
-  """Switch 'complete' to true in matches table for user, return status."""
+  """Switch 'complete' to true in matches table for user"""
   print(f"match_complete, {user_id}")
   user = sm.get_user(user_id)
   # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
@@ -486,7 +479,7 @@ def match_complete(user_id=""):
       current_proptime.notify_cancel()
       _cancel(user, current_proptime.get_id())
   propagate_update_needed()
-  return _get_status(user)
+  return _get_state(user)
 
 
 def current_match(user):

@@ -88,7 +88,7 @@ class DashForm(DashFormTemplate):
  
   def timer_2_tick(self, **event_args):
     """This method is called every 5 seconds, checking for status changes"""
-    state = anvil.server.call_s('get_status')
+    state = anvil.server.call_s('get_state')
     self.update_status(state)    
 
   def get_conflict_checks(self):

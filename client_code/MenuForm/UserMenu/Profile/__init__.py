@@ -129,7 +129,7 @@ class Profile(ProfileTemplate):
 
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    state = anvil.server.call('get_status')
+    state = anvil.server.call('get_state')
     top_form = get_open_form()
     top_form.reset_status(state)
     if state['status'] not in ["pinging", "matched"]:

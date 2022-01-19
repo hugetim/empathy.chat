@@ -32,7 +32,7 @@ def test_add_request(user_id, port_prop):
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     user = app_tables.users.get_by_id(user_id)
     matcher.propagate_update_needed()
-    state, prop_id = matcher._add_proposal(user, port_prop)
+    prop_id = matcher._add_proposal(user, port_prop)
     new_prop = matcher.Proposal.get_by_id(prop_id)
     if new_prop: 
       _add_prop_row_to_test_record(new_prop._row)

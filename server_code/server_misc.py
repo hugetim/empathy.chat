@@ -498,9 +498,10 @@ def _update_match_form(user):
     [their_name] = [u['first_name'] for u in this_match['users'] if u != user]
     return "matched", how_empathy_list, their_name, messages_out, their_value
   else:
-    state = matcher.confirm_wait_helper(user)
+    matcher.confirm_wait_helper(user)
+    partial_state = matcher.get_status(user)
     matcher.propagate_update_needed(user)
-    return state['status'], [], "", [], None
+    return partial_state['status'], [], "", [], None
 
   
 @authenticated_callable

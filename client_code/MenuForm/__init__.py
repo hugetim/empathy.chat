@@ -141,7 +141,7 @@ class MenuForm(MenuFormTemplate):
 
   def home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
-    self.reset_status(anvil.server.call('get_status'))
+    self.reset_status(anvil.server.call('get_state'))
     
   def connections_link_click(self, **event_args):
     """This method is called when the link is clicked"""

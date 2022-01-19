@@ -32,7 +32,7 @@ class TimerForm(TimerFormTemplate):
     if (now - self.last_5sec).total_seconds() > 4.5:
       # Run this code every 5 seconds
       self.last_5sec = now
-      state = anvil.server.call_s('get_status')
+      state = anvil.server.call_s('get_state')
       new_status = state['status']
       print("new_status:", new_status)
       if new_status != self.status:
