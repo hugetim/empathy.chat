@@ -126,9 +126,7 @@ def get_connections(user_id):
   else:
     dset2 = _get_connections(user, 1)
     records = []
-    #c_users = set()
     for d in range(0, up_to_degree+1):
-      #c_users.update(dset[d] & dset2[1])
       records += [sm.get_port_user_full(user2, distance=d, degree=d) for user2 in (dset[d] & dset2[1])]
     return records #+ _group_member_records_include(logged_in_user, dset2[1] - c_users.union({logged_in_user}))
 
