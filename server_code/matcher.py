@@ -354,7 +354,7 @@ def cancel_time(proptime_id, user_id=""):
   else:
     proptime.notify_cancel()
     _cancel(user, proptime_id)
-    return _get_state(user)
+  return _get_state(user)
 
 
 def _cancel(user, proptime_id=None):
