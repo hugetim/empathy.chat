@@ -184,10 +184,7 @@ def get_status(user):
 
 
 def _get_upcomings(user):
-    """Return list of user's upcoming matches
-    
-    Side effects: prune proposals
-    """
+    """Return list of user's upcoming matches"""
     if sm.DEBUG:
       print("_get_upcomings")
     match_dicts = []

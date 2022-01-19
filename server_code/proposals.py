@@ -378,7 +378,7 @@ class Proposal():
     from . import connections as c
     from . import groups_server as g
     distance = c.distance(self._prop_row['user'], user)
-    if (distance <= self.eligible or (self.eligible == 0 and user in self.eligible_users and distance < 99)):
+    if (distance <= self.eligible or (user in self.eligible_users and distance < 99)):
       return True
     elif (self.eligible_starred and sm.star_row(user, self.proposer)):
       return True
