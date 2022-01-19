@@ -75,14 +75,34 @@ def _degree(user2, user1, up_to_degree=3):
     return 0
   else:
     dset = _get_connections(user1, up_to_degree)
-    for d in range(1, up_to_degree+1):
-      if user2 in dset[d]:
-        return d
-    return 99
+    return _degree_from_dset(user2, dset)
 
+  
+def _degree_from_dset(user2, dset):
+  for d in dset:
+    if user2 in dset[d]:
+      return d
+  return 99
+  
+
+def _degrees(user2s, user1, up_to_degree=3):
+  """Returns 99 if no degree <= up_to_degree found"""
+  dset = _get_connections(user1, up_to_degree)
+  out = {}
+  for user2 in set(user2s):
+    if user2 == user1:
+      out[user2] = 0
+    else:
+      out[user2] = _degree_from_dset(user2, dset)
+  return out
+  
 
 def distance(user2, user1, up_to_distance=3):
   return _degree(user2, user1, up_to_distance)
+
+
+def distances(user2s, user1, up_to_distance=3):
+  return _degrees(user2s, user1, up_to_distance)
 
 
 @authenticated_callable
@@ -101,7 +121,7 @@ def get_connections(user_id):
       c_users.update(dset[d])
     return records + _group_member_records_exclude(logged_in_user, c_users)
   elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
-        and _degree(user, logged_in_user) > 1):
+        and _degree_from_dset(user, dset) > 1):
     return []
   else:
     dset2 = _get_connections(user, 1)

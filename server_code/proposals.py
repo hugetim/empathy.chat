@@ -374,10 +374,11 @@ class Proposal():
   def proposer(self):
     return self._prop_row['user']
   
-  def is_visible(self, user):
+  def is_visible(self, user, distance=None):
     from . import connections as c
     from . import groups_server as g
-    distance = c.distance(self._prop_row['user'], user)
+    if distance is None:
+      distance = c.distance(self._prop_row['user'], user)
     if (distance <= self.eligible or (user in self.eligible_users and distance < 99)):
       return True
     elif (self.eligible_starred and sm.star_row(user, self.proposer)):
@@ -512,9 +513,13 @@ class Proposal():
     """
     Proposal.prune_all()
     port_proposals = []
-    for row in app_tables.proposals.search(current=True):
-      prop = Proposal(row)
-      if prop.is_visible(user):
+    all_prop_rows = app_tables.proposals.search(current=True)
+    all_props = [Proposal(row) for row in all_prop_rows]
+    all_proposers = {prop.proposer for prop in all_props}
+    from . import connections as c
+    distances = c.distances(all_proposers, user)
+    for prop in all_props:
+      if prop.is_visible(user, distances[prop.proposer]):
         port_proposals.append(prop.portable(user))
     return port_proposals
   
