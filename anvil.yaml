@@ -35,9 +35,10 @@ services:
           the link below:</p><p><br></p><p>{{reset_link}}</p><p><br></p><p>This link
           will expire in ten minutes.</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
         subject: empathy.chat - Reset your password}
-      token_login: {html: '<p>Hi there,</p><p><br></p><p>A login request was received
-          for your empathy.chat account ({{email}}). To log in, click the link below:</p><p><br></p><p>{{login_link}}</p><p><br></p><p>This
-          link will expire in ten minutes.</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
+      token_login: {html: '<p>To log in to empathy.chat, click the link below:</p><p><br></p><p>{{login_link}}</p><p><br></p><p>This
+          link will expire in ten minutes.</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p><p><br></p><p><em>p.s.
+          Logging in this way prevents you from having to create and manage yet another
+          password. For more info:  </em>https://anvil.works/blog/magic-link-sign-in</p>',
         subject: empathy.chat - Login}
 startup: {type: module, module: startup}
 package_name: empathy_chat
