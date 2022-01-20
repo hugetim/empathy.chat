@@ -30,8 +30,8 @@ class MenuForm(MenuFormTemplate):
             + 'or be visible to other users. '
             + 'For help, contact: ' + p.CONTACT_EMAIL,
             dismissible=False)
-    else:
-      self.set_help_link("https://www.loomio.org/join/group/G537YtVTZmNTW1S1KTJnDvUb/")
+#     else:
+#       self.set_help_link("https://www.loomio.org/join/group/G537YtVTZmNTW1S1KTJnDvUb/")
     self.connections_link.visible = glob.trust_level >= 2 # should only be for level 2 if have connections
     self.my_groups_link.visible = glob.trust_level >= 4
     self.test_mode.visible = self.item['test_mode']
@@ -42,9 +42,9 @@ class MenuForm(MenuFormTemplate):
   def form_show(self, **event_args):
     self.reset_status(self.item['state'])
 
-  def set_help_link(self, url):
-    self.side_help_link.url = url
-    self.link_bar_help.url = url
+#   def set_help_link(self, url):
+#     self.side_help_link.url = url
+#     self.link_bar_help.url = url
     
   def reset_status(self, state):
     """Update form according to current state variables"""
