@@ -196,6 +196,47 @@ components:
   properties: {height: 32}
   name: spacer_1
   layout_properties: {grid_position: 'MGXSNE,CGULSX'}
+- type: FlowPanel
+  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+    foreground: '', visible: true, spacing_above: none, spacing_below: medium, background: ''}
+  name: flow_panel_3
+  layout_properties: {grid_position: 'WHMCHT,ECZRZV'}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'What size empathy chat?', font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
+      underline: false, icon: ''}
+    name: size_label
+    layout_properties:
+      col_widths: {}
+      grid_position: GBFPUO,BOQWZR
+    data_bindings: []
+  - type: DropDown
+    properties:
+      role: null
+      align: left
+      tooltip: ''
+      placeholder: ''
+      border: ''
+      enabled: true
+      foreground: ''
+      items: []
+      visible: true
+      font_size: null
+      font: ''
+      spacing_above: small
+      spacing_below: small
+      italic: false
+      background: ''
+      bold: false
+      underline: false
+      include_placeholder: false
+    name: size_drop_down
+    layout_properties: {grid_position: 'FZLHTD,JXVDVI'}
+    data_bindings:
+    - {property: selected_value, code: '(self.item[''min_size''], self.item[''max_size''])',
+      writeback: true}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: 'Who would you like to be able to see and accept this request?', font_size: null,

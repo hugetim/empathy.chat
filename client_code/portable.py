@@ -248,12 +248,14 @@ class Proposal():
 
   MAX_ALT_TIMES = 4
   
-  def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], 
-               eligible=2, eligible_users=[], eligible_group_ids=[], eligible_starred=True):
+  def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], min_size=2, max_size=2,
+               eligible=2, eligible_users=[], eligible_group_ids=[], eligible_starred=True,):
     self.prop_id = prop_id
     self.own = own
     self.user = user # should rename proposer
     self.times = times
+    self.min_size = min_size
+    self.max_size = max_size
     self.eligible = eligible
     self.eligible_users = eligible_users
     self.eligible_group_ids = eligible_group_ids
@@ -296,7 +298,9 @@ class Proposal():
   
   def create_form_item(self, status=None, conflict_checks=None):
     """Convert a proposal dictionary to the format of self.item"""
-    item = {'prop_id': self.prop_id, 
+    item = {'prop_id': self.prop_id,
+            'min_size': self.min_size,
+            'max_size': self.max_size,
             'eligible': self.eligible, 
             'eligible_users': [port_user.user_id for port_user in self.eligible_users], 
             'eligible_groups': self.eligible_group_ids,
@@ -320,6 +324,8 @@ class Proposal():
                       for user_id in item['eligible_users']]
     return Proposal(prop_id=item.get('prop_id'),
                     times=[first_time] + alts,
+                    min_size = item['min_size'],
+                    max_size = item['max_size'],
                     eligible=item['eligible'],
                     eligible_users=eligible_users,
                     eligible_group_ids=item['eligible_groups'],
