@@ -420,6 +420,8 @@ class Proposal():
   def update(self, port_prop):
     self._prop_row['current'] = True
     self._prop_row['last_edited'] = sm.now()
+    self._prop_row['min_size'] = port_prop.min_size
+    self._prop_row['max_size'] = port_prop.max_size
     self._prop_row['eligible'] = port_prop.eligible
     if self.proposer['trust_level'] < 3:
       self._prop_row['eligible'] = min(2, self._prop_row['eligible'])
@@ -476,6 +478,8 @@ class Proposal():
                                                 current=True,
                                                 created=now,
                                                 last_edited=now,
+                                                min_size=port_prop.min_size,
+                                                max_size=port_prop.max_size,                                            
                                                 eligible=port_prop.eligible,
                                                 eligible_users=user_rows,
                                                 eligible_groups=group_rows,
