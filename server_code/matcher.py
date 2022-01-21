@@ -78,6 +78,7 @@ def _init(user):
 
 
 @anvil.tables.in_transaction
+@timed
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_matches()
@@ -85,6 +86,7 @@ def _prune_all_expired_items():
 
 
 @anvil.tables.in_transaction
+@timed
 def _init_user_status(user):
   partial_state = get_status(user)
   if partial_state['status'] == 'pinged' and partial_state['seconds_left'] <= 0:
@@ -160,7 +162,7 @@ def get_status(user):
   current_proptime = ProposalTime.get_now_proposing(user)
   if current_proptime:
     expire_date = current_proptime.expire_date
-    if current_proptime.fully_accepted:
+    if current_proptime['fully_accepted']:
       status = "pinged"
       ping_start = current_proptime.ping_start
     else:
@@ -438,9 +440,9 @@ def _match_commit(user, proptime_id=None):
     current_proptime = ProposalTime.get_now(user)
   if current_proptime:
     print("current_proptime")
-    if current_proptime.fully_accepted:
+    if current_proptime['fully_accepted']:
       print("'accepted'")
-      if current_proptime.start_now:
+      if current_proptime['start_now']:
         match_start = sm.now()
       else:
         match_start = current_proptime.start_date
@@ -454,7 +456,7 @@ def _match_commit(user, proptime_id=None):
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal
       proposal.cancel_all_times()
-      if not current_proptime.start_now:
+      if not current_proptimestart_now:
         current_proptime.ping()
 
 

@@ -9,6 +9,7 @@ import anvil.email
 from . import parameters as p
 from . import helper as h
 from . import portable as port
+from anvil_extras.server_utils import timed
 
 
 DEBUG = False #p.DEBUG_MODE
@@ -23,6 +24,7 @@ def now():
 
 
 @anvil.tables.in_transaction
+@timed
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
   user = anvil.users.get_user()

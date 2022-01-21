@@ -47,10 +47,10 @@ class ProposalTime():
   def _row(self):
     return self._proptime_row
 
-  def __getattr__(self, key):
+  def __getitem__(self, key):
     return self._proptime_row[key]
-  
-  def __setattr__(self, key, value):
+
+  def __setitem__(self, key, value):
     self._proptime_row[key] = value
   
   @property
@@ -58,22 +58,22 @@ class ProposalTime():
     return self._proptime_row['accept_date']
  
   def duration_start_str(self, user):
-    out = port.DURATION_TEXT[self.duration]
-    if self.start_now:
+    out = port.DURATION_TEXT[self['duration']]
+    if self['start_now']:
       out += ", starting now"
     else:
-      out += f", {sm._notify_when(self.start_date, user)}"
+      out += f", {sm._notify_when(self['start_date'], user)}"
     return out
 
   def get_match_info(self):
-    return self.jitsi_code, self.duration
+    return self['jitsi_code'], self['duration']
   
   @property
   def proposal(self):
     return Proposal(self._proptime_row['proposal'])
 
   def all_users(self):
-    return [self.proposal.proposer] + list(self.users_accepting)
+    return [self.proposal.proposer] + list(self['users_accepting'])
   
   def is_accepted(self):
     return len(self.all_users) >= self.proposal.max_size
@@ -83,8 +83,8 @@ class ProposalTime():
       print("_attempt_accept_proptime")
     status = partial_state['status']
     if (status in [None, "requesting"] 
-        and self.current 
-        and (not self.fully_accepted)
+        and self['current'] 
+        and (not self['fully_accepted'])
         and self.proposal.is_visible(user)):
       self.accept(user, status)
       self.proposal.hide_unaccepted_times()
@@ -93,39 +93,39 @@ class ProposalTime():
     if sm.DEBUG:
       print("accept_proptime")
     now = sm.now()
-    if self.start_now and status == "requesting":
+    if self['start_now'] and status == "requesting":
       own_now_proposal_time = ProposalTime.get_now_proposing(user)
       if own_now_proposal_time:
         ProposalTime(own_now_proposal_time).proposal.cancel_all_times()
-    self.users_accepting += [user]
+    self['users_accepting'] += [user]
     if self.is_accepted():
-      self.fully_accepted = True
+      self['fully_accepted'] = True
       self.accept_date = now
       from . import matcher as m
-      if not self.start_now:
+      if not self['start_now']:
         m._match_commit(user, self.get_id())
-      elif (now - (self.start_date)).total_seconds() <= p.BUFFER_SECONDS:
+      elif (now - (self['start_date'])).total_seconds() <= p.BUFFER_SECONDS:
         m._match_commit(user)
       else:
         self.ping()
  
   def ping(self):   
     sm.ping(user=self.proposal.proposer,
-            start=None if self.start_now else self.start_date,
-            duration=self.duration,
+            start=None if self['start_now'] else self['start_date'],
+            duration=self['duration'],
            )    
       
   def in_users_accepting(self, user):
-    return self.users_accepting and user in self.users_accepting
+    return self['users_accepting'] and user in self['users_accepting']
       
   def remove_accepting(self, user=None):
     # below code assumes only dyads allowed
-    accepting_list = list(self.users_accepting)
+    accepting_list = list(self['users_accepting'])
     accepting_list.remove(user)
-    self.users_accepting = accepting_list
-    self.fully_accepted = False
+    self['users_accepting'] = accepting_list
+    self['fully_accepted'] = False
     self.accept_date = None
-    if not self.users_accepting:
+    if not self['users_accepting']:
       self.proposal.unhide_times()
 
   def cancel_other(self, user):
@@ -146,7 +146,7 @@ class ProposalTime():
       self.cancel()
 
   def is_expired(self):
-    return sm.now() > self.expire_date
+    return sm.now() > self['expire_date']
 
   def notify_cancel(self):
     if len(list(ProposalTime.times_from_proposal(self.proposal))) == 1:
@@ -156,9 +156,9 @@ class ProposalTime():
 #       self.proposal.notify_edit()
   
   def cancel_time_only(self, missed_ping=None):
-    if self.fully_accepted:
+    if self['fully_accepted']:
       self.proposal.unhide_times()
-    self.current = False
+    self['current'] = False
     self.cancelled = True
     if missed_ping:
       self.missed_pings += 1   
@@ -168,32 +168,32 @@ class ProposalTime():
     self.proposal.cancel_if_no_times() 
 
   def hide(self):
-    self.current = False
+    self['current'] = False
 
   def unhide(self):
     if self.cancelled != False:
       sm.warning(f"self._proptime_row['cancelled'] != False")
-    self.current = True
+    self['current'] = True
     
   def confirm_wait(self, start_now=True):
     import datetime
     if start_now:
-      self.expire_date = sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
+      self['expire_date'] = sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
       
   def update(self, port_time):
-    if self.start_now and port_time.start_now:
+    if self['start_now'] and port_time.start_now:
       pass #self._proptime_row['start_date'] = self._proptime_row['start_date']
     elif port_time.start_now:
-      self.start_now = sm.now()
+      self['start_now'] = sm.now()
     else:
-      self.start_date = port_time.start_date
-    self.start_now = port_time.start_now # order: after 'start_date' set
-    self.duration = port_time.duration
+      self['start_date'] = port_time.start_date
+    self['start_now'] = port_time.start_now # order: after 'start_date' set
+    self['duration'] = port_time.duration
     if port_time.start_now:
       self.confirm_wait()
     else:
-      self.expire_date = port_time.expire_date
-    self.current = True
+      self['expire_date'] = port_time.expire_date
+    self['current'] = True
     self.cancelled = False
     
   @staticmethod
@@ -295,7 +295,6 @@ class ProposalTime():
   
   
 class Proposal():
-  
   def __init__(self, prop_row):
     self._prop_row = prop_row
 
@@ -328,10 +327,10 @@ class Proposal():
   def _row(self):
     return self._prop_row
 
-  def __getattr__(self, key):
+  def __getitem__(self, key):
     return self._prop_row[key]
-  
-  def __setattr__(self, key, value):
+
+  def __setitem__(self, key, value):
     self._prop_row[key] = value
     
   @property
@@ -363,7 +362,7 @@ class Proposal():
 
   def hide_unaccepted_times(self):
     for proptime in ProposalTime.times_from_proposal(self, require_current=True):
-      if not proptime.fully_accepted:
+      if not proptime['fully_accepted']:
         proptime.hide()
 
   def unhide_times(self):
@@ -371,7 +370,7 @@ class Proposal():
       proptime.unhide()  
     
   def cancel_prop_only(self):
-    self.current = False
+    self['current'] = False
     
   def cancel_if_no_times(self):
     if ProposalTime.none_left(self._prop_row):
@@ -390,7 +389,7 @@ class Proposal():
       sm.warning(f"no such invite to add proposal to")
 
   def update(self, port_prop):
-    self.current = True
+    self['current'] = True
     self.last_edited = sm.now()
     self.min_size = port_prop.min_size
     self.max_size = port_prop.max_size

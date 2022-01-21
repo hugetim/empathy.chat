@@ -204,21 +204,3 @@ class PortItem:
       kwargs = {}
     new_object = anvil.server.call(self.server_fn_name, self, method, kwargs)
     self.update(new_object)    
-    
-    
-# @anvil.server.portable_class    
-# class ItemWrapped(AttributeToKey):
-#   def __init__(self, item):
-#     self.item = item
- 
-#   def to_data(self):
-#     return self.item
-
-#   def __getattr__(self, key):
-#     return self.item[key]
-  
-#   def get(self, key, default=None):
-#     return self.item.get(key, default)
-  
-#   def __setattr__(self, key, value):
-#     self.item[key] = value
