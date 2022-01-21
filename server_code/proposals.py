@@ -7,6 +7,7 @@ import anvil.tz
 from . import parameters as p
 from . import server_misc as sm
 from . import portable as port
+from anvil_extras.server_utils import timed
 
 
 class ProposalTime():
@@ -76,7 +77,7 @@ class ProposalTime():
     return [self.proposal.proposer] + list(self['users_accepting'])
   
   def is_accepted(self):
-    return len(self.all_users) >= self.proposal.max_size
+    return len(self.all_users) >= self.proposal['max_size']
   
   def attempt_accept(self, user, partial_state):
     if sm.DEBUG:
@@ -100,7 +101,7 @@ class ProposalTime():
     self['users_accepting'] += [user]
     if self.is_accepted():
       self['fully_accepted'] = True
-      self.accept_date = now
+      self['accept_date'] = now
       from . import matcher as m
       if not self['start_now']:
         m._match_commit(user, self.get_id())
@@ -124,7 +125,7 @@ class ProposalTime():
     accepting_list.remove(user)
     self['users_accepting'] = accepting_list
     self['fully_accepted'] = False
-    self.accept_date = None
+    self['accept_date'] = None
     if not self['users_accepting']:
       self.proposal.unhide_times()
 
@@ -159,9 +160,9 @@ class ProposalTime():
     if self['fully_accepted']:
       self.proposal.unhide_times()
     self['current'] = False
-    self.cancelled = True
+    self['cancelled'] = True
     if missed_ping:
-      self.missed_pings += 1   
+      self['missed_pings'] += 1   
   
   def cancel(self, missed_ping=None):
     self.cancel_time_only(missed_ping)
@@ -171,7 +172,7 @@ class ProposalTime():
     self['current'] = False
 
   def unhide(self):
-    if self.cancelled != False:
+    if self['cancelled'] != False:
       sm.warning(f"self._proptime_row['cancelled'] != False")
     self['current'] = True
     
@@ -194,7 +195,7 @@ class ProposalTime():
     else:
       self['expire_date'] = port_time.expire_date
     self['current'] = True
-    self.cancelled = False
+    self['cancelled'] = False
     
   @staticmethod
   def add(proposal, port_time):
@@ -335,9 +336,9 @@ class Proposal():
     
   @property
   def specific_user_eligible(self):
-    if (self.eligible == 0 and len(self.eligible_users) == 1 
-        and not self.eligible_groups and not self.eligible_starred):
-      return self.eligible_users[0]
+    if (self['eligible'] == 0 and len(self['eligible_users']) == 1 
+        and not self['eligible_groups'] and not self['eligible_starred']):
+      return self['eligible_users'][0]
     else:
       return None
     
@@ -350,12 +351,12 @@ class Proposal():
     from . import groups_server as g
     if distance is None:
       distance = c.distance(self.proposer, user)
-    if (distance <= self.eligible or (user in self.eligible_users and distance < 99)):
+    if (distance <= self['eligible'] or (user in self['eligible_users'] and distance < 99)):
       return True
-    elif (self.eligible_starred and sm.star_row(user, self.proposer)):
+    elif (self['eligible_starred'] and sm.star_row(user, self.proposer)):
       return True
     else:
-      for group in self.eligible_groups:
+      for group in self['eligible_groups']:
         if user in g.MyGroup.members_from_group_row(group):
           return True
       return False
@@ -391,16 +392,16 @@ class Proposal():
   def update(self, port_prop):
     self['current'] = True
     self.last_edited = sm.now()
-    self.min_size = port_prop.min_size
-    self.max_size = port_prop.max_size
-    self.eligible = port_prop.eligible
+    self['min_size'] = port_prop.min_size
+    self['max_size'] = port_prop.max_size
+    self['eligible'] = port_prop.eligible
     if self.proposer['trust_level'] < 3:
-      self.eligible = min(2, self.eligible)
-    self.eligible_users = [app_tables.users.get_by_id(port_user.user_id)
+      self['eligible'] = min(2, self['eligible'])
+    self['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id)
                            for port_user in port_prop.eligible_users]
-    self.eligible_groups = [app_tables.groups.get_by_id(group_id)
+    self['eligible_groups'] = [app_tables.groups.get_by_id(group_id)
                             for group_id in port_prop.eligible_group_ids]
-    self.eligible_starred = port_prop.eligible_starred
+    self['eligible_starred'] = port_prop.eligible_starred
     ## First cancel removed rows
     new_time_ids = [port_time.time_id for port_time in port_prop.times]
     for proptime in ProposalTime.times_from_proposal(self):
@@ -476,6 +477,7 @@ class Proposal():
     return app_tables.proposals.search(user=user, current=True)
   
   @staticmethod
+  @timed
   def get_port_view_items(user):
     port_proposals = Proposal.get_port_proposals(user)
     return port.Proposal.create_view_items(port_proposals)

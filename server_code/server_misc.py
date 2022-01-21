@@ -220,6 +220,13 @@ def get_port_user_full(user2, user1_id="", distance=None, degree=None, common_gr
   user1 = get_user(user1_id)
   return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree), 
                        common_group_names=common_group_names)
+
+
+def get_port_users_full(user2s, user1_id="", up_to_distance=3):
+  from . import connections as c
+  user1 = get_user(user1_id)
+  distances = c.distances(user2s, user1, up_to_distance)
+  return [get_port_user_full(user2, user1_id, distance=distances[user2], degree=distances[user2]) for user2 in user2s]
  
   
 @authenticated_callable
@@ -243,7 +250,7 @@ def _latest_invited(user):
 def _inviteds(user):
   return app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user, current=True)
 
-
+@timed
 def get_prompts(user):
   import datetime
   out = []

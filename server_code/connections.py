@@ -66,7 +66,7 @@ def member_close_connections(user):
   """Returns list of users"""
   degree1s = _get_connections(user, 1)[1]
   return [user2 for user2 in degree1s
-          if user2['trust_level'] >= 3 and distance(user2, user, 1) == 1]
+          if user2['trust_level'] >= 3 and distance(user2, user, up_to_distance=1) == 1]
   
     
 def _degree(user2, user1, up_to_degree=3):
@@ -317,8 +317,8 @@ def try_adding_to_invite_proposal(invite, user):
   if invite['proposal']:
     from . import matcher as m
     proposal = m.Proposal(invite['proposal'])
-    if proposal.current and user not in proposal.eligible_users:
-      proposal.eligible_users += [user]
+    if proposal['current'] and user not in proposal['eligible_users']:
+      proposal['eligible_users'] += [user]
       # Don't try to notify new_user invitee here because missing time_zone, first_name, and notif_settings
 
       
@@ -326,10 +326,10 @@ def try_removing_from_invite_proposal(invite, user):
   if invite['proposal']:
     from . import matcher as m
     proposal = m.Proposal(invite['proposal'])
-    if user in proposal.eligible_users:
-      temp = proposal.eligible_users
+    if user in proposal['eligible_users']:
+      temp = proposal['eligible_users']
       temp.remove(user)
-      proposal.eligible_users = temp
+      proposal['eligible_users'] = temp
       
   
 def try_connect(invite, invite_reply):

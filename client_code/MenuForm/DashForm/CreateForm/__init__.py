@@ -114,7 +114,7 @@ class CreateForm(CreateFormTemplate):
       ("triad (2 other participants)", (3, 3)),
     ]
     if not self.item['start_now']:
-      new_items.insert(1, ("pair or triad (1 or 2 others, however many accept in time)", (2, 3)))
+      new_items.append(("pair or triad (1 or 2 others, however many accept in time)", (2, 3)))
     elif self.item['min_size'] != self.item['max_size']:
       self.item['min_size'] = self.item['max_size']
     self.size_drop_down.items = new_items
