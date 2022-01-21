@@ -46,25 +46,15 @@ class ProposalTime():
   def _row(self):
     return self._proptime_row
 
-  @property
-  def start_now(self):
-    return self._proptime_row['start_now']
-
-  @property
-  def start_date(self):
-    return self._proptime_row['start_date']
+  def __getattr__(self, key):
+    return self._proptime_row[key]
   
-  @property
-  def expire_date(self):
-    return self._proptime_row['expire_date']
-
+  def __setattr__(self, key, value):
+    self._proptime_row[key] = value
+  
   @property
   def ping_start(self):
     return self._proptime_row['accept_date']
-  
-  @property
-  def duration(self):
-    return self._proptime_row['duration']
  
   def duration_start_str(self, user):
     out = port.DURATION_TEXT[self.duration]
@@ -75,24 +65,24 @@ class ProposalTime():
     return out
 
   def get_match_info(self):
-    return self._proptime_row['jitsi_code'], self._proptime_row['duration']
+    return self.jitsi_code, self.duration
   
   @property
   def proposal(self):
     return Proposal(self._proptime_row['proposal'])
 
   def is_accepted(self):
-    return bool(self._proptime_row['users_accepting'])
+    return len(self.users_accepting) == self.proposal.max_size - 1
 
   def all_users(self):
-    return [self.proposal.proposer] + list(self._proptime_row['users_accepting'])
+    return [self.proposal.proposer] + list(self.users_accepting)
   
   def attempt_accept(self, user, partial_state):
     if sm.DEBUG:
       print("_attempt_accept_proptime")
     status = partial_state['status']
     if (status in [None, "requesting"] 
-        and self._proptime_row['current'] 
+        and self.current 
         and (not self.is_accepted())
         and self.proposal.is_visible(user)):
       self.accept(user, status)
@@ -105,13 +95,13 @@ class ProposalTime():
       own_now_proposal_time = ProposalTime.get_now_proposing(user)
       if own_now_proposal_time:
         ProposalTime(own_now_proposal_time).proposal.cancel_all_times()
-    self._proptime_row['users_accepting'] = [user]
-    self._proptime_row['accept_date'] = now
+    self.users_accepting = [user]
+    self.accept_date = now
     self.proposal.hide_unaccepted_times()
     from . import matcher as m
     if not self.start_now:
       m._match_commit(user, self.get_id())
-    elif (now - (self._proptime_row['start_date'])).total_seconds() <= p.BUFFER_SECONDS:
+    elif (now - (self.start_date)).total_seconds() <= p.BUFFER_SECONDS:
       m._match_commit(user)
     else:
       self.ping()
@@ -123,12 +113,12 @@ class ProposalTime():
            )    
       
   def in_users_accepting(self, user):
-    return self._proptime_row['users_accepting'] and user in self._proptime_row['users_accepting']
+    return self.users_accepting and user in self.users_accepting
       
   def remove_accepting(self, user=None):
     # below code assumes only dyads allowed
-    self._proptime_row['users_accepting'] = []
-    self._proptime_row['accept_date'] = None
+    self.users_accepting = []
+    self.accept_date = None
     self.proposal.unhide_times()
 
   def cancel_other(self, user):
@@ -149,7 +139,7 @@ class ProposalTime():
       self.cancel()
 
   def is_expired(self):
-    return sm.now() > self._proptime_row['expire_date']
+    return sm.now() > self.expire_date
 
   def notify_cancel(self):
     if len(list(ProposalTime.times_from_proposal(self.proposal))) == 1:
@@ -161,43 +151,43 @@ class ProposalTime():
   def cancel_time_only(self, missed_ping=None):
     if self.is_accepted():
       self.proposal.unhide_times()
-    self._proptime_row['current'] = False
-    self._proptime_row['cancelled'] = True
+    self.current = False
+    self.cancelled = True
     if missed_ping:
-      self._proptime_row['missed_pings'] += 1   
+      self.missed_pings += 1   
   
   def cancel(self, missed_ping=None):
     self.cancel_time_only(missed_ping)
     self.proposal.cancel_if_no_times() 
 
   def hide(self):
-    self._proptime_row['current'] = False
+    self.current = False
 
   def unhide(self):
-    if self._proptime_row['cancelled'] != False:
+    if self.cancelled != False:
       sm.warning(f"self._proptime_row['cancelled'] != False")
-    self._proptime_row['current'] = True
+    self.current = True
     
   def confirm_wait(self, start_now=True):
     import datetime
     if start_now:
-      self._proptime_row['expire_date'] = sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
+      self.expire_date = sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS)
       
   def update(self, port_time):
-    if self._proptime_row['start_now'] and port_time.start_now:
+    if self.start_now and port_time.start_now:
       pass #self._proptime_row['start_date'] = self._proptime_row['start_date']
     elif port_time.start_now:
-      self._proptime_row['start_date'] = sm.now()
+      self.start_now = sm.now()
     else:
-      self._proptime_row['start_date'] = port_time.start_date
-    self._proptime_row['start_now'] = port_time.start_now # order: after 'start_date' set
-    self._proptime_row['duration'] = port_time.duration
+      self.start_date = port_time.start_date
+    self.start_now = port_time.start_now # order: after 'start_date' set
+    self.duration = port_time.duration
     if port_time.start_now:
       self.confirm_wait()
     else:
-      self._proptime_row['expire_date'] = port_time.expire_date
-    self._proptime_row['current'] = True
-    self._proptime_row['cancelled'] = False
+      self.expire_date = port_time.expire_date
+    self.current = True
+    self.cancelled = False
     
   @staticmethod
   def add(proposal, port_time):
@@ -330,37 +320,11 @@ class Proposal():
   def _row(self):
     return self._prop_row
 
-  @property
-  def current(self):
-    return self._prop_row['current']
-    
-  @property
-  def eligible(self):
-    return self._prop_row['eligible']
-
-  @property
-  def eligible_users(self):
-    return self._prop_row['eligible_users']
+  def __getattr__(self, key):
+    return self._prop_row[key]
   
-  @eligible_users.setter
-  def eligible_users(self, value):
-    self._prop_row['eligible_users'] = value
-  
-  @property
-  def eligible_groups(self):
-    return self._prop_row['eligible_groups']
-  
-  @eligible_groups.setter
-  def eligible_groups(self, value):
-    self._prop_row['eligible_groups'] = value
-
-  @property
-  def eligible_starred(self):
-    return self._prop_row['eligible_starred']
-  
-  @eligible_starred.setter
-  def eligible_starred(self, value):
-    self._prop_row['eligible_starred'] = value   
+  def __setattr__(self, key, value):
+    self._prop_row[key] = value
     
   @property
   def specific_user_eligible(self):
@@ -378,7 +342,7 @@ class Proposal():
     from . import connections as c
     from . import groups_server as g
     if distance is None:
-      distance = c.distance(self._prop_row['user'], user)
+      distance = c.distance(self.proposer, user)
     if (distance <= self.eligible or (user in self.eligible_users and distance < 99)):
       return True
     elif (self.eligible_starred and sm.star_row(user, self.proposer)):
@@ -399,7 +363,7 @@ class Proposal():
       proptime.unhide()  
     
   def cancel_prop_only(self):
-    self._prop_row['current'] = False
+    self.current = False
     
   def cancel_if_no_times(self):
     if ProposalTime.none_left(self._prop_row):
@@ -418,18 +382,18 @@ class Proposal():
       sm.warning(f"no such invite to add proposal to")
 
   def update(self, port_prop):
-    self._prop_row['current'] = True
-    self._prop_row['last_edited'] = sm.now()
-    self._prop_row['min_size'] = port_prop.min_size
-    self._prop_row['max_size'] = port_prop.max_size
-    self._prop_row['eligible'] = port_prop.eligible
+    self.current = True
+    self.last_edited = sm.now()
+    self.min_size = port_prop.min_size
+    self.max_size = port_prop.max_size
+    self.eligible = port_prop.eligible
     if self.proposer['trust_level'] < 3:
-      self._prop_row['eligible'] = min(2, self._prop_row['eligible'])
-    self._prop_row['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id) 
-                                        for port_user in port_prop.eligible_users]
-    self._prop_row['eligible_groups'] = [app_tables.groups.get_by_id(group_id) 
-                                         for group_id in port_prop.eligible_group_ids]
-    self._prop_row['eligible_starred'] = port_prop.eligible_starred
+      self.eligible = min(2, self.eligible)
+    self.eligible_users = [app_tables.users.get_by_id(port_user.user_id)
+                           for port_user in port_prop.eligible_users]
+    self.eligible_groups = [app_tables.groups.get_by_id(group_id)
+                            for group_id in port_prop.eligible_group_ids]
+    self.eligible_starred = port_prop.eligible_starred
     ## First cancel removed rows
     new_time_ids = [port_time.time_id for port_time in port_prop.times]
     for proptime in ProposalTime.times_from_proposal(self):

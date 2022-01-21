@@ -73,7 +73,7 @@ components:
           components:
           - type: Label
             properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-              visible: true, text: Name, font_size: null, font: '', spacing_above: small,
+              visible: true, text: Who, font_size: null, font: '', spacing_above: small,
               icon_align: left, spacing_below: small, italic: false, background: '',
               bold: true, underline: false, icon: ''}
             name: label_1
@@ -147,17 +147,20 @@ components:
     properties:
       role: null
       columns:
-      - {title: User(s), id: LRZCRL, data_key: users}
-      - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false}
-      - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false}
-      - {id: QGSDIT, title: Expires in..., data_key: expires_in}
-      - {title: '', id: PHQQNP, data_key: buttons, expand: true}
+      - {title: Who, id: LRZCRL, data_key: users, $$hashKey: 'object:21149'}
+      - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false,
+        $$hashKey: 'object:21150'}
+      - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false,
+        $$hashKey: 'object:21151'}
+      - {id: QGSDIT, title: Expires in..., data_key: expires_in, $$hashKey: 'object:21152'}
+      - {title: '', id: PHQQNP, data_key: buttons, expand: true, $$hashKey: 'object:21153'}
       auto_header: false
       tooltip: ''
       border: ''
       foreground: ''
       rows_per_page: 20
       visible: true
+      wrap_on: never
       show_page_controls: true
       spacing_above: small
       spacing_below: small
@@ -175,7 +178,7 @@ components:
       components:
       - type: Link
         properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White',
-          visible: true, text: Name, font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+          visible: true, text: Who, font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
           spacing_above: small, icon_align: right, col_widths: '', spacing_below: small,
           italic: false, background: '', bold: true, underline: false, icon: ''}
         name: link_users
