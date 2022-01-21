@@ -7,6 +7,7 @@ from .. import rosenberg
 from datetime import date, datetime
 from .. import parameters
 from .. import ui_procedures as ui
+from .. import glob
 from anvil_extras import augment
 
 
@@ -38,5 +39,8 @@ class LoginForm(LoginFormTemplate):
   def enter_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     ui.reload(self.init_dict)
+    if glob.MOBILE:
+      Notification("empathy.chat works OK on mobile but may be easier on a computer", 
+                   timeout=4, style="warning").show()
 
 

@@ -40,7 +40,8 @@ class MatchForm(MatchFormTemplate):
     self.update_status(self.item['status'])
     self.first_update = True
     self.update()
-    alert(content=MobileAlert(), title="Attention mobile users", large=True)
+    if glob.MOBILE:
+      alert(content=MobileAlert(), title="Attention mobile users", large=True)
     self._first_tick = True
     self.timer_2.interval = 5
 
