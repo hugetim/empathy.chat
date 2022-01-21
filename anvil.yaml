@@ -308,6 +308,9 @@ db_schema:
       admin_ui: {width: 158}
       type: link_multiple
       target: users
+    - name: fully_accepted
+      admin_ui: {width: 200}
+      type: bool
     - name: accept_date
       admin_ui: {width: 200}
       type: datetime

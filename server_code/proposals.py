@@ -37,6 +37,7 @@ class ProposalTime():
     del row_dict['cancelled']
     del row_dict['missed_pings']
     del row_dict['proposal']
+    del row_dict['fully_accepted']
     return port.ProposalTime(**row_dict)
 
   def __repr__(self):
@@ -71,11 +72,11 @@ class ProposalTime():
   def proposal(self):
     return Proposal(self._proptime_row['proposal'])
 
-  def is_accepted(self):
-    return len(self.users_accepting) == self.proposal.max_size - 1
-
   def all_users(self):
     return [self.proposal.proposer] + list(self.users_accepting)
+  
+  def is_accepted(self):
+    return len(self.all_users) >= self.proposal.max_size
   
   def attempt_accept(self, user, partial_state):
     if sm.DEBUG:
@@ -83,9 +84,10 @@ class ProposalTime():
     status = partial_state['status']
     if (status in [None, "requesting"] 
         and self.current 
-        and (not self.is_accepted())
+        and (not self.fully_accepted)
         and self.proposal.is_visible(user)):
       self.accept(user, status)
+      self.proposal.hide_unaccepted_times()
    
   def accept(self, user, status):
     if sm.DEBUG:
@@ -95,16 +97,17 @@ class ProposalTime():
       own_now_proposal_time = ProposalTime.get_now_proposing(user)
       if own_now_proposal_time:
         ProposalTime(own_now_proposal_time).proposal.cancel_all_times()
-    self.users_accepting = [user]
-    self.accept_date = now
-    self.proposal.hide_unaccepted_times()
-    from . import matcher as m
-    if not self.start_now:
-      m._match_commit(user, self.get_id())
-    elif (now - (self.start_date)).total_seconds() <= p.BUFFER_SECONDS:
-      m._match_commit(user)
-    else:
-      self.ping()
+    self.users_accepting += [user]
+    if self.is_accepted():
+      self.fully_accepted = True
+      self.accept_date = now
+      from . import matcher as m
+      if not self.start_now:
+        m._match_commit(user, self.get_id())
+      elif (now - (self.start_date)).total_seconds() <= p.BUFFER_SECONDS:
+        m._match_commit(user)
+      else:
+        self.ping()
  
   def ping(self):   
     sm.ping(user=self.proposal.proposer,
@@ -117,22 +120,26 @@ class ProposalTime():
       
   def remove_accepting(self, user=None):
     # below code assumes only dyads allowed
-    self.users_accepting = []
+    accepting_list = list(self.users_accepting)
+    accepting_list.remove(user)
+    self.users_accepting = accepting_list
+    self.fully_accepted = False
     self.accept_date = None
-    self.proposal.unhide_times()
+    if not self.users_accepting:
+      self.proposal.unhide_times()
 
   def cancel_other(self, user):
     if self.in_users_accepting(user):
       self.cancel(missed_ping=1)
     elif self.proposal.proposer == user:
       # below code assumes only dyads allowed
-      self.remove_accepting()
+      self.remove_accepting(user)
       if self.is_expired():
         self.cancel()  
     
   def cancel_this(self, user):
     if self.in_users_accepting(user):
-      self.remove_accepting()
+      self.remove_accepting(user)
       if self.is_expired():
        self.cancel() 
     elif self.proposal.proposer == user:
@@ -149,7 +156,7 @@ class ProposalTime():
 #       self.proposal.notify_edit()
   
   def cancel_time_only(self, missed_ping=None):
-    if self.is_accepted():
+    if self.fully_accepted:
       self.proposal.unhide_times()
     self.current = False
     self.cancelled = True
@@ -199,6 +206,7 @@ class ProposalTime():
                                                    current=True,
                                                    cancelled=False,
                                                    users_accepting=[],
+                                                   fully_accepted=False,
                                                    jitsi_code=sm.new_jitsi_code(),
                                                    missed_pings=0,
                                                   )).confirm_wait(port_time.start_now)
@@ -264,7 +272,7 @@ class ProposalTime():
     if sm.DEBUG:
       print("old_prop_times_to_prune")
     for row in app_tables.proposal_times.search(cancelled=False, 
-                                                users_accepting=q.any_of(None, []),
+                                                fully_accepted=False,
                                                 expire_date=q.less_than(now),
                                                ):
       yield ProposalTime(row)
@@ -279,7 +287,7 @@ class ProposalTime():
     cutoff_r = now - timeout
     for row in app_tables.proposal_times.search(cancelled=False, 
                                                 start_now=True,
-                                                users_accepting=q.not_(q.any_of(None, [])),
+                                                fully_accepted=True,
                                                 accept_date=q.less_than(cutoff_r),
                                                 expire_date=q.less_than(cutoff_r),
                                                ):
@@ -355,7 +363,7 @@ class Proposal():
 
   def hide_unaccepted_times(self):
     for proptime in ProposalTime.times_from_proposal(self, require_current=True):
-      if not proptime.is_accepted():
+      if not proptime.fully_accepted:
         proptime.hide()
 
   def unhide_times(self):

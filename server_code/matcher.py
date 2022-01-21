@@ -160,7 +160,7 @@ def get_status(user):
   current_proptime = ProposalTime.get_now_proposing(user)
   if current_proptime:
     expire_date = current_proptime.expire_date
-    if current_proptime.is_accepted():
+    if current_proptime.fully_accepted:
       status = "pinged"
       ping_start = current_proptime.ping_start
     else:
@@ -438,7 +438,7 @@ def _match_commit(user, proptime_id=None):
     current_proptime = ProposalTime.get_now(user)
   if current_proptime:
     print("current_proptime")
-    if current_proptime.is_accepted():
+    if current_proptime.fully_accepted:
       print("'accepted'")
       if current_proptime.start_now:
         match_start = sm.now()
