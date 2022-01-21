@@ -1,0 +1,29 @@
+container:
+  type: ColumnPanel
+  properties: {col_widths: '{}'}
+components:
+- type: RichText
+  properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
+    foreground: '', visible: true, font_size: null, content: "Our video conferencing\
+      \ service ([Jitsi](https://www.nytimes.com/wirecutter/reviews/best-video-conferencing-service/))\
+      \ may not work reliably on mobile *web browsers*, but a [mobile *app*](https://jitsi.org/downloads/)\
+      \ is available as an alternative. \nAfter clicking \"OK\" below, click the link\
+      \ displayed below the video to open and/or install the mobile app. (You could\
+      \ also enter the meeting code directly into the app.)\nNote: The link/code will\
+      \ be automatically hidden shortly, but clicking the  {info_button}  button will\
+      \ bring it back.", font: '', spacing_above: none, spacing_below: none, data: null,
+    background: '', format: markdown}
+  name: rich_text_1
+  layout_properties: {grid_position: 'SOLZCH,JMZXCR'}
+  components:
+  - type: Button
+    properties: {role: raised, align: center, tooltip: Toggle backup link to the video chat,
+      border: '', enabled: true, foreground: '', visible: true, text: Info, font_size: null,
+      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+      background: '', bold: false, underline: false, icon: 'fa:info-circle'}
+    name: info_button
+    layout_properties:
+      col_widths: {}
+      grid_position: SKRJSI,IQVZUG
+      slot: info_button
+is_package: true
