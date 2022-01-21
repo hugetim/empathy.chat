@@ -364,6 +364,12 @@ db_schema:
     - name: eligible_starred
       admin_ui: {width: 200}
       type: bool
+    - name: min_size
+      admin_ui: {width: 200}
+      type: number
+    - name: max_size
+      admin_ui: {width: 200}
+      type: number
   matches:
     title: Matches
     client: none
