@@ -8,6 +8,7 @@ from .server_misc import authenticated_callable
 from . import portable as port
 from . import parameters as p
 from . import helper as h
+from functools import lru_cache
 
 
 # def is_visible(user2, user1=None): # Currently unused
@@ -44,6 +45,7 @@ def get_create_user_items(user):
     return items[1]
 
 
+@lru_cache(maxsize=1024)
 def _get_connections(user, up_to_degree=3, include_zero=False):
   """Return dictionary from degree to set of connections"""
   if not ((up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)):
