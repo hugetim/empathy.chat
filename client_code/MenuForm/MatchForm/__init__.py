@@ -50,12 +50,16 @@ class MatchForm(MatchFormTemplate):
     # https://jitsi.github.io/handbook/docs/user-guide/user-guide-advanced
     base = "https://meet.jit.si/" if p.DEBUG_MODE else "https://8x8.vc/vpaas-magic-cookie-848c456481fc4755aeb61d02b9d9dab2/"
     self.jitsi_link.url = base + jitsi_code + "#config.prejoinPageEnabled=false"
-    self.jitsi_link.text = jitsi_code
+    self.jitsi_link.text = "" #jitsi_code
+    self.jitsi_code = jitsi_code
     self.jitsi_link.visible = True
-    if not self.jitsi_embed:
-      self.jitsi_embed = MyJitsi(item={'room_name': jitsi_code, 'name': glob.name})
-      self.jitsi_column_panel.add_component(self.jitsi_embed)
+    self.add_jitsi_embed()
     self.jitsi_column_panel.visible = True
+    
+  def add_jitsi_embed(self):
+    if not self.jitsi_embed:
+      self.jitsi_embed = MyJitsi(item={'room_name': self.jitsi_code, 'name': glob.name})
+      self.jitsi_column_panel.add_component(self.jitsi_embed)
 
   def init_slider_panel(self, my_value):
     if my_value:
@@ -158,8 +162,9 @@ class MatchForm(MatchFormTemplate):
   def complete_button_click(self, **event_args):
     self.timer_2.interval = 0
     if self.status == "matched":
-      self.jitsi_embed.visible = False
-      window.japi.executeCommand('hangup')
+      if self.jitsi_embed:
+        self.jitsi_embed.visible = False
+        window.japi.executeCommand('hangup')
       state = anvil.server.call('match_complete')
     else:
       state = anvil.server.call('cancel_now', self.proptime_id)
@@ -215,6 +220,19 @@ class MatchForm(MatchFormTemplate):
   def lists_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.lists_button, self.lists_card)
+
+  def jitsi_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    if self.jitsi_embed:
+      self.jitsi_embed.remove_from_parent()
+      self.jitsi_embed = None
+      window.japi.executeCommand('hangup')
+    self.restore_button.visible = True
+    
+  def restore_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.restore_button.visible = False
+    self.add_jitsi_embed()
 
 
 def toggle_button_card(button, card):

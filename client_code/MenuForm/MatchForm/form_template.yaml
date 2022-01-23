@@ -74,9 +74,26 @@ components:
         name: full_screen_button
         layout_properties: {}
         event_bindings: {click: full_screen_button_click}
+      - type: Link
+        properties: {role: null, url: '', align: left, tooltip: Open video/audio chat in new window (or mobile app),
+          border: '', foreground: '', visible: true, text: '', font_size: 12, wrap_on: mobile,
+          font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '{}',
+          spacing_below: none, italic: false, background: '', bold: false, underline: false,
+          icon: ''}
+        name: jitsi_link
+        layout_properties: {grid_position: 'WOLXYM,LIOMWJ'}
+        event_bindings: {click: jitsi_link_click}
+        components:
+        - type: Button
+          properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
+            foreground: '', visible: true, text: jitsi, font_size: null, font: '',
+            spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+            background: '', bold: false, underline: false, icon: 'fa:external-link'}
+          name: button_1
+          layout_properties: {grid_position: 'ADNINT,BAITJS'}
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle backup link to the video chat,
-          border: '', enabled: true, foreground: '', visible: true, text: Info, font_size: null,
+          border: '', enabled: true, foreground: '', visible: false, text: Info, font_size: null,
           font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:info-circle'}
         name: info_button
@@ -100,10 +117,18 @@ components:
         border: '', visible: true, role: null, tooltip: ''}
       name: jitsi_column_panel
       layout_properties: {expand: true, width: null, grid_position: 'DUEWCW,KTQWOP'}
-      components: []
+      components:
+      - type: Button
+        properties: {role: primary-color, align: center, tooltip: '', border: '',
+          enabled: true, foreground: '', visible: false, text: Restore Audio/video here,
+          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          italic: false, background: '', bold: false, underline: false, icon: ''}
+        name: restore_button
+        layout_properties: {}
+        event_bindings: {click: restore_button_click}
     - type: FlowPanel
       properties: {role: null, spacing: small, align: center, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: small, spacing_below: small,
+        foreground: '', visible: false, spacing_above: small, spacing_below: small,
         background: ''}
       name: info_flow_panel
       layout_properties: {grid_position: 'WOLXYM,KTDUPL'}
@@ -116,15 +141,6 @@ components:
           icon: ''}
         name: note_label
         layout_properties: {grid_position: 'WOLXYM,FPKEGW'}
-        event_bindings: {}
-      - type: Link
-        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
-          visible: false, text: jitsi_link, font_size: 12, wrap_on: mobile, font: '',
-          col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '',
-          spacing_below: none, italic: false, background: '', bold: false, underline: false,
-          icon: ''}
-        name: jitsi_link
-        layout_properties: {grid_position: 'WOLXYM,LIOMWJ'}
         event_bindings: {}
     event_bindings: {}
   - type: ColumnPanel
