@@ -24,6 +24,7 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_embed = None
     self._info_clicked = False
     self.info_button.role = ""
+    self.their_external = False
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
@@ -74,7 +75,7 @@ class MatchForm(MatchFormTemplate):
     self.slider_panel.set_event_handler('x-hide', self.hide_slider)
     
   def update(self):
-    status, self.how_empathy_list, self.their_name, new_items, their_value = (
+    status, self.how_empathy_list, self.their_name, new_items, their_value, their_external = (
       anvil.server.call_s('update_match_form')
     )
     self.update_status(status)
@@ -82,6 +83,7 @@ class MatchForm(MatchFormTemplate):
     self.update_messages(new_items)
     if self.slider_panel.item['status'] == "submitted" and their_value:
       self.slider_panel.receive_value(their_value)
+    self.update_external(their_external)
 
   def update_status(self, status):
     if status != self.status:
@@ -142,7 +144,18 @@ class MatchForm(MatchFormTemplate):
 #   def chat_display_card_show(self, **event_args):
 #     """This method is called when the column panel is shown on the screen"""
 #     self.call_js('scrollCard')      
-    
+
+  def update_external(self, their_external):
+    if bool(their_external) != self.their_external:
+      if their_external:
+        message = (f"{self.their_name} has left the empathy.chat window "
+                   "to continue the video/audio chat via an external client. "
+                   "You should see/hear them again (shortly if not already), "
+                   "but they may no longer see text messages sent via empathy.chat."
+                  )
+        Notification(message, timeout=None).show()
+    self.their_external = their_external
+
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
     if self._first_tick:
@@ -224,6 +237,7 @@ class MatchForm(MatchFormTemplate):
   def jitsi_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     if self.jitsi_embed:
+      anvil.server.call('update_my_external', True)
       self.jitsi_embed.remove_from_parent()
       self.jitsi_embed = None
       window.japi.executeCommand('hangup')
@@ -233,6 +247,7 @@ class MatchForm(MatchFormTemplate):
     """This method is called when the button is clicked"""
     self.restore_button.visible = False
     self.add_jitsi_embed()
+    anvil.server.call('update_my_external', False)
 
 
 def toggle_button_card(button, card):

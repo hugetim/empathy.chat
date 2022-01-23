@@ -474,6 +474,18 @@ def add_chat_message(user_id="", message="[blank test message]"):
 
 
 @authenticated_callable
+def update_my_external(my_external, user_id=""):
+  from . import matcher
+  print(f"update_my_external, {my_external}, {user_id}")
+  user = get_user(user_id)
+  from . import matcher
+  this_match, i = matcher.current_match_i(user)
+  temp_values = this_match['external']
+  temp_values[i] = my_external
+  this_match['external'] = temp_values 
+
+
+@authenticated_callable
 def update_match_form(user_id=""):
   """
   Return how_empathy_list, their_name, (iterable of dictionaries with keys: 'me', 'message'), their_value
@@ -487,6 +499,7 @@ def _update_match_form(user):
   this_match, i = matcher.current_match_i(user)
   if this_match:
     their_value = _their_value(this_match['slider_values'], i)
+    their_external = _their_value(this_match['external'], i)
     how_empathy_list = ([user['how_empathy']]
                         + [u['how_empathy'] for u in this_match['users']
                            if u != user]
@@ -496,7 +509,7 @@ def _update_match_form(user):
                      'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
                     for m in messages]
     [their_name] = [u['first_name'] for u in this_match['users'] if u != user]
-    return "matched", how_empathy_list, their_name, messages_out, their_value
+    return "matched", how_empathy_list, their_name, messages_out, their_value, their_external
   else:
     matcher.confirm_wait_helper(user)
     partial_state = matcher.get_status(user)

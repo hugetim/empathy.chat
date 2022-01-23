@@ -450,7 +450,9 @@ def _match_commit(user, proptime_id=None):
                                              match_commence=match_start,
                                              present=[0]*len(users),
                                              complete=[0]*len(users),
-                                             slider_values=[""]*len(users))
+                                             slider_values=[""]*len(users),
+                                             external=[False, False],
+                                            )
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal
       proposal.cancel_all_times()
