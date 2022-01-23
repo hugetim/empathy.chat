@@ -19,7 +19,7 @@ components:
     properties: {role: raised, align: center, tooltip: Toggle backup link to the video chat,
       border: '', enabled: true, foreground: '', visible: true, text: Info, font_size: null,
       font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:info-circle'}
+      background: '', bold: false, underline: false, icon: 'fa:exchange'}
     name: info_button
     layout_properties:
       col_widths: {}
