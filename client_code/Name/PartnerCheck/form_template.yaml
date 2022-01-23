@@ -8,7 +8,7 @@ components:
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
     text: '', font_size: null, font: '', spacing_above: medium, icon_align: left,
     spacing_below: small, italic: false, background: '', bold: true, underline: false,
-    icon: 'fa:check'}
+    icon: 'fa:check-circle-o'}
   name: label_1
   layout_properties:
     col_widths: {}
