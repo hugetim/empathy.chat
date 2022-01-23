@@ -39,7 +39,7 @@ class LoginForm(LoginFormTemplate):
   def enter_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     ui.reload(self.init_dict)
-    if glob.MOBILE:
+    if glob.MOBILE and self.init_dict['state']['status'] not in ["matched", "requesting", "pinged"]:
       Notification("empathy.chat works OK on mobile but may be easier on a computer", 
                    timeout=4, style="warning").show()
 
