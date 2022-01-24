@@ -27,7 +27,6 @@ def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
   user = anvil.users.get_user()
   print(user['email'])
-  user['init_date'] = now()
   user['time_zone'] = time_zone
   trust_level = init_user_info(user)
   if p.DEBUG_MODE and trust_level >= TEST_TRUST_LEVEL:
@@ -40,8 +39,9 @@ def initialize_session(time_zone):
 @anvil.server.callable
 def remove_user(user):
   """Remove new user created via Google sign-in"""
-  if user and (not user['password_hash']) and (not user['init_date']):
-    user.delete()
+  h.warning(f"Removing user {user['email']}")
+  if user and (not user['init_date']):
+    user['enabled'] = False
 
     
 def get_user(user_id="", require_auth=True):
@@ -125,6 +125,7 @@ def do_signup(email):
 
 def init_user_info(user):
   """Return trust, initializing info for new users & updating trust_level"""
+  user['init_date'] = now()
   if user['trust_level'] is None:
     user['notif_settings'] = {"essential": "sms", "message": "email", "specific": "email"}
     user['first_name'] = ""

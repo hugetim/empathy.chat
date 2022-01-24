@@ -6,13 +6,11 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from anvil import *
-from . import parameters as p
 from . import invites
-from . import portable as port
-from .Dialogs.Signup import Signup
 
 
 def invited_dialog(inviter):
+  from . import portable as port
   invite = invites.Invite(inviter=inviter, invitee=port.User.from_logged_in())
   errors = invite.relay('load')
   top_form = get_open_form()
@@ -41,7 +39,9 @@ def handle_link(link_key):
   else:
     alert(" ".join(errors)) #This is not a valid invite link."
 
+    
 def invited_signup(invite):
+  from .Dialogs.Signup import Signup
   d = Signup()
   new_user = None
   while not new_user:
