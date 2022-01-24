@@ -25,6 +25,7 @@ class MatchForm(MatchFormTemplate):
     self._info_clicked = False
     self.info_button.role = ""
     self.their_external = False
+    self.lists_url = ""
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
@@ -104,6 +105,7 @@ class MatchForm(MatchFormTemplate):
           if ready:
             state = anvil.server.call('match_commit')
             self.update_status(state['status'])
+            anvil.server.call_s('update_my_external', bool(self.jitsi_embed))
           else:
             state = anvil.server.call('cancel_now', self.proptime_id)
             ui.reload()
@@ -159,8 +161,9 @@ class MatchForm(MatchFormTemplate):
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
     if self._first_tick:
-      url = anvil.server.call('get_url', 'nycnvc_feelings_needs')
-      self.lists_card.add_component(pdf_viewer(url=url))
+      self.lists_url = anvil.server.call('get_url', 'nycnvc_feelings_needs')
+      if self.lists_card.visible:
+        self.add_lists_pdf_viewer()
       self._first_tick = False
     self.update()
 
@@ -232,8 +235,17 @@ class MatchForm(MatchFormTemplate):
 
   def lists_button_click(self, **event_args):
     """This method is called when the button is clicked"""
+    if not self.lists_card.visible:
+      if self.lists_url:
+        self.add_lists_pdf_viewer()
+    elif self.lists_card.get_components():
+      self.pdf_viewer.remove_from_parent()
     toggle_button_card(self.lists_button, self.lists_card)
 
+  def add_lists_pdf_viewer(self):
+    self.pdf_viewer = pdf_viewer(url=self.lists_url)
+    self.lists_card.add_component(self.pdf_viewer)  
+    
   def jitsi_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     if self.jitsi_embed:

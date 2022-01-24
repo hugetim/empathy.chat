@@ -480,9 +480,10 @@ def update_my_external(my_external, user_id=""):
   user = get_user(user_id)
   from . import matcher
   this_match, i = matcher.current_match_i(user)
-  temp_values = this_match['external']
-  temp_values[i] = my_external
-  this_match['external'] = temp_values 
+  if this_match:
+    temp_values = this_match['external']
+    temp_values[i] = my_external
+    this_match['external'] = temp_values 
 
 
 @authenticated_callable
@@ -514,7 +515,7 @@ def _update_match_form(user):
     matcher.confirm_wait_helper(user)
     partial_state = matcher.get_status(user)
     matcher.propagate_update_needed(user)
-    return partial_state['status'], [], "", [], None
+    return partial_state['status'], [], "", [], None, None
 
   
 @authenticated_callable

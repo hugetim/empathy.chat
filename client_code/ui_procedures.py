@@ -23,6 +23,7 @@ def reload(init_dict=None):
     item = {k: init_dict['state'][k] for k in MatchForm.state_keys}
     open_form(MatchForm(item=item))
   else:
+    from .MenuForm import MenuForm
     open_form('MenuForm', item=init_dict)
 
     

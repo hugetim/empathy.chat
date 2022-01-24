@@ -86,7 +86,7 @@ components:
         components:
         - type: Button
           properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-            foreground: '', visible: true, text: jitsi, font_size: null, font: '',
+            foreground: '', visible: true, text: Pop-Out Video, font_size: null, font: '',
             spacing_above: small, icon_align: left, spacing_below: small, italic: false,
             background: '', bold: false, underline: false, icon: 'fa:external-link'}
           name: button_1
@@ -121,7 +121,7 @@ components:
       - type: Button
         properties: {role: primary-color, align: center, tooltip: '', border: '',
           enabled: true, foreground: '', visible: false, text: Restore Audio/video here,
-          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          font_size: null, font: '', spacing_above: large, icon_align: left, spacing_below: large,
           italic: false, background: '', bold: false, underline: false, icon: ''}
         name: restore_button
         layout_properties: {}
@@ -222,6 +222,7 @@ components:
       spacing_below: small, background: ''}
     name: lists_card
     layout_properties: {grid_position: 'QIDPXD,MVNECY'}
+    event_bindings: {}
   - type: Spacer
     properties: {height: 649}
     name: spacer_1

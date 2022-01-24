@@ -15,9 +15,9 @@ components:
   components:
   - type: Button
     properties: {role: raised, align: center, tooltip: Toggle backup link to the video chat,
-      border: '', enabled: true, foreground: '', visible: true, text: Jitsi, font_size: null,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:external-link'}
+      border: '', enabled: true, foreground: '', visible: true, text: Pop-Out Video,
+      font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: false, underline: false, icon: 'fa:external-link'}
     name: info_button
     layout_properties:
       col_widths: {}
