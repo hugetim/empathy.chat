@@ -871,6 +871,11 @@ def get_url(name):
   return url
 
 
+@anvil.server.callable
+def get_urls(names):
+  return [get_url(name) for name in names]
+
+
 # def users_to_email_re_notif(user=None):
 #   """Return list of users to email notifications triggered by user
 

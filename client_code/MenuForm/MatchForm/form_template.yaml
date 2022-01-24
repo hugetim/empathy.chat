@@ -239,6 +239,18 @@ components:
 container:
   type: HtmlTemplate
   properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
-    role: null, html: ''}
+    role: null, html: "<script>\n function loadClips(doorbellMp3SrcUrl, doorbellWavSrcUrl,\
+      \ dingWavSrcUrl){\n    var doorbellMp3=document.getElementById('doorbellMp3');\n\
+      \    var doorbellWav=document.getElementById('doorbellWav');\n    var dingWav=document.getElementById('dingWav');\n\
+      \    doorbellMp3.src=doorbellMp3SrcUrl;\n    doorbellWav.src=doorbellWavSrcUrl;\n\
+      \    dingWav.src=dingWavSrcUrl;\n    var doorbell=document.getElementById('doorbell');\n\
+      \    var ding=document.getElementById('ding');\n    doorbell.load()\n    ding.load()\n\
+      \    }\n</script>\n\n<script>\nfunction playSound(audio_id) {\n          var\
+      \ sound = document.getElementById(audio_id);\n          sound.play();\n    \
+      \  }\n</script>\n\n<audio id=\"doorbell\" preload=\"auto\" autostart=\"false\"\
+      >\n  <source id=\"doorbellMp3\" src=\"\" type=\"audio/mp3\" />\n  <source id=\"\
+      doorbellWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n\n<audio id=\"ding\"\
+      \ preload=\"auto\" autostart=\"false\">\n  <source id=\"dingWav\" src=\"\" type=\"\
+      audio/wav\" />  \n</audio>\n"}
   event_bindings: {show: form_show}
 is_package: true
