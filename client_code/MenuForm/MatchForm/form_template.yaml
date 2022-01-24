@@ -120,7 +120,7 @@ components:
       components:
       - type: Button
         properties: {role: primary-color, align: center, tooltip: '', border: '',
-          enabled: true, foreground: '', visible: false, text: Restore Audio/video here,
+          enabled: true, foreground: '', visible: false, text: Restore video here,
           font_size: null, font: '', spacing_above: large, icon_align: left, spacing_below: large,
           italic: false, background: '', bold: false, underline: false, icon: ''}
         name: restore_button

@@ -488,9 +488,6 @@ def update_my_external(my_external, user_id=""):
 
 @authenticated_callable
 def update_match_form(user_id=""):
-  """
-  Return how_empathy_list, their_name, (iterable of dictionaries with keys: 'me', 'message'), their_value
-  """
   user = get_user(user_id)
   return _update_match_form(user)
 
@@ -501,6 +498,7 @@ def _update_match_form(user):
   if this_match:
     their_value = _their_value(this_match['slider_values'], i)
     their_external = _their_value(this_match['external'], i)
+    their_complete = _their_value(this_match['complete'], i)
     how_empathy_list = ([user['how_empathy']]
                         + [u['how_empathy'] for u in this_match['users']
                            if u != user]
@@ -510,12 +508,28 @@ def _update_match_form(user):
                      'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
                     for m in messages]
     [their_name] = [u['first_name'] for u in this_match['users'] if u != user]
-    return "matched", how_empathy_list, their_name, messages_out, their_value, their_external
+    return dict(
+      status="matched",
+      how_empathy_list=how_empathy_list,
+      their_name=their_name,
+      message_items=messages_out,
+      their_value=their_value,
+      their_external=their_external,
+      their_complete=their_complete,
+    )
   else:
     matcher.confirm_wait_helper(user)
     partial_state = matcher.get_status(user)
     matcher.propagate_update_needed(user)
-    return partial_state['status'], [], "", [], None, None
+    return dict(
+      status=partial_state['status'],
+      how_empathy_list=[],
+      their_name="",
+      message_items=[],
+      their_value=None,
+      their_external=None,
+      their_complete=None,
+    )
 
   
 @authenticated_callable

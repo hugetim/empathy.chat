@@ -25,6 +25,7 @@ class MatchForm(MatchFormTemplate):
     self._info_clicked = False
     self.info_button.role = ""
     self.their_external = False
+    self.their_complete = False
     self.lists_url = ""
 
   def form_show(self, **event_args):
@@ -76,15 +77,17 @@ class MatchForm(MatchFormTemplate):
     self.slider_panel.set_event_handler('x-hide', self.hide_slider)
     
   def update(self):
-    status, self.how_empathy_list, self.their_name, new_items, their_value, their_external = (
-      anvil.server.call_s('update_match_form')
-    )
-    self.update_status(status)
+    match_state = anvil.server.call_s('update_match_form')
+    self.how_empathy_list = match_state['how_empathy_list']
+    self.their_name = match_state['their_name']
+    self.update_status(match_state['status'])
     self.slider_panel.update_name(self.their_name)
-    self.update_messages(new_items)
+    self.update_messages(match_state['message_items'])
+    their_value = match_state['their_value']
     if self.slider_panel.item['status'] == "submitted" and their_value:
       self.slider_panel.receive_value(their_value)
-    self.update_external(their_external)
+    self.update_their_external(match_state['their_external'])
+    self.update_their_complete(match_state['their_complete'])
 
   def update_status(self, status):
     if status != self.status:
@@ -147,7 +150,7 @@ class MatchForm(MatchFormTemplate):
 #     """This method is called when the column panel is shown on the screen"""
 #     self.call_js('scrollCard')      
 
-  def update_external(self, their_external):
+  def update_their_external(self, their_external):
     if bool(their_external) != self.their_external:
       if their_external:
         message = (f"{self.their_name} has left the empathy.chat window "
@@ -158,6 +161,13 @@ class MatchForm(MatchFormTemplate):
         Notification(message, timeout=None).show()
     self.their_external = their_external
 
+  def update_their_complete(self, their_complete):
+    if bool(their_complete) != self.their_complete:
+      if their_complete:
+        message = f"{self.their_name} has left this empathy chat."
+        Notification(message, timeout=None).show()
+    self.their_complete = their_complete
+    
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
     if self._first_tick:
@@ -170,9 +180,9 @@ class MatchForm(MatchFormTemplate):
   def message_textbox_pressed_enter(self, **event_args):
     text = self.message_textbox.text
     if text:
-      _, _, _, temp, _ = anvil.server.call('add_chat_message', message=text)
+      match_state = anvil.server.call('add_chat_message', message=text)
       self.message_textbox.text = ""
-      self.update_messages(temp)
+      self.update_messages(match_state['message_items'])
       #self.call_js('scrollCard')
       
   def complete_button_click(self, **event_args):
