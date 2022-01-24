@@ -104,6 +104,7 @@ class MatchForm(MatchFormTemplate):
       if self.status == "pinged":
         with h.PausedTimer(self.timer_2):
           with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
+            self.call_js('playSound', 'doorbell')
             ready = confirm("Someone has asked to join your empathy chat. Ready?")
           if ready:
             state = anvil.server.call('match_commit')
@@ -170,7 +171,12 @@ class MatchForm(MatchFormTemplate):
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
     if self._first_tick:
-      self.lists_url = anvil.server.call('get_url', 'nycnvc_feelings_needs')
+      [self.lists_url, *clip_urls] = anvil.server.call('get_urls', ['nycnvc_feelings_needs',
+                                                                    'doorbell_mp3',
+                                                                    'doorbell_wav',
+                                                                    'bowl_struck_wav',
+                                                                   ])
+      self.call_js('loadClips', *clip_urls)
       if self.lists_card.visible:
         self.add_lists_pdf_viewer()
       self._first_tick = False
@@ -209,6 +215,7 @@ class MatchForm(MatchFormTemplate):
     toggle_button_card(self.timer_button, self.timer_card)
 
   def my_timer_1_elapsed(self, **event_args):
+    self.call_js('playSound', 'ding')
     if not self.timer_card.visible:
       self.timer_button_click()
       

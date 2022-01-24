@@ -158,11 +158,10 @@ components:
       layout_properties: {grid_position: 'UATIWX,QHMTDV'}
       components: []
   - type: ColumnPanel
-    properties: {role: card, tooltip: 'This is a private timer, the time not shown
-        to the other user. Note: If you hide a running timer, it will reappear when
-        the time elapses.', border: '', foreground: '', visible: false, wrap_on: mobile,
-      col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small,
-      background: ''}
+    properties: {role: card, tooltip: 'This is a private timer, not shown to the other
+        user. Note: If you hide a running timer, it will reappear when the time elapses.',
+      border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium,
+      spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
     name: timer_card
     layout_properties: {grid_position: 'ODNWIY,XMNGNB'}
     components:
@@ -239,6 +238,18 @@ components:
 container:
   type: HtmlTemplate
   properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
-    role: null, html: ''}
+    role: null, html: "<script>\n function loadClips(doorbellMp3SrcUrl, doorbellWavSrcUrl,\
+      \ dingWavSrcUrl){\n    var doorbellMp3=document.getElementById('doorbellMp3');\n\
+      \    var doorbellWav=document.getElementById('doorbellWav');\n    var dingWav=document.getElementById('dingWav');\n\
+      \    doorbellMp3.src=doorbellMp3SrcUrl;\n    doorbellWav.src=doorbellWavSrcUrl;\n\
+      \    dingWav.src=dingWavSrcUrl;\n    var doorbell=document.getElementById('doorbell');\n\
+      \    var ding=document.getElementById('ding');\n    doorbell.load()\n    ding.load()\n\
+      \    }\n</script>\n\n<script>\nfunction playSound(audio_id) {\n          var\
+      \ sound = document.getElementById(audio_id);\n          sound.play();\n    \
+      \  }\n</script>\n\n<audio id=\"doorbell\" preload=\"auto\" autostart=\"false\"\
+      >\n  <source id=\"doorbellMp3\" src=\"\" type=\"audio/mp3\" />\n  <source id=\"\
+      doorbellWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n\n<audio id=\"ding\"\
+      \ preload=\"auto\" autostart=\"false\">\n  <source id=\"dingWav\" src=\"\" type=\"\
+      audio/wav\" />  \n</audio>\n"}
   event_bindings: {show: form_show}
 is_package: true
