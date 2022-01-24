@@ -154,9 +154,8 @@ class MatchForm(MatchFormTemplate):
     if bool(their_external) != self.their_external:
       if their_external:
         message = (f"{self.their_name} has left the empathy.chat window "
-                   "to continue the video/audio chat via an external client. "
-                   "You should see/hear them again (shortly if not already), "
-                   "but they may no longer see text messages sent via empathy.chat."
+                   'to continue the video/audio chat in a separate, "popped-out" window. '
+                   "You should see/hear them again shortly (if not already)."
                   )
         Notification(message, timeout=None).show()
     self.their_external = their_external
