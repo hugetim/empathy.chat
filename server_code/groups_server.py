@@ -154,8 +154,7 @@ class Invite(sm.ServerItem, groups.Invite):
     port.update(self)
     return port 
 
-  @anvil.tables.in_transaction
-  def invite_row(self):
+  def _invite_row(self):
     row = None
     errors = []
     if self.invite_id:
@@ -171,7 +170,7 @@ class Invite(sm.ServerItem, groups.Invite):
     return row
   
   def visit(self, user, register=False):
-    invite_row = self.invite_row()
+    invite_row = self._invite_row()
     if invite_row and user:
       if register:
         Invite._register_user(user)
