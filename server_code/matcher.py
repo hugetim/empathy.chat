@@ -87,6 +87,7 @@ def _prune_all_expired_items():
 
 
 @anvil.tables.in_transaction
+@timed
 def _init_user_status(user):
   partial_state = get_status(user)
   if partial_state['status'] == 'pinged' and partial_state['seconds_left'] <= 0:
@@ -102,6 +103,7 @@ def _init_user_status(user):
 @anvil.tables.in_transaction
 def _init_get_final_state(user):
   anvil.server.session['state'] = _get_state(user)
+  user['update_needed'] = False
   return anvil.server.session['state']
 
   

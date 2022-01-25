@@ -77,7 +77,7 @@ class ProposalTime():
     return [self.proposal.proposer] + list(self['users_accepting'])
   
   def is_accepted(self):
-    return len(self.all_users) >= self.proposal['max_size']
+    return len(self.all_users()) >= self.proposal['max_size']
   
   def attempt_accept(self, user, partial_state):
     if sm.DEBUG:
@@ -88,7 +88,6 @@ class ProposalTime():
         and (not self['fully_accepted'])
         and self.proposal.is_visible(user)):
       self.accept(user, status)
-      self.proposal.hide_unaccepted_times()
    
   def accept(self, user, status):
     if sm.DEBUG:
@@ -102,6 +101,7 @@ class ProposalTime():
     if self.is_accepted():
       self['fully_accepted'] = True
       self['accept_date'] = now
+      self.proposal.hide_unaccepted_times()
       from . import matcher as m
       if not self['start_now']:
         m._match_commit(user, self.get_id())

@@ -9,6 +9,7 @@ from . import portable as port
 from . import parameters as p
 from . import helper as h
 from functools import lru_cache
+from anvil_extras.server_utils import timed
 
 
 # def is_visible(user2, user1=None): # Currently unused
@@ -45,11 +46,12 @@ def get_create_user_items(user):
     return items[1]
 
 
-@lru_cache(maxsize=1024)
-def _get_connections(user, up_to_degree=3, include_zero=False):
+def _get_connections(user, up_to_degree=3, include_zero=False, cache_override=False):
   """Return dictionary from degree to set of connections"""
   if not ((up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)):
     sm.warning(f"_get_connections(user, {up_to_degree}, {include_zero}) not expected")
+  if user == anvil.users.get_user() and not cache_override:
+    return _cached_get_connections(user, up_to_degree, include_zero)
   degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user, current=True)])
   out = {0: {user}, 1: degree1s}
   if user in out[1]:
@@ -64,13 +66,32 @@ def _get_connections(user, up_to_degree=3, include_zero=False):
   return out
 
 
+_cached_connections = {}
+_cached_up_to = -1
+
+def _cached_get_connections(logged_in_user, up_to_degree, include_zero):
+  global _cached_connections
+  global _cached_up_to
+  if up_to_degree > _cached_up_to:
+    _cached_connections = _get_connections(logged_in_user, up_to_degree=up_to_degree, include_zero=True, cache_override=True)
+    _cached_up_to = up_to_degree
+  return {key: _cached_connections[key] for key in range(1-include_zero, up_to_degree+1)}
+
+
+def _clear_cached_connections():
+  global _cached_connections
+  global _cached_up_to
+  _cached_connections = {}
+  _cached_up_to = -1
+
+  
 def member_close_connections(user):
   """Returns list of users"""
   degree1s = _get_connections(user, 1)[1]
   return [user2 for user2 in degree1s
           if user2['trust_level'] >= 3 and distance(user2, user, up_to_distance=1) == 1]
   
-    
+
 def _degree(user2, user1, up_to_degree=3):
   """Returns 99 if no degree <= up_to_degree found"""
   if user2 == user1:
@@ -347,6 +368,7 @@ def try_connect(invite, invite_reply):
       item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance", "current"}}
       app_tables.connections.add_row(**item)
       i_row['current'] = False
+    _clear_cached_connections()
     return True
   else:
     print(f"invite['guess'] doesn't match, {dict(invite)}, {invite['user2']['phone']}")
@@ -386,6 +408,7 @@ def disconnect(user2_id, user1_id=""):
     if r1to2 and r2to1: 
       r1to2['current'] = False
       r2to1['current'] = False
+      _clear_cached_connections()
       _remove_connection_prompts(user1, user2)
       return True
   return False

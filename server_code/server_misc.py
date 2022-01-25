@@ -23,20 +23,24 @@ def now():
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 
-@anvil.tables.in_transaction
-@timed
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
+  user, trust_level = _init_user(time_zone)
+  if p.DEBUG_MODE and user['trust_level'] >= TEST_TRUST_LEVEL:
+    from . import server_auto_test
+    server_auto_test.server_auto_tests()
+    #anvil.server.launch_background_task('server_auto_tests')
+  return user
+
+
+@anvil.tables.in_transaction
+def _init_user(time_zone):
   user = anvil.users.get_user()
   print(user['email'])
   user['init_date'] = now()
   user['time_zone'] = time_zone
   trust_level = init_user_info(user)
-  if p.DEBUG_MODE and trust_level >= TEST_TRUST_LEVEL:
-    from . import server_auto_test
-    server_auto_test.server_auto_tests()
-    #anvil.server.launch_background_task('server_auto_tests')
-  return user
+  return user, trust_level
 
 
 @anvil.server.callable
@@ -199,6 +203,8 @@ def name(user, to_user=None, distance=None):
 def get_port_user(user2, distance=None, user1_id="", simple=False):
   if user2:
     user1 = get_user(user1_id)
+    if user1 == user2:
+      distance = 0
     _name = name(user2, user1 if user1_id else None, distance)
     if simple:
       return port.User(user2.get_id(), _name)
