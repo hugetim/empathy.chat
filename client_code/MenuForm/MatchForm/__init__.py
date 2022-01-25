@@ -109,13 +109,13 @@ class MatchForm(MatchFormTemplate):
           if ready:
             state = anvil.server.call('match_commit')
             self.update_status(state['status'])
-            anvil.server.call_s('update_my_external', bool(self.jitsi_embed))
           else:
             state = anvil.server.call('cancel_now', self.proptime_id)
             ui.reload()
       if prev != "matched" and self.status == "matched":
         self.slider_panel.item['status'] = None
         self.slider_panel.update_status()
+        anvil.server.call_s('update_my_external', not bool(self.jitsi_embed))
       if not self.status:
         ui.reload()
       
