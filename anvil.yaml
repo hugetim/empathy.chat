@@ -168,6 +168,9 @@ db_schema:
     - name: date_described
       admin_ui: {width: 200}
       type: datetime
+    - name: distance
+      admin_ui: {width: 200}
+      type: number
     - name: guess
       admin_ui: {width: 200}
       type: string
@@ -181,9 +184,6 @@ db_schema:
     - name: current
       admin_ui: {width: 200}
       type: bool
-    - name: distance
-      admin_ui: {width: 200}
-      type: number
   prompts:
     title: Prompts
     client: none
@@ -197,7 +197,7 @@ db_schema:
       type: link_single
       target: users
     - name: spec
-      admin_ui: {width: 200}
+      admin_ui: {width: 622}
       type: simpleObject
     - name: dismissed
       admin_ui: {width: 200}
@@ -232,7 +232,7 @@ db_schema:
       admin_ui: {width: 198}
       type: string
     - name: last_login
-      admin_ui: {width: 155}
+      admin_ui: {width: 146}
       type: datetime
     - name: init_date
       admin_ui: {width: 200}
@@ -268,7 +268,7 @@ db_schema:
       admin_ui: {width: 150}
       type: datetime
     - name: remembered_logins
-      admin_ui: {width: 166}
+      admin_ui: {width: 171}
       type: simpleObject
     - name: n_password_failures
       admin_ui: {width: 178}
@@ -285,7 +285,7 @@ db_schema:
     server: full
     columns:
     - name: expire_date
-      admin_ui: {width: 220.663}
+      admin_ui: {width: 195.667}
       type: datetime
     - name: current
       admin_ui: {width: 91}
@@ -298,7 +298,7 @@ db_schema:
       type: link_single
       target: proposals
     - name: start_date
-      admin_ui: {width: 223}
+      admin_ui: {width: 252}
       type: datetime
     - name: start_now
       admin_ui: {width: 112}
@@ -310,6 +310,9 @@ db_schema:
       admin_ui: {width: 158}
       type: link_multiple
       target: users
+    - name: fully_accepted
+      admin_ui: {width: 200}
+      type: bool
     - name: accept_date
       admin_ui: {width: 200}
       type: datetime
@@ -338,7 +341,7 @@ db_schema:
     server: full
     columns:
     - name: created
-      admin_ui: {width: 218}
+      admin_ui: {width: 200}
       type: datetime
     - name: current
       admin_ui: {width: 95}
@@ -348,7 +351,7 @@ db_schema:
       type: link_single
       target: users
     - name: last_edited
-      admin_ui: {width: 210}
+      admin_ui: {width: 200}
       type: datetime
     - name: eligible
       admin_ui: {width: 98}
@@ -364,6 +367,12 @@ db_schema:
     - name: eligible_starred
       admin_ui: {width: 200}
       type: bool
+    - name: min_size
+      admin_ui: {width: 200}
+      type: number
+    - name: max_size
+      admin_ui: {width: 200}
+      type: number
   matches:
     title: Matches
     client: none
