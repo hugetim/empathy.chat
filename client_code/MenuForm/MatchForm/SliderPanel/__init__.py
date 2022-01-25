@@ -16,23 +16,30 @@ class SliderPanel(SliderPanelTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.their_name = ""
     if self.item.get('their_name'):
       self.update_name(self.item.get('their_name'))
     self.update_status()
 
   def update_status(self):
     if self.item['status'] in [None, 'waiting']:
-      self.title_label.text = 'How full is your "empathy tank"? (Empty: angry/distant, Full: content/open)'
+      self.title_label.text = 'How full is your "empathy tank"? (Empty: angry/distant, Full: content/open)'                              
       self.title_label.bold = True
-      self.left_column_panel.tooltip = "The idea is to compare values (after you both submit) to help you decide who gives empathy first."
-    else:
-      self.title_label.text = 'Use to help decide who gives empathy first (Empty: angry/distant, Full: content/open)'
+      self.left_column_panel.tooltip = ("The idea is to compare values (after you both submit) to help you decide who gives empathy first."
+                                        "More full usually means it's easier to be curious about what the other is feeling and needing.")
+    elif self.item['status'] == 'received':
+      self.title_label.text = 'You can compare to help decide who gives empathy first (Empty: angry/distant, Full: content/open)'
       self.title_label.bold = False
       self.left_column_panel.tooltip = ('It may be that neither of you is "full" enough to feel willing/able to give empathy first. '
                                         'If so, consider cancelling or rescheduling.')
+    else:
+      self.title_label.text = ("More full usually means it's easier to be curious about what the other is feeling and needing. "
+                               '(Empty: angry/distant, Full: content/open)')
+      self.title_label.bold = False
     self.refresh_data_bindings()
       
   def update_name(self, their_name):
+    self.their_name = their_name
     self.their_label.text = f"{their_name}:"
       
   def hide_button_click(self, **event_args):
