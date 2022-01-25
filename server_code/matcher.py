@@ -461,7 +461,7 @@ def _match_commit(user, proptime_id=None):
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal
       proposal.cancel_all_times()
-      if not current_proptimestart_now:
+      if not current_proptime['start_now']:
         current_proptime.ping()
 
 

@@ -198,7 +198,7 @@ components:
   layout_properties: {grid_position: 'MGXSNE,CGULSX'}
 - type: FlowPanel
   properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: none, spacing_below: medium, background: ''}
+    foreground: '', visible: false, spacing_above: none, spacing_below: medium, background: ''}
   name: flow_panel_3
   layout_properties: {grid_position: 'WHMCHT,ECZRZV'}
   components:
