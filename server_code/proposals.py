@@ -16,7 +16,7 @@ class ProposalTime():
 
   def get_id(self):
     return self._proptime_row.get_id()  
-    
+  
   def portable(self):
     row_dict = dict(self._proptime_row)
     row_dict['time_id'] = self.get_id()
@@ -300,7 +300,7 @@ class Proposal():
 
   def get_id(self):
     return self._prop_row.get_id()
-    
+  
   def portable(self, user):
     row_dict = dict(self._prop_row)
     row_dict['prop_id'] = self.get_id()

@@ -49,7 +49,7 @@ def _get_connections(user, up_to_degree=3, cache_override=False):
   """Return dictionary from degree to set of connections"""
   if up_to_degree not in range(1, 99):
     sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
-  if user == anvil.users.get_user() and not cache_override:
+  if not cache_override and user == anvil.users.get_user():
     return _cached_get_connections(user, up_to_degree)
   degree1s = {row['user2'] for row in app_tables.connections.search(user1=user, current=True)}
   out = {0: {user}, 1: degree1s}
@@ -72,8 +72,6 @@ def _cached_get_connections(logged_in_user, up_to_degree):
   if up_to_degree > _cached_up_to:
     _cached_connections = _get_connections(logged_in_user, up_to_degree=up_to_degree, cache_override=True)
     _cached_up_to = up_to_degree
-  else:
-    print(f"using cache for up to {up_to_degree}")
   return {key: _cached_connections[key].copy() for key in range(up_to_degree+1)}
 
 

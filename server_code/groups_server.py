@@ -36,7 +36,6 @@ def serve_my_group(port_my_group, method, kwargs):
 
 
 @anvil.server.callable
-@anvil.tables.in_transaction
 def serve_group_invite(port_invite, method, kwargs):
   print(f"serve_group_invite: {method}({kwargs}) called on {port_invite}")
   invite = Invite(port_invite)
@@ -155,6 +154,7 @@ class Invite(sm.ServerItem, groups.Invite):
     port.update(self)
     return port 
 
+  @anvil.tables.in_transaction
   def invite_row(self):
     row = None
     errors = []
@@ -171,16 +171,21 @@ class Invite(sm.ServerItem, groups.Invite):
     return row
   
   def visit(self, user, register=False):
-    """Assumes only self.link_key known (unless register)
-    
-       Side effects: set invite['user2'] if visitor is logged in,
-       likewise for invite_reply['user1'] if it exists"""
     invite_row = self.invite_row()
-    if user:
+    if invite_row and user:
       if register:
-        sm.init_user_info(user)
-      #self.update(Invite.from_invite_row(invite_row))
-      MyGroup.add_member(user, invite_row)
+        Invite._register_user(user)
+      Invite._add_visitor(user, invite_row)
+
+  @staticmethod
+  @anvil.tables.in_transaction
+  def _add_visitor(user, invite_row):
+    MyGroup.add_member(user, invite_row)
+    
+  @staticmethod
+  @anvil.tables.in_transaction
+  def _register_user(user):
+    sm.init_user_info(user)
       
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):
