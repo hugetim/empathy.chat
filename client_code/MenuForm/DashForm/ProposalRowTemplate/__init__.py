@@ -28,6 +28,12 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     else:
       self.users_flow_panel.add_component(Name(item=prop.user))
     time = self.item['prop_time']
+    for port_user in time.users_accepting:
+      if port_user.distance == 0:
+        self.users_flow_panel.add_component(Label(text="me,"), index=0)
+        self.item['me_accepting'] = True
+      else:
+        self.users_flow_panel.add_component(Name(item=port_user))
     self.item.update({'duration': t.DURATION_TEXT[time.duration],
                       'expire_date': time.expire_date,})
     if time.start_now:
@@ -61,7 +67,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
         self.timer_1.interval = 0
         days_and_hours, minutes, *rest = str(time_left).split(':')
         self.item['expires_in'] = f"{days_and_hours}:{minutes}"
-    self.accept_button.visible = not self.item['own']
+    self.accept_button.visible = not self.item['own'] and not self.item.get('me_accepting')
     self.edit_button.visible = self.item['own']
     self.cancel_button.visible = self.item['own']
 

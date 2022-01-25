@@ -69,7 +69,9 @@ def init(time_zone):
 
 def _init(user):
   _prune_all_expired_items()
-  state = _init_user_status(user)
+  _init_user_status(user)
+  state = _init_get_final_state(user)
+  propagate_update_needed(user)
   return {'trust_level': user['trust_level'],
           'test_mode': user['trust_level'] >= sm.TEST_TRUST_LEVEL,
           'name': user['first_name'],
@@ -85,6 +87,7 @@ def _prune_all_expired_items():
 
 
 @anvil.tables.in_transaction
+@timed
 def _init_user_status(user):
   partial_state = get_status(user)
   if partial_state['status'] == 'pinged' and partial_state['seconds_left'] <= 0:
@@ -95,8 +98,12 @@ def _init_user_status(user):
     _cancel_other(user)
   if partial_state['status'] in ('requesting', 'pinged', 'pinging'):
     confirm_wait_helper(user)
+
+    
+@anvil.tables.in_transaction
+def _init_get_final_state(user):
   anvil.server.session['state'] = _get_state(user)
-  propagate_update_needed(user)
+  user['update_needed'] = False
   return anvil.server.session['state']
 
   
@@ -159,8 +166,8 @@ def get_status(user):
   ping_start = None
   current_proptime = ProposalTime.get_now_proposing(user)
   if current_proptime:
-    expire_date = current_proptime.expire_date
-    if current_proptime.is_accepted():
+    expire_date = current_proptime['expire_date']
+    if current_proptime['fully_accepted']:
       status = "pinged"
       ping_start = current_proptime.ping_start
     else:
@@ -170,7 +177,7 @@ def get_status(user):
     if current_accept_time:
       status = "pinging"
       ping_start = current_accept_time.ping_start
-      expire_date = current_accept_time.expire_date
+      expire_date = current_accept_time['expire_date']
     else:
       this_match = current_match(user)
       if this_match:
@@ -195,7 +202,7 @@ def _get_upcomings(user):
                      if u != user]
       match_dict = {'port_users': port_users,
                     'start_date': match['match_commence'],
-                    'duration_minutes': ProposalTime(match['proposal_time']).duration,
+                    'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
                     'match_id': match.get_id(),
                    }
       match_dicts.append(match_dict)
@@ -438,12 +445,12 @@ def _match_commit(user, proptime_id=None):
     current_proptime = ProposalTime.get_now(user)
   if current_proptime:
     print("current_proptime")
-    if current_proptime.is_accepted():
+    if current_proptime['fully_accepted']:
       print("'accepted'")
-      if current_proptime.start_now:
+      if current_proptime['start_now']:
         match_start = sm.now()
       else:
-        match_start = current_proptime.start_date
+        match_start = current_proptime['start_date']
       users = current_proptime.all_users()
       new_match = app_tables.matches.add_row(users=users,
                                              proposal_time=current_proptime._row,
@@ -456,7 +463,7 @@ def _match_commit(user, proptime_id=None):
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal
       proposal.cancel_all_times()
-      if not current_proptime.start_now:
+      if not current_proptime['start_now']:
         current_proptime.ping()
 
 

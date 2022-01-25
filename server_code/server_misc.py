@@ -9,6 +9,7 @@ import anvil.email
 from . import parameters as p
 from . import helper as h
 from . import portable as port
+from anvil_extras.server_utils import timed
 
 
 DEBUG = False #p.DEBUG_MODE
@@ -22,18 +23,23 @@ def now():
   return datetime.datetime.utcnow().replace(tzinfo=anvil.tz.tzutc())
 
 
-@anvil.tables.in_transaction
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
-  user = anvil.users.get_user()
-  print(user['email'])
-  user['time_zone'] = time_zone
-  trust_level = init_user_info(user)
-  if p.DEBUG_MODE and trust_level >= TEST_TRUST_LEVEL:
+  user, trust_level = _init_user(time_zone)
+  if p.DEBUG_MODE and user['trust_level'] >= TEST_TRUST_LEVEL:
     from . import server_auto_test
     server_auto_test.server_auto_tests()
     #anvil.server.launch_background_task('server_auto_tests')
   return user
+
+
+@anvil.tables.in_transaction
+def _init_user(time_zone):
+  user = anvil.users.get_user()
+  print(user['email'])
+  user['time_zone'] = time_zone
+  trust_level = init_user_info(user)
+  return user, trust_level
 
 
 @anvil.server.callable
@@ -198,6 +204,8 @@ def name(user, to_user=None, distance=None):
 def get_port_user(user2, distance=None, user1_id="", simple=False):
   if user2:
     user1 = get_user(user1_id)
+    if user1 == user2:
+      distance = 0
     _name = name(user2, user1 if user1_id else None, distance)
     if simple:
       return port.User(user2.get_id(), _name)
@@ -219,6 +227,13 @@ def get_port_user_full(user2, user1_id="", distance=None, degree=None, common_gr
   user1 = get_user(user1_id)
   return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree), 
                        common_group_names=common_group_names)
+
+
+def get_port_users_full(user2s, user1_id="", up_to_distance=3):
+  from . import connections as c
+  user1 = get_user(user1_id)
+  distances = c.distances(user2s, user1, up_to_distance)
+  return [get_port_user_full(user2, user1_id, distance=distances[user2], degree=distances[user2]) for user2 in user2s]
  
   
 @authenticated_callable
@@ -242,7 +257,7 @@ def _latest_invited(user):
 def _inviteds(user):
   return app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user, current=True)
 
-
+@timed
 def get_prompts(user):
   import datetime
   out = []

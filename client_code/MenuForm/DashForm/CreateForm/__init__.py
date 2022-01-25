@@ -106,6 +106,18 @@ class CreateForm(CreateFormTemplate):
     
   def update(self):
     self.update_times()
+    self.update_size()
+    
+  def update_size(self):
+    new_items = [
+      ("pair (1 other participant)", (2, 2)),
+      ("triad (2 other participants)", (3, 3)),
+    ]
+    if not self.item['start_now']:
+      new_items.append(("pair or triad (1 or 2 others, however many accept in time)", (2, 3)))
+    elif self.item['min_size'] != self.item['max_size']:
+      self.item['min_size'] = self.item['max_size']
+    self.size_drop_down.items = new_items
 
   def radio_start_change(self, **event_args):
     """This method is called when an item is selected"""
