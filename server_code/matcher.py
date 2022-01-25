@@ -127,10 +127,10 @@ def propagate_update_needed(user=None):
       
 @authenticated_callable
 @anvil.tables.in_transaction
-def get_state(user_id=""):
+def get_state(user_id="", force_refresh=False):
   user = sm.get_user(user_id)
   saved_state = anvil.server.session.get('state')
-  if user['update_needed'] or not saved_state:
+  if user['update_needed'] or not saved_state or force_refresh:
     anvil.server.session['state'] = _get_state(user)
     user['update_needed'] = False
   return anvil.server.session['state']
