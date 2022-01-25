@@ -483,7 +483,7 @@ def update_my_external(my_external, user_id=""):
   this_match, i = matcher.current_match_i(user)
   if this_match:
     temp_values = this_match['external']
-    temp_values[i] = my_external
+    temp_values[i] = int(my_external)
     this_match['external'] = temp_values 
 
 
