@@ -8,7 +8,6 @@ from .server_misc import authenticated_callable
 from . import portable as port
 from . import parameters as p
 from . import helper as h
-from functools import lru_cache
 from anvil_extras.server_utils import timed
 
 
@@ -46,36 +45,36 @@ def get_create_user_items(user):
     return items[1]
 
 
-def _get_connections(user, up_to_degree=3, include_zero=False, cache_override=False):
+def _get_connections(user, up_to_degree=3, cache_override=False):
   """Return dictionary from degree to set of connections"""
-  if not ((up_to_degree in range(1, 99)) or (include_zero and up_to_degree == 0)):
-    sm.warning(f"_get_connections(user, {up_to_degree}, {include_zero}) not expected")
+  if up_to_degree not in range(1, 99):
+    sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
   if user == anvil.users.get_user() and not cache_override:
-    return _cached_get_connections(user, up_to_degree, include_zero)
-  degree1s = set([row['user2'] for row in app_tables.connections.search(user1=user, current=True)])
+    return _cached_get_connections(user, up_to_degree)
+  degree1s = {row['user2'] for row in app_tables.connections.search(user1=user, current=True)}
   out = {0: {user}, 1: degree1s}
   if user in out[1]:
     sm.warning(f"user in out[1]")
-  prev = set()
-  for d in range(up_to_degree):
+  prev = {user}
+  for d in range(1, up_to_degree):
     prev.update(out[d])
     current = {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]), current=True)}
     out[d+1] = current - prev
-  if not include_zero:
-    del out[0]
   return out
 
 
 _cached_connections = {}
 _cached_up_to = -1
 
-def _cached_get_connections(logged_in_user, up_to_degree, include_zero):
+def _cached_get_connections(logged_in_user, up_to_degree):
   global _cached_connections
   global _cached_up_to
   if up_to_degree > _cached_up_to:
-    _cached_connections = _get_connections(logged_in_user, up_to_degree=up_to_degree, include_zero=True, cache_override=True)
+    _cached_connections = _get_connections(logged_in_user, up_to_degree=up_to_degree, cache_override=True)
     _cached_up_to = up_to_degree
-  return {key: _cached_connections[key] for key in range(1-include_zero, up_to_degree+1)}
+  else:
+    print(f"using cache for up to {up_to_degree}")
+  return {key: _cached_connections[key].copy() for key in range(up_to_degree+1)}
 
 
 def _clear_cached_connections():
@@ -98,6 +97,7 @@ def _degree(user2, user1, up_to_degree=3):
     return 0
   else:
     dset = _get_connections(user1, up_to_degree)
+    del dset[0]
     return _degree_from_dset(user2, dset)
 
   
@@ -113,10 +113,7 @@ def _degrees(user2s, user1, up_to_degree=3):
   dset = _get_connections(user1, up_to_degree)
   out = {}
   for user2 in set(user2s):
-    if user2 == user1:
-      out[user2] = 0
-    else:
-      out[user2] = _degree_from_dset(user2, dset)
+    out[user2] = _degree_from_dset(user2, dset)
   return out
   
 
@@ -135,7 +132,7 @@ def get_connections(user_id):
   logged_in_user = anvil.users.get_user()
   is_me = user == logged_in_user
   up_to_degree = 3
-  dset = _get_connections(logged_in_user, up_to_degree, include_zero=True)
+  dset = _get_connections(logged_in_user, up_to_degree)
   if is_me:
     records = []
     c_users = set()
@@ -243,7 +240,7 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
               }]
     #[{"via": True, "whose": "", "desc": "", "date": ""}] if degree <= 2 else 
     out = []
-    dset2 = _get_connections(user2, degree-2, include_zero=True)
+    dset2 = _get_connections(user2, degree-2)
     seconds = dset[2] & dset2[degree-2]
     for second in seconds:
       dset_second = _get_connections(second, 1)

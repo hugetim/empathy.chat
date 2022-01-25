@@ -3,7 +3,6 @@ import anvil.tables
 from anvil.tables import app_tables
 import anvil.tables.query as q
 import anvil.server
-import anvil.tz
 from . import parameters as p
 from . import server_misc as sm
 from . import portable as port
