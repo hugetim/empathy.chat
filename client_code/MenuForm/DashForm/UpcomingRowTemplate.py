@@ -5,6 +5,7 @@ import anvil.server
 import anvil.tz
 import datetime
 from ... import helper as h
+from ... import parameters as p
 from ...portable import DURATION_TEXT
 from ...Name import Name
 
@@ -21,7 +22,8 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     # assumes only dyads allowed
     self.users_flow_panel.add_component(Name(item=self.item.pop('port_users')[0]))
     self.item['duration'] = DURATION_TEXT[self.item.pop('duration_minutes')]
-    self.item['start_time'] = h.day_time_str(h.as_local_tz(self.item.pop('start_date')))
+    self.start_dt = self.item.pop('start_date')
+    self.item['start_time'] = h.day_time_str(h.as_local_tz(self.start_dt))
     self.top_form = get_open_form()
 
   def update_dash(self, state):
@@ -32,4 +34,11 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     if confirm("Are you sure you want to cancel this upcoming empathy exchange?"):
       self.update_dash(anvil.server.call('cancel_match',
                                          self.item['match_id']))
+
+  def timer_1_tick(self, **event_args):
+    """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
+    timedelta_left = self.start_dt - h.now()
+    if timedelta_left.total_seconds() <= 60*p.START_EARLY_MINUTES:
+      self.update_dash(anvil.server.call('get_state', force_refresh=True))
+
 
