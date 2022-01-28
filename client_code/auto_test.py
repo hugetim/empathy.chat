@@ -107,8 +107,6 @@ class InviteTest(unittest.TestCase):
     self.assertEqual(invite1.inviter_guess, item1['phone_last4'])
     self.assertEqual(invite1.rel_to_invitee, item2['relationship'])
 
-class MyRequestTest(unittest.TestCase):
-  
     
 # class MyGroupsTest(unittest.TestCase):
 #   def setUp(self):

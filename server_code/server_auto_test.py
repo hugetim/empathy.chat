@@ -161,7 +161,7 @@ class NotifyConnectedTest(unittest.TestCase):
 def server_auto_tests(verbosity=2):
   #unittest.main(exit=False)
   import sys
-  test_modules = ['auto_test'] #, 'server_auto_test']
+  test_modules = ['requests_test'] #, 'auto_test'] #, 'server_auto_test']
   test = unittest.TestLoader().loadTestsFromNames(test_modules)
   unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity).run(test)
     
