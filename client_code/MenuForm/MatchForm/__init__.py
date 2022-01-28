@@ -44,7 +44,7 @@ class MatchForm(MatchFormTemplate):
     self.first_update = True
     self.update()
     if glob.MOBILE:
-      alert(content=MobileAlert(), title="Attention mobile users", large=True)
+      alert(content=MobileAlert(status=self.status), title="Attention mobile users", large=True)
     self._first_tick = True
     self.timer_2.interval = 5
 
@@ -264,6 +264,7 @@ class MatchForm(MatchFormTemplate):
     
   def jitsi_link_click(self, **event_args):
     """This method is called when the link is clicked"""
+    alert("test")
     if self.jitsi_embed:
       anvil.server.call('update_my_external', True)
       self.jitsi_embed.remove_from_parent()

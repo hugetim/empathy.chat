@@ -111,6 +111,7 @@ components:
             background: '', bold: false, underline: false, icon: 'fa:external-link'}
           layout_properties: {grid_position: 'ADNINT,BAITJS'}
           name: button_1
+          event_bindings: {}
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle backup link to the video chat,
           border: '', enabled: true, foreground: '', visible: false, text: Info, font_size: null,

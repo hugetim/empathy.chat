@@ -23,4 +23,13 @@ components:
       col_widths: {}
       grid_position: SKRJSI,IQVZUG
       slot: info_button
+- type: Label
+  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: false,
+    text: 'Note: If you do pop-out the video before the other participant arrives,
+      be sure to then return to empathy.chat (this browser tab) to watch for their
+      arrival--you will need to click a "YES" button to let them into the chat.',
+    font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+    italic: false, background: '', bold: true, underline: false, icon: ''}
+  name: requesting_label
+  layout_properties: {grid_position: 'COJCGW,QMIPKE'}
 is_package: true
