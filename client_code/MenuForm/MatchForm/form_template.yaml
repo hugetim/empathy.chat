@@ -8,13 +8,13 @@ container:
       \    doorbellMp3.src=doorbellMp3SrcUrl;\n    doorbellWav.src=doorbellWavSrcUrl;\n\
       \    dingWav.src=dingWavSrcUrl;\n    var doorbell=document.getElementById('doorbell');\n\
       \    var ding=document.getElementById('ding');\n    doorbell.load()\n    ding.load()\n\
-      \    ding.volume=0.4\n    }\n</script>\n\n<script>\nfunction playSound(audio_id)\
-      \ {\n          var sound = document.getElementById(audio_id);\n          sound.play();\n\
-      \      }\n</script>\n\n<audio id=\"doorbell\" preload=\"auto\" autostart=\"\
-      false\">\n  <source id=\"doorbellMp3\" src=\"\" type=\"audio/mp3\" />\n  <source\
-      \ id=\"doorbellWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n\n<audio id=\"\
-      ding\" preload=\"auto\" autostart=\"false\">\n  <source id=\"dingWav\" src=\"\
-      \" type=\"audio/wav\" />  \n</audio>\n"}
+      \    doorbell.volume=0.7\n    ding.volume=0.4\n    }\n</script>\n\n<script>\n\
+      function playSound(audio_id) {\n          var sound = document.getElementById(audio_id);\n\
+      \          sound.play();\n      }\n</script>\n\n<audio id=\"doorbell\" preload=\"\
+      auto\" autostart=\"false\">\n  <source id=\"doorbellMp3\" src=\"\" type=\"audio/mp3\"\
+      \ />\n  <source id=\"doorbellWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n\
+      \n<audio id=\"ding\" preload=\"auto\" autostart=\"false\">\n  <source id=\"\
+      dingWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n"}
   event_bindings: {show: form_show}
 components:
 - type: ColumnPanel
