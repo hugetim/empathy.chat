@@ -103,9 +103,12 @@ class MatchForm(MatchFormTemplate):
       self.status_label.visible = self.status == "requesting"
       if self.status == "pinged":
         with h.PausedTimer(self.timer_2):
-          with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
-            self.call_js('playSound', 'doorbell')
-            ready = confirm("Someone has asked to join your empathy chat. Ready?")
+          self.call_js('playSound', 'doorbell')
+          if self.jitsi_embed:
+            with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
+              ready = confirm("Someone has asked to join your empathy chat. Are you still available to exchange empathy?")
+          else: # User has popped out video and so may not see confirm dialog
+            ready = True
           if ready:
             state = anvil.server.call('match_commit')
             self.update_status(state['status'])
