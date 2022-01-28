@@ -103,7 +103,7 @@ class MatchForm(MatchFormTemplate):
       self.status_label.visible = self.status == "requesting"
       if self.status == "pinged":
         with h.PausedTimer(self.timer_2):
-          self.call_js('playSound', 'doorbell')
+          self._play_sound('doorbell')
           if self.jitsi_embed:
             with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
               ready = confirm("Someone has asked to join your empathy chat. Are you still available to exchange empathy?")
@@ -121,7 +121,13 @@ class MatchForm(MatchFormTemplate):
         anvil.server.call_s('update_my_external', not bool(self.jitsi_embed))
       if not self.status:
         ui.reload()
-      
+
+  def _play_sound(self, audio_id):
+    try:
+      self.call_js('playSound', audio_id)
+    except ExternalError as err:
+      print(f"Error playing {audio_id} sound: {repr(err)}")        
+        
   def update_messages(self, message_list):
     old_items = self.chat_repeating_panel.items
     messages_plus = []
@@ -218,7 +224,7 @@ class MatchForm(MatchFormTemplate):
     toggle_button_card(self.timer_button, self.timer_card)
 
   def my_timer_1_elapsed(self, **event_args):
-    self.call_js('playSound', 'ding')
+    self._play_sound('ding')
     if not self.timer_card.visible:
       self.timer_button_click()
       
