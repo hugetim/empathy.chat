@@ -11,6 +11,27 @@ from . import connections as c
 from . import invites
 from . import invites_server
 from . import server_misc as sm
+from . import notifies as n
+
+
+def name_mock(user, to_user):
+  return user
+
+
+class NamesTest(unittest.TestCase):
+  def setUp(self):
+    self.user = anvil.users.get_user()
+    self.poptibo = app_tables.users.get(email="poptibo@yahoo.com")
+    
+  def test_single_name(self):
+    self.assertEqual("Peter", n._names(["Peter"], to_user=self.poptibo, name_fn=name_mock))
+    
+  def test_two_names(self):
+    self.assertEqual("Peter and Paul", n._names(["Peter", "Paul"], to_user=self.poptibo, name_fn=name_mock))
+
+  def test_three_plus_names(self):  
+    self.assertEqual("Peter, Paul, and Mary", n._names(["Peter", "Paul", "Mary"], to_user=self.poptibo, name_fn=name_mock))
+    self.assertEqual("Peter, Paul, James, and Mary", n._names(["Peter", "Paul", "James", "Mary"], to_user=self.poptibo, name_fn=name_mock))
 
 
 class InviteBasicTest(unittest.TestCase):
@@ -161,7 +182,7 @@ class NotifyConnectedTest(unittest.TestCase):
 def server_auto_tests(verbosity=2):
   #unittest.main(exit=False)
   import sys
-  test_modules = ['auto_test'] #, 'server_auto_test']
+  test_modules = ['auto_test', 'server_auto_test']
   test = unittest.TestLoader().loadTestsFromNames(test_modules)
   unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity).run(test)
     

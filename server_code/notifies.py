@@ -44,9 +44,20 @@ def _addressee_name(user):
   return name if name else "empathy.chat user"
 
 
-def _other_name(name):
+def _other_name(name=""):
   return name if name else "Another empathy.chat user"
 
+
+def _names(other_users, to_user, name_fn=sm.name):
+  out = name_fn(other_users[0], to_user=to_user)
+  if len(other_users) >= 3:
+    out += ", "
+    out += ", ".join(name_fn(u, to_user=to_user) for u in other_users[1:-1])
+    out += ","
+  if len(other_users) >= 2:
+    out += f" and {other_users[-1]}"
+  return out
+  
 
 def _from_name_for_email(name=""):
   return f"empathy.chat (for {name})" if name else "empathy.chat"
@@ -107,13 +118,36 @@ def notify_match_cancel(user, start, canceler_name=""):
 
 {content}
 ''')
-  
+
+    
+def notify_late_for_chat(user, start, waiting_users=[]):
+  """Notify late user"""
+  print(f"'notify_late_for_chat', {start}")
+  subject = "empathy.chat - late for scheduled match"
+  verb = "is" if len(waiting_users) == 1 else "are"
+  participant_names = _names(waiting_users, to_user=user)
+  content1 = f"{participant_names} {verb} waiting for you to begin an empathy chat that was scheduled to start {notify_when(start, user)}."
+  content2 = f"Please login to {p.URL} now."
+  if user['phone'] and user['notif_settings'].get('essential') == 'sms':
+    send_sms(user['phone'], f"{subject}: {content1} {content2}")
+  elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
+    email_send(
+      to_user=user,
+      from_name=_from_name_for_email(participant_names),
+      subject=subject,
+      text=f'''Dear {_addressee_name(user)},
+
+{content1}
+
+{content2}
+''')
+      
       
 def notify_proposal_cancel(user, proposal, title, notif_settings_type="specific"):
   """Notify recipient of cancelled specific proposal"""
   print(f"'notify_proposal_cancel', {user['email']}, {proposal.get_id()}, {title}")
   from .proposals import ProposalTime
-  proposer_name = name(proposal.proposer, to_user=user)
+  proposer_name = sm.name(proposal.proposer, to_user=user)
   subject = f"empathy.chat - {title} from {proposer_name}"
   content1 = f"{_other_name(proposer_name)} has canceled their empathy chat request directed specifically to you."
   if user['phone'] and user['notif_settings'].get(notif_settings_type) == 'sms':
@@ -133,7 +167,7 @@ def notify_proposal(user, proposal, title, desc, notif_settings_type="specific")
   """Notify recipient of specific proposal"""
   print(f"'notify_proposal', {user['email']}, {proposal.get_id()}, {title}, {desc}")
   from .proposals import ProposalTime
-  proposer_name = name(proposal.proposer, to_user=user)
+  proposer_name = sm.name(proposal.proposer, to_user=user)
   subject = f"empathy.chat - {title} from {proposer_name}"
   proptimes = list(ProposalTime.times_from_proposal(proposal, require_current=True))
   if len(proptimes) > 1:
