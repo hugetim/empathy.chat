@@ -62,9 +62,10 @@ components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: 'me for essential notifications (when someone accepts
-          my empathy chat request, cancels an already scheduled empathy chat, etc.)',
-        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-        italic: false, background: '', bold: false, underline: false, icon: ''}
+          my empathy chat request, cancels an already scheduled empathy chat, is waiting
+          for me because I''m late for a scheduled chat, etc.)', font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
       name: label_5
       layout_properties: {expand: true, width: null}
   - type: FlowPanel

@@ -5,6 +5,7 @@ import anvil.tables.query as q
 import anvil.server
 from . import parameters as p
 from . import server_misc as sm
+from . import notifies as n
 from . import portable as port
 from anvil_extras.server_utils import timed
 
@@ -62,7 +63,7 @@ class ProposalTime():
     if self['start_now']:
       out += ", starting now"
     else:
-      out += f", {sm._notify_when(self['start_date'], user)}"
+      out += f", {n.notify_when(self['start_date'], user)}"
     return out
 
   def get_match_info(self):
@@ -110,10 +111,10 @@ class ProposalTime():
         self.ping()
  
   def ping(self):   
-    sm.ping(user=self.proposal.proposer,
-            start=None if self['start_now'] else self['start_date'],
-            duration=self['duration'],
-           )    
+    n.ping(user=self.proposal.proposer,
+           start=None if self['start_now'] else self['start_date'],
+           duration=self['duration'],
+          )    
       
   def in_users_accepting(self, user):
     return self['users_accepting'] and user in self['users_accepting']
@@ -419,7 +420,7 @@ class Proposal():
   def notify_add_specific(self):
     specific_user = self.specific_user_eligible
     if specific_user:
-      sm.notify_proposal(specific_user, self, f"specific empathy request", " has directed an empathy chat request specifically to you:")
+      n.notify_proposal(specific_user, self, f"specific empathy request", " has directed an empathy chat request specifically to you:")
     return {specific_user}
 
   def notify_edit(self, port_prop, old_port_prop):
@@ -428,9 +429,9 @@ class Proposal():
       old_specific_user = old_specific_port_user.s_user
       old_specific_still_eligible = self.is_visible(old_specific_user) 
       if old_specific_still_eligible and port_prop.times_notify_info != old_port_prop.times_notify_info:
-        sm.notify_proposal(old_specific_user, self, "specific empathy request", " has changed their empathy chat request to:")
+        n.notify_proposal(old_specific_user, self, "specific empathy request", " has changed their empathy chat request to:")
       elif not old_specific_still_eligible:
-        sm.notify_proposal_cancel(old_specific_user, self, "specific empathy request")
+        n.notify_proposal_cancel(old_specific_user, self, "specific empathy request")
         self.notify_add_specific()
     else:
       self.notify_add_specific()
@@ -438,7 +439,7 @@ class Proposal():
   def notify_cancel(self):
     specific_user = self.specific_user_eligible
     if specific_user:
-      sm.notify_proposal_cancel(specific_user, self, "specific empathy request")
+      n.notify_proposal_cancel(specific_user, self, "specific empathy request")
       
   @staticmethod
   def add(user, port_prop):

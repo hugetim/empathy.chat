@@ -21,25 +21,23 @@ services:
   client_config: {}
   server_config: {}
 - source: /runtime/services/anvil/users.yml
-  client_config: {require_secure_passwords: true, use_token: true, use_email: false,
+  client_config: {require_secure_passwords: true, use_token: true, use_email: true,
     allow_remember_me: true, allow_signup: true, enable_automatically: true, confirm_email: false,
-    remember_me_days: 365, use_google: true}
+    remember_me_days: 30, use_google: true}
   server_config:
     user_table: users
     email_content:
       confirm_address: {html: '<p>Thanks for registering your account with empathy.chat.
           Please click the following link to confirm that this is your account:</p><p><br></p><p>{{confirm_link}}</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
         subject: empathy.chat - Confirm your email address}
-      reset_password: {html: '<p>Hi there,</p><p><br></p><p>You have requested a password
-          reset for your empathy.chat account {{email}}. To reset your password, click
-          the link below:</p><p><br></p><p>{{reset_link}}</p><p><br></p><p>This link
-          will expire in ten minutes.</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
-        subject: empathy.chat - Reset your password}
+      reset_password: {html: '<p>To (re)set the password for your empathy.chat account
+          {{email}}, click the link below:</p><p>{{reset_link}}</p><p>This link will
+          expire in ten minutes.</p>', subject: empathy.chat - (re)set your password}
       token_login: {html: '<p>To log in to empathy.chat, click the link below:</p><p>{{login_link}}</p><p>This
-          link will expire in ten minutes.</p><p><em>p.s. Logging in this way prevents
-          you from having to create and manage yet another password. If you check
-          the "Remember me"  box when requesting this login link, you should only
-          need to login this way once per year (per device). For more info:</em>  https://anvil.works/blog/magic-link-sign-in</p>',
+          link will expire in ten minutes.</p><p><em>p.s. Logging in this way can
+          save you from having to manage yet another password. If you check the "Remember
+          me"  box when requesting this login link, you should only need to login
+          this way once per month (per device). For more info:</em>  https://anvil.works/blog/magic-link-sign-in</p>',
         subject: empathy.chat - Login}
 startup: {type: module, module: startup}
 package_name: empathy_chat
