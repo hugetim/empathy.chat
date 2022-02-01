@@ -66,15 +66,15 @@ def _from_name_for_email(name=""):
 def notify_when(start, user):
   if start:
     start_user_tz = sm.as_user_tz(start, user)
-    now_user_tz = sm.as_user_tz(now(), user)
+    now_user_tz = sm.as_user_tz(sm.now(), user)
     if start_user_tz.date() == now_user_tz.date():
       out = f"today at {h.time_str(start_user_tz)}"
     else:
       out = h.day_time_str(start_user_tz)
-    seconds_away = (start-now()).total_seconds()
-    if seconds_away < 60*15:
+    seconds_away = (start-sm.now()).total_seconds()
+    if seconds_away < 60*15 and seconds_away > 0:
       time_in_words = h.seconds_to_words(seconds_away, include_seconds=False)
-      out += f" (in {time_in_words})"
+      out += f" (in {time_in_words})"      
     return out
   else: 
     return "now"  
@@ -219,7 +219,7 @@ def notify_message(user, from_name=""):
 #   return []
 # import datetime
   #from . import matcher
-  #now = now()
+  #now = sm.now()
   #_prune_request_em()
   #assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
   #min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)

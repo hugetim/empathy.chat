@@ -249,6 +249,11 @@ def init_match_form(user_id=""):
       temp = this_match['present']
       temp[i] = 1
       this_match['present'] = temp
+      other_user = sm.their_value(this_match['users'], i)
+      their_present = sm.their_value(this_match['present'], i)
+      if (not their_present) and this_match['match_commence'] < sm.now():
+        from . import notifies as n
+        n.notify_late_for_chat(other_user, this_match['match_commence'], [user])
       proptime = ProposalTime(this_match['proposal_time'])
       jitsi_code, duration = proptime.get_match_info()
       propagate_update_needed()
