@@ -1,3 +1,4 @@
+import anvil.server
 from anvil.server import AnvilWrappedError, _register_exception_type
 
 

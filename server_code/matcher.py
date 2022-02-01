@@ -4,6 +4,7 @@ from anvil.tables import app_tables
 import anvil.tables.query as q
 import anvil.server
 from . import parameters as p
+from . import notifies as n
 from . import server_misc as sm
 from .server_misc import authenticated_callable
 from . import portable as port
@@ -215,7 +216,7 @@ def _cancel_match(user, match_id):
   if match:
     for u in match['users']:
       if u != user:
-        sm.notify_cancel(u, start=match['match_commence'], canceler_name=sm.name(user, to_user=u))
+        n.notify_cancel(u, start=match['match_commence'], canceler_name=sm.name(user, to_user=u))
     match.delete()
 
   
