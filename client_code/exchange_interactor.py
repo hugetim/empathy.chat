@@ -22,10 +22,7 @@ def update_my_external(my_external, user_id):
 def submit_slider(value, user_id):
   user = sm.get_user(user_id)
   repo = ExchangeRepository(user)
-  this_match, i = repo.exchange_i()
-  temp_values = this_match['slider_values']
-  temp_values[i] = value
-  this_match['slider_values'] = temp_values 
+  this_match, i = repo.submit_slider(value)
   return their_value(this_match['slider_values'], i)
 
     

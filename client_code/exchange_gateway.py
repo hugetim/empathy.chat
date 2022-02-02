@@ -22,6 +22,12 @@ class ExchangeRepository:
                             time_stamp=now,
                            )
 
+  def submit_slider(self, value):
+    temp_values = self._exchange['slider_values']
+    temp_values[self._user_i] = value
+    self._exchange['slider_values'] = temp_values 
+    return self.exchange_i()
+    
   def update_my_external(self, my_external):
     temp_values = self._exchange['external']
     temp_values[self._user_i] = int(my_external)
