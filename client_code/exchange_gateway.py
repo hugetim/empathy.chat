@@ -16,15 +16,15 @@ class ExchangeRepository:
       raise(RowMissingError("Current empathy chat not found for this user"))
   
   def add_chat(self, message, now):
-    app_tables.chat.add_row(match=self.match,
-                            user=self.user,
+    app_tables.chat.add_row(match=self._exchange,
+                            user=self._user,
                             message=message,
                             time_stamp=now,
                            )
 
   def update_my_external(self, my_external):
     temp_values = self._exchange['external']
-    temp_values[i] = int(my_external)
+    temp_values[self._user_i] = int(my_external)
     self._exchange['external'] = temp_values
     
   def mark_present(self):
@@ -37,4 +37,4 @@ class ExchangeRepository:
     return dict(self._exchange), self._user_i
   
   def chat_messages(self):
-    return app_tables.chat.search(anvil.tables.order_by("time_stamp", ascending=True), match=this_match)
+    return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=self._exchange)
