@@ -6,6 +6,7 @@ import anvil.server
 from . import parameters as p
 from . import notifies as n
 from . import server_misc as sm
+from . import exchange_interactor as ei
 from .server_misc import authenticated_callable
 from . import portable as port
 from .proposals import Proposal, ProposalTime
@@ -83,7 +84,7 @@ def _init(user):
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_matches()
-  sm.prune_messages()
+  sm.prune_chat_messages()
 
 
 @anvil.tables.in_transaction
@@ -249,8 +250,8 @@ def init_match_form(user_id=""):
       temp = this_match['present']
       temp[i] = 1
       this_match['present'] = temp
-      other_user = sm.their_value(this_match['users'], i)
-      their_present = sm.their_value(this_match['present'], i)
+      other_user = ei.their_value(this_match['users'], i)
+      their_present = ei.their_value(this_match['present'], i)
       if (not their_present) and this_match['match_commence'] < sm.now():
         from . import notifies as n
         n.notify_late_for_chat(other_user, this_match['match_commence'], [user])

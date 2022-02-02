@@ -389,10 +389,10 @@ def random_code(num_chars=5, digits_only=False):
   return "".join([random.choice(charset) for i in range(num_chars)])
 
 
-def prune_messages():
+def prune_chat_messages():
   """Prune messages from fully completed matches"""
   if DEBUG:
-    print("server_misc.prune_messages()")
+    print("server_misc.prune_chat_messages()")
   all_messages = app_tables.chat.search()
   matches = {message['match'] for message in all_messages}
   for match in matches:
@@ -477,107 +477,6 @@ def _invite_guess_fail_prompt(s_invite):
               date=now(),
               dismissed=False,
              )
-
-
-@authenticated_callable
-def add_chat_message(user_id="", message="[blank test message]"):
-  from . import matcher
-  print(f"add_chat_message, '[redacted]', {user_id}")
-  user = get_user(user_id)
-  this_match = matcher.current_match(user)
-  app_tables.chat.add_row(match=this_match,
-                          user=user,
-                          message=anvil.secrets.encrypt_with_key("new_key", message),
-                          time_stamp=now())
-  return _update_match_form(user)
-
-
-@authenticated_callable
-def update_my_external(my_external, user_id=""):
-  from . import matcher
-  print(f"update_my_external, {my_external}, {user_id}")
-  user = get_user(user_id)
-  from . import matcher
-  this_match, i = matcher.current_match_i(user)
-  if this_match:
-    temp_values = this_match['external']
-    temp_values[i] = int(my_external)
-    this_match['external'] = temp_values 
-
-
-@authenticated_callable
-def update_match_form(user_id=""):
-  user = get_user(user_id)
-  return _update_match_form(user)
-
-
-def _update_match_form(user):
-  """Return match_state dict
-  
-  Side effect: Update match['present']"""
-  from . import matcher
-  this_match, i = matcher.current_match_i(user)
-  if this_match:
-    other_user = their_value(this_match['users'], i)
-    _their_value = their_value(this_match['slider_values'], i)
-    their_external = their_value(this_match['external'], i)
-    their_complete = their_value(this_match['complete'], i)
-    if not this_match['present'][i]:
-      temp = this_match['present']
-      temp[i] = 1
-      this_match['present'] = temp
-    how_empathy_list = ([user['how_empathy']]
-                        + [u['how_empathy'] for u in this_match['users']
-                           if u != user]
-                       )
-    messages = app_tables.chat.search(anvil.tables.order_by("time_stamp", ascending=True), match=this_match)
-    messages_out = [{'me': (user == m['user']),
-                     'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
-                    for m in messages]
-    their_name = other_user['first_name']
-    return dict(
-      status="matched",
-      how_empathy_list=how_empathy_list,
-      their_name=their_name,
-      message_items=messages_out,
-      their_value=_their_value,
-      their_external=their_external,
-      their_complete=their_complete,
-    )
-  else:
-    matcher.confirm_wait_helper(user)
-    partial_state = matcher.get_status(user)
-    matcher.propagate_update_needed(user)
-    return dict(
-      status=partial_state['status'],
-      how_empathy_list=[],
-      their_name="",
-      message_items=[],
-      their_value=None,
-      their_external=None,
-      their_complete=None,
-    )
-
-  
-@authenticated_callable
-def submit_slider(value, user_id=""):
-  """Return their_value"""
-  from . import matcher
-  print(f"submit_slider, '[redacted]', {user_id}")
-  user = get_user(user_id)
-  this_match, i = matcher.current_match_i(user)
-  temp_values = this_match['slider_values']
-  temp_values[i] = value
-  this_match['slider_values'] = temp_values 
-  return their_value(this_match['slider_values'], i)
-
-
-def their_value(values, my_i):
-  temp_values = [value for value in values]
-  temp_values.pop(my_i)
-  if len(temp_values) != 1:
-    sm.warning(f"len(temp_values) != 1, but this function assumes dyads only")
-  return temp_values[0]                     # return the remaining value
 
 
 def _email_invalid(email):
