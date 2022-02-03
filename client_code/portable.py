@@ -248,12 +248,12 @@ class Proposal():
 
   MAX_ALT_TIMES = 4
   
-  def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], min_size=2, max_size=2,
+  def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
                eligible=2, eligible_users=[], eligible_group_ids=[], eligible_starred=True,):
     self.prop_id = prop_id
     self.own = own
     self.user = user # should rename proposer
-    self.times = times
+    self.times = times if times else [ProposalTime()]
     self.min_size = min_size
     self.max_size = max_size
     self.eligible = eligible
