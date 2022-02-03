@@ -13,4 +13,3 @@ trust_level = 0
 name = ""
 invites = invites.Invites()
 my_groups = groups.MyGroups()
-exchange_state = None

@@ -84,7 +84,7 @@ def _update_match_form_already_matched(user, repo):
     how_empathy_list=how_empathy_list,
     their_name=their_name,
     message_items=messages_out,
-    their_value=_their_value,
+    their_slider_value=_their_value,
     their_external=their_external,
     their_complete=their_complete,
   )
@@ -100,7 +100,7 @@ def _update_match_form_not_matched(user):
     how_empathy_list=[],
     their_name="",
     message_items=[],
-    their_value="",
+    their_slider_value="",
     their_external=None,
     their_complete=None,
   )

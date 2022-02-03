@@ -8,6 +8,7 @@ from ... import ui_procedures as ui
 from ... import glob
 from ... import helper as h
 from ... import parameters as p
+from ... import exchange_controller as ec
 from .MyJitsi import MyJitsi
 from .SliderPanel import SliderPanel
 from .MobileAlert import MobileAlert
@@ -24,23 +25,16 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_embed = None
     self._info_clicked = False
     self.info_button.role = ""
-    self.their_external = False
-    self.their_complete = False
     self.lists_url = ""
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    self.proptime_id, jitsi_code, duration, my_value = (
-      anvil.server.call('init_match_form')
-    )
-    self.their_name = ""
-    self.how_empathy_list = []
-    self.my_timer_1.minutes = (duration - 5)/2
-    self.set_jitsi_link(jitsi_code)
+    self.item = ec.init_pending_exchange(item['status'])
+    self.my_timer_1.minutes = self.item.default_timer_minutes
+    self.set_jitsi_link()
     self.chat_repeating_panel.items = []
-    self.init_slider_panel(my_value)
-    self.status = "init"
-    self.update_status(self.item['status'])
+    self.init_slider_panel()
+    self.base_status_reset()
     self.first_update = True
     self.update()
     if glob.MOBILE:
@@ -48,78 +42,80 @@ class MatchForm(MatchFormTemplate):
     self._first_tick = True
     self.timer_2.interval = 5
 
-  def set_jitsi_link(self, jitsi_code):
+  def set_jitsi_link(self):
     """Initialize or destroy embedded Jitsi Meet instance"""
-    # https://jitsi.github.io/handbook/docs/user-guide/user-guide-advanced
-    base = "https://meet.jit.si/" #if p.DEBUG_MODE else "https://8x8.vc/vpaas-magic-cookie-848c456481fc4755aeb61d02b9d9dab2/"
-    self.jitsi_link.url = base + jitsi_code + "#config.prejoinPageEnabled=false"
+    self.jitsi_link.url = self.item.jitsi_url
     self.jitsi_link.text = "" #jitsi_code
-    self.jitsi_code = jitsi_code
+    self.jitsi_code = self.item.jitsi_code
     self.jitsi_link.visible = True
     self.add_jitsi_embed()
     self.jitsi_column_panel.visible = True
     
   def add_jitsi_embed(self):
     if not self.jitsi_embed:
-      self.jitsi_embed = MyJitsi(item={'room_name': self.jitsi_code, 'name': glob.name})
+      self.jitsi_embed = MyJitsi(item={'room_name': self.jitsi_code, 'name': glob.name, 'domain': self.item.jitsi_domain})
       self.jitsi_column_panel.add_component(self.jitsi_embed)
 
-  def init_slider_panel(self, my_value):
-    if type(my_value) != str:
-      slider_item = {'visible': True, 'status': "submitted", 
-                     'my_value': my_value, 'their_value': 5, 'their_name': ""}
-    else:
-      slider_item = {'visible': True, 'status': "waiting", 
-                     'my_value': 5, 'their_value': 5, 'their_name': ""}
-      self.slider_button_click()
+  def init_slider_panel(self):
+    my_value = 5 if ec.slider_value_missing(self.item.my_slider_value) else self.item.my_slider_value
+    slider_item = {'visible': True, 'status': self.item.slider_status, 
+                   'my_value': my_value, 'their_value': 5, 'their_name': ""}
+    self.slider_button_click()
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
     self.slider_panel.set_event_handler('x-hide', self.hide_slider)
     
   def update(self):
-    match_state = anvil.server.call_s('update_match_form')
-    self.how_empathy_list = match_state['how_empathy_list']
-    self.their_name = match_state['their_name']
-    self.update_status(match_state['status'])
-    self.slider_panel.update_name(self.their_name)
-    self.update_messages(match_state['message_items'])
-    their_value = match_state['their_value']
-    if self.slider_panel.item['status'] == "submitted" and type(their_value) != str:
-      self.slider_panel.receive_value(their_value)
-    self.update_their_external(match_state['their_external'])
-    self.update_their_complete(match_state['their_complete'])
+    previous_item = self.item
+    self.item = ec.update_exchange_state(previous_item)
+    self.update_status(prev=previous_item.status)
+    self.slider_panel.update_name(self.item.their_name)
+    if self.item.status == "matched":
+      self.slider_panel.update_status(self.item.slider_status)
+    self.update_messages(self.item.message_items)
+    if previous_item.slider_status != self.item.slider_status:
+      if self.item.slider_status == "received":
+        self.slider_panel.receive_value(self.item.their_slider_value)
+      else:
+        self.slider_panel.update_status(self.item.slider_status)
+    self.update_their_external(prev_their_external=previous_item.their_external)
+    self.update_their_complete(prev_their_complete=previous_item.their_complete)
 
-  def update_status(self, status):
-    if status != self.status:
-      prev = self.status
-      self.status = status
-      matched = status == "matched"
+  def base_status_reset(self):
+      if not self.item.status:
+        return ui.reload()
+      matched = self.item.status == "matched"
       self.message_textbox.enabled = matched
       self.message_textbox.tooltip = (
         "" if matched else "Please wait until the other has joined before sending a message"
       )
       self.complete_button.visible = True
       self.complete_button.text = "End Chat" if matched else "Cancel"
-      self.status_label.visible = self.status == "requesting"
-      if self.status == "pinged":
-        with h.PausedTimer(self.timer_2):
-          self._play_sound('doorbell')
-          if self.jitsi_embed:
-            with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
-              ready = confirm("Someone has asked to join your empathy chat. Are you still available to exchange empathy?")
-          else: # User has popped out video and so may not see confirm dialog
-            ready = True
-          if ready:
-            state = anvil.server.call('match_commit')
-            self.update_status(state['status'])
-          else:
-            state = anvil.server.call('cancel_now', self.proptime_id)
-            ui.reload()
-      if prev not in ["matched", "init"] and self.status == "matched":
-        self.slider_panel.item['status'] = None
-        self.slider_panel.update_status()
+      self.status_label.visible = self.item.status == "requesting"
+    
+  def update_status(self, prev):
+    if prev != self.item.status:
+      self.base_status_reset()
+      if self.item.status == "matched":
         anvil.server.call_s('update_my_external', not bool(self.jitsi_embed))
-      if not self.status:
+      if self.item.status == "pinged":
+        self.pinged()
+
+  def pinged(self):
+    with h.PausedTimer(self.timer_2):
+      self._play_sound('doorbell')
+      if self.jitsi_embed:
+        with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
+          ready = confirm("Someone has asked to join your empathy chat. Are you still available to exchange empathy?")
+      else: # User has popped out video and so may not see confirm dialog
+        ready = True
+      if ready:
+        this_status = self.item.status
+        state = anvil.server.call('match_commit')
+        self.item.status = state['status']
+        self.update_status(prev=this_status)
+      else:
+        state = anvil.server.call('cancel_now', self.proptime_id)
         ui.reload()
 
   def _play_sound(self, audio_id):
@@ -131,10 +127,10 @@ class MatchForm(MatchFormTemplate):
   def update_messages(self, message_list):
     old_items = self.chat_repeating_panel.items
     messages_plus = []
-    for i, how_empathy in enumerate(self.how_empathy_list):
+    for i, how_empathy in enumerate(self.item.how_empathy_list):
       if how_empathy:
         mine = i == 0
-        who = glob.name if mine else self.their_name
+        who = glob.name if mine else self.item.their_name
         messages_plus.append({
           "label": f"[from {who}'s profile]",
           "message": f"How {who} likes to receive empathy:\n{how_empathy}",
@@ -144,7 +140,7 @@ class MatchForm(MatchFormTemplate):
     for message in message_list:
       mine = message['me']
       if first_message[mine]:
-        message['label'] = glob.name if mine else self.their_name
+        message['label'] = glob.name if mine else self.item.their_name
         first_message[mine] = False
     messages_plus += message_list
     if len(messages_plus) > len(old_items):
@@ -156,35 +152,25 @@ class MatchForm(MatchFormTemplate):
         self.chat_display_card.scroll_into_view()
       self.first_update = False
   
-#   def chat_display_card_show(self, **event_args):
-#     """This method is called when the column panel is shown on the screen"""
-#     self.call_js('scrollCard')      
-
-  def update_their_external(self, their_external):
-    if bool(their_external) != self.their_external:
-      if their_external:
-        message = (f"{self.their_name} has left the empathy.chat window "
+  def update_their_external(self, prev_their_external):
+    if bool(prev_their_external) != bool(self.item.their_external):
+      if self.item.their_external:
+        message = (f"{self.item.their_name} has left the empathy.chat window "
                    'to continue the video/audio chat in a separate, "popped-out" window. '
                    "You should see/hear them again shortly (if not already)."
                   )
         Notification(message, timeout=None).show()
-    self.their_external = their_external
 
-  def update_their_complete(self, their_complete):
-    if bool(their_complete) != self.their_complete:
-      if their_complete:
-        message = f"{self.their_name} has left this empathy chat."
+  def update_their_complete(self, prev_their_complete):
+    if bool(prev_their_complete) != bool(self.item.their_complete):
+      if self.item.their_complete:
+        message = f"{self.item.their_name} has left this empathy chat."
         Notification(message, timeout=None).show()
-    self.their_complete = their_complete
     
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
     if self._first_tick:
-      [self.lists_url, *clip_urls] = anvil.server.call('get_urls', ['nycnvc_feelings_needs',
-                                                                    'doorbell_mp3',
-                                                                    'doorbell_wav',
-                                                                    'bowl_struck_wav',
-                                                                   ])
+      [self.lists_url, *clip_urls] = ec.get_urls()
       self.call_js('loadClips', *clip_urls)
       if self.lists_card.visible:
         self.add_lists_pdf_viewer()
@@ -201,7 +187,7 @@ class MatchForm(MatchFormTemplate):
       
   def complete_button_click(self, **event_args):
     self.timer_2.interval = 0
-    if self.status == "matched":
+    if self.item.status == "matched":
       if self.jitsi_embed:
         self.jitsi_embed.visible = False
         window.japi.executeCommand('hangup')
