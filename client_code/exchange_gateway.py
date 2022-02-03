@@ -2,6 +2,7 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from .exceptions import RowMissingError
+from .data_helper import DataTableFlatSO
 
 
 class ExchangeRepository:
@@ -23,21 +24,15 @@ class ExchangeRepository:
                            )
 
   def submit_slider(self, value):
-    temp_values = self._exchange['slider_values']
-    temp_values[self._user_i] = value
-    self._exchange['slider_values'] = temp_values 
+    DataTableFlatSO(self._exchange, 'slider_values')[self._user_i] = value
     return self.exchange_i()
     
   def update_my_external(self, my_external):
-    temp_values = self._exchange['external']
-    temp_values[self._user_i] = int(my_external)
-    self._exchange['external'] = temp_values
+    DataTableFlatSO(self._exchange, 'external')[self._user_i] = my_external
     
   def mark_present(self):
     if not self._exchange['present'][self._user_i]:
-      temp = self._exchange['present']
-      temp[self._user_i] = 1
-      self._exchange['present'] = temp
+      DataTableFlatSO(self._exchange, 'present')[self._user_i] = 1
       
   def exchange_i(self):
     return dict(self._exchange), self._user_i
