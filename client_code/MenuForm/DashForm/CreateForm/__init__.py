@@ -71,7 +71,7 @@ class CreateForm(CreateFormTemplate):
   def update_times(self):
     if self.item['alt']:
       self.now_radio_button.enabled = False
-      self.now_radio_button.tooltip = 'To switch to "now", first remove the Alternate Times'
+      self.now_radio_button.tooltip = 'To switch to "Now", first remove the Alternate Times'
     else:
       self.now_radio_button.enabled = True
       self.now_radio_button.tooltip = ''
@@ -92,7 +92,7 @@ class CreateForm(CreateFormTemplate):
       if not self.date_picker_start_initialized:
         self.init_date_picker_start()
       self.date_picker_start.visible = True
-      self.button_add_alternate.visible = len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES
+      self.button_add_alternate.visible = len(self.item['alt']) < t.MAX_ALT_TIMES
       self.column_panel_cancel.visible = True
       self.drop_down_cancel.visible = True
       if self.item['cancel_buffer'] == "custom":

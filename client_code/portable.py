@@ -30,6 +30,8 @@ CANCEL_TEXT = {5: "5 min. prior",
                48*60: "48 hrs. prior",
                "custom": "a specific time...",
               }
+MAX_ALT_TIMES = 9
+UNLINKED = 99
 
 
 def last_name(last, distance=3):
@@ -63,7 +65,7 @@ class User(h.AttributeToKey):
   
   @property
   def distance_str(self):
-    return h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < 99) else ""
+    return h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < UNLINKED) else ""
   
   @property
   def s_user(self):
@@ -246,14 +248,12 @@ class ProposalTime():
 @anvil.server.portable_class 
 class Proposal():
 
-  MAX_ALT_TIMES = 4
-  
-  def __init__(self, prop_id=None, own=True, user=None, times=[ProposalTime()], min_size=2, max_size=2,
+  def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
                eligible=2, eligible_users=[], eligible_group_ids=[], eligible_starred=True,):
     self.prop_id = prop_id
     self.own = own
     self.user = user # should rename proposer
-    self.times = times
+    self.times = times if times else [ProposalTime()]
     self.min_size = min_size
     self.max_size = max_size
     self.eligible = eligible

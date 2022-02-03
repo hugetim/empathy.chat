@@ -198,7 +198,7 @@ def name(user, to_user=None, distance=None):
       from . import connections as c
       distance = c.distance(user, to_user, up_to_distance=2)
     else:
-      distance = 99
+      distance = port.UNLINKED
   return port.full_name(user['first_name'], user['last_name'], distance)  
 
 

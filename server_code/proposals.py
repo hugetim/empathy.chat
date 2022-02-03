@@ -351,7 +351,7 @@ class Proposal():
     from . import groups_server as g
     if distance is None:
       distance = c.distance(self.proposer, user)
-    if (distance <= self['eligible'] or (user in self['eligible_users'] and distance < 99)):
+    if (distance <= self['eligible'] or (user in self['eligible_users'] and distance < port.UNLINKED)):
       return True
     elif (self['eligible_starred'] and sm.star_row(user, self.proposer)):
       return True

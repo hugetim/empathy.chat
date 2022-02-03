@@ -17,10 +17,6 @@ components:
   properties: {}
   name: users_flow_panel
   layout_properties: {column: LRZCRL}
-- type: Timer
-  properties: {interval: 17}
-  name: timer_1
-  event_bindings: {tick: timer_1_tick}
 container:
   type: DataRowPanel
   event_bindings: {}
