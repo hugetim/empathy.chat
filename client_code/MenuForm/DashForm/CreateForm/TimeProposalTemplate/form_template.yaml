@@ -1,7 +1,9 @@
 container:
   type: ColumnPanel
   event_bindings: {show: form_show}
-  properties: {col_widths: '{}'}
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none,
+    background: ''}
 components:
 - type: FlowPanel
   properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
@@ -29,14 +31,14 @@ components:
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: small, background: ''}
+      spacing_below: none, background: ''}
     name: column_panel_2
     layout_properties: {width: 240}
     components:
     - type: DatePicker
       properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
         placeholder: '', border: '', enabled: true, foreground: '', visible: true,
-        font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false,
+        font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false,
         date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
         format: ''}
       name: date_picker_start
@@ -56,7 +58,7 @@ components:
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: small, background: ''}
+      spacing_below: none, background: ''}
     name: column_panel_1
     layout_properties: {width: 200, expand: false}
     event_bindings: {}
@@ -74,8 +76,8 @@ components:
         visible: true
         font_size: null
         font: ''
-        spacing_above: small
-        spacing_below: small
+        spacing_above: none
+        spacing_below: none
         italic: false
         background: theme:Gray 200
         bold: false
@@ -89,7 +91,7 @@ components:
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: small, background: ''}
+      spacing_below: none, background: ''}
     name: column_panel_3
     layout_properties: {width: 240}
     components:
@@ -106,7 +108,7 @@ components:
         visible: true
         font_size: null
         font: ''
-        spacing_above: small
+        spacing_above: none
         spacing_below: none
         italic: false
         background: theme:Gray 200
@@ -121,7 +123,7 @@ components:
     - type: DatePicker
       properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
         placeholder: '', border: '', enabled: true, foreground: '', visible: false,
-        font_size: null, font: '', spacing_above: none, spacing_below: small, italic: false,
+        font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false,
         date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
         format: ''}
       name: date_picker_cancel
@@ -141,7 +143,7 @@ components:
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
       foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null,
-      font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false,
+      font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
       background: '', bold: false, underline: false, icon: 'fa:trash'}
     name: remove_button
     layout_properties: {}

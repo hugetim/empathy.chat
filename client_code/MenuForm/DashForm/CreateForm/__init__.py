@@ -71,7 +71,7 @@ class CreateForm(CreateFormTemplate):
   def update_times(self):
     if self.item['alt']:
       self.now_radio_button.enabled = False
-      self.now_radio_button.tooltip = 'To switch to "now", first remove the Alternate Times'
+      self.now_radio_button.tooltip = 'To switch to "Now", first remove the Alternate Times'
     else:
       self.now_radio_button.enabled = True
       self.now_radio_button.tooltip = ''

@@ -5,7 +5,7 @@ container:
 components:
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none,
     background: ''}
   name: column_panel_1
   layout_properties: {grid_position: 'HYVJID,XFGHDE'}
@@ -53,7 +53,7 @@ components:
       - type: DatePicker
         properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
           placeholder: '', border: '', enabled: true, foreground: '', visible: false,
-          font_size: null, font: '', spacing_above: none, spacing_below: small, italic: false,
+          font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false,
           date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
           format: ''}
         name: date_picker_start
@@ -174,7 +174,9 @@ components:
       event_bindings: {}
     event_bindings: {}
   - type: RepeatingPanel
-    properties: {item_template: MenuForm.DashForm.CreateForm.TimeProposalTemplate}
+    properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
+      visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.DashForm.CreateForm.TimeProposalTemplate,
+      background: ''}
     name: repeating_panel_1
     layout_properties: {grid_position: 'NMTJRA,IQCFEX'}
     event_bindings: {}
@@ -186,7 +188,7 @@ components:
     layout_properties: {grid_position: 'MBSIRL,WLTAOZ'}
 - type: Button
   properties: {role: null, align: left, tooltip: '', border: '', enabled: true, foreground: '',
-    visible: true, text: Add Alternate Time, font_size: null, font: '', spacing_above: small,
+    visible: true, text: Add Alternate Time, font_size: null, font: '', spacing_above: none,
     icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
     underline: false, icon: ''}
   name: button_add_alternate
