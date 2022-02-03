@@ -30,6 +30,7 @@ CANCEL_TEXT = {5: "5 min. prior",
                48*60: "48 hrs. prior",
                "custom": "a specific time...",
               }
+MAX_ALT_TIMES = 9
 UNLINKED = 99
 
 
@@ -247,8 +248,6 @@ class ProposalTime():
 @anvil.server.portable_class 
 class Proposal():
 
-  MAX_ALT_TIMES = 4
-  
   def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
                eligible=2, eligible_users=[], eligible_group_ids=[], eligible_starred=True,):
     self.prop_id = prop_id

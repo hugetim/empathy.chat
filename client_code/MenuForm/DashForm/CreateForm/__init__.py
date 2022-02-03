@@ -92,7 +92,7 @@ class CreateForm(CreateFormTemplate):
       if not self.date_picker_start_initialized:
         self.init_date_picker_start()
       self.date_picker_start.visible = True
-      self.button_add_alternate.visible = len(self.item['alt']) < t.Proposal.MAX_ALT_TIMES
+      self.button_add_alternate.visible = len(self.item['alt']) < t.MAX_ALT_TIMES
       self.column_panel_cancel.visible = True
       self.drop_down_cancel.visible = True
       if self.item['cancel_buffer'] == "custom":
