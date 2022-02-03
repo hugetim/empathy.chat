@@ -4,6 +4,11 @@ from . import exchange_interactor as ei
 
 
 @authenticated_callable
+def init_match_form(user_id=""):
+  print(f"init_match_form, {user_id}")
+  return ei.init_match_form(user_id)
+
+@authenticated_callable
 def add_chat_message(user_id="", message="[blank test message]"):
   print(f"add_chat_message, '[redacted]', {user_id}")
   return ei.add_chat_message(user_id, message)

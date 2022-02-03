@@ -65,7 +65,7 @@ class MatchForm(MatchFormTemplate):
       self.jitsi_column_panel.add_component(self.jitsi_embed)
 
   def init_slider_panel(self, my_value):
-    if my_value:
+    if type(my_value) != str:
       slider_item = {'visible': True, 'status': "submitted", 
                      'my_value': my_value, 'their_value': 5, 'their_name': ""}
     else:

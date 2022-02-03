@@ -1,7 +1,38 @@
 from . import server_misc as sm
-from .exchange_gateway import ExchangeRepository
+from .exchange_gateway import ExchangeRepository #, in_transaction
+from anvil.tables import in_transaction
 from .exceptions import RowMissingError
 import anvil.secrets
+
+
+@in_transaction
+def init_match_form(user_id):
+  """Return jitsi_code, duration (or Nones), my_slider_value
+  
+  Side effect: set this_match['present']"""
+  from .proposals import ProposalTime
+  from . import matcher
+  user = sm.get_user(user_id)
+  current_proptime = ProposalTime.get_now(user)
+  if current_proptime:
+    jitsi_code, duration = current_proptime.get_match_info()
+    return current_proptime.get_id(), jitsi_code, duration, None
+  else:
+    try:
+      repo = ExchangeRepository(user)
+    except RowMissingError as err:
+      return None, None, None, None
+    this_match, i = repo.exchange_i()
+    repo.mark_present()
+    other_user = their_value(this_match['users'], i)
+    their_present = their_value(this_match['present'], i)
+    if (not their_present) and this_match['match_commence'] < sm.now():
+      from . import notifies as n
+      n.notify_late_for_chat(other_user, this_match['match_commence'], [user])
+    proptime = ProposalTime(this_match['proposal_time'])
+    jitsi_code, duration = proptime.get_match_info()
+    matcher.propagate_update_needed()
+    return proptime.get_id(), jitsi_code, duration, this_match['slider_values'][i]
 
 
 def add_chat_message(user_id, message):
@@ -13,12 +44,14 @@ def add_chat_message(user_id, message):
   return update_match_form(user_id, repo=repo)
 
 
+@in_transaction(relaxed=True)
 def update_my_external(my_external, user_id):
   user = sm.get_user(user_id)
   repo = ExchangeRepository(user)
   repo.update_my_external(my_external)
 
-  
+
+@in_transaction(relaxed=True)
 def submit_slider(value, user_id):
   user = sm.get_user(user_id)
   repo = ExchangeRepository(user)
@@ -48,7 +81,7 @@ def update_match_form(user_id, repo=None):
         their_external=None,
         their_complete=None,
       )
-  repo.mark_present()
+  _mark_present(repo)
   this_match, i = repo.exchange_i()
   other_user = their_value(this_match['users'], i)
   _their_value = their_value(this_match['slider_values'], i)
@@ -72,6 +105,12 @@ def update_match_form(user_id, repo=None):
     their_external=their_external,
     their_complete=their_complete,
   )
+ 
+
+@in_transaction(relaxed=True)
+def _mark_present(repo):
+  repo.mark_present()
+  
   
 def their_value(values, my_i):
   temp_values = [value for value in values]

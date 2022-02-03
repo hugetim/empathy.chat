@@ -5,6 +5,10 @@ from .exceptions import RowMissingError
 from .data_helper import DataTableFlatSO
 
 
+# def in_transaction(relaxed=False):
+#   return tables.in_transaction(relaxed=relaxed)
+
+
 class ExchangeRepository:
   def __init__(self, user):
     from . import matcher

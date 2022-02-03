@@ -6,7 +6,6 @@ import anvil.server
 from . import parameters as p
 from . import notifies as n
 from . import server_misc as sm
-from . import exchange_interactor as ei
 from .server_misc import authenticated_callable
 from . import portable as port
 from .proposals import Proposal, ProposalTime
@@ -230,37 +229,6 @@ def cancel_match(match_id, user_id=""):
   propagate_update_needed()
   _cancel_match(user, match_id)
   return _get_state(user)
-  
-  
-@authenticated_callable
-@anvil.tables.in_transaction
-def init_match_form(user_id=""):
-  """Return jitsi_code, duration (or Nones), my_slider_value
-  
-  Side effect: set this_match['present']"""
-  print(f"init_match_form, {user_id}")
-  user = sm.get_user(user_id)
-  current_proptime = ProposalTime.get_now(user)
-  if current_proptime:
-    jitsi_code, duration = current_proptime.get_match_info()
-    return current_proptime.get_id(), jitsi_code, duration, None
-  else:
-    this_match, i = current_match_i(user)
-    if this_match:
-      temp = this_match['present']
-      temp[i] = 1
-      this_match['present'] = temp
-      other_user = ei.their_value(this_match['users'], i)
-      their_present = ei.their_value(this_match['present'], i)
-      if (not their_present) and this_match['match_commence'] < sm.now():
-        from . import notifies as n
-        n.notify_late_for_chat(other_user, this_match['match_commence'], [user])
-      proptime = ProposalTime(this_match['proposal_time'])
-      jitsi_code, duration = proptime.get_match_info()
-      propagate_update_needed()
-      return proptime.get_id(), jitsi_code, duration, this_match['slider_values'][i]
-    else:
-      return None, None, None, None
 
 
 @authenticated_callable
