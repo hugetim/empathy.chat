@@ -47,7 +47,7 @@ def get_create_user_items(user):
 
 def _get_connections(user, up_to_degree=3, cache_override=False):
   """Return dictionary from degree to set of connections"""
-  if up_to_degree not in range(1, 99):
+  if up_to_degree not in range(0, 98):
     sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
   if not cache_override and user == anvil.users.get_user():
     return _cached_get_connections(user, up_to_degree)
