@@ -84,7 +84,7 @@ class MatchForm(MatchFormTemplate):
     self.slider_panel.update_name(self.their_name)
     self.update_messages(match_state['message_items'])
     their_value = match_state['their_value']
-    if self.slider_panel.item['status'] == "submitted" and their_value:
+    if self.slider_panel.item['status'] == "submitted" and type(their_value) != str:
       self.slider_panel.receive_value(their_value)
     self.update_their_external(match_state['their_external'])
     self.update_their_complete(match_state['their_complete'])
@@ -115,7 +115,7 @@ class MatchForm(MatchFormTemplate):
           else:
             state = anvil.server.call('cancel_now', self.proptime_id)
             ui.reload()
-      if prev != "matched" and self.status == "matched":
+      if prev not in ["matched", "init"] and self.status == "matched":
         self.slider_panel.item['status'] = None
         self.slider_panel.update_status()
         anvil.server.call_s('update_my_external', not bool(self.jitsi_embed))

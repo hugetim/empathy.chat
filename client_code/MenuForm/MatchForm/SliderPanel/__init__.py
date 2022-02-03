@@ -52,9 +52,9 @@ class SliderPanel(SliderPanelTemplate):
     """This method is called when the button is clicked"""
     self.item['status'] = "submitted"
     self.update_status()
-    their_value = anvil.server.call('submit_slider', 
+    their_value = anvil.server.call('submit_slider',
                                     self.my_slider.value)
-    if their_value:
+    if type(their_value) != str:
       self.receive_value(their_value)
 
   def receive_value(self, their_value):

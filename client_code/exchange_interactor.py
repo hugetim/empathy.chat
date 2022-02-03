@@ -16,12 +16,12 @@ def init_match_form(user_id):
   current_proptime = ProposalTime.get_now(user)
   if current_proptime:
     jitsi_code, duration = current_proptime.get_match_info()
-    return current_proptime.get_id(), jitsi_code, duration, None
+    return current_proptime.get_id(), jitsi_code, duration, ""
   else:
     try:
       repo = ExchangeRepository(user)
     except RowMissingError as err:
-      return None, None, None, None
+      return None, None, None, ""
     this_match, i = repo.exchange_i()
     repo.mark_present()
     other_user = their_value(this_match['users'], i)
@@ -77,7 +77,7 @@ def update_match_form(user_id, repo=None):
         how_empathy_list=[],
         their_name="",
         message_items=[],
-        their_value=None,
+        their_value="",
         their_external=None,
         their_complete=None,
       )
