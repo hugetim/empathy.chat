@@ -23,13 +23,13 @@ class MatchForm(MatchFormTemplate):
     #
     self.timer_2.interval = 0
     self.jitsi_embed = None
+    self.lists_url = ""
     self._info_clicked = False
     self.info_button.role = ""
-    self.lists_url = ""
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    self.item = ec.init_pending_exchange(item['status'])
+    self.item = ec.init_pending_exchange(self.item['status'])
     self.my_timer_1.minutes = self.item.default_timer_minutes
     self.set_jitsi_link()
     self.chat_repeating_panel.items = []
@@ -55,7 +55,31 @@ class MatchForm(MatchFormTemplate):
     if not self.jitsi_embed:
       self.jitsi_embed = MyJitsi(item={'room_name': self.jitsi_code, 'name': glob.name, 'domain': self.item.jitsi_domain})
       self.jitsi_column_panel.add_component(self.jitsi_embed)
-
+ 
+  def jitsi_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    if self.jitsi_embed:
+      anvil.server.call('update_my_external', True)
+      self.jitsi_embed.remove_from_parent()
+      self.jitsi_embed = None
+      window.japi.executeCommand('hangup')
+    self.restore_button.visible = True
+    
+  def restore_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.restore_button.visible = False
+    self.add_jitsi_embed()
+    anvil.server.call('update_my_external', False)      
+      
+  def complete_button_click(self, **event_args):
+    self.timer_2.interval = 0
+    if self.item.status == "matched":
+      if self.jitsi_embed:
+        self.jitsi_embed.visible = False
+        window.japi.executeCommand('hangup')
+    self.item.exit()
+    ui.reload()  
+    
   def init_slider_panel(self):
     my_value = 5 if ec.slider_value_missing(self.item.my_slider_value) else self.item.my_slider_value
     slider_item = {'visible': True, 'status': self.item.slider_status, 
@@ -70,14 +94,12 @@ class MatchForm(MatchFormTemplate):
     self.item = ec.update_exchange_state(previous_item)
     self.update_status(prev=previous_item.status)
     self.slider_panel.update_name(self.item.their_name)
-    if self.item.status == "matched":
-      self.slider_panel.update_status(self.item.slider_status)
-    self.update_messages(self.item.message_items)
     if previous_item.slider_status != self.item.slider_status:
       if self.item.slider_status == "received":
         self.slider_panel.receive_value(self.item.their_slider_value)
       else:
         self.slider_panel.update_status(self.item.slider_status)
+    self.update_messages()
     self.update_their_external(prev_their_external=previous_item.their_external)
     self.update_their_complete(prev_their_complete=previous_item.their_complete)
 
@@ -109,40 +131,20 @@ class MatchForm(MatchFormTemplate):
           ready = confirm("Someone has asked to join your empathy chat. Are you still available to exchange empathy?")
       else: # User has popped out video and so may not see confirm dialog
         ready = True
-      if ready:
-        this_status = self.item.status
-        state = anvil.server.call('match_commit')
-        self.item.status = state['status']
-        self.update_status(prev=this_status)
-      else:
-        state = anvil.server.call('cancel_now', self.proptime_id)
-        ui.reload()
+      self.process_pinged_response(ready)
+      
+  def process_pinged_response(self, ready):
+    if ready:
+      this_status = self.item.status
+      self.item.start_exchange()
+      self.update_status(prev=this_status)
+    else:
+      self.item.exit()
+      ui.reload()
 
-  def _play_sound(self, audio_id):
-    try:
-      self.call_js('playSound', audio_id)
-    except ExternalError as err:
-      print(f"Error playing {audio_id} sound: {repr(err)}")        
-        
-  def update_messages(self, message_list):
+  def update_messages(self):
     old_items = self.chat_repeating_panel.items
-    messages_plus = []
-    for i, how_empathy in enumerate(self.item.how_empathy_list):
-      if how_empathy:
-        mine = i == 0
-        who = glob.name if mine else self.item.their_name
-        messages_plus.append({
-          "label": f"[from {who}'s profile]",
-          "message": f"How {who} likes to receive empathy:\n{how_empathy}",
-          "me": mine,
-        })
-    first_message = {True: True, False: True}
-    for message in message_list:
-      mine = message['me']
-      if first_message[mine]:
-        message['label'] = glob.name if mine else self.item.their_name
-        first_message[mine] = False
-    messages_plus += message_list
+    messages_plus = self.item.messages_plus
     if len(messages_plus) > len(old_items):
       self.chat_repeating_panel.items = messages_plus
       self.message_card.visible = True
@@ -177,26 +179,6 @@ class MatchForm(MatchFormTemplate):
       self._first_tick = False
     self.update()
 
-  def message_textbox_pressed_enter(self, **event_args):
-    text = self.message_textbox.text
-    if text:
-      match_state = anvil.server.call('add_chat_message', message=text)
-      self.message_textbox.text = ""
-      self.update_messages(match_state['message_items'])
-      #self.call_js('scrollCard')
-      
-  def complete_button_click(self, **event_args):
-    self.timer_2.interval = 0
-    if self.item.status == "matched":
-      if self.jitsi_embed:
-        self.jitsi_embed.visible = False
-        window.japi.executeCommand('hangup')
-      state = anvil.server.call('match_complete')
-    else:
-      state = anvil.server.call('cancel_now', self.proptime_id)
-    ui.reload()
-    #self.top_form.reset_status(state)   
-
   def slider_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.slider_button, self.slider_card)
@@ -213,11 +195,37 @@ class MatchForm(MatchFormTemplate):
     self._play_sound('ding')
     if not self.timer_card.visible:
       self.timer_button_click()
-      
+
+  def _play_sound(self, audio_id):
+    try:
+      self.call_js('playSound', audio_id)
+    except ExternalError as err:
+      print(f"Error playing {audio_id} sound: {repr(err)}")        
+              
   def message_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.message_button, self.message_card)
+    
+  def message_textbox_pressed_enter(self, **event_args):
+    text = self.message_textbox.text
+    if text:
+      ec.add_chat_message(text)
+      self.message_textbox.text = ""
+      self.update_messages()
 
+  def lists_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    if not self.lists_card.visible:
+      if self.lists_url:
+        self.add_lists_pdf_viewer()
+    elif self.lists_card.get_components():
+      self.pdf_viewer.remove_from_parent()
+    toggle_button_card(self.lists_button, self.lists_card)
+
+  def add_lists_pdf_viewer(self):
+    self.pdf_viewer = pdf_viewer(url=self.lists_url)
+    self.lists_card.add_component(self.pdf_viewer)      
+    
   def full_screen_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     try:
@@ -242,37 +250,9 @@ class MatchForm(MatchFormTemplate):
   def info_timer_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     if not self._info_clicked and self.info_flow_panel.visible:
-      self.info_button_click()
+      self.info_button_click()  
 
-  def lists_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    if not self.lists_card.visible:
-      if self.lists_url:
-        self.add_lists_pdf_viewer()
-    elif self.lists_card.get_components():
-      self.pdf_viewer.remove_from_parent()
-    toggle_button_card(self.lists_button, self.lists_card)
-
-  def add_lists_pdf_viewer(self):
-    self.pdf_viewer = pdf_viewer(url=self.lists_url)
-    self.lists_card.add_component(self.pdf_viewer)  
-    
-  def jitsi_link_click(self, **event_args):
-    """This method is called when the link is clicked"""
-    if self.jitsi_embed:
-      anvil.server.call('update_my_external', True)
-      self.jitsi_embed.remove_from_parent()
-      self.jitsi_embed = None
-      window.japi.executeCommand('hangup')
-    self.restore_button.visible = True
-    
-  def restore_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    self.restore_button.visible = False
-    self.add_jitsi_embed()
-    anvil.server.call('update_my_external', False)
-
-
+      
 def toggle_button_card(button, card):
   card.visible = not card.visible
   button.role = None if card.visible else "raised"
