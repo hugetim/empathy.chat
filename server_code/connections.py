@@ -90,7 +90,7 @@ def member_close_connections(user):
   
 
 def _degree(user2, user1, up_to_degree=3):
-  """Returns 99 if no degree <= up_to_degree found"""
+  """Returns port.UNLINKED if no degree <= up_to_degree found"""
   if user2 == user1:
     return 0
   else:
@@ -103,11 +103,11 @@ def _degree_from_dset(user2, dset):
   for d in dset:
     if user2 in dset[d]:
       return d
-  return 99
+  return port.UNLINKED
   
 
 def _degrees(user2s, user1, up_to_degree=3):
-  """Returns 99 if no degree <= up_to_degree found"""
+  """Returns port.UNLINKED if no degree <= up_to_degree found"""
   dset = _get_connections(user1, up_to_degree)
   out = {}
   for user2 in set(user2s):
@@ -180,7 +180,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
 #     relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) & included_users
 #     for user2 in relevant_group_members:
 #       fellow_members_to_group_names[user2].append(group_row['name'])
-#   return [sm.get_port_user_full(user2, user, 99, 99, fellow_members_to_group_names[user2]) 
+#   return [sm.get_port_user_full(user2, user, port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
 #           for user2 in fellow_members_to_group_names.keys()]
 
 
@@ -193,7 +193,7 @@ def _group_member_records_exclude(user, excluded_users):
     relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) - excluded_users
     for user2 in relevant_group_members:
       fellow_members_to_group_names[user2].append(group_row['name'])
-  return [sm.get_port_user_full(user2, user.get_id(), 99, 99, fellow_members_to_group_names[user2]) 
+  return [sm.get_port_user_full(user2, user.get_id(), port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
           for user2 in fellow_members_to_group_names.keys()]
 
 
@@ -213,52 +213,46 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
   """Returns ordered list of dictionaries"""
   user1 = sm.get_user(user1_id)
   dset = _get_connections(user1, up_to_degree)
-  if user2 == user1:
+  degree = _degree_from_dset(user2, dset)
+  if degree == 0:
     return []
-  else:
-    degree = None
-    for d in range(1, up_to_degree+1):
-      if user2 in dset[d]:
-        degree = d
-        break
-    if not degree: 
-      return []
-    elif degree == 1:
-      conn = app_tables.connections.get(user1=user1, user2=user2, current=True)
-      their_conn = app_tables.connections.get(user1=user2, user2=user1, current=True)
-      return [{"via": False, 
-               "whose": "my", 
-               "desc": conn['relationship2to1'], 
-               "date": conn['date_described'], 
-               "child": None,
-               "their": their_conn['relationship2to1'],
-               "their_date": their_conn['date_described'],
-               "their_name": user2['first_name'],
-               "their_id": user2.get_id(),
-              }]
-    #[{"via": True, "whose": "", "desc": "", "date": ""}] if degree <= 2 else 
-    out = []
-    dset2 = _get_connections(user2, degree-2)
-    seconds = dset[2] & dset2[degree-2]
-    for second in seconds:
-      dset_second = _get_connections(second, 1)
-      firsts = dset[1] & dset_second[1]
-      for first in firsts:
-        name = sm.name(first, distance=1)
-        conn2 = app_tables.connections.get(user1=first, user2=second, current=True)
-        conn1 = app_tables.connections.get(user1=user1, user2=first, current=True)
-        out.append({"via": degree > 2,
-                    "whose": f"{name}'s", 
-                    "desc": conn2['relationship2to1'],
-                    "date": conn2['date_described'],
-                    "child": {"via": False,
-                              "whose": "my", 
-                              "desc": conn1['relationship2to1'],
-                              "date": conn1['date_described'],
-                              "child": None,
-                             },
-                   })
-    return out 
+  elif degree == port.UNLINKED:
+    return []
+  elif degree == 1:
+    conn = app_tables.connections.get(user1=user1, user2=user2, current=True)
+    their_conn = app_tables.connections.get(user1=user2, user2=user1, current=True)
+    return [{"via": False, 
+             "whose": "my", 
+             "desc": conn['relationship2to1'], 
+             "date": conn['date_described'], 
+             "child": None,
+             "their": their_conn['relationship2to1'],
+             "their_date": their_conn['date_described'],
+             "their_name": user2['first_name'],
+             "their_id": user2.get_id(),
+            }]
+  out = []
+  dset2 = _get_connections(user2, degree-2)
+  seconds = dset[2] & dset2[degree-2]
+  for second in seconds:
+    dset_second = _get_connections(second, 1)
+    firsts = dset[1] & dset_second[1]
+    for first in firsts:
+      name = sm.name(first, distance=1)
+      conn2 = app_tables.connections.get(user1=first, user2=second, current=True)
+      conn1 = app_tables.connections.get(user1=user1, user2=first, current=True)
+      out.append({"via": degree > 2,
+                  "whose": f"{name}'s", 
+                  "desc": conn2['relationship2to1'],
+                  "date": conn2['date_described'],
+                  "child": {"via": False,
+                            "whose": "my", 
+                            "desc": conn1['relationship2to1'],
+                            "date": conn1['date_described'],
+                            "child": None,
+                           },
+                 })
+  return out 
 
   
 @authenticated_callable

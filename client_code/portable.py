@@ -30,6 +30,7 @@ CANCEL_TEXT = {5: "5 min. prior",
                48*60: "48 hrs. prior",
                "custom": "a specific time...",
               }
+UNLINKED = 99
 
 
 def last_name(last, distance=3):
@@ -63,7 +64,7 @@ class User(h.AttributeToKey):
   
   @property
   def distance_str(self):
-    return h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < 99) else ""
+    return h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < UNLINKED) else ""
   
   @property
   def s_user(self):
