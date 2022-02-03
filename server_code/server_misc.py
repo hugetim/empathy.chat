@@ -614,7 +614,7 @@ def _check_for_confirmed_invites(user):
         add_invite_guess_fail_prompt(invites_server.Invite.from_invite_row(invite_row))
         c.remove_invite_pair(invite_row, invite_reply, user)
     else:
-      sm.warning(f"invite_reply not found, {dict(invite_row)}")
+      warning(f"invite_reply not found, {dict(invite_row)}")
   return any_confirmed, any_failed
 
 

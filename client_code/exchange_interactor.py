@@ -5,60 +5,49 @@ from .exceptions import RowMissingError
 import anvil.secrets
 
 
-@in_transaction
 def init_match_form(user_id):
   """Return jitsi_code, duration (or Nones), my_slider_value
   
   Side effect: set this_match['present']"""
+  user = sm.get_user(user_id)
+  try:
+    return _init_match_form_already_matched(user)
+  except RowMissingError as err:
+    return _init_match_form_not_matched(user)
+
+
+def _init_match_form_already_matched(user):
   from .proposals import ProposalTime
   from . import matcher
-  user = sm.get_user(user_id)
+  repo = ExchangeRepository(user)
+  _mark_present(repo)
+  matcher.propagate_update_needed()
+  this_match, i = repo.exchange_i()
+  other_user = their_value(this_match['users'], i)
+  their_present = their_value(this_match['present'], i)
+  if (not their_present) and this_match['match_commence'] < sm.now():
+    from . import notifies as n
+    n.notify_late_for_chat(other_user, this_match['match_commence'], [user])
+  proptime = ProposalTime(this_match['proposal_time'])
+  jitsi_code, duration = proptime.get_match_info()
+  return proptime.get_id(), jitsi_code, duration, this_match['slider_values'][i]
+
+
+def _init_match_form_not_matched(user):
+  from .proposals import ProposalTime
   current_proptime = ProposalTime.get_now(user)
   if current_proptime:
-    jitsi_code, duration = current_proptime.get_match_info()
-    return current_proptime.get_id(), jitsi_code, duration, ""
+    return _init_match_form_requesting(current_proptime)
   else:
-    try:
-      repo = ExchangeRepository(user)
-    except RowMissingError as err:
-      return None, None, None, ""
-    this_match, i = repo.exchange_i()
-    repo.mark_present()
-    other_user = their_value(this_match['users'], i)
-    their_present = their_value(this_match['present'], i)
-    if (not their_present) and this_match['match_commence'] < sm.now():
-      from . import notifies as n
-      n.notify_late_for_chat(other_user, this_match['match_commence'], [user])
-    proptime = ProposalTime(this_match['proposal_time'])
-    jitsi_code, duration = proptime.get_match_info()
-    matcher.propagate_update_needed()
-    return proptime.get_id(), jitsi_code, duration, this_match['slider_values'][i]
+    sm.warning(f"_init_match_form_not_matched request not found for {user.get_id()}")
+    return None, None, None, ""
 
 
-def add_chat_message(user_id, message):
-  user = sm.get_user(user_id)
-  repo = ExchangeRepository(user)
-  repo.add_chat(message=anvil.secrets.encrypt_with_key("new_key", message),
-                now=sm.now(),
-               )
-  return update_match_form(user_id, repo=repo)
-
-
-@in_transaction(relaxed=True)
-def update_my_external(my_external, user_id):
-  user = sm.get_user(user_id)
-  repo = ExchangeRepository(user)
-  repo.update_my_external(my_external)
-
-
-@in_transaction(relaxed=True)
-def submit_slider(value, user_id):
-  user = sm.get_user(user_id)
-  repo = ExchangeRepository(user)
-  this_match, i = repo.submit_slider(value)
-  return their_value(this_match['slider_values'], i)
-
-    
+def _init_match_form_requesting(current_proptime):
+  jitsi_code, duration = current_proptime.get_match_info()
+  return current_proptime.get_id(), jitsi_code, duration, ""
+  
+  
 def update_match_form(user_id, repo=None):
   """Return match_state dict
   
@@ -68,20 +57,14 @@ def update_match_form(user_id, repo=None):
     try:
       repo = ExchangeRepository(user)
     except RowMissingError as err:
-      from . import matcher
-      matcher.confirm_wait_helper(user)
-      partial_state = matcher.get_status(user)
-      matcher.propagate_update_needed(user)
-      return dict(
-        status=partial_state['status'],
-        how_empathy_list=[],
-        their_name="",
-        message_items=[],
-        their_value="",
-        their_external=None,
-        their_complete=None,
-      )
+      return _update_match_form_not_matched(user)
+  return _update_match_form_already_matched(user, repo)
+  
+
+def _update_match_form_already_matched(user, repo):
+  from . import matcher
   _mark_present(repo)
+  matcher.propagate_update_needed()
   this_match, i = repo.exchange_i()
   other_user = their_value(this_match['users'], i)
   _their_value = their_value(this_match['slider_values'], i)
@@ -106,10 +89,50 @@ def update_match_form(user_id, repo=None):
     their_complete=their_complete,
   )
  
+  
+def _update_match_form_not_matched(user):
+  from . import matcher
+  matcher.confirm_wait_helper(user)
+  partial_state = matcher.get_status(user)
+  matcher.propagate_update_needed(user)
+  return dict(
+    status=partial_state['status'],
+    how_empathy_list=[],
+    their_name="",
+    message_items=[],
+    their_value="",
+    their_external=None,
+    their_complete=None,
+  )
+
 
 @in_transaction(relaxed=True)
 def _mark_present(repo):
   repo.mark_present()
+
+
+def add_chat_message(user_id, message):
+  user = sm.get_user(user_id)
+  repo = ExchangeRepository(user)
+  repo.add_chat(message=anvil.secrets.encrypt_with_key("new_key", message),
+                now=sm.now(),
+               )
+  return update_match_form(user_id, repo=repo)
+
+
+@in_transaction(relaxed=True)
+def update_my_external(my_external, user_id):
+  user = sm.get_user(user_id)
+  repo = ExchangeRepository(user)
+  repo.update_my_external(my_external)
+
+
+@in_transaction(relaxed=True)
+def submit_slider(value, user_id):
+  user = sm.get_user(user_id)
+  repo = ExchangeRepository(user)
+  this_match, i = repo.submit_slider(value)
+  return their_value(this_match['slider_values'], i)  
   
   
 def their_value(values, my_i):
