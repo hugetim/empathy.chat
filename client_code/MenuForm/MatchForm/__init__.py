@@ -59,7 +59,7 @@ class MatchForm(MatchFormTemplate):
   def jitsi_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     if self.jitsi_embed:
-      anvil.server.call('update_my_external', True)
+      ec.update_my_external(True)
       self.jitsi_embed.remove_from_parent()
       self.jitsi_embed = None
       window.japi.executeCommand('hangup')
@@ -69,7 +69,7 @@ class MatchForm(MatchFormTemplate):
     """This method is called when the button is clicked"""
     self.restore_button.visible = False
     self.add_jitsi_embed()
-    anvil.server.call('update_my_external', False)      
+    ec.update_my_external(False) 
       
   def complete_button_click(self, **event_args):
     self.timer_2.interval = 0
@@ -119,7 +119,7 @@ class MatchForm(MatchFormTemplate):
     if prev != self.item.status:
       self.base_status_reset()
       if self.item.status == "matched":
-        anvil.server.call_s('update_my_external', not bool(self.jitsi_embed))
+        ec.update_my_external(not bool(self.jitsi_embed))
       if self.item.status == "pinged":
         self.pinged()
 

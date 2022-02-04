@@ -106,9 +106,14 @@ class ExchangeState(PendingState):
         first_message[mine] = False
     out += self.message_items
     return out
-      
-    
+
+
 def update_exchange_state(previous_state):
   state_dict = previous_state.__dict__
   state_dict.update(anvil.server.call_s('update_match_form'))
   return ExchangeState(**state_dict)
+
+
+def update_my_external(value):   
+  anvil.server.call_s('update_my_external', value)
+  

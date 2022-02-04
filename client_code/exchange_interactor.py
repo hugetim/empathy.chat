@@ -140,8 +140,11 @@ def add_chat_message(user_id, message):
 @in_transaction(relaxed=True)
 def update_my_external(my_external, user_id):
   user = sm.get_user(user_id)
-  repo = ExchangeRepository(user)
-  repo.update_my_external(my_external)
+  try:
+    repo = ExchangeRepository(user)
+    repo.update_my_external(int(my_external))
+  except RowMissingError:
+    print("Exchange record not available to record my_external")
 
 
 @in_transaction(relaxed=True)
