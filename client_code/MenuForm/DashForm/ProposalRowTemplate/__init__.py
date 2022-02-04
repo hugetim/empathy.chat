@@ -24,7 +24,16 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.item.update({'prop_id': prop.prop_id,
                       'own': prop.own,})
     if self.item['own']:
-      self.users_flow_panel.add_component(Label(text=f"My request #{self.item['prop_num']}"))
+      letter = "abcdefghijklmnopqrstuvwxyz".upper()
+      full_desc = prop.eligibility_desc
+      abbrev_desc = full_desc if len(full_desc) < 40 else full_desc[:36] + "..."
+      label = Label(text=(
+        f"My #{self.item['prop_num']}, option {letter[self.item['times_i']]}, to:\n {abbrev_desc}"
+      ), spacing_below="none", tooltip="One of my requested times")
+      if abbrev_desc != full_desc:
+        label.tooltip += f", to: {full_desc}"
+      self.users_flow_panel.add_component(label)
+      self.background = "theme:Light Yellow"
     else:
       self.users_flow_panel.add_component(Name(item=prop.user))
     time = self.item['prop_time']

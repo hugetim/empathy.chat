@@ -142,7 +142,7 @@ def user_groups(user):
 
 def get_create_group_items(user):
   group_rows = sorted(user_groups(user), key=lambda group_row:group_row['name'])
-  return [(g['name'], g.get_id()) for g in group_rows]
+  return [(g['name'], groups.Group(g['name'], g.get_id())) for g in group_rows]
   
 
 class Invite(sm.ServerItem, groups.Invite): 

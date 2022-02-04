@@ -7,6 +7,7 @@ from . import parameters as p
 from . import server_misc as sm
 from . import notifies as n
 from . import portable as port
+from . import groups
 from anvil_extras.server_utils import timed
 
 
@@ -313,7 +314,7 @@ class Proposal():
     eligible_users = row_dict.pop('eligible_users')
     row_dict['eligible_users'] = [sm.get_port_user(user, simple=True) for user in eligible_users]
     eligible_groups = row_dict.pop('eligible_groups')
-    row_dict['eligible_group_ids'] = [group_row.get_id() for group_row in eligible_groups]
+    row_dict['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id()) for group_row in eligible_groups]
     if not row_dict['current']:
       sm.warning(f"m.Proposal.portable() called on a not-current Proposal")
     del row_dict['current']
@@ -398,9 +399,9 @@ class Proposal():
     if self.proposer['trust_level'] < 3:
       self['eligible'] = min(2, self['eligible'])
     self['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id)
-                           for port_user in port_prop.eligible_users]
-    self['eligible_groups'] = [app_tables.groups.get_by_id(group_id)
-                            for group_id in port_prop.eligible_group_ids]
+                              for port_user in port_prop.eligible_users]
+    self['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
+                               for port_group in port_prop.eligible_groups]
     self['eligible_starred'] = port_prop.eligible_starred
     ## First cancel removed rows
     new_time_ids = [port_time.time_id for port_time in port_prop.times]
@@ -445,7 +446,7 @@ class Proposal():
   def add(user, port_prop):
     now = sm.now()
     user_rows = [app_tables.users.get_by_id(port_user.user_id) for port_user in port_prop.eligible_users]
-    group_rows = [app_tables.groups.get_by_id(group_id) for group_id in port_prop.eligible_group_ids]
+    group_rows = [app_tables.groups.get_by_id(port_group.group_id) for port_group in port_prop.eligible_groups]
     new_prop_row = app_tables.proposals.add_row(user=user,
                                                 current=True,
                                                 created=now,

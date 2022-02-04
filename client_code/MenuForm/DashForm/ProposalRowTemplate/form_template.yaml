@@ -40,7 +40,8 @@ components:
   name: timer_1
   event_bindings: {tick: timer_1_tick}
 - type: FlowPanel
-  properties: {}
+  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+    foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: users_flow_panel
   layout_properties: {column: LRZCRL}
 is_package: true

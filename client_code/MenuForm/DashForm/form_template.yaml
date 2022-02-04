@@ -147,13 +147,13 @@ components:
     properties:
       role: null
       columns:
-      - {title: Who, id: LRZCRL, data_key: users, $$hashKey: 'object:21149'}
+      - {title: Who, id: LRZCRL, data_key: users, $$hashKey: 'object:21149', expand: true}
       - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false,
         $$hashKey: 'object:21150'}
       - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false,
         $$hashKey: 'object:21151'}
       - {id: QGSDIT, title: Expires in..., data_key: expires_in, $$hashKey: 'object:21152'}
-      - {title: '', id: PHQQNP, data_key: buttons, expand: true, $$hashKey: 'object:21153'}
+      - {title: '', id: PHQQNP, data_key: buttons, expand: false, $$hashKey: 'object:21153'}
       auto_header: false
       tooltip: ''
       border: ''

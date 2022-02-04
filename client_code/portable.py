@@ -7,6 +7,7 @@ import datetime
 import anvil.tz
 from . import helper as h
 from . import parameters as p
+from .groups import Group
 
 
 DEFAULT_NEXT_MINUTES = 60
@@ -249,7 +250,7 @@ class ProposalTime():
 class Proposal():
 
   def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
-               eligible=2, eligible_users=[], eligible_group_ids=[], eligible_starred=True,):
+               eligible=2, eligible_users=[], eligible_groups=[], eligible_starred=True,):
     self.prop_id = prop_id
     self.own = own
     self.user = user # should rename proposer
@@ -258,7 +259,7 @@ class Proposal():
     self.max_size = max_size
     self.eligible = eligible
     self.eligible_users = eligible_users
-    self.eligible_group_ids = eligible_group_ids
+    self.eligible_groups = eligible_groups
     self.eligible_starred = eligible_starred
 
   @property
@@ -280,11 +281,25 @@ class Proposal():
   @property
   def times_notify_info(self):
     return {(time.start_now, time.start_date, time.duration) for time in self.times}
+
+  @property
+  def eligibility_desc(self):
+    items = []
+    if self.eligible_users:
+      items.append(", ".join([str(u) for u in self.eligible_users]))
+    if self.eligible_starred:
+      items.append('"starred"')
+    if self.eligible:
+      desc = {1: "1st degree links", 2: "up to 2 degrees", 3: "up to 3 degrees"}
+      items.append(desc[self.eligible])
+    if self.eligible_groups:
+      items.append(", ".join([str(u) for u in self.eligible_groups]))
+    return "; ".join(items)
   
   @property
   def specific_user_eligible(self):
     if (self.eligible == 0 and len(self.eligible_users) == 1 
-        and not self.eligible_group_ids and not self.eligible_starred):
+        and not self.eligible_groups and not self.eligible_starred):
       return self.eligible_users[0]
     else:
       return None
@@ -303,7 +318,7 @@ class Proposal():
             'max_size': self.max_size,
             'eligible': self.eligible, 
             'eligible_users': [port_user.user_id for port_user in self.eligible_users], 
-            'eligible_groups': self.eligible_group_ids,
+            'eligible_groups': self.eligible_groups,
             'conflict_checks': conflict_checks,
             'eligible_starred': self.eligible_starred,
            }
@@ -328,7 +343,7 @@ class Proposal():
                     max_size = item['max_size'],
                     eligible=item['eligible'],
                     eligible_users=eligible_users,
-                    eligible_group_ids=item['eligible_groups'],
+                    eligible_groups=item['eligible_groups'],
                     eligible_starred=item['eligible_starred'],
                    )
 
@@ -338,9 +353,9 @@ class Proposal():
     own_count = 0
     for prop in port_proposals:
       own_count += prop.own
-      for time in prop.times:
+      for i, time in enumerate(prop.times):
         items.append({'prop_time': time, 'prop': prop,
-                      'prop_num': own_count})
+                      'prop_num': own_count, 'times_i': i})
     return items
   
   @staticmethod

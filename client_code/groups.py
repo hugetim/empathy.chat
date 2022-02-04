@@ -11,6 +11,16 @@ from .exceptions import RowMissingError
 
 
 @anvil.server.portable_class
+class Group(h.AttributeToKey):
+  def __init__(self, name="", group_id=""):
+    self.name = name
+    self.group_id = group_id
+    
+  def __str__(self):
+    return self.name
+
+  
+@anvil.server.portable_class
 class MyGroups(h.PortItem):
   repr_desc = "groups.MyGroups: "
   server_fn_name = 'serve_my_groups'
@@ -37,6 +47,9 @@ class MyGroup(h.PortItem, h.AttributeToKey):
     self.group_id = group_id
     self.members = members if members else []
     self.invites = invites if invites else []
+    
+  def __str__(self):
+    return self.name
 
 
 @anvil.server.portable_class
