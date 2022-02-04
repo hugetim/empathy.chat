@@ -36,6 +36,10 @@ def handle_link(link_key):
         method = invited_signup(invite)
       if anvil.users.get_user():
         open_form('LoginForm')
+  elif "This invite link is no longer active." in errors:
+    alert("This invite link is no longer active.")
+    set_url_hash('')
+    open_form('LoginForm')
   else:
     alert(" ".join(errors)) #This is not a valid invite link."
 

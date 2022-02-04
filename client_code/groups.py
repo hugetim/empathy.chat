@@ -79,6 +79,12 @@ def handle_link(link_key):
     invite.relay('visit', {'user': user})
   except RowMissingError as err:
     alert(err)
+    return
+  except ExpiredInviteError as err:
+    alert(err)
+    set_url_hash('')
+    open_form('LoginForm')
+    return
   if not user:
     method = invited.invited_signup(invite)
   if anvil.users.get_user():

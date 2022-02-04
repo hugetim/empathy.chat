@@ -11,7 +11,7 @@ from . import groups
 from . import server_misc as sm
 from . import parameters as p
 from . import helper as h
-from .exceptions import RowMissingError
+from .exceptions import RowMissingError, ExpiredInviteError
 
 
 @sm.authenticated_callable
@@ -171,6 +171,8 @@ class Invite(sm.ServerItem, groups.Invite):
   
   def visit(self, user, register=False):
     invite_row = self._invite_row()
+    if not register and invite_row['expire_date'] < sm.now():
+      raise ExpiredInviteError("This group invite link is expired.")
     if invite_row and user:
       if register:
         Invite._register_user(user)

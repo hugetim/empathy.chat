@@ -169,6 +169,9 @@ class Invite(invites.Invite):
       errors.append(f"Not enough information to retrieve {'invite' if origin else 'response'} row.")
     return row, errors
 
+  def _old_invite_row(self):
+    return app_tables.invites.get(origin=True, link_key=self.link_key, current=False)
+  
   def visit(self, user, register=False):
     """Assumes only self.link_key known (unless register)
     
@@ -187,7 +190,11 @@ class Invite(invites.Invite):
             sm.init_user_info(user)
         errors += self._load_response(response_row)
     else:
-      errors.append("Invalid invite link")
+      non_current_invite = self._old_invite_row()
+      if non_current_invite:
+        errors.append("This invite link is no longer active.")
+      else:
+        errors.append("Invalid invite link")
     return errors
         
   def _load_invite(self, invite_row):
