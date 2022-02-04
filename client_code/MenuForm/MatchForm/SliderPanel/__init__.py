@@ -24,7 +24,6 @@ class SliderPanel(SliderPanelTemplate):
   def update_status(self, new_status="not provided"):
     if new_status != "not provided":
       self.item['status'] = new_status
-    print(self.item['status'])
     if self.item['status'] in [None, 'waiting']:
       self.title_label.text = 'How full is your "empathy tank"? (Empty: angry/distant, Full: content/open)'                              
       self.title_label.bold = True

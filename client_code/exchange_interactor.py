@@ -106,11 +106,28 @@ def _update_match_form_not_matched(user):
   )
 
 
+def match_complete(user_id):
+  """Switch 'complete' to true in matches table for user"""
+  from . import matcher
+  user = sm.get_user(user_id)
+  try:
+    repo = ExchangeRepository(user)
+    _mark_complete(repo)
+  except RowMissingError as err:
+    sm.warning(f"match_complete: match not found {user.get_id()}")
+  matcher.propagate_update_needed()
+
+
 @in_transaction(relaxed=True)
 def _mark_present(repo):
   repo.mark_present()
 
+  
+@in_transaction(relaxed=True)
+def _mark_complete(repo):
+  repo.complete()
 
+  
 def add_chat_message(user_id, message):
   user = sm.get_user(user_id)
   repo = ExchangeRepository(user)

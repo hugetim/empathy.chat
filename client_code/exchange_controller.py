@@ -68,7 +68,6 @@ class ExchangeState(PendingState):
 
   @property
   def slider_status(self):
-    print(f"{self.status}, {slider_value_missing(self.my_slider_value)}, {slider_value_missing(self.their_slider_value)}")
     if self.status != "matched":
       return super().slider_status
     elif slider_value_missing(self.my_slider_value):

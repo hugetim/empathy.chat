@@ -179,11 +179,13 @@ def get_status(user):
       ping_start = current_accept_time.ping_start
       expire_date = current_accept_time['expire_date']
     else:
-      this_match = current_match(user)
-      if this_match:
+      from .exchange_gateway import ExchangeRepository
+      from .exceptions import RowMissingError
+      try:
+        this_match = ExchangeRepository(user).exchange
         status = "matched"
         ping_start = this_match['match_commence']
-      else:
+      except RowMissingError:
         status = None
   return {'status': status, 
           'seconds_left': _seconds_left(status, expire_date, ping_start), 
@@ -439,52 +441,3 @@ def _match_commit(user, proptime_id=None):
       proposal.cancel_all_times()
       if not current_proptime['start_now']:
         current_proptime.ping()
-
-
-@authenticated_callable
-@anvil.tables.in_transaction
-def match_complete(user_id=""):
-  """Switch 'complete' to true in matches table for user"""
-  print(f"match_complete, {user_id}")
-  user = sm.get_user(user_id)
-  # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
-  this_match, i = current_match_i(user)
-  if this_match:
-    temp = this_match['complete']
-    temp[i] = 1
-    this_match['complete'] = temp
-  else:
-    current_proptime = ProposalTime.get_now(user)
-    if current_proptime:
-      current_proptime.notify_cancel()
-      _cancel(user, current_proptime.get_id())
-  propagate_update_needed()
-  return _get_state(user)
-
-
-def current_match(user):
-  import datetime
-  this_match = None
-  now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
-  current_matches = app_tables.matches.search(users=[user], complete=[0],
-                                              match_commence=q.less_than_or_equal_to(now_plus))
-  for row in current_matches:
-    i = row['users'].index(user)
-    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    if row['complete'][i] == 0:
-      this_match = row
-  return this_match
-
-
-def current_match_i(user):
-  import datetime
-  this_match, i = None, None
-  now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
-  current_matches = app_tables.matches.search(users=[user], complete=[0],
-                                              match_commence=q.less_than_or_equal_to(now_plus))
-  for row in current_matches:
-    i = row['users'].index(user)
-    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    if row['complete'][i] == 0:
-      this_match = row
-  return this_match, i
