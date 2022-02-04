@@ -114,6 +114,10 @@ def update_exchange_state(previous_state):
   return ExchangeState(**state_dict)
 
 
+def submit_slider(value):
+  return anvil.server.call('submit_slider', value)
+
+
 def update_my_external(value):   
   anvil.server.call_s('update_my_external', value)
   

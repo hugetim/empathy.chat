@@ -2,6 +2,7 @@ from ._anvil_designer import SliderPanelTemplate
 from anvil import *
 import anvil.users
 import anvil.server
+from .... import exchange_controller as ec
 
 
 class SliderPanel(SliderPanelTemplate):
@@ -54,8 +55,7 @@ class SliderPanel(SliderPanelTemplate):
     """This method is called when the button is clicked"""
     self.item['status'] = "submitted"
     self.update_status()
-    their_value = anvil.server.call('submit_slider',
-                                    self.my_slider.value)
+    their_value = ec.submit_slider(self.my_slider.value)
     if type(their_value) != str:
       self.receive_value(their_value)
 
