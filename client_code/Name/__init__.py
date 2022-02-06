@@ -3,6 +3,8 @@ from anvil import *
 import anvil.users
 import anvil.server
 from .. import helper as h
+from .. import parameters as p
+
 
 class Name(NameTemplate):
   def __init__(self, **properties):
@@ -10,6 +12,7 @@ class Name(NameTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.star_button.tooltip = p.STAR_TOOLTIP
     distance = self.item.get('distance')
     if distance and distance < port.UNLINKED:
       self.degree_label.text = h.add_num_suffix(distance)
