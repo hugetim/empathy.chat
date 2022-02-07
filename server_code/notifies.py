@@ -85,7 +85,7 @@ def ping(user, start, duration):
   print(f"'ping', {start}, {duration}")
   subject = "empathy.chat - match confirmed"
   content1 = f"Your proposal for a {duration} minute empathy match, starting {notify_when(start, user)}, has been accepted."
-  content2 = f"Go to {p.URL}for the empathy chat."
+  content2 = f"Go to {p.URL} for the empathy chat."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     send_sms(user['phone'], f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
