@@ -148,7 +148,7 @@ def notify_proposal_cancel(user, proposal, title, notif_settings_type="specific"
   print(f"'notify_proposal_cancel', {user['email']}, {proposal.get_id()}, {title}")
   from .proposals import ProposalTime
   proposer_name = sm.name(proposal.proposer, to_user=user)
-  subject = f"empathy.chat - {title} from {proposer_name}"
+  subject = f"empathy.chat - {title}"
   content1 = f"{_other_name(proposer_name)} has canceled their empathy chat request directed specifically to you."
   if user['phone'] and user['notif_settings'].get(notif_settings_type) == 'sms':
     send_sms(user['phone'], f"{subject}: {content1}")
@@ -156,7 +156,7 @@ def notify_proposal_cancel(user, proposal, title, notif_settings_type="specific"
     email_send(
       to_user=user,
       from_name=_from_name_for_email(proposer_name),
-      subject=subject,
+      subject=f"{subject} from {proposer_name}",
       text=f'''Dear {_addressee_name(user)},
 
 {content1}
@@ -168,7 +168,7 @@ def notify_proposal(user, proposal, title, desc, notif_settings_type="specific")
   print(f"'notify_proposal', {user['email']}, {proposal.get_id()}, {title}, {desc}")
   from .proposals import ProposalTime
   proposer_name = sm.name(proposal.proposer, to_user=user)
-  subject = f"empathy.chat - {title} from {proposer_name}"
+  subject = f"empathy.chat - {title}"
   proptimes = list(ProposalTime.times_from_proposal(proposal, require_current=True))
   if len(proptimes) > 1:
     times_str = "\n" + "either " + "\n or ".join([pt.duration_start_str(user) for pt in proptimes])
@@ -183,7 +183,7 @@ def notify_proposal(user, proposal, title, desc, notif_settings_type="specific")
     email_send(
       to_user=user,
       from_name=_from_name_for_email(proposer_name),
-      subject=subject,
+      subject=f"{subject} from {proposer_name}",
       text=f'''Dear {_addressee_name(user)},
 
 {content1}
