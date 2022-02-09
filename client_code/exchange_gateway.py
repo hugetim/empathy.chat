@@ -11,17 +11,19 @@ from .data_helper import DataTableFlatSO
 
 
 def _current_exchange_i(user):
+  """Return earliest if multiple current"""
   import datetime
   from .server_misc import now
   this_match, i = None, None
   now_plus = now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
-  current_matches = app_tables.matches.search(users=[user], complete=[0],
+  current_matches = app_tables.matches.search(tables.order_by('match_commence', ascending=True), users=[user], complete=[0],
                                               match_commence=q.less_than_or_equal_to(now_plus))
   for row in current_matches:
-    i = row['users'].index(user)
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
     if row['complete'][i] == 0:
       this_match = row
+      i = row['users'].index(user)
+      break
   return this_match, i
 
 
