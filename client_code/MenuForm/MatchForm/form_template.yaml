@@ -72,7 +72,7 @@ components:
         name: timer_button
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle text chat card,
-          border: '', enabled: true, foreground: '', visible: true, text: Message,
+          border: '', enabled: true, foreground: '', visible: true, text: Text Chat,
           font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: ''}
         layout_properties: {}
