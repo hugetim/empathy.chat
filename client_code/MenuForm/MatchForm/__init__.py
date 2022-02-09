@@ -90,18 +90,21 @@ class MatchForm(MatchFormTemplate):
     self.slider_panel.set_event_handler('x-hide', self.hide_slider)
     
   def update(self):
-    previous_item = self.item
-    self.item = ec.update_exchange_state(previous_item)
-    self.update_status(prev=previous_item.status)
+    previous_status = self.item.status
+    previous_slider_status = self.item.slider_status
+    previous_their_external = self.item.their_external
+    previous_their_complete = self.item.their_complete
+    self.item = ec.update_exchange_state(self.item)
+    self.update_status(prev=previous_status)
     self.slider_panel.update_name(self.item.their_name)
-    if previous_item.slider_status != self.item.slider_status:
+    if previous_slider_status != self.item.slider_status:
       if self.item.slider_status == "received":
         self.slider_panel.receive_value(self.item.their_slider_value)
       else:
         self.slider_panel.update_status(self.item.slider_status)
     self.update_messages()
-    self.update_their_external(prev_their_external=previous_item.their_external)
-    self.update_their_complete(prev_their_complete=previous_item.their_complete)
+    self.update_their_external(prev_their_external=previous_their_external)
+    self.update_their_complete(prev_their_complete=previous_their_complete)
 
   def base_status_reset(self):
       if not self.item.status:
