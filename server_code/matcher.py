@@ -423,18 +423,21 @@ def _match_commit(user, proptime_id=None):
     print("current_proptime")
     if current_proptime['fully_accepted']:
       print("'accepted'")
+      users = current_proptime.all_users()
+      present_list = [0]*len(users)
       if current_proptime['start_now']:
         match_start = sm.now()
+        present_list[users.index(user)] = 1
       else:
         match_start = current_proptime['start_date']
-      users = current_proptime.all_users()
+
       new_match = app_tables.matches.add_row(users=users,
                                              proposal_time=current_proptime._row,
                                              match_commence=match_start,
-                                             present=[0]*len(users),
+                                             present=present_list,
                                              complete=[0]*len(users),
                                              slider_values=[""]*len(users),
-                                             external=[0, 0],
+                                             external=[0]*len(users),
                                             )
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal
