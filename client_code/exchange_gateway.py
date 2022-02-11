@@ -19,10 +19,11 @@ def _current_exchange_i(user):
   current_matches = app_tables.matches.search(tables.order_by('match_commence', ascending=True), users=[user], complete=[0],
                                               match_commence=q.less_than_or_equal_to(now_plus))
   for row in current_matches:
+    temp_i = row['users'].index(user)
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    if row['complete'][i] == 0:
+    if row['complete'][temp_i] == 0:
       this_match = row
-      i = row['users'].index(user)
+      i = temp_i
       break
   return this_match, i
 
