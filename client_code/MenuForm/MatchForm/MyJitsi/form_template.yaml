@@ -15,13 +15,14 @@ container:
       \                  toolbarButtons: ['microphone', 'camera', \n             \
       \                                   'settings',\n                          \
       \                      'select-background',\n                              \
-      \                 ],\n                               hideConferenceTimer: false,\n\
-      \                               disablePolls: true,\n                      \
-      \         requireDisplayName: false,\n                               brandingRoomAlias:\
-      \ alias,\n                              };\n    options.interfaceConfigOverwrite\
-      \ = {DEFAULT_REMOTE_DISPLAY_NAME: ' ', //empathy.chat partner\n            \
-      \                            SETTINGS_SECTIONS: [ 'devices', 'language' ],\n\
-      \                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
+      \                 ],\n                               hideConferenceTimer: true,\n\
+      \                               hideConferenceSubject: true,\n             \
+      \                  subject: '',\n                               disablePolls:\
+      \ true,\n                               requireDisplayName: false,\n       \
+      \                        brandingRoomAlias: alias,\n                       \
+      \       };\n    options.interfaceConfigOverwrite = {DEFAULT_REMOTE_DISPLAY_NAME:\
+      \ ' ', //empathy.chat partner\n                                        SETTINGS_SECTIONS:\
+      \ [ 'devices', 'language' ],\n                                        ENFORCE_NOTIFICATION_AUTO_DISMISS_TIMEOUT:\
       \ 60000,\n                                        SHOW_CHROME_EXTENSION_BANNER:\
       \ false,\n                                        MOBILE_APP_PROMO: false,\n\
       \                                       };\n    window.japi = new JitsiMeetExternalAPI(domain,\
