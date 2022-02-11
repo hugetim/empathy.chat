@@ -434,7 +434,7 @@ def _match_commit(user, proptime_id=None):
                                              present=[0]*len(users),
                                              complete=[0]*len(users),
                                              slider_values=[""]*len(users),
-                                             external=[0, 0],
+                                             external=[0]*len(users),
                                             )
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal
