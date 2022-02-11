@@ -420,9 +420,7 @@ def _match_commit(user, proptime_id=None):
   else:
     current_proptime = ProposalTime.get_now(user)
   if current_proptime:
-    print("current_proptime")
     if current_proptime['fully_accepted']:
-      print("'accepted'")
       if current_proptime['start_now']:
         match_start = sm.now()
       else:
@@ -435,6 +433,7 @@ def _match_commit(user, proptime_id=None):
                                              complete=[0]*len(users),
                                              slider_values=[""]*len(users),
                                              external=[0]*len(users),
+                                             late_notified=[0]*len(users),
                                             )
       # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
       proposal = current_proptime.proposal

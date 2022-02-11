@@ -59,6 +59,10 @@ class ExchangeRepository:
   def mark_present(self):
     if not self._exchange['present'][self._user_i]:
       DataTableFlatSO(self._exchange, 'present')[self._user_i] = 1
+
+  def mark_notified(self, other_user):
+    other_i = self._exchange['users'].index(other_user)
+    DataTableFlatSO(self._exchange, 'late_notified')[other_i] = 1
       
   def exchange_i(self):
     return self.exchange, self._user_i

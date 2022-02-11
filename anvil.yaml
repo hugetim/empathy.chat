@@ -396,6 +396,9 @@ db_schema:
     - name: slider_values
       admin_ui: {width: 200}
       type: simpleObject
+    - name: late_notified
+      admin_ui: {width: 200}
+      type: simpleObject
     - name: external
       admin_ui: {width: 200}
       type: simpleObject

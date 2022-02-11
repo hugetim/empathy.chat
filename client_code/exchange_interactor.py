@@ -23,11 +23,6 @@ def _init_match_form_already_matched(user):
   _mark_present(repo)
   matcher.propagate_update_needed()
   this_match, i = repo.exchange_i()
-  other_user = their_value(this_match['users'], i)
-  their_present = their_value(this_match['present'], i)
-  if (not their_present) and this_match['match_commence'] < sm.now():
-    from . import notifies as n
-    n.notify_late_for_chat(other_user, this_match['match_commence'], [user])
   proptime = ProposalTime(this_match['proposal_time'])
   jitsi_code, duration = proptime.get_match_info()
   return proptime.get_id(), jitsi_code, duration, this_match['slider_values'][i]
@@ -67,6 +62,10 @@ def _update_match_form_already_matched(user, repo):
   matcher.propagate_update_needed()
   this_match, i = repo.exchange_i()
   other_user = their_value(this_match['users'], i)
+  if _late_notify_needed(this_match, i):
+    from . import notifies as n
+    n.notify_late_for_chat(other_user, this_match['match_commence'], [user])
+    _mark_notified(repo, other_user)
   _their_value = their_value(this_match['slider_values'], i)
   their_external = their_value(this_match['external'], i)
   their_complete = their_value(this_match['complete'], i)
@@ -88,7 +87,18 @@ def _update_match_form_already_matched(user, repo):
     their_external=their_external,
     their_complete=their_complete,
   )
- 
+
+
+def _late_notify_needed(this_match, i):
+  their_present = their_value(this_match['present'], i)
+  their_notified = their_value(this_match['late_notified'], i)
+  if their_present or their_notified:
+    return False
+  now = sm.now()
+  later_scheduled_match = this_match['proposal_time']['expire_date'] < now
+  past_start_time = this_match['match_commence'] < now
+  return later_scheduled_match and past_start_time
+
   
 def _update_match_form_not_matched(user):
   from . import matcher
@@ -126,6 +136,11 @@ def _mark_present(repo):
 @in_transaction(relaxed=True)
 def _mark_complete(repo):
   repo.complete()
+
+  
+@in_transaction(relaxed=True)
+def _mark_notified(repo, other_user): 
+  repo.mark_notified(other_user)
 
   
 def add_chat_message(user_id, message):
