@@ -83,6 +83,7 @@ def _update_match_form_already_matched(user, repo):
     how_empathy_list=how_empathy_list,
     their_name=their_name,
     message_items=messages_out,
+    my_slider_value=this_match['slider_values'][i],
     their_slider_value=_their_value,
     their_external=their_external,
     their_complete=their_complete,
@@ -107,12 +108,6 @@ def _update_match_form_not_matched(user):
   matcher.propagate_update_needed(user)
   return dict(
     status=partial_state['status'],
-    how_empathy_list=[],
-    their_name="",
-    message_items=[],
-    their_slider_value="",
-    their_external=None,
-    their_complete=None,
   )
 
 

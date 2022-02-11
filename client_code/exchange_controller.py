@@ -58,7 +58,7 @@ class PendingState(h.AttributeToKey):
 
 
 class ExchangeState(PendingState):
-  def __init__(self, message_items=None, their_slider_value="", their_external=False, their_complete=False, their_name="", **kwargs):
+  def __init__(self, message_items=None, their_slider_value="", their_external=None, their_complete=None, their_name="", **kwargs):
     super().__init__(**kwargs)
     self.their_slider_value = their_slider_value
     self.their_external = their_external
