@@ -19,6 +19,11 @@ class DashForm(DashFormTemplate):
     self.init_components(**properties)
     
     self.proposals_card.visible = glob.trust_level >= 2 # add in group membership once implemented
+    specific_now_prop = any(
+      [(item['prop'].start_now and item['prop'].specific_user_eligible)
+       for item in self.item['proposals']]
+    )
+    self.set_prompts_visible(not specific_now_prop)
     self.timer_2.interval = 5
        
   def form_show(self, **event_args):
@@ -61,15 +66,28 @@ class DashForm(DashFormTemplate):
     own_props_visible = (self.data_grid_1.visible
                          and any([item['prop'].own
                                   for item in self.item['proposals']]))
-    if own_props_visible:
+    self.status_label.bold = False
+    if own_props_visible and not others_props_visible:
       self.status_label.text = "Your current empathy chat requests:"
       self.status_label.align = "left"
       self.status_label.role = ""
       self.status_label.spacing_below = "none"
       self.status_label.visible = True
     elif others_props_visible:
-      self.status_label.text = (
-        "You can accept an existing empathy chat request or create your own.")
+      now_prop_visible = any([item['prop'].start_now
+                              for item in self.item['proposals']])
+      later_prop_visible = any([not item['prop'].start_now
+                                for item in self.item['proposals']])
+      if later_prop_visible and not now_prop_visible:
+        self.status_label.text = "You can accept an existing empathy chat request or create your own."
+      elif not later_prop_visible and now_prop_visible:
+        self.status_label.text = "You can join an empathy chat now or create a new empathy chat request."
+        self.status_label.bold = True
+      else:
+        self.status_label.text = (
+          "You can join an empathy chat now, accept a request to chat later, or create a new empathy chat request."
+        )
+        self.status_label.bold = True
       self.status_label.align = "center"
       self.status_label.role = "subheading"
       self.status_label.spacing_below = "small"
@@ -156,8 +174,12 @@ class DashForm(DashFormTemplate):
   def prompts_open_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     current = self.prompts_repeating_panel.visible
-    self.prompts_repeating_panel.visible = not current
-    if current:
-      self.prompts_open_link.icon = "fa:chevron-right"
+    self.set_prompts_visible(not current)
+  
+  def set_prompts_visible(self, visible):
+    self.prompts_repeating_panel.visible = visible
+    if visible:
+      self.prompts_open_link.icon = "fa:chevron-down"
     else:
-      self.prompts_open_link.icon = "fa:chevron-down"     
+      self.prompts_open_link.icon = "fa:chevron-right"
+        
