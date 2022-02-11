@@ -430,7 +430,6 @@ def _match_commit(user, proptime_id=None):
         present_list[users.index(user)] = 1
       else:
         match_start = current_proptime['start_date']
-
       new_match = app_tables.matches.add_row(users=users,
                                              proposal_time=current_proptime._row,
                                              match_commence=match_start,
