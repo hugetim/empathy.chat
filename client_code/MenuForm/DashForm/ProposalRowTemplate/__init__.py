@@ -46,7 +46,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.item.update({'duration': t.DURATION_TEXT[time.duration],
                       'expire_date': time.expire_date,})
     if time.start_now:
-      self.item['start_time'] = "Now (standing by)"
+      self.item['start_time'] = "Now (ready to start)"
       self.accept_button.text = "Join"
       self.accept_button.tooltip = "Click to join for an empathy chat for the duration listed"
     else:
