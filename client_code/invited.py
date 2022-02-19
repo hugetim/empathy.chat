@@ -60,6 +60,7 @@ def invited_signup(invite):
         d.signup_err_lbl.visible = True
   invite.relay('visit', dict(user=new_user, register=True))
   if method == "email":
-    alert(f"We have sent a login email to {new_user['email']}.\n\nCheck your email, and click on the link.\n\nYou can now close this window.")
+    alert(f'We have sent an email to {new_user["email"]} with "empathy.chat - (re)set your password" as the subject. ' 
+          'Click the link it contains to set your password and login.\n\nYou can now close this window/tab.')
   return method
     
