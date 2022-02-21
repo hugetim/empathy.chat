@@ -212,7 +212,7 @@ class MatchForm(MatchFormTemplate):
   def message_textbox_pressed_enter(self, **event_args):
     text = self.message_textbox.text
     if text:
-      ec.add_chat_message(text)
+      self.item.add_chat_message(text)
       self.message_textbox.text = ""
       self.update_messages()
 
