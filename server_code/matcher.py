@@ -90,13 +90,14 @@ def _prune_all_expired_items():
 @timed
 def _init_user_status(user):
   partial_state = get_status(user)
-  if partial_state['status'] == 'pinged' and partial_state['seconds_left'] <= 0:
+  if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
+    _cancel_other(user)
+  elif partial_state['status'] in ['pinged', 'requesting'] and partial_state['seconds_left'] <= 0:
     _cancel(user)
   elif partial_state['status'] == 'pinged':
     _match_commit(user)
-  elif partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
-    _cancel_other(user)
-  if partial_state['status'] in ('requesting', 'pinged', 'pinging'):
+    confirm_wait_helper(user)
+  elif partial_state['status'] in ['requesting', 'pinging']:
     confirm_wait_helper(user)
 
     
