@@ -288,7 +288,7 @@ class Proposal():
     if self.eligible_users:
       items.append(", ".join([str(u) for u in self.eligible_users]))
     if self.eligible_starred:
-      items.append('"starred"')
+      items.append('Starred')
     if self.eligible:
       desc = {1: "1st degree links", 2: "up to 2 degrees", 3: "up to 3 degrees"}
       items.append(desc[self.eligible])
