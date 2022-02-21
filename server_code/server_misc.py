@@ -269,6 +269,8 @@ def _latest_invited(user):
 def _inviteds(user):
   return app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user, current=True)
 
+
+@anvil.tables.in_transaction(relaxed=True)
 @timed
 def get_prompts(user):
   import datetime

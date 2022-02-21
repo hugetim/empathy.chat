@@ -26,7 +26,6 @@ def test_add_user(em, level=1):
 
 
 @authenticated_callable
-@anvil.tables.in_transaction
 def test_add_request(user_id, port_prop):
   print("test_add_request", user_id)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:

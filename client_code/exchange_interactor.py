@@ -104,7 +104,7 @@ def _late_notify_needed(this_match, i):
 def _update_match_form_not_matched(user):
   from . import matcher
   matcher.confirm_wait_helper(user)
-  partial_state = matcher.get_status(user)
+  partial_state = matcher.get_status_in_transaction(user)
   matcher.propagate_update_needed(user)
   return dict(
     status=partial_state['status'],
