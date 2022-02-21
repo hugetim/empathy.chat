@@ -40,18 +40,29 @@ def _prune_matches():
   if sm.DEBUG:
     print("_prune_matches")
   assume_complete = datetime.timedelta(hours=p.ASSUME_COMPLETE_HOURS)
-  cutoff_m = sm.now() - assume_complete
+  now = sm.now()
+  cutoff_m = now - assume_complete
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
   old_matches = app_tables.matches.search(complete=[0],
                                           match_commence=q.less_than(cutoff_m),
                                          )
   for row in old_matches:
-    temp = row['complete']
-    for i in range(len(temp)):
-      # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
-      temp[i] = 1
-    row['complete'] = temp
-
+    _mark_matches_row_complete(row)
+  newer_matches = app_tables.matches.search(complete=[0],
+                                            match_commence=q.between(min=cutoff_m, max=now),
+                                            present=q.not_([1]),
+                                           )
+  for row in newer_matches:
+    if now-row['match_commence'] > row['proposal_time']['duration']:
+      _mark_matches_row_complete(row)
+  
+def _mark_matches_row_complete(row):
+  temp = row['complete']
+  for i in range(len(temp)):
+    # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
+    temp[i] = 1
+  row['complete'] = temp
+    
 
 @authenticated_callable
 @timed
