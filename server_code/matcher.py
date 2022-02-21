@@ -53,7 +53,8 @@ def _prune_matches():
                                             present=q.not_([1]),
                                            )
   for row in newer_matches:
-    if now-row['match_commence'] > row['proposal_time']['duration']:
+    duration = datetime.timedelta(minutes=row['proposal_time']['duration'])
+    if now > row['match_commence'] + duration:
       _mark_matches_row_complete(row)
   
 def _mark_matches_row_complete(row):
@@ -145,12 +146,11 @@ def propagate_update_needed(user=None):
 
       
 @authenticated_callable
-@anvil.tables.in_transaction
 def get_state(user_id="", force_refresh=False):
   user = sm.get_user(user_id)
   saved_state = anvil.server.session.get('state')
   if user['update_needed'] or not saved_state or force_refresh:
-    anvil.server.session['state'] = _get_state(user)
+    anvil.server.session['state'] = _get_state_transaction(user)
     user['update_needed'] = False
   return anvil.server.session['state']
 
@@ -246,7 +246,6 @@ def cancel_match(match_id, user_id=""):
 
 
 @authenticated_callable
-@anvil.tables.in_transaction
 def accept_proposal(proptime_id, user_id=""):
   """Add user_accepting
   
@@ -254,9 +253,22 @@ def accept_proposal(proptime_id, user_id=""):
   """
   print(f"accept_proposal, {proptime_id}, {user_id}")
   user = sm.get_user(user_id)
-  partial_state = get_status(user)
-  ProposalTime.get_by_id(proptime_id).attempt_accept(user, partial_state)
+  proptime = ProposalTime.get_by_id(proptime_id)
+  _accept_proposal(proptime, user)
   propagate_update_needed()
+  return _get_state_transaction(user)
+
+
+@anvil.tables.in_transaction
+@timed
+def _accept_proposal(proptime, user):
+  partial_state = get_status(user)
+  proptime.attempt_accept(user, partial_state)
+
+  
+@anvil.tables.in_transaction
+@timed
+def _get_state_transaction(user):
   return _get_state(user)
 
 
