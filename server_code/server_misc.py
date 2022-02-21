@@ -106,6 +106,8 @@ def do_signup(email):
   user, newly_created = _create_user_if_needed_and_return_whether_created(email)
   if newly_created:
     anvil.users.send_password_reset_email(email) # This can also raise AuthenticationFailed, but shouldn't
+  else:
+    raise anvil.users.UserExists(f"An account already exists for this email address.")
   return user
 
 
@@ -123,9 +125,9 @@ def _create_user_if_needed_and_return_whether_created(email):
   if not user:
     print(f"do_signup adding new user: {email}")
     user = app_tables.users.add_row(email=email, enabled=True, signed_up=now())
-    return True
+    return user, True
   else:
-    return False
+    return user, False
 
   
 # @anvil.server.callable

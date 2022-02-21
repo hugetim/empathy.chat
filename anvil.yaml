@@ -30,9 +30,9 @@ services:
       confirm_address: {html: '<p>Thanks for registering your account with empathy.chat.
           Please click the following link to confirm that this is your account:</p><p><br></p><p>{{confirm_link}}</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
         subject: empathy.chat - Confirm your email address}
-      reset_password: {html: '<p>To (re)set the password for your empathy.chat account
-          {{email}}, click the link below:</p><p>{{reset_link}}</p><p>This link will
-          expire in ten minutes.</p>', subject: empathy.chat - (re)set your password}
+      reset_password: {html: '<p>To set (or reset) the password for your empathy.chat
+          account {{email}}, click the link below:</p><p>{{reset_link}}</p><p>This
+          link will expire in ten minutes.</p>', subject: empathy.chat - (re)set your password}
       token_login: {html: '<p>To log in to empathy.chat, click the link below:</p><p>{{login_link}}</p><p>This
           link will expire in ten minutes.</p><p><em>p.s. Logging in this way can
           save you from having to manage yet another password. If you check the "Remember
