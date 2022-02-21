@@ -101,9 +101,18 @@ def warning(warning_str, app_info_dict=None):
     
     
 @anvil.server.callable
-@anvil.tables.in_transaction
 def do_signup(email):
   """Returns user (existing user if existing email, else creates new user and sends login email)"""
+  user, newly_created = _create_user_if_needed_and_return_whether_created(email)
+  if newly_created:
+    anvil.users.send_password_reset_email(email) # This can also raise AuthenticationFailed, but shouldn't
+  else:
+    raise anvil.users.UserExists(f"An account already exists for this email address.")
+  return user
+
+
+@anvil.tables.in_transaction
+def _create_user_if_needed_and_return_whether_created(email):
   user = app_tables.users.get(email=email)
   if not user:
     if _email_invalid(email):
@@ -116,9 +125,10 @@ def do_signup(email):
   if not user:
     print(f"do_signup adding new user: {email}")
     user = app_tables.users.add_row(email=email, enabled=True, signed_up=now())
-    anvil.users.send_token_login_email(user['email']) # This can also raise AuthenticationFailed, but shouldn't
-  return user
-  
+    return user, True
+  else:
+    return user, False
+
   
 # @anvil.server.callable
 # @anvil.tables.in_transaction

@@ -58,8 +58,14 @@ def invited_signup(invite):
       except anvil.users.AuthenticationFailed:
         d.signup_err_lbl.text = "Email address missing or invalid. Please enter a valid email address."
         d.signup_err_lbl.visible = True
+      except anvil.users.UserExists as err:
+        d.signup_err_lbl.text = f"{err}\nPlease login to your account normally and then try this invite link again."
+        d.signup_err_lbl.visible = True
   invite.relay('visit', dict(user=new_user, register=True))
-  if method == "email":
-    alert(f"We have sent a login email to {new_user['email']}.\n\nCheck your email, and click on the link.\n\nYou can now close this window.")
+  if new_user and method == "email":
+    alert((f'We have sent an email to {new_user["email"]} with "empathy.chat - (re)set your password" as the subject.\n\n'
+           'Click the link contained in that email to set your password and login.\n\nYou can now close this window/tab.'), 
+          large=True, dismissible=False,
+         )
   return method
     
