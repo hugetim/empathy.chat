@@ -27,9 +27,18 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       letter = "abcdefghijklmnopqrstuvwxyz".upper()
       full_desc = prop.eligibility_desc
       abbrev_desc = full_desc if len(full_desc) < 40 else full_desc[:36] + "..."
-      label = Label(text=(
-        f"My #{self.item['prop_num']}, option {letter[self.item['times_i']]}, to:\n {abbrev_desc}"
-      ), spacing_below="none", tooltip="One of my requested times")
+      if len(prop.times) > 1:
+        if self.item['prop_count'] > 1:
+          id_desc = f"#{self.item['prop_num']}, option {letter[self.item['times_i']]},"
+        else:
+          id_desc = f"option {letter[self.item['times_i']]}"
+      else:
+        if self.item['prop_count'] > 1:
+          id_desc = f"request #{self.item['prop_num']},"
+        else:
+          id_desc = "request"
+      label = Label(text=f"My {id_desc} to:\n {abbrev_desc}", spacing_below="none", 
+                    tooltip="One of my requested times")
       if abbrev_desc != full_desc:
         label.tooltip += f", to: {full_desc}"
       self.users_flow_panel.add_component(label)

@@ -351,11 +351,12 @@ class Proposal():
   def create_view_items(port_proposals):
     items = []
     own_count = 0
+    total_own_count = sum([prop.own for prop in port_proposals])
     for prop in port_proposals:
       own_count += prop.own
       for i, time in enumerate(prop.times):
         items.append({'prop_time': time, 'prop': prop,
-                      'prop_num': own_count, 'times_i': i})
+                      'prop_num': own_count, 'prop_count': total_own_count, 'times_i': i})
     return items
   
   @staticmethod
