@@ -19,6 +19,9 @@ class Group(h.AttributeToKey):
   def __str__(self):
     return self.name
 
+  def __eq__(self, other):
+    return self.group_id == other.group_id
+
   
 @anvil.server.portable_class
 class MyGroups(h.PortItem):
