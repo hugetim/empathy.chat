@@ -11,7 +11,7 @@ from . import groups
 from . import server_misc as sm
 from . import parameters as p
 from . import helper as h
-from .exceptions import RowMissingError, ExpiredInviteError
+from .exceptions import RowMissingError, ExpiredInviteError, AlreadyInError
 
 
 @sm.authenticated_callable
@@ -132,8 +132,15 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
       app_tables.group_members.add_row(user=user,
                                        group=invite_row['group'],
                                        invite=invite_row,
-                                      )  
+                                      )
+    else:
+      this_group = invite_row['group']
+      host_name = sm.name(this_group['hosts'][0], user)
+      raise AlreadyInError(f"You are already a member of {host_name}'s {this_group['name']} group. "
+                           f"You no longer need use this group invite link. Simply visit {p.URL} instead."
+                          )
 
+      
 def user_groups(user):
   memberships = {m['group'] for m in app_tables.group_members.search(user=user)}
   hosteds = {group for group in app_tables.groups.search(hosts=[user], current=True)}

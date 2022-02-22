@@ -32,3 +32,8 @@ class RowMissingError(NamedError):
 @portable_exception
 class ExpiredInviteError(NamedError):
     pass
+
+  
+@portable_exception
+class AlreadyInError(NamedError):
+    pass
