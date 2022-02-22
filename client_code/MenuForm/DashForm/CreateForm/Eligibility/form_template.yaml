@@ -84,6 +84,7 @@ components:
     layout_properties: {grid_position: 'ZOGPKZ,GNUIJB', full_width_row: false}
     event_bindings: {change: drop_down_eligible_change}
     data_bindings: []
+  data_bindings: []
 - type: FlowPanel
   properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '', foreground: '',
     visible: false, spacing_above: small, spacing_below: small, background: ''}
