@@ -26,6 +26,7 @@ class SettingsForm(SettingsFormTemplate):
                                    ]
     if not phone: #order of these lines relative to those above and below matters
       self.essential_flow_panel.visible = False
+      self.specific_flow_panel.visible = False
       self.message_drop_down.items = self.message_drop_down.items[1:3]
     self.message_drop_down.selected_value = notif_settings.get('message')
     self.specific_drop_down.items = self.message_drop_down.items
