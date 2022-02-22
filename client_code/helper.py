@@ -121,7 +121,18 @@ def round_up_datetime(dt, minutes_res=15):
   new_minute = (dt.minute // minutes_res + 1) * minutes_res
   new_dt = dt + datetime.timedelta(minutes = new_minute - dt.minute)
   return new_dt.replace(second=0, microsecond=0)
-    
+
+
+def series_str(str_list):
+  out = str_list[0]
+  if len(str_list) >= 3:
+    out += ", "
+    out += ", ".join(str_list[1:-1])
+    out += ","
+  if len(str_list) >= 2:
+    out += f" and {str_list[-1]}"
+  return out
+
   
 def warning(warning_str):
   app_info_dict = {'id': anvil.app.id,
@@ -172,6 +183,7 @@ class PausedTimer:
     self.timer.interval = 0
   def __exit__(self, type, value, tb):
     self.timer.interval = self.orig_interval
+
     
 @anvil.server.portable_class    
 class AttributeToKey:
@@ -190,6 +202,7 @@ class AttributeToKey:
     except AttributeError:
       return default
 
+    
 @anvil.server.portable_class    
 class PortItem:
   def update(self, new_self):

@@ -8,6 +8,7 @@ from anvil.tables import app_tables
 import anvil.users
 import anvil.server
 from ..... import glob
+from ..... import helper as h
 
 
 class Eligibility(EligibilityTemplate):
@@ -16,11 +17,12 @@ class Eligibility(EligibilityTemplate):
   def __init__(self, item, **properties):
     # Set Form properties and Data Bindings.
     self.trust_level = glob.trust_level
-    user_items, group_items = anvil.server.call('init_create_form')
+    user_items, group_items, starred_name_list = anvil.server.call('init_create_form')
     if 'user_items' not in item:
       item['user_items'] = user_items
     if 'group_items' not in item:
       item['group_items'] = group_items
+    item['starred_name_list'] = starred_name_list
     self.init_components(item=item, **properties)
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel
@@ -35,6 +37,15 @@ class Eligibility(EligibilityTemplate):
     else:
       self.user_multi_select_drop_down.selected = self.item['eligible_users']
     self.starred_check_box.visible = bool(self.item['user_items']) or bool(self.item['group_items'])
+    if self.starred_check_box.visible:
+      if self.item['starred_name_list']:
+        name_list_str = h.series_str(list(self.item['starred_name_list']))
+        abbrev_list_str = name_list_str if len(name_list_str) < 34 else name_list_str[:30] + "..."
+        self.starred_check_box.text = f"My Starred list (currently: {abbrev_list_str})"
+        if abbrev_list_str != name_list_str:
+          self.starred_check_box.tooltip = f"currently: {name_list_str}"
+      else:
+        self.starred_check_box.text = "My Starred list (you currently have no Starred users)"
     self.network_flow_panel.visible = self.trust_level >= 2 and bool(self.item['user_items'])
     self.network_check_box.checked = self.item['eligible']
     if self.trust_level >= 3:

@@ -49,14 +49,7 @@ def _other_name(name=""):
 
 
 def _names(other_users, to_user, name_fn=sm.name):
-  out = name_fn(other_users[0], to_user=to_user)
-  if len(other_users) >= 3:
-    out += ", "
-    out += ", ".join(name_fn(u, to_user=to_user) for u in other_users[1:-1])
-    out += ","
-  if len(other_users) >= 2:
-    out += f" and {other_users[-1]}"
-  return out
+  return h.series_str([name_fn(u, to_user=to_user) for u in other_users])
   
 
 def _from_name_for_email(name=""):

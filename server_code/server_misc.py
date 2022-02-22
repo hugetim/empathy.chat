@@ -253,9 +253,9 @@ def init_create_form(user_id=""):
   from . import connections as c
   from . import groups_server as g
   user = get_user(user_id)
-  create_user_items = c.get_create_user_items(user)
+  create_user_items, starred_name_list = c.get_create_user_items(user)
   create_group_items = g.get_create_group_items(user)
-  return create_user_items, create_group_items
+  return create_user_items, create_group_items, starred_name_list
   
   
 def _latest_invited(user):
@@ -377,6 +377,11 @@ def save_starred(new_starred, user2_id, user_id=""):
 def star_row(user2, user1):
   return app_tables.stars.get(user1=user1, user2=user2)
 
+
+def starred_users(user):
+  for row in app_tables.stars.search(user1=user):
+    yield row['user2']
+  
 
 class ServerItem:
   def relay(self, method, kwargs=None):
