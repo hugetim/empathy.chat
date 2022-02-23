@@ -72,7 +72,11 @@ class Invite(h.PortItem, h.AttributeToKey):
   @property
   def expire_date_str(self):
     return h.short_date_str(self.expire_date)
-
+  
+  @property
+  def expire_date_only(self):
+    return self.expire_date.date()
+  
   
 def handle_link(link_key):
   print(f"groups.handle_link: {link_key}")

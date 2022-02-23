@@ -21,4 +21,19 @@ components:
     name: copy_button
     layout_properties: {grid_position: 'EQUXEF,LSHXUI'}
     event_bindings: {click: copy_button_click}
+- type: FlowPanel
+  properties: {}
+  name: flow_panel_1
+  layout_properties: {column: SQRIZT}
+  components:
+  - type: DatePicker
+    properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
+      placeholder: '', border: '', enabled: true, foreground: '', visible: true, font_size: null,
+      font: '', spacing_above: small, spacing_below: small, italic: false, date: '',
+      min_date: '', background: '', bold: false, underline: false, format: ''}
+    name: expire_date_picker
+    layout_properties: {column: SQRIZT, width: 230, expand: false}
+    event_bindings: {change: expire_date_picker_change}
+    data_bindings:
+    - {property: date, code: self.item.expire_date, writeback: true}
 is_package: true

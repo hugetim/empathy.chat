@@ -22,3 +22,9 @@ class GroupInviteRow(GroupInviteRowTemplate):
   def copy_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     ui.copy_to_clipboard(self.link.url, desc="The invite link")
+
+  def expire_date_picker_change(self, **event_args):
+    """This method is called when the selected date changes"""
+    self.item.relay("expire_date_update")
+    self.refresh_data_bindings()
+

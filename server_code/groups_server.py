@@ -175,6 +175,10 @@ class Invite(sm.ServerItem, groups.Invite):
     else:
       raise(RowMissingError("Not enough information to retrieve group_invite row."))
     return row
+
+  def expire_date_update(self):
+    row = self._invite_row()
+    row['expire_date'] = self.expire_date
   
   def visit(self, user, register=False):
     invite_row = self._invite_row()
