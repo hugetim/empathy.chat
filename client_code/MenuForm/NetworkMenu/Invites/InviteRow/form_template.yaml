@@ -13,4 +13,12 @@ components:
       italic: false, background: '', bold: false, underline: false, icon: ''}
     name: link
     layout_properties: {column: KXBOMI, expand: false, width: null}
+  - type: Button
+    properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: Copy Link, font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: copy_button
+    layout_properties: {grid_position: 'EQUXEF,LSHXUI'}
+    event_bindings: {click: copy_button_click}
 is_package: true

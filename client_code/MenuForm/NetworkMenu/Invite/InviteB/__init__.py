@@ -3,7 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from anvil_extras.utils import wait_for_writeback
-from anvil.js.window import navigator
+from ..... import ui_procedures as ui
 from ..InviteE import InviteE
 
 
@@ -34,9 +34,4 @@ class InviteB(InviteBTemplate):
     parent.add_component(InviteA(item=self.item))
 
   def copy_button_click(self, **event_args):
-    try:
-      navigator.clipboard.writeText(self.link_1.text)
-      self.copy_button.icon = "fa:check-circle"
-    except anvil.js.ExternalError as err:
-      Notification(err).show()
-
+    ui.copy_to_clipboard(self.link_1.url, desc="The invite link")

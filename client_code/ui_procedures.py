@@ -33,7 +33,17 @@ def get_init():
     time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
     #now = datetime.now()
     return h.robust_server_call('init', time_zone)
-    
+
+  
+def copy_to_clipboard(text, desc="It"):
+  import anvil.js
+  from anvil.js.window import navigator
+  try:
+    navigator.clipboard.writeText(text)
+    Notification(f"{desc} has been copied to the clipboard.", style="success").show()
+  except anvil.js.ExternalError as err:
+    Notification(str(err), timeout=5).show()
+    print(f"copy_to_clipboard error: {repr(err)}")
   
 def set_document_title(text):
   from anvil.js import window
