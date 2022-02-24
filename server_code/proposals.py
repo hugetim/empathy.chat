@@ -478,13 +478,13 @@ class Proposal():
     return app_tables.proposals.search(user=user, current=True)
   
   @staticmethod
+  @anvil.tables.in_transaction(relaxed=True)
+  @timed
   def get_port_view_items(user):
     port_proposals = Proposal.get_port_proposals(user)
     return port.Proposal.create_view_items(port_proposals)
 
   @staticmethod
-  @anvil.tables.in_transaction(relaxed=True)
-  @timed
   def get_port_proposals(user):
     """Return list of port.Proposals visible to user
     
