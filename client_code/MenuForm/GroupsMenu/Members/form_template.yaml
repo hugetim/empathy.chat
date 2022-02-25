@@ -35,11 +35,12 @@ components:
     properties:
       role: null
       columns:
-      - {title: Name, id: TCRDJP, data_key: name, expand: true, width: '80'}
-      - {title: Degree, id: CKNKJL, data_key: degree}
-      - {id: PGULWY, title: 'Seeking Buddy?', data_key: seeking}
-      - {title: Last Active, id: VWXCEI, data_key: last_active}
-      - {title: '', id: NBEGGD, data_key: buttons}
+      - {title: Name, id: TCRDJP, data_key: name, expand: true, width: '80', $$hashKey: 'object:18281'}
+      - {id: LBGLQR, title: Role, data_key: trust_label, $$hashKey: 'object:18352'}
+      - {title: Degree, id: CKNKJL, data_key: degree, $$hashKey: 'object:18282'}
+      - {id: PGULWY, title: 'Seeking Buddy?', data_key: seeking, $$hashKey: 'object:18283'}
+      - {title: Last Active, id: VWXCEI, data_key: last_active, $$hashKey: 'object:18284'}
+      - {title: '', id: NBEGGD, data_key: buttons, $$hashKey: 'object:18285'}
       auto_header: true
       tooltip: ''
       border: ''

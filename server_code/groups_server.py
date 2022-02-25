@@ -121,8 +121,11 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
     return port_group if portable else MyGroup(port_group)
   
   @staticmethod
-  def members_from_group_row(group_row):
-    member_set = {m['user'] for m in app_tables.group_members.search(group=group_row)}
+  def members_from_group_row(group_row, with_trust_level=False):
+    member_set = (
+      {m['user'] for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']} if with_trust_level
+      else {m['user'] for m in app_tables.group_members.search(group=group_row)}
+    )
     member_set.update(set(group_row['hosts']))
     return list(member_set)
 

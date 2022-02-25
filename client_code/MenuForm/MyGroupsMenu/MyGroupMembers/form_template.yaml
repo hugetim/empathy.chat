@@ -13,7 +13,9 @@ components:
       columns:
       - {title: '', id: RKBTGY, data_key: host, $$hashKey: 'object:82765', width: '40'}
       - {title: Name, id: TCRDJP, data_key: name, $$hashKey: 'object:82766'}
-      - {title: Degree, id: CKNKJL, data_key: degree, $$hashKey: 'object:82767'}
+      - {id: KANGHW, title: Role, data_key: trust_label, $$hashKey: 'object:23553',
+        width: '90'}
+      - {title: Degree, id: CKNKJL, data_key: degree, $$hashKey: 'object:82767', width: '90'}
       - {title: Last Active, id: VWXCEI, data_key: last_active, $$hashKey: 'object:82768',
         width: '90'}
       - {title: '', id: NBEGGD, data_key: buttons, $$hashKey: 'object:82769'}

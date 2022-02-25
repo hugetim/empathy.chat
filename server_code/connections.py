@@ -191,7 +191,7 @@ def _group_member_records_exclude(user, excluded_users):
   fellow_members_to_group_names = collections.defaultdict(list)
   excluded_users.add(user)
   for group_row in g.user_groups(user):
-    relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) - excluded_users
+    relevant_group_members = set(g.MyGroup.members_from_group_row(group_row, with_trust_level=True)) - excluded_users
     for user2 in relevant_group_members:
       fellow_members_to_group_names[user2].append(group_row['name'])
   return [sm.get_port_user_full(user2, user.get_id(), port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
