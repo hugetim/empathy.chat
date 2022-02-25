@@ -59,23 +59,20 @@ class MyGroup(h.PortItem, h.AttributeToKey):
 class Invite(h.PortItem, h.AttributeToKey):
   repr_desc = "groups.Invite: "
   server_fn_name = 'serve_group_invite'
-  def __init__(self, link_key="", invite_id="", expire_date=None, spec=None):
+  def __init__(self, link_key="", invite_id="", expire_date=None, spec=None, create_date=None):
     self.link_key = link_key
     self.invite_id = invite_id
     self.expire_date = expire_date
     self.spec = spec
+    self.create_date = create_date
    
   @property
   def url(self):
     return f"{p.URL}#?group={self.link_key}"
   
   @property
-  def expire_date_str(self):
-    return h.short_date_str(self.expire_date)
-  
-  @property
-  def expire_date_only(self):
-    return self.expire_date.date()
+  def create_date_str(self):
+    return h.short_date_str(self.create_date)
   
   
 def handle_link(link_key):

@@ -49,8 +49,10 @@ components:
       role: null
       columns:
       - {id: KXBOMI, title: Invite Link, data_key: url, $$hashKey: 'object:22731',
-        expand: true}
-      - {id: SQRIZT, title: Expire Date, data_key: expire_date_str, $$hashKey: 'object:22733'}
+        expand: false, width: '205'}
+      - {id: YBZLJH, title: Date Created, data_key: create_date_str, $$hashKey: 'object:38897',
+        width: '105'}
+      - {id: SQRIZT, title: Expire Date, data_key: expire_date, $$hashKey: 'object:22733'}
       auto_header: true
       tooltip: ''
       border: ''

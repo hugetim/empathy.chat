@@ -106,13 +106,14 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
                                                link_key=sm.random_code(num_chars=7),
                                                current=True,
                                               )
-    self.invites.append(Invite.from_invite_row(new_row))
+    self.invites.insert(0, Invite.from_invite_row(new_row))
 
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
     port_members = sm.get_port_users_full(MyGroup.members_from_group_row(group_row), user1_id=user_id)
     port_invites = [Invite.from_invite_row(i_row)
-                    for i_row in app_tables.group_invites.search(group=group_row, current=True)]
+                    for i_row in app_tables.group_invites.search(tables.order_by('expire_date', ascending=False), 
+                                                                 group=group_row, current=True)]
     port_group = groups.MyGroup(name=group_row['name'],
                                 group_id=group_row.get_id(),
                                 members=port_members,
@@ -209,5 +210,6 @@ class Invite(sm.ServerItem, groups.Invite):
                                 invite_id=invite_row.get_id(),
                                 expire_date=sm.as_user_tz(invite_row['expire_date'], user),
                                 spec=invite_row['spec'],
+                                create_date=sm.as_user_tz(invite_row['created'], user),
                                )
     return port_invite if portable else Invite(port_invite)

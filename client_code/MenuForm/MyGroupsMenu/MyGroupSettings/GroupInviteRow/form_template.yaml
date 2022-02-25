@@ -22,14 +22,15 @@ components:
     layout_properties: {grid_position: 'EQUXEF,LSHXUI'}
     event_bindings: {click: copy_button_click}
 - type: FlowPanel
-  properties: {}
+  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+    foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: flow_panel_1
   layout_properties: {column: SQRIZT}
   components:
   - type: DatePicker
     properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
       placeholder: '', border: '', enabled: true, foreground: '', visible: true, font_size: null,
-      font: '', spacing_above: small, spacing_below: small, italic: false, date: '',
+      font: '', spacing_above: none, spacing_below: none, italic: false, date: '',
       min_date: '', background: '', bold: false, underline: false, format: ''}
     name: expire_date_picker
     layout_properties: {column: SQRIZT, width: 230, expand: false}
