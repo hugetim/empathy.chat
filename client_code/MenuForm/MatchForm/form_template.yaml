@@ -249,7 +249,8 @@ components:
     event_bindings: {}
     name: lists_card
   - type: Spacer
-    properties: {height: 649}
+    properties: {visible: true, spacing_above: small, spacing_below: small, height: '800',
+      tooltip: ''}
     layout_properties: {slot: default, grid_position: 'JKHTEY,CRXPXJ'}
     name: spacer_1
 - type: Timer
