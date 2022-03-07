@@ -28,7 +28,7 @@ class SliderPanel(SliderPanelTemplate):
     if self.item['status'] in [None, 'waiting']:
       self.title_label.text = 'How full is your "empathy tank"? (Empty: angry/distant, Full: content/open)'                              
       self.title_label.bold = True
-      self.left_column_panel.tooltip = ("The idea is to compare values (after you both submit) to help you decide who gives empathy first."
+      self.left_column_panel.tooltip = ("After you both submit, you can compare positions to help you decide who gives empathy first. "
                                         "More full usually means it's easier to be curious about what the other is feeling and needing.")
     elif self.item['status'] == 'received':
       self.title_label.text = 'You can compare to help decide who gives empathy first (Empty: angry/distant, Full: content/open)'
