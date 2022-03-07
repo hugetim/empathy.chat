@@ -88,6 +88,12 @@ class ExchangeState(PendingState):
 
   @property
   def messages_plus(self):
+    out = self._format_how_empathy_as_messages()
+    self._label_first_messages_with_name()
+    out += self.message_items
+    return out
+
+  def _format_how_empathy_as_messages(self):
     out = []
     for i, how_empathy in enumerate(self.how_empathy_list):
       if how_empathy:
@@ -98,16 +104,17 @@ class ExchangeState(PendingState):
           "message": f"How {who} likes to receive empathy:\n{how_empathy}",
           "me": mine,
         })
+    return out
+
+  def _label_first_messages_with_name(self):
     first_message = {True: True, False: True}
     for message in self.message_items:
       mine = message['me']
       if first_message[mine]:
-        message['label'] = glob.name if mine else self.item.their_name
+        message['label'] = glob.name if mine else self.their_name
         first_message[mine] = False
-    out += self.message_items
-    return out
 
-
+        
 def update_exchange_state(previous_state):
   state_dict = previous_state.__dict__
   state_dict.update(anvil.server.call_s('update_match_form'))

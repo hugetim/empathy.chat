@@ -121,8 +121,10 @@ class InviteTest(unittest.TestCase):
 #     new_group = self.my_groups.add_group()
 #     self.assertEqual(new_group['name'], "New Group")
     
+
 def client_auto_tests():
-  pass
+  from . import exchange_controller_test as ect
+  ect.ExchangeControllerTest().main()
 #   Seconds2WordsTest().main()
 #   FullNameTest().main()
   
@@ -180,5 +182,5 @@ def run_now_test():
 #     #self.assertEqual( multiply(3,4), 12)
 
 
-# def run_tests():
+#def run_tests():
 #   unittest.main()
