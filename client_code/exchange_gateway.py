@@ -4,6 +4,7 @@ from anvil.tables import app_tables
 from . import parameters as p
 from .exceptions import RowMissingError
 from .data_helper import DataTableFlatSO
+from .exchanges import Exchange, Participant, Format
 
 
 # def in_transaction(relaxed=False):
@@ -28,13 +29,28 @@ def _current_exchange_i(user):
   return this_match, i
 
 
+def _get_participant(match_row, i):
+  keys = ['present', 'complete', 'slider_value', 'late_notified', 'external']
+  return Participant(user_id=match_row['users'][i].get_id(), 
+                     **{k: match_row[k][i] for k in keys})
+
+
 class ExchangeRepository:
-  def __init__(self, user):
+  def get_exchange(self, user):
     this_match, i = _current_exchange_i(user)
     if this_match:
-      self._user = user
-      self._user_i = i
-      self._exchange = this_match
+      match_dict = dict(this_match)
+      num_participants = len(match_dict['users'])
+#       participants = [_get_participant(match_dict, i)]
+#       for j in range(len(match_dict['users'])):
+#         if j != i:
+#           participants.append(_get_participant(match_dict, j))
+      participants = [_get_participant(match_dict, j) for j in range(num_participants)]
+      return Exchange(room_code=match_dict['proposal_time']['jitsi_code'],
+                      participants=participants,
+                      start_dt=match_dict['match_commence'],
+                      exchange_format=Format(match_dict['proposal_time']['duration']),
+                     )
     else:
       raise(RowMissingError("Current empathy chat not found for this user"))
       
