@@ -192,9 +192,9 @@ def get_status(user):
       from .exchange_gateway import ExchangeRepository
       from .exceptions import RowMissingError
       try:
-        this_match = ExchangeRepository(user).exchange
+        this_match = ExchangeRepository().get_exchange(user.get_id())
         status = "matched"
-        ping_start = this_match['match_commence']
+        ping_start = this_match.start_dt
       except RowMissingError:
         status = None
   return {'status': status, 

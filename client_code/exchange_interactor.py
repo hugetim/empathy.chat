@@ -1,5 +1,4 @@
 from . import server_misc as sm
-from anvil.tables import in_transaction
 from .exceptions import RowMissingError
 import anvil.secrets
 
@@ -8,29 +7,29 @@ def init_match_form(user_id, repo):
   """Return jitsi_code, duration (or Nones), my_slider_value
   
   Side effect: set this_match['present']"""
-  user = sm.get_user(user_id)
   try:
-    return _init_match_form_already_matched(user, repo)
+    return _init_match_form_already_matched(user_id, repo)
   except RowMissingError as err:
-    return _init_match_form_not_matched(user, repo)
+    return _init_match_form_not_matched(user_id)
 
 
-def _init_match_form_already_matched(user):
-  from .proposals import ProposalTime
+def _init_match_form_already_matched(user_id, repo):
   from . import matcher
-  exchange = repo.get_exchange(user)
-  _mark_present(exchange)
+  exchange = repo.get_exchange(user_id)
+  exchange.my(user_id)['present'] = 1
+  repo.save_exchange(exchange)
   matcher.propagate_update_needed()
-  return None, exchange.room_code, exchange.format.duration, exchange.slider_value(user_id)
+  return None, exchange.room_code, exchange.exchange_format.duration, exchange.my(user_id)['slider_value']
 
 
-def _init_match_form_not_matched(user):
+def _init_match_form_not_matched(user_id):
   from .proposals import ProposalTime
+  user = sm.get_user(user_id)
   current_proptime = ProposalTime.get_now(user)
   if current_proptime:
     return _init_match_form_requesting(current_proptime)
   else:
-    sm.warning(f"_init_match_form_not_matched request not found for {user.get_id()}")
+    sm.warning(f"_init_match_form_not_matched request not found for {user_id}")
     return None, None, None, ""
 
 
@@ -39,20 +38,19 @@ def _init_match_form_requesting(current_proptime):
   return current_proptime.get_id(), jitsi_code, duration, ""
   
   
-def update_match_form(user_id, repo=None):
+def update_match_form(user_id, exchange=None):
   """Return match_state dict
   
   Side effect: Update match['present']"""
-  user = sm.get_user(user_id)
-  if not repo:
+  if not exchange:
     try:
-      repo = ExchangeRepository(user)
+      exchange = repo.get_exchange(user_id)
     except RowMissingError as err:
-      return _update_match_form_not_matched(user)
-  return _update_match_form_already_matched(user, repo)
+      return _update_match_form_not_matched(user_id)
+  return _update_match_form_already_matched(user_id, exchange, repo)
   
 
-def _update_match_form_already_matched(user, repo):
+def _update_match_form_already_matched(user_id, exchange, repo):
   from . import matcher
   _mark_present(repo)
   matcher.propagate_update_needed()
@@ -97,8 +95,9 @@ def _late_notify_needed(this_match, i):
   return later_scheduled_match and past_start_time
 
   
-def _update_match_form_not_matched(user):
+def _update_match_form_not_matched(user_id):
   from . import matcher
+  user = sm.get_user(user_id)
   matcher.confirm_wait_helper(user)
   partial_state = matcher.get_status_in_transaction(user)
   matcher.propagate_update_needed(user)
@@ -119,19 +118,14 @@ def match_complete(user_id):
   matcher.propagate_update_needed()
 
 
-@in_transaction(relaxed=True)
-def _mark_present(repo):
-  repo.mark_present()
+# @in_transaction(relaxed=True)
+# def _mark_complete(repo):
+#   repo.complete()
 
   
-@in_transaction(relaxed=True)
-def _mark_complete(repo):
-  repo.complete()
-
-  
-@in_transaction(relaxed=True)
-def _mark_notified(repo, other_user): 
-  repo.mark_notified(other_user)
+# @in_transaction(relaxed=True)
+# def _mark_notified(repo, other_user): 
+#   repo.mark_notified(other_user)
 
   
 def add_chat_message(user_id, message):
@@ -143,22 +137,22 @@ def add_chat_message(user_id, message):
   return update_match_form(user_id, repo=repo)
 
 
-@in_transaction(relaxed=True)
-def update_my_external(my_external, user_id):
-  user = sm.get_user(user_id)
-  try:
-    repo = ExchangeRepository(user)
-    repo.update_my_external(int(my_external))
-  except RowMissingError:
-    print("Exchange record not available to record my_external")
+# @in_transaction(relaxed=True)
+# def update_my_external(my_external, user_id):
+#   user = sm.get_user(user_id)
+#   try:
+#     repo = ExchangeRepository(user)
+#     repo.update_my_external(int(my_external))
+#   except RowMissingError:
+#     print("Exchange record not available to record my_external")
 
 
-@in_transaction(relaxed=True)
-def submit_slider(value, user_id):
-  user = sm.get_user(user_id)
-  repo = ExchangeRepository(user)
-  this_match, i = repo.submit_slider(value)
-  return their_value(this_match['slider_values'], i)  
+# @in_transaction(relaxed=True)
+# def submit_slider(value, user_id):
+#   user = sm.get_user(user_id)
+#   repo = ExchangeRepository(user)
+#   this_match, i = repo.submit_slider(value)
+#   return their_value(this_match['slider_values'], i)  
   
   
 def their_value(values, my_i):
