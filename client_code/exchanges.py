@@ -13,9 +13,10 @@ class Exchange:
     self.start_dt = start_dt
     self.exchange_format = exchange_format
     
-  def slider_value(self, user_id):
+  def my(self, user_id):
     [participant] = [p for p in self.participants if p['user_id']==user_id]
-    return participant.slider_value
+    return participant
+  
 
   
 # class Participant:
