@@ -37,7 +37,7 @@ class MockRepo:
   def save_exchange(self, exchange):
     self._db_exchange = Exchange(exchange.exchange_id, exchange.room_code, exchange.participants,
                                  exchange.start_now, exchange.start_dt, exchange.exchange_format,
-                                 exchange.my()['user_id'], exchange._my_i)
+                                 exchange.my['user_id'], exchange._my_i)
     
   def get_chat_messages(self, exchange):
     return []
@@ -59,7 +59,7 @@ class TestInitMatch(unittest.TestCase):
     self.assertEqual(ei.init_match_form(poptibo_id, MockRepo(e)), 
                      (None, "room code", 45, "")
                     )
-    self.assertEqual(e.my()['present'], 1)
+    self.assertEqual(e.my['present'], 1)
 
 class TestUpdateMatch(unittest.TestCase):
   def test_update_match_form_matched(self):
@@ -77,5 +77,5 @@ class TestUpdateMatch(unittest.TestCase):
                           their_complete=0,
                          )
                     )
-    self.assertEqual(e.my()['present'], 1)
+    self.assertEqual(e.my['present'], 1)
     

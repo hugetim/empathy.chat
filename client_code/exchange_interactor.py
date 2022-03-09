@@ -15,12 +15,11 @@ def init_match_form(user_id, repo):
 
 def _init_match_form_already_matched(user_id, repo):
   exchange = repo.get_exchange(user_id)
-  my = exchange.my()
-  my['present'] = 1
+  exchange.my['present'] = 1
   repo.save_exchange(exchange)
-  other_user = sm.get_user(exchange.their()['user_id'])
+  other_user = sm.get_user(exchange.their['user_id'])
   other_user['update_needed'] = True
-  return None, exchange.room_code, exchange.exchange_format.duration, my['slider_value']
+  return None, exchange.room_code, exchange.exchange_format.duration, exchange.my['slider_value']
 
 
 def _init_match_form_not_matched(user_id):
@@ -52,17 +51,15 @@ def update_match_form(user_id, repo):
 
 def _update_match_form_already_matched(user_id, exchange, repo):
   user = sm.get_user(user_id)
-  my = exchange.my()
-  changed = not my['present']
-  my['present'] = 1
+  changed = not exchange.my['present']
+  exchange.my['present'] = 1
   #this_match, i = repo.exchange_i()
-  their = exchange.their()
-  other_user = sm.get_user(their['user_id'])
+  other_user = sm.get_user(exchange.their['user_id'])
   if exchange.late_notify_needed(sm.now()):
     from . import notifies as n
     n.notify_late_for_chat(other_user, exchange.start_dt, [user])
     changed = True
-    their['late_notified'] = 1
+    exchange.their['late_notified'] = 1
   if changed:
     repo.save_exchange(exchange)
     other_user['update_needed'] = True
@@ -77,10 +74,10 @@ def _update_match_form_already_matched(user_id, exchange, repo):
     how_empathy_list=how_empathy_list,
     their_name=their_name,
     message_items=messages_out,
-    my_slider_value=my['slider_value'],
-    their_slider_value=their['slider_value'],
-    their_external=their['external'],
-    their_complete=their['complete'],
+    my_slider_value=exchange.my['slider_value'],
+    their_slider_value=exchange.their['slider_value'],
+    their_external=exchange.their['external'],
+    their_complete=exchange.their['complete'],
   )
 
   
@@ -101,7 +98,7 @@ def match_complete(user_id, repo):
   try:
     exchange = repo.get_exchange(user_id)
     # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
-    exchange.my()['complete'] = 1
+    exchange.my['complete'] = 1
     repo.save_exchange(exchange)
   except RowMissingError as err:
     sm.warning(f"match_complete: match not found {user_id}")
@@ -120,7 +117,7 @@ def add_chat_message(user_id, message, repo):
 def update_my_external(my_external, user_id, repo):
   try:
     exchange = repo.get_exchange(user_id)
-    exchange.my()['external'] = int(my_external)
+    exchange.my['external'] = int(my_external)
     repo.save_exchange(exchange)
   except RowMissingError:
     print("Exchange record not available to record my_external")
@@ -128,14 +125,7 @@ def update_my_external(my_external, user_id, repo):
 
 def submit_slider(value, user_id, repo):
   exchange = repo.get_exchange(user_id)
-  exchange.my()['slider_value'] = value
+  exchange.my['slider_value'] = value
   repo.save_exchange(exchange)
-  return exchange.their()['slider_value']
+  return exchange.their['slider_value']
   
-  
-def their_value(values, my_i):
-  temp_values = [value for value in values]
-  temp_values.pop(my_i)
-  if len(temp_values) != 1:
-    sm.warning(f"len(temp_values) != 1, but this function assumes dyads only")
-  return temp_values[0]                     # return the remaining value

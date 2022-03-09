@@ -16,14 +16,21 @@ class Exchange:
     self.exchange_format = exchange_format
     if my_i:
       self._my_i = my_i
+      self._their_i = self.participants.index(self._their())
     else:
       [participant] = [p for p in self.participants if p['user_id'] == user_id]
       self._my_i = self.participants.index(participant)
-    
+      self._their_i = self.participants.index(self._their())
+
+  @property
   def my(self):
     return self.participants[self._my_i]
-  
+
+  @property
   def their(self):
+    return self.participants[self._their_i]
+  
+  def _their(self):
     other_participants = [p for p in self.participants]
     del other_participants[self._my_i]
     if len(other_participants) > 1:
@@ -32,8 +39,7 @@ class Exchange:
       return other_participants[0]
 
   def late_notify_needed(self, now):
-    their = self.their()
-    if their['present'] or their['late_notified']:
+    if self.their['present'] or self.their['late_notified']:
       return False
     past_start_time = self.start_dt < now
     return (not self.start_now) and past_start_time
