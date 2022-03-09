@@ -75,7 +75,7 @@ class ExchangeRepository:
     
   def add_chat(self, message, now, exchange):
     match_row = self._match_row(exchange)
-    user = app_tables.users.get_by_id(exchange.my()['user_id'])
+    user = app_tables.users.get_by_id(exchange.my['user_id'])
     app_tables.chat.add_row(match=match_row,
                             user=user,
                             message=message,
