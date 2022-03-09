@@ -13,9 +13,15 @@ class Exchange:
     self.start_dt = start_dt
     self.exchange_format = exchange_format
     
-  def my(self, user_id):
-    [participant] = [p for p in self.participants if p['user_id']==user_id]
+  def my(self, my_user_id):
+    [participant] = [p for p in self.participants if p['user_id'] == my_user_id]
     return participant
+  
+  def their(self, my_user_id):
+    other_participants = [p for p in self.participants if p['user_id'] != my_user_id]
+    if len(other_participants) != 1:
+      sm.warning(f"len(temp_values) != 1, but this function assumes dyads only")
+    return other_participants[0]
   
 
   
