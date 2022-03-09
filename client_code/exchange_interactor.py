@@ -41,7 +41,7 @@ def _init_match_form_requesting(current_proptime):
 def update_match_form(user_id, repo):
   """Return match_state dict
   
-  Side effect: Update match['present']"""
+  Side effects: Update match['present'], late notifications, confirm_wait"""
   try:
     exchange = repo.get_exchange(user_id)
     return _update_match_form_already_matched(user_id, exchange, repo)
@@ -100,12 +100,12 @@ def match_complete(user_id, repo):
     # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
     exchange.my['complete'] = 1
     repo.save_exchange(exchange)
+    matcher.propagate_update_needed()
   except RowMissingError as err:
     sm.warning(f"match_complete: match not found {user_id}")
-  matcher.propagate_update_needed()
 
    
-def add_chat_message(user_id, message, repo):
+def add_chat_message(message, user_id, repo):
   exchange = repo.get_exchange(user_id)
   repo.add_chat(message=anvil.secrets.encrypt_with_key("new_key", message),
                 now=sm.now(),

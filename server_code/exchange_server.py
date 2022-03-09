@@ -33,9 +33,9 @@ def submit_slider(value, user_id=""):
 
 
 @authenticated_callable
-def add_chat_message(user_id="", message="[blank test message]"):
-  print(f"add_chat_message, '[redacted]', {user_id}")
-  return ei.add_chat_message(user_id, message, repo)
+def add_chat_message(message="[blank test message]", user_id=""):
+  print(f"add_chat_message, {user_id}, '[redacted]'")
+  return ei.add_chat_message(message, user_id, repo)
 
 
 @authenticated_callable
