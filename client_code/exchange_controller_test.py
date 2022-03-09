@@ -2,12 +2,12 @@ import unittest
 from . import exchange_controller as ec
 
    
-class Mock():
-  pass
+# class Mock():
+#   pass
 
 
-glob = Mock()
-glob.name = "Tim"
+# glob = Mock()
+# glob.name = "Tim"
 
 
 class ExchangeControllerTest(unittest.TestCase):

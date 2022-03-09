@@ -1,4 +1,5 @@
 from collections import namedtuple
+from .server_misc import warning
 
 
 # Participant = namedtuple('Participant', ['user_id', 'present', 'complete', 'slider_value', 'late_notified', 'external'])
@@ -19,9 +20,10 @@ class Exchange:
   
   def their(self, my_user_id):
     other_participants = [p for p in self.participants if p['user_id'] != my_user_id]
-    if len(other_participants) != 1:
-      sm.warning(f"len(temp_values) != 1, but this function assumes dyads only")
-    return other_participants[0]
+    if len(other_participants) > 1:
+      warning(f"len(temp_values) > 1, but this function assumes dyads only")
+    if other_participants:
+      return other_participants[0]
   
 
   

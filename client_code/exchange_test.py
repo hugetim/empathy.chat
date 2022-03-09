@@ -16,8 +16,8 @@ from anvil.tables import app_tables
 #     an_exchange = Exchange("1234", [], [])
 #     self.assertFalse(an_exchange.my_slider_value())
 
-
-poptibo = app_tables.users.get(email="poptibo@yahoo.com")
+hugetim_id = app_tables.users.get(email="hugetim@gmail.com").get_id()
+poptibo_id = app_tables.users.get(email="poptibo@yahoo.com").get_id()
 
 
 class MockRepo:
@@ -36,18 +36,18 @@ class MockRepo:
 
 
 class ExchangeInteractorTest(unittest.TestCase):
-  def test_init_match_form_no_status(self):
-    user_id = poptibo.get_id()
-    repo = MockRepo(Exchange("eid", None, [dict(user_id="1", present=0, slider_value="")], None, Format(None)))
-    self.assertEqual(ei.init_match_form(user_id, repo), 
-                     (None, None, None, "")
-                    )
+#   def test_init_match_form_no_status(self):
+#     repo = MockRepo(Exchange("eid", None, [dict(user_id="1", present=0, slider_value="")], None, Format(None)))
+#     self.assertEqual(ei.init_match_form(poptibo_id, repo), 
+#                      (None, None, None, "")
+#                     )
     
   def test_init_match_form_matched(self):
-    user_id = poptibo.get_id()
-    e = Exchange("eid", "room code", [dict(user_id=poptibo.get_id(), present=0, slider_value="")], None, Format(45))
-    self.assertEqual(ei.init_match_form(user_id, MockRepo(e)), 
+    participants = [dict(user_id=poptibo_id, present=0, slider_value=""),
+                    dict(user_id=hugetim_id, present=0, slider_value="")]
+    e = Exchange("eid", "room code", participants, None, Format(45))
+    self.assertEqual(ei.init_match_form(poptibo_id, MockRepo(e)), 
                      (None, "room code", 45, "")
                     )
-    self.assertEqual(e.my(user_id)['present'], 1)
+    self.assertEqual(e.my(poptibo_id)['present'], 1)
     

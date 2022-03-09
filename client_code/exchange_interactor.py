@@ -14,11 +14,11 @@ def init_match_form(user_id, repo):
 
 
 def _init_match_form_already_matched(user_id, repo):
-  from . import matcher
   exchange = repo.get_exchange(user_id)
   exchange.my(user_id)['present'] = 1
   repo.save_exchange(exchange)
-  matcher.propagate_update_needed()
+  other_user = sm.get_user(exchange.their(user_id)['user_id'])
+  other_user['update_needed'] = True
   return None, exchange.room_code, exchange.exchange_format.duration, exchange.my(user_id)['slider_value']
 
 
