@@ -29,10 +29,13 @@ def _current_exchange_i(user):
   return this_match, i
 
 
-def _get_participant(match_row, i):
+def _get_participant(match_dict, i):
   keys = ['present', 'complete', 'slider_value', 'late_notified', 'external']
-  return Participant(user_id=match_row['users'][i].get_id(), 
-                     **{k: match_row[k][i] for k in keys})
+  participant = {k: match_dict[k][i] for k in keys}
+  participant['user_id'] = match_dict['users'][i].get_id()
+  return participant
+#   return Participant(user_id=match_row['users'][i].get_id(), 
+#                      **{k: match_row[k][i] for k in keys})
 
 
 class ExchangeRepository:
@@ -46,14 +49,21 @@ class ExchangeRepository:
 #         if j != i:
 #           participants.append(_get_participant(match_dict, j))
       participants = [_get_participant(match_dict, j) for j in range(num_participants)]
-      return Exchange(room_code=match_dict['proposal_time']['jitsi_code'],
+      return Exchange(exchange_id=this_match.get_id(),
+                      room_code=match_dict['proposal_time']['jitsi_code'],
                       participants=participants,
                       start_dt=match_dict['match_commence'],
                       exchange_format=Format(match_dict['proposal_time']['duration']),
                      )
     else:
       raise(RowMissingError("Current empathy chat not found for this user"))
-      
+
+  def save_exchange(self, exchange):
+    match_row = app_tables.matches.get_by_id(exchange.exchange_id)
+    keys_to_update = exchange.participants[0].keys()
+    keys_to_update.remove('user_id')
+    match_row.update(**{k: [p[k] for p in exchange.participants] for k in keys_to_update})
+    
   def add_chat(self, message, now):
     app_tables.chat.add_row(match=self._exchange,
                             user=self._user,

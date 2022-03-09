@@ -1,31 +1,27 @@
 from . import server_misc as sm
-from .exchange_gateway import ExchangeRepository #, in_transaction
 from anvil.tables import in_transaction
 from .exceptions import RowMissingError
 import anvil.secrets
 
 
-def init_match_form(user_id):
+def init_match_form(user_id, repo):
   """Return jitsi_code, duration (or Nones), my_slider_value
   
   Side effect: set this_match['present']"""
   user = sm.get_user(user_id)
   try:
-    return _init_match_form_already_matched(user)
+    return _init_match_form_already_matched(user, repo)
   except RowMissingError as err:
-    return _init_match_form_not_matched(user)
+    return _init_match_form_not_matched(user, repo)
 
 
 def _init_match_form_already_matched(user):
   from .proposals import ProposalTime
   from . import matcher
-  repo = ExchangeRepository(user)
-  _mark_present(repo)
+  exchange = repo.get_exchange(user)
+  _mark_present(exchange)
   matcher.propagate_update_needed()
-  this_match, i = repo.exchange_i()
-  proptime = ProposalTime(this_match['proposal_time'])
-  jitsi_code, duration = proptime.get_match_info()
-  return proptime.get_id(), jitsi_code, duration, this_match['slider_values'][i]
+  return None, exchange.room_code, exchange.format.duration, exchange.slider_value(user_id)
 
 
 def _init_match_form_not_matched(user):

@@ -1,12 +1,14 @@
 import anvil.server
 from .server_misc import authenticated_callable
 from . import exchange_interactor as ei
+from .exchange_gateway import ExchangeRepository
 
 
 @authenticated_callable
 def init_match_form(user_id=""):
   print(f"init_match_form, {user_id}")
-  return ei.init_match_form(user_id)
+  repo = ExchangeRepository()
+  return ei.init_match_form(user_id, repo)
 
 
 @authenticated_callable

@@ -1,19 +1,21 @@
 from collections import namedtuple
 
 
-Participant = namedtuple('Participant', ['user_id', 'present', 'complete', 'slider_value', 'late_notified', 'external'])
+# Participant = namedtuple('Participant', ['user_id', 'present', 'complete', 'slider_value', 'late_notified', 'external'])
 Format = namedtuple('Format', ['duration'])
 
 
 class Exchange:
-  def __init__(self, room_code, participants, start_dt, exchange_format):
+  def __init__(self, exchange_id, room_code, participants, start_dt, exchange_format):
+    self.exchange_id = exchange_id
     self.room_code = room_code
     self.participants = participants
     self.start_dt = start_dt
     self.exchange_format = exchange_format
     
-  def my_slider_value(self):
-    return None
+  def slider_value(self, user_id):
+    [participant] = [p for p in self.participants if p['user_id']==user_id]
+    return participant.slider_value
 
   
 # class Participant:
