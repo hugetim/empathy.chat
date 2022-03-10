@@ -110,7 +110,7 @@ class CreateForm(CreateFormTemplate):
     
   def update_size(self):
     new_items = [
-      ("pair (1 other participant)", (2, 2)),
+      ("pair/dyad (1 other participant)", (2, 2)),
       ("triad (2 other participants)", (3, 3)),
     ]
     if not self.item['start_now']:
