@@ -47,8 +47,6 @@ class LoginForm(LoginFormTemplate):
     from .. import rosenberg
     from datetime import date
     self.quote_label.text = rosenberg.quote_of_the_day(date.today())
-    from .. import glob
+    from .. import ui_procedures as ui
+    from .. import parameters
     self.timer_1.interval = 0
-
-
-
