@@ -1,11 +1,10 @@
 import anvil.users
 import anvil.server
-import datetime
-import anvil.tz
-import math
 
 
 def now():
+  import datetime
+  import anvil.tz
   return datetime.datetime.now().replace(tzinfo=anvil.tz.tzlocal())
 
 
@@ -22,6 +21,7 @@ def add_num_suffix(num):
   
 
 def seconds_to_digital(seconds):
+  import math
   original = seconds
   seconds = abs(seconds)
   minutes = math.trunc(seconds / 60)
@@ -45,6 +45,7 @@ def seconds_to_digital(seconds):
 
 
 def seconds_to_words(seconds, include_seconds=True):
+  import math
   original = seconds
   seconds = abs(seconds)
   minutes = math.trunc(seconds / 60)
@@ -98,6 +99,7 @@ def re_hours(h, set_time):
 
 
 def as_local_tz(_datetime):
+  import anvil.tz
   return _datetime.astimezone(anvil.tz.tzlocal())
 
 
@@ -118,6 +120,7 @@ def short_date_str(_datetime):
 
 
 def round_up_datetime(dt, minutes_res=15):
+  import datetime
   new_minute = (dt.minute // minutes_res + 1) * minutes_res
   new_dt = dt + datetime.timedelta(minutes = new_minute - dt.minute)
   return new_dt.replace(second=0, microsecond=0)

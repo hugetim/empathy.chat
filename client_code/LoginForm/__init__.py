@@ -2,8 +2,6 @@ from ._anvil_designer import LoginFormTemplate
 from anvil import *
 import anvil.users
 import anvil.server
-from .. import rosenberg
-from datetime import date
 
 
 class LoginForm(LoginFormTemplate):
@@ -12,7 +10,6 @@ class LoginForm(LoginFormTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    self.quote_label.text = rosenberg.quote_of_the_day(date.today())
     
   def form_show(self, **event_args):
     # Do the code here to show this blank form.
@@ -27,6 +24,7 @@ class LoginForm(LoginFormTemplate):
     self.card_1.visible = True
     from .. import ui_procedures as ui
     self.init_dict = ui.get_init()
+    ui.get_mobile_status()
     from .. import parameters
     if parameters.DEBUG_MODE:
       self.enter_button_click()
@@ -43,5 +41,14 @@ class LoginForm(LoginFormTemplate):
     if glob.MOBILE and self.init_dict['state']['status'] not in ["matched", "requesting", "pinged"]:
       Notification("empathy.chat works OK on mobile but may be easier on a computer", 
                    timeout=4, style="warning").show()
+
+  def timer_1_tick(self, **event_args):
+    """Async loading of Rosenberg quote"""
+    from .. import rosenberg
+    from datetime import date
+    self.quote_label.text = rosenberg.quote_of_the_day(date.today())
+    from .. import glob
+    self.timer_1.interval = 0
+
 
 

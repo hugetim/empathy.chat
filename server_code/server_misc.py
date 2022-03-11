@@ -33,16 +33,16 @@ def initialize_session(time_zone):
   return user
 
 
-@anvil.tables.in_transaction
 def _init_user(time_zone):
   user = anvil.users.get_user()
   print(user['email'])
-  user['time_zone'] = time_zone
-  trust_level = init_user_info(user)
+  init_user_info(user, time_zone)
+  trust_level = update_trust_level(user)
   return user, trust_level
 
 
 @anvil.server.callable
+@anvil.tables.in_transaction(relaxed=True)
 def remove_user(user):
   """Remove new user created via Google sign-in"""
   h.warning(f"Removing user {user['email']}")
@@ -141,8 +141,10 @@ def _create_user_if_needed_and_return_whether_created(email):
 #     return user
 
 
-def init_user_info(user):
+@anvil.tables.in_transaction(relaxed=True)
+def init_user_info(user, time_zone):
   """Return trust, initializing info for new users & updating trust_level"""
+  user['time_zone'] = time_zone
   user['init_date'] = now()
   if user['trust_level'] is None:
     user['notif_settings'] = {"essential": "sms", "message": "email", "specific": "email"}
@@ -152,9 +154,9 @@ def init_user_info(user):
     user['profile'] = ""
     user['phone'] = ""
     user['confirmed_url'] = ""
-  return update_trust_level(user)
 
 
+@anvil.tables.in_transaction
 def update_trust_level(user):
   """Return trust level based on other info
   

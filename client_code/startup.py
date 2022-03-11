@@ -11,11 +11,10 @@ def error_handler(err):
   raise(err)
 
 
-known_hash_keys = {'invite', 'group'}
-
-
 anvil.set_default_error_handling(error_handler)
+
 url_hash = anvil.get_url_hash()
+known_hash_keys = {'invite', 'group'}
 if isinstance(url_hash, dict) and len(url_hash.keys() & known_hash_keys) == 1:
   [known_key] = url_hash.keys() & known_hash_keys
   value = url_hash[known_key]

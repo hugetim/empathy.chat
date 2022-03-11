@@ -57,4 +57,8 @@ components:
   name: label_1
   layout_properties: {slot: title}
   event_bindings: {}
+- type: Timer
+  properties: {interval: 0.1}
+  name: timer_1
+  event_bindings: {tick: timer_1_tick}
 is_package: true

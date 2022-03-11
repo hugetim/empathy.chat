@@ -1,10 +1,16 @@
 from anvil import *
 import anvil.users
 import anvil.server
-from datetime import datetime
 from . import glob
 
 
+def get_mobile_status():
+  from anvil.js.window import navigator
+  import re
+  mobile_devices = "Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini"
+  glob.MOBILE = re.search(mobile_devices, navigator.userAgent) is not None
+
+  
 def disconnect_flow(user2_id, user2_name, user1_id=""):
   if confirm(f"Really remove your link to {user2_name}? This cannot be undone."):
     return anvil.server.call('disconnect', user2_id, user1_id)
@@ -31,7 +37,6 @@ def get_init():
     from anvil.js.window import Intl
     from . import helper as h
     time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    #now = datetime.now()
     return h.robust_server_call('init', time_zone)
 
   
@@ -44,7 +49,8 @@ def copy_to_clipboard(text, desc="It"):
   except anvil.js.ExternalError as err:
     Notification(str(err), timeout=5).show()
     print(f"copy_to_clipboard error: {repr(err)}")
-  
+
+    
 def set_document_title(text):
   from anvil.js import window
   old_title = window.document.title

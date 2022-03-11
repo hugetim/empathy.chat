@@ -1,5 +1,6 @@
 import unittest
 from . import exchange_controller as ec
+from . import glob
 
 
 class MockServer:
@@ -15,8 +16,9 @@ class MockServer:
    
     
 class ExchangeControllerTest(unittest.TestCase):
-  """Assumes logged-in user named 'Tim' (glob.name)"""
   def test_messages_plus(self):
+    save_glob_name = glob.name
+    glob.name = "Tim"
     state = ec.ExchangeState(
       status="matched", proptime_id=None, jitsi_code=None, duration=45,
       how_empathy_list=["my how_empathy", "their how_empathy"],
@@ -37,6 +39,7 @@ class ExchangeControllerTest(unittest.TestCase):
        dict(me=True, message="my second"),
       ],
     )
+    glob.name = save_glob_name
 
   def test_slider_status_waiting(self):
     mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, "")})
