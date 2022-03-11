@@ -1,7 +1,5 @@
 from anvil import *
-import anvil.users
 import anvil.server
-from anvil.tables import app_tables
 import unittest
 import time
 from . import helper as h
@@ -80,15 +78,15 @@ class InviteTest(unittest.TestCase):
     self.assertFalse(invite5.invalid_response())
 
   def test_rel_item(self):
-    invite1 = invites.Invite(rel_to_inviter="12345678", inviter_guess="1234", invitee=port.User.from_logged_in())
+    invite1 = invites.Invite(rel_to_inviter="12345678", inviter_guess="1234") #, invitee=port.User.from_logged_in())
     item1 = invite1.rel_item(for_response=False)
     self.assertEqual(item1['relationship'], invite1.rel_to_inviter)
     self.assertEqual(item1['phone_last4'], invite1.inviter_guess)
-    self.assertEqual(item1['name'], invite1.invitee.name if invite1.invitee else "")
+#     self.assertEqual(item1['name'], invite1.invitee.name if invite1.invitee else "")
     item2 = invite1.rel_item(for_response=True)
     self.assertEqual(item2['relationship'], invite1.rel_to_invitee)
     self.assertEqual(item2['phone_last4'], invite1.invitee_guess)
-    self.assertEqual(item2['name'], invite1.inviter.name if invite1.inviter else "")
+#     self.assertEqual(item2['name'], invite1.inviter.name if invite1.inviter else "")
     
     item1['relationship'] = "abcdefgh"
     item1['phone_last4'] = "4321"
@@ -112,21 +110,25 @@ class InviteTest(unittest.TestCase):
 #   def test_add_group(self):
 #     new_group = self.my_groups.add_group()
 #     self.assertEqual(new_group['name'], "New Group")
-    
+
 
 def client_auto_tests():
-  from . import exchange_controller_test as ect
-  ect.ExchangeControllerTest().main()
-#   Seconds2WordsTest().main()
-#   FullNameTest().main()
+  from anvil_extras.utils import timed
+  
+  @timed
+  def tests():
+    from . import exchange_controller_test as ect
+    ect.ExchangeControllerTest().main()
+  #   Seconds2WordsTest().main()
+  #   FullNameTest().main()
+  tests()
   
   
 def test_alert(content, handler):
   content.set_event_handler('x-close-alert', handler)
   
   
-class TestNow():
-
+class TestNow(): #not unittest.TestCase
   def setUp(self):
     self.top_form = get_open_form()
     self.top_form.home_link_click()
@@ -144,8 +146,7 @@ class TestNow():
       time.sleep(10)
       anvil.server.call('cancel_now')
       time.sleep(15)
-      
-      
+       
   def test_multiple_proposal_times(self):
     self.top_form.content.propose_button_click()
     time.sleep(5)
@@ -153,6 +154,7 @@ class TestNow():
     time.sleep(5)
     self.top_form.proposal_alert.save_button_click()
 
+    
 def run_now_test():
   #unittest.main()
   #print("run manually")

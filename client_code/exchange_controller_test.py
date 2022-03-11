@@ -1,16 +1,21 @@
 import unittest
 from . import exchange_controller as ec
 
+
+class MockServer:
+  def __init__(self, return_values):
+    self.return_values = return_values
+    self.call_args = {}
+    self.call_kwargs = {}
+
+  def call(self, method, *args, **kwargs):
+    self.call_args[method] = args
+    self.call_kwargs[method] = kwargs
+    return self.return_values[method]
    
-class Mock():
-  pass
-
-
-glob = Mock()
-glob.name = "Tim"
-
-
+    
 class ExchangeControllerTest(unittest.TestCase):
+  """Assumes logged-in user named 'Tim' (glob.name)"""
   def test_messages_plus(self):
     state = ec.ExchangeState(
       status="matched", proptime_id=None, jitsi_code=None, duration=45,
@@ -32,3 +37,33 @@ class ExchangeControllerTest(unittest.TestCase):
        dict(me=True, message="my second"),
       ],
     )
+
+  def test_slider_status_waiting(self):
+    mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, "")})
+    ec.ExchangeState.server = mock_server
+    state = ec.ExchangeState.init_exchange("waiting")
+    self.assertEqual(state.slider_status, "waiting")
+    self.assertFalse(mock_server.call_args['init_match_form'])
+    self.assertEqual(mock_server.call_kwargs['init_match_form'], {})
+    
+  def test_slider_status_none(self):
+    mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, "")})
+    ec.ExchangeState.server = mock_server
+    state = ec.ExchangeState.init_exchange("matched")
+    self.assertEqual(state.slider_status, None)
+    state.their_slider_value = 7
+    self.assertEqual(state.slider_status, None)
+   
+  def test_slider_status_submitted(self):
+    mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, 3)})
+    ec.ExchangeState.server = mock_server
+    state = ec.ExchangeState.init_exchange("matched")
+    self.assertEqual(state.slider_status, "submitted")
+    
+  def test_slider_status_received(self):
+    mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, 3)})
+    ec.ExchangeState.server = mock_server
+    state = ec.ExchangeState.init_exchange("matched")
+    state.their_slider_value = 7
+    self.assertEqual(state.slider_status, "received")
+    
