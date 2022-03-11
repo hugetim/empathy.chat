@@ -3,7 +3,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from . import parameters as p
 from .exceptions import RowMissingError
-from .data_helper import DataTableFlatSO
+from .exchanges import Exchange, Format
 
 
 # def in_transaction(relaxed=False):
@@ -28,48 +28,63 @@ def _current_exchange_i(user):
   return this_match, i
 
 
+def _get_participant(match_dict, i):
+  keys = ['present', 'complete', 'late_notified', 'external']
+  participant = {k: match_dict[k][i] for k in keys}
+  participant['user_id'] = match_dict['users'][i].get_id()
+  participant['slider_value'] = match_dict['slider_values'][i]
+  return participant
+#   return Participant(user_id=match_row['users'][i].get_id(), 
+#                      **{k: match_row[k][i] for k in keys})
+
+
 class ExchangeRepository:
-  def __init__(self, user):
+  def get_exchange(self, user_id):
+    from .server_misc import get_user
+    user = get_user(user_id)
     this_match, i = _current_exchange_i(user)
     if this_match:
-      self._user = user
-      self._user_i = i
-      self._exchange = this_match
+      match_dict = dict(this_match)
+      num_participants = len(match_dict['users'])
+#       participants = [_get_participant(match_dict, i)]
+#       for j in range(len(match_dict['users'])):
+#         if j != i:
+#           participants.append(_get_participant(match_dict, j))
+      participants = [_get_participant(match_dict, j) for j in range(num_participants)]
+      return Exchange(exchange_id=this_match.get_id(),
+                      room_code=match_dict['proposal_time']['jitsi_code'],
+                      participants=participants,
+                      start_now=match_dict['proposal_time']['start_now'],
+                      start_dt=match_dict['match_commence'],
+                      exchange_format=Format(match_dict['proposal_time']['duration']),
+                      user_id=user.get_id(),
+                      my_i=i,
+                     )
     else:
       raise(RowMissingError("Current empathy chat not found for this user"))
-      
-  def add_chat(self, message, now):
-    app_tables.chat.add_row(match=self._exchange,
-                            user=self._user,
+
+  @tables.in_transaction(relaxed=True)
+  def save_exchange(self, exchange):
+    """Update participant statuses"""
+    match_row = self._match_row(exchange)
+    keys_to_update = list(exchange.participants[0].keys())
+    keys_to_update.remove('user_id')
+    update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
+    update_dict['slider_values'] = update_dict.pop('slider_value')
+    match_row.update(**update_dict)
+    
+  def add_chat(self, message, now, exchange):
+    match_row = self._match_row(exchange)
+    user = app_tables.users.get_by_id(exchange.my['user_id'])
+    app_tables.chat.add_row(match=match_row,
+                            user=user,
                             message=message,
                             time_stamp=now,
                            )
-
-  def submit_slider(self, value):
-    DataTableFlatSO(self._exchange, 'slider_values')[self._user_i] = value
-    return self.exchange_i()
-    
-  def update_my_external(self, my_external):
-    DataTableFlatSO(self._exchange, 'external')[self._user_i] = my_external
-
-  def complete(self):
-    # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
-    DataTableFlatSO(self._exchange, 'complete')[self._user_i] = 1
-    
-  def mark_present(self):
-    if not self._exchange['present'][self._user_i]:
-      DataTableFlatSO(self._exchange, 'present')[self._user_i] = 1
-
-  def mark_notified(self, other_user):
-    other_i = self._exchange['users'].index(other_user)
-    DataTableFlatSO(self._exchange, 'late_notified')[other_i] = 1
       
-  def exchange_i(self):
-    return self.exchange, self._user_i
+  def get_chat_messages(self, exchange):
+    match_row = self._match_row(exchange)
+    return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=match_row)
   
-  @property
-  def exchange(self):
-    return dict(self._exchange)
-  
-  def chat_messages(self):
-    return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=self._exchange)
+  def _match_row(self, exchange):
+    return app_tables.matches.get_by_id(exchange.exchange_id)
