@@ -12,6 +12,7 @@ from . import invites
 from . import invites_server
 from . import server_misc as sm
 from . import notifies as n
+from . import portable as port
 
 
 def name_mock(user, to_user):
@@ -161,6 +162,7 @@ class InviteTest(unittest.TestCase):
     for test_invite in test_invites:
       test_invite.delete()
 
+      
 class SecondsLeftTest(unittest.TestCase):
   def test_initial_requesting(self):
     self.assertEqual(m._seconds_left("requesting"), p.WAIT_SECONDS)
@@ -178,6 +180,14 @@ class NotifyConnectedTest(unittest.TestCase):
                     )
 
 
+class PortUserTest(unittest.TestCase):
+  def test_from_logged_in(self):
+    port_user = port.User.from_logged_in()
+    user = anvil.users.get_user()
+    self.assertEqual(port_user.user_id, user.get_id())
+    self.assertEqual(port_user.distance, 0)
+    
+    
 @anvil.server.background_task
 def server_auto_tests(verbosity=2):
   #unittest.main(exit=False)

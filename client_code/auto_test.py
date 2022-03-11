@@ -32,14 +32,6 @@ class FullNameTest(unittest.TestCase):
       )
 
       
-class PortUserTest(unittest.TestCase):
-  def test_from_logged_in(self):
-    port_user = port.User.from_logged_in()
-    user = anvil.users.get_user()
-    port_user.user_id = user.get_id()
-    port_user.distance = 0
-      
-      
 class DatetimeFormatTest(unittest.TestCase):
   def test_remove_zeros(self):
     dt = datetime(2021, 1, 1, 1, 1)
