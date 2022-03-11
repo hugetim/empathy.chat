@@ -59,7 +59,7 @@ class MatchForm(MatchFormTemplate):
   def jitsi_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     if self.jitsi_embed:
-      ec.update_my_external(True)
+      ec.ExchangeState.update_my_external(True)
       self.jitsi_embed.remove_from_parent()
       self.jitsi_embed = None
       window.japi.executeCommand('hangup')
@@ -69,7 +69,7 @@ class MatchForm(MatchFormTemplate):
     """This method is called when the button is clicked"""
     self.restore_button.visible = False
     self.add_jitsi_embed()
-    ec.update_my_external(False) 
+    ec.ExchangeState.update_my_external(False) 
       
   def complete_button_click(self, **event_args):
     self.timer_2.interval = 0
@@ -94,7 +94,7 @@ class MatchForm(MatchFormTemplate):
     previous_slider_status = self.item.slider_status
     previous_their_external = self.item.their_external
     previous_their_complete = self.item.their_complete
-    self.item = ec.update_exchange_state(self.item)
+    self.item = ec.ExchangeState.update_exchange_state(self.item)
     self.update_status(prev=previous_status)
     self.slider_panel.update_name(self.item.their_name)
     if previous_slider_status != self.item.slider_status:
@@ -122,7 +122,7 @@ class MatchForm(MatchFormTemplate):
     if prev != self.item.status:
       self.base_status_reset()
       if self.item.status == "matched":
-        ec.update_my_external(not bool(self.jitsi_embed))
+        ec.ExchangeState.update_my_external(not bool(self.jitsi_embed))
       if self.item.status == "pinged":
         self.pinged()
 

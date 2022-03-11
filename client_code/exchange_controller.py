@@ -16,7 +16,7 @@ def slider_value_missing(value):
 
   
 class PendingState(h.AttributeToKey):
-  server_call = 
+  server = anvil.server
   def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value="", jitsi_domain="meet.jit.si", how_empathy_list=None):
     self.status = status
     self.proptime_id = proptime_id
@@ -42,7 +42,7 @@ class PendingState(h.AttributeToKey):
     return "waiting"
 
   def start_exchange(self):
-    state = anvil.server.call('match_commit')
+    state = self.server.call('match_commit')
     self.status = state['status']
 
 
@@ -66,12 +66,12 @@ class ExchangeState(PendingState):
 
   def exit(self):
     if self.status == "matched":
-      anvil.server.call('match_complete')
+      self.server.call('match_complete')
     else:
-      anvil.server.call('cancel_now', self.proptime_id)  
+      self.server.call('cancel_now', self.proptime_id)  
 
   def add_chat_message(self, message):
-    new_match_state = anvil.server.call('add_chat_message', message=message)
+    new_match_state = self.server.call('add_chat_message', message=message)
     for key, value in new_match_state.items():
       setattr(self, key, value)
 
@@ -103,10 +103,10 @@ class ExchangeState(PendingState):
         message['label'] = glob.name if mine else self.their_name
         first_message[mine] = False
 
-  @class_method
+  @classmethod
   def init_exchange(cls, status):
     proptime_id, jitsi_code, duration, my_slider_value = (
-      anvil.server.call('init_match_form')
+      cls.server.call('init_match_form')
     )
     return ExchangeState(status=status,
                         proptime_id=proptime_id,
@@ -115,17 +115,17 @@ class ExchangeState(PendingState):
                         my_slider_value=my_slider_value,
                        )        
 
-  @class_method        
+  @classmethod        
   def update_exchange_state(cls, previous_state):
     state_dict = previous_state.__dict__
-    state_dict.update(anvil.server.call_s('update_match_form'))
+    state_dict.update(cls.server.call_s('update_match_form'))
     return ExchangeState(**state_dict)
 
-  @class_method
+  @classmethod
   def submit_slider(cls, value):
-    return anvil.server.call('submit_slider', value)
+    return cls.server.call('submit_slider', value)
 
-  @class_method
+  @classmethod
   def update_my_external(cls, value):   
-    anvil.server.call_s('update_my_external', value)
+    cls.server.call_s('update_my_external', value)
   
