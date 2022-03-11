@@ -29,7 +29,7 @@ class MatchForm(MatchFormTemplate):
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    self.item = ec.init_pending_exchange(self.item['status'])
+    self.item = ec.ExchangeState.init_exchange(self.item['status'])
     self.my_timer_1.minutes = self.item.default_timer_minutes
     self.set_jitsi_link()
     self.chat_repeating_panel.items = []

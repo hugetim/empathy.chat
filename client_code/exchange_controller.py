@@ -11,23 +11,12 @@ def get_urls():
                                        ])
 
   
-def init_pending_exchange(status):
-  proptime_id, jitsi_code, duration, my_slider_value = (
-    anvil.server.call('init_match_form')
-  )
-  return ExchangeState(status=status,
-                      proptime_id=proptime_id,
-                      jitsi_code=jitsi_code,
-                      duration=duration,
-                      my_slider_value=my_slider_value,
-                     )
-
-
 def slider_value_missing(value):
   return type(value) == str
 
   
 class PendingState(h.AttributeToKey):
+  server_call = 
   def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value="", jitsi_domain="meet.jit.si", how_empathy_list=None):
     self.status = status
     self.proptime_id = proptime_id
@@ -114,17 +103,29 @@ class ExchangeState(PendingState):
         message['label'] = glob.name if mine else self.their_name
         first_message[mine] = False
 
-        
-def update_exchange_state(previous_state):
-  state_dict = previous_state.__dict__
-  state_dict.update(anvil.server.call_s('update_match_form'))
-  return ExchangeState(**state_dict)
+  @class_method
+  def init_exchange(cls, status):
+    proptime_id, jitsi_code, duration, my_slider_value = (
+      anvil.server.call('init_match_form')
+    )
+    return ExchangeState(status=status,
+                        proptime_id=proptime_id,
+                        jitsi_code=jitsi_code,
+                        duration=duration,
+                        my_slider_value=my_slider_value,
+                       )        
 
+  @class_method        
+  def update_exchange_state(cls, previous_state):
+    state_dict = previous_state.__dict__
+    state_dict.update(anvil.server.call_s('update_match_form'))
+    return ExchangeState(**state_dict)
 
-def submit_slider(value):
-  return anvil.server.call('submit_slider', value)
+  @class_method
+  def submit_slider(cls, value):
+    return anvil.server.call('submit_slider', value)
 
-
-def update_my_external(value):   
-  anvil.server.call_s('update_my_external', value)
+  @class_method
+  def update_my_external(cls, value):   
+    anvil.server.call_s('update_my_external', value)
   
