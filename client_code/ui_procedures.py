@@ -18,7 +18,7 @@ def disconnect_flow(user2_id, user2_name, user1_id=""):
     return False
 
       
-def reload(init_dict=None):
+def reload(init_dict=None, do_open=True):
   """Resest app after any potential change to trust_level or prompts"""
   if not init_dict:
     init_dict = get_init()
@@ -27,10 +27,15 @@ def reload(init_dict=None):
   if init_dict['state']['status'] in ["matched", "requesting", "pinged"]:
     from .MenuForm.MatchForm import MatchForm
     item = {k: init_dict['state'][k] for k in MatchForm.state_keys}
-    open_form(MatchForm(item=item))
+    new_form = MatchForm(item=item)
   else:
     from .MenuForm import MenuForm
-    open_form('MenuForm', item=init_dict)
+    new_form = MenuForm(item=init_dict)
+  if do_open:
+    open_form(new_form)
+  else:
+    return new_form
+
 
     
 def get_init():

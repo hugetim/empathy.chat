@@ -25,6 +25,7 @@ class LoginForm(LoginFormTemplate):
     from .. import ui_procedures as ui
     self.init_dict = ui.get_init()
     ui.get_mobile_status()
+    self.new_form = ui.reload(self.init_dict, do_open=False)
     from .. import parameters
     if parameters.DEBUG_MODE:
       self.enter_button_click()
@@ -35,8 +36,7 @@ class LoginForm(LoginFormTemplate):
 
   def enter_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    from .. import ui_procedures as ui
-    ui.reload(self.init_dict)
+    open_form(self.new_form)
     from .. import glob
     if glob.MOBILE and self.init_dict['state']['status'] not in ["matched", "requesting", "pinged"]:
       Notification("empathy.chat works OK on mobile but may be easier on a computer", 
