@@ -66,4 +66,7 @@ class ExchangeControllerTest(unittest.TestCase):
     state = ec.ExchangeState.init_exchange("matched")
     state.their_slider_value = 7
     self.assertEqual(state.slider_status, "received")
-    
+
+  def tearDown(self):
+    import anvil.server
+    ec.ExchangeState.server = anvil.server
