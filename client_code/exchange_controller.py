@@ -1,9 +1,6 @@
-import anvil.server
+import anvil.server as server
 from . import glob
 from . import helper as h
-
-
-server = anvil.server
 
 
 def get_urls():
