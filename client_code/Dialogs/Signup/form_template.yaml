@@ -50,4 +50,11 @@ components:
   layout_properties:
     col_widths: {}
     grid_position: NWKYCI,DMDDPA
+- type: Label
+  properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+    visible: true, text: Your contact info will only be used for purposes directly related to empathy.chat,
+    font_size: 10, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+    italic: false, background: '', bold: false, underline: false, icon: ''}
+  name: label_2
+  layout_properties: {grid_position: 'EXSGYR,AZZAID'}
 is_package: true
