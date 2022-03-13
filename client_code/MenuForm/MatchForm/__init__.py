@@ -59,10 +59,10 @@ class MatchForm(MatchFormTemplate):
   def jitsi_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     if self.jitsi_embed:
-      ec.ExchangeState.update_my_external(True)
-      self.jitsi_embed.remove_from_parent()
-      self.jitsi_embed = None
       window.japi.executeCommand('hangup')
+      self.jitsi_embed.remove_from_parent()
+      self.jitsi_embed = None 
+      ec.ExchangeState.update_my_external(True)
     self.restore_button.visible = True
     
   def restore_button_click(self, **event_args):
