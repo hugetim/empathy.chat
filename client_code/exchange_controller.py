@@ -3,8 +3,11 @@ from . import glob
 from . import helper as h
 
 
+server = anvil.server
+
+
 def get_urls():
-  return anvil.server.call('get_urls', ['nycnvc_feelings_needs',
+  return server.call('get_urls', ['nycnvc_feelings_needs',
                                         'doorbell_mp3',
                                         'doorbell_wav',
                                         'bowl_struck_wav',
@@ -16,7 +19,6 @@ def slider_value_missing(value):
 
   
 class PendingState(h.AttributeToKey):
-  server = anvil.server
   def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value="", jitsi_domain="meet.jit.si", how_empathy_list=None):
     self.status = status
     self.proptime_id = proptime_id
@@ -42,7 +44,7 @@ class PendingState(h.AttributeToKey):
     return "waiting"
 
   def start_exchange(self):
-    state = self.server.call('match_commit')
+    state = server.call('match_commit')
     self.status = state['status']
 
 
@@ -66,12 +68,12 @@ class ExchangeState(PendingState):
 
   def exit(self):
     if self.status == "matched":
-      self.server.call('match_complete')
+      server.call('match_complete')
     else:
-      self.server.call('cancel_now', self.proptime_id)  
+      server.call('cancel_now', self.proptime_id)  
 
   def add_chat_message(self, message):
-    new_match_state = self.server.call('add_chat_message', message=message)
+    new_match_state = server.call('add_chat_message', message=message)
     for key, value in new_match_state.items():
       setattr(self, key, value)
 
@@ -103,10 +105,10 @@ class ExchangeState(PendingState):
         message['label'] = glob.name if mine else self.their_name
         first_message[mine] = False
 
-  @classmethod
-  def init_exchange(cls, status):
+  @staticmethod
+  def init_exchange(status):
     proptime_id, jitsi_code, duration, my_slider_value = (
-      cls.server.call('init_match_form')
+      server.call('init_match_form')
     )
     return ExchangeState(status=status,
                         proptime_id=proptime_id,
@@ -115,17 +117,17 @@ class ExchangeState(PendingState):
                         my_slider_value=my_slider_value,
                        )        
 
-  @classmethod        
-  def update_exchange_state(cls, previous_state):
+  @staticmethod        
+  def update_exchange_state(previous_state):
     state_dict = previous_state.__dict__
-    state_dict.update(cls.server.call_s('update_match_form'))
+    state_dict.update(server.call_s('update_match_form'))
     return ExchangeState(**state_dict)
 
-  @classmethod
-  def submit_slider(cls, value):
-    return cls.server.call('submit_slider', value)
+  @staticmethod
+  def submit_slider(value):
+    return server.call('submit_slider', value)
 
-  @classmethod
-  def update_my_external(cls, value):   
-    cls.server.call_s('update_my_external', value)
+  @staticmethod
+  def update_my_external(value):   
+    server.call_s('update_my_external', value)
   

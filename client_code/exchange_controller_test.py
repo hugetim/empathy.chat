@@ -43,7 +43,7 @@ class ExchangeControllerTest(unittest.TestCase):
 
   def test_slider_status_waiting(self):
     mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, "")})
-    ec.ExchangeState.server = mock_server
+    ec.server = mock_server
     state = ec.ExchangeState.init_exchange("waiting")
     self.assertEqual(state.slider_status, "waiting")
     self.assertFalse(mock_server.call_args['init_match_form'])
@@ -51,7 +51,7 @@ class ExchangeControllerTest(unittest.TestCase):
     
   def test_slider_status_none(self):
     mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, "")})
-    ec.ExchangeState.server = mock_server
+    ec.server = mock_server
     state = ec.ExchangeState.init_exchange("matched")
     self.assertEqual(state.slider_status, None)
     state.their_slider_value = 7
@@ -59,17 +59,17 @@ class ExchangeControllerTest(unittest.TestCase):
    
   def test_slider_status_submitted(self):
     mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, 3)})
-    ec.ExchangeState.server = mock_server
+    ec.server = mock_server
     state = ec.ExchangeState.init_exchange("matched")
     self.assertEqual(state.slider_status, "submitted")
     
   def test_slider_status_received(self):
     mock_server = MockServer(return_values={'init_match_form': ("prop_id", "jitsi_code", 25, 3)})
-    ec.ExchangeState.server = mock_server
+    ec.server = mock_server
     state = ec.ExchangeState.init_exchange("matched")
     state.their_slider_value = 7
     self.assertEqual(state.slider_status, "received")
 
   def tearDown(self):
     import anvil.server
-    ec.ExchangeState.server = anvil.server
+    ec.server = anvil.server
