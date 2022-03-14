@@ -414,8 +414,9 @@ class Proposal():
     new_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(port_prop, self.proposer))
     for other_user in new_all_eligible_users - old_all_eligible_users:
       self._notify_add_to(other_user)
-    for other_user in new_all_eligible_users & old_all_eligible_users:
-      self._notify_edit_to(other_user)
+    if port_prop.times_notify_info != old_port_prop.times_notify_info:
+      for other_user in new_all_eligible_users & old_all_eligible_users:
+        self._notify_edit_to(other_user)
     for other_user in old_all_eligible_users - new_all_eligible_users:
       self._notify_cancel_to(other_user)
 
