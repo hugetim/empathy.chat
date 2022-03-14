@@ -56,13 +56,16 @@ class User(h.AttributeToKey):
     self.starred = starred
 
   def name_item(self):
-    return (self.name, self.user_id)
+    return (self.name, self)
 
   def __str__(self):
     return self.name
   
   def __repr__(self):
     return str(self.__dict__)
+  
+  def __eq__(self, other):
+    return self.user_id == other.user_id
   
   @property
   def distance_str(self):
@@ -78,7 +81,7 @@ class User(h.AttributeToKey):
     
   @staticmethod
   def from_name_item(item):
-    return User(item(1), item(0))
+    return item(1)
   
   @staticmethod
   def from_logged_in():
@@ -317,7 +320,7 @@ class Proposal():
             'min_size': self.min_size,
             'max_size': self.max_size,
             'eligible': self.eligible, 
-            'eligible_users': [port_user.user_id for port_user in self.eligible_users], 
+            'eligible_users': self.eligible_users, 
             'eligible_groups': self.eligible_groups,
             'conflict_checks': conflict_checks,
             'eligible_starred': self.eligible_starred,
@@ -332,17 +335,12 @@ class Proposal():
   def from_create_form(item):
     first_time = ProposalTime.from_create_form(item)
     alts = [ProposalTime.from_create_form(alt) for alt in item['alt']]
-    non_dash_items = [user_item for user_item in item['user_items']
-                      if user_item != "---"]
-    name_dict = {user_id: name for name, user_id in non_dash_items}
-    eligible_users = [User(user_id=user_id, name=name_dict[user_id])
-                      for user_id in item['eligible_users']]
     return Proposal(prop_id=item.get('prop_id'),
                     times=[first_time] + alts,
                     min_size = item['min_size'],
                     max_size = item['max_size'],
                     eligible=item['eligible'],
-                    eligible_users=eligible_users,
+                    eligible_users=item['eligible_users'],
                     eligible_groups=item['eligible_groups'],
                     eligible_starred=item['eligible_starred'],
                    )

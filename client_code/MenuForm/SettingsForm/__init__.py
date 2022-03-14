@@ -3,7 +3,9 @@ from anvil import *
 import anvil.users
 import anvil.server
 from ... import helper as h
+from ... import portable as port
 from .Phone import Phone
+from ..DashForm.CreateForm.Eligibility import Eligibility
 
 
 class SettingsForm(SettingsFormTemplate):
@@ -11,7 +13,7 @@ class SettingsForm(SettingsFormTemplate):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
     
-    phone, notif_settings = anvil.server.call('get_settings')
+    phone, notif_settings, self.elig_items = anvil.server.call('get_settings')
     #self.init_request_em_opts(re, re_opts, re_st)
     self.phone_form = Phone(item={"phone": phone[2:] if phone else "", # removing "+1" 
                                  })
@@ -27,10 +29,19 @@ class SettingsForm(SettingsFormTemplate):
     if not phone: #order of these lines relative to those above and below matters
       self.essential_flow_panel.visible = False
       self.specific_flow_panel.visible = False
+      self.sms_panel.visible = False
       self.message_drop_down.items = self.message_drop_down.items[1:3]
     self.message_drop_down.selected_value = notif_settings.get('message')
     self.specific_drop_down.items = self.message_drop_down.items
-    self.specific_drop_down.selected_value = notif_settings.get('specific')
+    self.specific_drop_down.selected_value = notif_settings['specific'] if notif_settings.get('specific') else "email"
+    self.update_eligibility_descs()
+    
+  def update_eligibility_descs(self):
+    pseudo_props = {}
+    for medium in ['sms', 'email']:
+      pseudo_props[medium] = port.Proposal(**{k: self.elig_items[medium][k] for k in Eligibility.export_item_keys})
+    self.sms_desc_label.text = pseudo_props['sms'].eligibility_desc
+    self.email_desc_label.text = pseudo_props['email'].eligibility_desc 
     
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
@@ -41,97 +52,21 @@ class SettingsForm(SettingsFormTemplate):
     for notif_type in ['essential', 'message', 'specific']:
       drop_down = getattr(self, notif_type + "_drop_down")
       notif_settings[notif_type] = drop_down.selected_value
-    anvil.server.call('set_notif_settings', notif_settings)
+    anvil.server.call('set_notif_settings', notif_settings, self.elig_items)
+
+  def edit_eligibility_desc(self, medium):
+    self.eligibility_form = Eligibility(item=dict(self.elig_items[medium]))
+    medium_title = medium if medium == "email" else "text/SMS"
+    result = alert(self.eligibility_form, large=True, title=f"Notify me by {medium_title} for requests from:", buttons=[("OK", True), ("Cancel", False)])
+    if result:
+      self.elig_items[medium] = self.eligibility_form.item
+    self.update_eligibility_descs()
+    self.set_notif_settings()
+ 
+  def sms_edit_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.edit_eligibility_desc('sms')
     
-   
-#   def request_em_check_box_change(self, **event_args):
-#     """This method is called when this checkbox is checked or unchecked"""
-#     checked = self.request_em_check_box.checked
-#     self.set_request_em_options(checked)
-#     re_st = anvil.server.call('set_request_em', checked)
-#     self.request_em_set_time = re_st
-
-#   def set_request_em_options(self, checked):
-#     """Update request_em options visibility/enabled."""
-#     if checked:
-#       self.re_radio_button_panel.visible = True
-#       self.re_radio_button_indef.enabled = True
-#       self.re_radio_button_fixed.enabled = True
-#       self.text_box_hours.enabled = self.re_radio_button_fixed.selected
-#     else:
-#       self.re_radio_button_panel.visible = False
-#       self.re_radio_button_indef.enabled = False
-#       self.re_radio_button_fixed.enabled = False
-#       self.text_box_hours.enabled = False
-
-#   def init_request_em_opts(self, re, re_opts, re_st):
-#     """Initialize to saved request_em option values"""
-#     self.pause_hours_update = True
-#     self.request_em_check_box.checked = re
-#     self.request_em_hours = re_opts["hours"]
-#     self.request_em_set_time = re_st
-#     fixed = bool(re_opts["fixed"])
-#     self.re_radio_button_indef.selected = not fixed
-#     self.re_radio_button_fixed.selected = fixed
-#     if self.request_em_check_box.checked and fixed:
-#       hours_left = h.re_hours(self.request_em_hours, 
-#                               self.request_em_set_time)
-#     else:
-#       hours_left = self.request_em_hours
-#     self.set_request_em_options(re)
-#     self.text_box_hours.text = "{:.1f}".format(hours_left)
-#     self.pause_hours_update = False
-
-#   def re_radio_button_indef_clicked(self, **event_args):
-#     fixed = False
-#     self.text_box_hours.enabled = fixed
-#     hours = self.text_box_hours.text
-#     self.request_em_hours = hours
-#     re_st = anvil.server.call('set_request_em_opts', fixed, hours)
-#     self.request_em_set_time = re_st
-    
-#   def re_radio_button_fixed_clicked(self, **event_args):
-#     fixed = True
-#     self.text_box_hours.enabled = fixed
-#     hours = self.text_box_hours.text
-#     self.request_em_hours = hours
-#     re_st = anvil.server.call('set_request_em_opts', fixed, hours)
-#     self.request_em_set_time = re_st
-
-#   def text_box_hours_pressed_enter(self, **event_args):
-#     self.update_hours()
-
-#   def text_box_hours_lost_focus(self, **event_args):
-#     self.update_hours()
-#     self.pause_hours_update = False
-  
-#   def update_hours(self):
-#     hours = self.text_box_hours.text
-#     if hours and hours > 0:
-#       fixed = self.re_radio_button_fixed.selected
-#       self.request_em_hours = hours
-#       re_st = anvil.server.call('set_request_em_opts', fixed, hours)
-#       self.request_em_set_time = re_st
-#     else:
-#       hours_left = h.re_hours(self.request_em_hours, 
-#                               self.request_em_set_time)
-#       self.text_box_hours.text = "{:.1f}".format(hours_left)
-
-#   def text_box_hours_focus(self, **event_args):
-#     self.pause_hours_update = True
-    
-#   def timer_2_tick(self, **event_args):
-#     """This method is called approx. once per 5 seconds"""
-#     if (self.request_em_check_box.checked and self.re_radio_button_fixed.selected
-#         and self.pause_hours_update == False):
-#       hours_left = h.re_hours(self.request_em_hours, 
-#                               self.request_em_set_time)
-#       if hours_left <= 0:
-#         checked = False
-#         self.request_em_check_box.checked = checked
-#         self.set_request_em_options(checked)
-#         self.text_box_hours.text = "{:.1f}".format(self.request_em_hours)
-#         re_st = anvil.server.call_s('set_request_em', checked)
-#         self.request_em_set_time = re_st
-#       else:
-#         self.text_box_hours.text = "{:.1f}".format(hours_left)
+  def email_edit_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.edit_eligibility_desc('email')

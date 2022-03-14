@@ -56,6 +56,9 @@ def _from_name_for_email(name=""):
   return f"empathy.chat (for {name})" if name else "empathy.chat"
 
 
+def _email_unsubscribe(detail='click the pencil button beneath "Email me (otherwise) regarding empathy requests from:", uncheck all boxes, and click "OK"'):
+  return f'To unsubscribe: Login to empathy.chat, go to Settings, {detail}.'
+
 def notify_when(start, user):
   if start:
     start_user_tz = sm.as_user_tz(start, user)
@@ -162,6 +165,8 @@ def _notify_proposal_cancel_by(user, proposal, title, medium):
       text=f'''Dear {_addressee_name(user)},
 
 {content1}
+
+{_email_unsubscribe()}
 ''')
 
     
@@ -200,6 +205,8 @@ def _notify_proposal_by(user, proposal, title, desc, medium):
 {content1}
 
 {content2}
+
+{_email_unsubscribe()}
 ''')
 
     
@@ -218,6 +225,8 @@ def notify_message(user, from_name=""):
       text=f'''Dear {_addressee_name(user)},
 
 {content}
+
+{_email_unsubscribe("and select 'don't notify' in the drop-down next to 'me when someone sends me a message'")}
 '''
     )
 

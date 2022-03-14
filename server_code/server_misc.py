@@ -154,7 +154,11 @@ def init_user_info(user, time_zone):
   user['time_zone'] = time_zone
   user['init_date'] = now()
   if user['trust_level'] is None:
-    user['notif_settings'] = {"essential": "sms", "message": "email", "specific": "email"}
+    user['notif_settings'] = {"essential": "sms",
+                              "message": "email",
+                              "email": {"eligible":1, "eligible_users":[], "eligible_groups":[], "eligible_starred":true},
+                              "sms": {"eligible":0, "eligible_users":[], "eligible_groups":[], "eligible_starred":false},
+                             }
     user['first_name'] = ""
     user['last_name'] = ""
     user['how_empathy'] = ""
@@ -523,28 +527,31 @@ def _emails_equal(a, b):
 @authenticated_callable
 def get_settings(user_id=""):
   """Return user settings displayed on SettingsForm"""
+  from . import groups
   user = get_acting_user(user_id)
-#   re_opts = user['request_em_settings']
-#   if (user['request_em'] == True and re_opts["fixed"]
-#       and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
-#     user['request_em'] = False
-  return (user['phone'], user['notif_settings'])
-
-
-# def _prune_request_em():
-#   """Switch expired request_em to false"""
-#   expired_rem_users = []
-#   for u in app_tables.users.search(request_em=True):
-#     if (u['request_em_settings']['fixed']
-#         and h.re_hours(u['request_em_settings']['hours'], u['request_em_set_time']) <= 0):
-#       u['request_em'] = False
+  item_lists = {}
+  item_lists['user_items'], item_lists['group_items'], item_lists['starred_name_list'] = init_create_form(user_id)
+  notif_settings = dict(user['notif_settings'])
+  elig_items = {}
+  for medium in ['sms', 'email']:
+    elig_items[medium] = notif_settings.pop(medium) if notif_settings.get(medium) else dict(eligible=0, eligible_starred=False, eligible_users=[], eligible_groups=[])
+    elig_items[medium]['eligible_users'] = [get_port_user(get_other_user(u_id), simple=True) for u_id in elig_items[medium]['eligible_users']]
+    eligible_group_rows = [app_tables.groups.get_by_id(g_id) for g_id in elig_items[medium]['eligible_groups']]
+    elig_items[medium]['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id()) for group_row in eligible_group_rows]
+    elig_items[medium].update(item_lists)
+  return (user['phone'], notif_settings, elig_items)
 
 
 @authenticated_callable
 @anvil.tables.in_transaction(relaxed=True)
-def set_notif_settings(notif_settings, user_id=""):
+def set_notif_settings(notif_settings, elig_items, user_id=""):
   print(f"set_notif_settings, {notif_settings}")
+  from . import groups
   user = get_acting_user(user_id)
+  for medium in ['sms', 'email']:
+    notif_settings[medium] = {k: elig_items[medium][k] for k in ['eligible', 'eligible_starred']}
+    notif_settings[medium]['eligible_users'] = [port_user.user_id for port_user in elig_items[medium]['eligible_users']]
+    notif_settings[medium]['eligible_groups'] = [group.group_id for group in elig_items[medium]['eligible_groups']]
   user['notif_settings'] = notif_settings
 
   
@@ -558,30 +565,6 @@ def get_eligibility_specs(user):
       specs[medium]['eligible_users'] = [get_other_user(u_id) for u_id in notif_settings[medium]['eligible_users']]
       specs[medium]['eligible_groups'] = [app_tables.groups.get_by_id(g_id) for g_id in notif_settings[medium]['eligible_groups']]
   return specs
-
-
-# @authenticated_callable
-# @anvil.tables.in_transaction
-# def set_request_em(request_em_checked, user_id=""):
-#   print("set_request_em", request_em_checked)
-#   user = get_acting_user(user_id)
-#   user['request_em'] = request_em_checked
-#   if request_em_checked:
-#     user['request_em_set_time'] = now()
-#   return user['request_em_set_time']
-
-
-# @authenticated_callable
-# @anvil.tables.in_transaction
-# def set_request_em_opts(fixed, hours, user_id=""):
-#   print("set_request_em_opts", fixed, hours)
-#   user = get_acting_user(user_id)
-#   re_opts = user['request_em_settings']
-#   re_opts["fixed"] = int(fixed)
-#   re_opts["hours"] = hours
-#   user['request_em_settings'] = re_opts
-#   user['request_em_set_time'] = now()
-#   return user['request_em_set_time']
 
 
 def _number_already_taken(number):
