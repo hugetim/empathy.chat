@@ -54,7 +54,7 @@ def _update_match_form_already_matched(user_id, exchange, repo):
   changed = not exchange.my['present']
   exchange.my['present'] = 1
   #this_match, i = repo.exchange_i()
-  other_user = sm.get_user(exchange.their['user_id'])
+  other_user = sm.get_user(exchange.their['user_id'], require_auth=False)
   if exchange.late_notify_needed(sm.now()):
     from . import notifies as n
     n.notify_late_for_chat(other_user, exchange.start_dt, [user])
