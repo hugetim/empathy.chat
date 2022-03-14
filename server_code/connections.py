@@ -127,7 +127,7 @@ def distances(user2s, user1, up_to_distance=3):
 @authenticated_callable
 def get_connections(user_id):
   print(f"get_connections, {user_id}")
-  user = sm.get_user(user_id, require_auth=False)
+  user = sm.get_other_user(user_id)
   logged_in_user = anvil.users.get_user()
   is_me = user == logged_in_user
   up_to_degree = 3
@@ -212,7 +212,7 @@ def _invite_status(user2, user1):
 
 def get_relationships(user2, user1_id="", up_to_degree=3):
   """Returns ordered list of dictionaries"""
-  user1 = sm.get_user(user1_id)
+  user1 = sm.get_acting_user(user1_id)
   dset = _get_connections(user1, up_to_degree)
   degree = _degree_from_dset(user2, dset)
   if degree == 0:
@@ -260,7 +260,7 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
 def load_invites(user_id=""):
 #   from . import matcher as m
   from . import invites_server
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   rows = app_tables.invites.search(origin=True, user1=user, current=True)
   out = []
   for row in rows:
@@ -278,7 +278,7 @@ def save_invites(items, user_id=""):
 #   from . import matcher as m
   from . import invites_server
   from . import matcher
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   matcher.propagate_update_needed(user)
   for port_invite in items:
     invites_server.Invite(item).edit_invite()
@@ -312,7 +312,7 @@ def remove_invite_pair(invite, invite_reply, user):
 
   
 def _invited_item_to_row_dict(invited_item, user, distance=1):
-  user2 = app_tables.users.get_by_id(invited_item['inviter_id'])
+  user2 = sm.get_other_user(invited_item['inviter_id'])
   now = sm.now()
   return dict(date=now,
               origin=False,
@@ -377,8 +377,8 @@ def _connected_prompt(invite, invite_reply):
 @authenticated_callable
 @anvil.tables.in_transaction
 def save_relationship(item, user_id=""):
-  user1 = sm.get_user(user_id)
-  user2 = app_tables.users.get_by_id(item['user2_id'])
+  user1 = sm.get_acting_user(user_id)
+  user2 = sm.get_other_user(item['user2_id'])
   row = app_tables.connections.get(user1=user1, user2=user2, current=True)
   row['relationship2to1'] = item['relationship']
   row['date_described'] = sm.now()
@@ -388,10 +388,10 @@ def save_relationship(item, user_id=""):
 @authenticated_callable
 @anvil.tables.in_transaction
 def disconnect(user2_id, user1_id=""):
-  user1 = sm.get_user(user1_id)
+  user1 = sm.get_acting_user(user1_id)
   from . import matcher
   matcher.propagate_update_needed()
-  user2 = app_tables.users.get_by_id(user2_id)
+  user2 = sm.get_other_user(user2_id)
   if user2:
     r1to2 = app_tables.connections.get(user1=user1, user2=user2, current=True)
     r2to1 = app_tables.connections.get(user1=user2, user2=user1, current=True)

@@ -124,7 +124,7 @@ def confirm_wait_helper(user):
 
 @authenticated_callable
 def get_proposals_upcomings(user_id=""):
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   proposals = Proposal.get_port_view_items(user)
   upcomings = _get_upcomings(user)
   return proposals, upcomings
@@ -139,7 +139,7 @@ def propagate_update_needed(user=None):
       
 @authenticated_callable
 def get_state(user_id="", force_refresh=False):
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   saved_state = anvil.server.session.get('state')
   if user['update_needed'] or not saved_state or force_refresh:
     _get_state(user)
@@ -238,7 +238,7 @@ def _cancel_match(user, match_id):
 def cancel_match(match_id, user_id=""):
   """Cancel pending match"""
   print(f"cancel_match, {match_id}, {user_id}")
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
   _cancel_match(user, match_id)
   return _get_state(user)
@@ -251,7 +251,7 @@ def accept_proposal(proptime_id, user_id=""):
   Side effect: update proptime table with acceptance, if available
   """
   print(f"accept_proposal, {proptime_id}, {user_id}")
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   proptime = ProposalTime.get_by_id(proptime_id)
   _accept_proposal(proptime, user)
   propagate_update_needed(user)
@@ -272,7 +272,7 @@ def add_proposal(proposal, link_key="", user_id=""):
   Side effects: Update proposal tables with additions, if valid; match if appropriate
   """
   print(f"add_proposal, {user_id}")
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
   prop_id = _add_proposal(user, proposal, link_key)
   return _get_state(user), prop_id
@@ -314,7 +314,7 @@ def edit_proposal(proposal, user_id=""):
   Side effects: Update proposal tables with revision, if valid; match if appropriate
   """
   print(f"edit_proposal, {user_id}")
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
   prop_id = _edit_proposal(user, proposal)
   return _get_state(user), prop_id
@@ -341,7 +341,7 @@ def _edit_proposal(user, port_prop):
 def cancel_time(proptime_id, user_id=""):
   """Remove proptime"""
   print(f"cancel_time, {proptime_id}, {user_id}")
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
   proptime = ProposalTime.get_by_id(proptime_id)
   port_prop = proptime.proposal.portable(user)
@@ -376,7 +376,7 @@ def _cancel_in_transaction(user, proptime_id=None):
 def cancel_accept(proptime_id=None, user_id=""):
   """Remove user accepting"""
   print(f"cancel_accept, {proptime_id}, {user_id}")
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
   _cancel_in_transaction(user, proptime_id)
   return _get_state(user)
@@ -386,7 +386,7 @@ def cancel_accept(proptime_id=None, user_id=""):
 def cancel_now(proptime_id=None, user_id=""):
   """Remove proptime and cancel pending match (if applicable)"""
   print(f"cancel_now, {proptime_id}, {user_id}")
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   if proptime_id:
     proptime = ProposalTime.get_by_id(proptime_id)
     if proptime:
@@ -419,7 +419,7 @@ def _cancel_other(user, proptime_id=None):
 #   cancel match (if applicable)--and cancel their request
 #   """
 #   print(f"cancel_other, {proptime_id}, {user_id}")
-#   user = sm.get_user(user_id)
+#   user = sm.get_acting_user(user_id)
 #   propagate_update_needed()
 #   _cancel_other_in_transaction(user, proptime_id)
 #   return _get_state(user)
@@ -431,7 +431,7 @@ def match_commit(proptime_id=None, user_id=""):
   Should not cause error if already commenced
   """
   print(f"match_commit, {proptime_id}, {user_id}")
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
   _match_commit_in_transaction(user, proptime_id)
   return _get_state(user)

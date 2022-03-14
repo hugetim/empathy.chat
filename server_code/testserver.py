@@ -29,7 +29,7 @@ def test_add_user(em, level=1):
 def test_add_request(user_id, port_prop):
   print("test_add_request", user_id)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
-    user = app_tables.users.get_by_id(user_id)
+    user = sm.get_acting_user(user_id)
     matcher.propagate_update_needed()
     prop_id = matcher._add_proposal(user, port_prop)
     new_prop = matcher.Proposal.get_by_id(prop_id)
@@ -48,7 +48,7 @@ def create_tests_record():
 def add_now_proposal():
   print("add_now_proposal")
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
-    tester = sm.get_user()
+    tester = sm.get_acting_user()
     matcher.propagate_update_needed()
     anvil.server.call('add_proposal', portable.Proposal(times=[portable.ProposalTime(start_now=True)]), user_id=tester.get_id())
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
@@ -60,7 +60,7 @@ def add_now_proposal():
 def accept_now_proposal(user_id):
   print("accept_now_proposal", user_id)
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
-    tester = sm.get_user()
+    tester = sm.get_acting_user()
     matcher.propagate_update_needed()
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
     if tester_now_proptime:

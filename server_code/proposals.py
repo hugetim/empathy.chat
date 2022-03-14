@@ -398,7 +398,7 @@ class Proposal():
     self['eligible'] = port_prop.eligible
     if self.proposer['trust_level'] < 3:
       self['eligible'] = min(2, self['eligible'])
-    self['eligible_users'] = [app_tables.users.get_by_id(port_user.user_id)
+    self['eligible_users'] = [sm.get_other_user(port_user.user_id)
                               for port_user in port_prop.eligible_users]
     self['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
                                for port_group in port_prop.eligible_groups]
@@ -445,7 +445,7 @@ class Proposal():
   @staticmethod
   def add(user, port_prop):
     now = sm.now()
-    user_rows = [app_tables.users.get_by_id(port_user.user_id) for port_user in port_prop.eligible_users]
+    user_rows = [sm.get_other_user(port_user.user_id) for port_user in port_prop.eligible_users]
     group_rows = [app_tables.groups.get_by_id(port_group.group_id) for port_group in port_prop.eligible_groups]
     new_prop_row = app_tables.proposals.add_row(user=user,
                                                 current=True,

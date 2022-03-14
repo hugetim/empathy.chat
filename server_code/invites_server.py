@@ -65,7 +65,7 @@ class Invite(invites.Invite):
   
   def add(self, user_id=""):
     """Side effect: Add invites row"""
-    user = sm.get_user(user_id)
+    user = sm.get_acting_user(user_id)
     self.inviter = user
     errors = self.invalid_invite()
     if self.invitee:
@@ -230,7 +230,7 @@ class Invite(invites.Invite):
 
   def respond(self, user_id=""):
     """Returns list of error strings"""
-    user = sm.get_user(user_id)
+    user = sm.get_acting_user(user_id)
     invite_row, errors = self._invite_row()
     if user:
       errors += self._try_adding_invitee(user, invite_row)

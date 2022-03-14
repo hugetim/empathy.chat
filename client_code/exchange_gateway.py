@@ -40,8 +40,8 @@ def _get_participant(match_dict, i):
 
 class ExchangeRepository:
   def get_exchange(self, user_id):
-    from .server_misc import get_user
-    user = get_user(user_id)
+    from .server_misc import get_acting_user
+    user = get_acting_user(user_id)
     this_match, i = _current_exchange_i(user)
     if this_match:
       match_dict = dict(this_match)

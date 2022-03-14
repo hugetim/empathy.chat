@@ -55,7 +55,7 @@ class MyGroups(sm.ServerItem, groups.MyGroups):
     return port  
     
   def load(self, user_id=""):
-    user = sm.get_user(user_id)
+    user = sm.get_acting_user(user_id)
     rows = app_tables.groups.search(hosts=[user], current=True)
     self._groups = [MyGroup.from_group_row(row) for row in rows]
     
@@ -63,7 +63,7 @@ class MyGroups(sm.ServerItem, groups.MyGroups):
     self.names_taken = [row['name'] for row in app_tables.groups.search(current=True)]
 
   def add(self, user_id=""):
-    user = sm.get_user(user_id)
+    user = sm.get_acting_user(user_id)
     new_row = app_tables.groups.add_row(hosts=[user],
                                         created=sm.now(),
                                         name="",
@@ -90,11 +90,11 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
     return app_tables.groups.get_by_id(self.group_id) if self.group_id else None
   
   def save_settings(self, user_id=""):
-    user = sm.get_user(user_id)
+    user = sm.get_acting_user(user_id)
     self.group_row['name'] = self.name
     
   def delete(self, user_id=""):
-    user = sm.get_user(user_id)
+    user = sm.get_acting_user(user_id)
     self.group_row.delete()
 
   def create_invite(self):
@@ -205,7 +205,7 @@ class Invite(sm.ServerItem, groups.Invite):
       
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):
-    user = sm.get_user(user_id)
+    user = sm.get_acting_user(user_id)
     port_invite = groups.Invite(link_key=invite_row['link_key'],
                                 invite_id=invite_row.get_id(),
                                 expire_date=sm.as_user_tz(invite_row['expire_date'], user),

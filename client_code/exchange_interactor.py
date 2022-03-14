@@ -17,14 +17,14 @@ def _init_match_form_already_matched(user_id, repo):
   exchange = repo.get_exchange(user_id)
   exchange.my['present'] = 1
   repo.save_exchange(exchange)
-  other_user = sm.get_user(exchange.their['user_id'])
+  other_user = sm.get_other_user(exchange.their['user_id'])
   other_user['update_needed'] = True
   return None, exchange.room_code, exchange.exchange_format.duration, exchange.my['slider_value']
 
 
 def _init_match_form_not_matched(user_id):
   from .proposals import ProposalTime
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   current_proptime = ProposalTime.get_now(user)
   if current_proptime:
     return _init_match_form_requesting(current_proptime)
@@ -50,11 +50,11 @@ def update_match_form(user_id, repo):
   
 
 def _update_match_form_already_matched(user_id, exchange, repo):
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   changed = not exchange.my['present']
   exchange.my['present'] = 1
   #this_match, i = repo.exchange_i()
-  other_user = sm.get_user(exchange.their['user_id'], require_auth=False)
+  other_user = sm.get_other_user(exchange.their['user_id'])
   if exchange.late_notify_needed(sm.now()):
     from . import notifies as n
     n.notify_late_for_chat(other_user, exchange.start_dt, [user])
@@ -83,7 +83,7 @@ def _update_match_form_already_matched(user_id, exchange, repo):
   
 def _update_match_form_not_matched(user_id):
   from . import matcher
-  user = sm.get_user(user_id)
+  user = sm.get_acting_user(user_id)
   matcher.confirm_wait_helper(user)
   partial_state = matcher.get_status_in_transaction(user)
   matcher.propagate_update_needed(user)

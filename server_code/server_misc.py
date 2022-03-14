@@ -50,18 +50,22 @@ def remove_user(user):
     user['enabled'] = False
 
     
-def get_user(user_id="", require_auth=True):
+def get_acting_user(user_id="", require_auth=True):
   if DEBUG:
-    print("get_user", user_id)
+    print("get_acting_user", user_id)
   logged_in_user = anvil.users.get_user()
   if user_id == "" or (logged_in_user and logged_in_user.get_id() == user_id):
     return logged_in_user
   elif (require_auth and (not logged_in_user or logged_in_user['trust_level'] < TEST_TRUST_LEVEL)):
     raise RuntimeError("User not authorized to access this information")
   else:
-    return app_tables.users.get_by_id(user_id)
+    return get_other_user(user_id)
 
-  
+
+def get_other_user(user_id):
+  return app_tables.users.get_by_id(user_id)
+
+
 @anvil.server.callable
 def report_error(err_repr, app_info_dict):
   from . import notifies as n
@@ -217,7 +221,7 @@ def name(user, to_user=None, distance=None):
 @authenticated_callable
 def get_port_user(user2, distance=None, user1_id="", simple=False):
   if user2:
-    user1 = get_user(user1_id)
+    user1 = get_acting_user(user1_id)
     if user1 == user2:
       distance = 0
     _name = name(user2, user1 if user1_id else None, distance)
@@ -238,14 +242,14 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
 @authenticated_callable
 def get_port_user_full(user2, user1_id="", distance=None, degree=None, common_group_names=None):
   from . import connections as c
-  user1 = get_user(user1_id)
+  user1 = get_acting_user(user1_id)
   return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree), 
                        common_group_names=common_group_names)
 
 
 def get_port_users_full(user2s, user1_id="", up_to_distance=3):
   from . import connections as c
-  user1 = get_user(user1_id)
+  user1 = get_acting_user(user1_id)
   distances = c.distances(user2s, user1, up_to_distance)
   return [get_port_user_full(user2, user1_id, distance=distances[user2], degree=distances[user2]) for user2 in user2s]
  
@@ -254,7 +258,7 @@ def get_port_users_full(user2s, user1_id="", up_to_distance=3):
 def init_create_form(user_id=""):
   from . import connections as c
   from . import groups_server as g
-  user = get_user(user_id)
+  user = get_acting_user(user_id)
   create_user_items, starred_name_list = c.get_create_user_items(user)
   create_group_items = g.get_create_group_items(user)
   return create_user_items, create_group_items, starred_name_list
@@ -319,8 +323,8 @@ def dismiss_prompt(prompt_id):
 
 @authenticated_callable
 def invited_item(inviter_id, user_id=""):
-  user = get_user(user_id)
-  inviter_user = app_tables.users.get_by_id(inviter_id)
+  user = get_acting_user(user_id)
+  inviter_user = get_other_user(inviter_id)
   inviteds = app_tables.invites.search(order_by("date", ascending=False), origin=True, user1=inviter_user, user2=user, current=True)
   return {"inviter": name(inviter_user, to_user=user), "link_key": inviteds[0]['link_key'],
           "inviter_id": inviter_id, "rel": inviteds[0]['relationship2to1']}
@@ -329,8 +333,8 @@ def invited_item(inviter_id, user_id=""):
 @authenticated_callable
 def init_profile(user_id=""):
   from . import connections as c
-  user = get_user(user_id, require_auth=False)
-  record = c.connection_record(user, get_user())
+  user = get_other_user(user_id)
+  record = c.connection_record(user, get_acting_user())
   record.update({'relationships': [] if record['me'] else c.get_relationships(user),
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
@@ -340,7 +344,7 @@ def init_profile(user_id=""):
   
 @authenticated_callable
 def set_seeking_buddy(seeking, user_id=""):
-  user = get_user(user_id)
+  user = get_acting_user(user_id)
   from . import matcher
   matcher.propagate_update_needed(user)
   user['seeking_buddy'] = seeking
@@ -348,7 +352,7 @@ def set_seeking_buddy(seeking, user_id=""):
   
 @authenticated_callable
 def save_name(name_item, user_id=""):
-  user = get_user(user_id)
+  user = get_acting_user(user_id)
   from . import matcher
   matcher.propagate_update_needed(user)
   user['first_name'] = name_item['first']
@@ -357,16 +361,16 @@ def save_name(name_item, user_id=""):
   
 @authenticated_callable
 def save_user_field(item_name, value, user_id=""):
-  user = get_user(user_id)
+  user = get_acting_user(user_id)
   user[item_name] = value
   
   
 @authenticated_callable
 def save_starred(new_starred, user2_id, user_id=""):
-  user = get_user(user_id)
+  user = get_acting_user(user_id)
   from . import matcher
   matcher.propagate_update_needed()
-  user2 = app_tables.users.get_by_id(user2_id)
+  user2 = get_other_user(user2_id)
   _star_row = star_row(user2, user)
   if new_starred and not _star_row:
     app_tables.stars.add_row(user1=user, user2=user2)
@@ -425,8 +429,8 @@ def update_history_form(user2_id, user_id=""):
   """
   Return (iterable of dictionaries with keys: 'me', 'message'), their_value
   """
-  user = get_user(user_id)
-  user2 = app_tables.users.get_by_id(user2_id)
+  user = get_acting_user(user_id)
+  user2 = get_other_user(user2_id)
   return _update_history_form(user2, user)
 
 
@@ -449,8 +453,8 @@ def _update_history_form(user2, user1):
 @authenticated_callable
 def add_message(user2_id, user_id="", message="[blank test message]"):
   print(f"add_message, '[redacted]', {user_id}")
-  user = get_user(user_id)
-  user2 = app_tables.users.get_by_id(user2_id)
+  user = get_acting_user(user_id)
+  user2 = get_other_user(user2_id)
   app_tables.messages.add_row(from_user=user,
                               to_user=user2,
                               message=anvil.secrets.encrypt_with_key("new_key", message),
@@ -516,7 +520,7 @@ def _emails_equal(a, b):
 @authenticated_callable
 def get_settings(user_id=""):
   """Return user settings displayed on SettingsForm"""
-  user = get_user(user_id)
+  user = get_acting_user(user_id)
 #   re_opts = user['request_em_settings']
 #   if (user['request_em'] == True and re_opts["fixed"]
 #       and h.re_hours(re_opts["hours"], user['request_em_set_time']) <= 0):
@@ -537,7 +541,7 @@ def get_settings(user_id=""):
 @anvil.tables.in_transaction(relaxed=True)
 def set_notif_settings(notif_settings, user_id=""):
   print(f"set_notif_settings, {notif_settings}")
-  user = get_user(user_id)
+  user = get_acting_user(user_id)
   user['notif_settings'] = notif_settings
 
 
@@ -545,7 +549,7 @@ def set_notif_settings(notif_settings, user_id=""):
 # @anvil.tables.in_transaction
 # def set_request_em(request_em_checked, user_id=""):
 #   print("set_request_em", request_em_checked)
-#   user = get_user(user_id)
+#   user = get_acting_user(user_id)
 #   user['request_em'] = request_em_checked
 #   if request_em_checked:
 #     user['request_em_set_time'] = now()
@@ -556,7 +560,7 @@ def set_notif_settings(notif_settings, user_id=""):
 # @anvil.tables.in_transaction
 # def set_request_em_opts(fixed, hours, user_id=""):
 #   print("set_request_em_opts", fixed, hours)
-#   user = get_user(user_id)
+#   user = get_acting_user(user_id)
 #   re_opts = user['request_em_settings']
 #   re_opts["fixed"] = int(fixed)
 #   re_opts["hours"] = hours
@@ -574,7 +578,7 @@ def send_verification_sms(number, user_id=""):
   if _number_already_taken(number):
     return "number unavailable"
   else:
-    user = get_user()
+    user = get_acting_user()
     code = random_code(num_chars=6, digits_only=True)
     from . import notifies as n
     error_message = n.send_sms(
@@ -598,7 +602,7 @@ def send_verification_sms(number, user_id=""):
 @anvil.tables.in_transaction
 def check_phone_code(code, user_id=""):
   import datetime
-  user = get_user(user_id)
+  user = get_acting_user(user_id)
   from . import matcher
   matcher.propagate_update_needed()
   # first expunge old codes
