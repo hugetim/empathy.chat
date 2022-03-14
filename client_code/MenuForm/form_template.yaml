@@ -179,7 +179,7 @@ components:
     name: logout_button
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Version 0.6.7, last updated 3/13/2022', font_size: 10,
+      visible: true, text: 'Version 0.6.8, last updated 3/14/2022', font_size: 10,
       font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     layout_properties: {grid_position: 'NMZJYT,IVZQMC'}
@@ -203,8 +203,16 @@ components:
     components:
     - type: Button
       properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Automatic tests, font_size: null, font: '',
+        foreground: '', visible: true, text: Slow server tests, font_size: null, font: '',
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
+      layout_properties: {grid_position: 'NWIGHO,WBHBNG'}
+      name: slowtest_button
+      event_bindings: {click: slowtest_button_click}
+    - type: Button
+      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+        foreground: '', visible: true, text: Auto end-to-end tests, font_size: null,
+        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       layout_properties: {grid_position: 'PANECG,VMUSSI'}
       event_bindings: {click: autotest_butten_click}

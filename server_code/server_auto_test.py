@@ -192,7 +192,16 @@ class PortUserTest(unittest.TestCase):
 def server_auto_tests(verbosity=2):
   #unittest.main(exit=False)
   import sys
-  test_modules = ['exchange_test']#, 'auto_test', 'server_auto_test']
+  test_modules = ['exchange_test', 'auto_test']#, 'server_auto_test']
   test = unittest.TestLoader().loadTestsFromNames(test_modules)
   unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity).run(test)
-    
+
+  
+@sm.authenticated_callable
+def slow_tests(verbosity=2):
+  #unittest.main(exit=False)
+  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
+    import sys
+    test_modules = ['server_auto_test']
+    test = unittest.TestLoader().loadTestsFromNames(test_modules)
+    unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity).run(test)

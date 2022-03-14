@@ -228,3 +228,6 @@ class MenuForm(MenuFormTemplate):
     """This method is called when the button is clicked"""
     auto_test.run_now_test()
 
+  def slowtest_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    anvil.server.call('slow_tests')
