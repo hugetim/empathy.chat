@@ -96,10 +96,10 @@ def ping(user, start, duration):
 
   
 def notify_match_cancel(user, start, canceler_name=""):
-  """Notify canceled-on user"""
+  """Notify cancelled-on user"""
   print(f"'notify_match_cancel', {start}, {canceler_name}")
-  subject = "empathy.chat - upcoming match canceled"
-  content = f"{_other_name(canceler_name)} has canceled your empathy chat, previously scheduled to start {notify_when(start, user)}."
+  subject = "empathy.chat - upcoming match cancelled"
+  content = f"{_other_name(canceler_name)} has cancelled your empathy chat, previously scheduled to start {notify_when(start, user)}."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     send_sms(user['phone'], f"{subject}: {content}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
@@ -151,7 +151,7 @@ def _notify_proposal_cancel_by(user, proposal, title, medium):
   from .proposals import ProposalTime
   proposer_name = sm.name(proposal.proposer, to_user=user)
   subject = f"empathy.chat - {title}"
-  content1 = f"{_other_name(proposer_name)} has canceled their empathy chat request."
+  content1 = f"{_other_name(proposer_name)} has cancelled their empathy chat request."
   if medium == 'sms':
     send_sms(user['phone'], f"empathy.chat: {content1}")
   elif medium == 'email':

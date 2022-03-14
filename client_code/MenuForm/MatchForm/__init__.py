@@ -140,6 +140,8 @@ class MatchForm(MatchFormTemplate):
     if ready:
       this_status = self.item.status
       self.item.start_exchange()
+      if self.item.status == "requesting":
+        Notification("The user who had asked to join has now cancelled their request.", timeout=None, style="warning").show()
       self.update_status(prev=this_status)
     else:
       self.item.exit()
