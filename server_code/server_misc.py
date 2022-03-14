@@ -63,7 +63,10 @@ def get_acting_user(user_id="", require_auth=True):
 
 
 def get_other_user(user_id):
-  return app_tables.users.get_by_id(user_id)
+  if user_id:
+    return app_tables.users.get_by_id(user_id)
+  else:
+    return anvil.users.get_user()
 
 
 @anvil.server.callable
@@ -543,6 +546,18 @@ def set_notif_settings(notif_settings, user_id=""):
   print(f"set_notif_settings, {notif_settings}")
   user = get_acting_user(user_id)
   user['notif_settings'] = notif_settings
+
+  
+def get_eligibility_specs(user):
+  specs = {}
+  notif_settings = user['notif_settings']
+  for medium in ['sms', 'email']:
+    if notif_settings.get(medium):
+      specs[medium] = {k: notif_settings[medium][k] for k in ['eligible', 'eligible_starred']}
+      specs[medium]['user'] = user
+      specs[medium]['eligible_users'] = [get_other_user(u_id) for u_id in notif_settings[medium]['eligible_users']]
+      specs[medium]['eligible_groups'] = [app_tables.groups.get_by_id(g_id) for g_id in notif_settings[medium]['eligible_groups']]
+  return specs
 
 
 # @authenticated_callable

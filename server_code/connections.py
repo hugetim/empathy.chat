@@ -124,6 +124,14 @@ def distances(user2s, user1, up_to_distance=3):
   return _degrees(user2s, user1, up_to_distance)
 
 
+def get_connected_users(user, up_to_degree):
+  dset = _get_connections(user, up_to_degree)
+  c_users = set()
+  for d in range(1, up_to_degree+1):
+    c_users.update(dset[d])
+  return c_users
+
+  
 @authenticated_callable
 def get_connections(user_id):
   print(f"get_connections, {user_id}")

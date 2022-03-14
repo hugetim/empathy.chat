@@ -303,7 +303,7 @@ class Proposal():
       return self.eligible_users[0]
     else:
       return None
-  
+   
   def get_check_items(self):
     items = []
     if self.own:

@@ -348,19 +348,7 @@ class Proposal():
     return self._prop_row['user']
   
   def is_visible(self, user, distance=None):
-    from . import connections as c
-    from . import groups_server as g
-    if distance is None:
-      distance = c.distance(self.proposer, user)
-    if (distance <= self['eligible'] or (user in self['eligible_users'] and distance < port.UNLINKED)):
-      return True
-    elif (self['eligible_starred'] and sm.star_row(user, self.proposer)):
-      return True
-    else:
-      for group in self['eligible_groups']:
-        if user in g.MyGroup.members_from_group_row(group):
-          return True
-      return False
+    return is_eligible(self, user, distance)
 
   def hide_unaccepted_times(self):
     for proptime in ProposalTime.times_from_proposal(self, require_current=True):
@@ -416,32 +404,34 @@ class Proposal():
         ProposalTime.add(proposal=self, port_time=port_time)
 
   def notify_add(self):
-    users_notified = self.notify_add_specific()
-    
-  def notify_add_specific(self):
-    specific_user = self.specific_user_eligible
-    if specific_user:
-      n.notify_proposal(specific_user, self, f"specific empathy request", " has directed an empathy chat request specifically to you:")
-    return {specific_user}
-
+#     keys_needed = ['user', 'eligible', 'eligible_users', 'eligible_starred', 'eligible_groups']
+#     anvil.server.launch_background_task('notify_add', {k: self[k] for k in keys_needed})
+    for other_user in all_eligible_users(self):
+      self._notify_add_to(other_user)
+   
   def notify_edit(self, port_prop, old_port_prop):
-    old_specific_port_user = old_port_prop.specific_user_eligible
-    if old_specific_port_user:
-      old_specific_user = old_specific_port_user.s_user
-      old_specific_still_eligible = self.is_visible(old_specific_user) 
-      if old_specific_still_eligible and port_prop.times_notify_info != old_port_prop.times_notify_info:
-        n.notify_proposal(old_specific_user, self, "specific empathy request", " has changed their empathy chat request to:")
-      elif not old_specific_still_eligible:
-        n.notify_proposal_cancel(old_specific_user, self, "specific empathy request")
-        self.notify_add_specific()
-    else:
-      self.notify_add_specific()
+    old_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(old_port_prop, self.proposer))
+    new_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(port_prop, self.proposer))
+    for other_user in new_all_eligible_users - old_all_eligible_users:
+      self._notify_add_to(other_user)
+    for other_user in new_all_eligible_users & old_all_eligible_users:
+      self._notify_edit_to(other_user)
+    for other_user in old_all_eligible_users - new_all_eligible_users:
+      self._notify_cancel_to(other_user)
 
   def notify_cancel(self):
-    specific_user = self.specific_user_eligible
-    if specific_user:
-      n.notify_proposal_cancel(specific_user, self, "specific empathy request")
-      
+    for other_user in all_eligible_users(self):
+      self._notify_cancel_to(other_user)
+ 
+  def _notify_add_to(self, other_user):
+    n.notify_proposal(other_user, self, f"empathy request", " has requested an empathy chat:")
+
+  def _notify_edit_to(self, other_user):
+    n.notify_proposal(other_user, self, "empathy request", " has changed their empathy chat request to:")
+    
+  def _notify_cancel_to(self, other_user):
+    n.notify_proposal_cancel(other_user, self, "empathy request")
+
   @staticmethod
   def add(user, port_prop):
     now = sm.now()
@@ -518,3 +508,46 @@ class Proposal():
       proposals_to_check.add(proptime.proposal)
     for proposal in proposals_to_check:
       proposal.cancel_if_no_times()
+
+      
+def get_eligibility_spec_from_port(port_prop, proposer):
+    spec = {}
+    spec['user'] = proposer
+    spec['eligible'] = port_prop.eligible
+    spec['eligible_starred'] = port_prop.eligible_starred
+    spec['eligible_users'] = [port_user.s_user for port_user in port_prop.eligible_users]
+    spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
+                               for port_group in port_prop.eligible_groups]
+    return spec
+  
+      
+def is_eligible(eligibility_spec, other_user, distance=None):
+  from . import connections as c
+  from . import groups_server as g
+  if distance is None:
+    distance = c.distance(eligibility_spec['user'], other_user)
+  if (distance <= eligibility_spec['eligible'] or (other_user in eligibility_spec['eligible_users'] and distance < port.UNLINKED)):
+    return True
+  elif (eligibility_spec['eligible_starred'] and sm.star_row(other_user, eligibility_spec['user'])):
+    return True
+  else:
+    for group in eligibility_spec['eligible_groups']:
+      if other_user in g.MyGroup.members_from_group_row(group):
+        return True
+    return False
+  
+  
+def all_eligible_users(eligibility_spec):
+  from . import connections as c
+  from . import groups_server as g
+  user = eligibility_spec['user']
+  all_eligible = set()
+  if eligibility_spec['eligible']:
+    all_eligible.update(set(c.get_connected_users(user, up_to_degree=eligibility_spec['eligible'])))
+  if eligibility_spec['eligible_starred']:
+    all_eligible.update(set(sm.starred_users(user)))
+  if eligibility_spec['eligible_users']:
+    all_eligible.update(set(eligibility_spec['eligible_users']))
+  for group in eligibility_spec['eligible_groups']:
+    all_eligible.update(set(g.MyGroup.members_from_group_row(group)))
+  return all_eligible
