@@ -2,7 +2,7 @@ dependencies:
 - app_id: MFQJNLWQIOGGXL4W
   version: {dev: false}
 - app_id: C6ZZPAPN4YYF5NVJ
-  version: {version_tag: v1.9.0}
+  version: {version_tag: v2.0.0}
 - app_id: WAF7GWYZ3PTOPDNF
   version: {dev: false}
 - app_id: TCL6O5RVEDFRHRMV
