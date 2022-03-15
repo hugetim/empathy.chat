@@ -155,7 +155,7 @@ def get_create_group_items(user):
   items = []
   for g in user_groups(user):
     host = g['hosts'][0]
-    subtext = f"host: {'me' if host == user else sm.name(host, to_user=user)}"
+    subtext = f"(host: {'me' if host == user else sm.name(host, to_user=user)})"
     items.append(dict(key=g['name'], value=groups.Group(g['name'], g.get_id()), subtext=subtext))
   return sorted(items, key=lambda item:(item['subtext'] + item['key']))
   
