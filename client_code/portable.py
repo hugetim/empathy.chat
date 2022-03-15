@@ -55,9 +55,6 @@ class User(h.AttributeToKey):
     self.seeking = seeking
     self.starred = starred
 
-  def name_item(self):
-    return (self.name, self)
-
   def __str__(self):
     return self.name
   
@@ -78,10 +75,10 @@ class User(h.AttributeToKey):
   def toggle_starred(self):
     self.starred = not self.starred
     return anvil.server.call('save_starred', self.starred, self.user_id)
-    
+
   @staticmethod
   def from_name_item(item):
-    return item(1)
+    return item['value']
   
   @staticmethod
   def from_logged_in():
@@ -114,7 +111,10 @@ class UserFull(User):
     self.trust_level = trust_level
     self.trust_label = trust_label
     self.common_group_names = common_group_names if common_group_names else []
-    
+
+  def name_item(self):
+    return dict(key=self.name, value=self, subtext=self.distance_str_or_groups, title=self.first if self.first else self.name)
+      
   @property
   def distance_str_or_groups(self):
     d_str = self.distance_str

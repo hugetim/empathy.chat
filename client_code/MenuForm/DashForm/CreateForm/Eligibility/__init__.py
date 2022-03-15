@@ -35,7 +35,7 @@ class Eligibility(EligibilityTemplate):
   def init(self):
     self.specific_users_check_box.checked = self.item['eligible_users']
     if not self.item['eligible_users'] and len(self.item['user_items']) == 1:
-      self.user_multi_select_drop_down.selected = [self.item['user_items'][0][1]]
+      self.user_multi_select_drop_down.selected = [self.item['user_items'][0]['value']]
     else:
       self.user_multi_select_drop_down.selected = self.item['eligible_users']
     self.starred_check_box.visible = bool(self.item['user_items']) or bool(self.item['group_items'])
@@ -62,7 +62,7 @@ class Eligibility(EligibilityTemplate):
     self.drop_down_eligible.selected_value = self.item['eligible'] if self.item['eligible'] else 1
     self.groups_check_box.checked = self.item['eligible_groups']
     if not self.item['eligible_groups'] and len(self.item['group_items']) == 1:
-      self.group_multi_select_drop_down.selected = [self.item['group_items'][0][1]]
+      self.group_multi_select_drop_down.selected = [self.item['group_items'][0]['value']]
     else:
       self.group_multi_select_drop_down.selected = self.item['eligible_groups']
     self.user_multi_select_drop_down.add_event_handler('change', self.user_multi_select_drop_down_change)

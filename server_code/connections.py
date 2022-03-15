@@ -37,8 +37,8 @@ def get_create_user_items(user):
   degree_set = [1, 2] if user['trust_level'] >= 3 else [1]
   for degree in degree_set:
     # change to distance=distance(user2, user1) or equivalent once properly implement distance
-    items[degree] = [sm.get_port_user(other, distance=degree).name_item() for other in dset[degree]]
-    items[degree].sort(key=lambda user_item: user_item[0])
+    items[degree] = [sm.get_port_user_full(other, distance=degree, degree=degree).name_item() for other in dset[degree]]
+    items[degree].sort(key=lambda user_item: user_item['key'])
   starred_name_list = [sm.name(u, distance=_degree_from_dset(u, dset)) for u in sm.starred_users(user)]
   if user['trust_level'] >= 3 and items[2]:
     return items[1] + ["---"] + items[2], starred_name_list
