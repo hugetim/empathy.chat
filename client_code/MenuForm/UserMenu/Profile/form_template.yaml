@@ -183,7 +183,7 @@ components:
         name: spacer_1
         layout_properties: {width: 41}
       data_bindings:
-      - {property: visible, code: 'self.item[''degree''] <= 1'}
+      - {property: visible, code: 'self.item[''degree''] <= 2'}
     - type: form:C6ZZPAPN4YYF5NVJ:Switch
       properties: {tooltip: '', enabled: true, foreground: null, text_post: Currently seeking a regular empathy buddy,
         visible: true, font_size: 14, spacing_above: small, checked_color: null, spacing_below: small,

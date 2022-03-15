@@ -31,17 +31,18 @@ def get_create_user_items(user):
   """Return list with 1st---2nd""" # add pending connections to front
   if sm.DEBUG:
     print(f"get_create_user_items, {user['email']}")
-  dset = _get_connections(user, 2)
+  dset = _get_connections(user, 3)
   dset[2] = [other for other in dset[2] if other['trust_level'] >= 3]
+  dset[3] = [other for other in dset[3] if other['trust_level'] >= 3]
   items = {}
-  degree_set = [1, 2] if user['trust_level'] >= 3 else [1]
+  degree_set = [1, 2, 3] if user['trust_level'] >= 3 else [1]
   for degree in degree_set:
     # change to distance=distance(user2, user1) or equivalent once properly implement distance
     items[degree] = [sm.get_port_user_full(other, distance=degree, degree=degree).name_item() for other in dset[degree]]
     items[degree].sort(key=lambda user_item: user_item['key'])
   starred_name_list = [sm.name(u, distance=_degree_from_dset(u, dset)) for u in sm.starred_users(user)]
   if user['trust_level'] >= 3 and items[2]:
-    return items[1] + ["---"] + items[2], starred_name_list
+    return items[1] + items[2] + items[3], starred_name_list
   else:
     return items[1], starred_name_list
 
@@ -148,7 +149,7 @@ def get_connections(user_id):
       c_users.update(dset[d])
     return records + _group_member_records_exclude(logged_in_user, c_users)
   elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
-        and _degree_from_dset(user, dset) > 1):
+        and _degree_from_dset(user, dset) > 2):
     return []
   else:
     dset2 = _get_connections(user, 1)
