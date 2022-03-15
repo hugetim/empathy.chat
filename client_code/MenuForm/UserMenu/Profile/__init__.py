@@ -41,7 +41,7 @@ class Profile(ProfileTemplate):
     
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
-    if self.item['distance'] > 1:
+    if self.item['distance'] > 2:
       get_open_form().content.connections_tab_button.visible = False
     self.update()
     

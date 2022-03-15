@@ -12,15 +12,16 @@ components:
   components:
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: ' [redacted name]''s ', font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: none, italic: true, background: '', bold: false,
-      underline: false, icon: 'fa:link'}
+      visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
+      spacing_below: none, italic: true, background: '', bold: false, underline: false,
+      icon: 'fa:link'}
     name: ellipsis_label
     layout_properties: {grid_position: 'IJEDWE,SXDVPO'}
-    data_bindings: []
+    data_bindings:
+    - {property: text, code: 'self.item[''via''] if self.item[''via''] else ""'}
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: '[redacted relationship description]', font_size: null,
+      visible: true, text: '[introduction/relationship hidden]', font_size: null,
       font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     name: label_1

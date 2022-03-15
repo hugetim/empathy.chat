@@ -36,17 +36,28 @@ def get_create_user_items(user):
   dset[3] = [other for other in dset[3] if other['trust_level'] >= 3]
   items = {}
   degree_set = [1, 2, 3] if user['trust_level'] >= 3 else [1]
+  c_users = set()
   for degree in degree_set:
     # change to distance=distance(user2, user1) or equivalent once properly implement distance
     items[degree] = [sm.get_port_user_full(other, distance=degree, degree=degree).name_item() for other in dset[degree]]
     items[degree].sort(key=lambda user_item: user_item['key'])
-  _group_member_records_exclude(logged_in_user, c_users)
+    c_users.update(dset[degree])
+  group_member_items = _group_member_items_exclude(user, c_users)
+#   if items[1] and group_member_items:
+#     group_member_items = ["---"] + group_member_items
   starred_name_list = [sm.name(u, distance=_degree_from_dset(u, dset)) for u in sm.starred_users(user)]
-  if user['trust_level'] >= 3 and items[2]:
-    return items[1] + items[2] + items[3], starred_name_list
+  if user['trust_level'] >= 3:
+    return items[1] + items[2] + items[3] + group_member_items, starred_name_list
   else:
-    return items[1], starred_name_list
+    return items[1] + group_member_items, starred_name_list
 
+  
+def _group_member_items_exclude(user, excluded_users):
+  fellow_members_to_group_names = _group_members_to_group_names_exclude(user, excluded_users)
+  items = [sm.get_port_user_full(user2, user.get_id(), port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]).name_item()
+           for user2 in fellow_members_to_group_names.keys()]
+  return sorted(items, key = lambda name_item:(name_item['subtext'] + name_item['key']))
+  
 
 def _get_connections(user, up_to_degree=3, cache_override=False):
   """Return dictionary from degree to set of connections"""
@@ -196,14 +207,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
 
 
 def _group_member_records_exclude(user, excluded_users):
-  from . import groups_server as g
-  import collections
-  fellow_members_to_group_names = collections.defaultdict(list)
-  excluded_users.add(user)
-  for group_row in g.user_groups(user):
-    relevant_group_members = set(g.MyGroup.members_from_group_row(group_row, with_trust_level=True)) - excluded_users
-    for user2 in relevant_group_members:
-      fellow_members_to_group_names[user2].append(group_row['name'])
+  fellow_members_to_group_names = _group_members_to_group_names_exclude(user, excluded_users)
   return [sm.get_port_user_full(user2, user.get_id(), port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
           for user2 in fellow_members_to_group_names.keys()]
 
@@ -217,6 +221,7 @@ def _group_members_to_group_names_exclude(user, excluded_users):
     relevant_group_members = set(g.MyGroup.members_from_group_row(group_row, with_trust_level=True)) - excluded_users
     for user2 in relevant_group_members:
       fellow_members_to_group_names[user2].append(group_row['name'])
+  return fellow_members_to_group_names
   
 
 def _invite_status(user2, user1):
@@ -263,7 +268,13 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
       name = sm.name(first, distance=1)
       conn2 = app_tables.connections.get(user1=first, user2=second, current=True)
       conn1 = app_tables.connections.get(user1=user1, user2=first, current=True)
-      out.append({"via": degree > 2,
+      if degree > 3:
+        via = " [name hidden]'s"
+      elif degree > 2:
+        via = f" {sm.name(second, distance=2)}'s "
+      else:
+        via = ""
+      out.append({"via": via,
                   "whose": f"{name}'s", 
                   "desc": conn2['relationship2to1'],
                   "date": conn2['date_described'],

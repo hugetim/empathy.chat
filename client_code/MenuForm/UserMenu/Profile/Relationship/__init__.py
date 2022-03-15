@@ -14,6 +14,7 @@ class Relationship(RelationshipTemplate):
     # Any code you write here will run when the form opens.
     self.row_spacing = 0
     self.update()
+    self.label_1.tooltip = "You can only view your close links' introductions / relationship descriptions."
     if self.item['child']:
       self.child_column_panel.add_component(Relationship(item=self.item['child']))
     else:
