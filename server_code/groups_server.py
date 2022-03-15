@@ -152,9 +152,12 @@ def user_groups(user):
 
 
 def get_create_group_items(user):
-  group_rows = sorted(user_groups(user), key=lambda group_row:group_row['name'])
-  return [dict(key=g['name'], value=groups.Group(g['name'], g.get_id()), subtext=f"host: {sm.name(g['hosts'][0], to_user=user)}")
-          for g in group_rows]
+  items = []
+  for g in user_groups(user):
+    host = g['hosts'][0]
+    subtext = f"host: {'me' if host == user else sm.name(host, to_user=user)}"
+    items.append(dict(key=g['name'], value=groups.Group(g['name'], g.get_id()), subtext=subtext))
+  return sorted(items, key=lambda item:(item['subtext'] + item['key']))
   
 
 class Invite(sm.ServerItem, groups.Invite): 
