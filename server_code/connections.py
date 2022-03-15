@@ -40,6 +40,7 @@ def get_create_user_items(user):
     # change to distance=distance(user2, user1) or equivalent once properly implement distance
     items[degree] = [sm.get_port_user_full(other, distance=degree, degree=degree).name_item() for other in dset[degree]]
     items[degree].sort(key=lambda user_item: user_item['key'])
+  _group_member_records_exclude(logged_in_user, c_users)
   starred_name_list = [sm.name(u, distance=_degree_from_dset(u, dset)) for u in sm.starred_users(user)]
   if user['trust_level'] >= 3 and items[2]:
     return items[1] + items[2] + items[3], starred_name_list
@@ -206,6 +207,17 @@ def _group_member_records_exclude(user, excluded_users):
   return [sm.get_port_user_full(user2, user.get_id(), port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
           for user2 in fellow_members_to_group_names.keys()]
 
+
+def _group_members_to_group_names_exclude(user, excluded_users):
+  from . import groups_server as g
+  import collections
+  fellow_members_to_group_names = collections.defaultdict(list)
+  excluded_users.add(user)
+  for group_row in g.user_groups(user):
+    relevant_group_members = set(g.MyGroup.members_from_group_row(group_row, with_trust_level=True)) - excluded_users
+    for user2 in relevant_group_members:
+      fellow_members_to_group_names[user2].append(group_row['name'])
+  
 
 def _invite_status(user2, user1):
   invites = app_tables.invites.search(user1=user1, user2=user2, origin=True, current=True)
