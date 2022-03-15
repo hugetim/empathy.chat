@@ -16,6 +16,7 @@ class Eligibility(EligibilityTemplate):
   
   def __init__(self, item, **properties):
     # Set Form properties and Data Bindings.
+    print(properties)
     self.trust_level = glob.trust_level
     if not item.get('user_items'):
       user_items, group_items, starred_name_list = anvil.server.call('init_create_form')

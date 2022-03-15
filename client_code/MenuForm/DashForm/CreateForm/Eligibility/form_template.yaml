@@ -26,9 +26,9 @@ components:
       layout_properties: {}
       event_bindings: {change: specific_users_check_box_change}
     - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
-      properties: {align: full, enable_filtering: null, placeholder: None Selected,
-        enabled: true, items: null, visible: true, spacing_above: small, spacing_below: small,
-        multiple: true}
+      properties: {align: full, enable_filtering: true, placeholder: None Selected,
+        enabled: true, enable_select_all: false, items: null, visible: true, spacing_above: small,
+        spacing_below: small, multiple: true}
       name: user_multi_select_drop_down
       layout_properties: {grid_position: 'ZOGPKZ,GNUIJB PGYIAA,VZADMQ', full_width_row: false,
         expand: true, width: null}
@@ -99,9 +99,9 @@ components:
     layout_properties: {grid_position: 'AXLKKX,QXOJGY'}
     event_bindings: {change: groups_check_box_change}
   - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
-    properties: {align: full, enable_filtering: null, placeholder: None Selected,
-      enabled: true, items: null, visible: true, spacing_above: small, spacing_below: small,
-      multiple: true}
+    properties: {align: full, enable_filtering: false, placeholder: None Selected,
+      enabled: true, enable_select_all: true, items: null, visible: true, spacing_above: small,
+      spacing_below: small, multiple: true}
     name: group_multi_select_drop_down
     layout_properties: {grid_position: 'JWIJWQ,TNFAHU', expand: true, width: null}
     data_bindings:
