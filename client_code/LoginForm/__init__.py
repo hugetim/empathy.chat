@@ -39,8 +39,8 @@ class LoginForm(LoginFormTemplate):
     open_form(self.new_form)
     from .. import glob
     if glob.MOBILE and self.init_dict['state']['status'] not in ["matched", "requesting", "pinged"]:
-      Notification("empathy.chat works OK on mobile but may be easier on a computer", 
-                   timeout=4, style="warning").show()
+      Notification("empathy.chat should work on a mobile device, but some bits function better on a computer.", 
+                   timeout=4, style="info").show()
 
   def timer_1_tick(self, **event_args):
     """Async loading of Rosenberg quote"""

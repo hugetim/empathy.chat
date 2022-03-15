@@ -141,27 +141,38 @@ class MenuForm(MenuFormTemplate):
 
   def home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
+    self.hide_sidebar_mobile()
     self.reset_status(anvil.server.call('get_state'))
     
   def connections_link_click(self, **event_args):
     """This method is called when the link is clicked"""
+    self.hide_sidebar_mobile()
     self.go_connections()  
     
   def groups_link_click(self, **event_args):
     """This method is called when the link is clicked"""
+    self.hide_sidebar_mobile()
     self.go_groups()  
   
   def my_groups_link_click(self, **event_args):
     """This method is called when the link is clicked"""
+    self.hide_sidebar_mobile()
     self.go_my_groups()  
     
   def profile_link_click(self, **event_args):
     """This method is called when the link is clicked"""
+    self.hide_sidebar_mobile()
     self.go_profile()
   
   def settings_link_click(self, **event_args):
     """This method is called when the link is clicked"""
+    self.hide_sidebar_mobile()
     self.go_settings()
+
+  def hide_sidebar_mobile(self):
+    if glob.MOBILE:
+      from anvil.js.window import hideSidebar
+      anvil.js.call(hideSidebar)
     
   def set_test_link(self):
     import random
