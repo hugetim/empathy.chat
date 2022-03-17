@@ -8,6 +8,10 @@ components:
   name: content_panel
   layout_properties: {slot: default}
   components:
+  - type: RichText
+    properties: {}
+    name: rich_text_1
+    layout_properties: {grid_position: 'CQBDSD,YDLVUQ'}
   - type: ColumnPanel
     properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
       wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',

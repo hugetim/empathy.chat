@@ -253,7 +253,7 @@ class ProposalTime():
 class Proposal():
 
   def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
-               eligible=2, eligible_users=[], eligible_groups=[], eligible_starred=True,):
+               eligible=0, eligible_users=[], eligible_groups=[], eligible_starred=True,):
     self.prop_id = prop_id
     self.own = own
     self.user = user # should rename proposer
