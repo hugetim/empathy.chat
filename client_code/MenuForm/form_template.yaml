@@ -179,7 +179,7 @@ components:
     name: logout_button
   - type: Label
     properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Version 0.6.9, last updated 3/15/2022', font_size: 10,
+      visible: true, text: 'Version 0.6.10, last updated 3/17/2022', font_size: 10,
       font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     layout_properties: {grid_position: 'NMZJYT,IVZQMC'}
