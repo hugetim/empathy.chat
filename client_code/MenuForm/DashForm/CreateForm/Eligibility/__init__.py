@@ -38,7 +38,7 @@ class Eligibility(EligibilityTemplate):
       self.user_multi_select_drop_down.selected = [self.item['user_items'][0]['value']]
     else:
       self.user_multi_select_drop_down.selected = self.item['eligible_users']
-    self.starred_check_box.visible = bool(self.item['user_items']) or bool(self.item['group_items'])
+    self.starred_check_box.visible = bool(self.item['user_items'])
     if self.starred_check_box.visible:
       if self.item['starred_name_list']:
         name_list_str = h.series_str(list(self.item['starred_name_list']))
