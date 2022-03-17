@@ -16,7 +16,7 @@ components:
     components:
     - type: RichText
       properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
-        foreground: '', visible: true, font_size: null, content: 'empathy.chat is...
+        foreground: '', visible: false, font_size: null, content: 'empathy.chat is...
 
 
           * a **network** of [NVC](https://www.nycnvc.org/what-is-nonviolent-communication)
@@ -86,7 +86,7 @@ components:
   components:
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: 'theme:White', visible: true, text: '', font_size: null, font: '',
+      foreground: 'theme:White', visible: false, text: '', font_size: null, font: '',
       spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: 'fa:sign-in'}
     name: login_button

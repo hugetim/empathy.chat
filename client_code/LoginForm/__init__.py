@@ -17,6 +17,8 @@ class LoginForm(LoginFormTemplate):
     
   def login_sequence(self):
     if not anvil.users.get_user():
+      self.login_button.visible = True
+      self.rich_text_1.visible = True
       user = anvil.users.login_with_form(show_signup_option=False, allow_cancel=True)
       if user and (not user['init_date']):
         anvil.users.logout()
