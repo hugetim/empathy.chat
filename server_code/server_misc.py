@@ -36,8 +36,8 @@ def initialize_session(time_zone):
 def _init_user(time_zone):
   user = anvil.users.get_user()
   print(user['email'])
-  init_user_info(user, time_zone)
-  trust_level = update_trust_level(user)
+  _init_user_info_transaction(user, time_zone)
+  trust_level = _update_trust_level(user)
   return user, trust_level
 
 
@@ -149,6 +149,10 @@ def _create_user_if_needed_and_return_whether_created(email):
 
 
 @anvil.tables.in_transaction(relaxed=True)
+def _init_user_info_transaction(user, time_zone):
+  return init_user_info(user, time_zone)
+
+
 def init_user_info(user, time_zone):
   """Return trust, initializing info for new users & updating trust_level"""
   user['time_zone'] = time_zone
@@ -168,7 +172,7 @@ def init_user_info(user, time_zone):
 
 
 @anvil.tables.in_transaction
-def update_trust_level(user):
+def _update_trust_level(user):
   """Return trust level based on other info
   
   Side-effect: update user['trust_level']"""
