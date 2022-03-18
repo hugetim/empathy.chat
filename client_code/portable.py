@@ -86,7 +86,7 @@ class User(h.AttributeToKey):
     distance = 0
     return User(user_id=logged_in_user.get_id(), 
                 name=full_name(logged_in_user['first_name'], logged_in_user['last_name'], distance=distance),
-                confirmed_url=bool(logged_in_user['confirmed_url']),
+                confirmed_url=logged_in_user['confirmed_url'],
                 distance=0,
                 seeking=logged_in_user['seeking_buddy'],
                 starred=None,
