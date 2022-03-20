@@ -160,8 +160,8 @@ def init_user_info(user, time_zone=""):
   if user['trust_level'] is None:
     user['notif_settings'] = {"essential": "sms",
                               "message": "email",
-                              "email": {"eligible":1, "eligible_users":[], "eligible_groups":[], "eligible_starred":true},
-                              "sms": {"eligible":0, "eligible_users":[], "eligible_groups":[], "eligible_starred":false},
+                              "email": {"eligible": 1, "eligible_users": [], "eligible_groups": [], "eligible_starred": True},
+                              "sms": {"eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False},
                              }
     user['first_name'] = ""
     user['last_name'] = ""

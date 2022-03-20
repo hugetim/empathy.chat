@@ -30,6 +30,7 @@ class SettingsForm(SettingsFormTemplate):
       self.essential_flow_panel.visible = False
       self.specific_flow_panel.visible = False
       self.sms_panel.visible = False
+      self.email_label.text = "Email me regarding empathy requests from: "
       self.message_drop_down.items = self.message_drop_down.items[1:3]
     self.message_drop_down.selected_value = notif_settings.get('message')
     self.specific_drop_down.items = self.message_drop_down.items
