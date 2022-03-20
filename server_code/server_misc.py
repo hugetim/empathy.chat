@@ -153,7 +153,7 @@ def _init_user_info_transaction(user, time_zone):
   return init_user_info(user, time_zone)
 
 
-def init_user_info(user, time_zone):
+def init_user_info(user, time_zone=""):
   """Return trust, initializing info for new users & updating trust_level"""
   user['time_zone'] = time_zone
   user['init_date'] = now()
