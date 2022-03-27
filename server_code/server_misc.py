@@ -613,6 +613,7 @@ def check_phone_code(code, user_id=""):
     if _now - code_row['date'] > datetime.timedelta(minutes=10):
       code_row.delete()
   current_code_rows = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone")
+  any_failed = False
   if len(current_code_rows) > 0:
     latest_code_row = current_code_rows[0]
     code_matches = code == latest_code_row['code']
