@@ -3,12 +3,21 @@ import anvil
 
 
 def error_handler(err):
-  app_info_dict = {'id': anvil.app.id,
-                   'branch': anvil.app.branch,
-                   'environment.name': anvil.app.environment.name,
-                  }
-  anvil.server.call('report_error', repr(err), app_info_dict)
-  raise(err)
+  if isinstance(err, anvil.server.AppOfflineError):
+    anvil.Notification("Error connecting to the server. If something is not working as expected, please try refreshing this page.",
+                       style="warning", timeout=4).show()
+    try:
+      from . import helper as h
+      h.warning(repr(err))
+    except Exception as err_err:
+      print(f"error_handler ({repr(err)}) warning exception: {repr(err_err)}")
+  else:
+    app_info_dict = {'id': anvil.app.id,
+                     'branch': anvil.app.branch,
+                     'environment.name': anvil.app.environment.name,
+                    }
+    anvil.server.call('report_error', repr(err), app_info_dict)
+    raise(err)
 
 
 anvil.set_default_error_handling(error_handler)

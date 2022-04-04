@@ -142,7 +142,8 @@ def warning(warning_str):
                    'branch': anvil.app.branch,
                    'environment.name': anvil.app.environment.name,
                   }
-  anvil.server.call('warning', warning_str, app_info_dict)
+  print(f"Reporting warning: {warning_str}")
+  anvil.server.call('warning', warning_str, app_info_dict, from_client=True)
 
 
 def my_assert(statement):

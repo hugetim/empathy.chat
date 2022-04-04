@@ -45,7 +45,7 @@ def _init_user(time_zone):
 @anvil.tables.in_transaction(relaxed=True)
 def remove_user(user):
   """Remove new user created via Google sign-in"""
-  h.warning(f"Removing user {user['email']}")
+  warning(f"Removing user {user['email']}")
   if user and (not user['init_date']):
     user['enabled'] = False
 
@@ -89,7 +89,7 @@ def report_error(err_repr, app_info_dict):
 
 
 @anvil.server.callable
-def warning(warning_str, app_info_dict=None):
+def warning(warning_str, app_info_dict=None, from_client=False):
   from . import notifies as n
   admin = app_tables.users.get(email="hugetim@gmail.com")
   current_user = anvil.users.get_user()
@@ -103,7 +103,8 @@ def warning(warning_str, app_info_dict=None):
       app_origin: {anvil.server.get_app_origin()}
       """
     )
-    print(f"Reporting warning: {warning_str}")
+    if not from_client:
+      print(f"Reporting warning: {warning_str}")
     n.email_send(admin, subject="empathy.chat warning", text=content, from_name="empathy.chat error handling")
     
     
