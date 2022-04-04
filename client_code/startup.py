@@ -4,7 +4,7 @@ import anvil
 
 def error_handler(err):
   if isinstance(err, anvil.server.AppOfflineError):
-    anvil.Notification("Server connection error. If something is not working as expected, please try refreshing this page.",
+    anvil.Notification("Server connection error. If something is not working as expected, please refresh the page.",
                        style="warning", timeout=5).show()
     try:
       from . import helper as h
