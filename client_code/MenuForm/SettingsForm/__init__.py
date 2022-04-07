@@ -13,7 +13,7 @@ class SettingsForm(SettingsFormTemplate):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
     
-    phone, notif_settings, self.elig_items = anvil.server.call('get_settings')
+    phone, time_zone, notif_settings, self.elig_items = anvil.server.call('get_settings')
     #self.init_request_em_opts(re, re_opts, re_st)
     self.phone_form = Phone(item={"phone": phone[2:] if phone else "", # removing "+1" 
                                  })
@@ -36,6 +36,7 @@ class SettingsForm(SettingsFormTemplate):
     self.specific_drop_down.items = self.message_drop_down.items
     self.specific_drop_down.selected_value = notif_settings['specific'] if notif_settings.get('specific') else "email"
     self.update_eligibility_descs()
+    self.time_zone_label.text = str(time_zone)
     
   def update_eligibility_descs(self):
     pseudo_props = {}

@@ -1,12 +1,13 @@
 components:
 - type: LinearPanel
-  properties: {}
+  properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
+    border: '', visible: true, role: null, tooltip: ''}
   name: phone_linear_panel
   layout_properties: {grid_position: 'OUXQPZ,GSYNHG'}
   components:
   - type: FlowPanel
     properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
     name: flow_panel_2
     layout_properties: {grid_position: 'KTKKYI,IMCAQV'}
     components:
@@ -86,4 +87,6 @@ components:
 container:
   type: ColumnPanel
   event_bindings: {}
-  properties: {col_widths: '{}'}
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
+    background: ''}
