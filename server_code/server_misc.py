@@ -350,6 +350,7 @@ def init_profile(user_id=""):
   record.update({'relationships': [] if record['me'] else c.get_relationships(user),
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
+                 'profile_updated': user['profile_updated'],
                 })
   return port.UserProfile(**record)
     
@@ -375,6 +376,8 @@ def save_name(name_item, user_id=""):
 def save_user_field(item_name, value, user_id=""):
   user = get_acting_user(user_id)
   user[item_name] = value
+  if item_name == 'profile':
+    user['profile_updated'] = sm.now()
   
   
 @authenticated_callable

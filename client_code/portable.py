@@ -119,15 +119,24 @@ class UserFull(User):
   def distance_str_or_groups(self):
     d_str = self.distance_str
     return d_str if d_str else "\n".join(self.common_group_names)
+  
+  @property
+  def confirmed_date_str(self):
+    return h.short_date_str(h.as_local_tz(self.confirmed_date)) if self.confirmed_date else ""
 
 
 @anvil.server.portable_class
 class UserProfile(UserFull):
-  def __init__(self, relationships=None, how_empathy="", profile="", **kwargs):
+  def __init__(self, relationships=None, how_empathy="", profile="", profile_updated=None, **kwargs):
     super().__init__(**kwargs)
     self.relationships = relationships if relationships else []
     self.how_empathy = how_empathy
     self.profile = profile
+    self.profile_updated_dt = profile_updated
+    
+  @property
+  def profile_updated_date_str(self):
+    return h.short_date_str(h.as_local_tz(self.profile_updated_dt)) if self.profile_updated_dt else ""
     
     
 @anvil.server.portable_class

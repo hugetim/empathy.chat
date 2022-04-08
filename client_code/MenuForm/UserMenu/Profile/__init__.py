@@ -16,9 +16,6 @@ from .Relationship import Relationship
 
 class Profile(ProfileTemplate):
   """item attribute is a port.UserProfile"""
-#   item_keys = {'me', 'user_id', 'first', 'last', 'name', 'degree', 'distance',
-#                'seeking', 'how_empathy', 'profile', 'trust_label', 'status', 'last_active',
-#                'confirmed_url', 'confirmed_date', 'trust_level',}
   trust_tooltip = p.TRUST_TOOLTIP
   
   def __init__(self, user_id="", **properties):
@@ -36,7 +33,11 @@ class Profile(ProfileTemplate):
     if self.item['confirmed_date']:
       self.web_page_link.tooltip = (
         f"{self.item['first']}'s ownership of this web page "
-        f"was confirmed on {h.short_date_str(h.as_local_tz(self.item['confirmed_date']))}."
+        f"was confirmed on {self.item.confirmed_date_str}."
+      )
+    if self.item.profile_updated_dt:
+      self.profile_text_area.tooltip = (
+        f"last updated {self.item.profile_updated_date_str}"
       )
     
   def form_show(self, **event_args):
