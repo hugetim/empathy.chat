@@ -35,10 +35,6 @@ class Profile(ProfileTemplate):
         f"{self.item['first']}'s ownership of this web page "
         f"was confirmed on {self.item.confirmed_date_str}."
       )
-    if self.item.profile_updated_dt:
-      self.profile_text_area.tooltip = (
-        f"last updated {self.item.profile_updated_date_str}"
-      )
     
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
@@ -56,6 +52,10 @@ class Profile(ProfileTemplate):
     name_likes = ("I like" if self.item['me'] 
                   else self.item['first'] + " likes")
     self.how_empathy_label.text = f"How {name_likes} to receive empathy:"
+    if self.item.profile_updated_dt:
+      self.profile_text_area.tooltip = (
+        f"last updated {self.item.profile_updated_date_str}"
+      )
     self.refresh_data_bindings()
 
   def connections_button_click(self, **event_args):
@@ -127,6 +127,7 @@ class Profile(ProfileTemplate):
     if out is True:
       anvil.server.call('save_user_field', 'profile', edit_form.item['text'])
       self.item['profile'] = edit_form.item['text']
+      self.item.profile_updated_dt = h.now()
       self.update()
 
   def propose_button_click(self, **event_args):

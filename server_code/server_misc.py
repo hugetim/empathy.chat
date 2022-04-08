@@ -377,7 +377,7 @@ def save_user_field(item_name, value, user_id=""):
   user = get_acting_user(user_id)
   user[item_name] = value
   if item_name == 'profile':
-    user['profile_updated'] = sm.now()
+    user['profile_updated'] = now()
   
   
 @authenticated_callable
