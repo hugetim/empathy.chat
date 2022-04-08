@@ -253,9 +253,15 @@ db_schema:
     - name: profile
       admin_ui: {width: 124}
       type: string
+    - name: profile_updated
+      admin_ui: {width: 200}
+      type: datetime
     - name: phone
       admin_ui: {width: 200}
       type: string
+    - name: contributor
+      admin_ui: {width: 200}
+      type: bool
     - name: confirmed_url
       admin_ui: {width: 200}
       type: string

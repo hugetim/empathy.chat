@@ -199,7 +199,7 @@ def _update_trust_level(user):
     trust = 2 # Confirmed
   if (trust >= 2 and trust < 3) and matched_with_distance1_member():
     trust = 3 # Member
-  if (trust >= 3 and trust < 4) and user['confirmed_url']:
+  if (trust >= 3 and trust < 4) and user['confirmed_url_date']:
     trust = 4 # Partner
   if not user['trust_level'] or trust > user['trust_level']:
     user['trust_level'] = trust
@@ -242,7 +242,7 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
     else:
       return port.User(user_id=user2.get_id(), 
                        name=_name,
-                       confirmed_url=user2['confirmed_url'],
+                       confirmed_url=user2['confirmed_url'] if user2['confirmed_url_date'] else None,
                        distance=distance,
                        seeking=user2['seeking_buddy'],
                        starred=bool(star_row(user2, user1)) if user2 != user1 else None, #True/False
