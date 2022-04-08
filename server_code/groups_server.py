@@ -21,6 +21,7 @@ def serve_my_groups(port_my_groups, method, kwargs):
     print(f"serve_my_groups: {method}({kwargs}) called on {port_my_groups}")
   else:
     print(f"serve_my_groups: {method}({kwargs})")
+  check_my_group_auth()
   my_groups = MyGroups(port_my_groups)
   my_groups.relay(method, kwargs)
   return my_groups.portable()
@@ -30,11 +31,18 @@ def serve_my_groups(port_my_groups, method, kwargs):
 @anvil.tables.in_transaction
 def serve_my_group(port_my_group, method, kwargs):
   print(f"serve_my_group: {method}({kwargs}) called on {port_my_group}")
+  check_my_group_auth()
   my_group = MyGroup(port_my_group)
   my_group.relay(method, kwargs)
   return my_group.portable()
 
 
+def check_my_group_auth():
+  user = anvil.users.get_user()
+  if not user or user['trust_level'] < 4:
+    raise(anvil.users.AuthenticationFailed("User not authorized to manage own groups."))
+
+    
 @anvil.server.callable
 def serve_group_invite(port_invite, method, kwargs):
   print(f"serve_group_invite: {method}({kwargs}) called on {port_invite}")
