@@ -1,7 +1,7 @@
 components:
 - type: ColumnPanel
   properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{"DGCFZA":93,"ECVXEI":13,"WAVKUR":73,"OYFYEC":10}',
+    wrap_on: mobile, col_spacing: small, spacing_above: none, col_widths: '{"DGCFZA":93,"ECVXEI":13,"WAVKUR":73,"OYFYEC":10}',
     spacing_below: small, background: ''}
   name: column_panel_1
   layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
@@ -240,7 +240,7 @@ components:
   - type: TextArea
     properties: {role: null, align: left, height: 60, tooltip: '', placeholder: '',
       border: '', enabled: false, foreground: '', visible: true, text: '', font_size: null,
-      auto_expand: false, font: '', spacing_above: none, spacing_below: large, italic: false,
+      auto_expand: false, font: '', spacing_above: none, spacing_below: small, italic: false,
       background: '', bold: false, underline: false}
     name: how_empathy_text_area
     layout_properties: {grid_position: 'XDKGUH,DGCFZA'}
@@ -248,7 +248,7 @@ components:
     - {property: text, code: 'self.item[''how_empathy'']', writeback: true}
   - type: Button
     properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
+      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:pencil'}
     name: edit_how_empathy_button
@@ -260,7 +260,7 @@ components:
     event_bindings: {click: edit_how_empathy_button_click}
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Profile:', font_size: null, font: '', spacing_above: medium,
+      visible: true, text: 'Profile:', font_size: null, font: '', spacing_above: large,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
       underline: false, icon: ''}
     name: label_2
@@ -268,7 +268,7 @@ components:
   - type: TextArea
     properties: {role: null, align: left, height: 190, tooltip: '', placeholder: '',
       border: '', enabled: false, foreground: '', visible: true, text: '', font_size: null,
-      auto_expand: false, font: '', spacing_above: none, spacing_below: large, italic: false,
+      auto_expand: false, font: '', spacing_above: none, spacing_below: small, italic: false,
       background: '', bold: false, underline: false}
     name: profile_text_area
     layout_properties:
@@ -278,7 +278,7 @@ components:
     - {property: text, code: 'self.item[''profile'']', writeback: true}
   - type: Button
     properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
+      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:pencil'}
     name: edit_profile_button
@@ -288,6 +288,10 @@ components:
     data_bindings:
     - {property: visible, code: 'self.item[''me'']'}
     event_bindings: {click: edit_profile_button_click}
+  - type: Spacer
+    properties: {height: 32}
+    name: spacer_3
+    layout_properties: {grid_position: 'VXRAXC,YQGAYT'}
 container:
   type: ColumnPanel
   event_bindings: {show: form_show}
