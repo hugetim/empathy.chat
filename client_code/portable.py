@@ -62,7 +62,7 @@ class User(h.AttributeToKey):
     return str(self.__dict__)
   
   def __eq__(self, other):
-    return self.user_id == other.user_id
+    return isinstance(other, User) and self.user_id == other.user_id
   
   @property
   def distance_str(self):
