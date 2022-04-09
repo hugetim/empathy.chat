@@ -17,7 +17,7 @@ class Group(h.AttributeToKey):
     return self.name
 
   def __eq__(self, other):
-    return self.group_id == other.group_id
+    return isinstance(other, Group) and self.group_id == other.group_id
 
   
 @anvil.server.portable_class
