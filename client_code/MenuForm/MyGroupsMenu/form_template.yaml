@@ -8,18 +8,18 @@ components:
   components:
   - type: RichText
     properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
-      foreground: '', visible: true, font_size: null, content: '#### To become an
-        empathy.chat "Partner," eligible to create and host your own groups, there
-        are two requirements:
+      foreground: '', visible: true, font_size: null, content: 'To become an empathy.chat
+        "Partner," eligible to create and host your own groups, there are two requirements:
 
-        > {check_box_1} Use your real first and last name, and provide a link to a
-        reputable web site profile (including a picture) that you can demonstrate
-        ownership of to verify your identity:
+
+        {check_box_1}Use your real first and last name, and provide a link to a reputable
+        web site profile (including a picture) that you can demonstrate ownership
+        of to verify your identity:
 
         {url_panel}
 
 
-        > {check_box_2} Contribute [in some way](https://www.loomio.org/d/CTLG3zqb/ways-to-contribute)
+        {check_box_2}Contribute [in some way](https://www.loomio.org/d/CTLG3zqb/ways-to-contribute)
         to empathy.chat.  {explain}', font: '', spacing_above: small, spacing_below: medium,
       data: null, background: '', format: markdown}
     name: rich_text_1

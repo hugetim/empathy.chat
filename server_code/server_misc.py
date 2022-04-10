@@ -575,6 +575,15 @@ def get_eligibility_specs(user):
   return specs
 
 
+@authenticated_callable
+def get_partner_criteria_info(user_id=""):
+  user = get_acting_user(user_id)
+  return {'contributor': user['contributor'],
+          'confirmed_url': user['confirmed_url'],
+          'confirmed_url_date': user['confirmed_url_date'],
+         }
+  
+
 def _number_already_taken(number):
   return bool(len(app_tables.users.search(phone=number)))
 

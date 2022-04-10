@@ -26,7 +26,7 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
     else:
       self.my_groups_panel.visible = False
       self.populate_partner_criteria_panel()
-      self.self.partner_criteria_panel.visible = True
+      self.partner_criteria_panel.visible = True
 
   @property
   def selected_group(self):
