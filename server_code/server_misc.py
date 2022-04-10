@@ -72,7 +72,8 @@ def get_other_user(user_id):
 @anvil.server.callable
 def report_error(err_repr, app_info_dict):
   from . import notifies as n
-  admin = app_tables.users.get(email="hugetim@gmail.com")
+  from anvil import secrets
+  admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
   current_user = anvil.users.get_user()
   if admin != current_user:
     current_user_email = current_user['email'] if current_user else ""
@@ -91,7 +92,8 @@ def report_error(err_repr, app_info_dict):
 @anvil.server.callable
 def warning(warning_str, app_info_dict=None, from_client=False):
   from . import notifies as n
-  admin = app_tables.users.get(email="hugetim@gmail.com")
+  from anvil import secrets
+  admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
   current_user = anvil.users.get_user()
   if admin != current_user:
     current_user_email = current_user['email'] if current_user else ""
@@ -105,7 +107,7 @@ def warning(warning_str, app_info_dict=None, from_client=False):
     )
     if not from_client:
       print(f"Reporting warning: {warning_str}")
-    n.email_send(admin, subject="empathy.chat warning", text=content, from_name="empathy.chat error handling")
+    n.email_send(admin, subject="empathy.chat warning", text=content, from_name="empathy.chat warning handling")
     
     
 @anvil.server.callable
@@ -582,6 +584,17 @@ def get_partner_criteria_info(user_id=""):
           'confirmed_url': user['confirmed_url'],
           'confirmed_url_date': user['confirmed_url_date'],
          }
+
+
+@authenticated_callable
+def submit_url_for_review(url, user_id=""):
+  from . import notifies as n
+  from anvil import secrets
+  admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
+  user = get_acting_user(user_id)
+  user['confirmed_url'] = url
+  email_text = f"{user['first_name']} {user['last_name']} ({user['email']}): {url}"
+  n.email_send(admin, "Profile confirmation request", email_text)
   
 
 def _number_already_taken(number):

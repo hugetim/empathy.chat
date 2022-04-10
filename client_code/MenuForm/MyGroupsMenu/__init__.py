@@ -89,14 +89,16 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
 
   def populate_partner_criteria_panel(self):
     self.item = anvil.server.call('get_partner_criteria_info')
-    self.identity_check_box.checked = self.item['confirmed_url_date']
+    url_confirmed = self.item['confirmed_url_date']
+    self.identity_check_label.icon = "fa:check-square-o" if url_confirmed else "fa:square-o"
     self.url_text_box.text = self.item['confirmed_url']
-    if self.identity_check_box.checked:
+    if url_confirmed:
+      self.url_text_box.enabled = False
       self.submit_url_button.visible = False
     elif not self.url_text_box.text:
       self.submit_url_button.enabled = False
-    self.contributor_check_box.checked = self.item['contributor']
-    if self.contributor_check_box.checked:
+    self.contributor_check_label.icon = "fa:check-square-o" if self.item['contributor'] else "fa:square-o"
+    if self.item['contributor']:
       self.explain_contribution_link.visible = False
       
   def url_text_box_change(self, **event_args):

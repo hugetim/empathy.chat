@@ -4,6 +4,7 @@ from . import exchange_interactor as ei
 from .exceptions import RowMissingError
 from anvil.tables import app_tables
 from .server_misc import now
+from anvil import secrets
 
 
 # class ExchangeTest(unittest.TestCase):
@@ -17,8 +18,8 @@ from .server_misc import now
 #     an_exchange = Exchange("1234", [], [])
 #     self.assertFalse(an_exchange.my_slider_value())
 
-hugetim_id = app_tables.users.get(email="hugetim@gmail.com").get_id()
-poptibo_id = app_tables.users.get(email="poptibo@yahoo.com").get_id()
+hugetim_id = app_tables.users.get(email=secrets.get_secret('admin_email')).get_id()
+poptibo_id = app_tables.users.get(email=secrets.get_secret('test_user2_email')).get_id()
 
 
 class MockRepo:

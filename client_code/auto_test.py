@@ -134,8 +134,9 @@ class TestNow(): #not unittest.TestCase
     self.top_form.home_link_click()
 
   def test_repeat_now_proposal(self):
+    from anvil import secrets
     for email, user_id in self.top_form.test_requestuser_drop_down.items:
-      if email == "hugetim@alumni.rice.edu":
+      if email == secrets.get_secret('test_user_email'):
         accept_user_id = user_id
     for i in range(2):
       anvil.server.call('add_now_proposal')

@@ -12,29 +12,28 @@ components:
         "Partner," eligible to create and host your own groups, there are two requirements:
 
 
-        {check_box_1}Use your real first and last name, and provide a link to a reputable
+        {check_box_1} Use your real first and last name, and provide a link to a reputable
         web site profile (including a picture) that you can demonstrate ownership
         of to verify your identity:
 
         {url_panel}
 
 
-        {check_box_2}Contribute [in some way](https://www.loomio.org/d/CTLG3zqb/ways-to-contribute)
+        {check_box_2} Contribute [in some way](https://www.loomio.org/d/CTLG3zqb/ways-to-contribute)
         to empathy.chat.  {explain}', font: '', spacing_above: small, spacing_below: medium,
       data: null, background: '', format: markdown}
     name: rich_text_1
     layout_properties: {grid_position: 'METHFR,YNUHZV'}
     components:
     - type: FlowPanel
-      properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: small, spacing_below: none,
-        background: ''}
+      properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
+        foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
       name: flow_panel_2
       layout_properties: {grid_position: 'LPLZKL,JCYJNZ', slot: url_panel}
       components:
       - type: TextBox
-        properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-          border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
+        properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: 'https://',
+          border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14,
           font: '', spacing_above: none, type: url, spacing_below: none, italic: false,
           background: '', bold: false, underline: false}
         name: url_text_box
@@ -42,26 +41,12 @@ components:
         event_bindings: {change: url_text_box_change}
       - type: Button
         properties: {role: primary-color, align: center, tooltip: '', border: '',
-          enabled: true, foreground: '', visible: true, text: submit for review, font_size: null,
-          font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-          background: '', bold: false, underline: false, icon: ''}
+          enabled: true, foreground: '', visible: true, text: submit profile link for review,
+          font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none,
+          italic: false, background: '', bold: false, underline: false, icon: ''}
         name: submit_url_button
         layout_properties: {}
         event_bindings: {click: submit_url_button_click}
-    - type: CheckBox
-      properties: {role: null, align: left, tooltip: '', border: '', enabled: false,
-        foreground: '', allow_indeterminate: false, visible: true, text: '', font_size: null,
-        font: '', spacing_above: none, spacing_below: none, italic: false, background: '',
-        bold: false, checked: false, underline: false}
-      name: identity_check_box
-      layout_properties: {slot: check_box_1}
-    - type: CheckBox
-      properties: {role: null, align: left, tooltip: '', border: '', enabled: false,
-        foreground: '', allow_indeterminate: false, visible: true, text: '', font_size: null,
-        font: '', spacing_above: none, spacing_below: none, italic: false, background: '',
-        bold: false, checked: false, underline: false}
-      name: contributor_check_box
-      layout_properties: {slot: check_box_2}
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: ' (You can click here to explain how you have contributed.)',
@@ -71,6 +56,23 @@ components:
       name: explain_contribution_link
       layout_properties: {grid_position: 'TBTUAE,UYKRBA', slot: explain}
       event_bindings: {click: explain_contribution_link_click}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: '', font_size: 15, font: '', spacing_above: none, icon_align: right,
+        spacing_below: none, italic: false, background: '', bold: false, underline: false,
+        icon: 'fa:square-o'}
+      name: identity_check_label
+      layout_properties: {grid_position: 'IARHXF,HFHMGE', slot: check_box_1}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: '', font_size: 15, font: '', spacing_above: none, icon_align: right,
+        spacing_below: none, italic: false, background: '', bold: false, underline: false,
+        icon: 'fa:square-o'}
+      name: contributor_check_label
+      layout_properties:
+        col_widths: {}
+        grid_position: GKPKSH,AQAXDZ
+        slot: check_box_2
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
     wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
@@ -164,6 +166,8 @@ components:
     components: []
 container:
   type: ColumnPanel
-  properties: {col_widths: '{}'}
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
+    spacing_below: small, background: ''}
   event_bindings: {}
 is_package: true
