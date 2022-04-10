@@ -199,7 +199,7 @@ def _update_trust_level(user):
     trust = 2 # Confirmed
   if (trust >= 2 and trust < 3) and matched_with_distance1_member():
     trust = 3 # Member
-  if (trust >= 3 and trust < 4) and user['confirmed_url_date']:
+  if (trust >= 3 and trust < 4) and user['confirmed_url_date'] and user['contributor']:
     trust = 4 # Partner
   if not user['trust_level'] or trust > user['trust_level']:
     user['trust_level'] = trust
