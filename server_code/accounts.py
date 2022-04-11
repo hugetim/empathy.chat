@@ -335,3 +335,12 @@ def submit_url_for_review(url, user_id=""):
   email_text = f"{user['first_name']} {user['last_name']} ({user['email']}): {url}"
   n.email_send(admin, "Profile confirmation request", email_text)
   
+
+@authenticated_callable
+def submit_contribution_desc(contribution_desc, user_id=""):
+  from . import notifies as n
+  admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
+  user = sm.get_acting_user(user_id)
+  email_text = f"{user['first_name']} {user['last_name']} ({user['email']}): {contribution_desc}"
+  n.email_send(admin, "Contribution confirmation request", email_text)
+  
