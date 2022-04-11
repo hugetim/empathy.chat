@@ -376,10 +376,13 @@ def save_name(name_item, user_id=""):
   
 @authenticated_callable
 def save_user_field(item_name, value, user_id=""):
-  user = get_acting_user(user_id)
-  user[item_name] = value
-  if item_name == 'profile':
-    user['profile_updated'] = now()
+  if item_name in ['how_empathy', 'profile']:
+    user = get_acting_user(user_id)
+    user[item_name] = value
+    if item_name == 'profile':
+      user['profile_updated'] = now()
+  else:
+    warning(f"Attempt to use 'save_user_field' for unauthorized item_name: {item_name}")
   
   
 @authenticated_callable
