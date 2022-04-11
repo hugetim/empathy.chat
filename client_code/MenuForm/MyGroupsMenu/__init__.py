@@ -99,7 +99,7 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
       self.submit_url_button.enabled = False
     self.contributor_check_label.icon = "fa:check-square-o" if self.item['contributor'] else "fa:square-o"
     if self.item['contributor']:
-      self.explain_contribution_link.visible = False
+      self.explain_contribution_button.visible = False
       
   def url_text_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
@@ -109,7 +109,7 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
     """This method is called when the button is clicked"""
     anvil.server.call('submit_url_for_review', self.url_text_box.text)
 
-  def explain_contribution_link_click(self, **event_args):
+  def explain_contribution_button_click(self, **event_args):
     """This method is called when the link is clicked"""
     prompt = ('If you have already contributed in some way, but the "Contribute" box is not yet checked, please explain how you have contributed below. '
               'Tim will follow up by email as needed.')
@@ -122,4 +122,4 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
                 buttons=[])
     if out is True:
       anvil.server.call('submit_contribution_desc', edit_form.item['text'])
-      self.explain_contribution_link.visible = False
+      self.explain_contribution_button.visible = False
