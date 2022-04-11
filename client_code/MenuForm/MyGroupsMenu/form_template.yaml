@@ -12,15 +12,15 @@ components:
         "Partner," eligible to create and host your own groups, there are two requirements:
 
 
-        {check_box_1} Use your real first and last name, and provide a link to a reputable
-        web site profile (including a picture) that you can demonstrate ownership
-        of to verify your identity:
+        {check_box_1} Use your real first and last name, verifying your identity by
+        providing a link to a reputable web site profile (including a picture) that
+        you can demonstrate ownership of:
 
         {url_panel}
 
 
         {check_box_2} Contribute [in some way](https://www.loomio.org/d/CTLG3zqb/ways-to-contribute)
-        to empathy.chat.  {explain}', font: '', spacing_above: small, spacing_below: medium,
+        to empathy.chat.  {explain}', font: '', spacing_above: small, spacing_below: none,
       data: null, background: '', format: markdown}
     name: rich_text_1
     layout_properties: {grid_position: 'METHFR,YNUHZV'}
@@ -58,14 +58,14 @@ components:
       event_bindings: {click: explain_contribution_link_click}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: 15, font: '', spacing_above: none, icon_align: right,
+        visible: true, text: '', font_size: 15, font: '', spacing_above: medium, icon_align: right,
         spacing_below: none, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:square-o'}
       name: identity_check_label
       layout_properties: {grid_position: 'IARHXF,HFHMGE', slot: check_box_1}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: 15, font: '', spacing_above: none, icon_align: right,
+        visible: true, text: '', font_size: 15, font: '', spacing_above: medium, icon_align: right,
         spacing_below: none, italic: false, background: '', bold: false, underline: false,
         icon: 'fa:square-o'}
       name: contributor_check_label
