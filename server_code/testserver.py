@@ -2,6 +2,7 @@ import anvil.users
 from anvil.tables import app_tables
 import anvil.server
 from . import server_misc as sm
+from . import accounts
 from .server_misc import authenticated_callable
 from . import matcher
 from . import portable
@@ -18,7 +19,7 @@ def test_add_user(em, level=1):
                                         first_name = em,
                                         enabled=True,
                                        )
-    sm.init_user_info(new_user)
+    accounts.init_user_info(new_user)
     new_user['trust_level'] = level
     test_users = anvil.server.session['test_record']['test_users']
     anvil.server.session['test_record']['test_users'] = test_users + [new_user]

@@ -66,9 +66,12 @@ class Eligibility(EligibilityTemplate):
       self.group_multi_select_drop_down.selected = [self.item['group_items'][0]['value']]
     else:
       self.group_multi_select_drop_down.selected = self.item['eligible_groups']
+    
+  def form_show(self, **event_args):
+    """This method is called when the column panel is shown on the screen"""
     self.user_multi_select_drop_down.add_event_handler('change', self.user_multi_select_drop_down_change)
-    self.group_multi_select_drop_down.add_event_handler('change', self.group_multi_select_drop_down_change)
-
+    self.group_multi_select_drop_down.add_event_handler('change', self.group_multi_select_drop_down_change)    
+    
   def any_visible(self):
     return (self.specific_users_flow_panel.visible
             or self.starred_check_box.visible

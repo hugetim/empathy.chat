@@ -5,6 +5,7 @@ import anvil.tables.query as q
 import anvil.server
 from . import parameters as p
 from . import notifies as n
+from . import accounts
 from . import server_misc as sm
 from .server_misc import authenticated_callable
 from . import portable as port
@@ -75,7 +76,7 @@ def init(time_zone):
   """
   print("('init')")
   # Initialize user info
-  user = sm.initialize_session(time_zone)
+  user = accounts.initialize_session(time_zone)
   return _init(user)
 
 

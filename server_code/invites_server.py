@@ -9,6 +9,7 @@ from anvil.tables import app_tables
 import anvil.server
 from . import invites
 from . import server_misc as sm
+from . import accounts
 from . import parameters as p
 
 
@@ -187,7 +188,7 @@ class Invite(invites.Invite):
         if self.invitee:
           response_row['user1'] = self.invitee
           if register:
-            sm.init_user_info(user)
+            accounts.init_user_info(user)
         errors += self._load_response(response_row)
     else:
       non_current_invite = self._old_invite_row()

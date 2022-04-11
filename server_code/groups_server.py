@@ -9,6 +9,7 @@ from anvil.tables import app_tables
 import anvil.server
 from . import groups
 from . import server_misc as sm
+from . import accounts
 from . import parameters as p
 from . import helper as h
 from .exceptions import RowMissingError, ExpiredInviteError, AlreadyInError
@@ -213,7 +214,7 @@ class Invite(sm.ServerItem, groups.Invite):
   @staticmethod
   @anvil.tables.in_transaction
   def _register_user(user):
-    sm.init_user_info(user)
+    accounts.init_user_info(user)
       
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):

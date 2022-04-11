@@ -4,6 +4,7 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from . import server_misc as sm
+from . import accounts
 from .server_misc import authenticated_callable
 from . import portable as port
 from . import parameters as p
@@ -188,7 +189,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
                  'last': port.last_name(user2['last_name'], record['distance']),
                  'confirmed_date': confirmed_url_date,
                  'trust_level': user2['trust_level'],
-                 'trust_label': sm.trust_label[user2['trust_level']],
+                 'trust_label': accounts.trust_label[user2['trust_level']],
                 })
   return record
 

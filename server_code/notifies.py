@@ -7,6 +7,7 @@ import anvil.tables.query as q
 import anvil.secrets
 import anvil.email
 from . import server_misc as sm
+from . import accounts
 from . import parameters as p
 from . import helper as h
 from anvil_extras.server_utils import timed
@@ -142,7 +143,7 @@ def notify_late_for_chat(user, start, waiting_users=[]):
 def notify_proposal_cancel(user, proposal, title):
   """Notify recipient of cancelled proposal if settings permit"""
   from .proposals import ProposalTime, is_eligible
-  eligibility_specs = sm.get_eligibility_specs(user)
+  eligibility_specs = accounts.get_eligibility_specs(user)
   if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], proposal.proposer):
     _notify_proposal_cancel_by(user, proposal, title, 'sms')
   elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], proposal.proposer):
@@ -173,7 +174,7 @@ def _notify_proposal_cancel_by(user, proposal, title, medium):
 def notify_proposal(user, proposal, title, desc):
   """Notify recipient of added/edited proposal if settings permit"""
   from .proposals import ProposalTime, is_eligible
-  eligibility_specs = sm.get_eligibility_specs(user)
+  eligibility_specs = accounts.get_eligibility_specs(user)
   if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], proposal.proposer):
     _notify_proposal_by(user, proposal, title, desc, 'sms')
   elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], proposal.proposer):
