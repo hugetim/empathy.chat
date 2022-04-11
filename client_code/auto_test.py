@@ -134,15 +134,12 @@ class TestNow(): #not unittest.TestCase
     self.top_form.home_link_click()
 
   def test_repeat_now_proposal(self):
-    from anvil import secrets
-    for email, user_id in self.top_form.test_requestuser_drop_down.items:
-      if email == secrets.get_secret('test_user_email'):
-        accept_user_id = user_id
+    accept_user_id = self.top_form.test_requestuser_drop_down.items[0][1]
     for i in range(2):
       anvil.server.call('add_now_proposal')
       time.sleep(15)
       anvil.server.call('accept_now_proposal', user_id=accept_user_id)
-      time.sleep(10)
+      time.sleep(15)
       anvil.server.call('cancel_accept', user_id=accept_user_id)
       time.sleep(10)
       anvil.server.call('cancel_now')

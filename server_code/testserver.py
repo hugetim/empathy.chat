@@ -117,10 +117,13 @@ def test_clear():
 
 @authenticated_callable
 def test_get_user_list():
+  from anvil import secrets
   print("('test_get_user_list')")
-  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:  
+    test_user = app_tables.users.get(email=secrets.get_secret('test_user_email'))
+    to_return = [(test_user['email'], test_user.get_id())]
     users = app_tables.users.search()
-    to_return = []
-    for user in users:
-      to_return += [(user['email'], user.get_id())]
+    for u in users:
+      if u != test_user:
+        to_return += [(u['email'], u.get_id())]
     return to_return

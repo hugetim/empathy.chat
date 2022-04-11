@@ -220,17 +220,26 @@ db_schema:
     - name: signed_up
       admin_ui: {width: 153}
       type: datetime
-    - name: password_hash
-      admin_ui: {width: 99}
-      type: string
     - name: confirmed_email
       admin_ui: {width: 149}
       type: bool
-    - name: email_confirmation_key
-      admin_ui: {width: 198}
+    - name: trust_level
+      admin_ui: {width: 86}
+      type: number
+    - name: phone
+      admin_ui: {width: 200}
       type: string
     - name: last_login
       admin_ui: {width: 146}
+      type: datetime
+    - name: contributor
+      admin_ui: {width: 200}
+      type: bool
+    - name: confirmed_url
+      admin_ui: {width: 200}
+      type: string
+    - name: confirmed_url_date
+      admin_ui: {width: 200}
       type: datetime
     - name: init_date
       admin_ui: {width: 200}
@@ -238,9 +247,12 @@ db_schema:
     - name: time_zone
       admin_ui: {width: 200}
       type: string
-    - name: trust_level
-      admin_ui: {width: 86}
-      type: number
+    - name: password_hash
+      admin_ui: {width: 99}
+      type: string
+    - name: email_confirmation_key
+      admin_ui: {width: 198}
+      type: string
     - name: notif_settings
       admin_ui: {width: 181}
       type: simpleObject
@@ -254,18 +266,6 @@ db_schema:
       admin_ui: {width: 124}
       type: string
     - name: profile_updated
-      admin_ui: {width: 200}
-      type: datetime
-    - name: phone
-      admin_ui: {width: 200}
-      type: string
-    - name: contributor
-      admin_ui: {width: 200}
-      type: bool
-    - name: confirmed_url
-      admin_ui: {width: 200}
-      type: string
-    - name: confirmed_url_date
       admin_ui: {width: 200}
       type: datetime
     - name: last_request_em
