@@ -1,6 +1,7 @@
 from anvil import *
 import anvil.users
 import anvil.server
+from anvil.js import window, ExternalError
 from . import glob
 
 
@@ -46,25 +47,23 @@ def get_init():
 
   
 def copy_to_clipboard(text, desc="It"):
-  import anvil.js
   from anvil.js.window import navigator
   try:
     navigator.clipboard.writeText(text)
     Notification(f"{desc} has been copied to the clipboard.", style="success").show()
-  except anvil.js.ExternalError as err:
+  except ExternalError as err:
     Notification(str(err), timeout=5).show()
     print(f"copy_to_clipboard error: {repr(err)}")
 
     
 def set_document_title(text):
-  from anvil.js import window
-  old_title = window.document.title
-  window.document.title = text
-  return old_title
+  try:
+    window.document.title = text
+  except ExternalError as err:
+    print(f"Error setting document title: {repr(err)}")
 
 
 def change_favicon(url):
-  from anvil.js import window
   favicons = window.document.querySelectorAll('link[rel="icon"]')
   # If a <link rel="icon"> element already exists,
   # change its href to the given link.
@@ -77,7 +76,6 @@ def change_favicon(url):
 
 
 def return_favicons(old_hrefs):
-  from anvil.js import window
   favicons = window.document.querySelectorAll('link[rel="icon"]')
   # If a <link rel="icon"> element already exists,
   # change its href to the given link.
@@ -93,16 +91,17 @@ class BrowserTab():
     
   def __enter__(self):
     if self.title is not None:
-      self.change_title()
-      self.old_title = set_document_title(self.title)
+      self.old_title = window.document.title
+      set_document_title(self.title)
     if self.favicon_url is not None:
-      self.old_hrefs = change_favicon(self.favicon_url)
-      
+      try:
+        self.old_hrefs = change_favicon(self.favicon_url)
+      except ExternalError as err:
+        self.favicon_url = None
+        print(f"Error setting favicon: {repr(err)}")
+        
   def __exit__(self, type, value, tb):
     if self.title is not None:
       set_document_title(self.old_title)
     if self.favicon_url is not None:
-      self.old_hrefs = return_favicons(self.old_hrefs)
-
-  def change_title(self):
-    
+      self.old_hrefs = return_favicons(self.old_hrefs)      
