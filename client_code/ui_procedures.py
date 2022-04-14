@@ -90,13 +90,19 @@ class BrowserTab():
   def __init__(self, title=None, favicon_url=None):
     self.title = title
     self.favicon_url = favicon_url
+    
   def __enter__(self):
     if self.title is not None:
+      self.change_title()
       self.old_title = set_document_title(self.title)
     if self.favicon_url is not None:
       self.old_hrefs = change_favicon(self.favicon_url)
+      
   def __exit__(self, type, value, tb):
     if self.title is not None:
       set_document_title(self.old_title)
     if self.favicon_url is not None:
       self.old_hrefs = return_favicons(self.old_hrefs)
+
+  def change_title(self):
+    
