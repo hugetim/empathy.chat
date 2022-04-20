@@ -2,6 +2,8 @@ from ._anvil_designer import NameEditTemplate
 from anvil import *
 import anvil.users
 import anvil.server
+from .....relationship import Relationship
+from ..... import glob
 
 
 class NameEdit(NameEditTemplate):
@@ -12,7 +14,13 @@ class NameEdit(NameEditTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-
+    self.first_name_panel.tooltip = "The name by which you'd like to be addressed. Aliases welcome (except for group hosts)."
+    self.last_name_panel.tooltip = Relationship.last_name_note
+    
+  def form_show(self, **event_args):
+    if glob.MOBILE:
+      self.note_label.text = f"Note:\nFirst Name - {self.first_name_panel.tooltip}\nLast Name - {self.last_name_panel.tooltip}"
+      
   def text_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
     self.save_button.enabled = self.first_name_text_box.text
@@ -26,10 +34,3 @@ class NameEdit(NameEditTemplate):
     """This method is called when the button is clicked"""
     self.raise_event("x-close-alert", value=False)
     
-
-
-
-
-
-
-
