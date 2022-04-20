@@ -9,6 +9,7 @@ from .... import glob
 from .... import invited
 from .... import portable as port
 from .... import parameters as p
+from .... import relationship as rel
 from .NameEdit import NameEdit
 from .TextAreaEdit import TextAreaEdit
 from .Relationship import Relationship
@@ -33,7 +34,8 @@ class Profile(ProfileTemplate):
     if self.item['url_confirmed']:
       self.web_page_link.tooltip = (
         f"{self.item['first']}'s ownership of this external web site profile "
-        f"was confirmed on {self.item.url_confirmed_date_str}."
+        f"was confirmed on {self.item.url_confirmed_date_str}.\n"
+        f"({rel.Relationship.PROFILE_URL_NOTE})"
       )
       self.web_page_alt_label.tooltip = self.web_page_link.tooltip
     
