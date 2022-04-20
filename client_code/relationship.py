@@ -13,6 +13,9 @@ class Relationship:
     self.host = group_host
     self.member = my_group_member
     
+  def __repr__(self):
+    return f"Relationship({self.distance}, {self.degree}, {self.host}, {self.member})"
+    
   @property
   def last_name_visible(self):
     return self.distance <= 1 or self.host or self.member

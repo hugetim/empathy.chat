@@ -1,5 +1,6 @@
 import unittest
 from .relationship import Relationship
+from . import portable as port
 
 
 class TestRelationshipName(unittest.TestCase):
@@ -23,6 +24,35 @@ class TestRelationshipName(unittest.TestCase):
     rel2 = Relationship(distance=2)
     self.assertFalse(rel2.last_name_visible)
     self.assertTrue(rel2.last_initial_visible)
+
+
+class TestLastName(unittest.TestCase):
+  def test_last_name(self):
+    test_name = "Smith"
+    rel_none = Relationship()
+    rel1 = Relationship(distance=1)
+    rel2 = Relationship(distance=2)
+    self.assertEqual(port.last_name(test_name, rel_none), "")
+    self.assertEqual(port.last_name(test_name, rel1), "Smith")
+    self.assertEqual(port.last_name(test_name, rel2), "S.")
+    
+  def test_no_last_name(self):
+    test_name = ""
+    rel_none = Relationship()
+    rel1 = Relationship(distance=1)
+    rel2 = Relationship(distance=2)
+    self.assertEqual(port.last_name(test_name, rel_none), "")
+    self.assertEqual(port.last_name(test_name, rel1), "")
+    self.assertEqual(port.last_name(test_name, rel2), "")
+
+    
+class FullNameTest(unittest.TestCase):
+  def test_distance(self):
+    for distance in range(1, 5):
+      self.assertEqual(
+        port.full_name("first", "last", distance),
+        "first last" if distance <= 1 else ("first" if distance > 2 else "first l.")
+      )
 
 
 class TestRelationshipProfile(unittest.TestCase):

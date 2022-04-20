@@ -6,6 +6,7 @@ from anvil.tables import app_tables
 from . import server_misc as sm
 from . import accounts
 from .server_misc import authenticated_callable
+from . import relationship as rel
 from . import portable as port
 from . import parameters as p
 from . import helper as h
@@ -178,6 +179,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
   if _distance is None:
     _distance = degree # distance(user2, user1)
   record = vars(sm.get_port_user(user2, _distance))
+  relationship = rel.Relationship(distance=_distance)
   is_me = user2 == user1
   confirmed_url_date = user2['confirmed_url_date'] if user2['confirmed_url'] else None
   record.update({'me': is_me,
@@ -186,7 +188,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
                  'status': _invite_status(user2, user1),
                  'unread_message': None, # True/False
                  'first': user2['first_name'],
-                 'last': port.last_name(user2['last_name'], record['distance']),
+                 'last': port.last_name(user2['last_name'], relationship),
                  'confirmed_date': confirmed_url_date,
                  'trust_level': user2['trust_level'],
                  'trust_label': accounts.trust_label[user2['trust_level']],

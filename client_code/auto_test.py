@@ -21,15 +21,6 @@ class Seconds2WordsTest(unittest.TestCase):
     self.assertEqual(h.seconds_to_words(-1), "minus 1 second")
 
     
-class FullNameTest(unittest.TestCase):
-  def test_distance(self):
-    for distance in range(1, 5):
-      self.assertEqual(
-        port.full_name("first", "last", distance),
-        "first last" if distance <= 2 else "first"
-      )
-
-      
 class DatetimeFormatTest(unittest.TestCase):
   def test_remove_zeros(self):
     dt = datetime(2021, 1, 1, 1, 1)

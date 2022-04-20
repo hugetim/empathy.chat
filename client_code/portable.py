@@ -36,12 +36,19 @@ MAX_ALT_TIMES = 9
 UNLINKED = rel.UNLINKED
 
 
-def last_name(last, distance=3):
-  return last if distance <= 2 else ""
+def last_name(last, relationship=None):
+  if not relationship:
+    return ""
+  if relationship.last_name_visible:
+    return last
+  elif relationship.last_initial_visible and last:
+    return last[0:1] + "."
+  else:
+    return ""
 
 
-def full_name(first, last, distance=3):
-  maybe_last = last_name(last, distance)
+def full_name(first, last, distance=UNLINKED):
+  maybe_last = last_name(last, rel.Relationship(distance=distance))
   return first + (" " + maybe_last if maybe_last else "")
     
 
@@ -55,6 +62,7 @@ class User(h.AttributeToKey):
     self.distance = distance
     self.seeking = seeking
     self.starred = starred
+    self.relationship = rel.Relationship(distance=self.distance)
 
   def __str__(self):
     return self.name
@@ -112,6 +120,7 @@ class UserFull(User):
     self.trust_level = trust_level
     self.trust_label = trust_label
     self.common_group_names = common_group_names if common_group_names else []
+    self.relationship = rel.Relationship(distance=self.distance, degree=self.degree)
 
   def name_item(self):
     return dict(key=self.name, value=self, subtext=self.distance_str_or_groups, title=self.first if self.first else self.name)
