@@ -23,4 +23,9 @@ class TestRelationshipName(unittest.TestCase):
     rel2 = Relationship(distance=2)
     self.assertFalse(rel2.last_name_visible)
     self.assertTrue(rel2.last_initial_visible)
+
+
+class TestRelationshipProfile(unittest.TestCase):
+  def test_profile_url_invisible_by_default(self):
+    self.assertFalse(Relationship().profile_url_visible)
     

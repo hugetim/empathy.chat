@@ -20,3 +20,6 @@ class Relationship:
   def last_initial_visible(self):
     return self.distance <= 2 or self.last_name_visible
   
+  @property
+  def profile_url_visible(self):
+    return self.last_name_visible
