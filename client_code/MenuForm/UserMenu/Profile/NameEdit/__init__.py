@@ -14,8 +14,8 @@ class NameEdit(NameEditTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    self.first_name_panel.tooltip = "The name by which you'd like to be addressed. Aliases welcome (except for group hosts)."
-    self.last_name_panel.tooltip = Relationship.last_name_note
+    self.first_name_panel.tooltip = "The name by which you'd like to be addressed. Pseudonyms welcome (except for group hosts)."
+    self.last_name_panel.tooltip = Relationship.LAST_NAME_NOTE
     
   def form_show(self, **event_args):
     if glob.MOBILE:

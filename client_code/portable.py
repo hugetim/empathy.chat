@@ -8,6 +8,7 @@ import anvil.tz
 from . import helper as h
 from . import parameters as p
 from .groups import Group
+from . import relationship as rel
 
 
 DEFAULT_NEXT_MINUTES = 60
@@ -32,7 +33,7 @@ CANCEL_TEXT = {5: "5 min. prior",
                "custom": "a specific time...",
               }
 MAX_ALT_TIMES = 9
-UNLINKED = 99
+UNLINKED = rel.UNLINKED
 
 
 def last_name(last, distance=3):
