@@ -1,6 +1,10 @@
+from anvil.server import portable_class
+
+
 UNLINKED = 99
 
 
+@portable_class
 class Relationship:
   LAST_NAME_NOTE = ("Only your close links and group hosts (and members of any groups you host) will be able to see your full last name. "
                     "Otherwise, only 2nd degree links (that is, friends of friends) will be able to see your last initial."
