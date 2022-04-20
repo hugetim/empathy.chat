@@ -26,6 +26,15 @@ class TestRelationshipName(unittest.TestCase):
 
 
 class TestRelationshipProfile(unittest.TestCase):
+  def test_profile_url_note(self):
+    self.assertTrue(Relationship.PROFILE_URL_NOTE)
+    
   def test_profile_url_invisible_by_default(self):
     self.assertFalse(Relationship().profile_url_visible)
+    
+  def test_profile_url_visible_to_close_only(self):
+    self.assertTrue(Relationship(distance=1).profile_url_visible)
+    self.assertFalse(Relationship(distance=1.1).profile_url_visible)
+    self.assertFalse(Relationship(group_host=True).profile_url_visible)
+    self.assertFalse(Relationship(my_group_member=True).profile_url_visible)
     
