@@ -16,11 +16,11 @@ class History(HistoryTemplate):
     # Any code you write here will run when the form opens.
     self.timer_2.interval = 30
     self.chat_repeating_panel.items = [] # for len(old_items) in update_messages()
-    new_items = anvil.server.call('update_history_form', self.item['user_id']) # for spinner
-    self.update_messages(new_items)
+    self.initial_new_items = anvil.server.call('update_history_form', self.item['user_id']) # for spinner
     
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
+    self.update_messages(self.initial_new_items)
     self.top_form = get_open_form()
        
   def update(self): 
