@@ -106,7 +106,7 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
     else:
       return port.User(user_id=user2.get_id(), 
                        name=_name,
-                       confirmed_url=user2['confirmed_url'] if user2['confirmed_url_date'] else None,
+                       url_confirmed=bool(user2['url_confirmed_date']),
                        distance=distance,
                        seeking=user2['seeking_buddy'],
                        starred=bool(star_row(user2, user1)) if user2 != user1 else None, #True/False

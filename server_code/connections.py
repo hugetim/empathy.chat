@@ -180,7 +180,6 @@ def connection_record(user2, user1, _distance=None, degree=None):
   record = vars(sm.get_port_user(user2, _distance))
   relationship = record.pop('relationship')
   is_me = user2 == user1
-  confirmed_url_date = user2['confirmed_url_date'] if user2['confirmed_url'] else None
   record.update({'me': is_me,
                  'degree': degree, 
                  'last_active': user2['init_date'],
@@ -188,7 +187,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
                  'unread_message': None, # True/False
                  'first': user2['first_name'],
                  'last': port.last_name(user2['last_name'], relationship),
-                 'confirmed_date': confirmed_url_date,
+                 'url_confirmed_date': user2['url_confirmed_date'],
                  'trust_level': user2['trust_level'],
                  'trust_label': accounts.trust_label[user2['trust_level']],
                 })

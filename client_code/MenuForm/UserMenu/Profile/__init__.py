@@ -30,11 +30,12 @@ class Profile(ProfileTemplate):
     self.last_active_label.text = f"  Last Active: {h.short_date_str(h.as_local_tz(self.item['last_active']))},"
     self.connections_button.text = "My Network" if self.item['me'] else "Links"
     self.column_panel_1.row_spacing = 0
-    if self.item['confirmed_date']:
+    if self.item['url_confirmed']:
       self.web_page_link.tooltip = (
-        f"{self.item['first']}'s ownership of this web page "
-        f"was confirmed on {self.item.confirmed_date_str}."
+        f"{self.item['first']}'s ownership of this external web site profile "
+        f"was confirmed on {self.item.url_confirmed_date_str}."
       )
+      self.web_page_alt_label.tooltip = self.web_page_link.tooltip
     
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""

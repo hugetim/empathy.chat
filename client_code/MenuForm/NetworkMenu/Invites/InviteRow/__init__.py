@@ -21,7 +21,7 @@ class InviteRow(InviteRowTemplate):
       self.link.visible = False
       self.copy_button.visible = False
       if user2.name:
-        name_item = {'name': user2.name, 'confirmed_url': user2.confirmed_url, 'user_id': user2.user_id}
+        name_item = {'name': user2.name, 'url_confirmed': user2.url_confirmed, 'user_id': user2.user_id}
         self.name = Name(item=name_item)
         self.name_or_url_flow_panel.add_component(self.name)
       else:

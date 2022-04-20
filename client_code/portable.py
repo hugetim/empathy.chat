@@ -55,10 +55,10 @@ def full_name(first, last, distance=UNLINKED):
 @anvil.server.portable_class
 class User(h.AttributeToKey):
   
-  def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None):
+  def __init__(self, user_id=None, name=None, url_confirmed=None, distance=None, seeking=None, starred=None):
     self.user_id = user_id
     self.name = name
-    self.confirmed_url = confirmed_url
+    self.url_confirmed = url_confirmed
     self.distance = distance
     self.seeking = seeking
     self.starred = starred
@@ -95,7 +95,7 @@ class User(h.AttributeToKey):
     distance = 0
     return User(user_id=logged_in_user.get_id(), 
                 name=full_name(logged_in_user['first_name'], logged_in_user['last_name'], distance=distance),
-                confirmed_url=logged_in_user['confirmed_url'],
+                url_confirmed=bool(logged_in_user['url_confirmed_date']),
                 distance=0,
                 seeking=logged_in_user['seeking_buddy'],
                 starred=None,
@@ -104,11 +104,11 @@ class User(h.AttributeToKey):
   
 @anvil.server.portable_class
 class UserFull(User):
-  def __init__(self, user_id=None, name=None, confirmed_url=None, distance=None, seeking=None, starred=None,
+  def __init__(self, user_id=None, name=None, url_confirmed=None, distance=None, seeking=None, starred=None,
                degree=None, last_active=None, status=None, unread_message=None, me=None, 
-               first="", last="", confirmed_date=None, trust_level=None, trust_label="",
+               first="", last="", url_confirmed_date=None, trust_level=None, trust_label="",
                common_group_names=None):
-    super().__init__(user_id=user_id, name=name, confirmed_url=confirmed_url, distance=distance, seeking=seeking, starred=starred)
+    super().__init__(user_id=user_id, name=name, url_confirmed=url_confirmed, distance=distance, seeking=seeking, starred=starred)
     self.degree = degree
     self.last_active = last_active
     self.status = status
@@ -116,7 +116,7 @@ class UserFull(User):
     self.me = me
     self.first = first
     self.last = last
-    self.confirmed_date = confirmed_date
+    self.url_confirmed_date = url_confirmed_date
     self.trust_level = trust_level
     self.trust_label = trust_label
     self.common_group_names = common_group_names if common_group_names else []
@@ -131,18 +131,19 @@ class UserFull(User):
     return d_str if d_str else "\n".join(self.common_group_names)
   
   @property
-  def confirmed_date_str(self):
-    return h.short_date_str(h.as_local_tz(self.confirmed_date)) if self.confirmed_date else ""
+  def url_confirmed_date_str(self):
+    return h.short_date_str(h.as_local_tz(self.url_confirmed_date)) if self.url_confirmed_date else ""
 
 
 @anvil.server.portable_class
 class UserProfile(UserFull):
-  def __init__(self, relationships=None, how_empathy="", profile="", profile_updated=None, **kwargs):
+  def __init__(self, relationships=None, how_empathy="", profile="", profile_updated=None, profile_url="", **kwargs):
     super().__init__(**kwargs)
     self.relationships = relationships if relationships else []
     self.how_empathy = how_empathy
     self.profile = profile
     self.profile_updated_dt = profile_updated
+    self.profile_url = profile_url
     
   @property
   def profile_updated_date_str(self):

@@ -50,7 +50,7 @@ def init_user_info(user, time_zone=""):
     user['how_empathy'] = ""
     user['profile'] = ""
     user['phone'] = ""
-    user['confirmed_url'] = ""
+    user['profile_url'] = ""
 
 
 @anvil.tables.in_transaction
@@ -80,7 +80,7 @@ def _update_trust_level(user):
     trust = 2 # Confirmed
   if (trust >= 2 and trust < 3) and matched_with_distance1_member():
     trust = 3 # Member
-  if (trust >= 3 and trust < 4) and user['confirmed_url_date'] and user['contributor']:
+  if (trust >= 3 and trust < 4) and user['url_confirmed_date'] and user['contributor']:
     trust = 4 # Partner
   if not user['trust_level'] or trust > user['trust_level']:
     user['trust_level'] = trust
@@ -236,12 +236,15 @@ def _check_for_confirmed_invites(user):
 @authenticated_callable
 def init_profile(user_id=""):
   from . import connections as c
+  from . import relationship as rel
   user = sm.get_other_user(user_id)
   record = c.connection_record(user, sm.get_acting_user())
+  relationship = rel.Relationship(distance=record['distance'])
   record.update({'relationships': [] if record['me'] else c.get_relationships(user),
                  'how_empathy': user['how_empathy'],
                  'profile': user['profile'],
                  'profile_updated': user['profile_updated'],
+                 'profile_url': user['profile_url'] if relationship.profile_url_visible else "",
                 })
   return port.UserProfile(**record)
     
@@ -321,8 +324,8 @@ def get_eligibility_specs(user):
 def get_partner_criteria_info(user_id=""):
   user = sm.get_acting_user(user_id)
   return {'contributor': user['contributor'],
-          'confirmed_url': user['confirmed_url'],
-          'confirmed_url_date': user['confirmed_url_date'],
+          'profile_url': user['profile_url'],
+          'url_confirmed_date': user['url_confirmed_date'],
          }
 
 
@@ -331,7 +334,7 @@ def submit_url_for_review(url, user_id=""):
   from . import notifies as n
   admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
   user = sm.get_acting_user(user_id)
-  user['confirmed_url'] = url
+  user['profile_url'] = url
   email_text = f"{user['first_name']} {user['last_name']} ({user['email']}): {url}"
   n.email_send(admin, "Profile confirmation request", email_text)
   
