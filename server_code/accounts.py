@@ -10,7 +10,6 @@ from . import portable as port
 from . import server_misc as sm
 from .server_misc import authenticated_callable
 from anvil_extras.server_utils import timed
-from anvil_extras.serialisation import datatable_schema
 
 
 @timed
@@ -26,11 +25,8 @@ def initialize_session(time_zone):
 @timed
 def _init_user(time_zone):
   user = anvil.users.get_user()
-  schema = datatable_schema("users")
-  user_dict = schema.dump(user, with_id=True)
-  print(user_dict['email'])
-  _init_user_info_transaction(user_dict, time_zone)
-  user.update(user_dict)
+  print(user['email'])
+  _init_user_info_transaction(user, time_zone)
   trust_level = _update_trust_level(user)
   return user, trust_level
 
