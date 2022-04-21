@@ -34,7 +34,7 @@ def _init_user_info_transaction(user, time_zone):
 
 def init_user_info(user, starting_trust_level, time_zone=""):
   """Return trust, initializing info for new users & updating trust_level"""
-  user.update(time_zone=time_zone, init_date=sm.now(), update_needed=False)
+  user.update(time_zone=time_zone, init_date=sm.now())
   starting_trust_level = user['trust_level']
   if starting_trust_level is None:
     notif_settings = {

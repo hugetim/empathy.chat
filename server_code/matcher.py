@@ -181,7 +181,7 @@ def _get_state(user):
       state['prompts'] = sm.get_prompts(user)
       timer.check("get_prompts")
     anvil.server.session['state'] = state
-    #user['update_needed'] = False  # moved to init_user_info
+    user['update_needed'] = False
     return state
   
 
