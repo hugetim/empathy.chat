@@ -1,3 +1,10 @@
+scheduled_tasks:
+- task_name: prune_chat_messages
+  time_spec:
+    n: 1
+    every: day
+    at: {minute: 0, hour: 21}
+  job_id: DBOWFNIB
 dependencies:
 - app_id: MFQJNLWQIOGGXL4W
   version: {dev: false}
