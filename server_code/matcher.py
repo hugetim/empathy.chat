@@ -35,12 +35,11 @@ def _seconds_left(status, expire_date=None, ping_start=None):
   else:
     print("matcher.seconds_left(s,lc,ps): " + status)
 
-       
-def _prune_matches():
+
+@anvil.server.background_task
+def prune_old_matches():
   """Complete old commenced matches for all users"""
   import datetime
-  if sm.DEBUG:
-    print("_prune_matches")
   assume_complete = datetime.timedelta(hours=p.ASSUME_COMPLETE_HOURS)
   now = sm.now()
   cutoff_m = now - assume_complete
@@ -50,15 +49,24 @@ def _prune_matches():
                                          )
   for row in old_matches:
     _mark_matches_row_complete(row)
+    
+    
+def _prune_newer_matches():
+  """Complete no-show matches for all users"""
+  if sm.DEBUG:
+    print("_prune_newer_matches")
+  import datetime
+  now = sm.now()
   newer_matches = app_tables.matches.search(complete=[0],
-                                            match_commence=q.between(min=cutoff_m, max=now),
+                                            match_commence=q.less_than(now),
                                             present=q.not_([1]),
                                            )
   for row in newer_matches:
     duration = datetime.timedelta(minutes=row['proposal_time']['duration'])
     if now > row['match_commence'] + duration:
       _mark_matches_row_complete(row)
-  
+
+
 def _mark_matches_row_complete(row):
   temp = row['complete']
   for i in range(len(temp)):
@@ -101,7 +109,7 @@ def _init_matcher(user, trust_level):
 
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
-  _prune_matches()
+  _prune_newer_matches()
   #sm.prune_chat_messages() # moved to scheduled task
 
 

@@ -5,6 +5,12 @@ scheduled_tasks:
     every: day
     at: {minute: 0, hour: 21}
   job_id: DBOWFNIB
+- task_name: prune_old_matches
+  time_spec:
+    n: 1
+    every: hour
+    at: {minute: 52}
+  job_id: CCYSLUDQ
 dependencies:
 - app_id: MFQJNLWQIOGGXL4W
   version: {dev: false}
