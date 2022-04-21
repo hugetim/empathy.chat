@@ -80,7 +80,8 @@ def warning(warning_str, app_info_dict=None, from_client=False):
     
 def as_user_tz(dt, user):
   import pytz
-  tz_user = pytz.timezone(user['time_zone'])
+  time_zone = user['time_zone'] if user['time_zone'] else "America/Chicago"
+  tz_user = pytz.timezone(time_zone)
   return dt.astimezone(tz_user)
 
 

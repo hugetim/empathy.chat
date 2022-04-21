@@ -283,7 +283,8 @@ def get_settings(user_id=""):
     eligible_group_rows = [app_tables.groups.get_by_id(g_id) for g_id in elig_items[medium]['eligible_groups']]
     elig_items[medium]['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id()) for group_row in eligible_group_rows]
     elig_items[medium].update(item_lists)
-  return (user['phone'], user['time_zone'], notif_settings, elig_items)
+  time_zone = user['time_zone'] if user['time_zone'] else "America/Chicago"
+  return (user['phone'], time_zone, notif_settings, elig_items)
 
 
 @authenticated_callable
