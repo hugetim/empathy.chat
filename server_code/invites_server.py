@@ -273,12 +273,13 @@ class Invite(invites.Invite):
 
   @staticmethod
   def from_invite_row(invite_row, portable=False, user_id=""):
+    user = sm.get_acting_user(user_id)
     port_invite = invites.Invite(invite_id=invite_row.get_id(),
-                                 inviter=sm.get_port_user(invite_row['user1']),
+                                 inviter=sm.get_port_user(invite_row['user1'], user1=user),
                                  rel_to_inviter=invite_row['relationship2to1'],
                                  inviter_guess=invite_row['guess'],
                                  link_key=invite_row['link_key'],
-                                 invitee=sm.get_port_user(invite_row['user2'], user1_id=user_id),
+                                 invitee=sm.get_port_user(invite_row['user2'], user1=user),
                                 )
     return port_invite if portable else Invite(port_invite)
 

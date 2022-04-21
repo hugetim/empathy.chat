@@ -94,13 +94,15 @@ def name(user, to_user=None, distance=None):
   return port.full_name(user['first_name'], user['last_name'], distance)  
 
 
-@authenticated_callable
-def get_port_user(user2, distance=None, user1_id="", simple=False):
+def get_port_user(user2, distance=None, user1=None, simple=False):
   if user2:
-    user1 = get_acting_user(user1_id)
+    explicit_user1 = True
+    if not user1:
+      explicit_user1 = False
+      user1 = get_acting_user()
     if user1 == user2:
       distance = 0
-    _name = name(user2, user1 if user1_id else None, distance)
+    _name = name(user2, user1 if explicit_user1 else None, distance)
     if simple:
       return port.User(user2.get_id(), _name)
     else:
@@ -114,11 +116,9 @@ def get_port_user(user2, distance=None, user1_id="", simple=False):
   else:
     return None
 
-  
-@authenticated_callable
-def get_port_user_full(user2, user1_id="", distance=None, degree=None, common_group_names=None):
+
+def get_port_user_full(user2, user1, distance=None, degree=None, common_group_names=None):
   from . import connections as c
-  user1 = get_acting_user(user1_id)
   return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree), 
                        common_group_names=common_group_names)
 
@@ -127,7 +127,7 @@ def get_port_users_full(user2s, user1_id="", up_to_distance=3):
   from . import connections as c
   user1 = get_acting_user(user1_id)
   distances = c.distances(user2s, user1, up_to_distance)
-  return [get_port_user_full(user2, user1_id, distance=distances[user2], degree=distances[user2]) for user2 in user2s]
+  return [get_port_user_full(user2, user1, distance=distances[user2], degree=distances[user2]) for user2 in user2s]
  
   
 @authenticated_callable
@@ -179,7 +179,7 @@ def get_prompts(user):
       import connections as c
       members = c.member_close_connections(user)
       if members:
-        out.append({"name": "member-chat", "members": [get_port_user(m, distance=1, simple=True) for m in members]})
+        out.append({"name": "member-chat", "members": [get_port_user(m, distance=1, user1=user, simple=True) for m in members]})
 #       else:
 #         out.append({"name": "invite-close"})
     elif (not invited and not [s for s in out if s['name'] == "connected"]

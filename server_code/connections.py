@@ -10,6 +10,7 @@ from . import portable as port
 from . import parameters as p
 from . import helper as h
 from anvil_extras.server_utils import timed
+from anvil_extras.logging import TimerLogger
 
 
 # def is_visible(user2, user1=None): # Currently unused
@@ -40,7 +41,7 @@ def get_create_user_items(user):
   c_users = set()
   for degree in degree_set:
     # change to distance=distance(user2, user1) or equivalent once properly implement distance
-    items[degree] = [sm.get_port_user_full(other, distance=degree, degree=degree).name_item() for other in dset[degree]]
+    items[degree] = [sm.get_port_user_full(other, user, distance=degree, degree=degree).name_item() for other in dset[degree]]
     items[degree].sort(key=lambda user_item: user_item['key'])
     c_users.update(dset[degree])
   group_member_items = _group_member_items_exclude(user, c_users)
@@ -55,7 +56,7 @@ def get_create_user_items(user):
   
 def _group_member_items_exclude(user, excluded_users):
   fellow_members_to_group_names = _group_members_to_group_names_exclude(user, excluded_users)
-  items = [sm.get_port_user_full(user2, user.get_id(), port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]).name_item()
+  items = [sm.get_port_user_full(user2, user, port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]).name_item()
            for user2 in fellow_members_to_group_names.keys()]
   return sorted(items, key = lambda name_item:(name_item['subtext'] + name_item['key']))
   
@@ -148,28 +149,36 @@ def get_connected_users(user, up_to_degree):
   
 @authenticated_callable
 def get_connections(user_id):
-  print(f"get_connections, {user_id}")
-  user = sm.get_other_user(user_id)
-  logged_in_user = anvil.users.get_user()
-  is_me = user == logged_in_user
-  up_to_degree = 3
-  dset = _get_connections(logged_in_user, up_to_degree)
-  if is_me:
-    records = []
-    c_users = set()
-    for d in range(1, up_to_degree+1):
-      records += [sm.get_port_user_full(user2, distance=d, degree=d) for user2 in dset[d]]
-      c_users.update(dset[d])
-    return records + _group_member_records_exclude(logged_in_user, c_users)
-  elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
-        and _degree_from_dset(user, dset) > 2):
-    return []
-  else:
-    dset2 = _get_connections(user, 1)
-    records = []
-    for d in range(0, up_to_degree+1):
-      records += [sm.get_port_user_full(user2, distance=d, degree=d) for user2 in (dset[d] & dset2[1])]
-    return records #+ _group_member_records_include(logged_in_user, dset2[1] - c_users.union({logged_in_user}))
+  #print(f"get_connections, {user_id}")
+  with TimerLogger("get_connections", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
+    user = sm.get_other_user(user_id)
+    if not user_id:
+      logged_in_user = user
+      is_me = True
+    else:
+      logged_in_user = anvil.users.get_user()
+      is_me = user == logged_in_user
+    timer.check("get_users")
+    up_to_degree = 3
+    dset = _get_connections(logged_in_user, up_to_degree)
+    timer.check("_get_connections")
+    if is_me:
+      records = []
+      c_users = set()
+      for d in range(1, up_to_degree+1):
+        records += [sm.get_port_user_full(user2, logged_in_user, distance=d, degree=d) for user2 in dset[d]]
+        c_users.update(dset[d])
+      timer.check("get non-group records")
+      return records + _group_member_records_exclude(logged_in_user, c_users)
+    elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
+          and _degree_from_dset(user, dset) > 2):
+      return []
+    else:
+      dset2 = _get_connections(user, 1)
+      records = []
+      for d in range(0, up_to_degree+1):
+        records += [sm.get_port_user_full(user2, logged_in_user, distance=d, degree=d) for user2 in (dset[d] & dset2[1])]
+      return records #+ _group_member_records_include(logged_in_user, dset2[1] - c_users.union({logged_in_user}))
 
 
 def connection_record(user2, user1, _distance=None, degree=None):
@@ -177,7 +186,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
     degree = _degree(user2, user1)
   if _distance is None:
     _distance = degree # distance(user2, user1)
-  record = vars(sm.get_port_user(user2, _distance))
+  record = vars(sm.get_port_user(user2, _distance, user1=user1))
   relationship = record.pop('relationship')
   is_me = user2 == user1
   record.update({'me': is_me,
@@ -209,7 +218,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
 
 def _group_member_records_exclude(user, excluded_users):
   fellow_members_to_group_names = _group_members_to_group_names_exclude(user, excluded_users)
-  return [sm.get_port_user_full(user2, user.get_id(), port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
+  return [sm.get_port_user_full(user2, user, port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
           for user2 in fellow_members_to_group_names.keys()]
 
 
@@ -299,7 +308,7 @@ def load_invites(user_id=""):
   for row in rows:
 #     item = {k: row[k] for k in ['date', 'relationship2to1', 'date_described', 'guess', 'link_key', 'distance']}
 #     if row['user2']:
-#       item['user2'] = sm.get_port_user(row['user2'], user1_id=user.get_id(), simple=False)
+#       item['user2'] = sm.get_port_user(row['user2'], user1=user, simple=False)
 #     if row['proposal']:
 #       item['proposal'] = m.Proposal(row['proposal']).portable(user)
     out.append(invites_server.Invite.from_invite_row(row, portable=True, user_id=user.get_id()))

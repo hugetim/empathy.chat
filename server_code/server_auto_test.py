@@ -68,7 +68,7 @@ class InviteTest(unittest.TestCase):
     self.assertFalse(self.s_invite1.inviter)
     
   def add_connect_invite(self):
-    port_invitee = sm.get_port_user(self.poptibo, user1_id=self.user.get_id())
+    port_invitee = sm.get_port_user(self.poptibo, user1=self.user)
     self.invite2 = invites.Invite(rel_to_inviter='test subject 1', inviter_guess="5555", invitee=port_invitee)
     self.s_invite2 = invites_server.Invite(self.invite2)
     errors = self.s_invite2.add()
@@ -95,7 +95,7 @@ class InviteTest(unittest.TestCase):
     self.assertFalse(self.invite2.link_key)
     self.assertTrue(self.invite2.invitee)
     #test_new_connect_dup
-    port_invitee = sm.get_port_user(self.poptibo, user1_id=self.user.get_id())
+    port_invitee = sm.get_port_user(self.poptibo, user1=self.user)
     invite2dup = invites.Invite(rel_to_inviter='test subject 1 dup', inviter_guess="5555", invitee=port_invitee)
     s_invite2dup = invites_server.Invite(invite2dup)
     errors = s_invite2dup.add()
@@ -103,7 +103,7 @@ class InviteTest(unittest.TestCase):
     self.cancel_connect_invite()   
     
   def test_new_connect_failed_guess(self):
-    port_invitee = sm.get_port_user(self.poptibo, user1_id=self.user.get_id())
+    port_invitee = sm.get_port_user(self.poptibo, user1=self.user)
     invite2 = invites.Invite(rel_to_inviter='test subject 1 dup', inviter_guess="6666", invitee=port_invitee)
     s_invite2 = invites_server.Invite(invite2)
     errors = s_invite2.add()

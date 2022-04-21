@@ -308,11 +308,11 @@ class Proposal():
     row_dict['prop_id'] = self.get_id()
     proposer = row_dict.pop('user')
     row_dict['own'] = proposer == user
-    row_dict['user'] = sm.get_port_user(proposer)
+    row_dict['user'] = sm.get_port_user(proposer, user1=user)
     row_dict['times'] = [proptime.portable() for proptime
                          in ProposalTime.times_from_proposal(self, require_current=True)]
     eligible_users = row_dict.pop('eligible_users')
-    row_dict['eligible_users'] = [sm.get_port_user(user, simple=True) for user in eligible_users]
+    row_dict['eligible_users'] = [sm.get_port_user(u, simple=True, user1=user) for u in eligible_users]
     eligible_groups = row_dict.pop('eligible_groups')
     row_dict['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id()) for group_row in eligible_groups]
     if not row_dict['current']:

@@ -279,7 +279,7 @@ def get_settings(user_id=""):
   elig_items = {}
   for medium in ['sms', 'email']:
     elig_items[medium] = notif_settings.pop(medium) if notif_settings.get(medium) else dict(eligible=0, eligible_starred=False, eligible_users=[], eligible_groups=[])
-    elig_items[medium]['eligible_users'] = [sm.get_port_user(sm.get_other_user(u_id), simple=True) for u_id in elig_items[medium]['eligible_users']]
+    elig_items[medium]['eligible_users'] = [sm.get_port_user(sm.get_other_user(u_id), user1=user, simple=True) for u_id in elig_items[medium]['eligible_users']]
     eligible_group_rows = [app_tables.groups.get_by_id(g_id) for g_id in elig_items[medium]['eligible_groups']]
     elig_items[medium]['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id()) for group_row in eligible_group_rows]
     elig_items[medium].update(item_lists)
