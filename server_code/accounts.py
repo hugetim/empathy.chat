@@ -38,8 +38,7 @@ def _init_user_info_transaction(user, time_zone):
 
 def init_user_info(user, time_zone=""):
   """Return trust, initializing info for new users & updating trust_level"""
-  user['time_zone'] = time_zone
-  user['init_date'] = sm.now()
+  user.update(time_zone=time_zone, init_date=sm.now())
   if user['trust_level'] is None:
     user['notif_settings'] = {"essential": "sms",
                               "message": "email",
