@@ -274,7 +274,8 @@ def _update_history_form(user2, user1):
   else:
     return []
     
-    
+
+@anvil.server.background_task
 def prune_chat_messages():
   """Prune messages from fully completed matches"""
   if DEBUG:
