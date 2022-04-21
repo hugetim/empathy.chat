@@ -76,16 +76,14 @@ def init(time_zone):
   """
   print("('init')")
   # Initialize user info
-  user = accounts.initialize_session(time_zone)
-  return _init(user)
+  user, trust_level = accounts.initialize_session(time_zone)
+  return _init(user, trust_level)
 
 @timed
-def _init(user):
-  _prune_all_expired_items()
+def _init(user, trust_level):
   _init_user_status(user)
   state = _get_state(user)
   propagate_update_needed(user)
-  trust_level = user['trust_level']
   return {'trust_level': trust_level,
           'test_mode': trust_level >= sm.TEST_TRUST_LEVEL,
           'name': user['first_name'],
@@ -93,17 +91,17 @@ def _init(user):
          }
 
 
-@anvil.tables.in_transaction
-@timed
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_matches()
   sm.prune_chat_messages()
 
 
-@anvil.tables.in_transaction
 @timed
+@anvil.tables.in_transaction
 def _init_user_status(user):
+  print("_init_user_status")
+  _prune_all_expired_items()
   partial_state = get_status(user)
   if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
     _cancel_other(user)
@@ -125,9 +123,10 @@ def confirm_wait_helper(user):
     current_proptime.confirm_wait()
 
 
-@authenticated_callable
-def get_proposals_upcomings(user_id=""):
-  user = sm.get_acting_user(user_id)
+@timed
+@anvil.tables.in_transaction(relaxed=True)
+def _get_proposals_upcomings(user):
+  print("_get_proposals_upcomings")
   proposals = Proposal.get_port_view_items(user)
   upcomings = _get_upcomings(user)
   return proposals, upcomings
@@ -157,16 +156,19 @@ def _get_state(user):
   Side effects: prune proposals when status in [None]
   """
   state = get_status_in_transaction(user)
-  state['proposals'] = [] if state['status'] else Proposal.get_port_view_items(user)
-  state['upcomings'] = [] if state['status'] else _get_upcomings(user)
-  state['prompts'] = [] if state['status'] else sm.get_prompts(user)
+  if state['status']:
+    state['proposals'], state['upcomings'] = ([], [])
+    state['prompts'] = []
+  else:
+    state['proposals'], state['upcomings'] = _get_proposals_upcomings(user)
+    state['prompts'] = sm.get_prompts(user)
   anvil.server.session['state'] = state
   user['update_needed'] = False
   return state
   
 
-@anvil.tables.in_transaction
 @timed
+@anvil.tables.in_transaction
 def get_status_in_transaction(user):
   return get_status(user)
 
@@ -176,8 +178,7 @@ def get_status(user):
   ping_start: accept_date or, for "matched", match_commence
   assumes 2-person matches only
   """
-  if sm.DEBUG:
-    print("_get_status")
+  print("_get_status")
   expire_date = None
   ping_start = None
   current_proptime = ProposalTime.get_now_proposing(user)
@@ -208,25 +209,21 @@ def get_status(user):
          }
 
 
-@anvil.tables.in_transaction(relaxed=True)
-@timed
 def _get_upcomings(user):
-    """Return list of user's upcoming matches"""
-    if sm.DEBUG:
-      print("_get_upcomings")
-    match_dicts = []
-    now = sm.now()
-    for match in app_tables.matches.search(users=[user], 
-                                           match_commence=q.greater_than(now)):
-      port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
-                     if u != user]
-      match_dict = {'port_users': port_users,
-                    'start_date': match['match_commence'],
-                    'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
-                    'match_id': match.get_id(),
-                   }
-      match_dicts.append(match_dict)
-    return match_dicts
+  """Return list of user's upcoming matches"""
+  match_dicts = []
+  now = sm.now()
+  for match in app_tables.matches.search(users=[user], 
+                                         match_commence=q.greater_than(now)):
+    port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
+                   if u != user]
+    match_dict = {'port_users': port_users,
+                  'start_date': match['match_commence'],
+                  'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
+                  'match_id': match.get_id(),
+                 }
+    match_dicts.append(match_dict)
+  return match_dicts
 
 
 @anvil.tables.in_transaction  
