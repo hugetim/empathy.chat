@@ -10,23 +10,27 @@ from . import portable as port
 from . import server_misc as sm
 from .server_misc import authenticated_callable
 from anvil_extras.server_utils import timed
+from anvil_extras.serialisation import datatable_schema
 
 
 @timed
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
   user, trust_level = _init_user(time_zone)
-  if p.DEBUG_MODE and user['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if p.DEBUG_MODE and trust_level >= sm.TEST_TRUST_LEVEL:
     from . import server_auto_test
     server_auto_test.server_auto_tests()
     #anvil.server.launch_background_task('server_auto_tests')
   return user
 
-
+@timed
 def _init_user(time_zone):
   user = anvil.users.get_user()
-  print(user['email'])
-  _init_user_info_transaction(user, time_zone)
+  schema = datatable_schema("users")
+  user_dict = schema.dump(user, with_id=True)
+  print(user_dict['email'])
+  _init_user_info_transaction(user_dict, time_zone)
+  user.update(user_dict)
   trust_level = _update_trust_level(user)
   return user, trust_level
 

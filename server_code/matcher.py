@@ -85,8 +85,9 @@ def _init(user):
   _init_user_status(user)
   state = _get_state(user)
   propagate_update_needed(user)
-  return {'trust_level': user['trust_level'],
-          'test_mode': user['trust_level'] >= sm.TEST_TRUST_LEVEL,
+  trust_level = user['trust_level']
+  return {'trust_level': trust_level,
+          'test_mode': trust_level >= sm.TEST_TRUST_LEVEL,
           'name': user['first_name'],
           'state': state,
          }
@@ -165,6 +166,7 @@ def _get_state(user):
   
 
 @anvil.tables.in_transaction
+@timed
 def get_status_in_transaction(user):
   return get_status(user)
 
