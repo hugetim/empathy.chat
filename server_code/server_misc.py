@@ -152,10 +152,9 @@ def inviteds(user):
   return app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user, current=True)
 
 
-@timed
 @anvil.tables.in_transaction(relaxed=True)
 def get_prompts(user):
-  print("get_prompts")
+  print("                      get_prompts")
   import datetime
   out = []
   other_prompts = app_tables.prompts.search(user=user)

@@ -10,53 +10,44 @@ from . import portable as port
 from . import server_misc as sm
 from .server_misc import authenticated_callable
 from anvil_extras.server_utils import timed
+from anvil_extras.logging import TimerLogger
 
 
-@timed
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
-  user, trust_level = _init_user(time_zone)
-  if p.DEBUG_MODE and trust_level >= sm.TEST_TRUST_LEVEL:
-    from . import server_auto_test
-    server_auto_test.server_auto_tests()
-    #anvil.server.launch_background_task('server_auto_tests')
-  return user, trust_level
-
-
-def _init_user(time_zone):
-  user = anvil.users.get_user()
-  print(user['email'])
-  starting_trust_level = _init_user_info_transaction(user, time_zone)
-  trust_level = _new_trust_level(user, starting_trust_level)
-  if trust_level != starting_trust_level:
-    user['trust_level'] = trust_level
-  return user, trust_level
+  with TimerLogger("initialize_session", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
+    user = anvil.users.get_user()
+    timer.check("anvil.users.get_user")
+    starting_trust_level = _init_user_info_transaction(user, time_zone)
+    timer.check("_init_user_info_transaction")
+    trust_level = _new_trust_level(user, starting_trust_level)
+    if trust_level != starting_trust_level:
+      user['trust_level'] = trust_level
+    return user, trust_level
 
 
 @anvil.tables.in_transaction(relaxed=True)
 def _init_user_info_transaction(user, time_zone):
+  print(f"                    {user['email']}")
   return init_user_info(user, time_zone)
 
 
 def init_user_info(user, starting_trust_level, time_zone=""):
   """Return trust, initializing info for new users & updating trust_level"""
-  user.update(time_zone=time_zone, init_date=sm.now())
+  user.update(time_zone=time_zone, init_date=sm.now(), update_needed=False)
   starting_trust_level = user['trust_level']
   if starting_trust_level is None:
-    user['notif_settings'] = {"essential": "sms",
-                              "message": "email",
-                              "email": {"eligible": 1, "eligible_users": [], "eligible_groups": [], "eligible_starred": True},
-                              "sms": {"eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False},
-                             }
-    user['first_name'] = ""
-    user['last_name'] = ""
-    user['how_empathy'] = ""
-    user['profile'] = ""
-    user['phone'] = ""
-    user['profile_url'] = ""
+    notif_settings = {
+      "essential": "sms",
+      "message": "email",
+      "email": {"eligible": 1, "eligible_users": [], "eligible_groups": [], "eligible_starred": True},
+      "sms": {"eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False},
+    }
+    user.update(notif_settings=notif_settings,
+                first_name="", last_name="", how_empathy="", profile="", phone="", profile_url="")
   return starting_trust_level
 
-@timed
+
 def _new_trust_level(user, starting_trust_level):
   """Return trust level based on other info"""
   def matched_with_distance1_member():
@@ -83,10 +74,8 @@ def _new_trust_level(user, starting_trust_level):
     trust = 3 # Member
   if (trust >= 3 and trust < 4) and user['url_confirmed_date'] and user['contributor']:
     trust = 4 # Partner
-  if not starting_trust_level or trust > starting_trust_level:
-    return trust
-  else:
-    return starting_trust_level
+  return starting_trust_level if (starting_trust_level and starting_trust_level >= trust) else trust
+
 
 trust_label = {0: "Visitor",
                1: "Guest",

@@ -11,6 +11,7 @@ from .server_misc import authenticated_callable
 from . import portable as port
 from .proposals import Proposal, ProposalTime
 from anvil_extras.server_utils import timed
+from anvil_extras.logging import TimerLogger
 
 
 def _seconds_left(status, expire_date=None, ping_start=None):
@@ -67,20 +68,27 @@ def _mark_matches_row_complete(row):
     
 
 @authenticated_callable
-@timed
 def init(time_zone):
-  """
-  Runs upon initializing app
+  """Runs upon initializing app
+  
   Side effects: prunes old proposals/matches,
                 updates expire_date if currently requesting/ping
   """
-  print("('init')")
-  # Initialize user info
-  user, trust_level = accounts.initialize_session(time_zone)
-  return _init(user, trust_level)
+  init_dict, trust_level = _init_before_tests(time_zone)
+  if p.DEBUG_MODE and trust_level >= sm.TEST_TRUST_LEVEL:
+    from . import server_auto_test
+    server_auto_test.server_auto_tests()
+    #anvil.server.launch_background_task('server_auto_tests')
+  return init_dict
+
 
 @timed
-def _init(user, trust_level):
+def _init_before_tests(time_zone):
+  user, trust_level = accounts.initialize_session(time_zone)
+  return _init_matcher(user, trust_level), trust_level
+
+
+def _init_matcher(user, trust_level):
   _init_user_status(user)
   state = _get_state(user)
   propagate_update_needed(user)
@@ -90,28 +98,29 @@ def _init(user, trust_level):
           'state': state,
          }
 
-@timed
+
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_matches()
   sm.prune_chat_messages()
 
 
-@timed
 @anvil.tables.in_transaction
 def _init_user_status(user):
-  print("_init_user_status")
-  _prune_all_expired_items()
-  partial_state = get_status(user)
-  if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
-    _cancel_other(user)
-  elif partial_state['status'] in ['pinged', 'requesting'] and partial_state['seconds_left'] <= 0:
-    _cancel(user)
-  elif partial_state['status'] == 'pinged':
-    _match_commit(user)
-    confirm_wait_helper(user)
-  elif partial_state['status'] in ['requesting', 'pinging']:
-    confirm_wait_helper(user)
+  with TimerLogger("  _init_user_status", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
+    _prune_all_expired_items()
+    timer.check("_prune_all_expired_items")
+    partial_state = get_status(user)
+    timer.check("get_status")
+    if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
+      _cancel_other(user)
+    elif partial_state['status'] in ['pinged', 'requesting'] and partial_state['seconds_left'] <= 0:
+      _cancel(user)
+    elif partial_state['status'] == 'pinged':
+      _match_commit(user)
+      confirm_wait_helper(user)
+    elif partial_state['status'] in ['requesting', 'pinging']:
+      confirm_wait_helper(user)
 
   
 def confirm_wait_helper(user):
@@ -123,16 +132,14 @@ def confirm_wait_helper(user):
     current_proptime.confirm_wait()
 
 
-@timed
 @anvil.tables.in_transaction(relaxed=True)
 def _get_proposals_upcomings(user):
-  print("_get_proposals_upcomings")
+  print("                      _get_proposals_upcomings")
   proposals = Proposal.get_port_view_items(user)
   upcomings = _get_upcomings(user)
   return proposals, upcomings
 
 
-@timed
 def propagate_update_needed(user=None):
   all_users = app_tables.users.search(update_needed=False)
   for u in all_users:
@@ -149,27 +156,30 @@ def get_state(user_id="", force_refresh=False):
   return anvil.server.session['state']
 
 
-@timed
 def _get_state(user):
   """Returns state dict
   
   Side effects: prune proposals when status in [None]
   """
-  state = get_status_in_transaction(user)
-  if state['status']:
-    state['proposals'], state['upcomings'] = ([], [])
-    state['prompts'] = []
-  else:
-    state['proposals'], state['upcomings'] = _get_proposals_upcomings(user)
-    state['prompts'] = sm.get_prompts(user)
-  anvil.server.session['state'] = state
-  user['update_needed'] = False
-  return state
+  with TimerLogger("          _get_state", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
+    state = get_status_in_transaction(user)
+    timer.check("get_status_in_transaction")
+    if state['status']:
+      state['proposals'], state['upcomings'] = ([], [])
+      state['prompts'] = []
+    else:
+      state['proposals'], state['upcomings'] = _get_proposals_upcomings(user)
+      timer.check("_get_proposals_upcomings")
+      state['prompts'] = sm.get_prompts(user)
+      timer.check("get_prompts")
+    anvil.server.session['state'] = state
+    #user['update_needed'] = False  # moved to init_user_info
+    return state
   
 
-@timed
 @anvil.tables.in_transaction
 def get_status_in_transaction(user):
+  print("                      get_status_in_transaction")
   return get_status(user)
 
   
@@ -178,7 +188,6 @@ def get_status(user):
   ping_start: accept_date or, for "matched", match_commence
   assumes 2-person matches only
   """
-  print("_get_status")
   expire_date = None
   ping_start = None
   current_proptime = ProposalTime.get_now_proposing(user)
