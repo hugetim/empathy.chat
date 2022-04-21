@@ -90,7 +90,7 @@ def _init(user, trust_level):
           'state': state,
          }
 
-
+@timed
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_matches()
