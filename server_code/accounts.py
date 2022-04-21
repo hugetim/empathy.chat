@@ -12,6 +12,7 @@ from .server_misc import authenticated_callable
 from anvil_extras.server_utils import timed
 
 
+@timed
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
   user, trust_level = _init_user(time_zone)

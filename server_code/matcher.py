@@ -79,7 +79,7 @@ def init(time_zone):
   user = accounts.initialize_session(time_zone)
   return _init(user)
 
-
+@timed
 def _init(user):
   _prune_all_expired_items()
   _init_user_status(user)
@@ -93,6 +93,7 @@ def _init(user):
 
 
 @anvil.tables.in_transaction
+@timed
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_matches()
@@ -131,8 +132,9 @@ def get_proposals_upcomings(user_id=""):
   return proposals, upcomings
 
 
+@timed
 def propagate_update_needed(user=None):
-  all_users = app_tables.users.search()
+  all_users = app_tables.users.search(update_needed=False)
   for u in all_users:
     if u != user:
       u['update_needed'] = True
@@ -147,6 +149,7 @@ def get_state(user_id="", force_refresh=False):
   return anvil.server.session['state']
 
 
+@timed
 def _get_state(user):
   """Returns state dict
   
@@ -204,6 +207,7 @@ def get_status(user):
 
 
 @anvil.tables.in_transaction(relaxed=True)
+@timed
 def _get_upcomings(user):
     """Return list of user's upcoming matches"""
     if sm.DEBUG:
