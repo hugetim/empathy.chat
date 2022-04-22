@@ -10,6 +10,8 @@ def get_mobile_status():
   import re
   mobile_devices = "Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini"
   glob.MOBILE = re.search(mobile_devices, navigator.userAgent) is not None
+  if glob.MOBILE:
+    print("MOBILE")
 
   
 def disconnect_flow(user2_id, user2_name, user1_id=""):
