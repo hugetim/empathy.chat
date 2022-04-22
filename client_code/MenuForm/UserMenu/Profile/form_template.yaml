@@ -184,6 +184,15 @@ components:
         layout_properties: {width: 41}
       data_bindings:
       - {property: visible, code: 'self.item[''degree''] <= 2'}
+    - type: Label
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+        visible: true, text: '', font_size: null, font: '', spacing_above: medium,
+        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+        underline: false, icon: 'fa:hand-paper-o'}
+      name: hand_label
+      layout_properties: {}
+      data_bindings:
+      - {property: visible, code: 'self.item[''seeking''] and self.item[''me'']'}
     - type: form:C6ZZPAPN4YYF5NVJ:Switch
       properties: {tooltip: '', enabled: true, foreground: null, text_post: Currently seeking a regular empathy buddy,
         visible: true, font_size: 14, spacing_above: small, checked_color: null, spacing_below: small,

@@ -94,8 +94,8 @@ class Profile(ProfileTemplate):
       self.update()
 
   def seeking_toggleswitch_change(self, **event_args):
-    self.item['seeking']
     anvil.server.call('set_seeking_buddy', self.item['seeking'])
+    self.refresh_data_bindings()
 
   def edit_how_empathy_button_click(self, **event_args):
     """This method is called when the button is clicked"""
