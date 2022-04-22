@@ -85,7 +85,7 @@ def _update_match_form_not_matched(user_id):
   from . import matcher
   user = sm.get_acting_user(user_id)
   matcher.confirm_wait_helper(user)
-  partial_state = matcher.get_status_in_transaction(user)
+  partial_state = matcher.get_status(user)
   matcher.propagate_update_needed(user)
   return dict(
     status=partial_state['status'],

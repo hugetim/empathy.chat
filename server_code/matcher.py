@@ -170,8 +170,8 @@ def _get_state(user):
   Side effects: prune proposals when status in [None]
   """
   with TimerLogger("          _get_state", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
-    state = get_status_in_transaction(user)
-    timer.check("get_status_in_transaction")
+    state = get_status(user)
+    timer.check("get_status")
     if state['status']:
       state['proposals'], state['upcomings'] = ([], [])
       state['prompts'] = []
@@ -185,12 +185,6 @@ def _get_state(user):
     return state
   
 
-@anvil.tables.in_transaction
-def get_status_in_transaction(user):
-  print("                      get_status_in_transaction")
-  return get_status(user)
-
-  
 def get_status(user):
   """Returns status dict (only 'status' and 'seconds_left')
   ping_start: accept_date or, for "matched", match_commence
