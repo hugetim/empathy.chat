@@ -164,7 +164,8 @@ class MatchForm(MatchFormTemplate):
       if self.item.their_external:
         message = (f"{self.item.their_name} has left the empathy.chat window "
                    'to continue the video/audio chat in a separate, "popped-out" window. '
-                   "You should see/hear them again shortly (if not already)."
+                   "You should see/hear them again shortly, if not already. "
+                   "(Note: This means they may not see Text Chat messages you send from here--or likewise the Slider.)"
                   )
         Notification(message, timeout=None).show()
 

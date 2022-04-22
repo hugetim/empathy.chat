@@ -3,6 +3,7 @@ from anvil import *
 import anvil.users
 import anvil.server
 from .... import exchange_controller as ec
+from .... import helper as h
 
 
 class SliderPanel(SliderPanelTemplate):
@@ -30,12 +31,18 @@ class SliderPanel(SliderPanelTemplate):
       self.title_label.bold = True
       self.left_column_panel.tooltip = ("After you both submit, you can compare positions to help you decide who gives empathy first. "
                                         "More full usually means it's easier to be curious about what the other is feeling and needing.")
+    elif self.item['status'] == 'submitted':
+      self.title_label.text = 'Status: Submitted, waiting for other to submit... (Empty: angry/distant, Full: content/open)'                              
+      self.title_label.bold = False
+      self.left_column_panel.tooltip = ("After you both submit, you can compare positions to help you decide who gives empathy first. "
+                                        "More full usually means it's easier to be curious about what the other is feeling and needing.")
     elif self.item['status'] == 'received':
       self.title_label.text = 'You can compare to help decide who gives empathy first (Empty: angry/distant, Full: content/open)'
-      self.title_label.bold = False
+      self.title_label.bold = True
       self.left_column_panel.tooltip = ('It may be that neither of you is "full" enough to feel willing/able to give empathy first. '
                                         'If so, consider cancelling or rescheduling.')
     else:
+      h.warning(f"Unexpected SliderPanel status: {self.item['status']}")
       self.title_label.text = ("More full usually means it's easier to be curious about what the other is feeling and needing. "
                                '(Empty: angry/distant, Full: content/open)')
       self.title_label.bold = False
