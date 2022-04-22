@@ -165,7 +165,7 @@ components:
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
         foreground: '', visible: true, text: 'Help / Feedback  ', font_size: 13, font: '',
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:question-circle'}
+        background: '', bold: false, underline: false, icon: 'fa:external-link'}
       layout_properties: {grid_position: 'SRQCCK,EEKFMZ'}
       event_bindings: {}
       name: help_button
