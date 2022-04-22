@@ -189,7 +189,7 @@ class PortUserTest(unittest.TestCase):
     
     
 @anvil.server.background_task
-def server_auto_tests(verbosity=2):
+def server_auto_tests(verbosity=1):
   #unittest.main(exit=False)
   import sys
   test_modules = ['auto_test', 'relationship_test']
