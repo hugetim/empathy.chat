@@ -97,8 +97,8 @@ def _init_before_tests(time_zone):
 
 
 def _init_matcher(user, trust_level):
-  _init_user_status(user)
-  state = _get_state(user)
+  partial_state_if_unchanged = _init_user_status(user)
+  state = _get_state(user, partial_state_if_unchanged)
   propagate_update_needed(user)
   return {'trust_level': trust_level,
           'test_mode': trust_level >= sm.TEST_TRUST_LEVEL,
@@ -129,6 +129,9 @@ def _init_user_status(user):
       confirm_wait_helper(user)
     elif partial_state['status'] in ['requesting', 'pinging']:
       confirm_wait_helper(user)
+    else:
+      return partial_state
+    return None
 
   
 def confirm_wait_helper(user):
@@ -164,13 +167,13 @@ def get_state(user_id="", force_refresh=False):
   return anvil.server.session['state']
 
 
-def _get_state(user):
+def _get_state(user, partial_state_if_known=None):
   """Returns state dict
   
   Side effects: prune proposals when status in [None]
   """
   with TimerLogger("          _get_state", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
-    state = get_status(user)
+    state = partial_state_if_known if partial_state_if_known else get_status(user)
     timer.check("get_status")
     if state['status']:
       state['proposals'], state['upcomings'] = ([], [])
