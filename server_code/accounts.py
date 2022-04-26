@@ -269,12 +269,14 @@ def save_user_field(item_name, value, user_id=""):
   
 
 @authenticated_callable
-def get_settings(user_id=""):
+def get_settings(lazy_items=[], user_id=""):
   """Return user settings displayed on SettingsForm"""
   from . import groups
   user = sm.get_acting_user(user_id)
   item_lists = {}
-  item_lists['user_items'], item_lists['group_items'], item_lists['starred_name_list'] = sm.init_create_form(user_id)
+  if not lazy_items:
+    lazy_items = sm.init_create_form(user_id)
+  item_lists['user_items'], item_lists['group_items'], item_lists['starred_name_list'] = lazy_items
   notif_settings = dict(user['notif_settings'])
   elig_items = {}
   for medium in ['sms', 'email']:

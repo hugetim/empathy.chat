@@ -4,6 +4,7 @@ import anvil.users
 import anvil.server
 from ... import helper as h
 from ... import portable as port
+from ... import glob
 from .Phone import Phone
 from ..DashForm.CreateForm.Eligibility import Eligibility
 
@@ -13,7 +14,8 @@ class SettingsForm(SettingsFormTemplate):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
     
-    phone, time_zone, notif_settings, self.elig_items = anvil.server.call('get_settings')
+    lazy_items = [glob.user_items, glob.group_items, glob.starred_name_list] if glob.lazy_loaded else []
+    phone, time_zone, notif_settings, self.elig_items = anvil.server.call('get_settings', lazy_items)
     #self.init_request_em_opts(re, re_opts, re_st)
     self.phone_form = Phone(item={"phone": phone[2:] if phone else "", # removing "+1" 
                                  })
