@@ -19,12 +19,11 @@ class Eligibility(EligibilityTemplate):
     print(properties)
     self.trust_level = glob.trust_level
     if not item.get('user_items'):
-      user_items, group_items, starred_name_list = anvil.server.call('init_create_form')
       if 'user_items' not in item:
-        item['user_items'] = user_items
+        item['user_items'] = glob.user_items
       if 'group_items' not in item:
-        item['group_items'] = group_items
-      item['starred_name_list'] = starred_name_list
+        item['group_items'] = glob.group_items
+      item['starred_name_list'] = glob.starred_name_list
     self.init_components(item=item, **properties)
     #alert title: New Empathy Chat Proposal
     #alert buttons: OK, Cancel
