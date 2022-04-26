@@ -64,8 +64,8 @@ class SettingsForm(SettingsFormTemplate):
     result = alert(self.eligibility_form, large=True, title=f"Notify me by {medium_title} for requests from:", buttons=[("OK", True), ("Cancel", False)])
     if result:
       self.elig_items[medium] = self.eligibility_form.item
-    self.update_eligibility_descs()
-    self.set_notif_settings()
+      self.update_eligibility_descs()
+      self.set_notif_settings()
  
   def sms_edit_button_click(self, **event_args):
     """This method is called when the button is clicked"""
