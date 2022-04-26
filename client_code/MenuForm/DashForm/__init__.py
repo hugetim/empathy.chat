@@ -186,7 +186,7 @@ class DashForm(DashFormTemplate):
         
   def timer_1_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
-    self.timer_1.interval = 0
+    self.timer_1.interval = 30*60 #kludge to prevent cache from becoming *too* stale
     with h.PausedTimer(self.timer_2):
       glob.populate_lazy_vars(blocking=False)
       time.sleep(6)
