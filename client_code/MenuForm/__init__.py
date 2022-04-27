@@ -188,6 +188,7 @@ class MenuForm(MenuFormTemplate):
     self.logout_user()
     
   def logout_user(self):
+    print("logout")
     anvil.users.logout()
     open_form('LoginForm')
 
