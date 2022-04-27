@@ -185,9 +185,19 @@ class PausedTimer:
     self.orig_interval = timer.interval
   def __enter__(self):
     self.timer.interval = 0
-  def __exit__(self, type, value, tb):
+  def __exit__(self, exc_type, exc_value, exc_tb):
     self.timer.interval = self.orig_interval
 
+    
+class Disabled:
+  def __init__(self, component):
+    self.component = component
+    self.orig_enabled = component.enabled
+  def __enter__(self):
+    self.component.enabled = False
+  def __exit__(self, exc_type, exc_value, exc_tb):
+    self.component.enabled = self.orig_enabled
+    
     
 @anvil.server.portable_class    
 class AttributeToKey:

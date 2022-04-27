@@ -119,7 +119,7 @@ class DashForm(DashFormTemplate):
     
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    with h.PausedTimer(self.timer_2):
+    with h.PausedTimer(self.timer_2), h.Disabled(self.propose_button):
       self.propose()
     
   def propose(self, specified_users=[], link_key=""):
