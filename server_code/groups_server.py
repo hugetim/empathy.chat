@@ -131,7 +131,7 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
     return port_group if portable else MyGroup(port_group)
   
   @staticmethod
-  def members_from_group_row(group_row, with_trust_level=False):
+  def members_from_group_row(group_row, with_trust_level=True):
     member_set = (
       {m['user'] for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']} if with_trust_level
       else {m['user'] for m in app_tables.group_members.search(group=group_row)}
@@ -141,7 +141,7 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
 
   @staticmethod
   def add_member(user, invite_row):
-    if user not in MyGroup.members_from_group_row(invite_row['group']):
+    if user not in MyGroup.members_from_group_row(invite_row['group'], with_trust_level=False):
       app_tables.group_members.add_row(user=user,
                                        group=invite_row['group'],
                                        invite=invite_row,
