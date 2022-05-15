@@ -32,7 +32,7 @@ class MenuForm(MenuFormTemplate):
             dismissible=False)
     else:
       self.set_help_link("https://www.loomio.org/join/group/G537YtVTZmNTW1S1KTJnDvUb/")
-    self.connections_link.visible = glob.trust_level >= 2 # should only be for level 2 if have connections
+    self.connections_link.visible = glob.trust_level >= 1
     self.my_groups_link.visible = glob.trust_level >= 3
     self.test_mode.visible = self.item['test_mode']
     if p.DEBUG_MODE and self.item['test_mode']:

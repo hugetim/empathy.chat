@@ -79,6 +79,9 @@ db_schema:
       admin_ui: {width: 200}
       type: link_single
       target: group_invites
+    - name: guest_allowed
+      admin_ui: {width: 200}
+      type: bool
   group_invites:
     title: Group Invites
     client: none
