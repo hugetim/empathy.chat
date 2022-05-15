@@ -227,7 +227,13 @@ def _group_members_to_group_names_exclude(user, excluded_users):
   import collections
   fellow_members_to_group_names = collections.defaultdict(list)
   excluded_users.add(user)
+  trust_level = user['trust_level']
+  if trust_level < 1:
+    return {}
   for group_row in g.user_groups(user):
+    if trust_level < 2:
+      if not g.guest_allowed_in_group(user, group_row):
+        continue
     relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) - excluded_users
     for user2 in relevant_group_members:
       fellow_members_to_group_names[user2].append(group_row['name'])

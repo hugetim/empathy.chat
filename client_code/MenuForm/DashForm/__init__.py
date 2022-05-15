@@ -19,7 +19,7 @@ class DashForm(DashFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     
-    self.proposals_card.visible = glob.trust_level >= 2 # add in group membership once implemented
+    self.proposals_card.visible = glob.trust_level >= 2 # show if guest_allowed (timer_1)
     specific_now_prop = any(
       [(item['prop'].start_now and item['prop'].specific_user_eligible)
        for item in self.item['proposals']]
@@ -188,6 +188,7 @@ class DashForm(DashFormTemplate):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     self.timer_1.interval = 30*60 #kludge to prevent cache from becoming *too* stale
     with h.PausedTimer(self.timer_2):
-      glob.populate_lazy_vars(blocking=False)
-      time.sleep(6)
-    
+      glob.populate_lazy_vars(spinner=False)
+      if glob.trust_level == 1 and glob.user_items:
+        self.proposals_card.visible = True
+        self.top_form.connections_link.visible = True

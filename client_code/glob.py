@@ -1,6 +1,5 @@
 import anvil.users
 import anvil.server
-from anvil_labs.non_blocking import call_server_async
 from . import parameters as p
 from . import invites
 from . import groups
@@ -31,12 +30,12 @@ def __getattr__(name):
     raise AttributeError(name)
  
 
-def populate_lazy_vars(blocking=True):
-  if blocking:
+def populate_lazy_vars(spinner=True):
+  if spinner:
     out = anvil.server.call('init_create_form')
-    _set_lazy_vars(out)
   else:
-    call_server_async('init_create_form').on_result(_set_lazy_vars)
+    out = anvil.server.call_s('init_create_form')
+  _set_lazy_vars(out)
 
     
 def _set_lazy_vars(out):

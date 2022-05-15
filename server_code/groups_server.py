@@ -167,6 +167,13 @@ def get_create_group_items(user):
     subtext = f"(host: {'me' if host == user else sm.name(host, to_user=user)})"
     items.append(dict(key=g['name'], value=groups.Group(g['name'], g.get_id()), subtext=subtext))
   return sorted(items, key=lambda item:(item['subtext'] + item['key']))
+
+
+def guest_allowed_in_group(user, group_row):
+  member_record = app_tables.group_members.get(user=user, group=group_row)
+  if not member_record:
+    sm.warning(f"guest_allowed_in_group({user['email']}, {group_row['name']}): member_record not found")
+  return member_record['guest_allowed']
   
 
 class Invite(sm.ServerItem, groups.Invite): 
