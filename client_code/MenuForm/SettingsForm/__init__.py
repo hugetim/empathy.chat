@@ -4,6 +4,7 @@ import anvil.users
 import anvil.server
 from ... import helper as h
 from ... import portable as port
+from ... import glob
 from .Phone import Phone
 from ..DashForm.CreateForm.Eligibility import Eligibility
 
@@ -13,7 +14,8 @@ class SettingsForm(SettingsFormTemplate):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
     
-    phone, time_zone, notif_settings, self.elig_items = anvil.server.call('get_settings')
+    lazy_items = [glob.user_items, glob.group_items, glob.starred_name_list] if glob.lazy_loaded else []
+    phone, time_zone, notif_settings, self.elig_items = anvil.server.call('get_settings', lazy_items)
     #self.init_request_em_opts(re, re_opts, re_st)
     self.phone_form = Phone(item={"phone": phone[2:] if phone else "", # removing "+1" 
                                  })
@@ -62,8 +64,8 @@ class SettingsForm(SettingsFormTemplate):
     result = alert(self.eligibility_form, large=True, title=f"Notify me by {medium_title} for requests from:", buttons=[("OK", True), ("Cancel", False)])
     if result:
       self.elig_items[medium] = self.eligibility_form.item
-    self.update_eligibility_descs()
-    self.set_notif_settings()
+      self.update_eligibility_descs()
+      self.set_notif_settings()
  
   def sms_edit_button_click(self, **event_args):
     """This method is called when the button is clicked"""

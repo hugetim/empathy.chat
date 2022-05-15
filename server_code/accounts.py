@@ -269,12 +269,14 @@ def save_user_field(item_name, value, user_id=""):
   
 
 @authenticated_callable
-def get_settings(user_id=""):
+def get_settings(lazy_items=[], user_id=""):
   """Return user settings displayed on SettingsForm"""
   from . import groups
   user = sm.get_acting_user(user_id)
   item_lists = {}
-  item_lists['user_items'], item_lists['group_items'], item_lists['starred_name_list'] = sm.init_create_form(user_id)
+  if not lazy_items:
+    lazy_items = sm.init_create_form(user_id)
+  item_lists['user_items'], item_lists['group_items'], item_lists['starred_name_list'] = lazy_items
   notif_settings = dict(user['notif_settings'])
   elig_items = {}
   for medium in ['sms', 'email']:
@@ -283,7 +285,9 @@ def get_settings(user_id=""):
     eligible_group_rows = [app_tables.groups.get_by_id(g_id) for g_id in elig_items[medium]['eligible_groups']]
     elig_items[medium]['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id()) for group_row in eligible_group_rows]
     elig_items[medium].update(item_lists)
-  time_zone = user['time_zone'] if user['time_zone'] else "America/Chicago"
+  time_zone = user['time_zone']
+  if not time_zone:
+    time_zone = "America/Chicago"
   return (user['phone'], time_zone, notif_settings, elig_items)
 
 
