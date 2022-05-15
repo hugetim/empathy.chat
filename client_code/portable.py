@@ -124,7 +124,14 @@ class UserFull(User):
 
   def name_item(self):
     return dict(key=self.name, value=self, subtext=self.distance_str_or_groups, title=self.first if self.first else self.name)
-      
+
+  @property
+  def distance_str(self):
+    out = User.distance_str
+    if self.status == "invite":
+      out += " (pending invite)"
+    return out
+  
   @property
   def distance_str_or_groups(self):
     d_str = self.distance_str
@@ -133,6 +140,10 @@ class UserFull(User):
   @property
   def url_confirmed_date_str(self):
     return h.short_date_str(h.as_local_tz(self.url_confirmed_date)) if self.url_confirmed_date else ""
+  
+  @property
+  def last_active_str(self):
+    return h.short_date_str(h.as_local_tz(self.last_active))
 
 
 @anvil.server.portable_class
@@ -148,7 +159,15 @@ class UserProfile(UserFull):
   @property
   def profile_updated_date_str(self):
     return h.short_date_str(h.as_local_tz(self.profile_updated_dt)) if self.profile_updated_dt else ""
-    
+ 
+
+@anvil.server.portable_class
+class MyGroupMember(UserFull):
+  def __init__(self, group_id, guest_allowed=False, **kwargs):
+    super().__init__(**kwargs)
+    self.group_id = group_id
+    self.guest_allowed = guest_allowed
+
     
 @anvil.server.portable_class
 class ProposalTime():

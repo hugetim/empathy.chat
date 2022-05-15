@@ -15,6 +15,7 @@ components:
       - {title: Name, id: TCRDJP, data_key: name, $$hashKey: 'object:82766'}
       - {id: KANGHW, title: Role, data_key: trust_label, $$hashKey: 'object:23553',
         width: '90'}
+      - {id: BMRGGD, title: No Phone Req., data_key: no_phone_required, $$hashKey: 'object:31451'}
       - {title: Degree, id: CKNKJL, data_key: degree, $$hashKey: 'object:82767', width: '90'}
       - {title: Last Active, id: VWXCEI, data_key: last_active, $$hashKey: 'object:82768',
         width: '90'}

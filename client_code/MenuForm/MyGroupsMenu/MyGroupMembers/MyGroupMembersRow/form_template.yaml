@@ -80,4 +80,14 @@ components:
     icon: ''}
   name: last_active_label
   layout_properties: {column: VWXCEI}
+- type: CheckBox
+  properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
+    foreground: '', allow_indeterminate: false, visible: true, text: '', font_size: null,
+    font: '', spacing_above: small, spacing_below: small, italic: false, background: '',
+    bold: false, checked: false, underline: false}
+  name: guest_allowed_check_box
+  layout_properties: {column: BMRGGD}
+  data_bindings:
+  - {property: checked, code: self.item.guest_allowed, writeback: true}
+  event_bindings: {change: guest_allowed_check_box_change}
 is_package: true

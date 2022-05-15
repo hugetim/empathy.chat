@@ -20,9 +20,7 @@ class ConnectionRow(ConnectionRowTemplate):
 
     # Any code you write here will run when the form opens.
     self.degree_label.text = self.item.distance_str_or_groups
-    self.last_active_label.text = h.short_date_str(h.as_local_tz(self.item['last_active']))
-    if self.item['status'] == "invite":
-      self.degree_label.text += " (pending invite)"
+    self.last_active_label.text = self.item.last_active_str
 
   def unconnect_button_click(self, **event_args):
     """This method is called when the button is clicked"""

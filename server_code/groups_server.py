@@ -119,16 +119,21 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
 
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
-    port_members = sm.get_port_users_full(MyGroup.members_from_group_row(group_row), user1_id=user_id)
+    members = MyGroup.members_from_group_row(group_row)
+    port_members = sm.get_port_users_full(members, user1_id=user_id)
+    group_id = group_row.get_id()
+    for member in port_members:
+      member.group_id = group_id
+      member.guest_allowed = 
     port_invites = [Invite.from_invite_row(i_row)
                     for i_row in app_tables.group_invites.search(tables.order_by('expire_date', ascending=False), 
                                                                  group=group_row, current=True)]
-    port_group = groups.MyGroup(name=group_row['name'],
-                                group_id=group_row.get_id(),
+    port_my_group = groups.MyGroup(name=group_row['name'],
+                                group_id=group_id,
                                 members=port_members,
                                 invites=port_invites,
                                )
-    return port_group if portable else MyGroup(port_group)
+    return port_my_group if portable else MyGroup(port_my_group)
   
   @staticmethod
   def members_from_group_row(group_row, with_trust_level=True):
@@ -174,6 +179,18 @@ def guest_allowed_in_group(user, group_row):
   if not member_record:
     sm.warning(f"guest_allowed_in_group({user['email']}, {group_row['name']}): member_record not found")
   return member_record['guest_allowed']
+  
+  
+@sm.authenticated_callable
+def update_guest_allowed(port_member):
+  user = sm.get_acting_user()
+  group_row = app_tables.groups.get_by_id(port_member.group_id)
+  if user not in group_row['hosts']:
+    sm.warning(f"update_guest_allowed not authorized")
+    return
+  user2 = sm.get_other_user(port_member.user_id)
+  member_row = app_tables.group_members.get(user=user2, group=group_row)
+  member_row['guest_allowed'] = port_member.guest_allowed
   
 
 class Invite(sm.ServerItem, groups.Invite): 

@@ -7,6 +7,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.users
 import anvil.server
+from anvil_extras.utils import wait_for_writeback
 from ..... import helper as h
 from ..... import ui_procedures as ui
 from ..... import prompts
@@ -23,10 +24,8 @@ class MyGroupMembersRow(MyGroupMembersRowTemplate):
 
     # Any code you write here will run when the form opens.
     if self.item['distance'] < port.UNLINKED:
-      self.degree_label.text = h.add_num_suffix(self.item['distance'])
-    self.last_active_label.text = h.short_date_str(h.as_local_tz(self.item['last_active']))
-    if self.item['status'] == "invite":
-      self.degree_label.text += " (pending invite)"
+      self.degree_label.text = self.item.distance_str
+    self.last_active_label.text = self.item.last_active_str
 
   def unconnect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -44,3 +43,9 @@ class MyGroupMembersRow(MyGroupMembersRowTemplate):
     """This method is called when the button is clicked"""
     if invited.invited_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
       self.parent.raise_event('x-reset')
+
+  @wait_for_writeback
+  def guest_allowed_check_box_change(self, **event_args):
+    """This method is called when this checkbox is checked or unchecked"""
+    anvil.server.call('update_guest_allowed', self.item)
+    self.refresh_data_bindings()
