@@ -127,7 +127,7 @@ class UserFull(User):
 
   @property
   def distance_str(self):
-    out = User.distance_str
+    out = super().distance_str
     if self.status == "invite":
       out += " (pending invite)"
     return out
@@ -163,10 +163,34 @@ class UserProfile(UserFull):
 
 @anvil.server.portable_class
 class MyGroupMember(UserFull):
-  def __init__(self, group_id, guest_allowed=False, **kwargs):
-    super().__init__(**kwargs)
+  def __init__(self, port_user_full, group_id, guest_allowed=False):
+    self._init_user_full_attributes(port_user_full)
+#     self = port_user_full
     self.group_id = group_id
     self.guest_allowed = guest_allowed
+    
+  def _init_user_full_attributes(self, puf):
+#     print(puf.__dict__)
+    for key in puf.__dict__:
+      self.__setattr__(key, puf.__dict__[key])   
+#     super().__init__(user_id=puf.user_id, 
+#                      name=puf.name, 
+#                      url_confirmed=puf.url_confirmed,
+#                      distance=puf.distance, 
+#                      seeking=puf.seeking, 
+#                      starred=puf.starred,
+#                      self.degree = degree,
+#     self.last_active = last_active
+#     self.status = status
+#     self.unread_message = unread_message
+#     self.me = me
+#     self.first = first
+#     self.last = last
+#     self.url_confirmed_date = url_confirmed_date
+#     self.trust_level = trust_level
+#     self.trust_label = trust_label
+#     self.common_group_names = common_group_names if common_group_names else []
+#     self.relationship = rel.Relationship(distance=self.distance, degree=self.degree)
 
     
 @anvil.server.portable_class

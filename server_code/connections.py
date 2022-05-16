@@ -209,7 +209,7 @@ def connection_record(user2, user1, _distance=None, degree=None):
 #   import collections
 #   fellow_members_to_group_names = collections.defaultdict(list)
 #   for group_row in g.user_groups(user):
-#     relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) & included_users
+#     relevant_group_members = set(g.members_from_group_row(group_row)) & included_users
 #     for user2 in relevant_group_members:
 #       fellow_members_to_group_names[user2].append(group_row['name'])
 #   return [sm.get_port_user_full(user2, user, port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
@@ -234,7 +234,7 @@ def _group_members_to_group_names_exclude(user, excluded_users):
     if trust_level < 2:
       if not g.guest_allowed_in_group(user, group_row):
         continue
-    relevant_group_members = set(g.MyGroup.members_from_group_row(group_row)) - excluded_users
+    relevant_group_members = set(g.members_from_group_row(group_row)) - excluded_users
     for user2 in relevant_group_members:
       fellow_members_to_group_names[user2].append(group_row['name'])
   return fellow_members_to_group_names

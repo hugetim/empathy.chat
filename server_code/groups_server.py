@@ -12,6 +12,7 @@ from . import server_misc as sm
 from . import accounts
 from . import parameters as p
 from . import helper as h
+from . import portable as port
 from .exceptions import RowMissingError, ExpiredInviteError, AlreadyInError
 
 
@@ -90,7 +91,8 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
   def portable(self):
     port = groups.MyGroup()
     port.update(self)
-    port.members = sm.get_port_users_full(self.members)
+    #port.members = sm.get_port_users_full(self.members)
+    port.members = list(port_members_from_group_row(self.group_row, user_id=""))
     port.invites = [invite.portable() for invite in self.invites]
     return port
 
@@ -119,34 +121,20 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
 
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
-    members = MyGroup.members_from_group_row(group_row)
-    port_members = sm.get_port_users_full(members, user1_id=user_id)
-    group_id = group_row.get_id()
-    for member in port_members:
-      member.group_id = group_id
-      member.guest_allowed = 
+    port_members = list(port_members_from_group_row(group_row, user_id))
     port_invites = [Invite.from_invite_row(i_row)
                     for i_row in app_tables.group_invites.search(tables.order_by('expire_date', ascending=False), 
                                                                  group=group_row, current=True)]
     port_my_group = groups.MyGroup(name=group_row['name'],
-                                group_id=group_id,
-                                members=port_members,
-                                invites=port_invites,
-                               )
+                                   group_id=group_row.get_id(),
+                                   members=port_members,
+                                   invites=port_invites,
+                                  )
     return port_my_group if portable else MyGroup(port_my_group)
-  
-  @staticmethod
-  def members_from_group_row(group_row, with_trust_level=True):
-    member_set = (
-      {m['user'] for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']} if with_trust_level
-      else {m['user'] for m in app_tables.group_members.search(group=group_row)}
-    )
-    member_set.update(set(group_row['hosts']))
-    return list(member_set)
 
   @staticmethod
   def add_member(user, invite_row):
-    if user not in MyGroup.members_from_group_row(invite_row['group'], with_trust_level=False):
+    if user not in members_from_group_row(invite_row['group'], with_trust_level=False):
       app_tables.group_members.add_row(user=user,
                                        group=invite_row['group'],
                                        invite=invite_row,
@@ -159,6 +147,25 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
                           )
 
       
+def members_from_group_row(group_row, with_trust_level=True):
+  member_set = (
+    {m['user'] for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']} if with_trust_level
+    else {m['user'] for m in app_tables.group_members.search(group=group_row)}
+  )
+  member_set.update(set(group_row['hosts']))
+  return list(member_set)
+
+
+def port_members_from_group_row(group_row, user_id):
+  with_trust_level=True
+  member_rows = [m for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']]
+  members = [m['user'] for m in member_rows]
+  port_users_full = sm.get_port_users_full(members, user1_id=user_id)
+  group_id = group_row.get_id()
+  for i, port_user_full in enumerate(port_users_full):
+    yield port.MyGroupMember(port_user_full, group_id, member_rows[i]['guest_allowed'])
+  
+
 def user_groups(user):
   memberships = {m['group'] for m in app_tables.group_members.search(user=user)}
   hosteds = {group for group in app_tables.groups.search(hosts=[user], current=True)}

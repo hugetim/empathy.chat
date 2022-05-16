@@ -531,7 +531,7 @@ def is_eligible(eligibility_spec, other_user, distance=None):
     return True
   else:
     for group in eligibility_spec['eligible_groups']:
-      if other_user in g.MyGroup.members_from_group_row(group):
+      if other_user in g.members_from_group_row(group):
         return True
     return False
   
@@ -548,5 +548,5 @@ def all_eligible_users(eligibility_spec):
   if eligibility_spec['eligible_users']:
     all_eligible.update(set(eligibility_spec['eligible_users']))
   for group in eligibility_spec['eligible_groups']:
-    all_eligible.update(set(g.MyGroup.members_from_group_row(group))-{user})
+    all_eligible.update(set(g.members_from_group_row(group))-{user})
   return all_eligible
