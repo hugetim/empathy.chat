@@ -142,7 +142,7 @@ components:
     components:
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: External Web Site Profile, font_size: null, wrap_on: mobile,
+        visible: true, text: '  External Web Site Profile', font_size: null, wrap_on: mobile,
         font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '',
         spacing_below: small, italic: false, background: '', bold: false, underline: true,
         icon: ''}
@@ -153,7 +153,7 @@ components:
       - {property: visible, code: 'self.item[''profile_url'']'}
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: false, text: External Web Site Profile Confirmed, font_size: null,
+        visible: false, text: '  External Web Site Profile Confirmed', font_size: null,
         font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       name: web_page_alt_label
