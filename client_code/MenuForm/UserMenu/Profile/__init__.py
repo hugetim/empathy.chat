@@ -33,7 +33,7 @@ class Profile(ProfileTemplate):
     self.column_panel_1.row_spacing = 0
     if self.item['url_confirmed']:
       self.web_page_link.tooltip = (
-        f"{self.item['first']}'s ownership of this external web site profile "
+        f"{self.item['first']}'s ownership of an external web site profile "
         f"was confirmed on {self.item.url_confirmed_date_str}.\n"
         f"({rel.Relationship.PROFILE_URL_NOTE})"
       )
