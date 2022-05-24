@@ -22,7 +22,7 @@ class LoginForm(LoginFormTemplate):
       user = anvil.users.login_with_form(show_signup_option=False, allow_cancel=True)
       if user and (not user['init_date']):
         anvil.users.logout()
-        with Notification("Creating a new account requires an invite link."):
+        with Notification("Sorry, empathy.chat is currently invite-only. Creating a new account requires an invite link."):
           anvil.server.call_s('remove_user', user)
           import time
           time.sleep(2)
