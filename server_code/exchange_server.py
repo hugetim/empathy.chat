@@ -1,4 +1,3 @@
-import anvil.server
 from .server_misc import authenticated_callable
 from . import exchange_interactor as ei
 from .exchange_gateway import ExchangeRepository
