@@ -24,7 +24,7 @@ dependencies:
   version: {dev: false}
 services:
 - source: /runtime/services/tables.yml
-  client_config: {enable_v2: true}
+  client_config: {enable_v2: false}
   server_config: {auto_create_missing_columns: false}
 - source: /runtime/services/anvil/email.yml
   client_config: {}
