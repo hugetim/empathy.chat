@@ -8,6 +8,7 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from .... import glob
+from .... import invite_controller
 
 
 class Invites(InvitesTemplate):
@@ -20,10 +21,10 @@ class Invites(InvitesTemplate):
     
   def update(self):
     self.invite_button.visible = glob.trust_level >= 3
-    glob.invites.load()
+    glob.invites = invite_controller.load_invites()
     self.invites_data_grid.visible = glob.invites
     if glob.invites:
-      self.invites_repeating_panel.items = glob.invites.to_data()
+      self.invites_repeating_panel.items = glob.invites
 
   def invite_button_click(self, **event_args):
     """This method is called when the button is clicked"""

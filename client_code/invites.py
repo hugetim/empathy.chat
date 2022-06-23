@@ -3,21 +3,7 @@ import anvil.users
 from . import helper as h
 from . import parameters as p
 
-
-class Invites(h.AttributeToKey):
-  def __init__(self):
-    self.invites = []
-    
-  def to_data(self):
-    return self.invites
-    
-  def __len__(self):
-    return len(self.invites)
-    
-  def load(self):
-    self.invites = anvil.server.call('load_invites')
-
-   
+  
 @anvil.server.portable_class
 class Invite(h.PortItem, h.AttributeToKey):
   no_auth_methods = ['visit', 'register', 'respond']
