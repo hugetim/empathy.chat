@@ -1,6 +1,7 @@
 import unittest
 from .exchanges import Exchange, Format
 from . import exchange_interactor as ei
+from .exchange_gateway import ExchangeRepository
 from .exceptions import RowMissingError
 from anvil.tables import app_tables
 from .server_misc import now
@@ -48,8 +49,8 @@ class TestInitMatch(unittest.TestCase):
   def test_init_match_form_no_status(self):
     participants = [dict(user_id="1", present=0, slider_value=""),
                     dict(user_id="2", present=0, slider_value="")]
-    repo = MockRepo(Exchange("eid", None, participants, False, None, Format(None), "1"))
-    self.assertEqual(ei.init_match_form(poptibo_id, repo), 
+    ei.repo = MockRepo(Exchange("eid", None, participants, False, None, Format(None), "1"))
+    self.assertEqual(ei.init_match_form(poptibo_id), 
                      (None, None, None, "")
                     )
     
@@ -57,17 +58,23 @@ class TestInitMatch(unittest.TestCase):
     participants = [dict(user_id=poptibo_id, present=0, slider_value=""),
                     dict(user_id=hugetim_id, present=0, slider_value="")]
     e = Exchange("eid", "room code", participants, False, None, Format(45), poptibo_id)
-    self.assertEqual(ei.init_match_form(poptibo_id, MockRepo(e)), 
+    ei.repo = MockRepo(e)
+    self.assertEqual(ei.init_match_form(poptibo_id), 
                      (None, "room code", 45, "")
                     )
     self.assertEqual(e.my['present'], 1)
 
+  def tearDown(self):
+    restore_repo()
+
+    
 class TestUpdateMatch(unittest.TestCase):
   def test_update_match_form_matched(self):
     participants = [dict(user_id=poptibo_id, present=0, slider_value=.2),
                     dict(user_id=hugetim_id, present=1, slider_value="", external=1, complete=0, late_notified=1)]
     e = Exchange("eid", "room code", participants, False, now(), Format(45), poptibo_id)
-    self.assertEqual(ei.update_match_form(poptibo_id, MockRepo(e)), 
+    ei.repo = MockRepo(e)
+    self.assertEqual(ei.update_match_form(poptibo_id), 
                      dict(status="matched",
                           how_empathy_list=["test how", "test how_empathy"],
                           their_name="Tim",
@@ -80,3 +87,10 @@ class TestUpdateMatch(unittest.TestCase):
                     )
     self.assertEqual(e.my['present'], 1)
     
+  def tearDown(self):
+    restore_repo()
+    
+
+def restore_repo():
+  ei.repo = ExchangeRepository()
+  

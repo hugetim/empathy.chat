@@ -1,19 +1,26 @@
+import anvil.secrets
+from .server_misc import authenticated_callable
 from . import server_misc as sm
 from .exceptions import RowMissingError
-import anvil.secrets
+from .exchange_gateway import ExchangeRepository
 
 
-def init_match_form(user_id, repo):
+repo = ExchangeRepository()
+
+
+@authenticated_callable
+def init_match_form(user_id=""):
   """Return jitsi_code, duration (or Nones), my_slider_value
   
   Side effect: set this_match['present']"""
+  print(f"init_match_form, {user_id}")
   try:
-    return _init_match_form_already_matched(user_id, repo)
+    return _init_match_form_already_matched(user_id)
   except RowMissingError as err:
     return _init_match_form_not_matched(user_id)
 
 
-def _init_match_form_already_matched(user_id, repo):
+def _init_match_form_already_matched(user_id):
   exchange = repo.get_exchange(user_id)
   exchange.my['present'] = 1
   repo.save_exchange(exchange)
@@ -37,19 +44,19 @@ def _init_match_form_requesting(current_proptime):
   jitsi_code, duration = current_proptime.get_match_info()
   return current_proptime.get_id(), jitsi_code, duration, ""
   
-  
-def update_match_form(user_id, repo):
+@authenticated_callable
+def update_match_form(user_id=""):
   """Return match_state dict
   
   Side effects: Update match['present'], late notifications, confirm_wait"""
   try:
     exchange = repo.get_exchange(user_id)
-    return _update_match_form_already_matched(user_id, exchange, repo)
+    return _update_match_form_already_matched(user_id, exchange)
   except RowMissingError as err:
     return _update_match_form_not_matched(user_id)
   
 
-def _update_match_form_already_matched(user_id, exchange, repo):
+def _update_match_form_already_matched(user_id, exchange):
   user = sm.get_acting_user(user_id)
   changed = not exchange.my['present']
   exchange.my['present'] = 1
@@ -92,8 +99,10 @@ def _update_match_form_not_matched(user_id):
   )
 
 
-def match_complete(user_id, repo):
+@authenticated_callable
+def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user"""
+  print(f"match_complete, {user_id}")
   from . import matcher
   try:
     exchange = repo.get_exchange(user_id)
@@ -104,17 +113,21 @@ def match_complete(user_id, repo):
   except RowMissingError as err:
     sm.warning(f"match_complete: match not found {user_id}")
 
-   
-def add_chat_message(message, user_id, repo):
+ 
+@authenticated_callable
+def add_chat_message(message="[blank test message]", user_id=""):
+  print(f"add_chat_message, {user_id}, '[redacted]'")
   exchange = repo.get_exchange(user_id)
   repo.add_chat(message=anvil.secrets.encrypt_with_key("new_key", message),
                 now=sm.now(),
                 exchange=exchange,
                )
-  return _update_match_form_already_matched(user_id, exchange, repo)
+  return _update_match_form_already_matched(user_id, exchange)
 
 
-def update_my_external(my_external, user_id, repo):
+@authenticated_callable
+def update_my_external(my_external, user_id=""):
+  print(f"update_my_external, {my_external}, {user_id}")
   try:
     exchange = repo.get_exchange(user_id)
     exchange.my['external'] = int(my_external)
@@ -123,9 +136,11 @@ def update_my_external(my_external, user_id, repo):
     print("Exchange record not available to record my_external")
 
 
-def submit_slider(value, user_id, repo):
+@authenticated_callable
+def submit_slider(value, user_id=""):
+  """Return their_value"""
+  print(f"submit_slider, '[redacted]', {user_id}")
   exchange = repo.get_exchange(user_id)
   exchange.my['slider_value'] = value
   repo.save_exchange(exchange)
   return exchange.their['slider_value']
-  
