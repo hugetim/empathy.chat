@@ -1,7 +1,6 @@
 import unittest
 from .exchanges import Exchange, Format
 from . import exchange_interactor as ei
-from .exchange_gateway import ExchangeRepository
 from .exceptions import RowMissingError
 from anvil.tables import app_tables
 from .server_misc import now
@@ -65,7 +64,7 @@ class TestInitMatch(unittest.TestCase):
     self.assertEqual(e.my['present'], 1)
 
   def tearDown(self):
-    restore_repo()
+    ei.reset_repo()
 
     
 class TestUpdateMatch(unittest.TestCase):
@@ -88,9 +87,5 @@ class TestUpdateMatch(unittest.TestCase):
     self.assertEqual(e.my['present'], 1)
     
   def tearDown(self):
-    restore_repo()
+    ei.reset_repo()
     
-
-def restore_repo():
-  ei.repo = ExchangeRepository()
-  

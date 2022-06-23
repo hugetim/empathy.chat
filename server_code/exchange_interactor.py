@@ -8,6 +8,11 @@ from .exchange_gateway import ExchangeRepository
 repo = ExchangeRepository()
 
 
+def reset_repo():
+  global repo
+  repo = ExchangeRepository()
+
+  
 @authenticated_callable
 def init_match_form(user_id=""):
   """Return jitsi_code, duration (or Nones), my_slider_value
