@@ -14,9 +14,6 @@ class Invites(h.AttributeToKey):
   def __len__(self):
     return len(self.invites)
     
-  def save(self):
-    anvil.server.call('save_invites', self.invites)
-    
   def load(self):
     self.invites = anvil.server.call('load_invites')
 
