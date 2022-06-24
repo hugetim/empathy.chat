@@ -43,6 +43,7 @@ class InviteBasicTest(unittest.TestCase):
     invite2 = s_invite1.portable()
     self.assertEqual(invite2.rel_to_inviter, 'test subject 1')
     
+    
 class InviteTest(unittest.TestCase):
   def setUp(self):
     self.start_time = sm.now()
