@@ -3,6 +3,7 @@ import anvil.users
 import anvil.server
 from anvil.js import window, ExternalError
 from . import glob
+from anvil_extras.utils import timed
 
 
 def get_mobile_status():
@@ -40,7 +41,7 @@ def reload(init_dict=None, do_open=True):
     return new_form
 
 
-    
+@timed    
 def get_init():
     from anvil.js.window import Intl
     from . import helper as h
