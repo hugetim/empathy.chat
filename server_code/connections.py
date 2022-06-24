@@ -362,8 +362,8 @@ def try_removing_from_invite_proposal(invite, user):
       
   
 def try_connect(invite, invite_reply):
-  from .invites_server import Invite
-  if Invite.phone_match(invite['guess'], invite['user2']):
+  from .invites_server import phone_match
+  if phone_match(invite['guess'], invite['user2']):
     try_adding_to_invite_proposal(invite, invite['user2'])
     already = app_tables.connections.search(user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']), current=True)
     if len(already) > 0:

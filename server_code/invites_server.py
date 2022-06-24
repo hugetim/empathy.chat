@@ -36,6 +36,10 @@ def _serve_invite(port_invite, method, kwargs, auth):
   return invite.portable(), errors
 
 
+def phone_match(last4, user):
+  return last4 == user['phone'][-4:]
+
+
 class Invite(invites.Invite):
   no_auth_methods = ['visit', 'register', 'respond']
   
@@ -72,7 +76,7 @@ class Invite(invites.Invite):
     if self.invitee:
       if not self.invitee['phone']:
         errors.append(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
-      elif not Invite.phone_match(self.inviter_guess, self.invitee):
+      elif not phone_match(self.inviter_guess, self.invitee):
         errors.append(f"The digits you entered do not match {sm.name(self.invitee)}'s confirmed phone number.")
     else:
       user['last_invite'] = sm.now()
@@ -94,10 +98,6 @@ class Invite(invites.Invite):
       else:
         errors.append("This invite already exists.")
     return errors
-
-  @staticmethod
-  def phone_match(last4, user):
-    return last4 == user['phone'][-4:]
   
   def _edit_row(self, row, guess, rel, now):
     row['guess'] = guess
@@ -218,7 +218,7 @@ class Invite(invites.Invite):
     from . import connections as c
     errors = []
     self.invitee = user
-    if user['phone'] and not Invite.phone_match(self.inviter_guess, user):
+    if user['phone'] and not phone_match(self.inviter_guess, user):
       errors += [p.MISTAKEN_INVITER_GUESS_ERROR]
       sm.add_invite_guess_fail_prompt(self)
       errors += self.cancel(invite_row)
@@ -241,7 +241,7 @@ class Invite(invites.Invite):
     errors += self.invalid_response()
     if errors:
       return errors
-    if not Invite.phone_match(self.invitee_guess, self.inviter):
+    if not phone_match(self.invitee_guess, self.inviter):
       errors.append(f"You did not accurately provide the last 4 digits of {sm.name(self.inviter)}'s confirmed phone number.")
       return errors
     response_row, errors = self._response_row()
@@ -281,29 +281,4 @@ class Invite(invites.Invite):
                                  link_key=invite_row['link_key'],
                                  invitee=sm.get_port_user(invite_row['user2'], user1=user),
                                 )
-    return port_invite if portable else Invite(port_invite)
-
-  
-#   def serve(self):
-#     errors = []
-#     invite_row = self._invite_row()
-#     if invite_row:
-#       errors += self._sync_invite(invite_row)
-#     elif self.not_yet_added and self.ready_to_add:
-#       new_self, add_errors = self.add(self.inviter.user_id if self.inviter else "")
-#       self.update(new_self)
-#       errors += add_errors
-#     else:
-#       errors += "No matching invite found."
-#     response_row = self._response_row()
-#     if response_row:
-#       errors += self._sync_response(response_row)
-#     elif not self.response_id and self.response_ready:
-#       errors += self._add_response()
-#     elif self.response_id:
-#       errors.append("Response row not found")
-#     return self, errors
-
-  
-
-  
+    return port_invite if portable else Invite(port_invite)  
