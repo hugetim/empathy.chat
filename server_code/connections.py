@@ -307,7 +307,7 @@ def get_relationships(user2, user1_id="", up_to_degree=3):
 @authenticated_callable
 def load_invites(user_id=""):
 #   from . import matcher as m
-  from . import invites_server
+  from . import invite_gateway
   user = sm.get_acting_user(user_id)
   rows = app_tables.invites.search(origin=True, user1=user, current=True)
   out = []
@@ -317,7 +317,7 @@ def load_invites(user_id=""):
 #       item['user2'] = sm.get_port_user(row['user2'], user1=user, simple=False)
 #     if row['proposal']:
 #       item['proposal'] = m.Proposal(row['proposal']).portable(user)
-    out.append(invites_server.Invite.from_invite_row(row, portable=True, user_id=user.get_id()))
+    out.append(invite_gateway.from_invite_row(row, user_id=user.get_id()))
   return out
 
 
