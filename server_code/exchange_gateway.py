@@ -6,10 +6,6 @@ from .exceptions import RowMissingError
 from .exchanges import Exchange, Format
 
 
-# def in_transaction(relaxed=False):
-#   return tables.in_transaction(relaxed=relaxed)
-
-
 def _current_exchange_i(user):
   """Return earliest if multiple current"""
   import datetime
