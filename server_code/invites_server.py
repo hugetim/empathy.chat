@@ -85,14 +85,13 @@ class Invite(invites.Invite):
   def edit_invite(self):
     errors = self.invalid_invite()
     if not errors:
-      errors = ig.update_invite(self)
+      ig.update_invite(self)
     return errors
     
   def cancel(self, invite_row=None):
+    errors = []
     if not invite_row:
-      invite_row, errors = ig._invite_row(self)
-    else:
-      errors = []
+      invite_row = ig._invite_row(self)
     if invite_row:
       if self.invitee:
         from . import connections as c
@@ -106,10 +105,11 @@ class Invite(invites.Invite):
 
   def cancel_response(self):
     from . import connections as c
-    invite_row, _ = ig._invite_row(self)
+    invite_row = ig._invite_row(self)
     if invite_row and self.invitee:
       c.try_removing_from_invite_proposal(invite_row, self.invitee)
-    response_row, errors = ig._response_row(self)
+    errors = []
+    response_row = ig._response_row(self)
     if response_row:
       response_row['current'] = False
     else:
@@ -132,18 +132,16 @@ class Invite(invites.Invite):
     
        Side effects: set invite['user2'] if visitor is logged in,
        likewise for invite_reply['user1'] if it exists"""
-    invite_row, errors = ig._invite_row(self)
-    if invite_row:
-      errors += self._load_invite(invite_row)
+    errors = []
+    ig.load_full_invite(self)
+    if self.invite_id:
       if user:
-        errors += self._try_adding_invitee(user, invite_row)
-      response_row = app_tables.invites.get(origin=False, link_key=self.link_key, current=True)
-      if response_row:
-        if self.invitee:
-          response_row['user1'] = self.invitee
-          if register:
-            accounts.init_user_info(user)
-        errors += self._load_response(response_row)
+        errors += self._try_adding_invitee(user)
+        if errors:
+          return errors
+        ig.save_invitee(self, user)
+        if register:
+          accounts.init_user_info(user)        
     else:
       non_current_invite = self._old_invite_row()
       if non_current_invite:
@@ -151,76 +149,37 @@ class Invite(invites.Invite):
       else:
         errors.append("Invalid invite link")
     return errors
-        
-  def _load_invite(self, invite_row):
-    errors = []
-    self.invite_id = invite_row.get_id()
-    self.inviter = invite_row['user1']
-    self.inviter_guess = invite_row['guess']
-    self.rel_to_inviter = invite_row['relationship2to1']
-    return errors
-  
-  def _load_response(self, response_row):
-    errors = []
-    self.response_id = response_row.get_id()
-    self.invitee = response_row['user1']
-    self.invitee_guess = response_row['guess']
-    self.rel_to_invitee = response_row['relationship2to1']
-    return errors
 
-  def _try_adding_invitee(self, user, invite_row):
-    from . import connections as c
+  def _try_adding_invitee(self, user):
     errors = []
     self.invitee = user
     if user['phone'] and not phone_match(self.inviter_guess, user):
       errors += [p.MISTAKEN_INVITER_GUESS_ERROR]
       sm.add_invite_guess_fail_prompt(self)
-      errors += self.cancel(invite_row)
-    else:
-      if invite_row['user2'] and invite_row['user2'] != self.invitee:
-        sm.warning(f"invite['user2'] being overwritten, {user['email']}, {dict(invite_row)}, {self.invite_id}")
-      invite_row['user2'] = self.invitee
-      c.try_adding_to_invite_proposal(invite_row, self.invitee)
+      errors += self.cancel()
     return errors
-
+  
   def respond(self, user_id=""):
     """Returns list of error strings"""
     user = sm.get_acting_user(user_id)
-    invite_row, errors = ig._invite_row(self)
+    errors = []
     if user:
-      errors += self._try_adding_invitee(user, invite_row)
+      errors += self._try_adding_invitee(user)
       if errors:
         return errors
-    now = sm.now()
+      ig.save_invitee(self, user)
     errors += self.invalid_response()
     if errors:
       return errors
     if not phone_match(self.invitee_guess, self.inviter):
       errors.append(f"You did not accurately provide the last 4 digits of {sm.name(self.inviter)}'s confirmed phone number.")
       return errors
-    response_row, errors = ig._response_row(self)
-    if not response_row:
-      response_row = app_tables.invites.add_row(date=now,
-                                                origin=False,
-                                                distance=1,
-                                                user1=self.invitee,
-                                                user2=self.inviter,
-                                                link_key=self.link_key,
-                                                current=True,
-                                               )
-    ig._edit_row(response_row, self.invitee_guess, self.rel_to_invitee, now)
+    ig.save_response(self)
     if self.invitee and self.invitee['phone']:
-      from . import connections as c
-      self.connection_successful = c.try_connect(invite_row, response_row)
+      self.connection_successful = ig.try_connect(self)
       if not self.connection_successful:
         sm.warning(f"unexpected failed connect, {self.invitee['email']}, {self.invite_id}")
     return errors
 
   def load(self):
-    invite_row, errors = ig._invite_row(self)
-    if invite_row:
-      errors += self._load_invite(invite_row)
-      response_row, _ = ig._response_row(self)
-      if response_row:
-        errors += self._load_response(response_row)
-    return errors
+    return ig.load_full_invite(self)
