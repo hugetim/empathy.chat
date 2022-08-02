@@ -4,6 +4,7 @@ import anvil.users
 import anvil.server
 from .CreateForm import CreateForm
 from ..UserMenu.Profile.NameEdit import NameEdit
+from ..MatchForm.MyJitsi import MyJitsi
 from ... import portable as t
 from ... import helper as h
 from ... import parameters as p
@@ -29,6 +30,7 @@ class DashForm(DashFormTemplate):
        
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
+    self.card_3.add_component(MyJitsi(item={'room_name': "test-12r7fa", 'name': glob.name, 'domain': "meet.jit.si"}))
     self.top_form = get_open_form()
     if not self.top_form.item['name']:
       name_item = {'first': "",
