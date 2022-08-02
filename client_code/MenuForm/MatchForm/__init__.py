@@ -48,12 +48,13 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_link.text = "" #jitsi_code
     self.jitsi_code = self.item.jitsi_code
     self.jitsi_link.visible = True
-    self.add_jitsi_embed()
     self.jitsi_column_panel.visible = True
+    self.add_jitsi_embed()
     
   def add_jitsi_embed(self):
     if not self.jitsi_embed:
       self.jitsi_embed = MyJitsi(item={'room_name': self.jitsi_code, 'name': glob.name, 'domain': self.item.jitsi_domain})
+      print("here")
       self.jitsi_column_panel.add_component(self.jitsi_embed)
  
   def jitsi_link_click(self, **event_args):

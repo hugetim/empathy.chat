@@ -1,7 +1,5 @@
 from ._anvil_designer import MyJitsiTemplate
 from anvil import *
-import anvil.users
-import anvil.server
 from .... import parameters as p
 
 
@@ -18,6 +16,7 @@ class MyJitsi(MyJitsiTemplate):
       self.alreadyinit += 1
 #       if p.DEBUG_MODE:
       room_name = self.item['room_name']
+      print(self.item)
 #       else:
 #         domain = "8x8.vc"
 #         room_name = f"vpaas-magic-cookie-848c456481fc4755aeb61d02b9d9dab2/{self.item['room_name']}"
