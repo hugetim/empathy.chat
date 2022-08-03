@@ -207,8 +207,8 @@ components:
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       layout_properties: {grid_position: 'NWIGHO,WBHBNG'}
-      name: slowtest_button
       event_bindings: {click: slowtest_button_click}
+      name: slowtest_button
     - type: Button
       properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
         foreground: '', visible: true, text: Auto end-to-end tests, font_size: null,
