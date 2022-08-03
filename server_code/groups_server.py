@@ -13,7 +13,7 @@ from . import accounts
 from . import parameters as p
 from . import helper as h
 from . import portable as port
-from .exceptions import RowMissingError, ExpiredInviteError, AlreadyInError
+from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 
 @sm.authenticated_callable
@@ -142,9 +142,9 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
     else:
       this_group = invite_row['group']
       host_name = sm.name(this_group['hosts'][0], user)
-      raise AlreadyInError(f"You are already a member of {host_name}'s {this_group['name']} group. "
-                           f"You no longer need use this group invite link. Simply visit {p.URL} instead."
-                          )
+      raise MistakenVisitError(f"You are already a member of {host_name}'s {this_group['name']} group. "
+                               f"You no longer need use this group invite link. Simply visit {p.URL} instead."
+                              )
 
       
 def members_from_group_row(group_row, with_trust_level=True):
@@ -235,6 +235,11 @@ class Invite(sm.ServerItem, groups.Invite):
     if invite_row and user:
       if register:
         Invite._register_user(user)
+      if user in invite_row['group']['hosts']:
+        this_group = invite_row['group']
+        raise MistakenVisitError(f"You have clicked/visited an invite link for a group you are a host of: {this_group['name']}. "
+                                 f"To invite someone else to join the group, instead send this group invite link to them."
+                                )
       Invite._add_visitor(user, invite_row)
 
   @staticmethod

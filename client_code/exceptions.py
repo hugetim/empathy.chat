@@ -35,5 +35,6 @@ class ExpiredInviteError(NamedError):
 
   
 @portable_exception
-class AlreadyInError(NamedError):
+class MistakenVisitError(NamedError):
     pass
+  

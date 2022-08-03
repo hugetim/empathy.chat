@@ -4,7 +4,7 @@ from anvil import *
 from . import helper as h
 from . import parameters as p
 from . import invited
-from .exceptions import RowMissingError, ExpiredInviteError, AlreadyInError
+from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 
 @anvil.server.portable_class
@@ -86,7 +86,7 @@ def handle_link(link_key):
     set_url_hash('')
     open_form('LoginForm')
     return
-  except AlreadyInError as err:
+  except MistakenVisitError as err:
     alert(err.args[0], large=True)
     set_url_hash('')
     open_form('LoginForm')
