@@ -237,7 +237,7 @@ class Invite(sm.ServerItem, groups.Invite):
         Invite._register_user(user)
       if user in invite_row['group']['hosts']:
         this_group = invite_row['group']
-        raise MistakenVisitError(f"You have clicked/visited an invite link for a group you are a host of: {this_group['name']}.\n"
+        raise MistakenVisitError(f"You have clicked/visited an invite link for a group you are a host of: {this_group['name']}.\n\n"
                                  f"To invite someone else to join your group, instead send this group invite link to them "
                                  "so they can visit the url, which will enable them to join the group (and also to create "
                                  "an empathy.chat account if they are new)."
