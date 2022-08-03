@@ -28,8 +28,37 @@ def add_invite(invite):
   else:
     errors.append("This invite already exists.")
   return errors
-    
-  
+
+
+def cancel_invite(invite):
+  errors = []
+  invite_row = _invite_row(invite)
+  _try_removing_from_invite_proposal(invite_row, invite.invitee)
+  if invite_row:
+    invite_row['current'] = False
+  else:
+    errors.append(f"Invites row not found with id {invite.invite_id}")
+  return errors
+
+
+def cancel_response(invite):
+  invite_row = _invite_row(invite)
+  _try_removing_from_invite_proposal(invite_row, invite.invitee)
+  errors = []
+  response_row = _response_row(invite)
+  if response_row:
+    response_row['current'] = False
+  else:
+    errors.append(f"Response row not found")
+  return errors
+
+
+def _try_removing_from_invite_proposal(invite_row, invitee):
+  if invite_row and invitee:
+    from . import connections as c
+    c.try_removing_from_invite_proposal(invite_row, invitee)
+
+
 def _edit_row(row, guess, rel, now):
   row['guess'] = guess
   if rel != row['relationship2to1']:
@@ -92,7 +121,8 @@ def _load_response(invite, response_row):
 
 def old_invite_row_exists(link_key):
   return bool(app_tables.invites.get(origin=True, link_key=link_key, current=False))
-  
+
+
 def save_invitee(invite, user):
   from . import connections as c
   invite_row = _invite_row(invite)

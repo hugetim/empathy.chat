@@ -86,32 +86,14 @@ class Invite(invites.Invite):
       ig.update_invite(self)
     return errors
     
-  def cancel(self, invite_row=None):
-    errors = []
-    if not invite_row:
-      invite_row = ig._invite_row(self)
-    if invite_row:
-      if self.invitee:
-        from . import connections as c
-        c.try_removing_from_invite_proposal(invite_row, self.invitee)
-      invite_row['current'] = False
-    else:
-      errors.append(f"Invites row not found with id {self.invite_id}")
+  def cancel(self):
+    errors = ig.cancel_invite(self)
     self.cancel_response() # Not finding a response_row is not an error here
     self._clear()
     return errors
 
   def cancel_response(self):
-    from . import connections as c
-    invite_row = ig._invite_row(self)
-    if invite_row and self.invitee:
-      c.try_removing_from_invite_proposal(invite_row, self.invitee)
-    errors = []
-    response_row = ig._response_row(self)
-    if response_row:
-      response_row['current'] = False
-    else:
-      errors.append(f"Response row not found")
+    errors = ig.cancel_response(self)
     self._clear()
     return errors
   
