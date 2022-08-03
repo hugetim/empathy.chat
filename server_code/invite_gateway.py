@@ -4,7 +4,7 @@ from anvil.tables import app_tables
 from .exceptions import RowMissingError
 from . import invites
 from . import server_misc as sm
-from .exceptions import RowMissingError, ExpiredInviteError, AlreadyInError
+from .exceptions import RowMissingError, ExpiredInviteError
 
 
 def add_invite(invite):
