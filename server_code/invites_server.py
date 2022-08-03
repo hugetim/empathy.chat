@@ -1,7 +1,5 @@
 import anvil.users
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
+from anvil.tables import in_transaction
 import anvil.server
 from . import invites
 from . import server_misc as sm
@@ -11,7 +9,7 @@ from . import invite_gateway as ig
 
 
 @anvil.server.callable
-@anvil.tables.in_transaction
+@in_transaction
 def serve_invite_unauth(port_invite, method, kwargs):
   from . import matcher
   matcher.propagate_update_needed()
@@ -19,7 +17,7 @@ def serve_invite_unauth(port_invite, method, kwargs):
 
 
 @sm.authenticated_callable
-@anvil.tables.in_transaction
+@in_transaction
 def serve_invite(port_invite, method, kwargs):
   from . import matcher
   matcher.propagate_update_needed()
@@ -123,9 +121,6 @@ class Invite(invites.Invite):
         self[key] = None
       else:
         self[key] = ""
-
-  def _old_invite_row(self):
-    return app_tables.invites.get(origin=True, link_key=self.link_key, current=False)
   
   def visit(self, user, register=False):
     """Assumes only self.link_key known (unless register)
@@ -143,8 +138,7 @@ class Invite(invites.Invite):
         if register:
           accounts.init_user_info(user)        
     else:
-      non_current_invite = self._old_invite_row()
-      if non_current_invite:
+      if ig.old_invite_row_exists(self.link_key):
         errors.append("This invite link is no longer active.")
       else:
         errors.append("Invalid invite link")

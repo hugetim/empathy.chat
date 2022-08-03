@@ -88,7 +88,10 @@ def _load_response(invite, response_row):
   invite.invitee = response_row['user1']
   invite.invitee_guess = response_row['guess']
   invite.rel_to_invitee = response_row['relationship2to1']      
-      
+
+
+def old_invite_row_exists(link_key):
+  return bool(app_tables.invites.get(origin=True, link_key=link_key, current=False))
   
 def save_invitee(invite, user):
   from . import connections as c

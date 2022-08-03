@@ -143,7 +143,23 @@ class InviteTest(unittest.TestCase):
     errors = s_invite2c.relay('visit', {'user': None})
     self.assertFalse(errors)
     self.assertFalse(invite2c.invitee)
-    
+
+  def test_old_visit(self):
+    self.add_link_invite()
+    invite2c = invites.Invite(link_key=self.invite1.link_key)
+    self.cancel_link_invite()
+    s_invite2c = invites_server.Invite(invite2c)
+    errors = s_invite2c.relay('visit', {'user': None})
+    self.assertTrue("This invite link is no longer active." in errors)
+    self.assertFalse(invite2c.invitee)
+
+  def test_invalid_visit(self):
+    invite2c = invites.Invite(link_key="invalid_link_key")
+    s_invite2c = invites_server.Invite(invite2c)
+    errors = s_invite2c.relay('visit', {'user': None})
+    self.assertTrue("Invalid invite link" in errors)
+    self.assertFalse(invite2c.invitee)
+  
   @timed
   def test_connect_response(self):
     self.add_connect_invite()
