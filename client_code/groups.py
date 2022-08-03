@@ -79,15 +79,15 @@ def handle_link(link_key):
   try:
     invite.relay('visit', {'user': user})
   except RowMissingError as err:
-    alert(err)
+    alert(err.args[0])
     return
   except ExpiredInviteError as err:
-    alert(err)
+    alert(err.args[0])
     set_url_hash('')
     open_form('LoginForm')
     return
   except AlreadyInError as err:
-    alert(err, large=True)
+    alert(err.args[0], large=True)
     set_url_hash('')
     open_form('LoginForm')
     return

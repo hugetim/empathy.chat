@@ -54,7 +54,7 @@ def invited_signup(invite):
         d.signup_err_lbl.text = "Email address missing or invalid. Please enter a valid email address."
         d.signup_err_lbl.visible = True
       except anvil.users.UserExists as err:
-        d.signup_err_lbl.text = f"{err}\nPlease login to your account normally and then try this invite link again."
+        d.signup_err_lbl.text = f"{err.args[0]}\nPlease login to your account normally and then try this invite link again."
         d.signup_err_lbl.visible = True
   invite.relay('visit', dict(user=new_user, register=True))
   if new_user and method == "email":
