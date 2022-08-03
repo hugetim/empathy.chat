@@ -66,7 +66,7 @@ def _row(invite, origin):
   return row
 
 
-def load_invite(invite):
+def load_full_invite(invite):
   """Side effect: update invite object from data"""
   invite_row = _invite_row(invite)
   if invite_row:
