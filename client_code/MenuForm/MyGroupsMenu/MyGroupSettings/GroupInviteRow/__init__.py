@@ -8,6 +8,7 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from ..... import ui_procedures as ui
+from anvil_extras.utils import wait_for_writeback
 
 
 class GroupInviteRow(GroupInviteRowTemplate):
@@ -23,8 +24,8 @@ class GroupInviteRow(GroupInviteRowTemplate):
     """This method is called when the button is clicked"""
     ui.copy_to_clipboard(self.link.url, desc="The invite link")
 
+  @wait_for_writeback
   def expire_date_picker_change(self, **event_args):
     """This method is called when the selected date changes"""
-    self.item.relay("expire_date_update")
+    # self.item.relay("expire_date_update")
     self.refresh_data_bindings()
-

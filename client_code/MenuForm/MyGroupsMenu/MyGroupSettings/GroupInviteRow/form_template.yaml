@@ -34,7 +34,7 @@ components:
       min_date: '', background: '', bold: false, underline: false, format: ''}
     name: expire_date_picker
     layout_properties: {column: SQRIZT, width: 230, expand: false}
-    event_bindings: {change: expire_date_picker_change}
+    event_bindings: {}
     data_bindings:
-    - {property: date, code: self.item.expire_date, writeback: true}
+    - {property: date, code: self.item.expire_date, writeback: false}
 is_package: true
