@@ -84,10 +84,15 @@ def _add_prop_row_to_test_record(prop_row):
  
 
 @authenticated_callable
-@anvil.tables.in_transaction
 def test_clear():
   print("('test_clear')")
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
+    anvil.server.launch_background_task('_clear_test_records')
+
+
+@anvil.server.background_task
+@anvil.tables.in_transaction
+def _clear_test_records():
     test_records = app_tables.test_data.search()
     test_matches = set()
     test_times = set()
