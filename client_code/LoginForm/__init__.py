@@ -33,6 +33,8 @@ class LoginForm(LoginFormTemplate):
       self.rich_text_1.visible = False
       self.card_1.visible = True
       from .. import ui_procedures as ui
+      from .. import glob
+      glob.logged_in_user = user
       self.init_dict = ui.get_init(spinner=False)
       ui.get_mobile_status()
       self.new_form = ui.reload(self.init_dict, do_open=False)

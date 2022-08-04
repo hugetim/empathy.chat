@@ -19,6 +19,10 @@ from .. import auto_test
 from .. import glob
 
 
+def not_me(user_id):
+  return user_id and user_id != glob.logged_in_user.get_id()
+
+
 class MenuForm(MenuFormTemplate):
   def __init__(self, **properties):
     # You must call self.init_components() before doing anything else in this function
@@ -104,7 +108,7 @@ class MenuForm(MenuFormTemplate):
 #     anvil.js.call(hideSidebar)
 
   def go_connections(self, user_id=""):
-    if h.not_me(user_id):
+    if not_me(user_id):
       self.title_label.text = "" # other user's profile
       item = {'user_id': user_id, 'tab': 'connections'}
       self.reset_and_load(UserMenu(item=item)) 
@@ -124,7 +128,7 @@ class MenuForm(MenuFormTemplate):
     self.my_groups_link.role = "selected" 
     
   def go_profile(self, user_id="", tab="profile"):
-    if h.not_me(user_id):
+    if not_me(user_id):
       self.title_label.text = "" # other user's profile
       item = {'user_id': user_id, 'tab': tab}
       self.reset_and_load(UserMenu(item=item)) 
@@ -190,6 +194,7 @@ class MenuForm(MenuFormTemplate):
   def logout_user(self):
     print("logout")
     anvil.users.logout()
+    glob.logged_in_user = None
     open_form('LoginForm')
 
   def test_mode_change(self, **event_args):

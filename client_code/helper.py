@@ -1,4 +1,3 @@
-import anvil.users
 import anvil.server
 
 
@@ -6,10 +5,6 @@ def now():
   import datetime
   import anvil.tz
   return datetime.datetime.now().replace(tzinfo=anvil.tz.tzlocal())
-
-
-def not_me(user_id):
-  return user_id and user_id != anvil.users.get_user().get_id()
 
 
 def add_num_suffix(num):

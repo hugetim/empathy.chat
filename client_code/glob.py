@@ -9,6 +9,7 @@ trust_level = 0
 name = ""
 invites = []
 my_groups = groups.MyGroups()
+logged_in_user = None
 
 
 # A private variable to cache the values once we've fetched them
