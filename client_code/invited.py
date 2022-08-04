@@ -2,6 +2,7 @@ import anvil.server
 import anvil.users
 from anvil import *
 from . import invites
+from . import parameters as p
 
 
 def invited_dialog(inviter):
@@ -33,6 +34,10 @@ def handle_link(link_key):
         open_form('LoginForm')
   elif "This invite link is no longer active." in errors:
     alert("This invite link is no longer active.")
+    set_url_hash('')
+    open_form('LoginForm')
+  elif p.CLICKED_OWN_LINK_ERROR in errors:
+    alert(p.CLICKED_OWN_LINK_ERROR, large=True)
     set_url_hash('')
     open_form('LoginForm')
   else:

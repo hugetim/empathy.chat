@@ -19,6 +19,12 @@ MIN_RELATIONSHIP_LENGTH = 3
 MISTAKEN_INVITER_GUESS_ERROR = (
   "Unfortunately, the inviter did not accurately provide the last 4 digits of your phone number."
 )
+CLICKED_OWN_LINK_ERROR = (
+  f"You have clicked/visited one of your own invite links.\n\n"
+  f"To invite someone else, instead send this invite link to them "
+  "so they can visit the url, which will enable them to connect with you "
+  "(and also to create an empathy.chat account if they are new)."
+)
 TRUST_TOOLTIP = {"Visitor": "Has not yet confirmed an email address",
                  "Guest": "Has not yet confirmed a phone number",
                  "Confirmed": "Has not yet had an empathy chat with a Member (who can verify their identity)",

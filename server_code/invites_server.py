@@ -113,6 +113,9 @@ class Invite(invites.Invite):
     ig.load_full_invite(self)
     if self.invite_id:
       if user:
+        if user == self.inviter:
+          errors += [p.CLICKED_OWN_LINK_ERROR]
+          return errors
         errors += self._try_adding_invitee(user)
         if errors:
           return errors
