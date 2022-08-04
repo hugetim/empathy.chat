@@ -50,14 +50,12 @@ components:
             bold: false, underline: false, icon: ''}
           name: label_2
           layout_properties: {grid_position: 'QXZSDK,KQZMAO'}
-          data_bindings:
-          - {property: visible, code: 'self.item[''status''] == "received"'}
+          data_bindings: []
         - type: Spacer
           properties: {height: 59}
           name: spacer_1
           layout_properties: {}
-          data_bindings:
-          - {property: visible, code: 'self.item[''status''] == "received"'}
+          data_bindings: []
         - type: Label
           properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
             visible: true, text: 'them:', font_size: null, font: '', spacing_above: large,
@@ -65,8 +63,9 @@ components:
             bold: false, underline: false, icon: ''}
           name: their_label
           layout_properties: {width: null, expand: false}
-          data_bindings:
-          - {property: visible, code: 'self.item[''status''] == "received"'}
+          data_bindings: []
+        data_bindings:
+        - {property: visible, code: 'self.item[''status''] != "waiting"'}
       - type: LinearPanel
         properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
           border: '', visible: true, role: null, tooltip: ''}
@@ -90,7 +89,7 @@ components:
           - {property: enabled, code: 'self.item[''status''] in [None, "waiting"]'}
         - type: form:MFQJNLWQIOGGXL4W:slider
           properties:
-            value: 5
+            value: -2
             minval: 0
             maxval: 10
             step: 0.2
@@ -103,6 +102,15 @@ components:
           - {property: is_visible, code: 'self.item[''status''] == "received"'}
           - {property: value, code: 'self.item[''their_value'']', writeback: true}
           event_bindings: {}
+        - type: Label
+          properties: {role: null, align: center, tooltip: '', border: '', foreground: 'theme:Gray
+              600', visible: true, text: (their slider will appear here once you both have submitted),
+            font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: ''}
+          name: placeholder_label
+          layout_properties: {}
+          data_bindings:
+          - {property: visible, code: 'self.item[''status''] not in ["waiting", "received"]'}
       data_bindings: []
   - type: Button
     properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
@@ -119,7 +127,7 @@ components:
         if self.item[''status''] == "waiting" else ""'}
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Waiting for other to submit..., font_size: null, font: '',
+      visible: true, text: waiting for other to submit..., font_size: null, font: '',
       spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     name: label_1
