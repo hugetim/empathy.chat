@@ -16,7 +16,8 @@ class LoginForm(LoginFormTemplate):
     self.login_sequence()
     
   def login_sequence(self):
-    if not anvil.users.get_user():
+    user = anvil.users.get_user()
+    if not user:
       self.login_button.visible = True
       self.rich_text_1.visible = True
       user = anvil.users.login_with_form(show_signup_option=False, allow_cancel=True)
@@ -26,12 +27,13 @@ class LoginForm(LoginFormTemplate):
           anvil.server.call_s('remove_user', user)
           import time
           time.sleep(2)
-    if anvil.users.get_user():
+        user = None
+    if user:
       self.login_button.visible = False
       self.rich_text_1.visible = False
       self.card_1.visible = True
       from .. import ui_procedures as ui
-      self.init_dict = ui.get_init()
+      self.init_dict = ui.get_init(spinner=False)
       ui.get_mobile_status()
       self.new_form = ui.reload(self.init_dict, do_open=False)
       from .. import parameters

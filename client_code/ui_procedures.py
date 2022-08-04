@@ -42,11 +42,14 @@ def reload(init_dict=None, do_open=True):
 
 
 @timed
-def get_init():
-    from anvil.js.window import Intl
-    from . import helper as h
-    time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
+def get_init(spinner=True):
+  from anvil.js.window import Intl
+  from . import helper as h
+  time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  if spinner:
     return h.robust_server_call('init', time_zone)
+  else:
+    return h.robust_server_call_s('init', time_zone)
 
   
 def copy_to_clipboard(text, desc="It"):

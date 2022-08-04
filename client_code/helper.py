@@ -153,19 +153,24 @@ def my_assert(statement):
 
 def robust_server_call(fn_name, *args, **kwargs):
   """Re-try server call up to 2 times if raises TimeoutError"""
-  return _robust_server_call(2, fn_name, *args, **kwargs)
+  return _robust_server_call(2, anvil.server.call, fn_name, *args, **kwargs)
 
-  
-def _robust_server_call(n, fn_name, *args, **kwargs):
+
+def robust_server_call_s(fn_name, *args, **kwargs):
+  """Re-try server call up to 2 times if raises TimeoutError"""
+  return _robust_server_call(2, anvil.server.call_s, fn_name, *args, **kwargs)
+
+
+def _robust_server_call(n, call_fn, fn_name, *args, **kwargs):
   if n <= 0:
-    return anvil.server.call(fn_name, *args, **kwargs)
+    return call_fn(fn_name, *args, **kwargs)
   else:
     try:
-      return anvil.server.call(fn_name, *args, **kwargs)
+      return call_fn(fn_name, *args, **kwargs)
     except anvil.server.TimeoutError:
       from . import helper as h
       h.warning("Re-trying {fn_name} server call due to TimeoutError")
-      return _robust_server_call(n-1, fn_name, *args, **kwargs)
+      return _robust_server_call(n-1, call_fn, fn_name, *args, **kwargs)
 
     
 class reverse_compare:
