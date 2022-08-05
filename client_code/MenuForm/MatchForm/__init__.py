@@ -25,76 +25,78 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_embed = None
     self.lists_url = ""
     self._info_clicked = False
-    self.info_button.role = ""
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
-    self.item = ec.ExchangeState.init_exchange(self.item['status'])
+    self.item = ec.ExchangeState.initialized_state(self.item['status'])
     self.my_timer_1.minutes = self.item.default_timer_minutes
-    self.set_jitsi_link()
+    self.init_jitsi()
     self.chat_repeating_panel.items = []
     self.init_slider_panel()
     self.base_status_reset()
-    self.first_update = True
+    self.first_messages_update = True
     self.update()
     if glob.MOBILE:
       alert(content=MobileAlert(), title="Attention mobile users", large=True)
     self._first_tick = True
     self.timer_2.interval = 5
 
-  def set_jitsi_link(self):
+  def init_jitsi(self):
     """Initialize or destroy embedded Jitsi Meet instance"""
-    self.jitsi_link.url = self.item.jitsi_url
-    self.jitsi_link.text = "" #jitsi_code
-    self.jitsi_code = self.item.jitsi_code
-    self.jitsi_link.visible = True
     self.add_jitsi_embed()
     self.jitsi_column_panel.visible = True
+    self.jitsi_link.url = self.item.jitsi_url
+    self.jitsi_link.visible = True
     
   def add_jitsi_embed(self):
     if not self.jitsi_embed:
-      self.jitsi_embed = MyJitsi(item={'room_name': self.jitsi_code, 'name': glob.name, 'domain': self.item.jitsi_domain})
+      self.jitsi_embed = MyJitsi(item={'room_name': self.item.jitsi_code, 'name': glob.name, 'domain': self.item.jitsi_domain})
       self.jitsi_column_panel.add_component(self.jitsi_embed)
- 
+
+  def remove_jitsi_embed(self):
+    self.jitsi_embed.remove_from_parent()
+    self.jitsi_embed = None 
+
+  def hide_and_hangup_jitsi_embed(self):
+    self.jitsi_embed.visible = False
+    window.japi.executeCommand('hangup')
+  
   def jitsi_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     if self.jitsi_embed:
-      window.japi.executeCommand('hangup')
-      self.jitsi_embed.remove_from_parent()
-      self.jitsi_embed = None 
-      ec.ExchangeState.update_my_external(True)
-    self.restore_button.visible = True
+      self.hide_and_hangup_jitsi_embed()
+      ec.update_my_external(True)
+      self.remove_jitsi_embed()
+      self.restore_button.visible = True
     
   def restore_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.restore_button.visible = False
     self.add_jitsi_embed()
-    ec.ExchangeState.update_my_external(False) 
+    ec.update_my_external(False) 
       
   def complete_button_click(self, **event_args):
     self.timer_2.interval = 0
-    if self.item.status == "matched":
-      if self.jitsi_embed:
-        self.jitsi_embed.visible = False
-        window.japi.executeCommand('hangup')
+    if self.jitsi_embed:
+      self.hide_and_hangup_jitsi_embed()
     self.item.exit()
     ui.reload()  
     
   def init_slider_panel(self):
-    my_value = 5 if ec.slider_value_missing(self.item.my_slider_value) else self.item.my_slider_value
+    my_value = self.item.my_initial_slider_value()
     slider_item = {'visible': True, 'status': self.item.slider_status, 
                    'my_value': my_value, 'their_value': 5, 'their_name': ""}
-    self.slider_button_click()
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
-    self.slider_panel.set_event_handler('x-hide', self.hide_slider)
+    self.slider_panel.set_event_handler('x-hide', self.slider_button_click)
+    self.slider_button_click()
     
   def update(self):
     previous_status = self.item.status
     previous_slider_status = self.item.slider_status
     previous_their_external = self.item.their_external
     previous_their_complete = self.item.their_complete
-    self.item = ec.ExchangeState.update_exchange_state(self.item)
+    self.item = ec.ExchangeState.updated_state(previous_state=self.item)
     self.update_status(prev=previous_status)
     self.slider_panel.update_name(self.item.their_name)
     if previous_slider_status != self.item.slider_status:
@@ -122,7 +124,7 @@ class MatchForm(MatchFormTemplate):
     if prev != self.item.status:
       self.base_status_reset()
       if self.item.status == "matched":
-        ec.ExchangeState.update_my_external(not bool(self.jitsi_embed))
+        ec.update_my_external(not bool(self.jitsi_embed))
       if self.item.status == "pinged":
         self.pinged()
 
@@ -155,9 +157,9 @@ class MatchForm(MatchFormTemplate):
       self.message_card.visible = True
       self.message_button.role = None
       self.call_js('scrollCard')
-      if not self.first_update:
+      if not self.first_messages_update:
         self.chat_display_card.scroll_into_view()
-      self.first_update = False
+      self.first_messages_update = False
   
   def update_their_external(self, prev_their_external):
     if bool(prev_their_external) != bool(self.item.their_external):
@@ -178,13 +180,16 @@ class MatchForm(MatchFormTemplate):
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
     if self._first_tick:
-      [self.lists_url, *clip_urls] = ec.get_urls()
-      self.call_js('loadClips', *clip_urls)
-      if self.lists_card.visible:
-        self.add_lists_pdf_viewer()
+      self.load_lists_and_sounds()
       self._first_tick = False
     self.update()
 
+  def load_lists_and_sounds(self):
+    [self.lists_url, *clip_urls] = ec.get_urls()
+    self.call_js('loadClips', *clip_urls)
+    if self.lists_card.visible:
+      self.add_lists_pdf_viewer()
+  
   def slider_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.slider_button, self.slider_card)
@@ -221,6 +226,7 @@ class MatchForm(MatchFormTemplate):
 
   def lists_button_click(self, **event_args):
     """This method is called when the button is clicked"""
+    # Complications are necessitated by vaguaries of pdf_viewer loading
     if not self.lists_card.visible:
       if self.lists_url:
         self.add_lists_pdf_viewer()

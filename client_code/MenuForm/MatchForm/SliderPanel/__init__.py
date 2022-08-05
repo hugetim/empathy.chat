@@ -62,7 +62,7 @@ class SliderPanel(SliderPanelTemplate):
     """This method is called when the button is clicked"""
     self.item['status'] = "submitted"
     self.update_status()
-    their_value = ec.ExchangeState.submit_slider(self.my_slider.value)
+    their_value = ec.submit_slider(self.my_slider.value)
     if type(their_value) != str:
       self.receive_value(their_value)
 
