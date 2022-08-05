@@ -21,24 +21,22 @@ class MatchForm(MatchFormTemplate):
     # You must call self.init_components() before doing anything else in this function
     self.init_components(**properties)
     #
-    self.timer_2.interval = 0
     self.jitsi_embed = None
     self.lists_url = ""
     self._info_clicked = False
+    self.chat_repeating_panel.items = []
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.item = ec.ExchangeState.initialized_state(self.item['status'])
     self.my_timer_1.minutes = self.item.default_timer_minutes
     self.init_jitsi()
-    self.chat_repeating_panel.items = []
     self.init_slider_panel()
-    self.base_status_reset()
+    self.base_status_reset() # to initialize some visible things before update server call delay
     self.first_messages_update = True
     self.update()
     if glob.MOBILE:
       alert(content=MobileAlert(), title="Attention mobile users", large=True)
-    self._first_tick = True
     self.timer_2.interval = 5
 
   def init_jitsi(self):
@@ -90,7 +88,15 @@ class MatchForm(MatchFormTemplate):
     self.slider_column_panel.add_component(self.slider_panel)
     self.slider_panel.set_event_handler('x-hide', self.slider_button_click)
     self.slider_button_click()
-    
+
+  def update_slider_panel(self, previous_slider_status):
+    self.slider_panel.update_name(self.item.their_name)
+    if previous_slider_status != self.item.slider_status:
+      if self.item.slider_status == "received":
+        self.slider_panel.receive_value(self.item.their_slider_value)
+      else:
+        self.slider_panel.update_status(self.item.slider_status)
+  
   def update(self):
     previous_status = self.item.status
     previous_slider_status = self.item.slider_status
@@ -98,12 +104,7 @@ class MatchForm(MatchFormTemplate):
     previous_their_complete = self.item.their_complete
     self.item = ec.ExchangeState.updated_state(previous_state=self.item)
     self.update_status(prev=previous_status)
-    self.slider_panel.update_name(self.item.their_name)
-    if previous_slider_status != self.item.slider_status:
-      if self.item.slider_status == "received":
-        self.slider_panel.receive_value(self.item.their_slider_value)
-      else:
-        self.slider_panel.update_status(self.item.slider_status)
+    self.update_slider_panel(previous_slider_status=previous_slider_status)
     self.update_messages()
     self.update_their_external(prev_their_external=previous_their_external)
     self.update_their_complete(prev_their_complete=previous_their_complete)
@@ -154,12 +155,15 @@ class MatchForm(MatchFormTemplate):
     messages_plus = self.item.messages_plus
     if len(messages_plus) > len(old_items):
       self.chat_repeating_panel.items = messages_plus
-      self.message_card.visible = True
-      self.message_button.role = None
-      self.call_js('scrollCard')
-      if not self.first_messages_update:
-        self.chat_display_card.scroll_into_view()
+      self.put_new_messages_in_view()
       self.first_messages_update = False
+
+  def put_new_messages_in_view(self):
+    self.message_card.visible = True
+    self.message_button.role = None
+    self.call_js('scrollCard')
+    if not self.first_messages_update:
+      self.chat_display_card.scroll_into_view()
   
   def update_their_external(self, prev_their_external):
     if bool(prev_their_external) != bool(self.item.their_external):
@@ -179,9 +183,8 @@ class MatchForm(MatchFormTemplate):
     
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
-    if self._first_tick:
+    if not self.lists_url:
       self.load_lists_and_sounds()
-      self._first_tick = False
     self.update()
 
   def load_lists_and_sounds(self):
@@ -193,10 +196,6 @@ class MatchForm(MatchFormTemplate):
   def slider_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.slider_button, self.slider_card)
-
-  def hide_slider(self, **event_args):
-    self.slider_card.visible = False
-    self.slider_button.role = "raised"
     
   def timer_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -246,14 +245,15 @@ class MatchForm(MatchFormTemplate):
       else:
           window.document.documentElement.requestFullscreen()
     except AttributeError as e:
-      Notification("Full screen toggle blocked by browser. Try F11.").show()
-      self.full_screen_button.enabled = False
-      print(f"Handled: {repr(e)}")
+      self.manage_full_screen_error(e)
     except ExternalError as e:
-      Notification("Full screen toggle blocked by browser. Try F11.").show()
-      self.full_screen_button.enabled = False
-      print(f"Handled: {repr(e)}")
+      self.manage_full_screen_error(e)
 
+  def manage_full_screen_error(self, e):
+    Notification("Full screen toggle blocked by browser. Try F11.").show()
+    self.full_screen_button.enabled = False
+    print(f"Handled: {repr(e)}")
+  
   def info_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.info_button, self.info_flow_panel)
