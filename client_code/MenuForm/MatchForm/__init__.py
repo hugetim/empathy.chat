@@ -29,13 +29,13 @@ class MatchForm(MatchFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.item = ec.ExchangeState.initialized_state(self.item['status'])
-    publisher.subscribe("match", self, self.handle_dispatches)
+    glob.publisher.subscribe("match", self, self.handle_dispatches)
     self.my_timer_1.minutes = self.item.default_timer_minutes
     self.init_jitsi()
     self.init_slider_panel()
     self.base_status_reset() # to initialize some visible things before update server call delay
     self.first_messages_update = True
-    self.update()
+    self.item = self.item.update()
     if glob.MOBILE:
       alert(content=MobileAlert(), title="Attention mobile users", large=True)
     self.timer_2.interval = 5
@@ -92,47 +92,41 @@ class MatchForm(MatchFormTemplate):
 
   def update_slider_panel(self, previous_slider_status):
     self.slider_panel.update_name(self.item.their_name)
-    if previous_slider_status != self.item.slider_status:
-      if self.item.slider_status == "received":
-        self.slider_panel.receive_value(self.item.their_slider_value)
-      else:
-        self.slider_panel.update_status(self.item.slider_status)
-  
-  def update(self):
-    previous_status = self.item.status
-    previous_slider_status = self.item.slider_status
-    previous_their_external = self.item.their_external
-    previous_their_complete = self.item.their_complete
-    self.item = ec.ExchangeState.updated_state(previous_state=self.item)
-    self.update_status(prev=previous_status)
-    self.update_slider_panel(previous_slider_status=previous_slider_status)
-    self.update_messages()
-    self.update_their_external(prev_their_external=previous_their_external)
-    self.update_their_complete(prev_their_complete=previous_their_complete)
+    if self.item.slider_status == "received":
+      self.slider_panel.receive_value(self.item.their_slider_value)
+    else:
+      self.slider_panel.update_status(self.item.slider_status)
 
   def handle_dispatches(self, dispatch):
-    if dispatch.title == "messages":
+    if dispatch.title == "new_status":
       self.update_status()
+    elif dispatch.title == "slider_update":
+      self.update_slider_panel()
+    elif dispatch.title == "messages_update":
+      self.update_messages()
+    elif dispatch.title == "their_external_change":
+      self.update_their_external()
+    elif dispatch.title == "their_complete_change":
+      self.update_their_complete()
   
   def base_status_reset(self):
-      if not self.item.status:
-        return ui.reload()
-      matched = self.item.status == "matched"
-      self.message_textbox.enabled = matched
-      self.message_textbox.tooltip = (
-        "" if matched else "Please wait until the other has joined before sending a message"
-      )
-      self.complete_button.visible = True
-      self.complete_button.text = "End Chat" if matched else "Cancel"
-      self.status_label.visible = self.item.status == "requesting"
+    if not self.item.status:
+      return ui.reload()
+    matched = self.item.status == "matched"
+    self.message_textbox.enabled = matched
+    self.message_textbox.tooltip = (
+      "" if matched else "Please wait until the other has joined before sending a message"
+    )
+    self.complete_button.visible = True
+    self.complete_button.text = "End Chat" if matched else "Cancel"
+    self.status_label.visible = self.item.status == "requesting"
     
-  def update_status(self, prev):
-    if prev != self.item.status:
-      self.base_status_reset()
-      if self.item.status == "matched":
-        ec.update_my_external(not bool(self.jitsi_embed))
-      if self.item.status == "pinged":
-        self.pinged()
+  def update_status(self):
+    self.base_status_reset()
+    if self.item.status == "matched":
+      ec.update_my_external(not bool(self.jitsi_embed))
+    if self.item.status == "pinged":
+      self.pinged()
 
   def pinged(self):
     with h.PausedTimer(self.timer_2):
@@ -156,12 +150,9 @@ class MatchForm(MatchFormTemplate):
       ui.reload()
 
   def update_messages(self):
-    old_items = self.chat_repeating_panel.items
-    messages_plus = self.item.messages_plus
-    if len(messages_plus) > len(old_items):
-      self.chat_repeating_panel.items = messages_plus
-      self.put_new_messages_in_view()
-      self.first_messages_update = False
+    self.chat_repeating_panel.items = messages_plus
+    self.put_new_messages_in_view()
+    self.first_messages_update = False
 
   def put_new_messages_in_view(self):
     self.message_card.visible = True
@@ -170,27 +161,25 @@ class MatchForm(MatchFormTemplate):
     if not self.first_messages_update:
       self.chat_display_card.scroll_into_view()
   
-  def update_their_external(self, prev_their_external):
-    if bool(prev_their_external) != bool(self.item.their_external):
-      if self.item.their_external:
-        message = (f"{self.item.their_name} has left the empathy.chat window "
-                   'to continue the video/audio chat in a separate, "popped-out" window. '
-                   "You should see/hear them again shortly, if not already. "
-                   "(Note: This means they may not see Text Chat messages you send from here--or likewise the Slider.)"
-                  )
-        Notification(message, timeout=None).show()
+  def update_their_external(self):
+    if self.item.their_external:
+      message = (f"{self.item.their_name} has left the empathy.chat window "
+                  'to continue the video/audio chat in a separate, "popped-out" window. '
+                  "You should see/hear them again shortly, if not already. "
+                  "(Note: This means they may not see Text Chat messages you send from here--or likewise the Slider.)"
+                )
+      Notification(message, timeout=None).show()
 
-  def update_their_complete(self, prev_their_complete):
-    if bool(prev_their_complete) != bool(self.item.their_complete):
-      if self.item.their_complete:
-        message = f"{self.item.their_name} has left this empathy chat."
-        Notification(message, timeout=None).show()
+  def update_their_complete(self):
+    if self.item.their_complete:
+      message = f"{self.item.their_name} has left this empathy chat."
+      Notification(message, timeout=None).show()
     
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
     if not self.lists_url:
       self.load_lists_and_sounds()
-    self.update()
+    self.item = self.item.update()
 
   def load_lists_and_sounds(self):
     [self.lists_url, *clip_urls] = ec.get_urls()

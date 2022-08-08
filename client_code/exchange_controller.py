@@ -113,6 +113,22 @@ class ExchangeState(PendingState):
         message['label'] = glob.name if mine else self.their_name
         first_message[mine] = False
 
+  def update(self):
+    state_dict = self.__dict__
+    state_dict.update(server.call_s('update_match_form'))
+    new = ExchangeState(**state_dict)
+    if self.status != new.status:
+      glob.publisher.publish("match", "new_status")
+    if (self.slider_status != new.slider_status or self.their_name != new.their_name):
+      glob.publisher.publish("match", "slider_update")
+    if len(new.messages_plus) > len(self.messages_plus):
+      glob.publisher.publish("match", "messages_update")
+    if bool(self.their_external) != bool(new.their_external):
+      glob.publisher.publish("match", "their_external_change")
+    if bool(self.their_complete) != bool(new.their_complete):
+      glob.publisher.publish("match", "their_complete_change")
+    return new
+
   @staticmethod
   def initialized_state(status):
     proptime_id, jitsi_code, duration, my_slider_value = (
@@ -124,10 +140,4 @@ class ExchangeState(PendingState):
                         duration=duration,
                         my_slider_value=my_slider_value,
                        )        
-
-  @staticmethod        
-  def updated_state(previous_state):
-    state_dict = previous_state.__dict__
-    state_dict.update(server.call_s('update_match_form'))
-    return ExchangeState(**state_dict)
   
