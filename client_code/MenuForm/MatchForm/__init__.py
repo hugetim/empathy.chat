@@ -1,13 +1,10 @@
 from ._anvil_designer import MatchFormTemplate
 from anvil import *
-import anvil.users
-import anvil.server
 from anvil.js import window, ExternalError
 from pdf_viewer.pdf_viewer import pdf_viewer
 from ... import ui_procedures as ui
 from ... import glob
 from ... import helper as h
-from ... import parameters as p
 from ... import exchange_controller as ec
 from .MyJitsi import MyJitsi
 from .SliderPanel import SliderPanel
@@ -24,7 +21,7 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_embed = None
     self.lists_url = ""
     self._info_clicked = False
-    self.chat_repeating_panel.items = []
+    self.first_messages_update = True
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
@@ -34,7 +31,6 @@ class MatchForm(MatchFormTemplate):
     self.init_jitsi()
     self.init_slider_panel()
     self.base_status_reset() # to initialize some visible things before update server call delay
-    self.first_messages_update = True
     self.item.update()
     if glob.MOBILE:
       alert(content=MobileAlert(), title="Attention mobile users", large=True)
@@ -206,9 +202,9 @@ class MatchForm(MatchFormTemplate):
     toggle_button_card(self.message_button, self.message_card)
     
   def message_textbox_pressed_enter(self, **event_args):
-    text = self.message_textbox.text
-    if text:
-      self.item.add_chat_message(text)
+    message_text = self.message_textbox.text
+    if message_text:
+      self.item.add_chat_message(message_text)
       self.message_textbox.text = ""
       self.update_messages()
 
