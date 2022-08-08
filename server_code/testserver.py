@@ -88,6 +88,7 @@ def test_clear():
   print("('test_clear')")
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     anvil.server.launch_background_task('_clear_test_records')
+  anvil.server.session['test_record'] = create_tests_record()
 
 
 @anvil.server.background_task

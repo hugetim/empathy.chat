@@ -52,7 +52,7 @@ class PendingState(h.AttributeToKey):
     return 5 if _slider_value_missing(self.my_slider_value) else self.my_slider_value
   
   def start_exchange(self):
-    prev_status = self.item.status
+    prev_status = self.status
     state = server.call('match_commit')
     self.status = state['status']
     if self.status != prev_status:
