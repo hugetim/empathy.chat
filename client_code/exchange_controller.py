@@ -57,6 +57,8 @@ class PendingState(h.AttributeToKey):
 
 
 class ExchangeState(PendingState):
+  channels = ["match.status", "match.slider", "match.messages", "match.external", "match.complete"]
+  
   def __init__(self, message_items=None, their_slider_value="", their_external=None, their_complete=None, their_name="", **kwargs):
     super().__init__(**kwargs)
     self.their_slider_value = their_slider_value
@@ -78,7 +80,9 @@ class ExchangeState(PendingState):
     if self.status == "matched":
       server.call('match_complete')
     else:
-      server.call('cancel_now', self.proptime_id)  
+      server.call('cancel_now', self.proptime_id)
+    for channel in self.channels:
+      glob.publisher.close_channel(channel)
 
   def add_chat_message(self, message):
     new_match_state = server.call('add_chat_message', message=message)
@@ -115,19 +119,19 @@ class ExchangeState(PendingState):
 
   def update(self):
     state_dict = self.__dict__
+    prev = ExchangeState(**state_dict)
     state_dict.update(server.call_s('update_match_form'))
-    new = ExchangeState(**state_dict)
-    if self.status != new.status:
-      glob.publisher.publish("match", "new_status")
-    if (self.slider_status != new.slider_status or self.their_name != new.their_name):
-      glob.publisher.publish("match", "slider_update")
-    if len(new.messages_plus) > len(self.messages_plus):
-      glob.publisher.publish("match", "messages_update")
-    if bool(self.their_external) != bool(new.their_external):
-      glob.publisher.publish("match", "their_external_change")
-    if bool(self.their_complete) != bool(new.their_complete):
-      glob.publisher.publish("match", "their_complete_change")
-    return new
+    self = ExchangeState(**state_dict)
+    if self.status != prev.status:
+      glob.publisher.publish("match.status", "new_status")
+    if (self.slider_status != prev.slider_status or self.their_name != prev.their_name):
+      glob.publisher.publish("match.slider", "slider_update")
+    if len(self.messages_plus) > len(prev.messages_plus):
+      glob.publisher.publish("match.messages", "messages_update")
+    if bool(self.their_external) != bool(prev.their_external):
+      glob.publisher.publish("match.external", "their_external_change")
+    if bool(self.their_complete) != bool(prev.their_complete):
+      glob.publisher.publish("match.complete", "their_complete_change")
 
   @staticmethod
   def initialized_state(status):

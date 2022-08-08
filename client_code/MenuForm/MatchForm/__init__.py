@@ -29,13 +29,13 @@ class MatchForm(MatchFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.item = ec.ExchangeState.initialized_state(self.item['status'])
-    glob.publisher.subscribe("match", self, self.handle_dispatches)
+    self.init_subscriptions()
     self.my_timer_1.minutes = self.item.default_timer_minutes
     self.init_jitsi()
     self.init_slider_panel()
     self.base_status_reset() # to initialize some visible things before update server call delay
     self.first_messages_update = True
-    self.item = self.item.update()
+    self.item.update()
     if glob.MOBILE:
       alert(content=MobileAlert(), title="Attention mobile users", large=True)
     self.timer_2.interval = 5
@@ -90,24 +90,19 @@ class MatchForm(MatchFormTemplate):
     self.slider_panel.set_event_handler('x-hide', self.slider_button_click)
     self.slider_button_click()
 
-  def update_slider_panel(self, previous_slider_status):
+  def update_slider_panel(self, dispatch=None):
     self.slider_panel.update_name(self.item.their_name)
     if self.item.slider_status == "received":
       self.slider_panel.receive_value(self.item.their_slider_value)
     else:
       self.slider_panel.update_status(self.item.slider_status)
 
-  def handle_dispatches(self, dispatch):
-    if dispatch.title == "new_status":
-      self.update_status()
-    elif dispatch.title == "slider_update":
-      self.update_slider_panel()
-    elif dispatch.title == "messages_update":
-      self.update_messages()
-    elif dispatch.title == "their_external_change":
-      self.update_their_external()
-    elif dispatch.title == "their_complete_change":
-      self.update_their_complete()
+  def init_subscriptions(self):
+    glob.publisher.subscribe("match.status", self, self.update_status)
+    glob.publisher.subscribe("match.slider", self, self.update_slider_panel)
+    glob.publisher.subscribe("match.messages", self, self.update_messages)
+    glob.publisher.subscribe("match.external", self, self.update_their_external)
+    glob.publisher.subscribe("match.complete", self, self.update_their_complete)
   
   def base_status_reset(self):
     if not self.item.status:
@@ -121,7 +116,7 @@ class MatchForm(MatchFormTemplate):
     self.complete_button.text = "End Chat" if matched else "Cancel"
     self.status_label.visible = self.item.status == "requesting"
     
-  def update_status(self):
+  def update_status(self, dispatch=None):
     self.base_status_reset()
     if self.item.status == "matched":
       ec.update_my_external(not bool(self.jitsi_embed))
@@ -149,7 +144,7 @@ class MatchForm(MatchFormTemplate):
       self.item.exit()
       ui.reload()
 
-  def update_messages(self):
+  def update_messages(self, dispatch=None):
     self.chat_repeating_panel.items = messages_plus
     self.put_new_messages_in_view()
     self.first_messages_update = False
@@ -161,7 +156,7 @@ class MatchForm(MatchFormTemplate):
     if not self.first_messages_update:
       self.chat_display_card.scroll_into_view()
   
-  def update_their_external(self):
+  def update_their_external(self, dispatch=None):
     if self.item.their_external:
       message = (f"{self.item.their_name} has left the empathy.chat window "
                   'to continue the video/audio chat in a separate, "popped-out" window. '
@@ -170,7 +165,7 @@ class MatchForm(MatchFormTemplate):
                 )
       Notification(message, timeout=None).show()
 
-  def update_their_complete(self):
+  def update_their_complete(self, dispatch=None):
     if self.item.their_complete:
       message = f"{self.item.their_name} has left this empathy chat."
       Notification(message, timeout=None).show()
@@ -179,7 +174,7 @@ class MatchForm(MatchFormTemplate):
     """This method is called approx. once every 5 seconds, checking for messages"""
     if not self.lists_url:
       self.load_lists_and_sounds()
-    self.item = self.item.update()
+    self.item.update()
 
   def load_lists_and_sounds(self):
     [self.lists_url, *clip_urls] = ec.get_urls()
