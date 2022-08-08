@@ -29,6 +29,7 @@ class MatchForm(MatchFormTemplate):
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
     self.item = ec.ExchangeState.initialized_state(self.item['status'])
+    publisher.subscribe("match", self, self.handle_dispatches)
     self.my_timer_1.minutes = self.item.default_timer_minutes
     self.init_jitsi()
     self.init_slider_panel()
@@ -109,6 +110,10 @@ class MatchForm(MatchFormTemplate):
     self.update_their_external(prev_their_external=previous_their_external)
     self.update_their_complete(prev_their_complete=previous_their_complete)
 
+  def handle_dispatches(self, dispatch):
+    if dispatch.title == "messages":
+      self.update_status()
+  
   def base_status_reset(self):
       if not self.item.status:
         return ui.reload()
