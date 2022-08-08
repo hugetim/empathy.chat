@@ -81,9 +81,8 @@ class MatchForm(MatchFormTemplate):
     ui.reload()  
     
   def init_slider_panel(self):
-    my_value = self.item.my_initial_slider_value()
-    slider_item = {'visible': True, 'status': self.item.slider_status, 
-                   'my_value': my_value, 'their_value': 5, 'their_name': ""}
+    slider_item = {'their_name': "", 'status': self.item.slider_status, 
+                   'my_value': self.item.my_initial_slider_value(), 'their_value': 5}
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
     self.slider_panel.set_event_handler('x-hide', self.slider_button_click)
@@ -106,14 +105,14 @@ class MatchForm(MatchFormTemplate):
   def base_status_reset(self):
     if not self.item.status:
       return ui.reload()
+    self.status_label.visible = self.item.status == "requesting"
     matched = self.item.status == "matched"
     self.message_textbox.enabled = matched
     self.message_textbox.tooltip = (
       "" if matched else "Please wait until the other has joined before sending a message"
     )
-    self.complete_button.visible = True
     self.complete_button.text = "End Chat" if matched else "Cancel"
-    self.status_label.visible = self.item.status == "requesting"
+    self.complete_button.visible = True
     
   def update_status(self, dispatch=None):
     self.base_status_reset()
