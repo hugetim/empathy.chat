@@ -2,6 +2,7 @@ import anvil.users
 import anvil.server
 from . import parameters as p
 from . import groups
+from anvil_extras.messaging import Publisher
 
 
 MOBILE = None
@@ -10,6 +11,7 @@ name = ""
 invites = []
 my_groups = groups.MyGroups()
 logged_in_user = None
+publisher = Publisher(with_logging=False)
 
 
 # A private variable to cache the values once we've fetched them
