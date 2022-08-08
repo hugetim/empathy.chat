@@ -9,7 +9,6 @@ from .... import helper as h
 class SliderPanel(SliderPanelTemplate):
   def __init__(self, **properties):
     """self.item assumed to have these keys: 
-    'visible',
     'their_value', default 5
     'my_value', default 5
     'status' in [None, 'submitted', 'received', 'waiting']
@@ -55,8 +54,6 @@ class SliderPanel(SliderPanelTemplate):
   def hide_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.raise_event('x-hide')
-#     self.item['visible'] = False
-#     self.update_status()
 
   def submit_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -71,9 +68,3 @@ class SliderPanel(SliderPanelTemplate):
     self.item['status'] = "received"
     self.update_status()
     self.their_slider.scroll_into_view()
-      
-  def show_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    self.item['visible'] = True
-    self.update_status()
-

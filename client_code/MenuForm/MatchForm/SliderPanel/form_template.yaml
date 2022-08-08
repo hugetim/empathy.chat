@@ -143,17 +143,6 @@ components:
     name: hide_button
     layout_properties: {grid_position: 'AAYMHE,KSEAJH GLODAL,FOMWST'}
     event_bindings: {click: hide_button_click}
-  data_bindings:
-  - {property: visible, code: 'self.item[''visible'']'}
+  data_bindings: []
   event_bindings: {}
-- type: Button
-  properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-    foreground: '', visible: true, text: Show Slider, font_size: null, font: '', spacing_above: small,
-    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-    underline: false, icon: ''}
-  name: show_button
-  layout_properties: {grid_position: 'TJFHTH,BTEJIS'}
-  event_bindings: {click: show_button_click}
-  data_bindings:
-  - {property: visible, code: 'not self.item[''visible'']'}
 is_package: true

@@ -22,20 +22,23 @@ class MatchForm(MatchFormTemplate):
     self.lists_url = ""
     self._info_clicked = False
     self.first_messages_update = True
+    self.init_subscriptions()
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
+    self.initial_form_setup()
+    if glob.MOBILE:
+      alert(content=MobileAlert(), title="Attention mobile users", large=True)
+    self.timer_2.interval = 5
+
+  def initial_form_setup(self):
     self.item = ec.ExchangeState.initialized_state(self.item['status'])
-    self.init_subscriptions()
     self.my_timer_1.minutes = self.item.default_timer_minutes
     self.init_jitsi()
     self.init_slider_panel()
     self.base_status_reset() # to initialize some visible things before update server call delay
     self.item.update()
-    if glob.MOBILE:
-      alert(content=MobileAlert(), title="Attention mobile users", large=True)
-    self.timer_2.interval = 5
-
+  
   def init_jitsi(self):
     """Initialize or destroy embedded Jitsi Meet instance"""
     self.add_jitsi_embed()
@@ -131,17 +134,15 @@ class MatchForm(MatchFormTemplate):
       
   def process_pinged_response(self, ready):
     if ready:
-      this_status = self.item.status
       self.item.start_exchange()
       if self.item.status == "requesting":
         Notification("The user who had asked to join has now cancelled their request.", timeout=None, style="warning").show()
-      self.update_status(prev=this_status)
     else:
       self.item.exit()
       ui.reload()
 
   def update_messages(self, dispatch=None):
-    self.chat_repeating_panel.items = messages_plus
+    self.chat_repeating_panel.items = self.item.messages_plus
     self.put_new_messages_in_view()
     self.first_messages_update = False
 
@@ -206,7 +207,7 @@ class MatchForm(MatchFormTemplate):
     if message_text:
       self.item.add_chat_message(message_text)
       self.message_textbox.text = ""
-      self.update_messages()
+      self.chat_repeating_panel.items = self.item.messages_plus
 
   def lists_button_click(self, **event_args):
     """This method is called when the button is clicked"""
