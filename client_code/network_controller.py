@@ -72,15 +72,7 @@ def get_create_group_items():
     host_id = g['hosts'][0]
     subtext = f"(host: {glob.users[host_id].name})"
     items.append(dict(key=g['name'], value=groups.Group(g['name'], g.group_id), subtext=subtext))
-  print(3)
   return sorted(items, key=lambda item:(item['subtext'] + item['key']))
-
-
-def _group_member_items_exclude(user_id, excluded_user_ids):
-  excluded_user_ids.add(user_id)
-  fellow_members_to_group_names = _group_members_to_group_names_exclude(excluded_user_ids)
-  items = [glob.users[user_id2].name_item() for user2 in fellow_members_to_group_names.keys()]
-  return sorted(items, key = lambda name_item:(name_item['subtext'] + name_item['key']))
 
 
 def get_create_user_items():
@@ -88,18 +80,6 @@ def get_create_user_items():
   user_id = glob.logged_in_user_id
   up_to_degree = 3 if glob.trust_level >= 3 else 1
   users = _get_my_connections(user_id, up_to_degree)
-  # dset = _get_connection_ids(user_id, up_to_degree)
-  # dset[2] = [other for other in dset[2] if glob.user[other]['trust_level'] >= 3]
-  # dset[3] = [other for other in dset[3] if glob.user[other]['trust_level'] >= 3]
-  # items = {}
-  # degree_set = [1, 2, 3] if my_trust_level >= 3 else [1]
-  # c_users = set()
-  # for degree in degree_set:
-  #   # change to distance=distance(user2, user1) or equivalent once properly implement distance
-  #   items[degree] = [glob.users[other].name_item() for other in dset[degree]]
-  #   items[degree].sort(key=lambda user_item: user_item['key'])
-  #   c_users.update(dset[degree])
-  # group_member_items = _group_member_items_exclude(glob.logged_in_user_id, c_users)
   name_items = [u.name_item() for u in users]
   starred_name_list = [u.name for u in users if u.starred]
   return name_items, starred_name_list
