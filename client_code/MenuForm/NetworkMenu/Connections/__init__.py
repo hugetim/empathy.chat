@@ -1,7 +1,7 @@
 from ._anvil_designer import ConnectionsTemplate
 from anvil import *
 import anvil.users
-import anvil.server
+from .... import network_controller as nc
 from .... import helper as h
 
 
@@ -19,7 +19,7 @@ class Connections(ConnectionsTemplate):
     self.update()
     
   def update(self):
-    items = anvil.server.call('get_connections', self.item['user_id'])
+    items = nc.get_connections(self.item['user_id'])
     items.sort(key=lambda pu: (pu.distance_str_or_groups, h.reverse_compare(pu['last_active'])))
     self.repeating_panel_1.items = items
     has_degrees = any([item.distance_str for item in items])

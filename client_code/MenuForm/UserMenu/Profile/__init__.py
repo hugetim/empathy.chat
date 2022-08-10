@@ -22,7 +22,9 @@ class Profile(ProfileTemplate):
   def __init__(self, user_id="", **properties):
     # Set Form properties and Data Bindings.
     self.trust_level = glob.trust_level
-    self.item = anvil.server.call('init_profile', user_id)
+    if not user_id:
+      user_id = glob.logged_in_user_id
+    self.item = glob.users[user_id]
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.

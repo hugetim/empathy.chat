@@ -18,7 +18,7 @@ class UserMenu(UserMenuTemplate):
     # Any code you write here will run when the form opens.
     self.connections_tab_button.visible = (
       self.item['user_id']
-      and self.item['user_id'] != glob.logged_in_user.get_id()
+      and self.item['user_id'] != glob.logged_in_user_id
     )
     self.history_tab_button.visible = self.connections_tab_button.visible ## TEMPORARY
     self.top_form = get_open_form()
@@ -45,7 +45,7 @@ class UserMenu(UserMenuTemplate):
     self.profile_tab_button.background = p.SELECTED_TAB_COLOR    
     
   def go_connections(self):
-    if self.item['user_id'] == glob.logged_in_user.get_id():
+    if self.item['user_id'] == glob.logged_in_user_id:
       h.warning(f"UserMenu.go_connections called on current user")
     self.content = Connections(item={'user_id': self.item['user_id']})
     self.load_component(self.content)
