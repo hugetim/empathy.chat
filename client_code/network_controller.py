@@ -19,6 +19,11 @@ def _get_connections(user_id, up_to_degree=3):
   return out
 
 
+def _get_their_connections(user_id):
+  dset2 = _get_connections(user_id, 1)
+  return [glob.users[id] for id in dset2[1]]
+
+
 def _get_my_connections(user_id):
   up_to_degree = 3
   dset = _get_connections(user_id, up_to_degree)
@@ -27,12 +32,28 @@ def _get_my_connections(user_id):
   for d in range(1, up_to_degree+1):
     records += [glob.users[id] for id in dset[d]] # sm.get_port_user_full(user2, logged_in_user, distance=d, degree=d) for user2 in 
     c_user_ids.update(dset[d])
-  return records #+ _group_member_records_exclude(logged_in_user, c_users)
+  return records + _group_member_records_exclude(user_id, c_user_ids)
 
 
-def _get_their_connections(user_id):
-  dset2 = _get_connections(user_id, 1)
-  return [glob.users[id] for id in dset2[1]]
+def _group_member_records_exclude(user_id, excluded_user_ids):
+  excluded_user_ids.add(user_id)
+  fellow_members_to_group_names = _group_members_to_group_names_exclude(excluded_user_ids)
+  return [glob.users[user_id2] for user_id2 in fellow_members_to_group_names.keys()] #not using group names
+
+
+def _group_members_to_group_names_exclude(excluded_user_ids):
+  import collections
+  fellow_members_to_group_names = collections.defaultdict(list)
+  # if glob.trust_level < 1:
+  #   return {}
+  for group in glob.their_groups.values():
+    # if glob.trust_level < 2:
+    #   if not g.guest_allowed_in_group(user, group_row):
+    #     continue
+    relevant_group_member_ids = set(group.members) - excluded_user_ids
+    for user_id2 in relevant_group_member_ids:
+      fellow_members_to_group_names[user_id2].append(group.name)
+  return fellow_members_to_group_names
 
 
 def get_connections(user_id):

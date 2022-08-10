@@ -9,9 +9,10 @@ from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 @anvil.server.portable_class
 class Group(h.AttributeToKey):
-  def __init__(self, name="", group_id=""):
+  def __init__(self, name="", group_id="", members=None):
     self.name = name
     self.group_id = group_id
+    self.members = members if members else []
     
   def __str__(self):
     return self.name
