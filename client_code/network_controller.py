@@ -44,9 +44,9 @@ def _group_member_records_exclude(user_id, excluded_user_ids):
 def _group_members_to_group_names_exclude(excluded_user_ids):
   import collections
   fellow_members_to_group_names = collections.defaultdict(list)
-  # if glob.trust_level < 1:
-  #   return {}
-  for group in glob.their_groups.values():
+  if glob.trust_level < 1:
+    return {}
+  for group in list(glob.my_groups) + list(glob.their_groups.values()):
     # if glob.trust_level < 2:
     #   if not g.guest_allowed_in_group(user, group_row):
     #     continue
