@@ -35,17 +35,21 @@ def __getattr__(name):
 
 def populate_lazy_vars(spinner=True):
   if spinner:
-    out = anvil.server.call('init_create_form')
+    out = anvil.server.call('init_cache')
   else:
-    out = anvil.server.call_s('init_create_form')
+    out = anvil.server.call_s('init_cache')
   _set_lazy_vars(out)
 
     
 def _set_lazy_vars(out):
+  from . import network_controller as nc
   global _lazy_dict
   global lazy_loaded
-  _user_items, _group_items, _starred_name_list = out
-  _lazy_dict = {'user_items': _user_items, 'group_items': _group_items,
-                'starred_name_list': _starred_name_list,
-               }
+  _users, _connections, _their_groups = out
+  _group_items = nc.get_create_group_items()
+  _user_items, _starred_name_list = nc.get_create_user_items()
+  _lazy_dict = {
+    'users': _users, 'connections': _connections, 'their_groups': _their_groups, 
+    'user_items': _user_items, 'group_items': _group_items, 'starred_name_list': _starred_name_list,
+  }
   lazy_loaded = True

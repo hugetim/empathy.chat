@@ -140,6 +140,12 @@ def init_create_form(user_id=""):
   create_user_items, starred_name_list = c.get_create_user_items(user)
   create_group_items = g.get_create_group_items(user)
   return create_user_items, create_group_items, starred_name_list
+
+
+@authenticated_callable
+@timed
+def init_cache():
+  pass
   
   
 def _latest_invited(user):
