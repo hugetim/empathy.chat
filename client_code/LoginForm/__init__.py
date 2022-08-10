@@ -35,6 +35,7 @@ class LoginForm(LoginFormTemplate):
       from .. import ui_procedures as ui
       from .. import glob
       glob.logged_in_user = user
+      glob.logged_in_user_id = user.get_id()
       self.init_dict = ui.get_init(spinner=False)
       ui.get_mobile_status()
       self.new_form = ui.reload(self.init_dict, do_open=False)

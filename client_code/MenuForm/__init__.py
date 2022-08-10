@@ -17,10 +17,7 @@ from .. import helper as h
 from .. import portable as t
 from .. import auto_test
 from .. import glob
-
-
-def not_me(user_id):
-  return user_id and user_id != glob.logged_in_user.get_id()
+from ..network_controller import not_me
 
 
 class MenuForm(MenuFormTemplate):
@@ -195,6 +192,7 @@ class MenuForm(MenuFormTemplate):
     print("logout")
     anvil.users.logout()
     glob.logged_in_user = None
+    glob.logged_in_user_id = ""
     open_form('LoginForm')
 
   def test_mode_change(self, **event_args):

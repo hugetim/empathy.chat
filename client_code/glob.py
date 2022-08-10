@@ -11,6 +11,7 @@ name = ""
 invites = []
 my_groups = groups.MyGroups()
 logged_in_user = None
+logged_in_user_id = ""
 publisher = Publisher(with_logging=False)
 
 

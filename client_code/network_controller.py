@@ -3,6 +3,10 @@ from . import glob
 from . import helper as h
 
 
+def not_me(user_id):
+  return user_id and user_id != glob.logged_in_user_id
+
+
 def _get_connections(user_id, up_to_degree=3):
   """Return dictionary from degree to set of connections"""
   degree1s = {row['user_id2'] for row in glob.connections if row['user_id1'] == user_id}
@@ -21,11 +25,18 @@ def _get_my_connections(user_id):
   records = []
   c_user_ids = set()
   for d in range(1, up_to_degree+1):
-    records += [id for id in dset[d]] # sm.get_port_user_full(user2, logged_in_user, distance=d, degree=d) for user2 in 
+    records += [glob.users[id] for id in dset[d]] # sm.get_port_user_full(user2, logged_in_user, distance=d, degree=d) for user2 in 
     c_user_ids.update(dset[d])
   return records #+ _group_member_records_exclude(logged_in_user, c_users)
 
 
+def _get_their_connections(user_id):
+  dset2 = _get_connections(user_id, 1)
+  return [glob.users[id] for id in dset2[1]]
+
+
 def get_connections(user_id):
-  #assume me
-  return _get_my_connections(user_id)
+  if not_me(user_id):
+    return _get_their_connections(user_id)
+  else:
+    return _get_my_connections(user_id)

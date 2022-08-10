@@ -69,7 +69,7 @@ class InviteTest(unittest.TestCase):
     self.assertFalse(invite5.invalid_response())
 
   def test_rel_item(self):
-    invite1 = invites.Invite(rel_to_inviter="12345678", inviter_guess="1234") #, invitee=port.User.from_logged_in())
+    invite1 = invites.Invite(rel_to_inviter="12345678", inviter_guess="1234")
     item1 = invite1.rel_item(for_response=False)
     self.assertEqual(item1['relationship'], invite1.rel_to_inviter)
     self.assertEqual(item1['phone_last4'], invite1.inviter_guess)
