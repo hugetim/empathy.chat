@@ -145,8 +145,19 @@ def init_create_form(user_id=""):
 @authenticated_callable
 @timed
 def init_cache():
-  pass
-  
+  from . import connections as c
+  users_dict, connections_list, their_groups_dict = c.init_connections()
+  port_my_groups = _init_my_groups()
+  return users_dict, connections_list, port_my_groups, their_groups_dict
+
+
+def _init_my_groups():
+  from . import groups
+  from . import groups_server as g
+  my_groups = g.MyGroups(groups.MyGroups())
+  my_groups.load()
+  return my_groups.portable()
+
   
 def _latest_invited(user):
   _inviteds = inviteds(user)

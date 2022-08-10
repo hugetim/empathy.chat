@@ -21,7 +21,6 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
 
     # Any code you write here will run when the form opens.
     if glob.trust_level >= 4:
-      glob.my_groups.relay('load')
       self.reset()
     else:
       self.my_groups_panel.visible = False

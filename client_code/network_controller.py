@@ -46,7 +46,14 @@ def _group_members_to_group_names_exclude(excluded_user_ids):
   fellow_members_to_group_names = collections.defaultdict(list)
   if glob.trust_level < 1:
     return {}
-  for group in list(glob.my_groups) + list(glob.their_groups.values()):
+  for group in glob.my_groups:
+    # if glob.trust_level < 2:
+    #   if not g.guest_allowed_in_group(user, group_row):
+    #     continue
+    relevant_group_member_ids = set([u.user_id for u in group.members]) - excluded_user_ids
+    for user_id2 in relevant_group_member_ids:
+      fellow_members_to_group_names[user_id2].append(group.name)
+  for group in glob.their_groups.values():
     # if glob.trust_level < 2:
     #   if not g.guest_allowed_in_group(user, group_row):
     #     continue

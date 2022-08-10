@@ -9,7 +9,6 @@ MOBILE = None
 trust_level = 0
 name = ""
 invites = []
-my_groups = groups.MyGroups()
 logged_in_user = None
 logged_in_user_id = ""
 publisher = Publisher(with_logging=False)
@@ -21,15 +20,18 @@ lazy_loaded = False
 
 
 def __getattr__(name):
-  if name in ['user_items', 'group_items', 'starred_name_list']: 
+  if name in ['users', 'connections', 'my_groups', 'their_groups', 'user_items', 'group_items', 'starred_name_list']: 
     global _lazy_dict
     # fetch the value if we haven't loaded it already:
-    trial_get = _lazy_dict.get(name)
-    if trial_get:
-      return trial_get
-    else:
-      populate_lazy_vars()          
-      return _lazy_dict.get(name)
+    while True:
+      print(name)
+      trial_get = _lazy_dict.get(name)
+      if trial_get != None:
+        return trial_get
+      import time
+      time.sleep(2)
+        # populate_lazy_vars()          
+        # return _lazy_dict.get(name)
   raise AttributeError(name)
  
 
@@ -45,11 +47,13 @@ def _set_lazy_vars(out):
   from . import network_controller as nc
   global _lazy_dict
   global lazy_loaded
-  _users, _connections, _their_groups = out
+  _users, _connections, _my_groups, _their_groups = out
+  _lazy_dict = {
+    'users': _users, 'connections': _connections, 'my_groups': _my_groups, 'their_groups': _their_groups, 
+  }
   _group_items = nc.get_create_group_items()
   _user_items, _starred_name_list = nc.get_create_user_items()
-  _lazy_dict = {
-    'users': _users, 'connections': _connections, 'their_groups': _their_groups, 
+  _lazy_dict.update({
     'user_items': _user_items, 'group_items': _group_items, 'starred_name_list': _starred_name_list,
-  }
+  })
   lazy_loaded = True

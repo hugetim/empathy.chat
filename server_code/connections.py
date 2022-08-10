@@ -61,22 +61,39 @@ def _group_member_items_exclude(user, excluded_users):
   return sorted(items, key = lambda name_item:(name_item['subtext'] + name_item['key']))
   
 
-def _get_connections(user, up_to_degree=3, cache_override=False):
+def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_list=False):
   """Return dictionary from degree to set of connections"""
   if up_to_degree not in range(0, 98):
     sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
   if not cache_override and user == anvil.users.get_user():
     return _cached_get_connections(user, up_to_degree)
-  degree1s = {row['user2'] for row in app_tables.connections.search(user1=user, current=True)}
+  conn_rows = {}
+  conn_rows[0] = app_tables.connections.search(user1=user, current=True)
+  degree1s = {row['user2'] for row in conn_rows[0]}
   out = {0: {user}, 1: degree1s}
   if user in out[1]:
     sm.warning(f"user in out[1]")
   prev = {user}
   for d in range(1, up_to_degree):
     prev.update(out[d])
-    current = {row['user2'] for row in app_tables.connections.search(user1=q.any_of(*out[d]), current=True)}
+    conn_rows[d] = app_tables.connections.search(user1=q.any_of(*out[d]), current=True)
+    current = {row['user2'] for row in conn_rows[d]}
     out[d+1] = current - prev
-  return out
+  if not output_conn_list:
+    return out
+  else:
+    connections_list = []
+    for d in range(0, up_to_degree):
+      connections_list += [_port_conn_row(row, d) for row in conn_rows[d]]
+    return out, connections_list
+
+
+def _port_conn_row(row, distance):
+  # assumes distance = degree
+  rel = row['relationship2to1'] if distance <= 1 else ""
+  return dict(user_id1=row['user1'].get_id(), user_id2=row['user2'].get_id(), relationship2to1=rel,
+              date=row['date'], date_described=row['date_described'], distance=row['distance'],
+             )
 
 
 _cached_connections = {}
@@ -145,6 +162,60 @@ def get_connected_users(user, up_to_degree):
   for d in range(1, up_to_degree+1):
     c_users.update(dset[d])
   return c_users
+
+
+def init_connections():
+  logged_in_user = sm.get_acting_user()
+  up_to_degree = 3
+  dset, connections_list = _get_connections(logged_in_user, up_to_degree, cache_override=True, output_conn_list=True)
+  records = [connection_record(logged_in_user, logged_in_user)]
+  c_users = set()
+  for d in range(1, up_to_degree+1):
+    records += [connection_record(user2, logged_in_user, _distance=d, degree=d) for user2 in dset[d]]
+    c_users.update(dset[d])
+  users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records, connections_list)
+  return users_dict, connections_list, their_groups_dict
+
+
+def _profiles_and_their_groups(user, c_users, records, connections_list):
+  from . import groups_server as g
+  from . import groups
+  import collections
+  their_groups_dict = {}
+  members_to_group_names = collections.defaultdict(list)
+  trust_level = user['trust_level']
+  # if trust_level < 1:
+  #   return {}
+  for group_row in g.user_groups(user):
+    if trust_level < 2:
+      if not g.guest_allowed_in_group(user, group_row):
+        continue
+    group_members = set(g.members_from_group_row(group_row))
+    if user not in group_row['hosts']:
+      their_groups_dict[group_row.get_id()] = groups.Group(name=group_row['name'],
+                                                           group_id=group_row.get_id(),
+                                                           members=[u.get_id() for u in group_members],
+                                                           hosts=[u.get_id() for u in group_row['hosts']],
+                                                          )
+    for user2 in group_members:
+      members_to_group_names[user2].append(group_row['name'])
+  records += [connection_record(user2, user, port.UNLINKED, port.UNLINKED) 
+              for user2 in set(members_to_group_names.keys()) - c_users.union({user})]
+  users_dict = {record['user_id']: _get_port_profile(record, connections_list, members_to_group_names) for record in records}
+  return users_dict, their_groups_dict
+
+
+def _get_port_profile(record, connections_list, members_to_group_names):
+  from . import relationship as rel
+  user = sm.get_other_user(record['user_id'])
+  relationship = rel.Relationship(distance=record['distance'])
+  record.update({'relationships': [] if record['me'] else get_relationships(user, up_to_degree=record['degree']),
+                 'how_empathy': user['how_empathy'],
+                 'profile': user['profile'],
+                 'profile_updated': user['profile_updated'],
+                 'profile_url': user['profile_url'] if relationship.profile_url_visible else "",
+                })
+  return port.UserProfile(**record)
 
   
 @authenticated_callable
