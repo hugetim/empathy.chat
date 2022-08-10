@@ -61,3 +61,17 @@ def get_connections(user_id):
     return _get_their_connections(user_id)
   else:
     return _get_my_connections(user_id)
+
+
+def get_create_group_items():
+  items = []
+  for g in glob.my_groups:
+    host = glob.logged_in_user_id
+    subtext = f"(host: me' if host == user else sm.name(host, to_user=user)})"
+    items.append(dict(key=g['name'], value=groups.Group(g['name'], g.get_id()), subtext=subtext))
+  for g in glob.groups:
+    host = g['hosts'][0]
+    subtext = f"(host: {'me' if host == user else sm.name(host, to_user=user)})"
+    items.append(dict(key=g['name'], value=groups.Group(g['name'], g.get_id()), subtext=subtext))
+  return sorted(items, key=lambda item:(item['subtext'] + item['key']))
+  
