@@ -163,7 +163,7 @@ def get_connected_users(user, up_to_degree):
     c_users.update(dset[d])
   return c_users
 
-@timed
+
 def init_connections():
   logged_in_user = sm.get_acting_user()
   up_to_degree = 3
@@ -176,7 +176,7 @@ def init_connections():
   users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records, connections_list)
   return users_dict, connections_list, their_groups_dict
 
-@timed
+
 def _profiles_and_their_groups(user, c_users, records, connections_list):
   from . import groups_server as g
   from . import groups

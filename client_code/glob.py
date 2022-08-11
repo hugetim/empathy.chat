@@ -26,7 +26,6 @@ def __getattr__(name):
     # fetch the value if we haven't loaded it already:
     with loading_indicator:
       while True:
-        print(name)
         trial_get = _lazy_dict.get(name)
         if trial_get != None:
           return trial_get
