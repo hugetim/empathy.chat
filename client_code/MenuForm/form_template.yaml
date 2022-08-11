@@ -302,3 +302,7 @@ components:
   layout_properties: {slot: default}
   event_bindings: {}
   name: content_column_panel
+- type: Timer
+  properties: {interval: 0.1}
+  name: timer_1
+  event_bindings: {tick: timer_1_tick}

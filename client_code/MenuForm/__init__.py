@@ -43,6 +43,12 @@ class MenuForm(MenuFormTemplate):
   def form_show(self, **event_args):
     self.reset_status(self.item['state'])
 
+  def timer_1_tick(self, **event_args):
+    """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
+    self.timer_1.interval = 30*60 #kludge to prevent cache from becoming *too* stale
+    # with h.PausedTimer(self.timer_2):
+    glob.populate_lazy_vars(spinner=False)
+  
   def set_help_link(self, url):
     self.side_help_link.url = url
     self.link_bar_help.url = url

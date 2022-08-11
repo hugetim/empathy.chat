@@ -186,9 +186,7 @@ class DashForm(DashFormTemplate):
         
   def timer_1_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
-    self.timer_1.interval = 30*60 #kludge to prevent cache from becoming *too* stale
-    with h.PausedTimer(self.timer_2):
-      glob.populate_lazy_vars(spinner=False)
-      if glob.trust_level == 1 and glob.user_items:
-        self.proposals_card.visible = True
-        self.top_form.connections_link.visible = True
+    self.timer_1.interval = 0
+    if glob.trust_level == 1 and glob.user_items:
+      self.proposals_card.visible = True
+      self.top_form.connections_link.visible = True
