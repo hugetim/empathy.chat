@@ -1,7 +1,7 @@
 from anvil import *
 import anvil.users
 import anvil.server
-from anvil.js import window, ExternalError
+from anvil.js import window, ExternalError, call_js
 from . import glob
 from anvil_extras.utils import timed
 
@@ -111,3 +111,19 @@ class BrowserTab():
       set_document_title(self.old_title)
     if self.favicon_url is not None:
       self.old_hrefs = return_favicons(self.old_hrefs)      
+
+
+class _loading_indicator:
+    def __enter__(self):
+        call_js('setLoading', True)
+        return self
+    def __exit__(self, exc_type, exc_value, tb):
+        call_js('setLoading', False)
+    def __call__(self, func):
+#         @wraps(func)
+        def wrapper(*args, **kw):
+            with self:
+                return func(*args, **kw)
+        return wrapper
+
+loading_indicator = _loading_indicator()

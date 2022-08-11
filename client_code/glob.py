@@ -21,17 +21,19 @@ lazy_loaded = False
 
 def __getattr__(name):
   if name in ['users', 'connections', 'my_groups', 'their_groups', 'user_items', 'group_items', 'starred_name_list']: 
+    from .ui_procedures import loading_indicator
     global _lazy_dict
     # fetch the value if we haven't loaded it already:
-    while True:
-      print(name)
-      trial_get = _lazy_dict.get(name)
-      if trial_get != None:
-        return trial_get
-      import time
-      time.sleep(2)
-        # populate_lazy_vars()          
-        # return _lazy_dict.get(name)
+    with loading_indicator:
+      while True:
+        print(name)
+        trial_get = _lazy_dict.get(name)
+        if trial_get != None:
+          return trial_get
+        import time
+        time.sleep(2)
+          # populate_lazy_vars()          
+          # return _lazy_dict.get(name)
   raise AttributeError(name)
  
 
