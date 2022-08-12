@@ -3,6 +3,7 @@ import anvil.server as server
 from . import glob
 from . import helper as h
 from . import groups
+from . import portable as port
 
 
 def not_me(user_id):
@@ -91,3 +92,64 @@ def get_create_user_items():
   name_items.sort(key=operator.itemgetter('subtext', 'key'))
   starred_name_list = [item['key'] for item in name_items if item['value'].starred]
   return name_items, starred_name_list
+
+
+def get_relationships(user2_id, up_to_degree=3):
+  """Returns ordered list of dictionaries"""
+  user1_id = glob.logged_in_user_id
+  user2 = glob.users[user2_id]
+  degree = user2.degree
+  if degree == 0:
+    return []
+  elif degree == port.UNLINKED:
+    return []
+  elif degree == 1:
+    conn = _get_connections(user1_id, first)
+    [conn] = [conn for conn in glob.connections 
+              if (conn['user_id1'] == user1_id and conn['user_id2'] == user2_id)]
+    [their_conn] = [conn for conn in glob.connections
+                    if (conn['user_id1'] == user2_id and conn['user_id2'] == user1_id)]
+    return [{"via": False, 
+             "whose": "my", 
+             "desc": conn['relationship2to1'], 
+             "date": conn['date_described'], 
+             "child": None,
+             "their": their_conn['relationship2to1'],
+             "their_date": their_conn['date_described'],
+             "their_name": user2['first'],
+             "their_id": user2_id,
+            }]
+  out = []
+  dset = _get_connection_ids(user1_id, 2)
+  dset2 = _get_connection_ids(user2_id, degree-2)
+  seconds = dset[2] & dset2[degree-2]
+  for second in seconds:
+    dset_second = _get_connection_ids(second, 1)
+    firsts = dset[1] & dset_second[1]
+    for first in firsts:
+      conn2 = _get_connections(first, second)
+      conn1 = _get_connections(user1_id, first)
+      if degree > 3:
+        via = " [name hidden]'s"
+      elif degree > 2:
+        via = f" {glob.users[second].name}'s "
+      else:
+        via = ""
+      out.append({"via": via,
+                  "whose": f"{glob.users[first].name}'s", 
+                  "desc": conn2['relationship2to1'],
+                  "date": conn2['date_described'],
+                  "child": {"via": False,
+                            "whose": "my", 
+                            "desc": conn1['relationship2to1'],
+                            "date": conn1['date_described'],
+                            "child": None,
+                           },
+                 })
+  return out 
+
+
+def _get_connection(user1_id, user2_id):
+  results = [conn for conn in glob.connections
+             if (conn['user_id1'] == user1_id and conn['user_id2'] == user2_id)]
+  return results[0] if results else None
