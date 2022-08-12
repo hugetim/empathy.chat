@@ -104,11 +104,8 @@ def get_relationships(user2_id, up_to_degree=3):
   elif degree == port.UNLINKED:
     return []
   elif degree == 1:
-    conn = _get_connections(user1_id, first)
-    [conn] = [conn for conn in glob.connections 
-              if (conn['user_id1'] == user1_id and conn['user_id2'] == user2_id)]
-    [their_conn] = [conn for conn in glob.connections
-                    if (conn['user_id1'] == user2_id and conn['user_id2'] == user1_id)]
+    conn = _get_connection(user1_id, user2_id)
+    their_conn = _get_connection(user2_id, user1_id)
     return [{"via": False, 
              "whose": "my", 
              "desc": conn['relationship2to1'], 
@@ -127,8 +124,8 @@ def get_relationships(user2_id, up_to_degree=3):
     dset_second = _get_connection_ids(second, 1)
     firsts = dset[1] & dset_second[1]
     for first in firsts:
-      conn2 = _get_connections(first, second)
-      conn1 = _get_connections(user1_id, first)
+      conn2 = _get_connection(first, second)
+      conn1 = _get_connection(user1_id, first)
       if degree > 3:
         via = " [name hidden]'s"
       elif degree > 2:

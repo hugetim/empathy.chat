@@ -10,6 +10,7 @@ from .... import invited
 from .... import portable as port
 from .... import parameters as p
 from .... import relationship as rel
+from .... import network_controller as nc
 from .NameEdit import NameEdit
 from .TextAreaEdit import TextAreaEdit
 from .Relationship import Relationship
@@ -29,7 +30,7 @@ class Profile(ProfileTemplate):
 
     # Any code you write here will run when the form opens.
     self.star_button.tooltip = p.STAR_TOOLTIP
-    self.relationship_repeating_panel.items = self.item['relationships']
+    self.relationship_repeating_panel.items = nc.get_relationships(user_id)
     self.last_active_label.text = f"  Last Active: {self.item.last_active_str},"
     self.connections_button.text = "My Network" if self.item['me'] else "Links"
     self.column_panel_1.row_spacing = 0

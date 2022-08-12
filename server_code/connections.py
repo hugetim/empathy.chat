@@ -211,7 +211,6 @@ def _get_port_profile(record, connections_list, members_to_group_names):
   relationship = rel.Relationship(distance=record['distance'])
   record.update({
     'common_group_names': members_to_group_names[user],
-    'relationships': [] if record['me'] else get_relationships(user, up_to_degree=record['degree']),
     'how_empathy': user['how_empathy'],
     'profile': user['profile'],
     'profile_updated': user['profile_updated'],
