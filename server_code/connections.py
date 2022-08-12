@@ -209,12 +209,14 @@ def _get_port_profile(record, connections_list, members_to_group_names):
   from . import relationship as rel
   user = sm.get_other_user(record['user_id'])
   relationship = rel.Relationship(distance=record['distance'])
-  record.update({'relationships': [] if record['me'] else get_relationships(user, up_to_degree=record['degree']),
-                 'how_empathy': user['how_empathy'],
-                 'profile': user['profile'],
-                 'profile_updated': user['profile_updated'],
-                 'profile_url': user['profile_url'] if relationship.profile_url_visible else "",
-                })
+  record.update({
+    'common_group_names': members_to_group_names[user],
+    'relationships': [] if record['me'] else get_relationships(user, up_to_degree=record['degree']),
+    'how_empathy': user['how_empathy'],
+    'profile': user['profile'],
+    'profile_updated': user['profile_updated'],
+    'profile_url': user['profile_url'] if relationship.profile_url_visible else "",
+  })
   return port.UserProfile(**record)
 
   
