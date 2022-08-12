@@ -205,13 +205,13 @@ class PortUserTest(unittest.TestCase):
     self.assertEqual(port_user.distance, 0)
     
     
-@anvil.server.background_task
-def server_auto_tests(verbosity=1):
-  #unittest.main(exit=False)
-  import sys
-  test_modules = ['auto_test', 'relationship_test']
-  test = unittest.TestLoader().loadTestsFromNames(test_modules)
-  unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity).run(test)
+# @anvil.server.background_task
+# def server_auto_tests(verbosity=1):
+#   #unittest.main(exit=False)
+#   import sys
+#   test_modules = ['auto_test', 'relationship_test']
+#   test = unittest.TestLoader().loadTestsFromNames(test_modules)
+#   unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity).run(test)
 
   
 @sm.authenticated_callable

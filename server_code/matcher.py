@@ -83,10 +83,10 @@ def init(time_zone):
                 updates expire_date if currently requesting/ping
   """
   init_dict, trust_level = _init_before_tests(time_zone)
-  if p.DEBUG_MODE and trust_level >= sm.TEST_TRUST_LEVEL:
-    from . import server_auto_test
-    server_auto_test.server_auto_tests()
-    #anvil.server.launch_background_task('server_auto_tests')
+  # if p.DEBUG_MODE and trust_level >= sm.TEST_TRUST_LEVEL:
+  #   from . import server_auto_test
+  #   server_auto_test.server_auto_tests()
+  #   #anvil.server.launch_background_task('server_auto_tests')
   return init_dict
 
 
