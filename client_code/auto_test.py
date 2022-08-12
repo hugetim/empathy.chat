@@ -2,8 +2,6 @@ from anvil import *
 import anvil.server
 import unittest
 import time
-from . import portable as port
-from . import parameters as p
 
     
 # class MyGroupsTest(unittest.TestCase):
