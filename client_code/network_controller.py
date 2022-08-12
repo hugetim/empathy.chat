@@ -1,3 +1,4 @@
+import operator
 import anvil.server as server
 from . import glob
 from . import helper as h
@@ -64,10 +65,9 @@ def _group_members_to_group_names_exclude(excluded_user_ids):
 
 
 def get_connections(user_id):
-  if not_me(user_id):
-    return _get_their_connections(user_id)
-  else:
-    return _get_my_connections(glob.logged_in_user_id)
+  profiles = (_get_their_connections(user_id) if not_me(user_id) 
+              else _get_my_connections(glob.logged_in_user_id))
+  return sorted(profiles, key=lambda u: (u.distance_str_or_groups, h.reverse_compare(u.last_active)))
 
 
 def get_create_group_items():
@@ -88,5 +88,6 @@ def get_create_user_items():
   up_to_degree = 3 if glob.trust_level >= 3 else 1
   users = _get_my_connections(user_id, up_to_degree)
   name_items = [u.name_item() for u in users]
-  starred_name_list = [u.name for u in users if u.starred]
+  name_items.sort(key=operator.itemgetter('subtext', 'key'))
+  starred_name_list = [item['key'] for item in name_items if item['value'].starred]
   return name_items, starred_name_list

@@ -55,7 +55,7 @@ def full_name(first, last, distance=UNLINKED):
 @anvil.server.portable_class
 class User(h.AttributeToKey):
   
-  def __init__(self, user_id=None, name=None, url_confirmed=None, distance=None, seeking=None, starred=None):
+  def __init__(self, user_id=None, name=None, url_confirmed=None, distance=UNLINKED, seeking=None, starred=None):
     self.user_id = user_id
     self.name = name
     self.url_confirmed = url_confirmed
@@ -104,8 +104,8 @@ class User(h.AttributeToKey):
   
 @anvil.server.portable_class
 class UserFull(User):
-  def __init__(self, user_id=None, name=None, url_confirmed=None, distance=None, seeking=None, starred=None,
-               degree=None, last_active=None, status=None, unread_message=None, me=None, 
+  def __init__(self, user_id=None, name=None, url_confirmed=None, distance=UNLINKED, seeking=None, starred=None,
+               degree=UNLINKED, last_active=None, status=None, unread_message=None, me=None, 
                first="", last="", url_confirmed_date=None, trust_level=None, trust_label="",
                common_group_names=None):
     super().__init__(user_id=user_id, name=name, url_confirmed=url_confirmed, distance=distance, seeking=seeking, starred=starred)
