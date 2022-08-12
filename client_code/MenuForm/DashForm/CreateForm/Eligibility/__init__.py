@@ -46,7 +46,7 @@ class Eligibility(EligibilityTemplate):
           self.starred_check_box.tooltip = f"currently: {name_list_str}"
       else:
         self.starred_check_box.text = "My Starred list (you currently have no Starred users)"
-    has_close_link = self.item['user_items'] and self.item['user_items'][0]['subtext'] == "1st"
+    has_close_link = self.item['user_items'] and self.item['user_items'][0]['value'].distance == 1
     self.network_flow_panel.visible = self.trust_level >= 2 and has_close_link
     self.network_check_box.checked = self.item['eligible']
     if self.trust_level >= 3:
