@@ -10,14 +10,20 @@ def not_me(user_id):
   return user_id and user_id != glob.logged_in_user_id
 
 
-def _get_connection_ids(user_id, up_to_degree=3):
+def _get_connection_ids(user_id, up_to_degree=3, include_reverse=False):
   """Return dictionary from degree to set of connections"""
-  degree1s = {row['user_id2'] for row in glob.connections if row['user_id1'] == user_id}
+  id1 = 'user_id1'
+  id2 = 'user_id2'
+  degree1s = {row[id2] for row in glob.connections if row[id1] == user_id}
+  if include_reverse:
+    degree1s.update({row[id1] for row in glob.connections if row[id2] == user_id})
   out = {0: {user_id}, 1: degree1s}
   prev = {user_id}
   for d in range(1, up_to_degree):
     prev.update(out[d])
-    current = {row['user_id2'] for row in glob.connections if row['user_id1'] in out[d]}
+    current = {row[id2] for row in glob.connections if row[id1] in out[d]}
+    if include_reverse:
+      current.update({row[id1] for row in glob.connections if row[id2] in out[d]})
     out[d+1] = current - prev
   return out
 
@@ -118,7 +124,7 @@ def get_relationships(user2_id, up_to_degree=3):
             }]
   out = []
   dset = _get_connection_ids(user1_id, 2)
-  dset2 = _get_connection_ids(user2_id, degree-2)
+  dset2 = _get_connection_ids(user2_id, degree-2, include_reverse=True)
   seconds = dset[2] & dset2[degree-2]
   for second in seconds:
     dset_second = _get_connection_ids(second, 1)
