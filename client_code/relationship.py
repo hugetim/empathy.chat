@@ -14,15 +14,15 @@ class Relationship:
   def __init__(self, distance=UNLINKED, degree=UNLINKED, group_host=False, my_group_member=False):
     self.distance = distance
     self.degree = degree if degree < UNLINKED else distance
-    self.host = group_host
-    self.member = my_group_member
+    self.group_host = group_host
+    self.my_group_member = my_group_member
     
   def __repr__(self):
-    return f"Relationship({self.distance}, {self.degree}, {self.host}, {self.member})"
+    return f"Relationship({self.distance}, {self.degree}, {self.group_host}, {self.my_group_member})"
     
   @property
   def last_name_visible(self):
-    return self.distance <= 1 or self.host or self.member
+    return self.distance <= 1 or self.group_host or self.my_group_member
     
   @property
   def last_initial_visible(self):

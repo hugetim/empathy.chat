@@ -168,9 +168,9 @@ class MyGroupMember(UserFull):
     self.group_id = group_id
     self.guest_allowed = guest_allowed
     
-  def _init_user_full_attributes(self, puf):
-    for key in puf.__dict__:
-      self.__setattr__(key, puf.__dict__[key])   
+  def _init_user_full_attributes(self, port_user_full):
+    for key in port_user_full.__dict__:
+      self.__setattr__(key, port_user_full.__dict__[key])   
 
     
 @anvil.server.portable_class
