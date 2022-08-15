@@ -123,8 +123,8 @@ components:
     data_bindings:
     - {property: enabled, code: 'not self.item[''status'']'}
     - {property: visible, code: 'self.item[''status''] != "received"'}
-    - {property: tooltip, code: '"Please wait to submit until the other user has joined"
-        if self.item[''status''] == "waiting" else ""'}
+    - {property: tooltip, code: '"You will be able to submit once another user has
+        joined" if self.item[''status''] == "waiting" else ""'}
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
       visible: true, text: waiting for other to submit..., font_size: null, font: '',

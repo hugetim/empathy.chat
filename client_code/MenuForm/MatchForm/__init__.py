@@ -109,7 +109,7 @@ class MatchForm(MatchFormTemplate):
     matched = self.item.status == "matched"
     self.message_textbox.enabled = matched
     self.message_textbox.tooltip = (
-      "" if matched else "Please wait until the other has joined before sending a message"
+      "" if matched else "You will be able to send a message once someone else has joined"
     )
     self.complete_button.text = "End Chat" if matched else "Cancel"
     self.complete_button.visible = True
