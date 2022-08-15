@@ -91,7 +91,7 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
 def _port_conn_row(row, distance):
   # assumes distance = degree
   rel = row['relationship2to1'] if distance <= 1 else ""
-  return dict(user_id1=row['user1'].get_id(), user_id2=row['user2'].get_id(), relationship2to1=rel,
+  return dict(user1_id=row['user1'].get_id(), user2_id=row['user2'].get_id(), relationship2to1=rel,
               date=row['date'], date_described=row['date_described'], distance=row['distance'],
              )
 

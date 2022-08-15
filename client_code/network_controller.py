@@ -12,8 +12,8 @@ def not_me(user_id):
 
 def _get_connection_ids(user_id, up_to_degree=3, include_reverse=False):
   """Return dictionary from degree to set of connections"""
-  id1 = 'user_id1'
-  id2 = 'user_id2'
+  id1 = 'user1_id'
+  id2 = 'user2_id'
   degree1s = {row[id2] for row in glob.connections if row[id1] == user_id}
   if include_reverse:
     degree1s.update({row[id1] for row in glob.connections if row[id2] == user_id})
@@ -46,7 +46,7 @@ def _get_my_connections(user_id, up_to_degree=3):
 def _group_member_records_exclude(user_id, excluded_user_ids):
   excluded_user_ids.add(user_id)
   fellow_members_to_group_names = _group_members_to_group_names_exclude(excluded_user_ids)
-  return [glob.users[user_id2] for user_id2 in fellow_members_to_group_names.keys()] #not using group names
+  return [glob.users[user2_id] for user2_id in fellow_members_to_group_names.keys()] #not using group names
 
 
 def _group_members_to_group_names_exclude(excluded_user_ids):
@@ -59,15 +59,15 @@ def _group_members_to_group_names_exclude(excluded_user_ids):
     #   if not g.guest_allowed_in_group(user, group_row):
     #     continue
     relevant_group_member_ids = set([u.user_id for u in group.members]) - excluded_user_ids
-    for user_id2 in relevant_group_member_ids:
-      fellow_members_to_group_names[user_id2].append(group.name)
+    for user2_id in relevant_group_member_ids:
+      fellow_members_to_group_names[user2_id].append(group.name)
   for group in glob.their_groups.values():
     # if glob.trust_level < 2:
     #   if not g.guest_allowed_in_group(user, group_row):
     #     continue
     relevant_group_member_ids = set(group.members) - excluded_user_ids
-    for user_id2 in relevant_group_member_ids:
-      fellow_members_to_group_names[user_id2].append(group.name)
+    for user2_id in relevant_group_member_ids:
+      fellow_members_to_group_names[user2_id].append(group.name)
   return fellow_members_to_group_names
 
 
@@ -154,5 +154,5 @@ def get_relationships(user2_id, up_to_degree=3):
 
 def _get_connection(user1_id, user2_id):
   results = [conn for conn in glob.connections
-             if (conn['user_id1'] == user1_id and conn['user_id2'] == user2_id)]
+             if (conn['user1_id'] == user1_id and conn['user2_id'] == user2_id)]
   return results[0] if results else None
