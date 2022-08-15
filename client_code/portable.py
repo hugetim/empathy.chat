@@ -159,18 +159,6 @@ class UserProfile(UserFull):
   @property
   def profile_updated_date_str(self):
     return h.short_date_str(h.as_local_tz(self.profile_updated_dt)) if self.profile_updated_dt else ""
- 
-
-@anvil.server.portable_class
-class MyGroupMember(UserFull):
-  def __init__(self, port_user_full, group_id, guest_allowed=False):
-    self._init_user_full_attributes(port_user_full)
-    self.group_id = group_id
-    self.guest_allowed = guest_allowed
-    
-  def _init_user_full_attributes(self, port_user_full):
-    for key in port_user_full.__dict__:
-      self.__setattr__(key, port_user_full.__dict__[key])   
 
     
 @anvil.server.portable_class

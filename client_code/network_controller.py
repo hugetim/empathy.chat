@@ -58,7 +58,8 @@ def _group_members_to_group_names_exclude(excluded_user_ids):
     # if glob.trust_level < 2:
     #   if not g.guest_allowed_in_group(user, group_row):
     #     continue
-    relevant_group_member_ids = set([u.user_id for u in group.members]) - excluded_user_ids
+    group_member_ids = [member_dict['member_id'] for member_dict in group.members]
+    relevant_group_member_ids = set(group_member_ids) - excluded_user_ids
     for user2_id in relevant_group_member_ids:
       fellow_members_to_group_names[user2_id].append(group.name)
   for group in glob.their_groups.values():
@@ -156,3 +157,15 @@ def _get_connection(user1_id, user2_id):
   results = [conn for conn in glob.connections
              if (conn['user1_id'] == user1_id and conn['user2_id'] == user2_id)]
   return results[0] if results else None
+
+
+class MyGroupMember(port.UserProfile):
+  def __init__(self, member_id, group_id, guest_allowed=False):
+    self._init_user_full_attributes(member_id)
+    self.group_id = group_id
+    self.guest_allowed = guest_allowed
+    
+  def _init_user_full_attributes(self, member_id):
+    user_profile = glob.users['member_id']
+    for key in user_profile.__dict__:
+      self.__setattr__(key, user_profile.__dict__[key])   

@@ -81,14 +81,14 @@ class MyGroups(sm.ServerItem, groups.MyGroups):
 class MyGroup(sm.ServerItem, groups.MyGroup): 
   def __init__(self, port_my_group):
     self.update(port_my_group)
-    self.members = [app_tables.users.get_by_id(member_id) for id in port_my_group.members]
+    self.members = [app_tables.users.get_by_id(member_dict['member_id']) for member_dict in port_my_group.members]
     self.invites = [Invite(port_invite) for port_invite in port_my_group.invites]
 
   def portable(self):
     port = groups.MyGroup()
     port.update(self)
     #port.members = sm.get_port_users_full(self.members)
-    port.members = list(port_members_from_group_row(self.group_row, user_id=""))
+    port.members = list(member_dicts_from_group_row(self.group_row))
     port.invites = [invite.portable() for invite in self.invites]
     return port
 
@@ -117,7 +117,7 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
 
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
-    port_members = list(port_members_from_group_row(group_row, user_id))
+    port_members = list(member_dicts_from_group_row(group_row))
     port_invites = [Invite.from_invite_row(i_row)
                     for i_row in app_tables.group_invites.search(tables.order_by('expire_date', ascending=False), 
                                                                  group=group_row, current=True)]
@@ -152,14 +152,12 @@ def members_from_group_row(group_row, with_trust_level=True):
   return list(member_set)
 
 
-def port_members_from_group_row(group_row, user_id):
-  with_trust_level=True
+def member_dicts_from_group_row(group_row):
   member_rows = [m for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']]
-  members = [m['user'] for m in member_rows]
-  port_users_full = sm.get_port_users_full(members, user1_id=user_id)
+  member_ids = [m['user'] for m in member_rows]
   group_id = group_row.get_id()
-  for i, port_user_full in enumerate(port_users_full):
-    yield port.MyGroupMember(port_user_full, group_id, member_rows[i]['guest_allowed'])
+  for i, member_id in enumerate(member_ids):
+    yield dict(member_id=member_id, group_id=group_id, guest_allowed=member_rows[i]['guest_allowed'])
   
 
 def user_groups(user):

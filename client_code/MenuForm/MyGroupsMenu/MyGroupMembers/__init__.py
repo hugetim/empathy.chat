@@ -1,12 +1,6 @@
 from ._anvil_designer import MyGroupMembersTemplate
 from anvil import *
-import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
-import anvil.users
-import anvil.server
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
+from .... import network_controller as nc
 
 class MyGroupMembers(MyGroupMembersTemplate):
   def __init__(self, menu, **properties):
@@ -16,6 +10,10 @@ class MyGroupMembers(MyGroupMembersTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.update()
 
   def update(self):
-    self.refresh_data_bindings()
+    port_members = [nc.MyGroupMember(**member_dict) for member_dict in self.group.members]
+    sorted_port_members = sorted(port_members, key=lambda pu: pu['last_active'], reverse=True)
+    self.repeating_panel_1.items = sorted_port_members
+    
