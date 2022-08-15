@@ -161,11 +161,11 @@ def _get_connection(user1_id, user2_id):
 
 class MyGroupMember(port.UserProfile):
   def __init__(self, member_id, group_id, guest_allowed=False):
-    self._init_user_full_attributes(member_id)
+    self._init_user_profile_attributes(member_id)
     self.group_id = group_id
     self.guest_allowed = guest_allowed
     
-  def _init_user_full_attributes(self, member_id):
-    user_profile = glob.users['member_id']
+  def _init_user_profile_attributes(self, member_id):
+    user_profile = glob.users[member_id]
     for key in user_profile.__dict__:
       self.__setattr__(key, user_profile.__dict__[key])   

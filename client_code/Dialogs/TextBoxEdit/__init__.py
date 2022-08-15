@@ -1,12 +1,5 @@
 from ._anvil_designer import TextBoxEditTemplate
 from anvil import *
-import anvil.google.auth, anvil.google.drive
-from anvil.google.drive import app_files
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
-import anvil.users
-import anvil.server
 
 
 class TextBoxEdit(TextBoxEditTemplate):
@@ -17,8 +10,6 @@ class TextBoxEdit(TextBoxEditTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    if self.item['text'] in self.item['disallowed_list']:
-      self.item['disallowed_list'].remove(self.item['text'])
 
   def text_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
@@ -31,7 +22,7 @@ class TextBoxEdit(TextBoxEditTemplate):
       if self.item['text'] not in self.item['disallowed_list']:
         self.raise_event("x-close-alert", value=True)
       else:
-        self.error_label.text = "That name is already taken."
+        self.error_label.text = "That name is already taken (or otherwise not allowed)."
         self.error_label.visible = True
 
   def cancel_button_click(self, **event_args):

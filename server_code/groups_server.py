@@ -99,10 +99,6 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
   def save_settings(self, user_id=""):
     user = sm.get_acting_user(user_id)
     self.group_row['name'] = self.name
-    
-  def delete(self, user_id=""):
-    user = sm.get_acting_user(user_id)
-    self.group_row.delete()
 
   def create_invite(self):
     from datetime import timedelta
@@ -142,6 +138,14 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
                                f"You no longer need use this group invite link. Simply visit {p.URL} instead."
                               )
 
+
+@sm.authenticated_callable
+def delete_group(port_my_group):
+  user = sm.get_acting_user()
+  my_group = MyGroup(port_my_group)
+  if user in my_group.group_row['hosts']:
+    my_group.group_row.delete()
+
       
 def members_from_group_row(group_row, with_trust_level=True):
   member_set = (
@@ -154,7 +158,7 @@ def members_from_group_row(group_row, with_trust_level=True):
 
 def member_dicts_from_group_row(group_row):
   member_rows = [m for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']]
-  member_ids = [m['user'] for m in member_rows]
+  member_ids = [m['user'].get_id() for m in member_rows]
   group_id = group_row.get_id()
   for i, member_id in enumerate(member_ids):
     yield dict(member_id=member_id, group_id=group_id, guest_allowed=member_rows[i]['guest_allowed'])
