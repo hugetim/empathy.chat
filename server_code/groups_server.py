@@ -81,7 +81,7 @@ class MyGroups(sm.ServerItem, groups.MyGroups):
 class MyGroup(sm.ServerItem, groups.MyGroup): 
   def __init__(self, port_my_group):
     self.update(port_my_group)
-    self.members = [port_member.s_user for port_member in port_my_group.members]
+    self.members = [app_tables.users.get_by_id(member_id) for id in port_my_group.members]
     self.invites = [Invite(port_invite) for port_invite in port_my_group.invites]
 
   def portable(self):
