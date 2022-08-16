@@ -7,7 +7,6 @@ from .DashForm import DashForm
 from .WaitForm import WaitForm
 from .MatchForm import MatchForm
 from .NetworkMenu import NetworkMenu
-from .GroupsMenu import GroupsMenu
 from .MyGroupsMenu import MyGroupsMenu
 from .UserMenu import UserMenu
 from .SettingsForm import SettingsForm
@@ -119,11 +118,6 @@ class MenuForm(MenuFormTemplate):
       self.title_label.text = "My Network"
       self.reset_and_load(NetworkMenu())
       self.connections_link.role = "selected"   
-
-  def go_groups(self):
-    self.title_label.text = "Groups"
-    self.reset_and_load(GroupsMenu())       
-    self.groups_link.role = "selected"
     
   def go_my_groups(self):
     self.title_label.text = "My Groups"
