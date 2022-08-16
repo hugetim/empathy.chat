@@ -5,6 +5,7 @@ from .MyGroupSettings import MyGroupSettings
 from .MyGroupMembers import MyGroupMembers
 from ... import parameters as p
 from ... import glob
+from ... import relationship as rel
 from ..UserMenu.Profile.TextAreaEdit import TextAreaEdit
 
 
@@ -89,6 +90,7 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
       self.submit_url_button.visible = False
     elif not self.url_text_box.text:
       self.submit_url_button.enabled = False
+    self.profile_url_note_label.text = f"({rel.Relationship.PROFILE_URL_NOTE})"
     self.contributor_check_label.icon = "fa:check-square-o" if self.item['contributor'] else "fa:square-o"
     if self.item['contributor']:
       self.explain_contribution_button.visible = False
