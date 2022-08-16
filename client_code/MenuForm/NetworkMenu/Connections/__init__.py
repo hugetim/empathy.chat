@@ -32,5 +32,6 @@ class Connections(ConnectionsTemplate):
     self.refresh_data_bindings()
 
   def reset(self, **event_args):
-    glob.populate_lazy_vars()
+    glob.update_lazy_vars()
     self.update()
+    

@@ -43,7 +43,18 @@ def populate_lazy_vars(spinner=True):
     out = anvil.server.call_s('init_cache')
   _set_lazy_vars(out)
 
-    
+
+def update_lazy_vars(spinner=True):
+  _clear_lazy_vars()
+  populate_lazy_vars(spinner)
+
+
+def _clear_lazy_vars():
+  global _lazy_dict
+  _lazy_dict = {}
+  lazy_loaded = False
+
+  
 def _set_lazy_vars(out):
   from . import network_controller as nc
   global _lazy_dict
