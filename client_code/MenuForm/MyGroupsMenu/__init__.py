@@ -29,9 +29,8 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
     self.update_drop_down()
     if glob.my_groups:
       self.go_group_settings()
-    self.groups_drop_down.visible = glob.my_groups
-    self.tabs_flow_panel.visible = glob.my_groups
-    self.content_column_panel.visible = glob.my_groups
+    for component in [self.groups_drop_down, self.tabs_flow_panel, self.content_column_panel]:
+      component.visible = glob.my_groups
 
   def update_drop_down(self):
     self.groups_drop_down.items = [(g['name'], g) for g in glob.my_groups]
