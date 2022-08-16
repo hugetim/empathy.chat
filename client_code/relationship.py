@@ -9,7 +9,7 @@ class Relationship:
   LAST_NAME_NOTE = ("Only your close links and group hosts (and members of any groups you host) will be able to see your full last name. "
                     "Otherwise, only 2nd degree links (that is, friends of friends) will be able to see your last initial."
                    )
-  PROFILE_URL_NOTE = "Only close links can see the profile URL, aside from the empathy.chat admin."
+  PROFILE_URL_NOTE = "Only close links are allowed to see this profile URL, aside from the empathy.chat admin."
   
   def __init__(self, distance=UNLINKED, degree=UNLINKED, group_host=False, my_group_member=False):
     self.distance = distance
