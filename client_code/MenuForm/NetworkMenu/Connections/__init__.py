@@ -3,6 +3,7 @@ from anvil import *
 import anvil.users
 from .... import network_controller as nc
 from .... import helper as h
+from .... import glob
 
 
 class Connections(ConnectionsTemplate):
@@ -12,10 +13,8 @@ class Connections(ConnectionsTemplate):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
 
-    # Any code you write here will run when the form opens.
-    def event_update(**event_args):
-      return self.update()                    
-    self.repeating_panel_1.set_event_handler('x-reset', event_update)
+    # Any code you write here will run when the form opens.           
+    self.repeating_panel_1.set_event_handler('x-reset', self.reset)
     self.update()
     
   def update(self):
@@ -31,3 +30,7 @@ class Connections(ConnectionsTemplate):
       columns[degree_index]['title'] = "Degree" if has_degrees else "Group(s)"
       self.data_grid_1.columns = columns
     self.refresh_data_bindings()
+
+  def reset(self, **event_args):
+    glob.populate_lazy_vars()
+    self.update()
