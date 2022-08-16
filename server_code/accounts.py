@@ -222,23 +222,7 @@ def _check_for_confirmed_invites(user):
     else:
       warning(f"invite_reply not found, {dict(invite_row)}")
   return any_confirmed, any_failed    
-    
-    
-@authenticated_callable
-def init_profile(user_id=""):
-  from . import connections as c
-  from . import relationship as rel
-  user = sm.get_other_user(user_id)
-  record = c.connection_record(user, sm.get_acting_user())
-  relationship = rel.Relationship(distance=record['distance'])
-  record.update({'relationships': [] if record['me'] else c.get_relationships(user),
-                 'how_empathy': user['how_empathy'],
-                 'profile': user['profile'],
-                 'profile_updated': user['profile_updated'],
-                 'profile_url': user['profile_url'] if relationship.profile_url_visible else "",
-                })
-  return port.UserProfile(**record)
-    
+      
   
 @authenticated_callable
 def set_seeking_buddy(seeking, user_id=""):
@@ -269,14 +253,10 @@ def save_user_field(item_name, value, user_id=""):
   
 
 @authenticated_callable
-def get_settings(lazy_items=[], user_id=""):
+def get_settings(user_id=""):
   """Return user settings displayed on SettingsForm"""
   from . import groups
   user = sm.get_acting_user(user_id)
-  item_lists = {}
-  if not lazy_items:
-    lazy_items = sm.init_create_form(user_id)
-  item_lists['user_items'], item_lists['group_items'], item_lists['starred_name_list'] = lazy_items
   notif_settings = dict(user['notif_settings'])
   elig_items = {}
   for medium in ['sms', 'email']:
@@ -284,7 +264,6 @@ def get_settings(lazy_items=[], user_id=""):
     elig_items[medium]['eligible_users'] = [sm.get_port_user(sm.get_other_user(u_id), user1=user, simple=True) for u_id in elig_items[medium]['eligible_users']]
     eligible_group_rows = [app_tables.groups.get_by_id(g_id) for g_id in elig_items[medium]['eligible_groups']]
     elig_items[medium]['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id()) for group_row in eligible_group_rows]
-    elig_items[medium].update(item_lists)
   time_zone = user['time_zone']
   if not time_zone:
     time_zone = "America/Chicago"

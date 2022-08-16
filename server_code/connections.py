@@ -11,54 +11,6 @@ from . import parameters as p
 from . import helper as h
 from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
-
-
-# def is_visible(user2, user1=None): # Currently unused
-#   """Is user2 visible to user1?"""
-#   if sm.DEBUG:
-#     print("c.is_visible")
-#   if user1 is None:
-#     user1 = anvil.users.get_user()
-#   trust1 = user1['trust_level']
-#   trust2 = user2['trust_level']
-#   if trust1 is None:
-#     return False
-#   elif trust2 is None:
-#     return False
-#   else:
-#     return trust1 > 0 and trust2 > 0 and distance(user2, user1) <= 3
-
-  
-def get_create_user_items(user):
-  """Return list with 1st---2nd""" # add pending connections to front
-  if sm.DEBUG:
-    print(f"get_create_user_items, {user['email']}")
-  dset = _get_connections(user, 3)
-  dset[2] = [other for other in dset[2] if other['trust_level'] >= 3]
-  dset[3] = [other for other in dset[3] if other['trust_level'] >= 3]
-  items = {}
-  degree_set = [1, 2, 3] if user['trust_level'] >= 3 else [1]
-  c_users = set()
-  for degree in degree_set:
-    # change to distance=distance(user2, user1) or equivalent once properly implement distance
-    items[degree] = [sm.get_port_user_full(other, user, distance=degree, degree=degree).name_item() for other in dset[degree]]
-    items[degree].sort(key=lambda user_item: user_item['key'])
-    c_users.update(dset[degree])
-  group_member_items = _group_member_items_exclude(user, c_users)
-#   if items[1] and group_member_items:
-#     group_member_items = ["---"] + group_member_items
-  starred_name_list = [sm.name(u, distance=_degree_from_dset(u, dset)) for u in sm.starred_users(user)]
-  if user['trust_level'] >= 3:
-    return items[1] + items[2] + items[3] + group_member_items, starred_name_list
-  else:
-    return items[1] + group_member_items, starred_name_list
-
-  
-def _group_member_items_exclude(user, excluded_users):
-  fellow_members_to_group_names = _group_members_to_group_names_exclude(user, excluded_users)
-  items = [sm.get_port_user_full(user2, user, port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]).name_item()
-           for user2 in fellow_members_to_group_names.keys()]
-  return sorted(items, key = lambda name_item:(name_item['subtext'] + name_item['key']))
   
 
 def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_list=False):
@@ -218,40 +170,6 @@ def _get_port_profile(record, connections_list, members_to_group_names):
   })
   return port.UserProfile(**record)
 
-  
-@authenticated_callable
-def get_connections(user_id):
-  #print(f"get_connections, {user_id}")
-  with TimerLogger("get_connections", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
-    user = sm.get_other_user(user_id)
-    if not user_id:
-      logged_in_user = user
-      is_me = True
-    else:
-      logged_in_user = anvil.users.get_user()
-      is_me = user == logged_in_user
-    timer.check("get_users")
-    up_to_degree = 3
-    dset = _get_connections(logged_in_user, up_to_degree)
-    timer.check("_get_connections")
-    if is_me:
-      records = []
-      c_users = set()
-      for d in range(1, up_to_degree+1):
-        records += [sm.get_port_user_full(user2, logged_in_user, distance=d, degree=d) for user2 in dset[d]]
-        c_users.update(dset[d])
-      timer.check("get non-group records")
-      return records + _group_member_records_exclude(logged_in_user, c_users)
-    elif (logged_in_user['trust_level'] < sm.TEST_TRUST_LEVEL
-          and _degree_from_dset(user, dset) > 2):
-      return []
-    else:
-      dset2 = _get_connections(user, 1)
-      records = []
-      for d in range(0, up_to_degree+1):
-        records += [sm.get_port_user_full(user2, logged_in_user, distance=d, degree=d) for user2 in (dset[d] & dset2[1])]
-      return records #+ _group_member_records_include(logged_in_user, dset2[1] - c_users.union({logged_in_user}))
-
 
 def connection_record(user2, user1, _distance=None, degree=None):
   if degree is None:
@@ -273,25 +191,6 @@ def connection_record(user2, user1, _distance=None, degree=None):
                  'trust_label': accounts.trust_label[user2['trust_level']],
                 })
   return record
-
-
-### Not actually needed (with distance=degree) because direct connections of my direct connections will always be 2nd degree to me
-# def _group_member_records_include(user, included_users):
-#   from . import groups_server as g
-#   import collections
-#   fellow_members_to_group_names = collections.defaultdict(list)
-#   for group_row in g.user_groups(user):
-#     relevant_group_members = set(g.members_from_group_row(group_row)) & included_users
-#     for user2 in relevant_group_members:
-#       fellow_members_to_group_names[user2].append(group_row['name'])
-#   return [sm.get_port_user_full(user2, user, port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
-#           for user2 in fellow_members_to_group_names.keys()]
-
-
-def _group_member_records_exclude(user, excluded_users):
-  fellow_members_to_group_names = _group_members_to_group_names_exclude(user, excluded_users)
-  return [sm.get_port_user_full(user2, user, port.UNLINKED, port.UNLINKED, fellow_members_to_group_names[user2]) 
-          for user2 in fellow_members_to_group_names.keys()]
 
 
 def _group_members_to_group_names_exclude(user, excluded_users):
@@ -324,58 +223,6 @@ def _invite_status(user2, user1):
       return ""
     
 
-def get_relationships(user2, user1_id="", up_to_degree=3):
-  """Returns ordered list of dictionaries"""
-  user1 = sm.get_acting_user(user1_id)
-  dset = _get_connections(user1, up_to_degree)
-  degree = _degree_from_dset(user2, dset)
-  if degree == 0:
-    return []
-  elif degree == port.UNLINKED:
-    return []
-  elif degree == 1:
-    conn = app_tables.connections.get(user1=user1, user2=user2, current=True)
-    their_conn = app_tables.connections.get(user1=user2, user2=user1, current=True)
-    return [{"via": False, 
-             "whose": "my", 
-             "desc": conn['relationship2to1'], 
-             "date": conn['date_described'], 
-             "child": None,
-             "their": their_conn['relationship2to1'],
-             "their_date": their_conn['date_described'],
-             "their_name": user2['first_name'],
-             "their_id": user2.get_id(),
-            }]
-  out = []
-  dset2 = _get_connections(user2, degree-2)
-  seconds = dset[2] & dset2[degree-2]
-  for second in seconds:
-    dset_second = _get_connections(second, 1)
-    firsts = dset[1] & dset_second[1]
-    for first in firsts:
-      name = sm.name(first, distance=1)
-      conn2 = app_tables.connections.get(user1=first, user2=second, current=True)
-      conn1 = app_tables.connections.get(user1=user1, user2=first, current=True)
-      if degree > 3:
-        via = " [name hidden]'s"
-      elif degree > 2:
-        via = f" {sm.name(second, distance=2)}'s "
-      else:
-        via = ""
-      out.append({"via": via,
-                  "whose": f"{name}'s", 
-                  "desc": conn2['relationship2to1'],
-                  "date": conn2['date_described'],
-                  "child": {"via": False,
-                            "whose": "my", 
-                            "desc": conn1['relationship2to1'],
-                            "date": conn1['date_described'],
-                            "child": None,
-                           },
-                 })
-  return out 
-
-  
 @authenticated_callable
 def load_invites(user_id=""):
 #   from . import matcher as m

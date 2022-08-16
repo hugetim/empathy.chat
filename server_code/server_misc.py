@@ -118,30 +118,6 @@ def get_port_user(user2, distance=None, user1=None, simple=False):
     return None
 
 
-def get_port_user_full(user2, user1, distance=None, degree=None, common_group_names=None):
-  from . import connections as c
-  return port.UserFull(**c.connection_record(user2=user2, user1=user1, _distance=distance, degree=degree), 
-                       common_group_names=common_group_names)
-
-
-def get_port_users_full(user2s, user1_id="", up_to_distance=3):
-  from . import connections as c
-  user1 = get_acting_user(user1_id)
-  distances = c.distances(user2s, user1, up_to_distance)
-  return [get_port_user_full(user2, user1, distance=distances[user2], degree=distances[user2]) for user2 in user2s]
- 
-  
-@authenticated_callable
-@timed
-def init_create_form(user_id=""):
-  from . import connections as c
-  from . import groups_server as g
-  user = get_acting_user(user_id)
-  create_user_items, starred_name_list = c.get_create_user_items(user)
-  create_group_items = g.get_create_group_items(user)
-  return create_user_items, create_group_items, starred_name_list
-
-
 @authenticated_callable
 @timed
 def init_cache():

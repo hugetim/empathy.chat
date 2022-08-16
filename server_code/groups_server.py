@@ -87,7 +87,6 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
   def portable(self):
     port = groups.MyGroup()
     port.update(self)
-    #port.members = sm.get_port_users_full(self.members)
     port.members = list(member_dicts_from_group_row(self.group_row))
     port.invites = [invite.portable() for invite in self.invites]
     return port
@@ -168,15 +167,6 @@ def user_groups(user):
   memberships = {m['group'] for m in app_tables.group_members.search(user=user)}
   hosteds = {group for group in app_tables.groups.search(hosts=[user], current=True)}
   return memberships.union(hosteds)
-
-
-def get_create_group_items(user):
-  items = []
-  for g in user_groups(user):
-    host = g['hosts'][0]
-    subtext = f"(host: {'me' if host == user else sm.name(host, to_user=user)})"
-    items.append(dict(key=g['name'], value=groups.Group(g['name'], g.get_id()), subtext=subtext))
-  return sorted(items, key=lambda item:(item['subtext'] + item['key']))
 
 
 def guest_allowed_in_group(user, group_row):
