@@ -136,21 +136,20 @@ def _profiles_and_their_groups(user, c_users, records, connections_list):
   their_groups_dict = {}
   members_to_group_names = collections.defaultdict(list)
   trust_level = user['trust_level']
-  # if trust_level < 1:
-  #   return {}
-  for group_row in g.user_groups(user):
-    if trust_level < 2:
-      if not g.guest_allowed_in_group(user, group_row):
-        continue
-    group_members = set(g.members_from_group_row(group_row))
-    if user not in group_row['hosts']:
-      their_groups_dict[group_row.get_id()] = groups.Group(name=group_row['name'],
-                                                           group_id=group_row.get_id(),
-                                                           members=[u.get_id() for u in group_members],
-                                                           hosts=[u.get_id() for u in group_row['hosts']],
-                                                          )
-    for user2 in group_members:
-      members_to_group_names[user2].append(group_row['name'])
+  if trust_level >= 1:
+    for group_row in g.user_groups(user):
+      if trust_level < 2:
+        if not g.guest_allowed_in_group(user, group_row):
+          continue
+      group_members = set(g.members_from_group_row(group_row))
+      if user not in group_row['hosts']:
+        their_groups_dict[group_row.get_id()] = groups.Group(name=group_row['name'],
+                                                            group_id=group_row.get_id(),
+                                                            members=[u.get_id() for u in group_members],
+                                                            hosts=[u.get_id() for u in group_row['hosts']],
+                                                            )
+      for user2 in group_members:
+        members_to_group_names[user2].append(group_row['name'])
   records += [connection_record(user2, user, port.UNLINKED, port.UNLINKED) 
               for user2 in set(members_to_group_names.keys()) - c_users.union({user})]
   users_dict = {record['user_id']: _get_port_profile(record, connections_list, members_to_group_names) for record in records}
@@ -191,24 +190,6 @@ def connection_record(user2, user1, _distance=None, degree=None):
                  'trust_label': accounts.trust_label[user2['trust_level']],
                 })
   return record
-
-
-def _group_members_to_group_names_exclude(user, excluded_users):
-  from . import groups_server as g
-  import collections
-  fellow_members_to_group_names = collections.defaultdict(list)
-  excluded_users.add(user)
-  trust_level = user['trust_level']
-  if trust_level < 1:
-    return {}
-  for group_row in g.user_groups(user):
-    if trust_level < 2:
-      if not g.guest_allowed_in_group(user, group_row):
-        continue
-    relevant_group_members = set(g.members_from_group_row(group_row)) - excluded_users
-    for user2 in relevant_group_members:
-      fellow_members_to_group_names[user2].append(group_row['name'])
-  return fellow_members_to_group_names
   
 
 def _invite_status(user2, user1):
