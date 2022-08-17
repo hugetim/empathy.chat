@@ -1,6 +1,5 @@
 from ._anvil_designer import RelationshipTemplate
 from anvil import *
-import anvil.users
 import anvil.server
 from ..... import helper as h
 from ..RelEdit import RelEdit
@@ -44,3 +43,11 @@ class Relationship(RelationshipTemplate):
       self.item['desc'] = edit_form.item['relationship']
       self.refresh_data_bindings()
       self.update()
+
+  def whose_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    get_open_form().go_profile(self.item['whose_id'])
+
+  def via_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    get_open_form().go_profile(self.item['via_id'])
