@@ -131,8 +131,7 @@ components:
         background: ''}
       name: relationship_repeating_panel
       layout_properties: {grid_position: 'UBZMDW,UKHAPU', expand: true, width: null}
-    data_bindings:
-    - {property: visible, code: 'not self.item[''me'']'}
+    data_bindings: []
   - type: FlowPanel
     properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
       foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
@@ -231,7 +230,7 @@ components:
   - type: FlowPanel
     properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '',
       foreground: '', visible: true, spacing_above: large, spacing_below: large, background: ''}
-    name: flow_panel_2
+    name: connections_seeking_flow_panel
     layout_properties: {grid_position: 'MVEQVS,BFRRSM'}
     components:
     - type: FlowPanel
@@ -279,7 +278,7 @@ components:
         visible: false, text: Currently seeking a regular empathy buddy, font_size: null,
         font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: 'fa:hand-paper-o'}
-      name: label_1
+      name: seeking_label
       layout_properties: {}
       data_bindings:
       - {property: visible, code: '(not self.item[''me'']) and self.item[''seeking'']'}

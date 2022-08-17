@@ -1,6 +1,5 @@
 from ._anvil_designer import ProfileTemplate
 from anvil import *
-import anvil.users
 import anvil.server
 from .... import helper as h
 from .... import ui_procedures as ui
@@ -31,6 +30,10 @@ class Profile(ProfileTemplate):
     # Any code you write here will run when the form opens.
     self.star_button.tooltip = p.STAR_TOOLTIP
     self.relationship_repeating_panel.items = nc.get_relationships(user_id)
+    self.relationship_flow_panel.visible = bool(self.relationship_repeating_panel.items)
+    self.connections_seeking_flow_panel.visible = (self.connections_flow_panel.visible 
+                                                   or self.seeking_switch.visible 
+                                                   or self.seeking_label.visible)
     self.last_active_label.text = f"  Last Active: {self.item.last_active_str},"
     self.connections_button.text = "My Network" if self.item['me'] else "Links"
     self.column_panel_1.row_spacing = 0
