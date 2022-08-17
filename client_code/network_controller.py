@@ -154,7 +154,7 @@ def _indirect_relationship_dict(user1_id, first, second, via_str):
           "whose": f"{glob.users[first].name}'s", 
           "desc": conn2['relationship2to1'],
           "date": conn2['date_described'],
-          "child": _direct_relationship_dict(user1_id, first),
+          "child": None, #_direct_relationship_dict(user1_id, first),
          }
 
 
