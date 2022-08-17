@@ -79,9 +79,9 @@ def _group_item(group, my_group=False):
   if my_group:
     subtext = "(host: me)"
   else:
-    host_id = g['hosts'][0]
+    host_id = group['hosts'][0]
     subtext = f"(host: {glob.users[host_id].name})"
-  return dict(key=g['name'], value=groups.Group(g['name'], g.group_id), subtext=subtext)
+  return dict(key=group['name'], value=groups.Group(group['name'], group.group_id), subtext=subtext)
   
 
 
@@ -89,63 +89,82 @@ def get_create_user_items():
   """Return list with 1st---2nd""" # add pending connections to front
   user_id = glob.logged_in_user_id
   up_to_degree = 3 if glob.trust_level >= 3 else 1
-  users = _get_my_connections(user_id, up_to_degree)
-  name_items = [u.name_item() for u in users]
-  name_items.sort(key=operator.itemgetter('subtext', 'key'))
-  starred_name_list = [item['key'] for item in name_items if item['value'].starred]
+  name_items = _get_sorted_name_items(user_id, up_to_degree)
+  starred_name_list = [item['key'] for item in name_items if item['value'].starred] # ensures sort order
   return name_items, starred_name_list
 
 
-def get_relationships(user2_id, up_to_degree=3):
+def _get_sorted_name_items(user_id, up_to_degree):
+  user_profiles = _get_my_connections(user_id, up_to_degree)
+  name_items = [u.name_item() for u in user_profiles]
+  name_items.sort(key=operator.itemgetter('subtext', 'key'))
+  return name_items
+
+
+def get_relationships(user2_id):
   """Returns ordered list of dictionaries"""
   user1_id = glob.logged_in_user_id
-  user2 = glob.users[user2_id]
-  degree = user2.degree
-  if degree == 0:
-    return []
-  elif degree == port.UNLINKED:
+  degree = glob.users[user2_id].degree
+  if degree in [0, port.UNLINKED]:
     return []
   elif degree == 1:
-    conn = _get_connection(user1_id, user2_id)
-    their_conn = _get_connection(user2_id, user1_id)
-    return [{"via": False, 
-             "whose": "my", 
-             "desc": conn['relationship2to1'], 
-             "date": conn['date_described'], 
-             "child": None,
-             "their": their_conn['relationship2to1'],
-             "their_date": their_conn['date_described'],
-             "their_name": user2['first'],
-             "their_id": user2_id,
-            }]
+    return [_direct_relationship_dict(user1_id, user2_id, with_their=True)]
+  else:
+    return _indirect_relationship_dicts(user1_id, user2_id, degree)
+
+
+def _direct_relationship_dict(user1_id, user2_id, with_their=False):
+  conn = _get_connection(user1_id, user2_id)
+  out = {"via": False,
+         "whose": "my", 
+         "desc": conn['relationship2to1'], 
+         "date": conn['date_described'], 
+         "child": None,
+        }
+  if with_their:
+    out.update(_direct_relationship_their_dict(user1_id, user2_id))
+  return out
+
+
+def _direct_relationship_their_dict(user1_id, user2_id):
+  their_conn = _get_connection(user2_id, user1_id)
+  return {
+    "their": their_conn['relationship2to1'],
+    "their_date": their_conn['date_described'],
+    "their_name": glob.users[user2_id]['first'],
+    "their_id": user2_id,
+  }
+
+
+def _indirect_relationship_dicts(user1_id, user2_id, degree):
   out = []
-  dset = _get_connection_ids(user1_id, 2)
+  dset1 = _get_connection_ids(user1_id, 2)
   dset2 = _get_connection_ids(user2_id, degree-2, include_reverse=True)
-  seconds = dset[2] & dset2[degree-2]
-  for second in seconds:
+  for second in (dset1[2] & dset2[degree-2]):
+    via_str = _indirect_relationship_via_str(second, degree)
     dset_second = _get_connection_ids(second, 1)
-    firsts = dset[1] & dset_second[1]
-    for first in firsts:
-      conn2 = _get_connection(first, second)
-      conn1 = _get_connection(user1_id, first)
-      if degree > 3:
-        via = " [name hidden]'s"
-      elif degree > 2:
-        via = f" {glob.users[second].name}'s "
-      else:
-        via = ""
-      out.append({"via": via,
-                  "whose": f"{glob.users[first].name}'s", 
-                  "desc": conn2['relationship2to1'],
-                  "date": conn2['date_described'],
-                  "child": {"via": False,
-                            "whose": "my", 
-                            "desc": conn1['relationship2to1'],
-                            "date": conn1['date_described'],
-                            "child": None,
-                           },
-                 })
-  return out 
+    for first in (dset1[1] & dset_second[1]):
+      out.append(_indirect_relationship_dict(user1_id, first, second, via_str))
+  return out
+
+
+def _indirect_relationship_dict(user1_id, first, second, via_str):
+  conn2 = _get_connection(first, second)
+  return {"via": via_str,
+          "whose": f"{glob.users[first].name}'s", 
+          "desc": conn2['relationship2to1'],
+          "date": conn2['date_described'],
+          "child": _direct_relationship_dict(user1_id, first),
+         }
+
+
+def _indirect_relationship_via_str(second, degree):
+  if degree > 3:
+    return " [name hidden]'s"
+  elif degree > 2:
+    return f" {glob.users[second].name}'s "
+  else:
+    return ""
 
 
 def _get_connection(user1_id, user2_id):
