@@ -116,7 +116,7 @@ components:
       layout_properties: {}
   - type: FlowPanel
     properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
+      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
     name: relationship_flow_panel
     layout_properties: {grid_position: 'BVAHNH,TKZZYQ'}
     components:
@@ -134,12 +134,12 @@ components:
     data_bindings: []
   - type: FlowPanel
     properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
+      foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
     name: flow_panel_5
     layout_properties: {grid_position: 'JXADDC,HAPHQS'}
     components:
     - type: Spacer
-      properties: {visible: true, spacing_above: none, spacing_below: small, height: 32,
+      properties: {visible: true, spacing_above: none, spacing_below: none, height: 32,
         tooltip: ''}
       name: spacer_2_copy
       layout_properties: {width: 54, expand: false}
@@ -161,10 +161,13 @@ components:
       - {property: text, code: '", ".join(self.item[''common_group_names''])'}
     data_bindings:
     - {property: visible, code: 'self.item[''common_group_names'']'}
+  - type: form:HorizontalRule
+    properties: {}
+    name: horizontal_rule_1
+    layout_properties: {grid_position: 'SBGBZX,VNKWGR'}
   - type: FlowPanel
     properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: medium, spacing_below: medium,
-      background: ''}
+      foreground: '', visible: true, spacing_above: none, spacing_below: medium, background: ''}
     name: flow_panel_3
     layout_properties: {grid_position: 'RCVJIV,AUBWFW'}
     components:
@@ -176,7 +179,7 @@ components:
     - type: Link
       properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: External Web Site Profile, font_size: null, wrap_on: mobile,
-        font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '',
+        font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '',
         spacing_below: small, italic: false, background: '', bold: false, underline: true,
         icon: ''}
       name: web_page_link
@@ -187,7 +190,7 @@ components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: false, text: External Web Site Profile Confirmed, font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       name: web_page_alt_label
       layout_properties: {}
@@ -203,23 +206,23 @@ components:
     - {property: visible, code: 'self.item[''url_confirmed'']'}
   - type: FlowPanel
     properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
+      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
     name: flow_panel_4
     layout_properties: {grid_position: 'IBGVDS,QXUMBH'}
     components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+        visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
+        spacing_below: small, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
       name: last_active_label
       layout_properties: {grid_position: 'IBGVDS,ZRRCBX'}
       data_bindings: []
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+        visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
+        spacing_below: small, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
       name: trust_label
       layout_properties:
         col_widths: {}
