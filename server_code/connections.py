@@ -125,42 +125,51 @@ def init_connections():
   for d in range(1, up_to_degree+1):
     records += [connection_record(user2, logged_in_user, _distance=d, degree=d) for user2 in dset[d]]
     c_users.update(dset[d])
-  users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records, connections_list)
+  users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records)
   return users_dict, connections_list, their_groups_dict
 
 
-def _profiles_and_their_groups(user, c_users, records, connections_list):
-  from . import groups_server as g
-  from . import groups
-  import collections
-  their_groups_dict = {}
-  members_to_group_names = collections.defaultdict(list)
-  trust_level = user['trust_level']
-  if trust_level >= 1:
-    for group_row in g.user_groups(user):
-      if trust_level < 1 or (trust_level < 2 and not g.guest_allowed_in_group(user, group_row)):
-        group_members = group_row['hosts']
-      else:
-        group_members = {u for u in g.members_from_group_row(group_row)
-                        if (u['trust_level'] >= 2 
-                            or (u['trust_level'] >= 1 and g.guest_allowed_in_group(u, group_row))
-                            )
-                        }
-      if user not in group_row['hosts']:
-        their_groups_dict[group_row.get_id()] = groups.Group(name=group_row['name'],
-                                                            group_id=group_row.get_id(),
-                                                            members=[u.get_id() for u in group_members],
-                                                            hosts=[u.get_id() for u in group_row['hosts']],
-                                                            )
-      for user2 in group_members:
-        members_to_group_names[user2].append(group_row['name'])
+def _profiles_and_their_groups(user, c_users, records):
+  members_to_group_names, their_groups_dict = _group_info(user)
   records += [connection_record(user2, user, port.UNLINKED, port.UNLINKED) 
               for user2 in set(members_to_group_names.keys()) - c_users.union({user})]
-  users_dict = {record['user_id']: _get_port_profile(record, connections_list, members_to_group_names) for record in records}
+  users_dict = {record['user_id']: _get_port_profile(record, members_to_group_names) for record in records}
   return users_dict, their_groups_dict
 
 
-def _get_port_profile(record, connections_list, members_to_group_names):
+def _group_info(user):
+  import collections
+  members_to_group_names = collections.defaultdict(list)
+  their_groups_dict = {}
+  for group_row, group_members in _group_and_members(user):
+    for user2 in group_members:
+      members_to_group_names[user2].append(group_row['name'])
+    if user not in group_row['hosts']:
+      their_groups_dict[group_row.get_id()] = _port_group(group_row, group_members)
+  return members_to_group_names, their_groups_dict
+
+
+def _group_and_members(user):
+  from . import groups_server as g
+  for group_row in g.user_groups(user):
+    if not g.user_allowed_in_group(user, group_row):
+      group_members = set(group_row['hosts'])
+    else:
+      group_members = {u for u in g.members_from_group_row(group_row)
+                       if g.user_allowed_in_group(u, group_row)}
+    yield group_row, group_members
+
+
+def _port_group(group_row, group_members):
+  from . import groups
+  return groups.Group(name=group_row['name'],
+                      group_id=group_row.get_id(),
+                      members=[u.get_id() for u in group_members],
+                      hosts=[u.get_id() for u in group_row['hosts']],
+                     )
+
+
+def _get_port_profile(record, members_to_group_names):
   from . import relationship as rel
   user = sm.get_other_user(record['user_id'])
   relationship = rel.Relationship(distance=record['distance'])

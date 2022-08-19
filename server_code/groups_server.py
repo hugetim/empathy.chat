@@ -169,12 +169,18 @@ def user_groups(user):
   return memberships.union(hosteds)
 
 
-def guest_allowed_in_group(user, group_row):
+def _guest_allowed_in_group(user, group_row):
   member_record = app_tables.group_members.get(user=user, group=group_row)
   if not member_record:
-    sm.warning(f"guest_allowed_in_group({user['email']}, {group_row['name']}): member_record not found")
+    sm.warning(f"_guest_allowed_in_group({user['email']}, {group_row['name']}): member_record not found")
   return member_record['guest_allowed']
-  
+
+
+def user_allowed_in_group(user, group_row):
+  return (user['trust_level'] >= 2 
+          or (user['trust_level'] >= 1 and _guest_allowed_in_group(user, group_row))
+         )
+
   
 @sm.authenticated_callable
 def update_guest_allowed(port_member):
