@@ -138,10 +138,14 @@ def _profiles_and_their_groups(user, c_users, records, connections_list):
   trust_level = user['trust_level']
   if trust_level >= 1:
     for group_row in g.user_groups(user):
-      if trust_level < 2:
-        if not g.guest_allowed_in_group(user, group_row):
-          continue
-      group_members = set(g.members_from_group_row(group_row))
+      if trust_level < 1 or (trust_level < 2 and not g.guest_allowed_in_group(user, group_row)):
+        group_members = group_row['hosts']
+      else:
+        group_members = {u for u in g.members_from_group_row(group_row)
+                        if (u['trust_level'] >= 2 
+                            or (u['trust_level'] >= 1 and g.guest_allowed_in_group(u, group_row))
+                            )
+                        }
       if user not in group_row['hosts']:
         their_groups_dict[group_row.get_id()] = groups.Group(name=group_row['name'],
                                                             group_id=group_row.get_id(),
