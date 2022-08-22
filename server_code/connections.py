@@ -15,7 +15,7 @@ from anvil_extras.logging import TimerLogger
 
 def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_list=False):
   """Return dictionary from degree to set of connections"""
-  if up_to_degree not in range(0, 98):
+  if up_to_degree not in range(1, 98):
     sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
   if not cache_override and user == anvil.users.get_user():
     return _cached_get_connections(user, up_to_degree)
@@ -23,8 +23,6 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
   conn_rows[0] = app_tables.connections.search(user1=user, current=True)
   degree1s = {row['user2'] for row in conn_rows[0]}
   out = {0: {user}, 1: degree1s}
-  if user in out[1]:
-    sm.warning(f"user in out[1]")
   prev = {user}
   for d in range(1, up_to_degree):
     prev.update(out[d])
@@ -34,10 +32,14 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
   if not output_conn_list:
     return out
   else:
-    connections_list = []
-    for d in range(0, up_to_degree):
-      connections_list += [_port_conn_row(row, d) for row in conn_rows[d]]
-    return out, connections_list
+    return out, _get_connections_list(conn_rows, up_to_degree)
+
+
+def _get_connections_list(conn_rows, up_to_degree):
+  connections_list = []
+  for d in range(0, up_to_degree):
+    connections_list += [_port_conn_row(row, d) for row in conn_rows[d]]
+  return connections_list
 
 
 def _port_conn_row(row, distance):
@@ -120,13 +122,18 @@ def init_connections():
   logged_in_user = sm.get_acting_user()
   up_to_degree = 3
   dset, connections_list = _get_connections(logged_in_user, up_to_degree, cache_override=True, output_conn_list=True)
-  records = [connection_record(logged_in_user, logged_in_user)]
-  c_users = set()
-  for d in range(1, up_to_degree+1):
-    records += [connection_record(user2, logged_in_user, _distance=d, degree=d) for user2 in dset[d]]
-    c_users.update(dset[d])
+  records, c_users = _get_records_and_c_users(logged_in_user, dset, up_to_degree)
   users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records)
   return users_dict, connections_list, their_groups_dict
+
+
+def _get_records_and_c_users(logged_in_user, dset, up_to_degree):
+  records = [connection_record(logged_in_user, logged_in_user)]
+  connected_users = set()
+  for d in range(1, up_to_degree+1):
+    records += [connection_record(user2, logged_in_user, _distance=d, degree=d) for user2 in dset[d]]
+    connected_users.update(dset[d])
+  return records, connected_users
 
 
 def _profiles_and_their_groups(user, c_users, records):
