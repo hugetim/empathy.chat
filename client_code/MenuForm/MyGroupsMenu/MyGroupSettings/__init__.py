@@ -60,5 +60,5 @@ class MyGroupSettings(MyGroupSettingsTemplate):
   
   def button_invite_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.group = anvil.server.call('create_group_invite', self.group)
+    self.group.update(anvil.server.call('create_group_invite', self.group))
     self.update()
