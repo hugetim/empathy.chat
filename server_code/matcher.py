@@ -352,8 +352,8 @@ def edit_proposal(proposal, user_id=""):
 
 @timed
 def _edit_proposal(user, port_prop):
-  old_port_prop = _save_proposal_edit(user, port_prop)
-  if old_port_prop:
+  prop, old_port_prop = _save_proposal_edit(user, port_prop)
+  if prop:
     prop.notify_edit(port_prop, old_port_prop)
     return prop.get_id()
   else:
@@ -371,8 +371,8 @@ def _save_proposal_edit(user, port_prop):
     duration = port_prop.times[0].duration
     if (status is not None or _match_overlapping_now_proposal(user, prop, duration, partial_state)):
       prop.cancel_all_times()
-      return None
-  return old_port_prop
+      return None, old_port_prop
+  return prop, old_port_prop
 
   
 @authenticated_callable
