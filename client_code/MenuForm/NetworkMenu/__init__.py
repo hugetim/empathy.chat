@@ -1,7 +1,5 @@
 from ._anvil_designer import NetworkMenuTemplate
 from anvil import *
-import anvil.users
-import anvil.server
 from .Connections import Connections
 from .Blocks import Blocks
 from .Invites import Invites

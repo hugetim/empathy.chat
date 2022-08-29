@@ -1,7 +1,5 @@
 from ._anvil_designer import PartnerCheckTemplate
 from anvil import *
-import anvil.users
-import anvil.server
 from ... import parameters as p
 
 

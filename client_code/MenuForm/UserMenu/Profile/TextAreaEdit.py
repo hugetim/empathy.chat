@@ -1,7 +1,5 @@
 from ._anvil_designer import TextAreaEditTemplate
 from anvil import *
-import anvil.users
-import anvil.server
 
 
 class TextAreaEdit(TextAreaEditTemplate):

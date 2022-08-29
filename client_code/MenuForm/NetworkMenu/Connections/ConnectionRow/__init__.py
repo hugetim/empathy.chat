@@ -1,7 +1,5 @@
 from ._anvil_designer import ConnectionRowTemplate
 from anvil import *
-import anvil.users
-import anvil.server
 from ..... import helper as h
 from ..... import ui_procedures as ui
 from ..... import prompts

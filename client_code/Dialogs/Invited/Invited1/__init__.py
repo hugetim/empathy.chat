@@ -1,7 +1,5 @@
 from ._anvil_designer import Invited1Template
 from anvil import *
-import anvil.users
-import anvil.server
 import time
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPromptOnly import RelationshipPromptOnly
 from .... import ui_procedures as ui
