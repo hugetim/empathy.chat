@@ -39,9 +39,7 @@ class MyGroups():
   
    
 @anvil.server.portable_class
-class MyGroup(h.PortItem, h.AttributeToKey):
-  repr_desc = "groups.MyGroup: "
-  server_fn_name = 'serve_my_group'
+class MyGroup(h.AttributeToKey):
   default_name = "New Group"
   
   def __init__(self, name="", group_id="", members=None, invites=None):
@@ -53,6 +51,13 @@ class MyGroup(h.PortItem, h.AttributeToKey):
   def __str__(self):
     return self.name
 
+  def __repr__(self):
+    return f"MyGroup({self.name}, {self.group_id}, {self.members!r}, {self.invites!r})"
+
+  def update(self, new_self):
+    for key, value in new_self.__dict__.items():
+      setattr(self, key, value)
+      
 
 @anvil.server.portable_class
 class Invite(h.PortItem, h.AttributeToKey):

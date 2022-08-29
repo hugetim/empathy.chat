@@ -12,16 +12,6 @@ from . import portable as port
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 
-@sm.authenticated_callable
-@anvil.tables.in_transaction
-def serve_my_group(port_my_group, method, kwargs):
-  print(f"serve_my_group: {method}({kwargs}) called on {port_my_group}")
-  check_my_group_auth()
-  my_group = MyGroup(port_my_group)
-  my_group.relay(method, kwargs)
-  return my_group.portable()
-
-
 def check_my_group_auth():
   user = anvil.users.get_user()
   if not user or user['trust_level'] < 4:
@@ -54,7 +44,7 @@ class MyGroups(groups.MyGroups):
 @sm.authenticated_callable
 @anvil.tables.in_transaction
 def load_my_groups(user_id=""):
-  check_my_group_auth()
+  print(f"load_my_groups({user_id})")
   out = MyGroups(groups.MyGroups())
   user = sm.get_acting_user(user_id)
   rows = app_tables.groups.search(hosts=[user], current=True)
@@ -65,6 +55,7 @@ def load_my_groups(user_id=""):
 @sm.authenticated_callable
 @anvil.tables.in_transaction
 def add_my_group(port_my_groups, user_id=""):
+  print(f"add_my_group(port_my_groups, {user_id})")
   check_my_group_auth()
   user = sm.get_acting_user(user_id)
   my_groups = MyGroups(port_my_groups)
@@ -77,7 +68,7 @@ def add_my_group(port_my_groups, user_id=""):
   return my_groups.portable()
     
       
-class MyGroup(sm.ServerItem, groups.MyGroup): 
+class MyGroup(groups.MyGroup): 
   def __init__(self, port_my_group):
     self.update(port_my_group)
     self.members = [app_tables.users.get_by_id(member_dict['member_id']) for member_dict in port_my_group.members]
@@ -94,21 +85,6 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
   def group_row(self):
     return app_tables.groups.get_by_id(self.group_id) if self.group_id else None
   
-  def save_settings(self, user_id=""):
-    user = sm.get_acting_user(user_id)
-    self.group_row['name'] = self.name
-
-  def create_invite(self):
-    from datetime import timedelta
-    now = sm.now()
-    new_row = app_tables.group_invites.add_row(created=now,
-                                               expire_date=now+timedelta(days=30),
-                                               group=self.group_row,
-                                               link_key=sm.random_code(num_chars=7),
-                                               current=True,
-                                              )
-    self.invites.insert(0, Invite.from_invite_row(new_row))
-
   @staticmethod
   def from_group_row(group_row, portable=False, user_id=""):
     port_members = list(member_dicts_from_group_row(group_row))
@@ -135,6 +111,33 @@ class MyGroup(sm.ServerItem, groups.MyGroup):
       raise MistakenVisitError(f"You are already a member of {host_name}'s {this_group['name']} group. "
                                f"You no longer need use this group invite link. Simply visit {p.URL} instead."
                               )
+
+
+@sm.authenticated_callable
+@anvil.tables.in_transaction
+def save_my_group_settings(group_id, name, user_id=""):
+  print(f"save_my_group_settings({group_id}, {name}, {user_id})")
+  check_my_group_auth()
+  user = sm.get_acting_user(user_id)
+  app_tables.groups.get_by_id(group_id)['name'] = name
+
+
+@sm.authenticated_callable
+@anvil.tables.in_transaction
+def create_group_invite(port_my_group):
+  print(f"create_group_invite({port_my_group!r})")
+  check_my_group_auth()
+  my_group = MyGroup(port_my_group)
+  from datetime import timedelta
+  now = sm.now()
+  new_row = app_tables.group_invites.add_row(created=now,
+                                             expire_date=now+timedelta(days=30),
+                                             group=my_group.group_row,
+                                             link_key=sm.random_code(num_chars=7),
+                                             current=True,
+                                            )
+  my_group.invites.insert(0, Invite.from_invite_row(new_row))
+  return my_group.portable()
 
 
 @sm.authenticated_callable

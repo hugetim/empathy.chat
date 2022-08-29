@@ -39,7 +39,7 @@ class MyGroupSettings(MyGroupSettingsTemplate):
 
   def _save_name(self, group_name):
     self.group['name'] = group_name
-    self.group.relay('save_settings')
+    anvil.server.call('save_my_group_settings', self.group.group_id, group_name)
     self.update()
     self.my_groups_menu.update_drop_down()
   
@@ -60,5 +60,5 @@ class MyGroupSettings(MyGroupSettingsTemplate):
   
   def button_invite_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.group.relay('create_invite')
+    self.group = anvil.server.call('create_group_invite', self.group)
     self.update()
