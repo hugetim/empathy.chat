@@ -1,6 +1,5 @@
 from ._anvil_designer import InviteETemplate
 from anvil import *
-import anvil.users
 import anvil.server
 from ..... import portable as t
 from datetime import timedelta

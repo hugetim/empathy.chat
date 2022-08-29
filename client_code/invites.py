@@ -1,5 +1,4 @@
 import anvil.server
-import anvil.users
 from . import helper as h
 from . import parameters as p
 

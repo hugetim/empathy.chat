@@ -1,5 +1,3 @@
-import anvil.users
-import anvil.server
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
@@ -17,7 +15,7 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
   """Return dictionary from degree to set of connections"""
   if up_to_degree not in range(1, 98):
     sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
-  if not cache_override and user == anvil.users.get_user():
+  if not cache_override and user == sm.get_acting_user():
     return _cached_get_connections(user, up_to_degree)
   conn_rows = {}
   conn_rows[0] = app_tables.connections.search(user1=user, current=True)

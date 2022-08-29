@@ -1,4 +1,3 @@
-import anvil.users
 from anvil.tables import in_transaction
 import anvil.server
 from . import invites

@@ -1,6 +1,5 @@
 from ._anvil_designer import ConnectionsTemplate
 from anvil import *
-import anvil.users
 from .... import network_controller as nc
 from .... import helper as h
 from .... import glob

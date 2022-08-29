@@ -1,4 +1,3 @@
-import anvil.users
 import anvil.server
 from . import parameters as p
 from . import groups

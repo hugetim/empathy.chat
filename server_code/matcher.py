@@ -1,4 +1,3 @@
-import anvil.users
 import anvil.tables
 from anvil.tables import app_tables
 import anvil.tables.query as q

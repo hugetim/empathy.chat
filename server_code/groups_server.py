@@ -13,7 +13,7 @@ from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 
 def check_my_group_auth():
-  user = anvil.users.get_user()
+  user = sm.get_acting_user()
   if not user or user['trust_level'] < 4:
     raise(anvil.users.AuthenticationFailed("User not authorized to manage own groups."))
 

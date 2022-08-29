@@ -1,6 +1,5 @@
 from ._anvil_designer import PhoneTemplate
 from anvil import *
-import anvil.users
 import anvil.server
 from ... import helper as h
 from ... import ui_procedures as ui

@@ -1,4 +1,3 @@
-import anvil.users
 import anvil.tables
 from anvil.tables import app_tables
 import anvil.tables.query as q
@@ -323,7 +322,7 @@ class Proposal():
     return port.Proposal(**row_dict)
   
   def __repr__(self):
-    return repr(self.portable(anvil.users.get_user()))
+    return repr(self.portable(sm.get_acting_user()))
   
   @property
   def _row(self):

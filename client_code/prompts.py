@@ -1,6 +1,4 @@
 from anvil import *
-import anvil.users
-import anvil.server
 from functools import partial
 from . import invited
 from . import invites

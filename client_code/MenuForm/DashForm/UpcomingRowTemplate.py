@@ -1,6 +1,5 @@
 from ._anvil_designer import UpcomingRowTemplateTemplate
 from anvil import *
-import anvil.users
 import anvil.server
 import anvil.tz
 import datetime

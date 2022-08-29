@@ -1,6 +1,5 @@
 from ._anvil_designer import PromptTemplateTemplate
 from anvil import *
-import anvil.users
 import anvil.server
 from .... import prompts
 from .... import ui_procedures as ui

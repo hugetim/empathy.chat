@@ -1,5 +1,4 @@
 from anvil import *
-import anvil.users
 import anvil.server
 from anvil.js import window, ExternalError, call_js
 from . import glob
