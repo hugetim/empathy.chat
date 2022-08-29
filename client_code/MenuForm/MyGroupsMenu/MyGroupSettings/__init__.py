@@ -25,7 +25,7 @@ class MyGroupSettings(MyGroupSettingsTemplate):
 
   def _delete_group(self):
     anvil.server.call('delete_group', self.group)
-    glob.my_groups.relay('load')
+    glob.my_groups = anvil.server.call('load_my_groups')
     self.my_groups_menu.reset()
   
   def update(self):

@@ -128,11 +128,8 @@ def init_cache():
 
 
 def _init_my_groups():
-  from . import groups
   from . import groups_server as g
-  my_groups = g.MyGroups(groups.MyGroups())
-  my_groups.load()
-  return my_groups.portable()
+  return g.load_my_groups()
 
   
 def _latest_invited(user):

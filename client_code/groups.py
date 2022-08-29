@@ -23,10 +23,7 @@ class Group(h.AttributeToKey):
 
   
 @anvil.server.portable_class
-class MyGroups(h.PortItem):
-  repr_desc = "groups.MyGroups: "
-  server_fn_name = 'serve_my_groups'
-  
+class MyGroups():
   def __init__(self, groups=None, names_taken=None):
     self._groups = list(groups) if groups else []
     self.names_taken = names_taken if names_taken else []
@@ -36,6 +33,9 @@ class MyGroups(h.PortItem):
   
   def __len__(self):
     return len(self._groups)
+
+  def __repr__(self):
+    return f"MyGroups({self._groups!r}, {self.names_taken!r})"
   
    
 @anvil.server.portable_class

@@ -43,7 +43,7 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
     
   def create_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    glob.my_groups.relay('add')
+    glob.my_groups = anvil.server.call('add_my_group', glob.my_groups)
     self.groups_drop_down.selected_value = glob.my_groups[-1]
     self.reset()
       

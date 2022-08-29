@@ -8,7 +8,7 @@ import time
 #   def setUp(self):
 #     pass
 #     #self.my_groups = groups.MyGroups()
-#     #self.my_groups.relay('load')
+#     #self.my_groups = anvil.server.call('load_my_groups)
     
 #   def test_get_items(self):
 #     items = self.my_groups.drop_down_items()

@@ -14,19 +14,6 @@ from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 @sm.authenticated_callable
 @anvil.tables.in_transaction
-def serve_my_groups(port_my_groups, method, kwargs):
-  if sm.DEBUG:
-    print(f"serve_my_groups: {method}({kwargs}) called on {port_my_groups}")
-  else:
-    print(f"serve_my_groups: {method}({kwargs})")
-  check_my_group_auth()
-  my_groups = MyGroups(port_my_groups)
-  my_groups.relay(method, kwargs)
-  return my_groups.portable()
-
-
-@sm.authenticated_callable
-@anvil.tables.in_transaction
 def serve_my_group(port_my_group, method, kwargs):
   print(f"serve_my_group: {method}({kwargs}) called on {port_my_group}")
   check_my_group_auth()
@@ -49,7 +36,7 @@ def serve_group_invite(port_invite, method, kwargs):
   return invite.portable()
 
 
-class MyGroups(sm.ServerItem, groups.MyGroups): 
+class MyGroups(groups.MyGroups): 
   def __init__(self, port_my_groups):
     self._groups = [MyGroup(port_group) for port_group in port_my_groups]
     self.update_names_taken()
@@ -60,22 +47,34 @@ class MyGroups(sm.ServerItem, groups.MyGroups):
     port.names_taken = self.names_taken
     return port  
     
-  def load(self, user_id=""):
-    user = sm.get_acting_user(user_id)
-    rows = app_tables.groups.search(hosts=[user], current=True)
-    self._groups = [MyGroup.from_group_row(row) for row in rows]
-    
   def update_names_taken(self):
     self.names_taken = [row['name'] for row in app_tables.groups.search(current=True)]
 
-  def add(self, user_id=""):
-    user = sm.get_acting_user(user_id)
-    new_row = app_tables.groups.add_row(hosts=[user],
-                                        created=sm.now(),
-                                        name="",
-                                        current=True,
-                                       )
-    self._groups.append(MyGroup.from_group_row(new_row))
+
+@sm.authenticated_callable
+@anvil.tables.in_transaction
+def load_my_groups(user_id=""):
+  check_my_group_auth()
+  out = MyGroups(groups.MyGroups())
+  user = sm.get_acting_user(user_id)
+  rows = app_tables.groups.search(hosts=[user], current=True)
+  out._groups = [MyGroup.from_group_row(row) for row in rows]
+  return out.portable()
+
+
+@sm.authenticated_callable
+@anvil.tables.in_transaction
+def add_my_group(port_my_groups, user_id=""):
+  check_my_group_auth()
+  user = sm.get_acting_user(user_id)
+  my_groups = MyGroups(port_my_groups)
+  new_row = app_tables.groups.add_row(hosts=[user],
+                                      created=sm.now(),
+                                      name="",
+                                      current=True,
+                                     )
+  my_groups._groups.append(MyGroup.from_group_row(new_row))
+  return my_groups.portable()
     
       
 class MyGroup(sm.ServerItem, groups.MyGroup): 
