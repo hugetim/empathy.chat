@@ -1,7 +1,7 @@
 container:
   type: ColumnPanel
   properties: {col_widths: '{}'}
-  event_bindings: {show: form_show}
+  event_bindings: {}
 components:
 - type: LinearPanel
   properties: {}
@@ -21,31 +21,6 @@ components:
         spacing_above: small, icon_align: left, spacing_below: small, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       name: label_2
-      layout_properties: {}
-- type: LinearPanel
-  properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
-    border: '', visible: true, role: null, tooltip: ''}
-  name: user_linear_panel
-  layout_properties: {grid_position: 'EQUXEF,YOTSSF'}
-  components:
-  - type: FlowPanel
-    properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-      foreground: '', visible: false, spacing_above: small, spacing_below: small,
-      background: ''}
-    name: flow_panel_1
-    layout_properties: {grid_position: 'QUSUJC,RSXZDU'}
-    components:
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'To confirm your identity, please verify ownership of
-          your phone number.', font_size: null, font: '', spacing_above: small, icon_align: left,
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
-      name: label_1
-      layout_properties: {}
-    - type: form:Why
-      properties: {}
-      name: why_1
       layout_properties: {}
 - type: Spacer
   properties: {height: 19}
