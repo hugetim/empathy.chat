@@ -9,4 +9,4 @@ class PartnerCheck(PartnerCheckTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    self.label_1.tooltip = f"This user has confirmed ownership of an external web site profile, thus verifying their name."
+    self.label_1.tooltip = p.PARTNER_CHECK_TOOLTIP
