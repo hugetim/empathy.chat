@@ -1,4 +1,4 @@
-import anvil.tables as tables
+import anvil.tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from . import server_misc as sm

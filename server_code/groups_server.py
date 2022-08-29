@@ -1,5 +1,5 @@
 import anvil.users
-import anvil.tables as tables
+import anvil.tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
@@ -89,7 +89,7 @@ class MyGroup(groups.MyGroup):
   def from_group_row(group_row, portable=False, user_id=""):
     port_members = list(member_dicts_from_group_row(group_row))
     port_invites = [Invite.from_invite_row(i_row)
-                    for i_row in app_tables.group_invites.search(tables.order_by('expire_date', ascending=False), 
+                    for i_row in app_tables.group_invites.search(anvil.tables.order_by('expire_date', ascending=False), 
                                                                  group=group_row, current=True)]
     port_my_group = groups.MyGroup(name=group_row['name'],
                                    group_id=group_row.get_id(),

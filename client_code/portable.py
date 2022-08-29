@@ -1,8 +1,5 @@
 import anvil.users
 import anvil.server
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
 import datetime
 import anvil.tz
 from . import helper as h
