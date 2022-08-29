@@ -513,7 +513,7 @@ def get_eligibility_spec_from_port(port_prop, proposer):
     spec['user'] = proposer
     spec['eligible'] = port_prop.eligible
     spec['eligible_starred'] = port_prop.eligible_starred
-    spec['eligible_users'] = [port_user.s_user for port_user in port_prop.eligible_users]
+    spec['eligible_users'] = [sm.get_other_user(port_user.user_id) for port_user in port_prop.eligible_users]
     spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
                                for port_group in port_prop.eligible_groups]
     return spec

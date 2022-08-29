@@ -316,7 +316,7 @@ def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
   current_port_props = Proposal.get_port_proposals(user)
   now_port_props = [p for p in current_port_props if p.start_now and not p.own]
   for other_port_prop in now_port_props:
-    if (my_now_proposal.is_visible(other_port_prop.user.s_user)
+    if (my_now_proposal.is_visible(sm.get_other_user(other_port_prop.user.user_id))
         and my_duration == other_port_prop.times[0].duration):
       other_prop_time = ProposalTime.get_by_id(other_port_prop.times[0].time_id)
       other_prop_time.accept(user, state['status'])

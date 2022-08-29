@@ -73,10 +73,6 @@ class User(h.AttributeToKey):
   @property
   def distance_str(self):
     return h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < UNLINKED) else ""
-  
-  @property
-  def s_user(self):
-    return app_tables.users.get_by_id(self.user_id)
  
   def toggle_starred(self):
     self.starred = not self.starred

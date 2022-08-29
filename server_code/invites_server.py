@@ -45,7 +45,7 @@ class Invite(invites.Invite):
   def _convert_port_user(self, port_user_attr_name):
     port_user_attr = getattr(self, port_user_attr_name)
     if port_user_attr:
-      setattr(self, port_user_attr_name, port_user_attr.s_user)
+      setattr(self, port_user_attr_name, sm.get_other_user(port_user_attr.user_id))
  
   def portable(self):
     port = invites.Invite()
