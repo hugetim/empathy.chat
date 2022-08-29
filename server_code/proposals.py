@@ -63,7 +63,7 @@ class ProposalTime():
     if self['start_now']:
       out += ", starting now"
     else:
-      out += f", {n.notify_when(self['start_date'], user)}"
+      out += f", {n.when_str(self['start_date'], user)}"
     return out
 
   def get_match_info(self):

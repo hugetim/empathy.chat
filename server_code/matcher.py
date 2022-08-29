@@ -239,16 +239,19 @@ def _get_upcomings(user):
   return match_dicts
 
 
-@anvil.tables.in_transaction  
+@anvil.tables.in_transaction(relaxed=True)
 def _cancel_match(user, match_id):
   if sm.DEBUG:
     print(f"_cancel_match, {match_id}")
   match = app_tables.matches.get_by_id(match_id)
   if match:
-    for u in match['users']:
-      if u != user:
-        n.notify_match_cancel(u, start=match['match_commence'], canceler_name=sm.name(user, to_user=u))
+    users_to_notify = [u for u in match['users'] if u != user]    
+    match_commence = match['match_commence']
     match.delete()
+    return users_to_notify, match_commence
+  else:
+    return [], None
+    
 
   
 @authenticated_callable
@@ -257,7 +260,9 @@ def cancel_match(match_id, user_id=""):
   print(f"cancel_match, {match_id}, {user_id}")
   user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
-  _cancel_match(user, match_id)
+  users_to_notify, match_commence = _cancel_match(user, match_id)
+  for u in users_to_notify:
+    n.notify_match_cancel(u, start=match_commence, canceler_name=sm.name(user, to_user=u))
   return _get_state(user)
 
 
@@ -295,9 +300,18 @@ def add_proposal(proposal, link_key="", user_id=""):
   return _get_state(user), prop_id
 
 
-@anvil.tables.in_transaction
 @timed
 def _add_proposal(user, port_prop, link_key=""):
+  prop = _save_new_proposal(user, port_prop, link_key)
+  if prop:
+    prop.notify_add()
+    return prop.get_id()
+  else:
+    return None
+
+
+@anvil.tables.in_transaction
+def _save_new_proposal(user, port_prop, link_key):
   partial_state = get_status(user)
   status = partial_state['status']
   prop = Proposal.add(user, port_prop)
@@ -306,10 +320,9 @@ def _add_proposal(user, port_prop, link_key=""):
     if (status is not None or _match_overlapping_now_proposal(user, prop, duration, partial_state)):
       prop.cancel_all_times()
       return None
-  prop.notify_add()
   if link_key:
     prop.add_to_invite(link_key)
-  return prop.get_id()
+  return prop
 
 
 def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
@@ -337,9 +350,18 @@ def edit_proposal(proposal, user_id=""):
   return _get_state(user), prop_id
 
 
-@anvil.tables.in_transaction
 @timed
 def _edit_proposal(user, port_prop):
+  old_port_prop = _save_proposal_edit(user, port_prop)
+  if old_port_prop:
+    prop.notify_edit(port_prop, old_port_prop)
+    return prop.get_id()
+  else:
+    return None
+
+
+@anvil.tables.in_transaction
+def _save_proposal_edit(user, port_prop):
   partial_state = get_status(user)
   status = partial_state['status']
   prop = Proposal.get_by_id(port_prop.prop_id)
@@ -350,8 +372,7 @@ def _edit_proposal(user, port_prop):
     if (status is not None or _match_overlapping_now_proposal(user, prop, duration, partial_state)):
       prop.cancel_all_times()
       return None
-  prop.notify_edit(port_prop, old_port_prop)
-  return prop.get_id()
+  return old_port_prop
 
   
 @authenticated_callable

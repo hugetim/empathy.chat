@@ -54,7 +54,7 @@ def _from_name_for_email(name=""):
 def _email_unsubscribe(detail='click the pencil button beneath "Email me (otherwise) regarding empathy requests from:", uncheck all boxes, and click "OK"'):
   return f'To unsubscribe: Login to empathy.chat, go to Settings, {detail}.'
 
-def notify_when(start, user):
+def when_str(start, user):
   if start:
     start_user_tz = sm.as_user_tz(start, user)
     now_user_tz = sm.as_user_tz(sm.now(), user)
@@ -75,7 +75,7 @@ def ping(user, start, duration):
   """Notify pinged user"""
   print(f"'ping', {start}, {duration}")
   subject = "empathy.chat - match confirmed"
-  content1 = f"Your proposal for a {duration} minute empathy match, starting {notify_when(start, user)}, has been accepted."
+  content1 = f"Your proposal for a {duration} minute empathy match, starting {when_str(start, user)}, has been accepted."
   content2 = f"Go to {p.URL} for the empathy chat."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     send_sms(user['phone'], f"{subject}: {content1} {content2}")
@@ -97,7 +97,7 @@ def notify_match_cancel(user, start, canceler_name=""):
   """Notify cancelled-on user"""
   print(f"'notify_match_cancel', {start}, {canceler_name}")
   subject = "empathy.chat - upcoming match cancelled"
-  content = f"{_other_name(canceler_name)} has cancelled your empathy chat, previously scheduled to start {notify_when(start, user)}."
+  content = f"{_other_name(canceler_name)} has cancelled your empathy chat, previously scheduled to start {when_str(start, user)}."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     send_sms(user['phone'], f"{subject}: {content}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
@@ -117,7 +117,7 @@ def notify_late_for_chat(user, start, waiting_users=[]):
   subject = "empathy.chat - late for scheduled match"
   verb = "is" if len(waiting_users) == 1 else "are"
   participant_names = _names(waiting_users, to_user=user)
-  content1 = f"{participant_names} {verb} waiting for you to begin an empathy chat that was scheduled to start {notify_when(start, user)}."
+  content1 = f"{participant_names} {verb} waiting for you to begin an empathy chat that was scheduled to start {when_str(start, user)}."
   content2 = f"Please login to {p.URL} now."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
     send_sms(user['phone'], f"{subject}: {content1} {content2}")
