@@ -275,7 +275,9 @@ def accept_proposal(proptime_id, user_id=""):
   print(f"accept_proposal, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
   proptime = ProposalTime.get_by_id(proptime_id)
-  _accept_proposal(proptime, user)
+  ping_needed = _accept_proposal(proptime, user)
+  if ping_needed:
+    proptime.ping()
   propagate_update_needed(user)
   return _get_state(user)
 
@@ -284,7 +286,8 @@ def accept_proposal(proptime_id, user_id=""):
 @timed
 def _accept_proposal(proptime, user):
   partial_state = get_status(user)
-  proptime.attempt_accept(user, partial_state)
+  ping_needed = proptime.attempt_accept(user, partial_state)
+  return ping_needed
 
 
 @authenticated_callable
@@ -332,7 +335,9 @@ def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
     if (my_now_proposal.is_visible(sm.get_other_user(other_port_prop.user.user_id))
         and my_duration == other_port_prop.times[0].duration):
       other_prop_time = ProposalTime.get_by_id(other_port_prop.times[0].time_id)
-      other_prop_time.accept(user, state['status'])
+      ping_needed = other_prop_time.accept(user, state['status'])
+      if ping_needed:
+        other_prop_time.ping()
       return True
   return False
   

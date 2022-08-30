@@ -87,7 +87,7 @@ class ProposalTime():
         and self['current'] 
         and (not self['fully_accepted'])
         and self.proposal.is_visible(user)):
-      self.accept(user, status)
+      return self.accept(user, status)
    
   def accept(self, user, status):
     if sm.DEBUG:
@@ -108,7 +108,7 @@ class ProposalTime():
       elif (now - (self['start_date'])).total_seconds() <= p.BUFFER_SECONDS:
         m._match_commit(user)
       else:
-        self.ping()
+        return True
  
   def ping(self):   
     n.ping(user=self.proposal.proposer,
