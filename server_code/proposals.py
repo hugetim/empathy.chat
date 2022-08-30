@@ -187,7 +187,7 @@ class ProposalTime():
     if self['start_now'] and port_time.start_now:
       pass #self._proptime_row['start_date'] = self._proptime_row['start_date']
     elif port_time.start_now:
-      self['start_now'] = sm.now()
+      self['start_date'] = sm.now()
     else:
       self['start_date'] = port_time.start_date
     self['start_now'] = port_time.start_now # order: after 'start_date' set
