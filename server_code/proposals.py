@@ -80,6 +80,7 @@ class ProposalTime():
     return len(self.all_users()) >= self.proposal['max_size']
   
   def attempt_accept(self, user, partial_state):
+    """Returns True if ping_needed, None otherwise"""
     if sm.DEBUG:
       print("_attempt_accept_proptime")
     status = partial_state['status']
@@ -90,6 +91,7 @@ class ProposalTime():
       return self.accept(user, status)
    
   def accept(self, user, status):
+    """Returns True if ping_needed, None otherwise"""
     if sm.DEBUG:
       print("accept_proptime")
     now = sm.now()

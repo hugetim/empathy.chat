@@ -305,7 +305,9 @@ def add_proposal(proposal, link_key="", user_id=""):
 
 @timed
 def _add_proposal(user, port_prop, link_key=""):
-  prop = _save_new_proposal(user, port_prop, link_key)
+  prop, other_prop_time, ping_needed = _save_new_proposal(user, port_prop, link_key)
+  if ping_needed:
+    other_prop_time.ping()
   if prop:
     prop.notify_add()
     return prop.get_id()
@@ -320,12 +322,22 @@ def _save_new_proposal(user, port_prop, link_key):
   prop = Proposal.add(user, port_prop)
   if port_prop.start_now:
     duration = port_prop.times[0].duration
-    if (status is not None or _match_overlapping_now_proposal(user, prop, duration, partial_state)):
-      prop.cancel_all_times()
-      return None
+    if status is None:
+      other_prop_time = _match_overlapping_now_proposal(user, prop, duration, partial_state)
+      if not other_prop_time:
+        return _add_link_key_and_return(link_key, prop)
+      ping_needed = other_prop_time.accept(user, status)
+    else:
+      other_prop_time, ping_needed = None, None
+    prop.cancel_all_times()
+    return None, other_prop_time, ping_needed
+  return _add_link_key_and_return(link_key, prop)
+
+
+def _add_link_key_and_return(link_key, prop):
   if link_key:
     prop.add_to_invite(link_key)
-  return prop
+  return prop, None, None
 
 
 def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
@@ -335,11 +347,8 @@ def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
     if (my_now_proposal.is_visible(sm.get_other_user(other_port_prop.user.user_id))
         and my_duration == other_port_prop.times[0].duration):
       other_prop_time = ProposalTime.get_by_id(other_port_prop.times[0].time_id)
-      ping_needed = other_prop_time.accept(user, state['status'])
-      if ping_needed:
-        other_prop_time.ping()
-      return True
-  return False
+      return other_prop_time
+  return None
   
 
 @authenticated_callable
@@ -357,7 +366,9 @@ def edit_proposal(proposal, user_id=""):
 
 @timed
 def _edit_proposal(user, port_prop):
-  prop, old_port_prop = _save_proposal_edit(user, port_prop)
+  prop, old_port_prop, other_prop_time, ping_needed = _save_proposal_edit(user, port_prop)
+  if ping_needed:
+    other_prop_time.ping()
   if prop:
     prop.notify_edit(port_prop, old_port_prop)
     return prop.get_id()
@@ -374,10 +385,17 @@ def _save_proposal_edit(user, port_prop):
   prop.update(port_prop)
   if port_prop.start_now:
     duration = port_prop.times[0].duration
-    if (status is not None or _match_overlapping_now_proposal(user, prop, duration, partial_state)):
-      prop.cancel_all_times()
-      return None, old_port_prop
-  return prop, old_port_prop
+    if status is None:
+      other_prop_time = _match_overlapping_now_proposal(user, prop, duration, partial_state)
+      if not other_prop_time:
+        return prop, old_port_prop, None, None
+      ping_needed = other_prop_time.accept(user, status)
+    else:
+      other_prop_time, ping_needed = None, None
+    prop.cancel_all_times()
+    return None, old_port_prop, other_prop_time, ping_needed
+  else:
+    return prop, old_port_prop, None, None
 
   
 @authenticated_callable
