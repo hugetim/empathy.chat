@@ -5,6 +5,7 @@ from . import server_misc as sm
 from . import accounts
 from . import parameters as p
 from . import invite_gateway as ig
+from .exceptions import RowMissingError
 
 
 @anvil.server.callable
@@ -141,7 +142,10 @@ class Invite(invites.Invite):
 
   def _try_connect(self):
     errors = []
-    connection_successful = ig.try_connect(self)
+    try:
+      connection_successful = ig.try_connect(self)
+    except RowMissingError:
+      return errors
     if not connection_successful:
       errors.append(f"{sm.name(self.inviter)} did not accurately provide the last 4 digits of your confirmed phone number.")
     return errors

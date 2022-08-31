@@ -92,6 +92,8 @@ def _row(invite, origin):
     row = app_tables.invites.get(origin=origin, user1=user1, user2=user2, current=True)
   else:
     raise(RowMissingError(f"Not enough information to retrieve {'invite' if origin else 'response'} row."))
+  if not row:
+    raise(RowMissingError(f"No such {'invite' if origin else 'response'} row."))
   return row
 
 
