@@ -14,7 +14,6 @@ from .DashForm.CreateForm import CreateForm
 from .. import parameters as p
 from .. import helper as h
 from .. import portable as t
-from .. import auto_test
 from .. import glob
 from ..network_controller import not_me
 
@@ -35,8 +34,6 @@ class MenuForm(MenuFormTemplate):
     self.connections_link.visible = glob.trust_level >= 2 # show if guest_allowed (DashForm.timer_1)
     self.my_groups_link.visible = glob.trust_level >= 3
     self.test_mode.visible = self.item['test_mode']
-    # if p.DEBUG_MODE and self.item['test_mode']:
-    #   auto_test.client_auto_tests()
     self.set_test_link()
     
   def form_show(self, **event_args):
