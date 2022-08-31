@@ -38,11 +38,11 @@ class TestNow(): #not unittest.TestCase
     self.top_form.home_link_click()
 
   def test_repeat_now_proposal(self):
-    accept_user_id = self.top_form.test_requestuser_drop_down.items[0][1]
+    accept_user_id = self.top_form.test_user_id
     for i in range(2):
-      anvil.server.call('add_now_proposal')
+      anvil.server.call('add_now_proposal_old')
       time.sleep(15)
-      anvil.server.call('accept_now_proposal', user_id=accept_user_id)
+      anvil.server.call('accept_now_proposal_old', user_id=accept_user_id)
       time.sleep(15)
       anvil.server.call('cancel_accept', user_id=accept_user_id)
       time.sleep(10)
