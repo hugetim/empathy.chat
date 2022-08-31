@@ -16,23 +16,16 @@ class LoginForm(LoginFormTemplate):
     self.login_sequence()
     
   def login_sequence(self):
+    from .. import ui_procedures as ui
     user = anvil.users.get_user()
     if not user:
       self.login_button.visible = True
       self.rich_text_1.visible = True
-      user = anvil.users.login_with_form(show_signup_option=False, allow_cancel=True)
-      if user and (not user['init_date']):
-        anvil.users.logout()
-        with Notification("Sorry, empathy.chat is currently invite-only. Creating a new account requires an invite link."):
-          anvil.server.call_s('remove_user', user)
-          import time
-          time.sleep(2)
-        user = None
+      user = ui.login()
     if user:
       self.login_button.visible = False
       self.rich_text_1.visible = False
       self.card_1.visible = True
-      from .. import ui_procedures as ui
       from .. import glob
       glob.logged_in_user = user
       glob.logged_in_user_id = user.get_id()

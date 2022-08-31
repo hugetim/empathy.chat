@@ -50,7 +50,7 @@ def invited_signup(invite):
   new_user = None
   while not new_user:
     method = alert(d, title="Sign Up", buttons=[("Sign Up", "email", 'primary')])
-    if method == "google":
+    if method in ["google", "login"]:
       new_user = d.new_user
     elif method == "email":
       try:
