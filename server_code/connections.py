@@ -283,21 +283,29 @@ def try_connect(invite, invite_reply):
   from .invites_server import phone_match
   if phone_match(invite['guess'], invite['user2']):
     try_adding_to_invite_proposal(invite, invite['user2'])
-    already = app_tables.connections.search(user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']), current=True)
-    if len(already) > 0:
+    if _already_connected(invite):
       sm.warning(f"connection already exists, {dict(invite)}")
       return True
     app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
-    for i_row in [invite, invite_reply]:
-      item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance", "current"}}
-      app_tables.connections.add_row(**item)
-      i_row['current'] = False
-    _clear_cached_connections()
+    _transform_invite_rows_to_connections(invite, invite_reply)
     return True
   else:
     print(f"invite['guess'] doesn't match, {dict(invite)}, {invite['user2']['phone']}")
     return False
- 
+
+
+def _already_connected(invite):
+  already = app_tables.connections.search(user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']), current=True)
+  return len(already) > 0
+
+
+def _transform_invite_rows_to_connections(invite, invite_reply):
+  for i_row in [invite, invite_reply]:
+    item = {k: i_row[k] for k in {"user1", "user2", "date", "relationship2to1", "date_described", "distance", "current"}}
+    app_tables.connections.add_row(**item)
+    i_row['current'] = False
+  _clear_cached_connections()
+  
 
 def _connected_prompt(invite, invite_reply):
   return dict(user=invite['user1'],

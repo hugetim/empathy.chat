@@ -119,6 +119,8 @@ class Invite(invites.Invite):
         if errors:
           return errors
         ig.save_invitee(self, user)
+        if self.invitee and self.invitee['phone']:
+          errors += self._try_connect()
         if register:
           accounts.init_user_info(user)        
     else:
@@ -135,6 +137,13 @@ class Invite(invites.Invite):
       errors += [p.MISTAKEN_INVITER_GUESS_ERROR]
       sm.add_invite_guess_fail_prompt(self)
       errors += self.cancel()
+    return errors
+
+  def _try_connect(self):
+    errors = []
+    connection_successful = ig.try_connect(self)
+    if not connection_successful:
+      errors.append(f"{sm.name(self.inviter)} did not accurately provide the last 4 digits of your confirmed phone number.")
     return errors
   
   def respond(self, user_id=""):
@@ -154,9 +163,7 @@ class Invite(invites.Invite):
       return errors
     ig.save_response(self)
     if self.invitee and self.invitee['phone']:
-      self.connection_successful = ig.try_connect(self)
-      if not self.connection_successful:
-        sm.warning(f"unexpected failed connect, {self.invitee['email']}, {self.invite_id}")
+      errors += self._try_connect()
     return errors
 
   def load(self):

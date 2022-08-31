@@ -61,7 +61,9 @@ def invited_signup(invite):
       except anvil.users.UserExists as err:
         d.signup_err_lbl.text = f"{err.args[0]}\nPlease login to your account normally and then try this invite link again."
         d.signup_err_lbl.visible = True
-  invite.relay('visit', dict(user=new_user, register=True))
+  errors = invite.relay('visit', dict(user=new_user, register=True))
+  if isinstance(invite, invites.Invite) and not errors and new_user['phone']:
+    Notification("You have been successfully linked.", style="success").show()
   if new_user and method == "email":
     alert((f'We have sent an email to {new_user["email"]} with "empathy.chat - (re)set your password" as the subject.\n\n'
            'Click the link contained in that email to set your password and login.\n\nYou can now close this window/tab.'), 
