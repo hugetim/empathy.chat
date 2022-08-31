@@ -110,8 +110,9 @@ class InviteTest(unittest.TestCase):
     errors = s_invite2.add()
     self.assertTrue(errors)
     test_prompts = app_tables.prompts.search(user=self.user, 
-                                             spec={'name': 'invite_guess_fail', 'to_id': self.poptibo.get_id()})
-    print({'name': 'invite_guess_fail', 'to_id': self.poptibo.get_id()})
+                                             spec={'name': 'invite_guess_fail', 'to_id': self.poptibo.get_id()},
+                                             dismissed=False,
+                                            )
     self.assertEqual(len(test_prompts), 1)
     for test_prompt in test_prompts:
       test_prompt.delete()

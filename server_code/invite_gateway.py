@@ -12,7 +12,7 @@ def add_invite(invite):
   
   Side effect: add invite_id attribute to invite"""
   errors = []
-  invite_row = _invite_row(invite)
+  invite_row = _invite_row(invite, missing_ok=True)
   if not invite_row:
     now = sm.now()
     new_row = app_tables.invites.add_row(date=now,
@@ -32,7 +32,7 @@ def add_invite(invite):
 
 def cancel_invite(invite):
   errors = []
-  invite_row = _invite_row(invite)
+  invite_row = _invite_row(invite, missing_ok=True)
   _try_removing_from_invite_proposal(invite_row, invite.invitee)
   if invite_row:
     invite_row['current'] = False
@@ -45,7 +45,7 @@ def cancel_response(invite):
   invite_row = _invite_row(invite)
   _try_removing_from_invite_proposal(invite_row, invite.invitee)
   errors = []
-  response_row = _response_row(invite)
+  response_row = _response_row(invite, missing_ok=True)
   if response_row:
     response_row['current'] = False
   else:
@@ -71,15 +71,15 @@ def update_invite(invite):
   _edit_row(invite_row, invite.inviter_guess, invite.rel_to_inviter, sm.now())
     
     
-def _invite_row(invite):
-  return _row(invite, origin=True)
+def _invite_row(invite, missing_ok=False):
+  return _row(invite, origin=True, missing_ok=missing_ok)
 
 
-def _response_row(invite):
-  return _row(invite, origin=False)
+def _response_row(invite, missing_ok=False):
+  return _row(invite, origin=False, missing_ok=missing_ok)
 
 
-def _row(invite, origin):
+def _row(invite, origin, missing_ok=False):
   row_id = invite.invite_id if origin else invite.response_id
   row = None
   if row_id:
@@ -92,17 +92,17 @@ def _row(invite, origin):
     row = app_tables.invites.get(origin=origin, user1=user1, user2=user2, current=True)
   else:
     raise(RowMissingError(f"Not enough information to retrieve {'invite' if origin else 'response'} row."))
-  if not row:
+  if not missing_ok and not row:
     raise(RowMissingError(f"No such {'invite' if origin else 'response'} row."))
   return row
 
 
 def load_full_invite(invite):
   """Side effect: update invite object from data"""
-  invite_row = _invite_row(invite)
+  invite_row = _invite_row(invite, missing_ok=True)
   if invite_row:
     _load_invite(invite, invite_row)
-    response_row = _response_row(invite)
+    response_row = _response_row(invite, missing_ok=True)
     if response_row:
       _load_response(invite, response_row)
 
@@ -138,8 +138,9 @@ def save_invitee(invite, user):
 
 
 def save_response(invite):
+  """Side effect: update invite object with response_id if new response"""
   now = sm.now()
-  response_row = _response_row(invite)
+  response_row = _response_row(invite, missing_ok=True)
   if not response_row:
     response_row = app_tables.invites.add_row(date=now,
                                               origin=False,
@@ -149,6 +150,7 @@ def save_response(invite):
                                               link_key=invite.link_key,
                                               current=True,
                                              )
+    invite.response_id = response_row.get_id()
   _edit_row(response_row, invite.invitee_guess, invite.rel_to_invitee, now)
 
   
