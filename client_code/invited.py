@@ -3,6 +3,7 @@ import anvil.users
 from anvil import *
 from . import invites
 from . import parameters as p
+from . import ui_procedures as ui
 
 
 def invited_dialog(inviter):
@@ -31,15 +32,13 @@ def handle_link(link_key):
       if not user:
         method = invited_signup(invite)
       if anvil.users.get_user():
-        open_form('LoginForm')
+        ui.clear_hash_and_open_form('LoginForm')
   elif "This invite link is no longer active." in errors:
     alert("This invite link is no longer active.")
-    set_url_hash('')
-    open_form('LoginForm')
+    ui.clear_hash_and_open_form('LoginForm')
   elif p.CLICKED_OWN_LINK_ERROR in errors:
     alert(p.CLICKED_OWN_LINK_ERROR, large=True)
-    set_url_hash('')
-    open_form('LoginForm')
+    ui.clear_hash_and_open_form('LoginForm')
   else:
     alert(" ".join(errors)) #This is not a valid invite link."
 

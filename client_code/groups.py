@@ -4,6 +4,7 @@ from anvil import *
 from . import helper as h
 from . import parameters as p
 from . import invited
+from . import ui_procedures as ui
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 
@@ -87,18 +88,17 @@ def handle_link(link_key):
     invite.relay('visit', {'user': user})
   except RowMissingError as err:
     alert(err.args[0])
+    ui.clear_hash_and_open_form('LoginForm')
     return
   except ExpiredInviteError as err:
     alert(err.args[0])
-    set_url_hash('')
-    open_form('LoginForm')
+    ui.clear_hash_and_open_form('LoginForm')
     return
   except MistakenVisitError as err:
     alert(err.args[0], large=True)
-    set_url_hash('')
-    open_form('LoginForm')
+    ui.clear_hash_and_open_form('LoginForm')
     return
   if not user:
     method = invited.invited_signup(invite)
   if anvil.users.get_user():
-    open_form('LoginForm')
+    ui.clear_hash_and_open_form('LoginForm')

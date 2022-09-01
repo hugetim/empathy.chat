@@ -19,6 +19,11 @@ def login():
   return user
 
 
+def clear_hash_and_open_form(form):
+  set_url_hash('')
+  open_form(form)
+
+
 def get_mobile_status():
   from anvil.js.window import navigator
   import re

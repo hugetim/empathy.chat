@@ -34,4 +34,5 @@ if isinstance(url_hash, dict) and len(url_hash.keys() & known_hash_keys) == 1:
                 }
   hash_router[known_key](value)
 else:
-  anvil.open_form('LoginForm')
+  from . import ui_procedures as ui
+  ui.clear_hash_and_open_form('LoginForm')
