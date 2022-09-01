@@ -6,6 +6,7 @@ from . import parameters as p
 from . import ui_procedures as ui
 from . import groups
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
+from .Dialogs.Invited import Invited
 
 
 def invited_dialog(inviter):
@@ -13,7 +14,6 @@ def invited_dialog(inviter):
   invite = invites.Invite(inviter=inviter, invitee=port.User.from_logged_in())
   errors = invite.relay('load')
   top_form = get_open_form()
-  from .Dialogs.Invited import Invited
   top_form.invited_alert = Invited(item=invite)
   return alert(content=top_form.invited_alert,
                title="Accept this invitation to link?",
@@ -32,22 +32,22 @@ def _handle_close_invite(link_key):
   user = anvil.users.get_user()
   invite = invites.Invite(link_key=link_key)
   errors = invite.relay('visit', {'user': user})
+  _handle_close_invite_visit_outcome(invite, errors, user)
+  ui.clear_hash_and_open_form('LoginForm')
+
+
+def _handle_close_invite_visit_outcome(invite, errors, user):
   if not errors:
-    from .Dialogs.Invited import Invited
     invited_alert = Invited(item=invite)
     if alert(content=invited_alert, 
              title="", 
              buttons=[], large=True, dismissible=False):
       if not user:
         method = invited_signup(invite)
-      if anvil.users.get_user():
-        ui.clear_hash_and_open_form('LoginForm')
   elif "This invite link is no longer active." in errors:
     alert("This invite link is no longer active.")
-    ui.clear_hash_and_open_form('LoginForm')
   elif p.CLICKED_OWN_LINK_ERROR in errors:
     alert(p.CLICKED_OWN_LINK_ERROR, large=True)
-    ui.clear_hash_and_open_form('LoginForm')
   else:
     alert(" ".join(errors)) #This is not a valid invite link."
 
@@ -58,22 +58,15 @@ def _handle_group_invite(link_key):
   invite = groups.Invite(link_key=link_key)
   try:
     invite.relay('visit', {'user': user})
+    if not user:
+      method = invited_signup(invite)
   except RowMissingError as err:
     alert(err.args[0])
-    ui.clear_hash_and_open_form('LoginForm')
-    return
   except ExpiredInviteError as err:
     alert(err.args[0])
-    ui.clear_hash_and_open_form('LoginForm')
-    return
   except MistakenVisitError as err:
     alert(err.args[0], large=True)
-    ui.clear_hash_and_open_form('LoginForm')
-    return
-  if not user:
-    method = invited_signup(invite)
-  if anvil.users.get_user():
-    ui.clear_hash_and_open_form('LoginForm')
+  ui.clear_hash_and_open_form('LoginForm')
 
     
 def invited_signup(invite):

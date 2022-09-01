@@ -37,6 +37,10 @@ class Invite(h.PortItem, h.AttributeToKey):
   
   def invalid_response(self):
     return Invite._check_guess_rel(self.invitee_guess, self.rel_to_invitee)
+
+  @property
+  def from_invite_link(self):
+    return bool(self.link_key)
   
   @staticmethod
   def _check_guess_rel(guess, rel):

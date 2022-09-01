@@ -141,9 +141,9 @@ def warning(warning_str):
   anvil.server.call('warning', warning_str, app_info_dict, from_client=True)
 
 
-def my_assert(statement):
+def my_assert(statement, id_str):
   if not statement:
-    warning(f"bool({statement}) is not True")
+    warning(f"{id_str}: bool({statement}) is not True")
  
 
 def robust_server_call(fn_name, *args, **kwargs):
