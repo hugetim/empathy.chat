@@ -6,7 +6,6 @@ import anvil.google.auth
 import anvil.tables.query as q
 from anvil import secrets
 from . import parameters as p
-from . import portable as port
 from . import server_misc as sm
 from .server_misc import authenticated_callable
 from anvil_extras.server_utils import timed
