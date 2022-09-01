@@ -4,6 +4,8 @@ from anvil import *
 from . import invites
 from . import parameters as p
 from . import ui_procedures as ui
+from . import groups
+from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 
 def invited_dialog(inviter):
@@ -16,10 +18,17 @@ def invited_dialog(inviter):
   return alert(content=top_form.invited_alert,
                title="Accept this invitation to link?",
                buttons=[], large=True, dismissible=False)
-  
 
-def handle_link(link_key):
-  print(f"handle_link: {link_key}")
+  
+def handle_link(hash_key, hash_value):
+  hash_router = {'invite': _handle_close_invite,
+                 'group': _handle_group_invite,
+                }
+  hash_router[hash_key](hash_value)
+
+
+def _handle_close_invite(link_key):
+  print(f"_handle_close_invite: {link_key}")
   user = anvil.users.get_user()
   invite = invites.Invite(link_key=link_key)
   errors = invite.relay('visit', {'user': user})
@@ -41,6 +50,30 @@ def handle_link(link_key):
     ui.clear_hash_and_open_form('LoginForm')
   else:
     alert(" ".join(errors)) #This is not a valid invite link."
+
+
+def _handle_group_invite(link_key):
+  print(f"_handle_group_invite: {link_key}")
+  user = anvil.users.get_user()
+  invite = groups.Invite(link_key=link_key)
+  try:
+    invite.relay('visit', {'user': user})
+  except RowMissingError as err:
+    alert(err.args[0])
+    ui.clear_hash_and_open_form('LoginForm')
+    return
+  except ExpiredInviteError as err:
+    alert(err.args[0])
+    ui.clear_hash_and_open_form('LoginForm')
+    return
+  except MistakenVisitError as err:
+    alert(err.args[0], large=True)
+    ui.clear_hash_and_open_form('LoginForm')
+    return
+  if not user:
+    method = invited_signup(invite)
+  if anvil.users.get_user():
+    ui.clear_hash_and_open_form('LoginForm')
 
     
 def invited_signup(invite):
@@ -69,4 +102,3 @@ def invited_signup(invite):
           large=True, dismissible=False,
          )
   return method
-    
