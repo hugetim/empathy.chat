@@ -32,7 +32,7 @@ services:
   server_config: {}
 - source: /runtime/services/google.yml
   client_config: {}
-  server_config: {}
+  server_config: {app_origin_redirect: true}
 - source: /runtime/services/anvil/users.yml
   client_config: {require_secure_passwords: true, use_token: false, use_email: true,
     allow_remember_me: true, allow_signup: true, enable_automatically: true, confirm_email: false,
