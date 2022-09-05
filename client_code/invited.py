@@ -5,6 +5,7 @@ from . import invites
 from . import parameters as p
 from . import ui_procedures as ui
 from . import groups
+from .glob import publisher
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 from .Dialogs.Invited import Invited
 
@@ -84,6 +85,7 @@ def invited_signup(invite):
   while not new_user:
     method = alert(d, title="Sign Up", buttons=[("Sign Up", "email", 'primary')])
     new_user = _process_signup_dialog(d, method)
+  publisher.close_channel("signup_error")
   errors = invite.relay('visit', dict(user=new_user, register=True))
   if isinstance(invite, invites.Invite) and new_user['phone'] and not errors:
     Notification("You have been successfully linked.", style="success").show()
@@ -107,19 +109,19 @@ def _process_signup_dialog(signup_dialog, method):
   if method in ["google", "login"]:
     return signup_dialog.new_user
   elif method == "email":
-    return _submit_signup_email_to_server(signup_dialog)
+    return _submit_signup_email_to_server(signup_dialog.email_box.text)
 
 
-def _submit_signup_email_to_server(signup_dialog):
+def _submit_signup_email_to_server(email_address):
   """Return new_user if successful signup/login
   
-  Side effects: display errors on Dialog form
+  Side effects: publish errors (to Dialog form)
   """
   try:
-    return anvil.server.call('do_signup', signup_dialog.email_box.text)
+    return anvil.server.call('do_signup', email_address)
   except anvil.users.AuthenticationFailed:
-    signup_dialog.signup_err_lbl.text = "Email address missing or invalid. Please enter a valid email address."
-    signup_dialog.signup_err_lbl.visible = True
+    publisher.publish("signup_error", 
+                      "Email address missing or invalid. Please enter a valid email address.")
   except anvil.users.UserExists as err:
-    signup_dialog.signup_err_lbl.text = f"{err.args[0]}\nPlease login to your account normally and then try this invite link again."
-    signup_dialog.signup_err_lbl.visible = True
+    publisher.publish("signup_error", 
+                      f"{err.args[0]}\nPlease login to your account normally and then try this invite link again.")
