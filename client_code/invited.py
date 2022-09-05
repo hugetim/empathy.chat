@@ -75,23 +75,37 @@ def invited_signup(invite):
   new_user = None
   while not new_user:
     method = alert(d, title="Sign Up", buttons=[("Sign Up", "email", 'primary')])
-    if method in ["google", "login"]:
-      new_user = d.new_user
-    elif method == "email":
-      try:
-        new_user = anvil.server.call('do_signup', d.email_box.text)
-      except anvil.users.AuthenticationFailed:
-        d.signup_err_lbl.text = "Email address missing or invalid. Please enter a valid email address."
-        d.signup_err_lbl.visible = True
-      except anvil.users.UserExists as err:
-        d.signup_err_lbl.text = f"{err.args[0]}\nPlease login to your account normally and then try this invite link again."
-        d.signup_err_lbl.visible = True
+    new_user = _process_signup_dialog(d, method)
   errors = invite.relay('visit', dict(user=new_user, register=True))
-  if isinstance(invite, invites.Invite) and not errors and new_user['phone']:
+  if isinstance(invite, invites.Invite) and new_user['phone'] and not errors:
     Notification("You have been successfully linked.", style="success").show()
   if new_user and method == "email":
-    alert((f'We have sent an email to {new_user["email"]} with "empathy.chat - (re)set your password" as the subject.\n\n'
-           'Click the link contained in that email to set your password and login.\n\nYou can now close this window/tab.'), 
-          large=True, dismissible=False,
-         )
+    _show_alert_re_pw_email(new_user["email"])
   return method
+
+
+def _show_alert_re_pw_email(email_address):
+  alert((f'We have sent an email to {email_address} with "empathy.chat - (re)set your password" as the subject.\n\n'
+         'Click the link contained in that email to set your password and login.\n\nYou can now close this window/tab.'), 
+        large=True, 
+        dismissible=False,
+       )
+
+
+def _process_signup_dialog(d, method):
+  """Return new_user if successful signup/login
+  
+  Side effects: display errors on Dialog form
+  """
+  if method in ["google", "login"]:
+    return d.new_user
+  elif method == "email":
+    try:
+      return anvil.server.call('do_signup', d.email_box.text)
+    except anvil.users.AuthenticationFailed:
+      d.signup_err_lbl.text = "Email address missing or invalid. Please enter a valid email address."
+      d.signup_err_lbl.visible = True
+    except anvil.users.UserExists as err:
+      d.signup_err_lbl.text = f"{err.args[0]}\nPlease login to your account normally and then try this invite link again."
+      d.signup_err_lbl.visible = True
+      
