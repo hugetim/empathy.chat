@@ -38,12 +38,7 @@ def _handle_close_invite(link_key):
 
 def _handle_close_invite_visit_outcome(invite, errors, user):
   if not errors:
-    invited_alert = Invited(item=invite)
-    if alert(content=invited_alert, 
-             title="", 
-             buttons=[], large=True, dismissible=False):
-      if not user:
-        method = invited_signup(invite)
+    _complete_close_invited_process(invite, user)
   elif "This invite link is no longer active." in errors:
     alert("This invite link is no longer active.")
   elif p.CLICKED_OWN_LINK_ERROR in errors:
@@ -52,23 +47,36 @@ def _handle_close_invite_visit_outcome(invite, errors, user):
     alert(" ".join(errors)) #This is not a valid invite link."
 
 
+def _complete_close_invited_process(invite, user):
+  invited_alert = Invited(item=invite)
+  if alert(content=invited_alert, 
+           title="", 
+           buttons=[], large=True, dismissible=False):
+    if not user:
+      invited_signup(invite)
+
+
 def _handle_group_invite(link_key):
   print(f"_handle_group_invite: {link_key}")
   user = anvil.users.get_user()
   invite = groups.Invite(link_key=link_key)
+  _process_group_invite_visit(invite, user)
+  ui.clear_hash_and_open_form('LoginForm')
+
+
+def _process_group_invite_visit(invite, user):
   try:
     invite.relay('visit', {'user': user})
     if not user:
-      method = invited_signup(invite)
+      invited_signup(invite)
   except RowMissingError as err:
     alert(err.args[0])
   except ExpiredInviteError as err:
     alert(err.args[0])
   except MistakenVisitError as err:
     alert(err.args[0], large=True)
-  ui.clear_hash_and_open_form('LoginForm')
 
-    
+
 def invited_signup(invite):
   from .Dialogs.Signup import Signup
   d = Signup()
@@ -81,7 +89,6 @@ def invited_signup(invite):
     Notification("You have been successfully linked.", style="success").show()
   if new_user and method == "email":
     _show_alert_re_pw_email(new_user["email"])
-  return method
 
 
 def _show_alert_re_pw_email(email_address):
@@ -92,20 +99,27 @@ def _show_alert_re_pw_email(email_address):
        )
 
 
-def _process_signup_dialog(d, method):
+def _process_signup_dialog(signup_dialog, method):
   """Return new_user if successful signup/login
   
   Side effects: display errors on Dialog form
   """
   if method in ["google", "login"]:
-    return d.new_user
+    return signup_dialog.new_user
   elif method == "email":
-    try:
-      return anvil.server.call('do_signup', d.email_box.text)
-    except anvil.users.AuthenticationFailed:
-      d.signup_err_lbl.text = "Email address missing or invalid. Please enter a valid email address."
-      d.signup_err_lbl.visible = True
-    except anvil.users.UserExists as err:
-      d.signup_err_lbl.text = f"{err.args[0]}\nPlease login to your account normally and then try this invite link again."
-      d.signup_err_lbl.visible = True
-      
+    return _submit_signup_email_to_server(signup_dialog)
+
+
+def _submit_signup_email_to_server(signup_dialog):
+  """Return new_user if successful signup/login
+  
+  Side effects: display errors on Dialog form
+  """
+  try:
+    return anvil.server.call('do_signup', signup_dialog.email_box.text)
+  except anvil.users.AuthenticationFailed:
+    signup_dialog.signup_err_lbl.text = "Email address missing or invalid. Please enter a valid email address."
+    signup_dialog.signup_err_lbl.visible = True
+  except anvil.users.UserExists as err:
+    signup_dialog.signup_err_lbl.text = f"{err.args[0]}\nPlease login to your account normally and then try this invite link again."
+    signup_dialog.signup_err_lbl.visible = True
