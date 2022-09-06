@@ -146,6 +146,7 @@ def _submit_response(invite):
   else:
     _handle_successful_response(invite)
 
+
 def _handle_successful_response(invite):    
   user = anvil.users.get_user()
   has_phone = user['phone'] if user else None

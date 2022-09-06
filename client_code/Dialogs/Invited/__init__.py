@@ -42,4 +42,3 @@ class Invited(InvitedTemplate):
   def _close_alert(self, value):
     publisher.unsubscribe("invited", self)
     self.raise_event("x-close-alert", value=value)
-    
