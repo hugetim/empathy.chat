@@ -112,8 +112,15 @@ def _prune_all_expired_items():
   #sm.prune_chat_messages() # moved to scheduled task
 
 
-@anvil.tables.in_transaction
 def _init_user_status(user):
+  partial_state_if_unchanged, proptime_to_ping = _init_user_status_transaction(user)
+  if proptime_to_ping:
+    proptime_to_ping.ping()
+  return partial_state_if_unchanged
+
+
+@anvil.tables.in_transaction
+def _init_user_status_transaction(user):
   with TimerLogger("  _init_user_status", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
     _prune_all_expired_items()
     timer.check("_prune_all_expired_items")
@@ -124,15 +131,16 @@ def _init_user_status(user):
     elif partial_state['status'] in ['pinged', 'requesting'] and partial_state['seconds_left'] <= 0:
       _cancel(user)
     elif partial_state['status'] == 'pinged':
-      _match_commit(user)
+      proptime_to_ping = _match_commit_wo_transaction(user)
       confirm_wait_helper(user)
+      return None, proptime_to_ping
     elif partial_state['status'] in ['requesting', 'pinging']:
       confirm_wait_helper(user)
     else:
-      return partial_state
-    return None
+      return partial_state, None
+    return None, None
 
-  
+ 
 def confirm_wait_helper(user):
   """updates expire_date for current request"""
   if sm.DEBUG:
@@ -520,48 +528,67 @@ def _cancel_other(user, proptime_id=None):
 
 @authenticated_callable
 def match_commit(proptime_id=None, user_id=""):
-  """Upon first commence of "now", copy row over and delete "matching" row.
+  """
+  Upon first commence of 'now', copy row over and delete 'matching' row.
   Should not cause error if already commenced
   """
   print(f"match_commit, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
-  _match_commit_in_transaction(user, proptime_id)
+  _match_commit(user, proptime_id)
   return _get_state(user)
 
 
-@anvil.tables.in_transaction
 @timed
-def _match_commit_in_transaction(user, proptime_id=None):
-  return _match_commit(user, proptime_id)
-
-
 def _match_commit(user, proptime_id=None):
   if sm.DEBUG:
     print("_match_commit")
   if proptime_id:
     print("proptime_id")
-    current_proptime = ProposalTime.get_by_id(proptime_id)
+    proptime = ProposalTime.get_by_id(proptime_id)
   else:
-    current_proptime = ProposalTime.get_now(user)
-  if current_proptime:
-    if current_proptime['fully_accepted']:
-      if current_proptime['start_now']:
-        match_start = sm.now()
-      else:
-        match_start = current_proptime['start_date']
-      users = current_proptime.all_users()
-      new_match = app_tables.matches.add_row(users=users,
-                                             proposal_time=current_proptime._row,
-                                             match_commence=match_start,
-                                             present=[0]*len(users),
-                                             complete=[0]*len(users),
-                                             slider_values=[""]*len(users),
-                                             external=[0]*len(users),
-                                             late_notified=[0]*len(users),
-                                            )
-      # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-      proposal = current_proptime.proposal
-      proposal.cancel_all_times()
-      if not current_proptime['start_now']:
-        current_proptime.ping()
+    proptime = ProposalTime.get_now(user)
+  if proptime and proptime['fully_accepted']:
+    ping_needed = _commit_proptime_to_match_in_transaction(proptime)
+    if ping_needed:
+      proptime.ping()
+
+
+def _match_commit_wo_transaction(user):
+  """Return proptime_to_ping (if applicable)"""
+  current_proptime = ProposalTime.get_now(user)
+  if current_proptime and current_proptime['fully_accepted']:
+    ping_needed = commit_proptime_to_match(current_proptime)
+    if ping_needed:
+      return current_proptime
+
+
+@anvil.tables.in_transaction
+def _commit_proptime_to_match_in_transaction(proptime):
+  return commit_proptime_to_match(proptime)
+
+
+def commit_proptime_to_match(proptime):
+  """Return True if ping needed
+  
+  Side effects: cancel proposal and create new match row"""
+  print("commit_proptime_to_match")
+  _create_new_match_from_proptime(proptime)
+  proposal = proptime.proposal
+  proposal.cancel_all_times()
+  return (not proptime['start_now'])
+
+
+def _create_new_match_from_proptime(proptime):
+  match_start = sm.now() if proptime['start_now'] else proptime['start_date']
+  users = proptime.all_users()
+  new_match = app_tables.matches.add_row(users=users,
+                                         proposal_time=proptime._row,
+                                         match_commence=match_start,
+                                         present=[0]*len(users),
+                                         complete=[0]*len(users),
+                                         slider_values=[""]*len(users),
+                                         external=[0]*len(users),
+                                         late_notified=[0]*len(users),
+                                        )
+  # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
