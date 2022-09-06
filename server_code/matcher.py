@@ -333,9 +333,12 @@ def _save_new_proposal(user, port_prop, link_key):
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate
   """
+  if sm.DEBUG:
+    print(f"_save_new_proposal, {port_prop}")
+  status = get_partial_state(user)['status']
   prop = Proposal.add(user, port_prop)
   if port_prop.start_now:
-    prop, other_prop_time_to_ping = _process_now_proposal_edit(user, port_prop, prop)
+    prop, other_prop_time_to_ping = _process_now_proposal_edit(user, port_prop, prop, status)
   else:
     other_prop_time_to_ping = None
   if prop and link_key:
@@ -392,6 +395,7 @@ def _save_proposal_edit(user, port_prop, prop):
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate
   """
+  status = get_partial_state(user)['status']
   prop.update(port_prop)
   if port_prop.start_now:
     return _process_now_proposal_edit(user, port_prop, prop)
@@ -400,12 +404,11 @@ def _save_proposal_edit(user, port_prop, prop):
   
 
 
-def _process_now_proposal_edit(user, port_prop, prop):
+def _process_now_proposal_edit(user, port_prop, prop, status):
   """Return prop (None if cancelled or matching with another proposal), other_prop_time_to_ping (if applicable)
   
   Side effects: Update proposal tables with additional revisions, if any; match if appropriate
   """
-  status = get_partial_state(user)['status']
   available_for_now_proposal = (status is None)
   if available_for_now_proposal:
     return _process_now_proposal_edit_available(user, port_prop, prop)

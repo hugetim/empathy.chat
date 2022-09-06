@@ -375,6 +375,8 @@ class Proposal():
       self.cancel_prop_only()
 
   def cancel_all_times(self):
+    if sm.DEBUG:
+      print("cancel_all_times")
     for proptime in ProposalTime.times_from_proposal(self):
       proptime.cancel_time_only()
     self.cancel_prop_only()    

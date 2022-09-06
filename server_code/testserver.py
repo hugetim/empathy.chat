@@ -3,11 +3,11 @@ import anvil.tables
 from anvil.tables import app_tables
 import anvil.server
 import anvil.secrets as secrets
-from empathy_chat import server_misc as sm
-from empathy_chat import accounts
-from empathy_chat.server_misc import authenticated_callable
-from empathy_chat import matcher
-from empathy_chat import portable
+from . import server_misc as sm
+from . import accounts
+from .server_misc import authenticated_callable
+from . import matcher
+from . import portable
 
 
 @authenticated_callable
