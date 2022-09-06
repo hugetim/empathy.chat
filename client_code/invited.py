@@ -4,6 +4,7 @@ from anvil import *
 from . import invites
 from . import parameters as p
 from . import ui_procedures as ui
+from . import helper as h
 from . import groups
 from .glob import publisher
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
@@ -125,3 +126,33 @@ def _submit_signup_email_to_server(email_address):
   except anvil.users.UserExists as err:
     publisher.publish("signup_error", 
                       f"{err.args[0]}\nPlease login to your account normally and then try this invite link again.")
+
+
+def submit_response(invite):
+  validation_errors = invite.invalid_response()
+  if validation_errors:
+    publisher.publish("invited1_error", "\n".join(validation_errors))
+  else:
+    _submit_response(invite)
+
+def _submit_response(invite):
+  errors = invite.relay('respond')
+  if p.MISTAKEN_INVITER_GUESS_ERROR in errors:
+    Notification(p.MISTAKEN_INVITER_GUESS_ERROR, title="Mistaken Invite", style="info", timeout=None).show()
+    publisher.publish("invited", "failure")
+  elif errors:
+    publisher.publish("invited1_error", "\n".join(errors))
+  else:
+    _handle_successful_response(invite)
+
+def _handle_successful_response(invite):    
+  user = anvil.users.get_user()
+  has_phone = user['phone'] if user else None
+  h.my_assert(has_phone or invite.from_invite_link, "either Confirmed or link invite")
+  if not user:
+    publisher.publish("invited", "go_invited2", invite)
+  elif not has_phone:
+    publisher.publish("invited", "success")
+  else:
+    Notification("You have been successfully linked.", style="success").show()
+    publisher.publish("invited", "success")

@@ -1,5 +1,7 @@
 from ._anvil_designer import InvitedTemplate
 from anvil import *
+from ....glob import publisher
+from .... import helper as h
 
 
 class Invited(InvitedTemplate):
@@ -9,6 +11,7 @@ class Invited(InvitedTemplate):
 
     # Any code you write here will run when the form opens.
     self._content = self.spacer_1
+    publisher.subscribe("invited", self, self.dispatch_handler)
     self.go_invited1(self.item)
 
   def _reset_and_load(self, component):
@@ -24,3 +27,12 @@ class Invited(InvitedTemplate):
     from .Invited1 import Invited1
     self._reset_and_load(Invited1(item=item))
 
+  def dispatch_handler(self, dispatch):
+    if dispatch.title == "go_invited2":
+      self.go_invited2(dispatch.content)
+    elif dispatch.title == "success":
+      self.raise_event("x-close-alert", value=True)
+    elif dispatch.title == "failure":
+      self.raise_event("x-close-alert", value=False)
+    else:
+      h.warning(f"Unhandled Invited dispatch: {dispatch}")

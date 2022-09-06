@@ -3,10 +3,8 @@ from anvil import *
 import anvil.users
 import time
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPromptOnly import RelationshipPromptOnly
-from .... import ui_procedures as ui
 from .... import invited
-from .... import parameters as p
-from .... import helper as h
+from ....glob import publisher
 from anvil_extras.utils import wait_for_writeback
 
 
@@ -28,6 +26,7 @@ class Invited1(Invited1Template):
       f"Please provide the last 4 digits of {self.item['inviter'].name}'s phone number:"
     )
     self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
+    publisher.subscribe("invited1_error", self, self.dispatch_handler)
 
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
@@ -47,38 +46,15 @@ class Invited1(Invited1Template):
     """This method is called when the button is clicked"""
     #self.item.update({'relationship': self.relationship_prompt.item['relationship']})
     self.item.update_from_rel_item(self.relationship_prompt.item, for_response=True)
-    validation_errors = self.item.invalid_response()
-    if validation_errors:
-      self.error("\n".join(validation_errors))
-    else:
-      self._submit_response()
-
-  def _submit_response(self):
-    errors = self.item.relay('respond')
-    if p.MISTAKEN_INVITER_GUESS_ERROR in errors:
-      Notification(p.MISTAKEN_INVITER_GUESS_ERROR, title="Mistaken Invite", style="info", timeout=None).show()
-      self.parent.raise_event("x-close-alert", value=False)
-    elif errors:
-      self.error("\n".join(errors))
-    else:
-      self._handle_successful_response()
-
-  def _handle_successful_response(self):    
-    user = anvil.users.get_user()
-    has_phone = user['phone'] if user else None
-    h.my_assert(has_phone or self.item.from_invite_link, "either Confirmed or link invite")
-    if not user:
-      self.parent.go_invited2(self.item)
-    elif not has_phone:
-      self.parent.raise_event("x-close-alert", value=True)
-    else:
-      Notification("You have been successfully linked.", style="success").show()
-      self.parent.raise_event("x-close-alert", value=True)
+    invited.submit_response(self.item)
 
   def error(self, text):
     self.error_label.text = text
     self.error_label.visible = True
 
+  def dispatch_handler(self, dispatch):
+    self.error(dispatch.title)
+  
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.parent.raise_event("x-close-alert", value=False)
