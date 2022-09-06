@@ -292,9 +292,9 @@ def _accept_proposal(proptime, user):
 
 @authenticated_callable
 def add_proposal(proposal, link_key="", user_id=""):
-  """Return state, prop_id (none if matching with another proposal)
+  """Return state, prop_id (None if cancelled or matching with another proposal)
   
-  Side effects: Update proposal tables with additions, if valid; match if appropriate
+  Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
   print(f"add_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
@@ -305,9 +305,13 @@ def add_proposal(proposal, link_key="", user_id=""):
 
 @timed
 def _add_proposal(user, port_prop, link_key=""):
-  prop, other_prop_time, ping_needed = _save_new_proposal(user, port_prop, link_key)
-  if ping_needed:
-    other_prop_time.ping()
+  """Return prop_id (None if cancelled or matching with another proposal)
+  
+  Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
+  """
+  prop, other_prop_time_to_ping = _save_new_proposal(user, port_prop, link_key)
+  if other_prop_time_to_ping:
+    other_prop_time_to_ping.ping()
   if prop:
     prop.notify_add()
     return prop.get_id()
@@ -317,26 +321,18 @@ def _add_proposal(user, port_prop, link_key=""):
 
 @anvil.tables.in_transaction
 def _save_new_proposal(user, port_prop, link_key):
-  partial_state = get_partial_state(user)
-  status = partial_state['status']
+  """Return prop (None if cancelled or matching with another proposal), other_prop_to_ping (if applicable)
+  
+  Side effects: Update proposal tables with additions, if valid; match if appropriate
+  """
   prop = Proposal.add(user, port_prop)
   if port_prop.start_now:
-    if status is None:
-      other_prop_time = _overlapping_others_now_proposal(user, prop, port_prop)
-      if not other_prop_time:
-        return _add_link_key_and_return(link_key, prop)
-      ping_needed = other_prop_time.accept(user, status)
-    else:
-      other_prop_time, ping_needed = None, None
-    prop.cancel_all_times()
-    return None, other_prop_time, ping_needed
-  return _add_link_key_and_return(link_key, prop)
-
-
-def _add_link_key_and_return(link_key, prop):
-  if link_key:
+    prop, other_prop_time_to_ping = _process_now_proposal_edit(user, port_prop, prop)
+  else:
+    other_prop_time_to_ping = None
+  if prop and link_key:
     prop.add_to_invite(link_key)
-  return prop, None, None
+  return prop, other_prop_time_to_ping
 
 
 def _overlapping_others_now_proposal(user, my_now_proposal, my_now_port_prop):
@@ -355,7 +351,7 @@ def _overlapping_others_now_proposal(user, my_now_proposal, my_now_port_prop):
 def edit_proposal(port_prop, user_id=""):
   """Return state, prop_id (None if cancelled or matching with another proposal)
   
-  Side effects: Update proposal tables with revision, if valid; match if appropriate
+  Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
   """
   print(f"edit_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
@@ -368,7 +364,7 @@ def edit_proposal(port_prop, user_id=""):
 def _edit_proposal(user, port_prop):
   """Return prop_id (None if cancelled or matching with another proposal)
   
-  Side effects: Update proposal tables with revision, if valid; match if appropriate
+  Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
   """
   prop = Proposal.get_by_id(port_prop.prop_id)
   old_port_prop = prop.portable(user)
@@ -404,7 +400,6 @@ def _process_now_proposal_edit(user, port_prop, prop):
   status = get_partial_state(user)['status']
   available_for_now_proposal = (status is None)
   if available_for_now_proposal:
-    other_
     return _process_now_proposal_edit_available(user, port_prop, prop)
   else:
     prop.cancel_all_times()
@@ -413,10 +408,15 @@ def _process_now_proposal_edit(user, port_prop, prop):
 
 
 def _process_now_proposal_edit_available(user, port_prop, prop):
+  """Return prop (None if matching with another proposal), other_prop_time_to_ping (if applicable)
+  
+  Side effects: Update proposal tables with additional revisions, if any; match if appropriate
+  """
   overlapping_prop_time = _overlapping_others_now_proposal(user, prop, port_prop)
   if overlapping_prop_time:
     prop.cancel_all_times()
-    return None, _accept_overlapping_proposal(user, overlapping_prop_time)
+    other_prop_time_to_ping = _accept_overlapping_proposal(user, overlapping_prop_time)
+    return None, other_prop_time_to_ping
   else:
     return prop, None
   
