@@ -398,7 +398,7 @@ def _save_proposal_edit(user, port_prop, prop):
   status = get_partial_state(user)['status']
   prop.update(port_prop)
   if port_prop.start_now:
-    return _process_now_proposal_edit(user, port_prop, prop)
+    return _process_now_proposal_edit(user, port_prop, prop, status)
   else:
     return prop, None
   
