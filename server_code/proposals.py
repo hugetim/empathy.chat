@@ -94,24 +94,31 @@ class ProposalTime():
     """Returns True if ping_needed, None otherwise"""
     if sm.DEBUG:
       print("accept_proptime")
+    self._cancel_any_conflicting_own_now_proposal(user, status)
+    self['users_accepting'] += [user]
+    if self.is_accepted():
+      return self._register_fully_accepted(user)
+
+  def _register_fully_accepted(self, user):
+    """Returns True if ping_needed, None otherwise"""
+    from . import matcher as m
     now = sm.now()
+    self['fully_accepted'] = True
+    self['accept_date'] = now
+    self.proposal.hide_unaccepted_times()
+    if not self['start_now']:
+      m._match_commit(user, self.get_id())
+    elif (now - (self['start_date'])).total_seconds() <= p.BUFFER_SECONDS:
+      m._match_commit(user)
+    else:
+      return True
+  
+  def _cancel_any_conflicting_own_now_proposal(self, user, status):
     if self['start_now'] and status == "requesting":
       own_now_proposal_time = ProposalTime.get_now_proposing(user)
       if own_now_proposal_time:
         ProposalTime(own_now_proposal_time).proposal.cancel_all_times()
-    self['users_accepting'] += [user]
-    if self.is_accepted():
-      self['fully_accepted'] = True
-      self['accept_date'] = now
-      self.proposal.hide_unaccepted_times()
-      from . import matcher as m
-      if not self['start_now']:
-        m._match_commit(user, self.get_id())
-      elif (now - (self['start_date'])).total_seconds() <= p.BUFFER_SECONDS:
-        m._match_commit(user)
-      else:
-        return True
- 
+
   def ping(self):   
     n.ping(user=self.proposal.proposer,
            start=None if self['start_now'] else self['start_date'],

@@ -352,23 +352,29 @@ def _match_overlapping_now_proposal(user, my_now_proposal, my_duration, state):
   
 
 @authenticated_callable
-def edit_proposal(proposal, user_id=""):
-  """Return state, prop_id (none if matching with another proposal)
+def edit_proposal(port_prop, user_id=""):
+  """Return state, prop_id (None if matching with another proposal)
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate
   """
   print(f"edit_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
-  prop_id = _edit_proposal(user, proposal)
+  prop_id = _edit_proposal(user, port_prop)
   return _get_state(user), prop_id
 
 
 @timed
 def _edit_proposal(user, port_prop):
-  prop, old_port_prop, other_prop_time, ping_needed = _save_proposal_edit(user, port_prop)
-  if ping_needed:
-    other_prop_time.ping()
+  """Return prop_id (None if matching with another proposal)
+  
+  Side effects: Update proposal tables with revision, if valid; match if appropriate
+  """
+  prop = Proposal.get_by_id(port_prop.prop_id)
+  old_port_prop = prop.portable(user)
+  prop, other_prop_time_to_ping = _save_proposal_edit(user, port_prop, prop)
+  if other_prop_time_to_ping:
+    other_prop_time_to_ping.ping()
   if prop:
     prop.notify_edit(port_prop, old_port_prop)
     return prop.get_id()
@@ -377,25 +383,28 @@ def _edit_proposal(user, port_prop):
 
 
 @anvil.tables.in_transaction
-def _save_proposal_edit(user, port_prop):
+def _save_proposal_edit(user, port_prop, prop):
+  """Return prop (None if matching with another proposal), other_prop_time_to_ping (if applicable)
+  
+  Side effects: Update proposal tables with revision, if valid; match if appropriate
+  """
   partial_state = get_status(user)
   status = partial_state['status']
-  prop = Proposal.get_by_id(port_prop.prop_id)
-  old_port_prop = prop.portable(user)
   prop.update(port_prop)
   if port_prop.start_now:
-    duration = port_prop.times[0].duration
+    other_prop_time_to_ping = None
     if status is None:
+      duration = port_prop.times[0].duration
       other_prop_time = _match_overlapping_now_proposal(user, prop, duration, partial_state)
       if not other_prop_time:
-        return prop, old_port_prop, None, None
+        return prop, None
       ping_needed = other_prop_time.accept(user, status)
-    else:
-      other_prop_time, ping_needed = None, None
+      if ping_needed:
+        other_prop_time_to_ping = other_prop_time
     prop.cancel_all_times()
-    return None, old_port_prop, other_prop_time, ping_needed
+    return None, other_prop_time
   else:
-    return prop, old_port_prop, None, None
+    return prop, None
 
   
 @authenticated_callable
