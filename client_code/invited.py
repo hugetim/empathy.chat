@@ -135,6 +135,7 @@ def submit_response(invite):
   else:
     _submit_response(invite)
 
+
 def _submit_response(invite):
   errors = invite.relay('respond')
   if p.MISTAKEN_INVITER_GUESS_ERROR in errors:
@@ -156,3 +157,4 @@ def _handle_successful_response(invite):
   else:
     Notification("You have been successfully linked.", style="success").show()
     publisher.publish("invited", "success")
+    

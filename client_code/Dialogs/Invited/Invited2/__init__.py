@@ -1,7 +1,7 @@
 from ._anvil_designer import Invited2Template
 from anvil import *
 from ....MenuForm.SettingsForm.Phone import Phone
-from .... import invited
+from ....glob import publisher
 
 
 class Invited2(Invited2Template):
@@ -13,14 +13,14 @@ class Invited2(Invited2Template):
     
   def ok_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.parent.raise_event("x-close-alert", value=True)
+    publisher.publish("invited", "success")
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item.relay('cancel_response')
-    self.parent.raise_event("x-close-alert", value=False)
+    publisher.publish("invited", "failure")
 
   def back_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item.relay('cancel_response')
-    self.parent.go_invited1(self.item)
+    publisher.publish("invited", "go_invited1", self.item)

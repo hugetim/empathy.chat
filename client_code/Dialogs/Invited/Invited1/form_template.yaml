@@ -1,7 +1,7 @@
 container:
   type: ColumnPanel
   properties: {col_widths: '{}'}
-  event_bindings: {show: form_show}
+  event_bindings: {show: form_show, hide: form_hide}
 components:
 - type: RichText
   properties: {role: null, align: center, tooltip: '', enable_slots: true, border: '',

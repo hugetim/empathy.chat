@@ -57,4 +57,8 @@ class Invited1(Invited1Template):
   
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.parent.raise_event("x-close-alert", value=False)
+    publisher.publish("invited", "failure")
+
+  def form_hide(self, **event_args):
+    """This method is called when the column panel is removed from the screen"""
+    publisher.unsubscribe("invited1_error", self)
