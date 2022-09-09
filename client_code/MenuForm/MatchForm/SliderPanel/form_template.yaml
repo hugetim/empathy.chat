@@ -104,7 +104,7 @@ components:
           event_bindings: {}
         - type: Label
           properties: {role: null, align: center, tooltip: '', border: '', foreground: 'theme:Gray
-              600', visible: true, text: (their slider will appear here once you both have submitted),
+              600', visible: true, text: (their slider will appear here once you have both submitted),
             font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
             italic: false, background: '', bold: false, underline: false, icon: ''}
           name: placeholder_label
