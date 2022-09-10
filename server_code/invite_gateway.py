@@ -11,7 +11,7 @@ def get_invite_from_link_key(link_key):
   invite_row = app_tables.invites.get(origin=True, link_key=link_key, current=True)
   return invites.Invite(                   
     invite_id=invite_row.get_id(),
-    inviter=invite_row['user1'],
+    inviter=sm.get_port_user(invite_row['user1']),
     inviter_guess=invite_row['guess'],
     rel_to_inviter=invite_row['relationship2to1'],
   )

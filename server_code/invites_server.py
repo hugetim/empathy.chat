@@ -39,7 +39,7 @@ def load_from_link_key(link_key):
      Raise error if visitor is logged in and mistaken inviter guess
   """
   invite = ig.get_invite_from_link_key(link_key)
-  return invite.portable()
+  return invite
   # if self.invite_id:
   #   if user:
   #     if user == self.inviter:
