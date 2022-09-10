@@ -37,4 +37,8 @@ class ExpiredInviteError(NamedError):
 @portable_exception
 class MistakenVisitError(NamedError):
     pass
-  
+
+
+@portable_exception
+class MistakenGuessError(NamedError):
+    pass
