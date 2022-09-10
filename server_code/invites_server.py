@@ -5,7 +5,7 @@ from . import server_misc as sm
 from . import accounts
 from . import parameters as p
 from . import invite_gateway as ig
-from .exceptions import RowMissingError
+from .exceptions import RowMissingError, MistakenGuessError
 
 
 @anvil.server.callable
@@ -31,6 +31,12 @@ def _serve_invite(port_invite, method, kwargs, auth):
   return invite.portable(), errors
 
 
+def _try_adding_invitee(invite, user):
+  if user['phone'] and not phone_match(invite.inviter_guess, user):
+    sm.add_invite_guess_fail_prompt(invite)
+    raise(MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR))
+    
+
 @anvil.server.callable
 @in_transaction
 def load_from_link_key(link_key):
@@ -39,6 +45,9 @@ def load_from_link_key(link_key):
      Raise error if visitor is logged in and mistaken inviter guess
   """
   invite = ig.get_invite_from_link_key(link_key)
+  user = anvil.server.users()
+  if user:
+    
   return invite
   # if self.invite_id:
   #   if user:
@@ -166,7 +175,7 @@ class Invite(invites.Invite):
     self.invitee = user
     if user['phone'] and not phone_match(self.inviter_guess, user):
       errors += [p.MISTAKEN_INVITER_GUESS_ERROR]
-      sm.add_invite_guess_fail_prompt(self)
+      sm.old_add_invite_guess_fail_prompt(self)
       errors += self.cancel()
     return errors
 
