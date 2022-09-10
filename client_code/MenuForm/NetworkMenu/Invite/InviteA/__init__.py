@@ -1,13 +1,14 @@
 from ._anvil_designer import InviteATemplate
 from anvil import *
-from ..InviteB import InviteB
 from .RelationshipPrompt import RelationshipPrompt
+from ..... import invite_controller
 from anvil_extras.utils import wait_for_writeback
 
 class InviteA(InviteATemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
+    publisher.subscribe("invite_a_error", self, self.dispatch_handler)
     
   def form_show(self, **event_args):
     """This method is called when the column panel is shown on the screen"""
@@ -24,24 +25,11 @@ class InviteA(InviteATemplate):
     """This method is called when the button is clicked"""
     if self.continue_button.enabled:
       self.item.update_from_rel_item(self.relationship_prompt.item, for_response=False)
-      validation_errors = self.item.invalid_invite()
-      if validation_errors:
-        self.error("\n".join(validation_errors))
-      else:
-        errors = self.item.relay('add')
-        if errors:
-          self.error("\n".join(errors))
-        elif self.item.invitee: #existing user
-          message = f"You will be linked once {self.item.invitee.name} confirms."
-          self.parent.raise_event("x-close-alert", value="success")
-          alert(message)
-        else:
-          parent = self.parent
-          self.remove_from_parent()
-          parent.add_component(InviteB(item=self.item))
+      invite_controller.submit_invite(self.item)
     
   def error(self, text):
     self.error_label.text = text
     self.error_label.visible = True
     
-
+  def dispatch_handler(self, dispatch):
+    self.error(dispatch.title)
