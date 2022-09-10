@@ -8,7 +8,7 @@ from .exceptions import RowMissingError, ExpiredInviteError
 
 
 def get_invite_from_link_key(link_key):
-  invite_row = app_tables.invites.get(origin=True, link_key=invite.link_key, current=True)
+  invite_row = app_tables.invites.get(origin=True, link_key=link_key, current=True)
   return invites.Invite(                   
     invite_id=invite_row.get_id(),
     inviter=invite_row['user1'],

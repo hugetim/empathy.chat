@@ -33,32 +33,32 @@ def _serve_invite(port_invite, method, kwargs, auth):
 
 @anvil.server.callable
 @in_transaction
-def load_from_link_key(self, link_key):
+def load_from_link_key(link_key):
   """Return Invite
   
      Raise error if visitor is logged in and mistaken inviter guess
   """
   invite = ig.get_invite_from_link_key(link_key)
-  #######################################3
-  if self.invite_id:
-    if user:
-      if user == self.inviter:
-        errors += [p.CLICKED_OWN_LINK_ERROR]
-        return errors
-      errors += self._try_adding_invitee(user)
-      if errors:
-        return errors
-      ig.save_invitee(self, user)
-      if self.invitee and self.invitee['phone']:
-        errors += self._try_connect()
-      if register:
-        accounts.init_user_info(user)        
-  else:
-    if ig.old_invite_row_exists(self.link_key):
-      errors.append("This invite link is no longer active.")
-    else:
-      errors.append("Invalid invite link")
-  return errors
+  return invite.portable()
+  # if self.invite_id:
+  #   if user:
+  #     if user == self.inviter:
+  #       errors += [p.CLICKED_OWN_LINK_ERROR]
+  #       return errors
+  #     errors += self._try_adding_invitee(user)
+  #     if errors:
+  #       return errors
+  #     ig.save_invitee(self, user)
+  #     if self.invitee and self.invitee['phone']:
+  #       errors += self._try_connect()
+  #     if register:
+  #       accounts.init_user_info(user)        
+  # else:
+  #   if ig.old_invite_row_exists(self.link_key):
+  #     errors.append("This invite link is no longer active.")
+  #   else:
+  #     errors.append("Invalid invite link")
+  # return errors
 
 
 def phone_match(last4, user):
