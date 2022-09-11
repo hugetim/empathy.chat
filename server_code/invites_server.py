@@ -33,6 +33,7 @@ def _serve_invite(port_invite, method, kwargs, auth):
 
 def _try_adding_invitee(invite, user):
   if user['phone'] and not phone_match(invite.inviter_guess, user):
+    invite.invitee = user
     sm.add_invite_guess_fail_prompt(invite)
     raise(MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR))
     
@@ -45,10 +46,10 @@ def load_from_link_key(link_key):
      Raise error if visitor is logged in and mistaken inviter guess
   """
   invite = ig.get_invite_from_link_key(link_key)
-  user = anvil.server.users()
+  user = sm.get_acting_user()
   if user:
-    
-  return invite
+    _try_adding_invitee(invite, user)
+  return invite.portable()
   # if self.invite_id:
   #   if user:
   #     if user == self.inviter:
@@ -175,7 +176,7 @@ class Invite(invites.Invite):
     self.invitee = user
     if user['phone'] and not phone_match(self.inviter_guess, user):
       errors += [p.MISTAKEN_INVITER_GUESS_ERROR]
-      sm.old_add_invite_guess_fail_prompt(self)
+      sm.add_invite_guess_fail_prompt(self)
       errors += self.cancel()
     return errors
 

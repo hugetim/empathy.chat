@@ -198,19 +198,19 @@ def invited_item(inviter_id, user_id=""):
           "inviter_id": inviter_id, "rel": _inviteds[0]['relationship2to1']}
 
 
-def old_add_invite_guess_fail_prompt(s_invite):
-  prompt_dict = _old_invite_guess_fail_prompt(s_invite)
-  add_invite_guess_fail_prompt(prompt_dict)
+def add_invite_guess_fail_prompt(s_invite):
+  prompt_dict = _invite_guess_fail_prompt(s_invite)
+  _add_invite_guess_fail_prompt(prompt_dict)
 
 
-def add_invite_guess_fail_prompt(prompt_dict):
+def _add_invite_guess_fail_prompt(prompt_dict):
   if not app_tables.prompts.get(user=prompt_dict['user'], spec={"name": "invite_guess_fail", 
                                                                 "guess": prompt_dict['spec']['guess'],
                                                                 "to_id": prompt_dict['spec']['to_id']}):
     app_tables.prompts.add_row(**prompt_dict)
 
 
-def _old_invite_guess_fail_prompt(s_invite):
+def _invite_guess_fail_prompt(s_invite):
   return dict(user=s_invite.inviter,
               spec={"name": "invite_guess_fail", "rel": s_invite.rel_to_inviter, "guess": s_invite.inviter_guess,
                     "to_name": name(s_invite.invitee), "to_id": s_invite.invitee.get_id(), },

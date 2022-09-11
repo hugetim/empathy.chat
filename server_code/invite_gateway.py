@@ -8,13 +8,15 @@ from .exceptions import RowMissingError, ExpiredInviteError
 
 
 def get_invite_from_link_key(link_key):
+  from . import invites_server
   invite_row = app_tables.invites.get(origin=True, link_key=link_key, current=True)
-  return invites.Invite(                   
+  port_invite = invites.Invite(                   
     invite_id=invite_row.get_id(),
     inviter=sm.get_port_user(invite_row['user1']),
     inviter_guess=invite_row['guess'],
     rel_to_inviter=invite_row['relationship2to1'],
   )
+  return invites_server.Invite(port_invite)
 
 def add_invite(invite):
   """Add row to invites table
