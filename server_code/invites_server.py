@@ -34,12 +34,15 @@ def _serve_invite(port_invite, method, kwargs, auth):
 def _try_adding_invitee(invite, user):
   if user['phone'] and not phone_match(invite.inviter_guess, user):
     invite.invitee = user
-    sm.add_invite_guess_fail_prompt(invite)
+    _add_guess_fail_prompt(invite)
     raise(MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR))
-    
+
+
+@in_transaction
+def _add_guess_fail_prompt(invite):
+  sm.add_invite_guess_fail_prompt(invite)
 
 @anvil.server.callable
-@in_transaction
 def load_from_link_key(link_key):
   """Return Invite
   
