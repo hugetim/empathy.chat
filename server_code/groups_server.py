@@ -207,30 +207,33 @@ class Invite(sm.ServerItem, groups.Invite):
 
   def _invite_row(self):
     row = None
-    errors = []
     if self.invite_id:
       row = app_tables.group_invites.get_by_id(self.invite_id)
       if not row:
-        raise(RowMissingError("Invalid group invite id."))
+        raise RowMissingError("Invalid group invite id.")
     elif self.link_key:
       row = app_tables.group_invites.get(link_key=self.link_key, current=True)
       if not row:
-        raise(RowMissingError("Invalid group invite link."))
+        raise RowMissingError("Invalid group invite link.")
     else:
-      raise(RowMissingError("Not enough information to retrieve group_invite row."))
+      raise RowMissingError("Not enough information to retrieve group_invite row.")
     return row
 
   def expire_date_update(self):
     row = self._invite_row()
     row['expire_date'] = self.expire_date
-  
-  def visit(self, user, register=False):
+
+  def register(self, user):
     invite_row = self._invite_row()
-    if not register and invite_row['expire_date'] < sm.now():
+    if invite_row and user:
+      Invite._register_user(user)
+      Invite._add_visitor(user, invite_row)
+  
+  def visit(self, user):
+    invite_row = self._invite_row()
+    if invite_row['expire_date'] < sm.now():
       raise ExpiredInviteError("This group invite link is expired.")
     if invite_row and user:
-      if register:
-        Invite._register_user(user)
       if user in invite_row['group']['hosts']:
         this_group = invite_row['group']
         raise MistakenVisitError(f"You have clicked/visited an invite link for a group you are a host of: {this_group['name']}.\n\n"

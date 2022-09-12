@@ -124,11 +124,17 @@ def invited_signup(invite):
     method = alert(d, title="Sign Up", buttons=[("Sign Up", "email", 'primary')])
     new_user = _process_signup_dialog(d, method)
   publisher.close_channel("signup_error")
-  errors = invite.relay('visit', dict(user=new_user, register=True))
-  if isinstance(invite, invites.Invite) and new_user['phone'] and not errors:
-    Notification("You have been successfully linked.", style="success").show()
-  if new_user and method == "email":
-    _show_alert_re_pw_email(new_user["email"])
+  try:
+    invite.relay('register', dict(user=new_user))
+    if isinstance(invite, invites.Invite) and new_user['phone']:
+      Notification("You have been successfully linked.", style="success").show()
+    if new_user and method == "email":
+      _show_alert_re_pw_email(new_user["email"])
+  except MistakenGuessError as err:
+    _error_alert(err)
+  except RowMissingError as err:
+    _error_alert(err)
+    
 
 
 def _show_alert_re_pw_email(email_address):

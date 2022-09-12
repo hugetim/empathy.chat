@@ -9,8 +9,17 @@ from .exceptions import RowMissingError, MistakenGuessError, InvalidInviteError,
 
 
 @anvil.server.callable
-@in_transaction
 def serve_invite_unauth(port_invite, method, kwargs):
+  try:
+    return _serve_invite_unauth(port_invite, method, kwargs)
+  except MistakenGuessError as err:
+    if err.args[0] == p.MISTAKEN_INVITER_GUESS_ERROR:
+      _add_guess_fail_prompt(invite)
+    raise err
+
+
+@in_transaction
+def _serve_invite_unauth(port_invite, method, kwargs): 
   from . import matcher
   matcher.propagate_update_needed()
   return _serve_invite(port_invite, method, kwargs, auth=False)
@@ -34,7 +43,6 @@ def _serve_invite(port_invite, method, kwargs, auth):
 def _check_invitee_phone_match(invite, user):
   if user['phone'] and not phone_match(invite.inviter_guess, user):
     invite.invitee = user
-    _add_guess_fail_prompt(invite)
     raise MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR)
 
 
@@ -68,11 +76,24 @@ def load_from_link_key(link_key):
   if user:
     if user == invite.inviter:
       raise MistakenVisitError(p.CLICKED_OWN_LINK_ERROR)
-    _check_invitee_phone_match(invite, user)
+    try:
+      _check_invitee_phone_match(invite, user)
+    except MistakenGuessError as err:
+      _add_guess_fail_prompt(invite)
+      raise err
   return invite.portable()
 
 
 @in_transaction
+def _try_to_save_response(invite, user):
+  _check_invitee_phone_match(invite, user)
+  invite.invitee = user
+  ig.save_invitee(invite, user)
+  ig.save_response(invite)
+  if user['phone']:
+    _try_connect(invite)
+
+  
 def _try_connect(invite):
   from . import matcher
   ig.try_connect(invite)
@@ -85,29 +106,20 @@ def respond_to_close_invite(port_invite):
     raise InvalidInviteError(", ".join(port_invite.invalid_response()))
   invite = Invite(port_invite)
   ig.ensure_correct_inviter_info(invite)
-  if not phone_match(invite.invitee_guess, invite.inviter):
-    raise MistakenGuessError(f"You did not accurately provide the last 4 digits of {port_invite.inviter.name}'s confirmed phone number.")
+  _check_inviter_phone_match(invite)
   user = sm.get_acting_user()
   if user:
-    _check_invitee_phone_match(invite, user)
-    invite.invitee = user
-    ig.save_response(invite)
-    _try_connect(invite)
-  # if user:
-  #   errors += self._try_adding_invitee(user)
-  #   if errors:
-  #     return errors
-  #   ig.save_invitee(self, user)
-  # errors += self.invalid_response()
-  # if errors:
-  #   return errors
-  # if not phone_match(self.invitee_guess, self.inviter):
-  #   errors.append(f"You did not accurately provide the last 4 digits of {sm.name(self.inviter)}'s confirmed phone number.")
-  #   return errors
-  # ig.save_response(self)
-  # if self.invitee and self.invitee['phone']:
-  #   errors += self._try_connect()
-  # return errors
+    try:
+      _try_to_save_response(invite, user)
+    except MistakenGuessError as err:
+      if err.args[0] == p.MISTAKEN_INVITER_GUESS_ERROR:
+        _add_guess_fail_prompt(invite)
+      raise err
+
+
+def _check_inviter_phone_match(invite):
+  if not phone_match(invite.invitee_guess, invite.inviter):
+    raise MistakenGuessError(f"You did not accurately provide the last 4 digits of {sm.name(invite.inviter)}'s confirmed phone number.")
 
 
 def phone_match(last4, user):
@@ -183,51 +195,18 @@ class Invite(invites.Invite):
       else:
         self[key] = ""
   
-  def visit(self, user, register=False):
-    """Assumes only self.link_key known (unless register)
-    
-       Side effects: set invite['user2'] if visitor is logged in,
-       likewise for invite_reply['user1'] if it exists"""
-    errors = []
-    ig.load_full_invite(self)
-    if self.invite_id:
-      if user:
-        if user == self.inviter:
-          errors += [p.CLICKED_OWN_LINK_ERROR]
-          return errors
-        errors += self._try_adding_invitee(user)
-        if errors:
-          return errors
-        ig.save_invitee(self, user)
-        if self.invitee and self.invitee['phone']:
-          errors += self._try_connect()
-        if register:
-          accounts.init_user_info(user)        
-    else:
-      if ig.old_invite_row_exists(self.link_key):
-        errors.append("This invite link is no longer active.")
-      else:
-        errors.append("Invalid invite link")
-    return errors
-
-  def _try_adding_invitee(self, user):
-    errors = []
+  def register(self, user):
+    if not user:
+      sm.warning(f"visit called without user on {self}")
+    ig.ensure_correct_inviter_info(self)
+    _check_inviter_phone_match(self) 
+    _check_invitee_phone_match(self, user)
     self.invitee = user
-    if user['phone'] and not phone_match(self.inviter_guess, user):
-      errors += [p.MISTAKEN_INVITER_GUESS_ERROR]
-      sm.add_invite_guess_fail_prompt(self)
-      errors += self.cancel()
-    return errors
-
-  def _try_connect(self):
-    errors = []
-    try:
-      connection_successful = ig.try_connect(self)
-    except RowMissingError:
-      return errors
-    if not connection_successful:
-      errors.append(f"{sm.name(self.inviter)} did not accurately provide the last 4 digits of your confirmed phone number.")
-    return errors
+    ig.save_invitee(self, user)
+    ig.save_response(self)
+    if user['phone']:
+      _try_connect(self)
+    accounts.init_user_info(user)        
 
   def load(self):
     return ig.load_full_invite(self)
