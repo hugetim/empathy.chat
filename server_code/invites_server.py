@@ -31,11 +31,11 @@ def _serve_invite(port_invite, method, kwargs, auth):
   return invite.portable(), errors
 
 
-def _try_adding_invitee(invite, user):
+def _check_invitee_phone_match(invite, user):
   if user['phone'] and not phone_match(invite.inviter_guess, user):
     invite.invitee = user
     _add_guess_fail_prompt(invite)
-    raise(MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR))
+    raise MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR)
 
 
 @in_transaction
@@ -68,7 +68,7 @@ def load_from_link_key(link_key):
   if user:
     if user == invite.inviter:
       raise MistakenVisitError(p.CLICKED_OWN_LINK_ERROR)
-    _try_adding_invitee(invite, user)
+    _check_invitee_phone_match(invite, user)
   return invite.portable()
 
 
@@ -81,11 +81,17 @@ def _try_connect(invite):
 
 @anvil.server.callable
 def respond_to_close_invite(port_invite):
-  user = sm.get_acting_user()
+  if port_invite.invalid_response():
+    raise InvalidInviteError(", ".join(port_invite.invalid_response()))
   invite = Invite(port_invite)
-  invite.invitee = user
-  ig.save_response(invite)
-  _try_connect(invite)
+  if not phone_match(invite.invitee_guess, invite.inviter):
+    raise MistakenGuessError(f"You did not accurately provide the last 4 digits of {port_invite.inviter.name}'s confirmed phone number.")
+  user = sm.get_acting_user()
+  if user:
+    _check_invitee_phone_match(invite, user)
+    invite.invitee = user
+    ig.save_response(invite)
+    _try_connect(invite)
   # if user:
   #   errors += self._try_adding_invitee(user)
   #   if errors:
