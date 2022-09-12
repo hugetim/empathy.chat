@@ -7,7 +7,7 @@ from . import ui_procedures as ui
 from . import helper as h
 from . import groups
 from .glob import publisher
-from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError, InvalidInviteError
+from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError, InvalidInviteError, MistakenGuessError
 from .Dialogs.Invited import Invited
 
 
