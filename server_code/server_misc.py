@@ -199,12 +199,8 @@ def invited_item(inviter_id, user_id=""):
 
 
 def add_invite_guess_fail_prompt(s_invite):
-  print(s_invite)
   prompt_dict = _invite_guess_fail_prompt(s_invite)
-  print(prompt_dict)
-  new_row = app_tables.prompts.add_row(**prompt_dict)
-  print(dict(new_row))
-  #_add_invite_guess_fail_prompt(prompt_dict)
+  _add_invite_guess_fail_prompt(prompt_dict)
 
 
 def _add_invite_guess_fail_prompt(prompt_dict):
