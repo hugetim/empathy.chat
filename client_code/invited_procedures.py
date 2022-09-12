@@ -1,4 +1,4 @@
-import anvil.server
+import anvil.server as server
 import anvil.users
 from anvil import *
 from . import invites
@@ -38,7 +38,7 @@ def _handle_close_invite(link_key):
 
 def _load_close_invite(link_key):
   try:
-    invite = load_from_link_key(link_key)
+    invite = server.call('load_from_link_key', link_key)
   except InvalidInviteError as err:
     _error_alert(err)
   except MistakenVisitError as err:
@@ -77,6 +77,43 @@ def _process_group_invite_visit(invite, user):
     _error_alert(err)
   except MistakenVisitError as err:
     _error_alert(err, large=True)
+
+
+def submit_response(invite):
+  validation_errors = invite.invalid_response()
+  if not validation_errors:
+    _submit_response(invite)
+  else:
+    publisher.publish("invited1_error", "\n".join(validation_errors))
+
+
+def _submit_response(invite):
+  try:
+    server.call('respond_to_close_invite', invite)
+    _handle_successful_response(invite)
+  except MistakenGuessError as err:
+    _handle_response_guess_error(err)
+
+
+def _handle_response_guess_error(err):
+  if err.args[0] == p.MISTAKEN_INVITER_GUESS_ERROR:
+    Notification(p.MISTAKEN_INVITER_GUESS_ERROR, title="Mistaken Invite", style="info", timeout=None).show()
+    publisher.publish("invited", "failure")
+  else:
+    publisher.publish("invited1_error", err.args[0])
+
+  
+def _handle_successful_response(invite):    
+  user = anvil.users.get_user()
+  has_phone = user['phone'] if user else None
+  h.my_assert(has_phone or invite.from_invite_link, "either Confirmed or link invite")
+  if not user:
+    publisher.publish("invited", "go_invited2", invite)
+  elif not has_phone:
+    publisher.publish("invited", "success")
+  else:
+    Notification("You have been successfully linked.", style="success").show()
+    publisher.publish("invited", "success")
 
 
 def invited_signup(invite):
@@ -126,36 +163,4 @@ def _submit_signup_email_to_server(email_address):
   except anvil.users.UserExists as err:
     publisher.publish("signup_error", 
                       f"{err.args[0]}\nPlease login to your account normally and then try this invite link again.")
-
-
-def submit_response(invite):
-  validation_errors = invite.invalid_response()
-  if not validation_errors:
-    _submit_response(invite)
-  else:
-    publisher.publish("invited1_error", "\n".join(validation_errors))
-
-
-def _submit_response(invite):
-  errors = invite.relay('respond')
-  if p.MISTAKEN_INVITER_GUESS_ERROR in errors:
-    Notification(p.MISTAKEN_INVITER_GUESS_ERROR, title="Mistaken Invite", style="info", timeout=None).show()
-    publisher.publish("invited", "failure")
-  elif errors:
-    publisher.publish("invited1_error", "\n".join(errors))
-  else:
-    _handle_successful_response(invite)
-
-
-def _handle_successful_response(invite):    
-  user = anvil.users.get_user()
-  has_phone = user['phone'] if user else None
-  h.my_assert(has_phone or invite.from_invite_link, "either Confirmed or link invite")
-  if not user:
-    publisher.publish("invited", "go_invited2", invite)
-  elif not has_phone:
-    publisher.publish("invited", "success")
-  else:
-    Notification("You have been successfully linked.", style="success").show()
-    publisher.publish("invited", "success")
     

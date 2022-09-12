@@ -84,6 +84,7 @@ def respond_to_close_invite(port_invite):
   if port_invite.invalid_response():
     raise InvalidInviteError(", ".join(port_invite.invalid_response()))
   invite = Invite(port_invite)
+  ig.ensure_correct_inviter_info(invite)
   if not phone_match(invite.invitee_guess, invite.inviter):
     raise MistakenGuessError(f"You did not accurately provide the last 4 digits of {port_invite.inviter.name}'s confirmed phone number.")
   user = sm.get_acting_user()

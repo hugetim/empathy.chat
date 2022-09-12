@@ -22,6 +22,10 @@ def get_invite_from_link_key(link_key, current=True):
   return invites_server.Invite(port_invite)
 
 
+def ensure_correct_inviter_info(invite):
+  _load_invite(invite, _invite_row(invite))
+
+
 def add_invite(invite):
   """Add row to invites table
   
