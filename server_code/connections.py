@@ -284,7 +284,7 @@ def try_connect(invite, invite_reply):
   if phone_match(invite['guess'], invite['user2']):
     try_adding_to_invite_proposal(invite, invite['user2'])
     if _already_connected(invite):
-      sm.warning(f"connection already exists, {dict(invite)}")
+      sm.warning(f"connection already exists, {dict(invite)}, {invite['user1']['email']} to {invite['user2']['email']}")
       return True
     app_tables.prompts.add_row(**_connected_prompt(invite, invite_reply))
     _transform_invite_rows_to_connections(invite, invite_reply)

@@ -72,6 +72,37 @@ def load_from_link_key(link_key):
   return invite.portable()
 
 
+@in_transaction
+def _try_connect(invite):
+  from . import matcher
+  ig.try_connect(invite)
+  matcher.propagate_update_needed()
+
+
+@anvil.server.callable
+def respond_to_close_invite(port_invite):
+  user = sm.get_acting_user()
+  invite = Invite(port_invite)
+  invite.invitee = user
+  ig.save_response(invite)
+  _try_connect(invite)
+  # if user:
+  #   errors += self._try_adding_invitee(user)
+  #   if errors:
+  #     return errors
+  #   ig.save_invitee(self, user)
+  # errors += self.invalid_response()
+  # if errors:
+  #   return errors
+  # if not phone_match(self.invitee_guess, self.inviter):
+  #   errors.append(f"You did not accurately provide the last 4 digits of {sm.name(self.inviter)}'s confirmed phone number.")
+  #   return errors
+  # ig.save_response(self)
+  # if self.invitee and self.invitee['phone']:
+  #   errors += self._try_connect()
+  # return errors
+
+
 def phone_match(last4, user):
   return last4 == user['phone'][-4:]
 
@@ -189,26 +220,6 @@ class Invite(invites.Invite):
       return errors
     if not connection_successful:
       errors.append(f"{sm.name(self.inviter)} did not accurately provide the last 4 digits of your confirmed phone number.")
-    return errors
-  
-  def respond(self, user_id=""):
-    """Returns list of error strings"""
-    user = sm.get_acting_user(user_id)
-    errors = []
-    if user:
-      errors += self._try_adding_invitee(user)
-      if errors:
-        return errors
-      ig.save_invitee(self, user)
-    errors += self.invalid_response()
-    if errors:
-      return errors
-    if not phone_match(self.invitee_guess, self.inviter):
-      errors.append(f"You did not accurately provide the last 4 digits of {sm.name(self.inviter)}'s confirmed phone number.")
-      return errors
-    ig.save_response(self)
-    if self.invitee and self.invitee['phone']:
-      errors += self._try_connect()
     return errors
 
   def load(self):
