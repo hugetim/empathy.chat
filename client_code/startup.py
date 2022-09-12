@@ -14,7 +14,7 @@ anvil.set_default_error_handling(error_handler)
 
 
 def _route_hash(known_hash_key, hash_value):
-  from . import invited
+  from . import invited_procedures as invited
   invited.handle_link(known_hash_key, hash_value)
 
 

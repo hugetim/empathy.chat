@@ -5,7 +5,7 @@ from .... import helper as h
 from .... import ui_procedures as ui
 from .... import prompts
 from .... import glob
-from .... import invited
+from .... import invited_procedures as invited
 from .... import portable as port
 from .... import parameters as p
 from .... import relationship as rel

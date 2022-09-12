@@ -3,7 +3,7 @@ from anvil import *
 import anvil.users
 import time
 from ....MenuForm.NetworkMenu.Invite.InviteA.RelationshipPromptOnly import RelationshipPromptOnly
-from .... import invited
+from .... import invited_procedures as invited
 from ....glob import publisher
 from anvil_extras.utils import wait_for_writeback
 

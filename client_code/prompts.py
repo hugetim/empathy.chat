@@ -1,6 +1,6 @@
 from anvil import *
 from functools import partial
-from . import invited
+from . import invited_procedures as invited
 from . import invites
 from . import portable as port
 from . import helper as h
