@@ -5,7 +5,7 @@ from . import server_misc as sm
 from . import accounts
 from . import parameters as p
 from . import invite_gateway as ig
-from .exceptions import RowMissingError, MistakenGuessError
+from .exceptions import RowMissingError, MistakenGuessError, InvalidInviteError, MistakenVisitError
 
 
 @anvil.server.callable
@@ -42,36 +42,34 @@ def _try_adding_invitee(invite, user):
 def _add_guess_fail_prompt(invite):
   sm.add_invite_guess_fail_prompt(invite)
 
+
+def _get_invite_from_link_key(link_key):
+  try:
+    return ig.get_invite_from_link_key(link_key)
+  except RowMissingError:
+    _handle_missing_invite_link_key(link_key)
+
+    
+def _handle_missing_invite_link_key(link_key):
+  if ig.old_invite_row_exists(link_key):
+    raise InvalidInviteError("This invite link is no longer active.")
+  else:
+    raise InvalidInviteError("Invalid invite link")
+    
+
 @anvil.server.callable
 def load_from_link_key(link_key):
   """Return Invite
   
      Raise error if visitor is logged in and mistaken inviter guess
   """
-  invite = ig.get_invite_from_link_key(link_key)
+  invite = _get_invite_from_link_key(link_key)
   user = sm.get_acting_user()
   if user:
+    if user == invite.inviter:
+      raise MistakenVisitError(p.CLICKED_OWN_LINK_ERROR)
     _try_adding_invitee(invite, user)
   return invite.portable()
-  # if self.invite_id:
-  #   if user:
-  #     if user == self.inviter:
-  #       errors += [p.CLICKED_OWN_LINK_ERROR]
-  #       return errors
-  #     errors += self._try_adding_invitee(user)
-  #     if errors:
-  #       return errors
-  #     ig.save_invitee(self, user)
-  #     if self.invitee and self.invitee['phone']:
-  #       errors += self._try_connect()
-  #     if register:
-  #       accounts.init_user_info(user)        
-  # else:
-  #   if ig.old_invite_row_exists(self.link_key):
-  #     errors.append("This invite link is no longer active.")
-  #   else:
-  #     errors.append("Invalid invite link")
-  # return errors
 
 
 def phone_match(last4, user):

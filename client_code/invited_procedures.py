@@ -7,7 +7,7 @@ from . import ui_procedures as ui
 from . import helper as h
 from . import groups
 from .glob import publisher
-from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
+from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError, InvalidInviteError
 from .Dialogs.Invited import Invited
 
 
@@ -31,30 +31,30 @@ def handle_link(hash_key, hash_value):
 
 def _handle_close_invite(link_key):
   print(f"_handle_close_invite: {link_key}")
-  user = anvil.users.get_user()
-  invite = invites.Invite(link_key=link_key)
-  errors = invite.relay('visit', {'user': user})
-  _handle_close_invite_visit_outcome(invite, errors, user)
+  invite = _load_close_invite(link_key)
+  _complete_close_invited_process(invite)
   ui.clear_hash_and_open_form('LoginForm')
 
 
-def _handle_close_invite_visit_outcome(invite, errors, user):
-  if not errors:
-    _complete_close_invited_process(invite, user)
-  elif "This invite link is no longer active." in errors:
-    alert("This invite link is no longer active.")
-  elif p.CLICKED_OWN_LINK_ERROR in errors:
-    alert(p.CLICKED_OWN_LINK_ERROR, large=True)
-  else:
-    alert(" ".join(errors)) #This is not a valid invite link."
+def _load_close_invite(link_key):
+  try:
+    invite = load_from_link_key(link_key)
+  except InvalidInviteError as err:
+    _error_alert(err)
+  except MistakenVisitError as err:
+    _error_alert(err, large=True)
 
 
-def _complete_close_invited_process(invite, user):
+def _error_alert(err, large=False):
+  alert(err.args[0], large=large)
+
+
+def _complete_close_invited_process(invite):
   invited_alert = Invited(item=invite)
   if alert(content=invited_alert, 
            title="", 
            buttons=[], large=True, dismissible=False):
-    if not user:
+    if not anvil.users.get_user():
       invited_signup(invite)
 
 
@@ -72,11 +72,11 @@ def _process_group_invite_visit(invite, user):
     if not user:
       invited_signup(invite)
   except RowMissingError as err:
-    alert(err.args[0])
+    _error_alert(err)
   except ExpiredInviteError as err:
-    alert(err.args[0])
+    _error_alert(err)
   except MistakenVisitError as err:
-    alert(err.args[0], large=True)
+    _error_alert(err, large=True)
 
 
 def invited_signup(invite):
@@ -130,10 +130,10 @@ def _submit_signup_email_to_server(email_address):
 
 def submit_response(invite):
   validation_errors = invite.invalid_response()
-  if validation_errors:
-    publisher.publish("invited1_error", "\n".join(validation_errors))
-  else:
+  if not validation_errors:
     _submit_response(invite)
+  else:
+    publisher.publish("invited1_error", "\n".join(validation_errors))
 
 
 def _submit_response(invite):

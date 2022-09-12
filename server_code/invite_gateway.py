@@ -4,12 +4,14 @@ from anvil.tables import app_tables
 from .exceptions import RowMissingError
 from . import invites
 from . import server_misc as sm
-from .exceptions import RowMissingError, ExpiredInviteError
+from .exceptions import RowMissingError, ExpiredInviteError, InvalidInviteError
 
 
-def get_invite_from_link_key(link_key):
+def get_invite_from_link_key(link_key, current=True):
   from . import invites_server
-  invite_row = app_tables.invites.get(origin=True, link_key=link_key, current=True)
+  invite_row = app_tables.invites.get(origin=True, link_key=link_key, current=current)
+  if not invite_row:
+    raise RowMissingError()
   port_invite = invites.Invite(
     link_key=link_key,
     invite_id=invite_row.get_id(),
@@ -134,7 +136,7 @@ def _load_response(invite, response_row):
 
 
 def old_invite_row_exists(link_key):
-  return bool(app_tables.invites.get(origin=True, link_key=link_key, current=False))
+  return bool(len(app_tables.invites.search(origin=True, link_key=link_key, current=False)))
 
 
 def save_invitee(invite, user):
