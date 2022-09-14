@@ -68,10 +68,3 @@ def _set_lazy_vars(out):
     'user_items': _user_items, 'group_items': _group_items, 'starred_name_list': _starred_name_list,
   })
   lazy_loaded = True
-
-
-def port_logged_in_user():
-  if logged_in_user_id:
-    return users[logged_in_user_id]
-  else:
-    return None  

@@ -84,15 +84,19 @@ class User(h.AttributeToKey):
   
   @staticmethod
   def from_logged_in():
-    logged_in_user = anvil.users.get_user()
-    distance = 0
-    return User(user_id=logged_in_user.get_id(), 
-                name=full_name(logged_in_user['first_name'], logged_in_user['last_name'], distance=distance),
-                url_confirmed=bool(logged_in_user['url_confirmed_date']),
-                distance=0,
-                seeking=logged_in_user['seeking_buddy'],
-                starred=None,
-               )
+    from . import glob
+    if glob.logged_in_user_id and glob.lazy_loaded:
+      return glob.users[glob.logged_in_user_id]
+    else:
+      logged_in_user = anvil.users.get_user()
+      distance = 0
+      return User(user_id=logged_in_user.get_id(), 
+                  name=full_name(logged_in_user['first_name'], logged_in_user['last_name'], distance=distance),
+                  url_confirmed=bool(logged_in_user['url_confirmed_date']),
+                  distance=0,
+                  seeking=logged_in_user['seeking_buddy'],
+                  starred=None,
+                )
 
   
 @anvil.server.portable_class
