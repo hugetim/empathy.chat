@@ -10,26 +10,12 @@ from .exceptions import RowMissingError, MistakenGuessError, InvalidInviteError,
 
 @anvil.server.callable
 def serve_invite_unauth(port_invite, method, kwargs):
-  try:
-    return _serve_invite_unauth(port_invite, method, kwargs)
-  except MistakenGuessError as err:
-    if err.args[0] == p.MISTAKEN_INVITER_GUESS_ERROR:
-      _add_guess_fail_prompt(invite)
-    raise err
-
-
-@in_transaction
-def _serve_invite_unauth(port_invite, method, kwargs): 
-  from . import matcher
-  matcher.propagate_update_needed()
   return _serve_invite(port_invite, method, kwargs, auth=False)
 
 
 @sm.authenticated_callable
 @in_transaction
 def serve_invite(port_invite, method, kwargs):
-  from . import matcher
-  matcher.propagate_update_needed()
   return _serve_invite(port_invite, method, kwargs, auth=True)
 
 
@@ -42,7 +28,7 @@ def _serve_invite(port_invite, method, kwargs, auth):
 
 def _check_invitee_phone_match(invite, user):
   if user['phone'] and not phone_match(invite.inviter_guess, user):
-    invite.invitee = user
+    invite.invitee = user #for the sake of subsequent (out of transaction) _add_guess_fail_prompt(invite)
     raise MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR)
 
 
@@ -79,16 +65,29 @@ def load_from_link_key(link_key):
     try:
       _check_invitee_phone_match(invite, user)
     except MistakenGuessError as err:
-      _add_guess_fail_prompt(invite)
-      raise err
+      _handle_mistaken_inviter_guess_error(invite, err)
   return invite.portable()
 
 
-@in_transaction
+def _handle_mistaken_inviter_guess_error(invite, err):
+  if err.args[0] == p.MISTAKEN_INVITER_GUESS_ERROR:
+    _add_guess_fail_prompt(invite)
+    invite.inviter['update_needed'] = True
+  raise err
+
+
 def _try_to_save_response(invite, user):
+  try:
+    _save_response(invite, user)
+  except MistakenGuessError as err:
+    _handle_mistaken_inviter_guess_error(invite, err)
+
+
+@in_transaction
+def _save_response(invite, user):
+  print(f"_save_response: ({invite.invite_id}, {invite.response_id}), {user['email']}")
   _check_invitee_phone_match(invite, user)
   invite.invitee = user
-  ig.save_invitee(invite, user)
   ig.save_response(invite)
   if user['phone']:
     _try_connect(invite)
@@ -96,8 +95,8 @@ def _try_to_save_response(invite, user):
   
 def _try_connect(invite):
   from . import matcher
-  ig.try_connect(invite)
-  matcher.propagate_update_needed()
+  if ig.try_connect(invite):
+    matcher.propagate_update_needed()
 
 
 @anvil.server.callable
@@ -109,12 +108,7 @@ def respond_to_close_invite(port_invite):
   _check_inviter_phone_match(invite)
   user = sm.get_acting_user()
   if user:
-    try:
-      _try_to_save_response(invite, user)
-    except MistakenGuessError as err:
-      if err.args[0] == p.MISTAKEN_INVITER_GUESS_ERROR:
-        _add_guess_fail_prompt(invite)
-      raise err
+    _try_to_save_response(invite, user)
 
 
 def _check_inviter_phone_match(invite):
@@ -164,20 +158,23 @@ class Invite(invites.Invite):
         errors.append(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
       elif not phone_match(self.inviter_guess, self.invitee):
         errors.append(f"The digits you entered do not match {sm.name(self.invitee)}'s confirmed phone number.")
-    else:
+      self.invitee['update_needed'] = True
+    else: # link invite
       user['last_invite'] = sm.now()
     if not errors:
       self.link_key = "" if self.invitee else sm.random_code(num_chars=7)
       errors = ig.add_invite(self)
     return errors
 
-  def edit_invite(self):
-    errors = self.invalid_invite()
-    if not errors:
-      ig.update_invite(self)
-    return errors
+  # def edit_invite(self):
+  #   errors = self.invalid_invite()
+  #   if not errors:
+  #     ig.update_invite(self)
+  #   return errors
     
   def cancel(self):
+    if self.invitee:
+      self.invitee['update_needed'] = True
     errors = ig.cancel_invite(self)
     self.cancel_response() # Not finding a response_row is not an error here
     self._clear()
@@ -200,12 +197,7 @@ class Invite(invites.Invite):
       sm.warning(f"visit called without user on {self}")
     ig.ensure_correct_inviter_info(self)
     _check_inviter_phone_match(self) 
-    _check_invitee_phone_match(self, user)
-    self.invitee = user
-    ig.save_invitee(self, user)
-    ig.save_response(self)
-    if user['phone']:
-      _try_connect(self)
+    _try_to_save_response(self, user)
     accounts.init_user_info(user)        
 
   def load(self):

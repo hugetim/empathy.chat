@@ -1,7 +1,6 @@
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-from .exceptions import RowMissingError
 from . import invites
 from . import server_misc as sm
 from .exceptions import RowMissingError, ExpiredInviteError, InvalidInviteError
@@ -144,33 +143,35 @@ def old_invite_row_exists(link_key):
   return bool(len(app_tables.invites.search(origin=True, link_key=link_key, current=False)))
 
 
-def save_invitee(invite, user):
+def save_response(invite):
+  """Side effects: add to invite proposal if applicable, update invite object with response_id"""
+  _save_invitee_to_invite(invite)
+  if invite.response_id and app_tables.invites.get_by_id(invite.response_id):
+    sm.warning(f"unexpected response row, {invite.inviter['email']}, {invite.invitee['email']}, {invite.invite_id}, {invite.response_id}")
+  _add_response_row(invite)
+
+
+def _save_invitee_to_invite(invite):
+  """Side effect: add to invite proposal if applicable"""
   from . import connections as c
   invite_row = _invite_row(invite)
-  if invite_row['user2'] and invite_row['user2'] != invite.invitee:
-    sm.warning(f"invite['user2'] being overwritten, {user['email']}, {dict(invite_row)}, {invite.invite_id}")
   invite_row['user2'] = invite.invitee
   c.try_adding_to_invite_proposal(invite_row, invite.invitee)
-  if invite.response_id:
-    response_row = _response_row(invite)
-    response_row['user1'] = invite.invitee
 
 
-def save_response(invite):
-  """Side effect: update invite object with response_id if new response"""
+def _add_response_row(invite):
+  """Side effect: update invite object with response_id"""
   now = sm.now()
-  response_row = _response_row(invite, missing_ok=True)
-  if not response_row:
-    response_row = app_tables.invites.add_row(date=now,
-                                              origin=False,
-                                              distance=1,
-                                              user1=invite.invitee,
-                                              user2=invite.inviter,
-                                              link_key=invite.link_key,
-                                              current=True,
-                                             )
-    invite.response_id = response_row.get_id()
+  response_row = app_tables.invites.add_row(date=now,
+                                            origin=False,
+                                            distance=1,
+                                            user1=invite.invitee,
+                                            user2=invite.inviter,
+                                            link_key=invite.link_key,
+                                            current=True,
+                                            )
   _edit_row(response_row, invite.invitee_guess, invite.rel_to_invitee, now)
+  invite.response_id = response_row.get_id()
 
   
 def try_connect(invite):
