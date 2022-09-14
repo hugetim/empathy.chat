@@ -220,23 +220,6 @@ def _invite_status(user2, user1):
       return "invited"
     else:
       return ""
-    
-
-@authenticated_callable
-def load_invites(user_id=""):
-#   from . import matcher as m
-  from . import invite_gateway
-  user = sm.get_acting_user(user_id)
-  rows = app_tables.invites.search(origin=True, user1=user, current=True)
-  out = []
-  for row in rows:
-#     item = {k: row[k] for k in ['date', 'relationship2to1', 'date_described', 'guess', 'link_key', 'distance']}
-#     if row['user2']:
-#       item['user2'] = sm.get_port_user(row['user2'], user1=user, simple=False)
-#     if row['proposal']:
-#       item['proposal'] = m.Proposal(row['proposal']).portable(user)
-    out.append(invite_gateway.from_invite_row(row, user_id=user.get_id()))
-  return out
 
 
 def remove_invite_pair(invite, invite_reply, user):

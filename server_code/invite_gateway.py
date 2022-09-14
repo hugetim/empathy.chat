@@ -8,17 +8,28 @@ from .exceptions import RowMissingError, ExpiredInviteError, InvalidInviteError
 
 def get_invite_from_link_key(link_key, current=True):
   from . import invites_server
+  invite_row = _get_invite_row_from_link_key(link_key, current=True)
+  port_invite = from_invite_row(invite_row)
+  return invites_server.Invite(port_invite)
+
+
+def from_invite_row(invite_row, user_id=""):
+  user = sm.get_acting_user(user_id)
+  port_invite = invites.Invite(invite_id=invite_row.get_id(),
+                               inviter=sm.get_port_user(invite_row['user1'], user1=user),
+                               rel_to_inviter=invite_row['relationship2to1'],
+                               inviter_guess=invite_row['guess'],
+                               link_key=invite_row['link_key'],
+                               invitee=sm.get_port_user(invite_row['user2'], user1=user),
+                              )
+  return port_invite
+
+
+def _get_invite_row_from_link_key(link_key, current=True):
   invite_row = app_tables.invites.get(origin=True, link_key=link_key, current=current)
   if not invite_row:
-    raise RowMissingError()
-  port_invite = invites.Invite(
-    link_key=link_key,
-    invite_id=invite_row.get_id(),
-    inviter=sm.get_port_user(invite_row['user1']),
-    inviter_guess=invite_row['guess'],
-    rel_to_inviter=invite_row['relationship2to1'],
-  )
-  return invites_server.Invite(port_invite)
+    raise RowMissingError("No such invite row.")
+  return invite_row
 
 
 def ensure_correct_inviter_info(invite):
@@ -179,16 +190,4 @@ def try_connect(invite):
   invite_row = _invite_row(invite)
   response_row = _response_row(invite)
   return c.try_connect(invite_row, response_row)
-
-
-def from_invite_row(invite_row, user_id=""):
-  user = sm.get_acting_user(user_id)
-  port_invite = invites.Invite(invite_id=invite_row.get_id(),
-                               inviter=sm.get_port_user(invite_row['user1'], user1=user),
-                               rel_to_inviter=invite_row['relationship2to1'],
-                               inviter_guess=invite_row['guess'],
-                               link_key=invite_row['link_key'],
-                               invitee=sm.get_port_user(invite_row['user2'], user1=user),
-                              )
-  return port_invite
   

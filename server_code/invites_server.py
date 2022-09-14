@@ -24,17 +24,21 @@ def _serve_invite(port_invite, method, kwargs, auth):
   invite = Invite(port_invite)
   errors = invite.relay(method, kwargs, auth=auth)
   return invite.portable(), errors
+    
 
-
-def _check_invitee_phone_match(invite, user):
-  if user['phone'] and not phone_match(invite.inviter_guess, user):
-    invite.invitee = user #for the sake of subsequent (out of transaction) _add_guess_fail_prompt(invite)
-    raise MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR)
-
-
-@in_transaction
-def _add_guess_fail_prompt(invite):
-  sm.add_invite_guess_fail_prompt(invite)
+@anvil.server.callable
+def load_from_link_key(link_key):
+  """Return Invite
+  
+     Raise error if visitor is logged in and mistaken inviter guess
+  """
+  invite = _get_invite_from_link_key(link_key)
+  user = sm.get_acting_user()
+  if user:
+    if user == invite.inviter:
+      raise MistakenVisitError(p.CLICKED_OWN_LINK_ERROR)
+    _handle_invitee_phone_match_check(invite, user)
+  return invite.portable()
 
 
 def _get_invite_from_link_key(link_key):
@@ -49,24 +53,19 @@ def _handle_missing_invite_link_key(link_key):
     raise InvalidInviteError("This invite link is no longer active.")
   else:
     raise InvalidInviteError("Invalid invite link")
-    
 
-@anvil.server.callable
-def load_from_link_key(link_key):
-  """Return Invite
-  
-     Raise error if visitor is logged in and mistaken inviter guess
-  """
-  invite = _get_invite_from_link_key(link_key)
-  user = sm.get_acting_user()
-  if user:
-    if user == invite.inviter:
-      raise MistakenVisitError(p.CLICKED_OWN_LINK_ERROR)
-    try:
-      _check_invitee_phone_match(invite, user)
-    except MistakenGuessError as err:
-      _handle_mistaken_inviter_guess_error(invite, err)
-  return invite.portable()
+
+def _handle_invitee_phone_match_check(invite, user):
+  try:
+    _check_invitee_phone_match(invite, user)
+  except MistakenGuessError as err:
+    _handle_mistaken_inviter_guess_error(invite, err)
+
+
+def _check_invitee_phone_match(invite, user):
+  if user['phone'] and not phone_match(invite.inviter_guess, user):
+    invite.invitee = user #for the sake of subsequent (out of transaction) _add_guess_fail_prompt(invite)
+    raise MistakenGuessError(p.MISTAKEN_INVITER_GUESS_ERROR)
 
 
 def _handle_mistaken_inviter_guess_error(invite, err):
@@ -74,6 +73,33 @@ def _handle_mistaken_inviter_guess_error(invite, err):
     _add_guess_fail_prompt(invite)
     invite.inviter['update_needed'] = True
   raise err
+
+
+@in_transaction
+def _add_guess_fail_prompt(invite):
+  sm.add_invite_guess_fail_prompt(invite)
+
+
+@anvil.server.callable
+def respond_to_close_invite(port_invite):
+  invite = _get_s_invite_and_check_validity(port_invite)
+  user = sm.get_acting_user()
+  if user:
+    _try_to_save_response(invite, user)
+
+
+def _get_s_invite_and_check_validity(port_invite):
+  if port_invite.invalid_response():
+    raise InvalidInviteError(", ".join(port_invite.invalid_response()))
+  invite = Invite(port_invite)
+  ig.ensure_correct_inviter_info(invite)
+  _check_inviter_phone_match(invite)
+  return invite
+
+
+def _check_inviter_phone_match(invite):
+  if not phone_match(invite.invitee_guess, invite.inviter):
+    raise MistakenGuessError(f"You did not accurately provide the last 4 digits of {sm.name(invite.inviter)}'s confirmed phone number.")
 
 
 def _try_to_save_response(invite, user):
@@ -99,21 +125,14 @@ def _try_connect(invite):
     matcher.propagate_update_needed()
 
 
-@anvil.server.callable
-def respond_to_close_invite(port_invite):
-  if port_invite.invalid_response():
-    raise InvalidInviteError(", ".join(port_invite.invalid_response()))
-  invite = Invite(port_invite)
-  ig.ensure_correct_inviter_info(invite)
-  _check_inviter_phone_match(invite)
-  user = sm.get_acting_user()
-  if user:
-    _try_to_save_response(invite, user)
-
-
-def _check_inviter_phone_match(invite):
-  if not phone_match(invite.invitee_guess, invite.inviter):
-    raise MistakenGuessError(f"You did not accurately provide the last 4 digits of {sm.name(invite.inviter)}'s confirmed phone number.")
+@sm.authenticated_callable
+def load_invites(user_id=""):
+  user = sm.get_acting_user(user_id)
+  rows = app_tables.invites.search(origin=True, user1=user, current=True)
+  out = []
+  for row in rows:
+    out.append(ig.from_invite_row(row, user_id=user.get_id()))
+  return out
 
 
 def phone_match(last4, user):
