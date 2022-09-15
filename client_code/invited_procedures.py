@@ -54,6 +54,7 @@ def _complete_close_invited_process(invite):
   if alert(content=invited_alert, 
            title="", 
            buttons=[], large=True, dismissible=False):
+    invite = invited_alert.item
     if not anvil.users.get_user():
       invited_signup(invite)
 
