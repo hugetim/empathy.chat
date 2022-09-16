@@ -122,7 +122,7 @@ class Profile(ProfileTemplate):
   def edit_profile_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     prompt = (
-      "Please share your background with NVC and exchanging empathy, in a few sentences.\n"
+      "Please share your background with NVC and experience level exchanging empathy, in a few sentences.\n"
       "You could also share what you're looking for in an empathy buddy, "
       "things about you that others might relate to, or anything else you like. "
     )
