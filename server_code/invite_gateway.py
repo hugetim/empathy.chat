@@ -36,6 +36,13 @@ def ensure_correct_inviter_info(invite):
   _load_invite(invite, _invite_row(invite))
 
 
+def check_id_and_link_key_and_ensure_correct_inviter(invite):
+  invite_row = _get_invite_row_from_link_key(invite.link_key, current=True)
+  if invite.invite_id != invite_row.get_id():
+    raise RowMissingError("invite_id doesn't match link_key")
+  invite.inviter = invite_row['user1']
+  
+
 def add_invite(invite):
   """Add row to invites table
   

@@ -123,7 +123,7 @@ def invited_signup(invite):
   new_user = None
   while not new_user:
     method = alert(d, title="Sign Up", buttons=[("Sign Up", "email", 'primary')])
-    new_user = _process_signup_dialog(d, method)
+    new_user = _process_signup_dialog(d, method, invite)
   publisher.close_channel("signup_error")
   try:
     invite.relay('register', dict(user=new_user))
@@ -146,7 +146,7 @@ def _show_alert_re_pw_email(email_address):
        )
 
 
-def _process_signup_dialog(signup_dialog, method):
+def _process_signup_dialog(signup_dialog, method, invite):
   """Return new_user if successful signup/login
   
   Side effects: display errors on Dialog form
@@ -154,20 +154,23 @@ def _process_signup_dialog(signup_dialog, method):
   if method in ["google", "login"]:
     return signup_dialog.new_user
   elif method == "email":
-    return _submit_signup_email_to_server(signup_dialog.email_box.text)
+    return _submit_signup_email_to_server(signup_dialog.email_box.text, invite)
 
 
-def _submit_signup_email_to_server(email_address):
+def _submit_signup_email_to_server(email_address, invite):
   """Return new_user if successful signup/login
   
   Side effects: publish errors (to Dialog form)
   """
   try:
-    return anvil.server.call('do_signup', email_address)
+    return anvil.server.call('do_signup', email_address, invite)
   except anvil.users.AuthenticationFailed:
     publisher.publish("signup_error", 
                       "Email address missing or invalid. Please enter a valid email address.")
   except anvil.users.UserExists as err:
     publisher.publish("signup_error", 
                       f"{err.args[0]}\nPlease login to your account normally and then try this invite link again.")
+  except InvalidInviteError as err:
+    publisher.publish("signup_error", 
+                      f"{err.args[0]}\nIf you already have an account, please login to your account normally and then try this invite link again.")
     

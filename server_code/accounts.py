@@ -6,6 +6,7 @@ import anvil.google.auth
 import anvil.tables.query as q
 from anvil import secrets
 from . import parameters as p
+from .exceptions import InvalidInviteError
 from . import server_misc as sm
 from .server_misc import authenticated_callable
 from anvil_extras.server_utils import timed
@@ -85,9 +86,23 @@ trust_label = {0: "Visitor",
               }
 
 
+def get_invite_from_port(port_invite):
+  from . import invites
+  from . import invites_server
+  from . import groups
+  from . import groups_server
+  if isinstance(port_invite, invites.Invite):
+    return invites_server.Invite(port_invite)
+  if isinstance(port_invite, groups.Invite):
+    return groups_server.Invite(port_invite)
+
+
 @anvil.server.callable
-def do_signup(email):
+def do_signup(email, port_invite):
   """Returns user (existing user if existing email, else creates new user and sends login email)"""
+  invite = get_invite_from_port(port_invite)
+  if not invite.authorizes_signup():
+    raise InvalidInviteError("Sorry, signup is not authorized by this invite and response.")
   user, newly_created = _create_user_if_needed_and_return_whether_created(email)
   if newly_created:
     anvil.users.send_password_reset_email(email) # This can also raise AuthenticationFailed, but shouldn't

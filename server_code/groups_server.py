@@ -223,8 +223,21 @@ class Invite(sm.ServerItem, groups.Invite):
     row = self._invite_row()
     row['expire_date'] = self.expire_date
 
+  def authorizes_signup(self):
+    try:
+      invite_row = self._invite_row()
+    except RowMissingError:
+      return False
+    if invite_row['link_key'] != self.link_key or invite_row.get_id() != self.invite_id:
+      return False
+    if invite_row['expire_date'] < sm.now():
+      return False
+    return True
+  
   def register(self, user):
     invite_row = self._invite_row()
+    if invite_row['expire_date'] < sm.now():
+      raise ExpiredInviteError("This group invite link is expired.")
     if invite_row and user:
       Invite._register_user(user)
       Invite._add_visitor(user, invite_row)

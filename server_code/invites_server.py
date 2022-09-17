@@ -210,12 +210,24 @@ class Invite(invites.Invite):
         self[key] = None
       else:
         self[key] = ""
+
+  def authorizes_signup(self):
+    try:
+      ig.check_id_and_link_key_and_ensure_correct_inviter(self)
+    except RowMissingError:
+      return False
+    try:
+      _check_inviter_phone_match(self)
+    except MistakenGuessError:
+      return False
+    return True
+    
   
   def register(self, user):
     if not user:
       sm.warning(f"visit called without user on {self}")
     ig.ensure_correct_inviter_info(self)
-    _check_inviter_phone_match(self) 
+    _check_inviter_phone_match(self)
     _try_to_save_response(self, user)
     accounts.init_user_info(user)        
 
