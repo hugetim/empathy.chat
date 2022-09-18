@@ -133,11 +133,20 @@ def create_group_invite(port_my_group):
   new_row = app_tables.group_invites.add_row(created=now,
                                              expire_date=now+timedelta(days=30),
                                              group=my_group.group_row,
-                                             link_key=sm.random_code(num_chars=7),
+                                             link_key=new_link_key(),
                                              current=True,
                                             )
   my_group.invites.insert(0, Invite.from_invite_row(new_row))
   return my_group.portable()
+
+
+def new_link_key():
+  unique_key_found = False
+  while not unique_key_found:
+    random_key = sm.random_code(num_chars=7)
+    matching_rows = app_tables.group_invites.search(link_key=random_key)
+    unique_key_found = not len(matching_rows)
+  return random_key
 
 
 @sm.authenticated_callable

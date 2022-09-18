@@ -41,7 +41,16 @@ def check_id_and_link_key_and_ensure_correct_inviter(invite):
   if invite.invite_id != invite_row.get_id():
     raise RowMissingError("invite_id doesn't match link_key")
   invite.inviter = invite_row['user1']
-  
+
+
+def new_link_key():
+  unique_key_found = False
+  while not unique_key_found:
+    random_key = sm.random_code(num_chars=7)
+    matching_rows = app_tables.invites.search(origin=True, link_key=random_key)
+    unique_key_found = not len(matching_rows)
+  return random_key
+
 
 def add_invite(invite):
   """Add row to invites table

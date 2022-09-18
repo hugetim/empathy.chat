@@ -181,7 +181,7 @@ class Invite(invites.Invite):
     else: # link invite
       user['last_invite'] = sm.now()
     if not errors:
-      self.link_key = "" if self.invitee else sm.random_code(num_chars=7)
+      self.link_key = "" if self.invitee else ig.new_link_key()
       errors = ig.add_invite(self)
     return errors
 
