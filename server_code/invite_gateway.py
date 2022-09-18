@@ -46,7 +46,7 @@ def check_id_and_link_key_and_ensure_correct_inviter(invite):
 def new_link_key():
   unique_key_found = False
   while not unique_key_found:
-    random_key = sm.random_code(num_chars=7)
+    random_key = sm.random_code(num_chars=NEW_LINK_KEY_LENGTH)
     matching_rows = app_tables.invites.search(origin=True, link_key=random_key)
     unique_key_found = not len(matching_rows)
   return random_key

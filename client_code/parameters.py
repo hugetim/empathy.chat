@@ -33,3 +33,4 @@ TRUST_TOOLTIP = {"Visitor": "Has not yet confirmed an email address",
                 }
 PARTNER_CHECK_TOOLTIP = "This user has confirmed ownership of an external web site profile, thus verifying their name."
 STAR_TOOLTIP = 'Add/remove user from your (private) Starred list'
+NEW_LINK_KEY_LENGTH = 8
