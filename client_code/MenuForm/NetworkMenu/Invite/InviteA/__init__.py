@@ -2,6 +2,7 @@ from ._anvil_designer import InviteATemplate
 from anvil import *
 from .RelationshipPrompt import RelationshipPrompt
 from ..... import invite_controller
+from .....glob import publisher
 from anvil_extras.utils import wait_for_writeback
 
 class InviteA(InviteATemplate):

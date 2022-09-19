@@ -25,7 +25,6 @@ class Invited1(Invited1Template):
     self.phone_request_label.text = (
       f"Please provide the last 4 digits of {self.item['inviter'].name}'s phone number:"
     )
-    self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
     publisher.subscribe("invited1_error", self, self.dispatch_handler)
 
   def form_show(self, **event_args):
@@ -36,6 +35,7 @@ class Invited1(Invited1Template):
     item = self.item.rel_item(for_response=True) #{'relationship': self.item['relationship'], 'name': self.item['inviter']}
     self.relationship_prompt = RelationshipPromptOnly(item=item)
     self.linear_panel_2.add_component(self.relationship_prompt)
+    self.relationship_prompt.add_event_handler('x-continue', self.continue_button_click)
   
   def phone_last4_text_box_pressed_enter(self, **event_args):
     """This method is called when the user presses Enter in this text box"""

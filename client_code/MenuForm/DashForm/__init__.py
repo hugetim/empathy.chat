@@ -45,6 +45,7 @@ class DashForm(DashFormTemplate):
     name = self.top_form.item['name']
     if name:
       self.welcome_label.text = "Hi, " + name + "!"
+    self.timer_1.interval = 0.1 # so it loads new name for My Profile
     self.update_form()
 
   def update_form(self):

@@ -128,11 +128,7 @@ def _try_connect(invite):
 @sm.authenticated_callable
 def load_invites(user_id=""):
   user = sm.get_acting_user(user_id)
-  rows = app_tables.invites.search(origin=True, user1=user, current=True)
-  out = []
-  for row in rows:
-    out.append(ig.from_invite_row(row, user_id=user.get_id()))
-  return out
+  return ig.load_invites(user)
 
 
 def phone_match(last4, user):

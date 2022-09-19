@@ -229,7 +229,7 @@ components:
     event_bindings: {click: propose_button_click}
 - name: timer_1
   type: Timer
-  properties: {interval: 0.1}
+  properties: {interval: 0}
   event_bindings: {tick: timer_1_tick}
 container:
   type: HtmlTemplate

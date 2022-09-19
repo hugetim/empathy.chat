@@ -255,6 +255,7 @@ class Invite(sm.ServerItem, groups.Invite):
     invite_row = self._invite_row()
     if invite_row['expire_date'] < sm.now():
       raise ExpiredInviteError("This group invite link is expired.")
+    self.invite_id = invite_row.get_id()
     if invite_row and user:
       if user in invite_row['group']['hosts']:
         this_group = invite_row['group']

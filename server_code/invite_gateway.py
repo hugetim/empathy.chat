@@ -7,6 +7,14 @@ from . import parameters as p
 from .exceptions import RowMissingError, ExpiredInviteError, InvalidInviteError
 
 
+def load_invites(user):
+  rows = app_tables.invites.search(origin=True, user1=user, current=True)
+  out = []
+  for row in rows:
+    out.append(from_invite_row(row, user_id=user.get_id()))
+  return out
+
+
 def get_invite_from_link_key(link_key, current=True):
   from . import invites_server
   invite_row = _get_invite_row_from_link_key(link_key, current=True)

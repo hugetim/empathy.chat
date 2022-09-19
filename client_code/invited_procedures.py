@@ -38,8 +38,10 @@ def _handle_close_invite(link_key):
 
 def _load_close_invite(link_key):
   try:
-    invite = server.call('load_from_link_key', link_key)
+    return server.call('load_from_link_key', link_key)
   except InvalidInviteError as err:
+    _error_alert(err)
+  except MistakenGuessError as err:
     _error_alert(err)
   except MistakenVisitError as err:
     _error_alert(err, large=True)

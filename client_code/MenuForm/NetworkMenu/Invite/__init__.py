@@ -1,5 +1,6 @@
 from ._anvil_designer import InviteTemplate
 from anvil import *
+from ....glob import publisher
 
 
 class Invite(InviteTemplate):
@@ -17,15 +18,15 @@ class Invite(InviteTemplate):
     self.add_component(self._content)
 
   def go_invite_a(self, item):
-    from ..InviteA import InviteA
+    from .InviteA import InviteA
     self._reset_and_load(InviteA(item=item))
   
   def go_invite_b(self, item):
-    from ..InviteB import InviteB
+    from .InviteB import InviteB
     self._reset_and_load(InviteB(item=item))
 
   def go_invite_e(self, item):
-    from ..InviteE import InviteE
+    from .InviteE import InviteE
     self._reset_and_load(InviteE(item=item))
   
   def dispatch_handler(self, dispatch):
