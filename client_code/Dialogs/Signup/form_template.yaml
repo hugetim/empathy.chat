@@ -52,7 +52,7 @@ components:
     grid_position: NWKYCI,DMDDPA
 - type: Label
   properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-    visible: true, text: Your contact info will only be used for purposes directly related to empathy.chat,
+    visible: true, text: Your contact info will only be used for purposes directly related to empathy.chat (and will not be displayed to other users),
     font_size: 10, font: '', spacing_above: small, icon_align: left, spacing_below: small,
     italic: false, background: '', bold: false, underline: false, icon: ''}
   name: label_2
@@ -60,7 +60,7 @@ components:
 - type: Link
   properties: {role: null, url: '', align: center, tooltip: '', border: '', foreground: '',
     visible: true, text: 'Already have an empathy.chat account? Click here to login.',
-    font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
+    font_size: 12, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
     icon_align: left, col_widths: '', spacing_below: none, italic: false, background: '',
     bold: false, underline: false, icon: ''}
   name: login_link
