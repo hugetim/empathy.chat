@@ -113,21 +113,26 @@ def do_signup(email, port_invite):
 
 @anvil.tables.in_transaction
 def _create_user_if_needed_and_return_whether_created(email):
+  user = _get_user_by_email(email)
+  if user:
+    return user, False
+  else:
+    print(f"do_signup adding new user: {email}")
+    user = app_tables.users.add_row(email=email, enabled=True, signed_up=sm.now())
+    return user, True
+
+
+def _get_user_by_email(email):
   user = app_tables.users.get(email=email)
   if not user:
     if _email_invalid(email):
-      print("Invalid email")
+      print(f"Invalid email: {email}")
       raise(anvil.users.AuthenticationFailed("Invalid email"))
     all_users = app_tables.users.search()
     for u in all_users:
       if _emails_equal(email, u['email']):
         user = u
-  if not user:
-    print(f"do_signup adding new user: {email}")
-    user = app_tables.users.add_row(email=email, enabled=True, signed_up=sm.now())
-    return user, True
-  else:
-    return user, False
+  return user
 
   
 def _email_invalid(email):

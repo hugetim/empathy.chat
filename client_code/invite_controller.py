@@ -20,7 +20,7 @@ def _submit_invite(invite):
     publisher.publish("invite", "success")
     alert(message)
   else:
-    publisher.publish("invite", "go_invite_b")
+    publisher.publish("invite", "go_invite_b", invite)
 
 
 def load_invites():
