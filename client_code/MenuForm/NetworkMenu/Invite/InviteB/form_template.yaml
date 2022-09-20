@@ -36,7 +36,7 @@ components:
       layout_properties: {}
   - type: FlowPanel
     properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+      foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
     name: flow_panel_2
     layout_properties: {}
     components:
@@ -59,35 +59,26 @@ components:
       name: copy_button
       layout_properties: {grid_position: 'EQUXEF,LSHXUI'}
       event_bindings: {click: copy_button_click}
-  - type: FlowPanel
-    properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
-    name: flow_panel_4
+  - type: RichText
+    properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
+      foreground: '', visible: true, font_size: null, content: 'Once they register
+        using this link and confirm ownership of a phone number ending in {last4_label},
+        you will be linked.', font: '', spacing_above: none, spacing_below: none,
+      data: null, background: '', format: markdown}
+    name: rich_text_1
     layout_properties: {}
     components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'Once they register using this link and confirm ownership
-          of a phone number ending in ', font_size: null, font: '', spacing_above: small,
+        visible: true, text: '', font_size: null, font: '', spacing_above: small,
         icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
         underline: false, icon: ''}
-      name: label_6
-      layout_properties: {}
-    - type: Label
-      properties: {}
       name: label_7
-      layout_properties: {}
+      layout_properties: {slot: last4_label}
       data_bindings:
       - {property: text, code: 'self.item[''inviter_guess'']'}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: ', you will be linked.', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: label_8
-      layout_properties: {}
 - type: Spacer
-  properties: {height: 19}
+  properties: {height: 7}
   name: spacer_1
   layout_properties: {grid_position: 'NLEJVM,PDQRTP'}
 - type: FlowPanel

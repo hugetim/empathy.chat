@@ -65,7 +65,6 @@ def add_invite(invite):
   """Add row to invites table
   
   Side effect: add invite_id attribute to invite"""
-  errors = []
   invite_row = _invite_row(invite, missing_ok=True)
   if not invite_row:
     now = sm.now()
@@ -80,8 +79,7 @@ def add_invite(invite):
     invite.invite_id = new_row.get_id()
     _edit_row(new_row, invite.inviter_guess, invite.rel_to_inviter, now)
   else:
-    errors.append("This invite already exists.")
-  return errors
+    raise InvalidInviteError("This invite already exists.")
 
 
 def cancel_invite(invite):

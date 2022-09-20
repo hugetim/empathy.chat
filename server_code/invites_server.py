@@ -167,19 +167,19 @@ class Invite(invites.Invite):
     """Side effect: Add invites row"""
     user = sm.get_acting_user(user_id)
     self.inviter = user
-    errors = self.invalid_invite()
+    validation_errors = self.invalid_invite()
+    if validation_errors:
+      raise InvalidInviteError("\n".join(validation_errors))
     if self.invitee:
       if not self.invitee['phone']:
-        errors.append(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
+        raise InvalidInviteError(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
       elif not phone_match(self.inviter_guess, self.invitee):
-        errors.append(f"The digits you entered do not match {sm.name(self.invitee)}'s confirmed phone number.")
-      self.invitee['update_needed'] = True
+        raise MistakenGuessError(f"The digits you entered do not match {sm.name(self.invitee)}'s confirmed phone number.")
+      self.invitee['update_needed'] = True  # app_tables.users 
     else: # link invite
       user['last_invite'] = sm.now()
-    if not errors:
-      self.link_key = "" if self.invitee else ig.new_link_key()
-      errors = ig.add_invite(self)
-    return errors
+    self.link_key = "" if self.invitee else ig.new_link_key()
+    ig.add_invite(self)
 
   # def edit_invite(self):
   #   errors = self.invalid_invite()
