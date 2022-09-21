@@ -83,26 +83,17 @@ def add_invite(invite):
 
 
 def cancel_invite(invite):
-  errors = []
-  invite_row = _invite_row(invite, missing_ok=True)
-  _try_removing_from_invite_proposal(invite_row, invite.invitee)
-  if invite_row:
-    invite_row['current'] = False
-  else:
-    errors.append(f"Invites row not found with id {invite.invite_id}")
-  return errors
-
-
-def cancel_response(invite):
   invite_row = _invite_row(invite)
   _try_removing_from_invite_proposal(invite_row, invite.invitee)
-  errors = []
-  response_row = _response_row(invite, missing_ok=True)
+  invite_row['current'] = False
+
+
+def cancel_response(invite, response_missing_ok=False):
+  invite_row = _invite_row(invite)
+  _try_removing_from_invite_proposal(invite_row, invite.invitee)
+  response_row = _response_row(invite, missing_ok=response_missing_ok)
   if response_row:
     response_row['current'] = False
-  else:
-    errors.append(f"Response row not found")
-  return errors
 
 
 def _try_removing_from_invite_proposal(invite_row, invitee):
@@ -143,9 +134,9 @@ def _row(invite, origin, missing_ok=False):
     user2 = invite.invitee if origin else invite.inviter
     row = app_tables.invites.get(origin=origin, user1=user1, user2=user2, current=True)
   else:
-    raise(RowMissingError(f"Not enough information to retrieve {'invite' if origin else 'response'} row."))
+    raise RowMissingError(f"Not enough information to retrieve {'invite' if origin else 'response'} row.")
   if not missing_ok and not row:
-    raise(RowMissingError(f"No such {'invite' if origin else 'response'} row."))
+    raise RowMissingError(f"No such {'invite' if origin else 'response'} row.")
   return row
 
 

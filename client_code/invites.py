@@ -44,12 +44,12 @@ class Invite(h.PortItem, h.AttributeToKey):
   
   @staticmethod
   def _check_guess_rel(guess, rel):
-    errors = []
+    validation_errors = []
     if not guess or len(guess) != 4:
-      errors.append("Wrong number of digits entered.")
+      validation_errors.append("Wrong number of digits entered.")
     if not rel or len(rel) < p.MIN_RELATIONSHIP_LENGTH:
-      errors.append("Please add a description of your relationship.")
-    return errors
+      validation_errors.append("Please add a description of your relationship.")
+    return validation_errors
   
   @property                   
   def response_ready(self):

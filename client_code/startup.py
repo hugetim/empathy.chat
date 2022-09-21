@@ -7,7 +7,7 @@ def error_handler(err):
     eh.handle_server_connection_error(err)
   else:
     eh.report_error(err)
-    raise(err)
+    raise err
 
 
 anvil.set_default_error_handling(error_handler)

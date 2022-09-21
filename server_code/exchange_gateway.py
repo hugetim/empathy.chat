@@ -57,7 +57,7 @@ class ExchangeRepository:
                       my_i=i,
                      )
     else:
-      raise(RowMissingError("Current empathy chat not found for this user"))
+      raise RowMissingError("Current empathy chat not found for this user")
 
   @tables.in_transaction(relaxed=True)
   def save_exchange(self, exchange):

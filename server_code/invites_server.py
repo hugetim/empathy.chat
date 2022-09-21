@@ -190,15 +190,13 @@ class Invite(invites.Invite):
   def cancel(self):
     if self.invitee:
       self.invitee['update_needed'] = True
-    errors = ig.cancel_invite(self)
-    self.cancel_response() # Not finding a response_row is not an error here
+    ig.cancel_invite(self)
+    self.cancel_response(missing_ok=True) # Not finding a response_row is not an error here
     self._clear()
-    return errors
 
-  def cancel_response(self):
-    errors = ig.cancel_response(self)
+  def cancel_response(self, missing_ok=False):
+    ig.cancel_response(self, response_missing_ok=missing_ok)
     self._clear()
-    return errors
   
   def _clear(self):
     for key, value in vars(self).items():
@@ -228,4 +226,4 @@ class Invite(invites.Invite):
     accounts.init_user_info(user)        
 
   def load(self):
-    return ig.load_full_invite(self)
+    ig.load_full_invite(self)

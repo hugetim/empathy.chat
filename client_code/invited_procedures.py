@@ -14,7 +14,7 @@ from .Dialogs.Invited import Invited
 def invited_dialog(inviter):
   from . import portable as port
   invite = invites.Invite(inviter=inviter, invitee=port.User.from_logged_in())
-  errors = invite.relay('load')
+  invite.relay('load')
   top_form = get_open_form()
   top_form.invited_alert = Invited(item=invite)
   return alert(content=top_form.invited_alert,

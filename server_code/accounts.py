@@ -127,7 +127,7 @@ def _get_user_by_email(email):
   if not user:
     if _email_invalid(email):
       print(f"Invalid email: {email}")
-      raise(anvil.users.AuthenticationFailed("Invalid email"))
+      raise anvil.users.AuthenticationFailed("Invalid email")
     all_users = app_tables.users.search()
     for u in all_users:
       if _emails_equal(email, u['email']):
