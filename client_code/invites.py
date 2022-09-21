@@ -76,9 +76,8 @@ class Invite(h.PortItem, h.AttributeToKey):
     if not kwargs:
       kwargs = {}
     if method in self.no_auth_methods:
-      new_object, errors = anvil.server.call('serve_invite_unauth', self, method, kwargs)
+      new_object = anvil.server.call('serve_invite_unauth', self, method, kwargs)
     else:
-      new_object, errors = anvil.server.call('serve_invite', self, method, kwargs)
+      new_object = anvil.server.call('serve_invite', self, method, kwargs)
     self.update(new_object)
-    return errors
 

@@ -22,8 +22,8 @@ def serve_invite(port_invite, method, kwargs):
 def _serve_invite(port_invite, method, kwargs, auth):
   print(f"invites_server: {method}({kwargs}) called on {port_invite}")
   invite = Invite(port_invite)
-  errors = invite.relay(method, kwargs, auth=auth)
-  return invite.portable(), errors
+  invite.relay(method, kwargs, auth=auth)
+  return invite.portable()
     
 
 @anvil.server.callable
@@ -216,10 +216,9 @@ class Invite(invites.Invite):
       return False
     return True
     
-  
   def register(self, user):
     if not user:
-      sm.warning(f"visit called without user on {self}")
+      sm.warning(f"register called without user on {self}")
     ig.ensure_correct_inviter_info(self)
     _check_inviter_phone_match(self)
     _try_to_save_response(self, user)
