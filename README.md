@@ -14,3 +14,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Governance and Acknowledgments
 
 * [Click here](https://www.loomio.com/d/PQvJ9HEU/governance-who-makes-final-decisions-about-how-empathy-chat-works-)
+
+## Tests and Dependencies
+
+* Tests are in [a separate repo](https://github.com/hugetim/empathy.chat-tests)
+* Dependencies:
+  * [anvil-extras](https://github.com/anvilistas/anvil-extras)
+  * minor custom dependencies (not yet made public): "my slider_text_ticks", MyTimer, pdf_viewer
