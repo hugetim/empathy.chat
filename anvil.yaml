@@ -33,7 +33,7 @@ services:
 - source: /runtime/services/google.yml
   client_config: {}
   server_config: {client_id: 241428580212-4q2brrbaghlmsgq4brfn9ulnp7tmlnlj.apps.googleusercontent.com,
-    client_secret: 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, app_origin_redirect: true}
+    client_secret: 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, app_origin_redirect: true}
 - source: /runtime/services/anvil/users.yml
   client_config: {require_secure_passwords: true, use_token: false, use_email: true,
     allow_remember_me: true, allow_signup: true, enable_automatically: true, confirm_email: false,
