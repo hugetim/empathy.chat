@@ -40,7 +40,7 @@ def get_other_user(user_id):
 
 
 @anvil.server.callable
-def report_error(err_repr, app_info_dict):
+def report_error(err_repr, app_info_dict, context_str):
   from . import notifies as n
   admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
   current_user = anvil.users.get_user()
@@ -50,7 +50,7 @@ def report_error(err_repr, app_info_dict):
       f"""{err_repr}
       user: {current_user_email}
       app: {app_info_dict}
-      context: {repr(anvil.server.context)}
+      context: {context_str}
       app_origin: {anvil.server.get_app_origin()}
       """
     )

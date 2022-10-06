@@ -24,11 +24,15 @@ def clear_hash_and_open_form(form):
   open_form(form)
 
 
-def get_mobile_status():
+def get_user_agent():
   from anvil.js.window import navigator
+  return navigator.userAgent
+
+
+def get_mobile_status():
   import re
   mobile_devices = "Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini"
-  glob.MOBILE = re.search(mobile_devices, navigator.userAgent) is not None
+  glob.MOBILE = re.search(mobile_devices, get_user_agent()) is not None
   if glob.MOBILE:
     print("MOBILE")
 

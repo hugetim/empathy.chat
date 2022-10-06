@@ -14,7 +14,11 @@ def handle_server_connection_error(err):
 
 def report_error(err):
   app_info_dict = {'id': anvil.app.id,
-                  'branch': anvil.app.branch,
-                  'environment.name': anvil.app.environment.name,
+                   'branch': anvil.app.branch,
+                   'environment.name': anvil.app.environment.name,
                   }
-  anvil.server.call('report_error', repr(err), app_info_dict)
+  context = anvil.server.context
+  if context.type == "browser":
+    from . import ui_procedures as  ui
+    app_info_dict['user_agent'] = ui.get_user_agent()
+  anvil.server.call('report_error', repr(err), app_info_dict, repr(context))
