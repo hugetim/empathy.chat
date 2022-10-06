@@ -55,34 +55,34 @@ components:
       name: flow_panel_1
       components:
       - type: Button
-        properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
-          border: '', enabled: true, foreground: '', visible: true, text: Slider,
-          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: ''}
-        layout_properties: {}
-        event_bindings: {click: slider_button_click}
-        name: slider_button
-      - type: Button
         properties: {role: raised, align: center, tooltip: Toggle private timer, border: '',
           enabled: true, foreground: '', visible: true, text: Timer, font_size: null,
           font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: ''}
+          italic: false, background: '', bold: false, underline: false, icon: 'fa:hourglass-start'}
         layout_properties: {slot: default}
         event_bindings: {click: timer_button_click}
         name: timer_button
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle text chat card,
-          border: '', enabled: true, foreground: '', visible: true, text: Text Chat,
+          border: '', enabled: true, foreground: '', visible: true, text: Messages/History,
           font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: ''}
+          italic: false, background: '', bold: false, underline: false, icon: 'fa:comment'}
         layout_properties: {}
         event_bindings: {click: message_button_click}
         name: message_button
       - type: Button
+        properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
+          border: '', enabled: true, foreground: '', visible: true, text: Slider,
+          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          italic: false, background: '', bold: false, underline: false, icon: 'fa:sliders'}
+        layout_properties: {}
+        event_bindings: {click: slider_button_click}
+        name: slider_button
+      - type: Button
         properties: {role: raised, align: center, tooltip: Toggle feelings and needs list display,
           border: '', enabled: true, foreground: '', visible: true, text: Lists, font_size: null,
           font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: ''}
+          italic: false, background: '', bold: false, underline: false, icon: 'fa:map-o'}
         layout_properties: {}
         event_bindings: {click: lists_button_click}
         name: lists_button
@@ -205,14 +205,6 @@ components:
     layout_properties: {grid_position: 'DMNLEV,YIZNLS'}
     name: message_card
     components:
-    - type: Label
-      properties: {role: null, align: center, tooltip: 'Note: Text chat here is distinct
-          from chat messages within the Jitsi video chat client', border: '', foreground: '',
-        visible: false, text: Text Chat, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      layout_properties: {grid_position: 'FZHJWV,TBCRHI'}
-      name: label_1
     - type: ColumnPanel
       properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
@@ -226,6 +218,14 @@ components:
         layout_properties: {grid_position: 'NOKAIK,HLVTUU'}
         event_bindings: {}
         name: chat_repeating_panel
+      - type: Label
+        properties: {role: null, align: center, tooltip: 'Note: Text chat here is
+            distinct from chat messages within the Jitsi video chat client', border: '',
+          foreground: '', visible: false, text: Messages / History, font_size: null,
+          font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          italic: false, background: '', bold: false, underline: false, icon: ''}
+        layout_properties: {grid_position: 'UMGWST,YDXSKA'}
+        name: label_1
     - type: ColumnPanel
       properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
         wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',

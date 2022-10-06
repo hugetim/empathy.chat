@@ -94,7 +94,7 @@ class ExchangeState(PendingState):
 
   @property
   def messages_plus(self):
-    out = self._format_how_empathy_as_messages()
+    out = [] #self._format_how_empathy_as_messages()
     self._label_first_messages_with_name()
     out += self.message_items
     return out
