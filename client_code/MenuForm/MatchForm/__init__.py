@@ -23,6 +23,7 @@ class MatchForm(MatchFormTemplate):
     self._info_clicked = False
     self.first_messages_update = True
     self.init_subscriptions()
+    self._initialized_sounds = set()
 
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
@@ -30,6 +31,8 @@ class MatchForm(MatchFormTemplate):
     if glob.MOBILE:
       alert(content=MobileAlert(), title="Attention mobile users", large=True)
     self.timer_2.interval = 5
+    if not self.lists_url:
+      self.load_lists_and_sounds()
 
   def initial_form_setup(self):
     self.item = ec.ExchangeState.initialized_state(self.item['status'])
@@ -106,6 +109,7 @@ class MatchForm(MatchFormTemplate):
     if not self.item.status:
       return ui.reload()
     self.status_label.visible = self.item.status == "requesting"
+    self.mute_doorbell_link.visible = self.status_label.visible
     matched = self.item.status == "matched"
     self.message_textbox.enabled = matched
     self.message_textbox.tooltip = (
@@ -123,7 +127,8 @@ class MatchForm(MatchFormTemplate):
 
   def pinged(self):
     with h.PausedTimer(self.timer_2):
-      self._play_sound('doorbell')
+      if self.mute_doorbell_link.icon == 'fa:bell':
+        self._play_sound('doorbell')
       if self.jitsi_embed:
         with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
           ready = confirm("Someone has asked to join your empathy chat. Are you still available to exchange empathy?")
@@ -168,8 +173,6 @@ class MatchForm(MatchFormTemplate):
     
   def timer_2_tick(self, **event_args):
     """This method is called approx. once every 5 seconds, checking for messages"""
-    if not self.lists_url:
-      self.load_lists_and_sounds()
     self.item.update()
 
   def load_lists_and_sounds(self):
@@ -177,20 +180,38 @@ class MatchForm(MatchFormTemplate):
     self.call_js('loadClips', *clip_urls)
     if self.lists_card.visible:
       self.add_lists_pdf_viewer()
-  
-  def slider_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
-    toggle_button_card(self.slider_button, self.slider_card)
+
+  def mute_doorbell_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    if self.mute_doorbell_link.icon == 'fa:bell-slash':
+      self.mute_doorbell_link.icon = 'fa:bell'
+      self.mute_doorbell_link.text = "doorbell sound will play upon arrival"
+      if 'doorbell' not in self._initialized_sounds:
+        self._initialize_sound('doorbell')
+    else:
+      self.mute_doorbell_link.icon = 'fa:bell-slash'
+      self.mute_doorbell_link.text = "doorbell sound muted"
     
   def timer_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.timer_button, self.timer_card)
 
+  def my_timer_1_started(self, **event_args):
+    if 'ding' not in self._initialized_sounds:
+      self._initialize_sound('ding')
+  
   def my_timer_1_elapsed(self, **event_args):
     self._play_sound('ding')
     if not self.timer_card.visible:
       self.timer_button_click()
 
+  def _initialize_sound(self, audio_id):
+    self._initialized_sounds.add(audio_id)
+    try:
+      self.call_js('initSound', audio_id)
+    except ExternalError as err:
+      print(f"Error playing {audio_id} sound: {repr(err)}")    
+  
   def _play_sound(self, audio_id):
     try:
       self.call_js('playSound', audio_id)
@@ -208,6 +229,10 @@ class MatchForm(MatchFormTemplate):
       self.message_textbox.text = ""
       self.chat_repeating_panel.items = self.item.messages_plus
 
+  def slider_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    toggle_button_card(self.slider_button, self.slider_card)
+  
   def lists_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     # Complications are necessitated by vaguaries of pdf_viewer loading
@@ -249,7 +274,7 @@ class MatchForm(MatchFormTemplate):
     if not self._info_clicked and self.info_flow_panel.visible:
       self.info_button_click()  
 
-      
+
 def toggle_button_card(button, card):
   card.visible = not card.visible
   button.role = None if card.visible else "raised"

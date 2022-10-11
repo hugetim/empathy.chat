@@ -7,14 +7,17 @@ container:
       \    var doorbellWav=document.getElementById('doorbellWav');\n    var dingWav=document.getElementById('dingWav');\n\
       \    doorbellMp3.src=doorbellMp3SrcUrl;\n    doorbellWav.src=doorbellWavSrcUrl;\n\
       \    dingWav.src=dingWavSrcUrl;\n    var doorbell=document.getElementById('doorbell');\n\
-      \    var ding=document.getElementById('ding');\n    doorbell.load()\n    ding.load()\n\
-      \    doorbell.volume=0.7\n    ding.volume=0.4\n    }\n</script>\n\n<script>\n\
-      function playSound(audio_id) {\n          var sound = document.getElementById(audio_id);\n\
-      \          sound.play();\n      }\n</script>\n\n<audio id=\"doorbell\" preload=\"\
-      auto\" autostart=\"false\">\n  <source id=\"doorbellMp3\" src=\"\" type=\"audio/mp3\"\
-      \ />\n  <source id=\"doorbellWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n\
-      \n<audio id=\"ding\" preload=\"auto\" autostart=\"false\">\n  <source id=\"\
-      dingWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n"}
+      \    var ding=document.getElementById('ding');\n    doorbell.load();\n    ding.load();\n\
+      \  }\n</script>\n\n<script>\nfunction playSound(audio_id) {\n  var volume =\
+      \ {\"ding\": 0.4,\n                \"doorbell\": 0.7,\n               };\n \
+      \ var sound = document.getElementById(audio_id);\n  sound.pause();\n  sound.currentTime\
+      \ = 0;\n  sound.volume = volume[audio_id];\n  sound.play();\n}\n</script>\n\n\
+      <script>\nfunction initSound(audio_id) {\n  var sound = document.getElementById(audio_id);\n\
+      \  sound.volume = 0.0;\n  sound.play();\n}\n</script>\n\n<audio id=\"doorbell\"\
+      \ preload=\"auto\" autostart=\"false\">\n  <source id=\"doorbellMp3\" src=\"\
+      \" type=\"audio/mp3\" />\n  <source id=\"doorbellWav\" src=\"\" type=\"audio/wav\"\
+      \ />  \n</audio>\n\n<audio id=\"ding\" preload=\"auto\" autostart=\"false\"\
+      >\n  <source id=\"dingWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n"}
   event_bindings: {show: form_show}
 components:
 - type: ColumnPanel
@@ -34,11 +37,20 @@ components:
     - type: Label
       properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
         visible: false, text: Waiting for someone else to join..., font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
+        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       layout_properties: {grid_position: 'YOJCEM,HURPQL'}
       event_bindings: {}
       name: status_label
+    - type: Link
+      properties: {role: text, url: '', align: center, tooltip: '', border: '', foreground: 'theme:Primary
+          500', visible: false, text: doorbell sound will play upon arrival, font_size: null,
+        wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none, icon_align: left,
+        col_widths: '', spacing_below: none, italic: false, background: '', bold: false,
+        underline: false, icon: 'fa:bell'}
+      name: mute_doorbell_link
+      layout_properties: {grid_position: 'GRCATF,VPJYTW'}
+      event_bindings: {click: mute_doorbell_link_click}
     - type: Label
       properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
         visible: false, text: '', font_size: null, font: '', spacing_above: small,
@@ -196,7 +208,7 @@ components:
       properties: {minutes: 10, seconds: 0, paused: true, visible: true, enabled: true,
         align: left}
       layout_properties: {grid_position: 'PGYFGE,FTMBCC'}
-      event_bindings: {elapsed: my_timer_1_elapsed}
+      event_bindings: {elapsed: my_timer_1_elapsed, started: my_timer_1_started}
       name: my_timer_1
   - type: ColumnPanel
     properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
