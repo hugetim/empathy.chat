@@ -131,6 +131,16 @@ def series_str(str_list):
     out += f" and {str_list[-1]}"
   return out
 
+
+def add_new_day_to_message_list(message_list):
+  import datetime
+  if message_list:
+    message_list[0]['new_day'] = True
+    for i in range(1, len(message_list)):
+      message_list[i]['new_day'] = (message_list[i]['time_stamp'].date() 
+                                    != message_list[i-1]['time_stamp'].date())
+  return message_list
+
   
 def warning(warning_str):
   app_info_dict = {'id': anvil.app.id,

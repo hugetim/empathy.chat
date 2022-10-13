@@ -97,7 +97,7 @@ class ExchangeState(PendingState):
     out = [] #self._format_how_empathy_as_messages()
     self._label_first_messages_with_name()
     out += self.message_items
-    return out
+    return h.add_new_day_to_message_list(out)
 
   def _format_how_empathy_as_messages(self):
     out = []

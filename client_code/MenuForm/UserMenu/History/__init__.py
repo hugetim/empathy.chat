@@ -1,6 +1,7 @@
 from ._anvil_designer import HistoryTemplate
 from anvil import *
 import anvil.server
+from .... import helper as h
 
 
 class History(HistoryTemplate):
@@ -25,10 +26,7 @@ class History(HistoryTemplate):
   def update_messages(self, message_list):
     old_items = self.chat_repeating_panel.items
     if len(message_list) > len(old_items):
-      message_list[0]['new_day'] = True
-      for i in range(1, len(message_list)):
-        message_list[i]['new_day'] = (message_list[i]['time_stamp'].date() 
-                                      != message_list[i-1]['time_stamp'].date())
+      message_list = h.add_new_day_to_message_list(message_list)
       self.chat_repeating_panel.items = message_list
       self.call_js('scrollCardLong') 
   

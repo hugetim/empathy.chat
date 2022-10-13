@@ -12,6 +12,8 @@ class ChatTemplate(ChatTemplateTemplate):
     self.meta_label.text = self.item.get("label", "")
     _datetime = self.item.get('time_stamp')
     if _datetime:
+      if self.meta_label.text:
+        self.meta_label.text += " "
       self.meta_label.text += h.time_str(h.as_local_tz(_datetime))
       self.day_label.text = h.dow_date_str(h.as_local_tz(_datetime))
     self.meta_label.visible = bool(self.meta_label.text)
