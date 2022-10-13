@@ -31,7 +31,7 @@ container:
       \n<style>\n  #jitsi iframe {\n    border: none;\n    width: 100%;\n    min-width:\
       \ 150px;\n  }\n  #jitsi {\n    padding: 0px 10px 10px 0px;\n    border: thin\
       \ ridge;\n    height: 425px;\n    resize: vertical;\n    overflow: hidden;\n\
-      \    min-height: 150px;\n    max-height: 690px;\n  }\n</style>\n"}
+      \    min-height: 150px;\n    max-height: 1000px; //690px\n  }\n</style>\n"}
   event_bindings: {show: form_show}
 components: []
 is_package: true
