@@ -117,20 +117,6 @@ def get_port_user(user2, distance=None, user1=None, simple=False):
   else:
     return None
 
-
-@authenticated_callable
-@timed
-def init_cache():
-  from . import connections as c
-  users_dict, connections_list, their_groups_dict = c.init_connections()
-  port_my_groups = _init_my_groups()
-  return users_dict, connections_list, port_my_groups, their_groups_dict
-
-
-def _init_my_groups():
-  from . import groups_server as g
-  return g.load_my_groups()
-
   
 def _latest_invited(user):
   _inviteds = inviteds(user)
@@ -219,7 +205,7 @@ def _invite_guess_fail_prompt(s_invite):
              )
 
 
-def _add_message_prompt(user2, user1):
+def add_message_prompt(user2, user1):
   such_prompts = app_tables.prompts.search(user=user2, dismissed=False, spec={"name": "message", "from_id": user1.get_id()})
   if len(such_prompts) == 0:
     from_name = name(user1, to_user=user2)
@@ -229,47 +215,6 @@ def _add_message_prompt(user2, user1):
     from . import notifies as n
     n.notify_message(user2, from_name)
 
-
-@authenticated_callable
-def add_message(user2_id, user_id="", message="[blank test message]"):
-  print(f"add_message, '[redacted]', {user_id}")
-  user = get_acting_user(user_id)
-  user2 = get_other_user(user2_id)
-  app_tables.messages.add_row(from_user=user,
-                              to_user=user2,
-                              message=secrets.encrypt_with_key("new_key", message),
-                              time_stamp=now())
-  _add_message_prompt(user2, user)
-  from . import matcher
-  matcher.propagate_update_needed(user)
-  return _update_history_form(user2, user)
-
-
-@authenticated_callable
-def update_history_form(user2_id, user_id=""):
-  """
-  Return (iterable of dictionaries with keys: 'me', 'message'), their_value
-  """
-  user = get_acting_user(user_id)
-  user2 = get_other_user(user2_id)
-  return _update_history_form(user2, user)
-
-
-def _update_history_form(user2, user1):
-  messages = app_tables.messages.search(
-    anvil.tables.order_by("time_stamp", ascending=True),
-    q.any_of(q.all_of(from_user=user2, to_user=user1),
-             q.all_of(from_user=user1, to_user=user2),
-            )
-  )
-  if messages:
-    return [{'me': (user1 == m['from_user']),
-             'message': secrets.decrypt_with_key("new_key", m['message']),
-             'time_stamp': m['time_stamp'],
-            } for m in messages]
-  else:
-    return []
-    
 
 @anvil.server.background_task
 def prune_chat_messages():
