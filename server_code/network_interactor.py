@@ -34,7 +34,7 @@ def add_message(user2_id, user_id="", message="[blank test message]"):
   sm.add_message_prompt(user2, user)
   from . import matcher
   matcher.propagate_update_needed(user)
-  return _get_messages(user2, user)
+  return get_messages(user2, user)
 
 
 @authenticated_callable
@@ -44,10 +44,10 @@ def update_history_form(user2_id, user_id=""):
   """
   user = sm.get_acting_user(user_id)
   user2 = sm.get_other_user(user2_id)
-  return _get_messages(user2, user)
+  return get_messages(user2, user)
   
 
-def _get_messages(user2, user1):
+def get_messages(user2, user1):
   messages = repo.get_messages(user2, user1)
   if messages:
     return [{'me': (user1 == m['from_user']),

@@ -1,6 +1,7 @@
 import anvil.secrets
 from .server_misc import authenticated_callable
 from . import server_misc as sm
+from . import network_interactor as ni
 from .exceptions import RowMissingError
 from .exchange_gateway import ExchangeRepository
 
@@ -76,10 +77,7 @@ def _update_match_form_already_matched(user_id, exchange):
     repo.save_exchange(exchange)
     other_user['update_needed'] = True
   how_empathy_list = [user['how_empathy'], other_user['how_empathy']]
-  messages = repo.get_chat_messages(exchange)
-  messages_out = [{'me': (user == m['user']),
-                   'message': anvil.secrets.decrypt_with_key("new_key", m['message'])}
-                  for m in messages]
+  messages_out = ni.get_messages(other_user, user)
   their_name = other_user['first_name']
   return dict(
     status="matched",
