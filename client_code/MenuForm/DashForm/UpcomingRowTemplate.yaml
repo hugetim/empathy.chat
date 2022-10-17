@@ -6,6 +6,14 @@ components:
   layout_properties: {column: PHQQNP}
   components:
   - type: Button
+    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: false, text: Join, font_size: null, font: '', spacing_above: none,
+      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
+      underline: false, icon: ''}
+    name: join_button
+    layout_properties: {}
+    event_bindings: {click: join_button_click}
+  - type: Button
     properties: {role: null, align: center, tooltip: Cancel this proposal time, border: '',
       enabled: true, foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null,
       font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
