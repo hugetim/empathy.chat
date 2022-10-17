@@ -17,7 +17,7 @@ class LoginForm(LoginFormTemplate):
     
   def login_sequence(self):
     from .. import ui_procedures as ui
-    user = anvil.users.get_user()
+    user, user_id = anvil.server.call_s('get_user', with_id=True)
     if not user:
       self.login_button.visible = True
       self.rich_text_1.visible = True
@@ -28,7 +28,7 @@ class LoginForm(LoginFormTemplate):
       self.card_1.visible = True
       from .. import glob
       glob.logged_in_user = user
-      glob.logged_in_user_id = user.get_id()
+      glob.logged_in_user_id = user_id
       self.init_dict = ui.get_init(spinner=False)
       ui.get_mobile_status()
       self.new_form = ui.reload(self.init_dict, do_open=False)

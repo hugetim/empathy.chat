@@ -55,7 +55,8 @@ runtime_options: {version: 2, server_version: python3-full, client_version: '3',
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:child-large.PNG',
   title: empathy.chat}
 startup_form: MenuForm
-native_deps: {head_html: '<script src="https://meet.jit.si/external_api.js"></script>'}
+native_deps: {head_html: "<script src=\"https://meet.jit.si/external_api.js\"></script>\n\
+    <style>\n#loadingSpinner {\n  display: none;\n}\n</style>"}
 db_schema:
   group_members:
     title: Group Members

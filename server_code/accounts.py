@@ -13,6 +13,14 @@ from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
 
 
+@anvil.server.callable
+def get_user(allow_remembered=True, with_id=False):
+  if with_id:
+    user = anvil.users.get_user(allow_remembered)
+    return user, user.get_id()
+  else:
+    return anvil.users.get_user(allow_remembered)
+
 def initialize_session(time_zone):
   """initialize session state: user_id, user, and current_row"""
   with TimerLogger("initialize_session", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
