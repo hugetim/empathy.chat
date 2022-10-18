@@ -2,10 +2,10 @@ from ._anvil_designer import MatchFormTemplate
 from anvil import *
 from anvil.js import window, ExternalError
 from pdf_viewer.pdf_viewer import pdf_viewer
-from ... import ui_procedures as ui
-from ... import glob
-from ... import helper as h
-from ... import exchange_controller as ec
+from .. import ui_procedures as ui
+from .. import glob
+from .. import helper as h
+from .. import exchange_controller as ec
 from .MyJitsi import MyJitsi
 from .SliderPanel import SliderPanel
 from .MobileAlert import MobileAlert

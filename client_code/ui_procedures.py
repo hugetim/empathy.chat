@@ -54,7 +54,7 @@ def reload(init_dict=None, do_open=True):
   glob.name = init_dict['name']
   glob.trust_level = init_dict['trust_level']
   if init_dict['state']['status'] in ["matched", "requesting", "pinged"]:
-    from .MenuForm.MatchForm import MatchForm
+    from .MatchForm import MatchForm
     item = {k: init_dict['state'][k] for k in MatchForm.state_keys}
     new_form = MatchForm(item=item)
   else:

@@ -5,7 +5,7 @@ import anvil.server
 import anvil.js
 from .DashForm import DashForm
 from .WaitForm import WaitForm
-from .MatchForm import MatchForm
+from ..MatchForm import MatchForm
 from .NetworkMenu import NetworkMenu
 from .MyGroupsMenu import MyGroupsMenu
 from .UserMenu import UserMenu

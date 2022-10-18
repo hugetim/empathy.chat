@@ -1,6 +1,6 @@
 from ._anvil_designer import MyJitsiTemplate
 from anvil import *
-from .... import parameters as p
+from ... import parameters as p
 
 
 class MyJitsi(MyJitsiTemplate):

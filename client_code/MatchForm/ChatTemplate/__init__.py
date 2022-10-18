@@ -1,6 +1,6 @@
 from ._anvil_designer import ChatTemplateTemplate
 from anvil import *
-from .... import helper as h
+from ... import helper as h
 
 
 class ChatTemplate(ChatTemplateTemplate):

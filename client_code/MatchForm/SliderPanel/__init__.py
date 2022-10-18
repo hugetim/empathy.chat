@@ -1,7 +1,7 @@
 from ._anvil_designer import SliderPanelTemplate
 from anvil import *
-from .... import exchange_controller as ec
-from .... import helper as h
+from ... import exchange_controller as ec
+from ... import helper as h
 
 
 class SliderPanel(SliderPanelTemplate):
