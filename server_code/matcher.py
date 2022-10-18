@@ -234,17 +234,26 @@ def _get_upcomings(user):
   """Return list of user's upcoming matches"""
   match_dicts = []
   now = sm.now()
-  for match in app_tables.matches.search(users=[user], 
-                                         match_commence=q.greater_than(now)):
-    port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
-                   if u != user]
-    match_dict = {'port_users': port_users,
-                  'start_date': match['match_commence'],
-                  'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
-                  'match_id': match.get_id(),
-                 }
-    match_dicts.append(match_dict)
+  # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
+  my_incomplete_matches = app_tables.matches.search(users=[user], complete=[0])
+  for match in my_incomplete_matches:
+    my_index = match['users'].index(user)
+    if match['complete'][my_index] == 0:
+      import datetime
+      duration = datetime.timedelta(minutes=match['proposal_time']['duration'])
+      if now < match['match_commence'] + duration:
+        match_dicts.append(_match_dict(match, user))
   return match_dicts
+
+
+def _match_dict(match, user):
+  port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
+                if u != user]
+  return {'port_users': port_users,
+          'start_date': match['match_commence'],
+          'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
+          'match_id': match.get_id(),
+         }
 
 
 @anvil.tables.in_transaction(relaxed=True)

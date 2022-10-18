@@ -116,6 +116,7 @@ def match_complete(user_id=""):
       user = sm.get_acting_user()
       other_user = sm.get_other_user(exchange.their['user_id'])
       n.notify_match_cancel_bg(other_user, exchange.start_dt, canceler_name=sm.name(user, to_user=other_user))
+      exchange.their['complete'] = 1
     repo.save_exchange(exchange)
     matcher.propagate_update_needed()
   except RowMissingError as err:
