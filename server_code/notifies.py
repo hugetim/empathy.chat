@@ -1,5 +1,6 @@
 import anvil.secrets
 import anvil.email
+import anvil.server
 from . import server_misc as sm
 from . import accounts
 from . import parameters as p
@@ -92,7 +93,12 @@ def ping(user, start, duration):
     )
   #p.s. You are receiving this email because you checked the box: "Notify me by email when a match is found." To stop receiving these emails, ensure this option is unchecked when requesting empathy.
 
-  
+
+def notify_match_cancel_bg(user, start, canceler_name=""):
+  anvil.server.launch_background_task('notify_match_cancel', user, start, canceler_name)
+
+
+@anvil.server.background_task
 def notify_match_cancel(user, start, canceler_name=""):
   """Notify cancelled-on user"""
   print(f"'notify_match_cancel', {start}, {canceler_name}")
