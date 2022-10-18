@@ -12,6 +12,13 @@ def handle_server_connection_error(err):
     print(f"error_handler ({repr(err)}) warning exception: {repr(err_err)}")
 
 
+def handle_authentication_error(err):
+  try:
+    h.warning(repr(err))
+  except Exception as err_err:
+    print(f"error_handler ({repr(err)}) warning exception: {repr(err_err)}")
+
+
 def report_error(err):
   app_info_dict = {'id': anvil.app.id,
                    'branch': anvil.app.branch,
