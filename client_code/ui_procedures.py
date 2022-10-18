@@ -31,12 +31,15 @@ def get_user_agent():
 
 def get_mobile_status():
   import re
+  user_agent = get_user_agent()
   mobile_devices = "Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini"
-  glob.MOBILE = re.search(mobile_devices, get_user_agent()) is not None
-  if glob.MOBILE:
-    print("MOBILE")
+  glob.MOBILE = re.search(mobile_devices, user_agent) is not None
+  apple_devices = "Macintosh|iPhone|iPad|iPod"
+  glob.APPLE = re.search(apple_devices, user_agent) is not None
+  if glob.MOBILE or glob.APPLE:
+    print(f"{'MOBILE' if glob.MOBILE else ''} {'APPLE' if glob.APPLE else ''}")
 
-  
+
 def disconnect_flow(user2_id, user2_name, user1_id=""):
   if confirm(f"Really remove your link to {user2_name}? This cannot be undone."):
     return anvil.server.call('disconnect', user2_id, user1_id)

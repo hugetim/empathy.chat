@@ -5,6 +5,7 @@ from anvil_extras.messaging import Publisher
 
 
 MOBILE = None
+APPLE = None
 trust_level = 0
 name = ""
 invites = []

@@ -22,6 +22,9 @@ class MatchForm(MatchFormTemplate):
     self.lists_url = ""
     self._info_clicked = False
     self.first_messages_update = True
+    self._doorbell_muted = glob.APPLE
+    self._clips_loaded = False
+    self._update_doorbell_link()
     self.init_subscriptions()
     self._initialized_sounds = set()
 
@@ -109,7 +112,7 @@ class MatchForm(MatchFormTemplate):
     if not self.item.status:
       return ui.reload()
     self.status_label.visible = self.item.status == "requesting"
-    self.mute_doorbell_link.visible = self.status_label.visible
+    self._update_doorbell_visible()
     matched = self.item.status == "matched"
     self.message_textbox.enabled = matched
     self.message_textbox.tooltip = (
@@ -127,7 +130,7 @@ class MatchForm(MatchFormTemplate):
 
   def pinged(self):
     with h.PausedTimer(self.timer_2):
-      if self.mute_doorbell_link.icon == 'fa:bell':
+      if not self._doorbell_muted:
         self._play_sound('doorbell')
       if self.jitsi_embed:
         with ui.BrowserTab("Someone waiting to join your empathy.chat", "_/theme/favicon-dot.ico"):
@@ -178,20 +181,29 @@ class MatchForm(MatchFormTemplate):
   def load_lists_and_sounds(self):
     [self.lists_url, *clip_urls] = ec.get_urls()
     self.call_js('loadClips', *clip_urls)
+    self._clips_loaded = True
+    self._update_doorbell_visible()
     if self.lists_card.visible:
       self.add_lists_pdf_viewer()
 
-  def mute_doorbell_link_click(self, **event_args):
-    """This method is called when the link is clicked"""
-    if self.mute_doorbell_link.icon == 'fa:bell-slash':
-      self.mute_doorbell_link.icon = 'fa:bell'
-      self.mute_doorbell_link.text = "doorbell sound will play upon arrival"
-      if 'doorbell' not in self._initialized_sounds:
-        self._initialize_sound('doorbell')
-    else:
+  def _update_doorbell_visible(self):
+    self.mute_doorbell_link.visible = self.status_label.visible and self._clips_loaded
+
+  def _update_doorbell_link(self):
+    if self._doorbell_muted:
       self.mute_doorbell_link.icon = 'fa:bell-slash'
       self.mute_doorbell_link.text = "doorbell sound (upon arrival) muted"
-    
+    else:
+      self.mute_doorbell_link.icon = 'fa:bell'
+      self.mute_doorbell_link.text = "doorbell sound will play upon arrival"
+  
+  def mute_doorbell_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    self._doorbell_muted = not self._doorbell_muted
+    if 'doorbell' not in self._initialized_sounds:
+      self._initialize_sound('doorbell')
+    self._update_doorbell_link()
+
   def timer_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.timer_button, self.timer_card)
