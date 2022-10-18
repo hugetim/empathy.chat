@@ -68,7 +68,7 @@ components:
       components:
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle private timer, border: '',
-          enabled: true, foreground: '', visible: true, text: Timer, font_size: null,
+          enabled: true, foreground: '', visible: true, text: Timer, font_size: 13,
           font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:hourglass-start'}
         layout_properties: {slot: default}
@@ -77,7 +77,7 @@ components:
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle text chat card,
           border: '', enabled: true, foreground: '', visible: true, text: Messages/History,
-          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:comment'}
         layout_properties: {}
         event_bindings: {click: message_button_click}
@@ -85,14 +85,14 @@ components:
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
           border: '', enabled: true, foreground: '', visible: true, text: Slider,
-          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:sliders'}
         layout_properties: {}
         event_bindings: {click: slider_button_click}
         name: slider_button
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle feelings and needs list display,
-          border: '', enabled: true, foreground: '', visible: true, text: Lists, font_size: null,
+          border: '', enabled: true, foreground: '', visible: true, text: Lists, font_size: 13,
           font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:map-o'}
         layout_properties: {}
@@ -101,7 +101,7 @@ components:
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle full-screen mode (not just the video chat),
           border: '', enabled: true, foreground: '', visible: true, text: Full Screen,
-          font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+          font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:arrows-alt'}
         layout_properties: {}
         event_bindings: {click: full_screen_button_click}
@@ -118,7 +118,7 @@ components:
         components:
         - type: Button
           properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-            foreground: '', visible: true, text: Pop-Out Video, font_size: null, font: '',
+            foreground: '', visible: true, text: Pop-Out Video, font_size: 13, font: '',
             spacing_above: small, icon_align: left, spacing_below: small, italic: false,
             background: '', bold: false, underline: false, icon: 'fa:external-link'}
           layout_properties: {grid_position: 'ADNINT,BAITJS'}
@@ -126,7 +126,7 @@ components:
           event_bindings: {click: jitsi_link_click}
       - type: Button
         properties: {role: null, align: center, tooltip: Toggle backup link to the video chat,
-          border: '', enabled: true, foreground: '', visible: false, text: Info, font_size: null,
+          border: '', enabled: true, foreground: '', visible: false, text: Info, font_size: 13,
           font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:info-circle'}
         layout_properties: {}
@@ -139,7 +139,7 @@ components:
         name: spacer_2
       - type: Button
         properties: {role: secondary-color, align: right, tooltip: '', border: '',
-          enabled: true, foreground: '', visible: false, text: Cancel, font_size: null,
+          enabled: true, foreground: '', visible: false, text: Cancel, font_size: 13,
           font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: ''}
         layout_properties: {grid_position: 'NLWDED,PWPLEY'}
