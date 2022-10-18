@@ -226,7 +226,7 @@ components:
       name: chat_display_card
       components:
       - type: RepeatingPanel
-        properties: {item_template: MenuForm.MatchForm.ChatTemplate}
+        properties: {item_template: MatchForm.ChatTemplate}
         layout_properties: {grid_position: 'NOKAIK,HLVTUU'}
         event_bindings: {}
         name: chat_repeating_panel

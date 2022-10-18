@@ -159,7 +159,7 @@ db_schema:
     server: full
     columns:
     - name: origin
-      admin_ui: {width: 200}
+      admin_ui: {width: 77.015872}
       type: bool
     - name: user1
       admin_ui: {width: 200}
@@ -179,20 +179,20 @@ db_schema:
       admin_ui: {width: 200}
       type: datetime
     - name: distance
-      admin_ui: {width: 200}
+      admin_ui: {width: 95.021872}
       type: number
     - name: guess
-      admin_ui: {width: 200}
+      admin_ui: {width: 86.015872}
       type: string
     - name: link_key
-      admin_ui: {width: 200}
+      admin_ui: {width: 99.015872}
       type: string
     - name: proposal
       admin_ui: {width: 200}
       type: link_single
       target: proposals
     - name: current
-      admin_ui: {width: 200}
+      admin_ui: {width: 78.015872}
       type: bool
   prompts:
     title: Prompts
@@ -266,7 +266,7 @@ db_schema:
       admin_ui: {width: 186}
       type: string
     - name: notif_settings
-      admin_ui: {width: 181}
+      admin_ui: {width: 1945.013872}
       type: simpleObject
     - name: seeking_buddy
       admin_ui: {width: 133}
