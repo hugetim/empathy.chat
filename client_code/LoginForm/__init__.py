@@ -18,6 +18,7 @@ class LoginForm(LoginFormTemplate):
   def login_sequence(self):
     from .. import ui_procedures as ui
     user, user_id = anvil.server.call_s('get_user', with_id=True)
+    self.loading_label.visible = False
     if not user:
       self.login_button.visible = True
       self.rich_text_1.visible = True

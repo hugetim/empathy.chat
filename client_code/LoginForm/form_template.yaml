@@ -8,6 +8,13 @@ components:
   name: content_panel
   layout_properties: {slot: default}
   components:
+  - type: Label
+    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
+      visible: true, text: '...loading...', font_size: null, font: '', spacing_above: large,
+      icon_align: left, spacing_below: small, italic: true, background: '', bold: false,
+      underline: false, icon: ''}
+    name: loading_label
+    layout_properties: {grid_position: 'GCWUHK,RRHYSP'}
   - type: FlowPanel
     properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
       foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
