@@ -17,7 +17,7 @@ from anvil_extras.logging import TimerLogger
 def get_user(allow_remembered=True, with_id=False):
   if with_id:
     user = anvil.users.get_user(allow_remembered)
-    return user, user.get_id()
+    return user, user.get_id() if user else ""
   else:
     return anvil.users.get_user(allow_remembered)
 
