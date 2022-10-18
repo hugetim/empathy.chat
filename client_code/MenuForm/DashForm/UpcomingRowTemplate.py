@@ -40,9 +40,8 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     timedelta_left = self.start_dt - h.now()
     if timedelta_left.total_seconds() <= 60*p.START_EARLY_MINUTES:
-      #self.join_button.visible = True
-      self.update_dash(anvil.server.call('get_state', force_refresh=True))
+      self.join_button.visible = True
 
   def join_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    pass
+    self.update_dash(dict(status="matched"))

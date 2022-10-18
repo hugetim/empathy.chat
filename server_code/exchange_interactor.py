@@ -16,9 +16,9 @@ def reset_repo():
   
 @authenticated_callable
 def init_match_form(user_id=""):
-  """Return jitsi_code, duration (or Nones), my_slider_value
+  """Return current_proptime id (or None), jitsi_code, duration (or Nones), my_slider_value
   
-  Side effect: set this_match['present']"""
+  Side effect: if already matched, set this_match['present']"""
   print(f"init_match_form, {user_id}")
   try:
     return _init_match_form_already_matched(user_id)
@@ -27,7 +27,7 @@ def init_match_form(user_id=""):
 
 
 def _init_match_form_already_matched(user_id):
-  exchange = repo.get_exchange(user_id)
+  exchange = repo.get_exchange(user_id, to_join=True)
   exchange.my['present'] = 1
   repo.save_exchange(exchange)
   other_user = sm.get_other_user(exchange.their['user_id'])
@@ -56,7 +56,7 @@ def update_match_form(user_id=""):
   
   Side effects: Update match['present'], late notifications, confirm_wait"""
   try:
-    exchange = repo.get_exchange(user_id)
+    exchange = repo.get_exchange(user_id, to_join=True)
     return _update_match_form_already_matched(user_id, exchange)
   except RowMissingError as err:
     return _update_match_form_not_matched(user_id)

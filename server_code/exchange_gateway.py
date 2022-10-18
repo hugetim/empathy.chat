@@ -6,7 +6,7 @@ from .exceptions import RowMissingError
 from .exchanges import Exchange, Format
 
 
-def _current_exchange_i(user):
+def _current_exchange_i(user, to_join):
   """Return earliest if multiple current"""
   import datetime
   from .server_misc import now
@@ -17,7 +17,7 @@ def _current_exchange_i(user):
   for row in current_matches:
     temp_i = row['users'].index(user)
     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    if row['complete'][temp_i] == 0:
+    if (to_join or row['present'][temp_i] == 1) and row['complete'][temp_i] == 0:
       this_match = row
       i = temp_i
       break
@@ -35,10 +35,10 @@ def _get_participant(match_dict, i):
 
 
 class ExchangeRepository:
-  def get_exchange(self, user_id):
+  def get_exchange(self, user_id, to_join=False):
     from .server_misc import get_acting_user
     user = get_acting_user(user_id)
-    this_match, i = _current_exchange_i(user)
+    this_match, i = _current_exchange_i(user, to_join)
     if this_match:
       match_dict = dict(this_match)
       num_participants = len(match_dict['users'])
