@@ -190,7 +190,7 @@ class MatchForm(MatchFormTemplate):
         self._initialize_sound('doorbell')
     else:
       self.mute_doorbell_link.icon = 'fa:bell-slash'
-      self.mute_doorbell_link.text = "doorbell sound muted"
+      self.mute_doorbell_link.text = "doorbell sound (upon arrival) muted"
     
   def timer_button_click(self, **event_args):
     """This method is called when the button is clicked"""
