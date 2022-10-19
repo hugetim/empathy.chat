@@ -19,7 +19,8 @@ DURATION_TEXT = {15: "5 & 5 (~15 min. total)",
                  65: "30 & 30 (~65 min. total)"}
 CANCEL_MIN_MINUTES = 5
 CANCEL_DEFAULT_MINUTES = 15
-CANCEL_TEXT = {5: "5 min. prior",
+CANCEL_TEXT = {0: 'At t=0, make Start Time "Now"',
+               5: "5 min. prior",
                15: "15 min. prior",
                30: "30 min. prior",
                60: "1 hr. prior",
@@ -208,7 +209,7 @@ class ProposalTime():
 
   def get_errors(self, conflict_checks=None):
     """Return a dictionary of errors
-    >>>(ProposalTime(start_now=False, start_date= h.now()).get_errors()
+    >>>(ProposalTime(start_now=False, start_date=h.now()).get_errors()
         == {'start_date': ("The Start Time must be at least " 
                           + str(CANCEL_MIN_MINUTES) + " minutes away.")}
     True
@@ -216,8 +217,11 @@ class ProposalTime():
     now = h.now()
     messages = {}
     if not self.start_now:
-      if self.start_date < (now + datetime.timedelta(minutes=CANCEL_MIN_MINUTES)):
-        messages['start_date'] = ("The Start Time must be at least " 
+      if self.start_date < now:
+        messages['start_date'] = ("Start Time must be in the future.")
+      elif (self.start_date != self.expire_date 
+            and self.start_date < (now + datetime.timedelta(minutes=CANCEL_MIN_MINUTES))):
+        messages['start_date'] = ("Start Time must be at least " 
                                   + str(CANCEL_MIN_MINUTES) + " minutes away.")
       else:
         if self.expire_date < now:
@@ -225,8 +229,9 @@ class ProposalTime():
         elif self.expire_date > self.start_date:
           messages['cancel_buffer'] = ('The "Cancel" time must be prior to the Start Time (by at least '
                                       + str(CANCEL_MIN_MINUTES) + ' minutes).')
-        elif self.expire_date > (self.start_date 
-                                 - datetime.timedelta(minutes=CANCEL_MIN_MINUTES)):
+        elif (self.start_date != self.expire_date
+              and self.expire_date > (self.start_date
+                                      - datetime.timedelta(minutes=CANCEL_MIN_MINUTES))):
           messages['cancel_buffer'] = ('The "Cancel" time must be at least ' 
                                       + str(CANCEL_MIN_MINUTES) + ' minutes prior to the Start Time.')
     return messages
@@ -272,7 +277,7 @@ class ProposalTime():
   @staticmethod  
   def default_start():
     now=h.now()
-    return {'s_min': now + datetime.timedelta(seconds=max(p.WAIT_SECONDS, 60*CANCEL_MIN_MINUTES)),
+    return {'s_min': now + datetime.timedelta(seconds=p.WAIT_SECONDS),
             'start': now + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES),
             's_max': now + datetime.timedelta(days=31)}
         

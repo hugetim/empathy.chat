@@ -15,7 +15,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
 
     # Any code you write here will run when the form opens.
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
-    self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
+    self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))[1:]
     self.normalize_initial_state()
     self.init_date_picker_start()
     self.date_picker_cancel_initialized = False
