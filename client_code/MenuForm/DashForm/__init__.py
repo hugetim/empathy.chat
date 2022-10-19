@@ -156,9 +156,7 @@ class DashForm(DashFormTemplate):
 
   def edit_proposal(self, prop_id):
     """This method is called when the button is clicked"""
-    props_to_edit = [prop_item['prop'] for prop_item in self.item['proposals'] 
-                     if prop_item['prop'].prop_id == prop_id]
-    prop_to_edit = props_to_edit[0]
+    prop_to_edit = self._prop_from_id(prop_id)
     form_item = prop_to_edit.create_form_item(self.item['status'],
                                               self.get_conflict_checks())
     content = CreateForm(item=form_item)
@@ -171,7 +169,18 @@ class DashForm(DashFormTemplate):
     if out is True:
       proposal = content.proposal()
       self._handle_prop_call(*anvil.server.call('edit_proposal', proposal))
-      
+
+  def start_now(self, prop_id):
+    proposal = self._prop_from_id(prop_id)
+    proposal.times = proposal.times[0:1]
+    proposal.times[0].start_now = True
+    self._handle_prop_call(*anvil.server.call('edit_proposal', proposal))
+
+  def _prop_from_id(self, prop_id):
+    props_to_edit = [prop_item['prop'] for prop_item in self.item['proposals'] 
+                     if prop_item['prop'].prop_id == prop_id]
+    return props_to_edit[0]
+  
   def prompts_open_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     current = self.prompts_repeating_panel.visible

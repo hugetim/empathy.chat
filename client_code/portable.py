@@ -19,7 +19,7 @@ DURATION_TEXT = {15: "5 & 5 (~15 min. total)",
                  65: "30 & 30 (~65 min. total)"}
 CANCEL_MIN_MINUTES = 5
 CANCEL_DEFAULT_MINUTES = 15
-CANCEL_TEXT = {0: 'At t=0, make Start Time "Now"',
+CANCEL_TEXT = {0: 'At t=0, becomes "Now" request',
                5: "5 min. prior",
                15: "15 min. prior",
                30: "30 min. prior",

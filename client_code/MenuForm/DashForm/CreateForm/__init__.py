@@ -165,13 +165,14 @@ class CreateForm(CreateFormTemplate):
   def button_add_alternate_click(self, **event_args):
     """This method is called when the button is clicked"""
     if not self.item['alt']:
-      if self.item['start_now']:
-        start_1 = h.now()
+      start_1 = h.now() if self.item['start_now'] else self.item['start_date']
+      if self.item['cancel_buffer'] == 0:
+        cancel_buffer = t.CANCEL_DEFAULT_MINUTES  
       else:
-        start_1 = self.item['start_date']
+        cancel_buffer = self.item['cancel_buffer']
       self.item['alt'] = [{'start_date': (start_1 + t.DEFAULT_NEXT_DELTA),
                            'duration': self.item['duration'],
-                           'cancel_buffer': self.item['cancel_buffer'],
+                           'cancel_buffer': cancel_buffer,
                            'cancel_date': None,
                            'time_id': None,
                            'conflict_checks': self.item['conflict_checks'],

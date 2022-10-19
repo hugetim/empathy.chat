@@ -91,8 +91,18 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     
   def update(self):
     if self.item['prop_time'].start_now:
-      self.timer_1.interval = 0
       self.item['expires_in'] = "n/a"
+      self.timer_1.interval = 0
+    elif self.item['prop_time'].start_date == self.item['prop_time'].expire_date:
+      self.item['expires_in'] = '(may become "Now" request at Start Time)'
+      time_left = self.time_left()
+      if self.item['own'] and time_left.total_seconds() < 60*t.CANCEL_MIN_MINUTES:
+        self.start_button.visible = True
+        self.item['expires_in'] = '(at Start Time, becomes "Now" request)'
+      if self.item['own'] and time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
+        self.timer_1.interval = 1
+      else:
+        self.timer_1.interval = 0
     else:
       time_left = self.time_left()
       if time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
@@ -121,12 +131,21 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
   def timer_1_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     timedelta_left = self.time_left()
-    self.update_expire_seconds(timedelta_left)
-    if timedelta_left.total_seconds() <= 0:
-      self.update_dash(anvil.server.call('get_state', force_refresh=True))
+    if self.item['prop_time'].start_date == self.item['prop_time'].expire_date:
+      if timedelta_left.total_seconds() <= 0:
+        self.start_button_click()
+    else:
+      self.update_expire_seconds(timedelta_left)
+      if timedelta_left.total_seconds() <= 0:
+        self.update_dash(anvil.server.call('get_state', force_refresh=True))
 
   def edit_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.top_form.content.edit_proposal(self.item['prop_id'])
+
+  def start_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.top_form.content.start_now(self.item['prop_id'])
+
 
 
