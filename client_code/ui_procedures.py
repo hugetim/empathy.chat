@@ -53,6 +53,7 @@ def reload(init_dict=None, do_open=True):
     init_dict = get_init()
   glob.name = init_dict['name']
   glob.trust_level = init_dict['trust_level']
+  glob.cache_task = init_dict['cache_task']
   if init_dict['state']['status'] in ["matched", "requesting", "pinged"]:
     from .MatchForm import MatchForm
     item = {k: init_dict['state'][k] for k in MatchForm.state_keys}

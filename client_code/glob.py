@@ -2,6 +2,7 @@ import anvil.server
 from . import parameters as p
 from . import groups
 from anvil_extras.messaging import Publisher
+from anvil_extras.utils import timed
 
 
 MOBILE = None
@@ -17,6 +18,7 @@ publisher = Publisher(with_logging=False)
 # A private variable to cache the values once we've fetched them
 _lazy_dict = {}
 lazy_loaded = False
+cache_task = None
 
 
 def __getattr__(name):
@@ -26,16 +28,24 @@ def __getattr__(name):
     # fetch the value if we haven't loaded it already:
     with loading_indicator:
       while True:
-        trial_get = _lazy_dict.get(name)
+        trial_get = _trial_get(name)
         if trial_get != None:
           return trial_get
         import time
-        time.sleep(2)
+        time.sleep(0.2)
           # populate_lazy_vars()          
           # return _lazy_dict.get(name)
   raise AttributeError(name)
- 
 
+
+def _trial_get(name):
+  trial_get = _lazy_dict.get(name)
+  if trial_get == None and cache_task and cache_task.is_completed():
+    _set_lazy_vars(cache_task.get_state()['out'])
+    trial_get = _lazy_dict.get(name)
+  return trial_get
+  
+  
 def populate_lazy_vars(spinner=True):
   if spinner:
     out = anvil.server.call('init_cache')
@@ -51,10 +61,13 @@ def update_lazy_vars(spinner=True):
 
 def _clear_lazy_vars():
   global _lazy_dict
+  global lazy_loaded
+  global cache_task
   _lazy_dict = {}
   lazy_loaded = False
+  cache_task = None
 
-  
+
 def _set_lazy_vars(out):
   from . import network_controller as nc
   global _lazy_dict

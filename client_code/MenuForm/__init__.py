@@ -38,13 +38,13 @@ class MenuForm(MenuFormTemplate):
     # if p.DEBUG_MODE and self.item['test_mode']:
     #   auto_test.client_auto_tests()
     self.set_test_link()
+    self.timer_1.interval = 30*60 #kludge to prevent cache from becoming *too* stale
     
   def form_show(self, **event_args):
     self.reset_status(self.item['state'])
 
   def timer_1_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
-    self.timer_1.interval = 30*60 #kludge to prevent cache from becoming *too* stale
     # with h.PausedTimer(self.timer_2):
     glob.populate_lazy_vars(spinner=False)
   

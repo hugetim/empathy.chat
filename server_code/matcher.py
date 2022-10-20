@@ -95,14 +95,25 @@ def _init_before_tests(time_zone):
   return _init_matcher(user, trust_level)
 
 
+@anvil.server.background_task
+def _init_cache_bg(user):
+  import anvil.users
+  from . import network_interactor as ni
+  anvil.users.force_login(user)
+  anvil.server.task_state['out'] = ni.init_cache()
+  anvil.users.logout()
+
+
 def _init_matcher(user, trust_level):
   partial_state_if_unchanged = _init_user_status(user)
   state = _get_state(user, partial_state_if_unchanged)
   propagate_update_needed(user)
+  task = anvil.server.launch_background_task('_init_cache_bg', user)
   return {'trust_level': trust_level,
           'test_mode': trust_level >= sm.TEST_TRUST_LEVEL,
           'name': user['first_name'],
           'state': state,
+          'cache_task': task,
          }
 
 
