@@ -1,4 +1,4 @@
-import anvil.secrets
+from anvil import secrets
 import anvil.email
 import anvil.server
 from . import server_misc as sm
@@ -18,8 +18,8 @@ def email_send(to_user, subject, text, from_name="", from_address="no-reply"):
 
 
 def send_sms(to_number, text):
-  account_sid = anvil.secrets.get_secret('account_sid')
-  auth_token = anvil.secrets.get_secret('auth_token')
+  account_sid = secrets.get_secret('account_sid')
+  auth_token = secrets.get_secret('auth_token')
   from twilio.rest import Client
   client = Client(account_sid, auth_token)
   try:
@@ -79,7 +79,7 @@ def ping(user, start, duration):
   content1 = f"Your proposal for a {duration} minute empathy match, starting {when_str(start, user)}, has been accepted."
   content2 = f"Go to {p.URL} for the empathy chat."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
-    send_sms(user['phone'], f"{subject}: {content1} {content2}")
+    send_sms(sm.phone(user), f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     email_send(
       to_user=user,
@@ -105,7 +105,7 @@ def notify_match_cancel(user, start, canceler_name=""):
   subject = "empathy.chat - upcoming match cancelled"
   content = f"{_other_name(canceler_name)} has cancelled your empathy chat, previously scheduled to start {when_str(start, user)}."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
-    send_sms(user['phone'], f"{subject}: {content}")
+    send_sms(sm.phone(user), f"{subject}: {content}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     email_send(
       to_user=user,
@@ -126,7 +126,7 @@ def notify_late_for_chat(user, start, waiting_users=[]):
   content1 = f"{participant_names} {verb} waiting for you to begin an empathy chat that was scheduled to start {when_str(start, user)}."
   content2 = f"Please login to {p.URL} now."
   if user['phone'] and user['notif_settings'].get('essential') == 'sms':
-    send_sms(user['phone'], f"{subject}: {content1} {content2}")
+    send_sms(sm.phone(user), f"{subject}: {content1} {content2}")
   elif user['notif_settings'].get('essential'):  # includes case of 'sms' and not user['phone']
     email_send(
       to_user=user,
@@ -157,7 +157,7 @@ def _notify_proposal_cancel_by(user, proposal, title, medium):
   subject = f"empathy.chat - {title}"
   content1 = f"{_other_name(proposer_name)} has cancelled their empathy chat request."
   if medium == 'sms':
-    send_sms(user['phone'], f"empathy.chat: {content1}")
+    send_sms(sm.phone(user), f"empathy.chat: {content1}")
   elif medium == 'email':
     email_send(
       to_user=user,
@@ -195,7 +195,7 @@ def _notify_proposal_by(user, proposal, title, desc, medium):
     content2 = f"Login to {p.URL} to accept."
   content1 = f"{_other_name(proposer_name)}{desc}{times_str}."
   if medium == 'sms':
-    send_sms(user['phone'], f"empathy.chat: {content1}\n{content2}")
+    send_sms(sm.phone(user), f"empathy.chat: {content1}\n{content2}")
   elif medium == 'email':
     email_send(
       to_user=user,
@@ -217,7 +217,7 @@ def notify_message(user, from_name=""):
   subject = f"empathy.chat - {_other_name(from_name)} sent you a message"
   content = f"{_other_name(from_name)} has sent you a message on {p.URL}"
   if user['phone'] and user['notif_settings'].get('message') == 'sms':
-    send_sms(user['phone'], f"empathy.chat - {content}")
+    send_sms(sm.phone(user), f"empathy.chat - {content}")
   elif user['notif_settings'].get('message'): # includes case of 'sms' and not user['phone']
     email_send(
       to_user=user,

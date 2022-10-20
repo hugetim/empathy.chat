@@ -85,6 +85,10 @@ def as_user_tz(dt, user):
   return dt.astimezone(tz_user)
 
 
+def phone(user):
+  return secrets.decrypt_with_key("new_key", user['phone'])
+  
+
 def name(user, to_user=None, distance=None):
   if distance is None:
     if to_user:

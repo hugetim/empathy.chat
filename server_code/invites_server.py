@@ -132,7 +132,7 @@ def load_invites(user_id=""):
 
 
 def phone_match(last4, user):
-  return last4 == user['phone'][-4:]
+  return last4 == sm.phone(user)[-4:]
 
 
 class Invite(invites.Invite):

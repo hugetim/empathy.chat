@@ -199,7 +199,7 @@ def send_verification_sms(number, user_id=""):
     else:
       app_tables.codes.add_row(
         type="phone",
-        address=number,
+        address=secrets.encrypt_with_key("new_key", number),
         code=code,
         user=user,
         date=sm.now()
@@ -294,7 +294,7 @@ def get_settings(user_id=""):
   time_zone = user['time_zone']
   if not time_zone:
     time_zone = "America/Chicago"
-  return (user['phone'], time_zone, notif_settings, elig_items)
+  return (sm.phone(user), time_zone, notif_settings, elig_items)
 
 
 @authenticated_callable
