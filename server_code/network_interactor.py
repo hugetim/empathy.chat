@@ -10,16 +10,18 @@ repo = NetworkRepository()
 
 @authenticated_callable
 @timed
-def init_cache():
+def init_cache(user=None):
   from . import connections as c
-  users_dict, connections_list, their_groups_dict = c.init_connections()
-  port_my_groups = _init_my_groups()
+  if not user:
+    user = sm.get_acting_user()
+  users_dict, connections_list, their_groups_dict = c.init_connections(user=user)
+  port_my_groups = _init_my_groups(user)
   return users_dict, connections_list, port_my_groups, their_groups_dict
 
 
-def _init_my_groups():
+def _init_my_groups(user):
   from . import groups_server as g
-  return g.load_my_groups()
+  return g.load_my_groups(user=user)
 
 
 @authenticated_callable

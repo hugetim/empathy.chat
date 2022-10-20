@@ -99,9 +99,7 @@ def _init_before_tests(time_zone):
 def _init_cache_bg(user):
   import anvil.users
   from . import network_interactor as ni
-  anvil.users.force_login(user)
-  anvil.server.task_state['out'] = ni.init_cache()
-  anvil.users.logout()
+  anvil.server.task_state['out'] = ni.init_cache(user)
 
 
 def _init_matcher(user, trust_level):

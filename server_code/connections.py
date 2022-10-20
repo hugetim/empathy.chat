@@ -15,7 +15,7 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
   """Return dictionary from degree to set of connections"""
   if up_to_degree not in range(1, 98):
     sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
-  if not cache_override and user == sm.get_acting_user():
+  if not cache_override and user == _cached_user:
     return _cached_get_connections(user, up_to_degree)
   conn_rows = {}
   conn_rows[0] = app_tables.connections.search(user1=user, current=True)
@@ -50,13 +50,16 @@ def _port_conn_row(row, distance):
 
 _cached_connections = {}
 _cached_up_to = -1
+_cached_user = None
 
 def _cached_get_connections(logged_in_user, up_to_degree):
   global _cached_connections
   global _cached_up_to
+  global _cached_user
   if up_to_degree > _cached_up_to:
     _cached_connections = _get_connections(logged_in_user, up_to_degree=up_to_degree, cache_override=True)
     _cached_up_to = up_to_degree
+    _cached_user = logged_in_user
   return {key: _cached_connections[key].copy() for key in range(up_to_degree+1)}
 
 
@@ -116,8 +119,8 @@ def get_connected_users(user, up_to_degree):
   return c_users
 
 
-def init_connections():
-  logged_in_user = sm.get_acting_user()
+def init_connections(user=None):
+  logged_in_user = user if user else sm.get_acting_user()
   up_to_degree = 3
   dset, connections_list = _get_connections(logged_in_user, up_to_degree, cache_override=True, output_conn_list=True)
   records, c_users = _get_records_and_c_users(logged_in_user, dset, up_to_degree)

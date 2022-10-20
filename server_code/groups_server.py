@@ -29,27 +29,28 @@ def serve_group_invite(port_invite, method, kwargs):
 class MyGroups(groups.MyGroups): 
   def __init__(self, port_my_groups):
     self._groups = [MyGroup(port_group) for port_group in port_my_groups]
-    self.update_names_taken()
+    self.names_taken = port_my_groups.names_taken
 
   def portable(self):
     port = groups.MyGroups()
     port._groups = [group.portable() for group in self]
     port.names_taken = self.names_taken
     return port  
+
     
-  def update_names_taken(self):
-    self.names_taken = [row['name'] for row in app_tables.groups.search(current=True)]
+def get_names_taken():
+  return [row['name'] for row in app_tables.groups.search(current=True)]
 
 
 @sm.authenticated_callable
 @anvil.tables.in_transaction
-def load_my_groups(user_id=""):
+def load_my_groups(user_id="", user=None):
   print(f"load_my_groups({user_id})")
-  out = MyGroups(groups.MyGroups())
-  user = sm.get_acting_user(user_id)
+  if not user:
+    user = sm.get_acting_user(user_id)
   rows = app_tables.groups.search(hosts=[user], current=True)
-  out._groups = [MyGroup.from_group_row(row) for row in rows]
-  return out.portable()
+  _groups = [MyGroup.from_group_row(row, portable=True, user=user) for row in rows]
+  return groups.MyGroups(_groups, get_names_taken())
 
 
 @sm.authenticated_callable
@@ -65,6 +66,7 @@ def add_my_group(port_my_groups, user_id=""):
                                       current=True,
                                      )
   my_groups._groups.append(MyGroup.from_group_row(new_row))
+  my_groups.names_taken = get_names_taken()
   return my_groups.portable()
     
       
@@ -86,9 +88,11 @@ class MyGroup(groups.MyGroup):
     return app_tables.groups.get_by_id(self.group_id) if self.group_id else None
   
   @staticmethod
-  def from_group_row(group_row, portable=False, user_id=""):
+  def from_group_row(group_row, portable=False, user=None):
+    if not user:
+      user = sm.get_acting_user()
     port_members = list(member_dicts_from_group_row(group_row))
-    port_invites = [Invite.from_invite_row(i_row)
+    port_invites = [Invite.from_invite_row(i_row, portable=True, user=user)
                     for i_row in app_tables.group_invites.search(anvil.tables.order_by('expire_date', ascending=False), 
                                                                  group=group_row, current=True)]
     port_my_group = groups.MyGroup(name=group_row['name'],
@@ -277,8 +281,9 @@ class Invite(sm.ServerItem, groups.Invite):
     accounts.init_user_info(user)
       
   @staticmethod
-  def from_invite_row(invite_row, portable=False, user_id=""):
-    user = sm.get_acting_user(user_id)
+  def from_invite_row(invite_row, portable=False, user=None):
+    if not user:
+      user = sm.get_acting_user(user_id)
     port_invite = groups.Invite(link_key=invite_row['link_key'],
                                 invite_id=invite_row.get_id(),
                                 expire_date=sm.as_user_tz(invite_row['expire_date'], user),

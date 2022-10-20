@@ -11,7 +11,7 @@ def load_invites(user):
   rows = app_tables.invites.search(origin=True, user1=user, current=True)
   out = []
   for row in rows:
-    out.append(from_invite_row(row, user_id=user.get_id()))
+    out.append(from_invite_row(row, user=user))
   return out
 
 
@@ -22,8 +22,9 @@ def get_invite_from_link_key(link_key, current=True):
   return invites_server.Invite(port_invite)
 
 
-def from_invite_row(invite_row, user_id=""):
-  user = sm.get_acting_user(user_id)
+def from_invite_row(invite_row, user=None):
+  if not user:
+    user = sm.get_acting_user()
   port_invite = invites.Invite(invite_id=invite_row.get_id(),
                                inviter=sm.get_port_user(invite_row['user1'], user1=user),
                                rel_to_inviter=invite_row['relationship2to1'],
