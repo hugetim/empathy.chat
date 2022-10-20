@@ -184,7 +184,7 @@ def user_groups(user):
 def allowed_members_from_group_row(group_row):
   member_set = (
     {m['user'] for m in app_tables.group_members.search(group=group_row) 
-     if m['user']['trust_level'] and m['user']['trust_level'] >= 2 or (m['user']['trust_level'] >= 1 and m['guest_allowed'])}
+     if m['user']['trust_level'] and (m['user']['trust_level'] >= 2 or (m['user']['trust_level'] >= 1 and m['guest_allowed']))}
   )
   member_set.update(set(group_row['hosts']))
   return list(member_set)
