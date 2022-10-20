@@ -174,6 +174,7 @@ class Invite(invites.Invite):
       if not self.invitee['phone']:
         raise InvalidInviteError(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
       elif not phone_match(self.inviter_guess, self.invitee):
+        sm.warning(f"{user['email']} mistaken guess ({self.inviter_guess}) of {self.invitee['email']}'s phone last 4.")
         raise MistakenGuessError(f"The digits you entered do not match {sm.name(self.invitee)}'s confirmed phone number.")
       self.invitee['update_needed'] = True  # app_tables.users 
     else: # link invite

@@ -1,6 +1,8 @@
 import anvil.server
 from .glob import publisher
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError, InvalidInviteError, MistakenGuessError
+from .ui_procedures import loading_indicator
+import time
 
 
 def submit_invite(invite):
@@ -23,6 +25,8 @@ def _submit_invite(invite):
   except InvalidInviteError as err:
     publisher.publish("invite_a_error", err.args[0])
   except MistakenGuessError as err:
+    with loading_indicator:
+      time.sleep(5)  # delay to slow down brute force guessing
     publisher.publish("invite_a_error", err.args[0])
 
 

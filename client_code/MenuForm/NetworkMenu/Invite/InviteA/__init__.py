@@ -5,6 +5,7 @@ from ..... import invite_controller
 from .....glob import publisher
 from anvil_extras.utils import wait_for_writeback
 
+
 class InviteA(InviteATemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
