@@ -104,7 +104,7 @@ class MyGroup(groups.MyGroup):
 
   @staticmethod
   def add_member(user, invite_row):
-    if user not in members_from_group_row(invite_row['group'], with_trust_level=False):
+    if user not in all_members_from_group_row(invite_row['group']):
       app_tables.group_members.add_row(user=user,
                                        group=invite_row['group'],
                                        invite=invite_row,
@@ -161,11 +161,8 @@ def delete_group(port_my_group):
     my_group.group_row.delete()
 
       
-def members_from_group_row(group_row, with_trust_level=True):
-  member_set = (
-    {m['user'] for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']} if with_trust_level
-    else {m['user'] for m in app_tables.group_members.search(group=group_row)}
-  )
+def all_members_from_group_row(group_row):
+  member_set = {m['user'] for m in app_tables.group_members.search(group=group_row)}
   member_set.update(set(group_row['hosts']))
   return list(member_set)
 
@@ -182,6 +179,15 @@ def user_groups(user):
   memberships = {m['group'] for m in app_tables.group_members.search(user=user)}
   hosteds = {group for group in app_tables.groups.search(hosts=[user], current=True)}
   return memberships.union(hosteds)
+
+
+def allowed_members_from_group_row(group_row):
+  member_set = (
+    {m['user'] for m in app_tables.group_members.search(group=group_row) 
+     if m['user']['trust_level'] >= 2 or (m['user']['trust_level'] >= 1 and m['guest_allowed'])}
+  )
+  member_set.update(set(group_row['hosts']))
+  return list(member_set)
 
 
 def _guest_allowed_in_group(user, group_row):

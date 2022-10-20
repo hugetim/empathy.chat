@@ -163,8 +163,7 @@ def _group_and_members(user):
     if not g.user_allowed_in_group(user, group_row):
       group_members = set(group_row['hosts'])
     else:
-      group_members = {u for u in g.members_from_group_row(group_row)
-                       if g.user_allowed_in_group(u, group_row)}
+      group_members = {u for u in g.allowed_members_from_group_row(group_row)}
     yield group_row, group_members
 
 
