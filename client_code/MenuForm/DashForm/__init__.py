@@ -24,7 +24,7 @@ class DashForm(DashFormTemplate):
        for item in self.item['proposals']]
     )
     self.set_prompts_visible(not specific_now_prop)
-    self.timer_2.interval = 5
+    self.timer_2.interval = 7.5
        
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""

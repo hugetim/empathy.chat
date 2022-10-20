@@ -46,6 +46,7 @@ class MenuForm(MenuFormTemplate):
   def timer_1_tick(self, **event_args):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     # with h.PausedTimer(self.timer_2):
+    print("refreshing cache")
     glob.populate_lazy_vars(spinner=False)
   
   def set_help_link(self, url):
