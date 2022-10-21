@@ -62,6 +62,9 @@ class ExchangeRepository:
   @tables.in_transaction(relaxed=True)
   def save_exchange(self, exchange):
     """Update participant statuses"""
+    self.save_exchange_wo_transaction(exchange)
+
+  def save_exchange_wo_transaction(self, exchange):
     match_row = self._match_row(exchange)
     keys_to_update = list(exchange.participants[0].keys())
     keys_to_update.remove('user_id')
@@ -75,7 +78,7 @@ class ExchangeRepository:
                                            match_commence=exchange.start_dt,
                                           )
     exchange.exchange_id = match_row.get_id()
-    self.save_exchange(exchange)
+    self.save_exchange_wo_transaction(exchange)
     return exchange
 
   def add_chat(self, message, now, exchange):
