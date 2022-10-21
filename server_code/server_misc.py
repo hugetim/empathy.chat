@@ -99,7 +99,7 @@ def name(user, to_user=None, distance=None):
   return port.full_name(user['first_name'], user['last_name'], distance)  
 
 
-def get_port_user(user2, distance=None, user1=None, simple=False):
+def get_port_user(user2, distance=None, user1=None, simple=False, starred=None):
   if not user2:
     return None
   explicit_user1 = True
@@ -112,12 +112,14 @@ def get_port_user(user2, distance=None, user1=None, simple=False):
   if simple:
     return port.User(user2.get_id(), _name)
   else:
+    if starred is None:
+      starred = bool(star_row(user2, user1)) if user2 != user1 else None
     return port.User(user_id=user2.get_id(),
                      name=_name,
                      url_confirmed=bool(user2['url_confirmed_date']),
                      distance=distance,
                      seeking=user2['seeking_buddy'],
-                     starred=bool(star_row(user2, user1)) if user2 != user1 else None, #True/False
+                     starred=starred, #True/False
                     )
 
   

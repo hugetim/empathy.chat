@@ -29,7 +29,7 @@ def __getattr__(name):
     with loading_indicator:
       while True:
         trial_get = _trial_get(name)
-        if trial_get != None:
+        if trial_get is not None:
           return trial_get
         import time
         time.sleep(.25)
@@ -40,7 +40,7 @@ def __getattr__(name):
 
 def _trial_get(name):
   trial_get = _lazy_dict.get(name)
-  if trial_get == None and cache_task and cache_task.is_completed():
+  if trial_get is None and cache_task and cache_task.is_completed():
     _set_lazy_vars(cache_task.get_state()['out'])
     trial_get = _lazy_dict.get(name)
   return trial_get
