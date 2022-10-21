@@ -590,7 +590,7 @@ def _commit_proptime_to_match_in_transaction(proptime, user, present):
 
 
 def commit_proptime_to_match(proptime, user, present=False):
-  """Return True if ping needed
+  """Return True if "ping" needed (which includes notification of accepted "later" request)
   
   Side effects: cancel proposal and create new match row"""
   from . import exchange_interactor as ei

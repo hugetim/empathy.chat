@@ -73,7 +73,7 @@ def when_str(start, user):
   
   
 def ping(user, start, duration):
-  """Notify pinged user"""
+  """Notify pinged user (or proposer of fully accepted "later" request)"""
   print(f"'ping', {start}, {duration}")
   subject = "empathy.chat - match confirmed"
   content1 = f"Your proposal for a {duration} minute empathy match, starting {when_str(start, user)}, has been accepted."
