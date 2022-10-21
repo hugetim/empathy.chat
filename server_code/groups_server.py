@@ -43,7 +43,7 @@ def get_names_taken():
 
 
 @sm.authenticated_callable
-@anvil.tables.in_transaction
+@anvil.tables.in_transaction(relaxed=True)
 def load_my_groups(user_id="", user=None):
   print(f"load_my_groups({user_id})")
   if not user:

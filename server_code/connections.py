@@ -15,7 +15,7 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
   """Return dictionary from degree to set of connections"""
   if up_to_degree not in range(1, 98):
     sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
-  if not cache_override and user == _cached_user:
+  if not cache_override and user == sm.get_acting_user():
     return _cached_get_connections(user, up_to_degree)
   conn_rows = {}
   conn_rows[0] = app_tables.connections.search(user1=user, current=True)
@@ -50,16 +50,13 @@ def _port_conn_row(row, distance):
 
 _cached_connections = {}
 _cached_up_to = -1
-_cached_user = None
 
 def _cached_get_connections(logged_in_user, up_to_degree):
   global _cached_connections
   global _cached_up_to
-  global _cached_user
   if up_to_degree > _cached_up_to:
     _cached_connections = _get_connections(logged_in_user, up_to_degree=up_to_degree, cache_override=True)
     _cached_up_to = up_to_degree
-    _cached_user = logged_in_user
   return {key: _cached_connections[key].copy() for key in range(up_to_degree+1)}
 
 
@@ -79,12 +76,7 @@ def member_close_connections(user):
 
 def _degree(user2, user1, up_to_degree=3):
   """Returns port.UNLINKED if no degree <= up_to_degree found"""
-  if user2 == user1:
-    return 0
-  else:
-    dset = _get_connections(user1, up_to_degree)
-    del dset[0]
-    return _degree_from_dset(user2, dset)
+  return _degrees([user2], user1, up_to_degree)[user2]
 
   
 def _degree_from_dset(user2, dset):
@@ -96,10 +88,11 @@ def _degree_from_dset(user2, dset):
 
 def _degrees(user2s, user1, up_to_degree=3):
   """Returns port.UNLINKED if no degree <= up_to_degree found"""
-  dset = _get_connections(user1, up_to_degree)
   out = {}
-  for user2 in set(user2s):
-    out[user2] = _degree_from_dset(user2, dset)
+  if user2s:
+    dset = _get_connections(user1, up_to_degree)
+    for user2 in set(user2s):
+      out[user2] = 0 if user2==user1 else _degree_from_dset(user2, dset)
   return out
   
 
@@ -119,13 +112,17 @@ def get_connected_users(user, up_to_degree):
   return c_users
 
 
+@anvil.tables.in_transaction(relaxed=True)
 def init_connections(user=None):
-  logged_in_user = user if user else sm.get_acting_user()
-  up_to_degree = 3
-  dset, connections_list = _get_connections(logged_in_user, up_to_degree, cache_override=True, output_conn_list=True)
-  records, c_users = _get_records_and_c_users(logged_in_user, dset, up_to_degree)
-  users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records)
-  return users_dict, connections_list, their_groups_dict
+  with TimerLogger("  init_connections", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
+    logged_in_user = user if user else sm.get_acting_user()
+    up_to_degree = 3
+    dset, connections_list = _get_connections(logged_in_user, up_to_degree, cache_override=True, output_conn_list=True)
+    timer.check('_get_connections')
+    records, c_users = _get_records_and_c_users(logged_in_user, dset, up_to_degree)
+    timer.check('_get_records_and_c_users')
+    users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records)
+    return users_dict, connections_list, their_groups_dict
 
 
 def _get_records_and_c_users(logged_in_user, dset, up_to_degree):
