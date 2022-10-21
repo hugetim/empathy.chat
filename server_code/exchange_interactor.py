@@ -4,6 +4,7 @@ from . import server_misc as sm
 from . import network_interactor as ni
 from .exceptions import RowMissingError
 from .exchange_gateway import ExchangeRepository
+from .exchanges import Exchange, Format
 
 
 repo = ExchangeRepository()
@@ -49,7 +50,8 @@ def _init_match_form_not_matched(user_id):
 def _init_match_form_requesting(current_proptime):
   jitsi_code, duration = current_proptime.get_match_info()
   return current_proptime.get_id(), jitsi_code, duration, ""
-  
+
+
 @authenticated_callable
 def update_match_form(user_id=""):
   """Return match_state dict
@@ -100,6 +102,22 @@ def _update_match_form_not_matched(user_id):
   return dict(
     status=partial_state['status'],
   )
+
+
+def create_new_match_from_proptime(proptime, user, present):
+  room_code, duration = proptime.get_match_info()
+  match_start = sm.now() if proptime['start_now'] else proptime['start_date']
+  participants = [dict(user_id=u.get_id(),
+                       present=int(present), # if result of a start_now request, go directly in
+                       complete=0,
+                       slider_value="", # see exchange_controller._slider_value_missing()
+                       late_notified=0,
+                       external=0,
+                      ) for u in proptime.all_users()]
+  # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
+  exchange = Exchange(None, room_code, participants, proptime['start_now'], match_start, Format(duration), user.get_id())
+  #exchange.my['present'] = int(present)
+  repo.create_exchange(exchange, proptime)
 
 
 @authenticated_callable

@@ -25,7 +25,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     self.start_dt = self.item.pop('start_date')
     self.item['start_time'] = h.day_time_str(h.as_local_tz(self.start_dt))
     self.top_form = get_open_form()
-    self.start_exchange_if_time()
+    self.show_join_button_if_time()
 
   def update_dash(self, state):
     self.top_form.content.update_status(state)
@@ -36,8 +36,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
       self.update_dash(anvil.server.call('cancel_match',
                                          self.item['match_id']))
 
-  def start_exchange_if_time(self):
-    """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
+  def show_join_button_if_time(self):
     timedelta_left = self.start_dt - h.now()
     if timedelta_left.total_seconds() <= 60*p.START_EARLY_MINUTES:
       self.join_button.visible = True

@@ -68,7 +68,16 @@ class ExchangeRepository:
     update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
     update_dict['slider_values'] = update_dict.pop('slider_value')
     match_row.update(**update_dict)
-    
+
+  def create_exchange(self, exchange, proptime):
+    match_row = app_tables.matches.add_row(users=proptime.all_users(),
+                                           proposal_time=proptime._row,
+                                           match_commence=exchange.start_dt,
+                                          )
+    exchange.exchange_id = match_row.get_id()
+    self.save_exchange(exchange)
+    return exchange
+
   def add_chat(self, message, now, exchange):
     match_row = self._match_row(exchange)
     user = app_tables.users.get_by_id(exchange.my['user_id'])
@@ -78,9 +87,9 @@ class ExchangeRepository:
                             time_stamp=now,
                            )
       
-  def get_chat_messages(self, exchange):
-    match_row = self._match_row(exchange)
-    return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=match_row)
+  # def get_chat_messages(self, exchange):
+  #   match_row = self._match_row(exchange)
+  #   return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=match_row)
   
   def _match_row(self, exchange):
     return app_tables.matches.get_by_id(exchange.exchange_id)

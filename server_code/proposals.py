@@ -107,9 +107,9 @@ class ProposalTime():
     self['accept_date'] = now
     self.proposal.hide_unaccepted_times()
     if not self['start_now']:
-      return m.commit_proptime_to_match(self)
+      return m.commit_proptime_to_match(self, user)
     elif (now - (self['start_date'])).total_seconds() <= p.BUFFER_SECONDS:
-      return m.commit_proptime_to_match(self)
+      return m.commit_proptime_to_match(self, user)
     else:
       return True
   

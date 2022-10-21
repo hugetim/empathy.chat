@@ -140,7 +140,7 @@ def _init_user_status_transaction(user):
     elif partial_state['status'] in ['pinged', 'requesting'] and partial_state['seconds_left'] <= 0:
       _cancel(user)
     elif partial_state['status'] == 'pinged':
-      proptime_to_ping = _match_commit_wo_transaction(user)
+      proptime_to_ping = _match_commence_wo_transaction(user)
       confirm_wait_helper(user)
       return None, proptime_to_ping
     elif partial_state['status'] in ['requesting', 'pinging']:
@@ -548,68 +548,54 @@ def _cancel_other(user, proptime_id=None):
 
 
 @authenticated_callable
-def match_commit(proptime_id=None, user_id=""):
+def match_commence(proptime_id=None, user_id=""):
   """
   Upon first commence of 'now', copy row over and delete 'matching' row.
   Should not cause error if already commenced
   """
-  print(f"match_commit, {proptime_id}, {user_id}")
+  print(f"match_commence, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
   propagate_update_needed(user)
-  _match_commit(user, proptime_id)
+  _match_commence(user, proptime_id)
   return _get_state(user)
 
 
 @timed
-def _match_commit(user, proptime_id=None):
+def _match_commence(user, proptime_id=None):
   if sm.DEBUG:
-    print("_match_commit")
+    print("_match_commence")
   if proptime_id:
     print("proptime_id")
     proptime = ProposalTime.get_by_id(proptime_id)
   else:
     proptime = ProposalTime.get_now(user)
   if proptime and proptime['fully_accepted']:
-    ping_needed = _commit_proptime_to_match_in_transaction(proptime)
+    ping_needed = _commit_proptime_to_match_in_transaction(proptime, user, present=True)
     if ping_needed:
       proptime.ping()
 
 
-def _match_commit_wo_transaction(user):
+def _match_commence_wo_transaction(user):
   """Return proptime_to_ping (if applicable)"""
   current_proptime = ProposalTime.get_now(user)
   if current_proptime and current_proptime['fully_accepted']:
-    ping_needed = commit_proptime_to_match(current_proptime)
+    ping_needed = commit_proptime_to_match(current_proptime, user, present=True)
     if ping_needed:
       return current_proptime
 
 
 @anvil.tables.in_transaction
-def _commit_proptime_to_match_in_transaction(proptime):
-  return commit_proptime_to_match(proptime)
+def _commit_proptime_to_match_in_transaction(proptime, user, present):
+  return commit_proptime_to_match(proptime, user, present)
 
 
-def commit_proptime_to_match(proptime):
+def commit_proptime_to_match(proptime, user, present=False):
   """Return True if ping needed
   
   Side effects: cancel proposal and create new match row"""
+  from . import exchange_interactor as ei
   print("commit_proptime_to_match")
-  _create_new_match_from_proptime(proptime)
+  ei.create_new_match_from_proptime(proptime, user, present)
   proposal = proptime.proposal
   proposal.cancel_all_times()
   return (not proptime['start_now'])
-
-
-def _create_new_match_from_proptime(proptime):
-  match_start = sm.now() if proptime['start_now'] else proptime['start_date']
-  users = proptime.all_users()
-  new_match = app_tables.matches.add_row(users=users,
-                                         proposal_time=proptime._row,
-                                         match_commence=match_start,
-                                         present=[0]*len(users),
-                                         complete=[0]*len(users),
-                                         slider_values=[""]*len(users),
-                                         external=[0]*len(users),
-                                         late_notified=[0]*len(users),
-                                        )
-  # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects

@@ -53,7 +53,7 @@ class PendingState(h.AttributeToKey):
   
   def start_exchange(self):
     prev_status = self.status
-    state = server.call('match_commit')
+    state = server.call('match_commence')
     self.status = state['status']
     if self.status != prev_status:
       glob.publisher.publish("match.status", "new_status")
