@@ -100,26 +100,25 @@ def name(user, to_user=None, distance=None):
 
 
 def get_port_user(user2, distance=None, user1=None, simple=False):
-  if user2:
-    explicit_user1 = True
-    if not user1:
-      explicit_user1 = False
-      user1 = get_acting_user()
-    if user1 == user2:
-      distance = 0
-    _name = name(user2, user1 if explicit_user1 else None, distance)
-    if simple:
-      return port.User(user2.get_id(), _name)
-    else:
-      return port.User(user_id=user2.get_id(), 
-                       name=_name,
-                       url_confirmed=bool(user2['url_confirmed_date']),
-                       distance=distance,
-                       seeking=user2['seeking_buddy'],
-                       starred=bool(star_row(user2, user1)) if user2 != user1 else None, #True/False
-                      )
-  else:
+  if not user2:
     return None
+  explicit_user1 = True
+  if not user1:
+    explicit_user1 = False
+    user1 = get_acting_user()
+  if user1 == user2:
+    distance = 0
+  _name = name(user2, user1 if explicit_user1 else None, distance)
+  if simple:
+    return port.User(user2.get_id(), _name)
+  else:
+    return port.User(user_id=user2.get_id(),
+                     name=_name,
+                     url_confirmed=bool(user2['url_confirmed_date']),
+                     distance=distance,
+                     seeking=user2['seeking_buddy'],
+                     starred=bool(star_row(user2, user1)) if user2 != user1 else None, #True/False
+                    )
 
   
 def _latest_invited(user):
