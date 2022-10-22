@@ -39,17 +39,17 @@ class Eligibility(EligibilityTemplate):
           self.starred_check_box.tooltip = f"currently: {name_list_str}"
       else:
         self.starred_check_box.text = "My Starred list (you currently have no Starred users)"
-    has_close_link = self.item['user_items'] and self.item['user_items'][0]['value'].distance == 1
-    self.network_flow_panel.visible = self.trust_level >= 2 and has_close_link
+    has_phone_buddy = self.item['user_items'] and self.item['user_items'][0]['value'].distance == 1
+    self.network_flow_panel.visible = self.trust_level >= 2 and has_phone_buddy
     self.network_check_box.checked = self.item['eligible']
     if self.trust_level >= 3:
-      self.drop_down_eligible.items = [("users (up to 3 degrees separation)", 3),
-                                       ('"friends of friends" (up to 2 degrees separation)', 2),
+      self.drop_down_eligible.items = [("all buddies (up to 3 degrees)", 3),
+                                       ('"buddies of buddies" (up to 2 degrees)', 2),
                                       ]
     else: 
       self.drop_down_eligible.items = []
       self.item['eligible'] = min(self.item['eligible'], 1)
-    self.drop_down_eligible.items += [("my close links (1st degree only)", 1),
+    self.drop_down_eligible.items += [("my phone buddies (1st degree only)", 1),
                                      ]
     self.drop_down_eligible.selected_value = self.item['eligible'] if self.item['eligible'] else 1
     self.groups_check_box.checked = self.item['eligible_groups']

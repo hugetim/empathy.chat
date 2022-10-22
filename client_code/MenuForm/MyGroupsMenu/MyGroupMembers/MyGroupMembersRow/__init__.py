@@ -29,7 +29,7 @@ class MyGroupMembersRow(MyGroupMembersRowTemplate):
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if prompts.invite_dialog(port.User(name=self.item['name'], user_id=self.item['user_id']),
-                             title="Form a new close link",
+                             title="Connect to a phone buddy",
                             ):
       self.parent.raise_event('x-reset')
 

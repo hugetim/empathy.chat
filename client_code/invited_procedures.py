@@ -18,7 +18,7 @@ def invited_dialog(inviter):
   top_form = get_open_form()
   top_form.invited_alert = Invited(item=invite)
   return alert(content=top_form.invited_alert,
-               title="Accept this invitation to link?",
+               title="Accept this invitation to connect?",
                buttons=[], large=True, dismissible=False)
 
   
@@ -115,7 +115,7 @@ def _handle_successful_response(invite):
   elif not has_phone:
     publisher.publish("invited", "success")
   else:
-    Notification("You have been successfully linked.", style="success").show()
+    Notification("You have been successfully connected.", style="success").show()
     publisher.publish("invited", "success")
 
 
@@ -130,7 +130,7 @@ def invited_signup(invite):
   try:
     invite.relay('register', dict(user=new_user))
     if isinstance(invite, invites.Invite) and new_user['phone']:
-      Notification("You have been successfully linked.", style="success").show()
+      Notification("You have been successfully connected.", style="success").show()
     if new_user and method == "email":
       _show_alert_re_pw_email(new_user["email"])
   except MistakenGuessError as err:

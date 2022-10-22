@@ -17,7 +17,7 @@ def _submit_invite(invite):
   try:
     invite.relay('add')
     if invite.invitee: #existing user
-      message = f"You will be linked once {invite.invitee.name} confirms."
+      message = f"You will be connected once {invite.invitee.name} confirms."
       publisher.publish("invite", "success")
       alert(message)
     else:

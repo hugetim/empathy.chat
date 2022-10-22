@@ -35,7 +35,7 @@ class Profile(ProfileTemplate):
                                                    or self.seeking_switch.visible 
                                                    or self.seeking_label.visible)
     self.last_active_label.text = f"  Last Active: {self.item.last_active_str},"
-    self.connections_button.text = "My Network" if self.item['me'] else "Links"
+    self.connections_button.text = "My Network" if self.item['me'] else "Buddies"
     self.column_panel_1.row_spacing = 0
     if self.item['url_confirmed']:
       self.web_page_link.tooltip = (
@@ -157,7 +157,7 @@ class Profile(ProfileTemplate):
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if prompts.invite_dialog(port.User(name=self.item['name'], user_id=self.item['user_id']),
-                             title="Form a new close link",):
+                             title="Connect to a phone buddy",):
       get_open_form().go_profile(self.item['user_id'])
 
   def confirm_button_click(self, **event_args):
