@@ -76,7 +76,12 @@ def warning(warning_str, app_info_dict=None, from_client=False):
     if not from_client:
       print(f"Reporting warning: {warning_str}")
     n.email_send(admin, subject="empathy.chat warning", text=content, from_name="empathy.chat warning handling")
-    
+
+
+def my_assert(statement, id_str):
+  if not statement:
+    warning(f"{id_str}: bool({statement}) is not True")
+  
     
 def as_user_tz(dt, user):
   import pytz

@@ -123,8 +123,9 @@ def _prune_all_expired_items():
 
 def _init_user_status(user):
   partial_state_if_unchanged, proptime_to_ping = _init_user_status_transaction(user)
-  if proptime_to_ping:
-    proptime_to_ping.ping()
+  sm.my_assert((not ping_needed), "ping_needed when responding to ping?")
+  # if proptime_to_ping:
+  #   proptime_to_ping.ping()
   return partial_state_if_unchanged
 
 
@@ -571,8 +572,9 @@ def _match_commence(user, proptime_id=None):
     proptime = ProposalTime.get_now(user)
   if proptime and proptime['fully_accepted']:
     ping_needed = _commit_proptime_to_match_in_transaction(proptime, user, present=True)
-    if ping_needed:
-      proptime.ping()
+    sm.my_assert((not ping_needed), "ping_needed when responding to ping?")
+    # if ping_needed:
+    #   proptime.ping()
 
 
 def _match_commence_wo_transaction(user):
