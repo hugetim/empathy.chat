@@ -122,8 +122,7 @@ def _prune_all_expired_items():
 
 
 def _init_user_status(user):
-  partial_state_if_unchanged, proptime_to_ping = _init_user_status_transaction(user)
-  sm.my_assert((not ping_needed), "ping_needed when responding to ping?")
+  partial_state_if_unchanged = _init_user_status_transaction(user)
   # if proptime_to_ping:
   #   proptime_to_ping.ping()
   return partial_state_if_unchanged
@@ -143,12 +142,12 @@ def _init_user_status_transaction(user):
     elif partial_state['status'] == 'pinged':
       proptime_to_ping = _match_commence_wo_transaction(user)
       confirm_wait_helper(user)
-      return None, proptime_to_ping
+      sm.my_assert((not proptime_to_ping), "ping_needed when responding to ping?")
     elif partial_state['status'] in ['requesting', 'pinging']:
       confirm_wait_helper(user)
     else:
-      return partial_state, None
-    return None, None
+      return partial_state
+    return None
 
  
 def confirm_wait_helper(user):
