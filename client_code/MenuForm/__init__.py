@@ -34,7 +34,7 @@ class MenuForm(MenuFormTemplate):
       self.set_help_link("https://www.loomio.org/join/group/G537YtVTZmNTW1S1KTJnDvUb/")
     self.connections_link.visible = glob.trust_level >= 2 # show if guest_allowed (DashForm.timer_1)
     self.my_groups_link.visible = glob.trust_level >= 3
-    self.test_mode.visible = self.item['test_mode']
+    self.test_column_panel.visible = self.item['test_mode']
     # if p.DEBUG_MODE and self.item['test_mode']:
     #   auto_test.client_auto_tests()
     self.set_test_link()
@@ -195,11 +195,6 @@ class MenuForm(MenuFormTemplate):
     glob.logged_in_user = None
     glob.logged_in_user_id = ""
     open_form('LoginForm')
-
-  def test_mode_change(self, **event_args):
-    """This method is called when this checkbox is checked or unchecked"""
-    self.test_column_panel.visible = self.test_mode.checked
-    self.test_user_id = anvil.server.call('get_test_user_id')
 
   def autotest_butten_click(self, **event_args):
     """This method is called when the button is clicked"""

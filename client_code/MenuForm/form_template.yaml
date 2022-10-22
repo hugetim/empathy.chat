@@ -176,14 +176,6 @@ components:
     layout_properties: {grid_position: 'NMZJYT,IVZQMC'}
     event_bindings: {}
     name: version_label
-  - type: CheckBox
-    properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: false, text: test mode, font_size: null, font: '',
-      spacing_above: small, spacing_below: small, italic: false, background: '', bold: false,
-      checked: false, underline: false}
-    layout_properties: {grid_position: 'BFRXNX,DQTVLO'}
-    event_bindings: {change: test_mode_change}
-    name: test_mode
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
       wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
