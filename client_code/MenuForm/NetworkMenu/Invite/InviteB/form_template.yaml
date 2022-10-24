@@ -63,7 +63,7 @@ components:
     properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
       foreground: '', visible: true, font_size: null, content: 'Once they register
         using this link and confirm ownership of a phone number ending in {last4_label},
-        you will be linked.', font: '', spacing_above: none, spacing_below: none,
+        you will be connected.', font: '', spacing_above: none, spacing_below: none,
       data: null, background: '', format: markdown}
     name: rich_text_1
     layout_properties: {}
