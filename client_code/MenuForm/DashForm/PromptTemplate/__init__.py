@@ -20,6 +20,6 @@ class PromptTemplate(PromptTemplateTemplate):
   def dismiss_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     anvil.server.call('dismiss_prompt', prompt_id=self.item['dismissable'])
-    ui.reload()
+    ui.init_load()
 
 

@@ -81,24 +81,19 @@ def init(time_zone):
   Side effects: prunes old proposals/matches,
                 updates expire_date if currently requesting/ping
   """
-  init_dict = _init_before_tests(time_zone)
-  # if p.DEBUG_MODE and trust_level >= sm.TEST_TRUST_LEVEL:
-  #   from . import server_auto_test
-  #   server_auto_test.server_auto_tests()
-  #   #anvil.server.launch_background_task('server_auto_tests')
-  return init_dict
-
-
-@timed
-def _init_before_tests(time_zone):
-  user, trust_level = accounts.initialize_session(time_zone)
-  return _init_matcher(user, trust_level)
+  user = anvil.users.get_user()
+  task = anvil.server.launch_background_task('_init_bg', time_zone, user)
+  return task
 
 
 @anvil.server.background_task
-def _init_cache_bg(user):
+@timed
+def _init_bg(time_zone, user):
   import anvil.users
   from . import network_interactor as ni
+  anvil.users.force_login(user)
+  trust_level = accounts.initialize_session(time_zone, user)
+  anvil.server.task_state['init_dict'] = _init_matcher(user, trust_level)
   anvil.server.task_state['out'] = ni.init_cache(user)
 
 
@@ -106,12 +101,10 @@ def _init_matcher(user, trust_level):
   partial_state_if_unchanged = _init_user_status(user)
   state = _get_state(user, partial_state_if_unchanged)
   propagate_update_needed(user)
-  task = anvil.server.launch_background_task('_init_cache_bg', user)
   return {'trust_level': trust_level,
           'test_mode': trust_level >= sm.TEST_TRUST_LEVEL,
           'name': user['first_name'],
           'state': state,
-          'cache_task': task,
          }
 
 

@@ -29,9 +29,8 @@ class LoginForm(LoginFormTemplate):
       from .. import glob
       glob.logged_in_user = user
       glob.logged_in_user_id = user_id
-      self.init_dict = ui.get_init(spinner=False)
       ui.get_mobile_status()
-      self.new_form = ui.reload(self.init_dict, do_open=False)
+      self.new_form = ui.init_load(reload=False)
       from .. import parameters
       if parameters.DEBUG_MODE:
         self.enter_button_click()

@@ -84,7 +84,7 @@ class MatchForm(MatchFormTemplate):
     if self.jitsi_embed:
       self.hide_and_hangup_jitsi_embed()
     self.item.exit()
-    ui.reload()  
+    ui.init_load()  
     
   def init_slider_panel(self):
     slider_item = {'their_name': "", 'status': self.item.slider_status, 
@@ -110,7 +110,7 @@ class MatchForm(MatchFormTemplate):
   
   def base_status_reset(self):
     if not self.item.status:
-      return ui.reload()
+      return ui.init_load()
     self.status_label.visible = self.item.status == "requesting"
     self._update_doorbell_visible()
     matched = self.item.status == "matched"
@@ -146,7 +146,7 @@ class MatchForm(MatchFormTemplate):
         Notification("The user who had asked to join has now cancelled their request.", timeout=None, style="warning").show()
     else:
       self.item.exit()
-      ui.reload()
+      ui.init_load()
 
   def update_messages(self, dispatch=None):
     self.chat_repeating_panel.items = self.item.messages_plus

@@ -91,7 +91,7 @@ class Phone(PhoneTemplate):
         text += f" {p.MISTAKEN_INVITER_GUESS_ERROR}"
       alert(text, dismissible=(not any_failed))
       self.update("confirmed")
-      ui.reload()
+      ui.init_load()
       get_open_form().go_settings()
     else:
       self.phone_error_label.text = "The code submitted does not match (or is expired)."

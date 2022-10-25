@@ -21,17 +21,16 @@ def get_user(allow_remembered=True, with_id=False):
   else:
     return anvil.users.get_user(allow_remembered)
 
-def initialize_session(time_zone):
+def initialize_session(time_zone, user):
   """initialize session state: user_id, user, and current_row"""
   with TimerLogger("initialize_session", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
-    user = anvil.users.get_user()
     timer.check("anvil.users.get_user")
     starting_trust_level = _init_user_info_transaction(user, time_zone)
     timer.check("_init_user_info_transaction")
     trust_level = _new_trust_level(user, starting_trust_level)
     if trust_level != starting_trust_level:
       user['trust_level'] = trust_level
-    return user, trust_level
+    return trust_level
 
 
 @anvil.tables.in_transaction(relaxed=True)

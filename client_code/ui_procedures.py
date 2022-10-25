@@ -47,13 +47,11 @@ def disconnect_flow(user2_id, user2_name, user1_id=""):
     return False
 
       
-def reload(init_dict=None, do_open=True):
+def init_load(reload=True):
   """Resest app after any potential change to trust_level or prompts"""
-  if not init_dict:
-    init_dict = get_init()
+  init_dict = get_init() # spinner=reload
   glob.name = init_dict['name']
   glob.trust_level = init_dict['trust_level']
-  glob.cache_task = init_dict['cache_task']
   if init_dict['state']['status'] in ["matched", "requesting", "pinged"]:
     from .MatchForm import MatchForm
     item = {k: init_dict['state'][k] for k in MatchForm.state_keys}
@@ -61,7 +59,7 @@ def reload(init_dict=None, do_open=True):
   else:
     from .MenuForm import MenuForm
     new_form = MenuForm(item=init_dict)
-  if do_open:
+  if reload:
     open_form(new_form)
   else:
     return new_form
@@ -69,13 +67,27 @@ def reload(init_dict=None, do_open=True):
 
 @timed
 def get_init(spinner=True):
-  from anvil.js.window import Intl
-  from . import helper as h
-  time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
   if spinner:
-    return h.robust_server_call('init', time_zone)
+    with loading_indicator:
+      return _get_init_from_bg()
   else:
-    return h.robust_server_call_s('init', time_zone)
+    return _get_init_from_bg()
+
+
+def _get_init_from_bg():
+  import time
+  from . import helper as h
+  from anvil.js.window import Intl
+  time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  glob.cache_task = h.robust_server_call_s('init', time_zone)
+  time.sleep(0.75)
+  while True:
+    try:
+      return glob.cache_task.get_state()['init_dict']
+    except KeyError:
+      if glob.cache_task.get_termination_status() in ['failed', 'killed', 'missing']:
+        glob.cache_task.get_error()
+      time.sleep(.1)
 
   
 def copy_to_clipboard(text, desc="It"):
