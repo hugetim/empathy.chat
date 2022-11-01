@@ -55,11 +55,11 @@ def populate_lazy_vars(spinner=True):
 
 
 def update_lazy_vars(spinner=True):
-  _clear_lazy_vars()
+  clear_lazy_vars()
   populate_lazy_vars(spinner)
 
 
-def _clear_lazy_vars():
+def clear_lazy_vars():
   global _lazy_dict
   global lazy_loaded
   global cache_task

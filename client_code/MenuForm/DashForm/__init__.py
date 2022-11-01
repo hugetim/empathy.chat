@@ -106,7 +106,7 @@ class DashForm(DashFormTemplate):
       self.top_form.reset_status(state)
  
   def timer_2_tick(self, **event_args):
-    """This method is called every 5 seconds, checking for status changes"""
+    """This method is called every [interval] seconds, checking for status changes"""
     state = anvil.server.call_s('get_state')
     self.update_status(state)    
 

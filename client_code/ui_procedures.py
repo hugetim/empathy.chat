@@ -79,6 +79,7 @@ def _get_init_from_bg():
   from . import helper as h
   from anvil.js.window import Intl
   time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  glob.clear_lazy_vars()
   glob.cache_task = h.robust_server_call_s('init', time_zone)
   time.sleep(0.75)
   while True:

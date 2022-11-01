@@ -114,15 +114,8 @@ def _prune_all_expired_items():
   #sm.prune_chat_messages() # moved to scheduled task
 
 
-def _init_user_status(user):
-  partial_state_if_unchanged = _init_user_status_transaction(user)
-  # if proptime_to_ping:
-  #   proptime_to_ping.ping()
-  return partial_state_if_unchanged
-
-
 @anvil.tables.in_transaction
-def _init_user_status_transaction(user):
+def _init_user_status(user):
   with TimerLogger("  _init_user_status", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
     _prune_all_expired_items()
     timer.check("_prune_all_expired_items")
