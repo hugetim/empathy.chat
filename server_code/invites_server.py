@@ -103,8 +103,11 @@ def _check_inviter_phone_match(invite):
 
 
 def _try_to_save_response(invite, user):
+  from . import matcher
   try:
-    _save_response(invite, user)
+    propagate_needed = _save_response(invite, user)
+    if propagate_needed:
+      matcher.propagate_update_needed()
   except MistakenGuessError as err:
     _handle_mistaken_inviter_guess_error(invite, err)
 
@@ -115,14 +118,11 @@ def _save_response(invite, user):
   _check_invitee_phone_match(invite, user)
   invite.invitee = user
   ig.save_response(invite)
-  if user['phone']:
-    _try_connect(invite)
+  return user['phone'] and _try_connect(invite)
 
   
 def _try_connect(invite):
-  from . import matcher
-  if ig.try_connect(invite):
-    matcher.propagate_update_needed()
+  return ig.try_connect(invite)
 
 
 @sm.authenticated_callable
