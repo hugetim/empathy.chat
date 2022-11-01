@@ -207,16 +207,17 @@ def send_verification_sms(number, user_id=""):
   
   
 @authenticated_callable
-@anvil.tables.in_transaction
 def check_phone_code(code, user_id=""):
-  import datetime
   from . import matcher
   user = sm.get_acting_user(user_id)
-  # first expunge old codes
-  _now = sm.now()
-  for code_row in app_tables.codes.search():
-    if _now - code_row['date'] > datetime.timedelta(minutes=10):
-      code_row.delete()
+  _expunge_old_codes()
+  code_matches, any_failed = _check_phone_code(code, user)
+  matcher.propagate_update_needed()
+  return code_matches, any_failed
+
+
+@anvil.tables.in_transaction
+def _check_phone_code(code, user):
   current_code_rows = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone")
   any_failed = False
   if len(current_code_rows) > 0:
@@ -227,9 +228,16 @@ def check_phone_code(code, user_id=""):
       any_confirmed, any_failed = _check_for_confirmed_invites(user)
   else:
     code_matches = None
-  matcher.propagate_update_needed()
   return code_matches, any_failed
- 
+
+
+def _expunge_old_codes():
+  import datetime
+  _now = sm.now()
+  for code_row in app_tables.codes.search():
+    if _now - code_row['date'] > datetime.timedelta(minutes=10):
+      code_row.delete()
+
 
 def _check_for_confirmed_invites(user):
   any_confirmed = False

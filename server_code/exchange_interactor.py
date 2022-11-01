@@ -128,17 +128,22 @@ def match_complete(user_id=""):
   try:
     exchange = repo.get_exchange(user_id)
     # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
-    exchange.my['complete'] = 1
-    if exchange.their['present'] == 0:
-      from . import notifies as n
-      user = sm.get_acting_user()
-      other_user = sm.get_other_user(exchange.their['user_id'])
-      n.notify_match_cancel_bg(other_user, exchange.start_dt, canceler_name=sm.name(user, to_user=other_user))
-      exchange.their['complete'] = 1
+    exchange = _complete_exchange(exchange)
     repo.save_exchange(exchange)
     matcher.propagate_update_needed()
   except RowMissingError as err:
     sm.warning(f"match_complete: match not found {user_id}")
+
+
+def _complete_exchange(exchange):
+  from . import notifies as n
+  exchange.my['complete'] = 1
+  if exchange.their['present'] == 0:
+    user = sm.get_acting_user()
+    other_user = sm.get_other_user(exchange.their['user_id'])
+    n.notify_match_cancel_bg(other_user, exchange.start_dt, canceler_name=sm.name(user, to_user=other_user))
+    exchange.their['complete'] = 1
+  return exchange
 
  
 @authenticated_callable

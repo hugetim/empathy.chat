@@ -118,11 +118,7 @@ def _save_response(invite, user):
   _check_invitee_phone_match(invite, user)
   invite.invitee = user
   ig.save_response(invite)
-  return user['phone'] and _try_connect(invite)
-
-  
-def _try_connect(invite):
-  return ig.try_connect(invite)
+  return user['phone'] and ig.try_connect(invite)
 
 
 @sm.authenticated_callable

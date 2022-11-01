@@ -177,7 +177,6 @@ def get_prompts(user):
 
 
 @authenticated_callable
-@anvil.tables.in_transaction(relaxed=True)
 def dismiss_prompt(prompt_id):
   from . import matcher
   prompt = app_tables.prompts.get_by_id(prompt_id)
