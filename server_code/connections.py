@@ -312,12 +312,17 @@ def save_relationship(item, user_id=""):
 
   
 @authenticated_callable
-@anvil.tables.in_transaction
 def disconnect(user2_id, user1_id=""):
-  user1 = sm.get_acting_user(user1_id)
   from . import matcher
-  matcher.propagate_update_needed()
+  user1 = sm.get_acting_user(user1_id)
   user2 = sm.get_other_user(user2_id)
+  out = _disconnect(user2, user1)
+  matcher.propagate_update_needed()
+  return out
+
+
+@anvil.tables.in_transaction
+def _disconnect(user2, user1):
   if user2:
     r1to2 = app_tables.connections.get(user1=user1, user2=user2, current=True)
     r2to1 = app_tables.connections.get(user1=user2, user2=user1, current=True)

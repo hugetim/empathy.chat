@@ -210,9 +210,8 @@ def send_verification_sms(number, user_id=""):
 @anvil.tables.in_transaction
 def check_phone_code(code, user_id=""):
   import datetime
-  user = sm.get_acting_user(user_id)
   from . import matcher
-  matcher.propagate_update_needed()
+  user = sm.get_acting_user(user_id)
   # first expunge old codes
   _now = sm.now()
   for code_row in app_tables.codes.search():
@@ -226,9 +225,10 @@ def check_phone_code(code, user_id=""):
     if code_matches:
       user['phone'] = latest_code_row['address']
       any_confirmed, any_failed = _check_for_confirmed_invites(user)
-    return code_matches, any_failed
   else:
-    return None, any_failed
+    code_matches = None
+  matcher.propagate_update_needed()
+  return code_matches, any_failed
  
 
 def _check_for_confirmed_invites(user):
@@ -252,19 +252,19 @@ def _check_for_confirmed_invites(user):
   
 @authenticated_callable
 def set_seeking_buddy(seeking, user_id=""):
-  user = sm.get_acting_user(user_id)
   from . import matcher
-  matcher.propagate_update_needed(user)
+  user = sm.get_acting_user(user_id)
   user['seeking_buddy'] = seeking
+  matcher.propagate_update_needed(user)
   
   
 @authenticated_callable
 def save_name(name_item, user_id=""):
-  user = sm.get_acting_user(user_id)
   from . import matcher
-  matcher.propagate_update_needed(user)
+  user = sm.get_acting_user(user_id)
   user['first_name'] = name_item['first']
   user['last_name'] = name_item['last']
+  matcher.propagate_update_needed(user)
   
   
 @authenticated_callable

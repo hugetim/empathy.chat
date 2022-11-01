@@ -180,9 +180,9 @@ def get_prompts(user):
 @anvil.tables.in_transaction(relaxed=True)
 def dismiss_prompt(prompt_id):
   from . import matcher
-  matcher.propagate_update_needed()
   prompt = app_tables.prompts.get_by_id(prompt_id)
   prompt['dismissed'] = True
+  matcher.propagate_update_needed()
   
 
 @authenticated_callable
@@ -241,9 +241,8 @@ def prune_chat_messages():
     
 @authenticated_callable
 def save_starred(new_starred, user2_id, user_id=""):
-  user = get_acting_user(user_id)
   from . import matcher
-  matcher.propagate_update_needed()
+  user = get_acting_user(user_id)
   user2 = get_other_user(user2_id)
   _star_row = star_row(user2, user)
   if new_starred and not _star_row:
@@ -252,6 +251,7 @@ def save_starred(new_starred, user2_id, user_id=""):
     _star_row.delete()
   else:
     warning("Redundant save_starred call.")
+  matcher.propagate_update_needed()
 
     
 def star_row(user2, user1):

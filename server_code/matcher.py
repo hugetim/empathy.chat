@@ -278,10 +278,10 @@ def cancel_match(match_id, user_id=""):
   """Cancel pending match"""
   print(f"cancel_match, {match_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  propagate_update_needed(user)
   users_to_notify, match_commence = _cancel_match(user, match_id)
   for u in users_to_notify:
     n.notify_match_cancel(u, start=match_commence, canceler_name=sm.name(user, to_user=u))
+  propagate_update_needed(user)
   return _get_state(user)
 
 
@@ -317,8 +317,8 @@ def add_proposal(proposal, link_key="", user_id=""):
   """
   print(f"add_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
-  propagate_update_needed(user)
   prop_id = _add_proposal(user, proposal, link_key)
+  propagate_update_needed(user)
   return _get_state(user), prop_id
 
 
@@ -377,8 +377,8 @@ def edit_proposal(port_prop, user_id=""):
   """
   print(f"edit_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
-  propagate_update_needed(user)
   prop_id = _edit_proposal(user, port_prop)
+  propagate_update_needed(user)
   return _get_state(user), prop_id
 
 
@@ -457,7 +457,6 @@ def cancel_time(proptime_id, user_id=""):
   """Remove proptime"""
   print(f"cancel_time, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  propagate_update_needed(user)
   proptime = ProposalTime.get_by_id(proptime_id)
   port_prop = proptime.proposal.portable(user)
   if len(port_prop.times) > 1:
@@ -467,6 +466,7 @@ def cancel_time(proptime_id, user_id=""):
   else:
     proptime.notify_cancel()
     _cancel_in_transaction(user, proptime_id)
+  propagate_update_needed(user)
   return _get_state(user)
 
 
@@ -492,8 +492,8 @@ def cancel_accept(proptime_id=None, user_id=""):
   """Remove user accepting"""
   print(f"cancel_accept, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  propagate_update_needed(user)
   _cancel_in_transaction(user, proptime_id)
+  propagate_update_needed(user)
   return _get_state(user)
 
 
@@ -506,8 +506,8 @@ def cancel_now(proptime_id=None, user_id=""):
     proptime = ProposalTime.get_by_id(proptime_id)
     if proptime:
       proptime.notify_cancel()
-  propagate_update_needed()
   _cancel_in_transaction(user, proptime_id)
+  propagate_update_needed()
   return _get_state(user)
 
 
@@ -535,8 +535,8 @@ def _cancel_other(user, proptime_id=None):
 #   """
 #   print(f"cancel_other, {proptime_id}, {user_id}")
 #   user = sm.get_acting_user(user_id)
-#   propagate_update_needed()
 #   _cancel_other_in_transaction(user, proptime_id)
+#   propagate_update_needed()
 #   return _get_state(user)
 
 
@@ -548,8 +548,8 @@ def match_commence(proptime_id=None, user_id=""):
   """
   print(f"match_commence, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  propagate_update_needed(user)
   _match_commence(user, proptime_id)
+  propagate_update_needed(user)
   return _get_state(user)
 
 
