@@ -286,15 +286,10 @@ def random_code(num_chars=5, digits_only=False):
   return "".join([random.choice(charset) for i in range(num_chars)])
 
 
-@anvil.server.http_endpoint('/:name')
-def get_doc(name):
-  return app_tables.files.get(name=name)['file']
-
-
 @anvil.server.callable
 def get_url(name):
-  url = anvil.server.get_api_origin() +'/'+name
-  return url
+  media = app_tables.files.get(name=name)['file']
+  return media.url
 
 
 @anvil.server.callable
