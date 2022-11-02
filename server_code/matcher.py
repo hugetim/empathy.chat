@@ -80,9 +80,11 @@ def init(time_zone):
   
   Side effects: prunes old proposals/matches,
                 updates expire_date if currently requesting/ping
+                clears cached session['state']
   """
   user = anvil.users.get_user()
   task = anvil.server.launch_background_task('_init_bg', time_zone, user)
+  anvil.server.session['state'] = None
   return task
 
 
@@ -185,8 +187,9 @@ def _get_state(user, partial_state_if_known=None):
       timer.check("_get_proposals_upcomings")
       state['prompts'] = sm.get_prompts(user)
       timer.check("get_prompts")
-    anvil.server.session['state'] = state
-    user['update_needed'] = False
+    if anvil.server.context.client.type == 'browser':
+      anvil.server.session['state'] = state
+      user['update_needed'] = False
     return state
   
 
