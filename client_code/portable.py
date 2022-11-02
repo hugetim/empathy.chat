@@ -77,7 +77,6 @@ class User(h.AttributeToKey):
  
   def toggle_starred(self):
     self.starred = not self.starred
-    return anvil.server.call('save_starred', self.starred, self.user_id)
 
   @staticmethod
   def from_name_item(item):

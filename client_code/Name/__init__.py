@@ -1,5 +1,6 @@
 from ._anvil_designer import NameTemplate
 from anvil import *
+import anvil.server
 from .. import helper as h
 from .. import parameters as p
 from .. import portable as port
@@ -25,5 +26,4 @@ class Name(NameTemplate):
     """This method is called when the button is clicked"""
     self.item.toggle_starred()
     self.refresh_data_bindings()
-
-
+    anvil.server.call_s('save_starred', self.item.starred, self.item.user_id)

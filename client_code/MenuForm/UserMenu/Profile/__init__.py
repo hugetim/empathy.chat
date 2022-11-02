@@ -169,3 +169,4 @@ class Profile(ProfileTemplate):
     """This method is called when the button is clicked"""
     self.item.toggle_starred()
     self.update()
+    anvil.server.call_s('save_starred', self.item.starred, self.item.user_id)
