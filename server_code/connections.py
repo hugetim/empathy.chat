@@ -126,8 +126,9 @@ def init_connections(user=None):
 
 
 def _get_records_and_c_users(logged_in_user, dset, up_to_degree):
+  from . import network_interactor as ni
   records = [connection_record(logged_in_user, logged_in_user)]
-  starred_users = set(sm.starred_users(logged_in_user))
+  starred_users = set(ni.starred_users(logged_in_user))
   connected_users = set()
   for d in range(1, up_to_degree+1):
     records += [connection_record(user2, logged_in_user, _distance=d, degree=d, starred=(user2 in starred_users)) 

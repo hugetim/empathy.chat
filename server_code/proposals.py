@@ -7,6 +7,7 @@ from . import server_misc as sm
 from . import notifies as n
 from . import portable as port
 from . import groups
+from . import network_interactor as ni
 from anvil_extras.server_utils import timed
 
 
@@ -537,7 +538,7 @@ def is_eligible(eligibility_spec, other_user, distance=None):
     distance = c.distance(eligibility_spec['user'], other_user)
   if (distance <= eligibility_spec['eligible'] or (other_user in eligibility_spec['eligible_users'] and distance < port.UNLINKED)):
     return True
-  elif (eligibility_spec['eligible_starred'] and sm.star_row(other_user, eligibility_spec['user'])):
+  elif (eligibility_spec['eligible_starred'] and ni.star_row(other_user, eligibility_spec['user'])):
     return True
   else:
     for group in eligibility_spec['eligible_groups']:
@@ -554,7 +555,7 @@ def all_eligible_users(eligibility_spec):
   if eligibility_spec['eligible']:
     all_eligible.update(set(c.get_connected_users(user, up_to_degree=eligibility_spec['eligible'])))
   if eligibility_spec['eligible_starred']:
-    all_eligible.update(set(sm.starred_users(user)))
+    all_eligible.update(set(ni.starred_users(user)))
   if eligibility_spec['eligible_users']:
     all_eligible.update(set(eligibility_spec['eligible_users']))
   for group in eligibility_spec['eligible_groups']:

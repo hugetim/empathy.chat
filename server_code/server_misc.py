@@ -105,6 +105,7 @@ def name(user, to_user=None, distance=None):
 
 
 def get_port_user(user2, distance=None, user1=None, simple=False, starred=None):
+  from . import network_interactor as ni
   if not user2:
     return None
   explicit_user1 = True
@@ -118,7 +119,7 @@ def get_port_user(user2, distance=None, user1=None, simple=False, starred=None):
     return port.User(user2.get_id(), _name)
   else:
     if starred is None:
-      starred = bool(star_row(user2, user1)) if user2 != user1 else None
+      starred = bool(ni.star_row(user2, user1)) if user2 != user1 else None
     return port.User(user_id=user2.get_id(),
                      name=_name,
                      url_confirmed=bool(user2['url_confirmed_date']),
@@ -224,43 +225,6 @@ def add_message_prompt(user2, user1):
     from . import notifies as n
     n.notify_message(user2, from_name)
 
-
-@anvil.server.background_task
-def prune_chat_messages():
-  """Prune messages from fully completed matches"""
-  if DEBUG:
-    print("server_misc.prune_chat_messages()")
-  all_messages = app_tables.chat.search()
-  matches = {message['match'] for message in all_messages}
-  for match in matches:
-    if min(match['complete']) == 1:
-      for row in app_tables.chat.search(match=match):
-        row.delete()
-
-    
-@authenticated_callable
-def save_starred(new_starred, user2_id, user_id=""):
-  from . import matcher
-  user = get_acting_user(user_id)
-  user2 = get_other_user(user2_id)
-  _star_row = star_row(user2, user)
-  if new_starred and not _star_row:
-    app_tables.stars.add_row(user1=user, user2=user2)
-  elif not new_starred and _star_row:
-    _star_row.delete()
-  else:
-    warning("Redundant save_starred call.")
-  matcher.propagate_update_needed()
-
-    
-def star_row(user2, user1):
-  return app_tables.stars.get(user1=user1, user2=user2)
-
-
-def starred_users(user):
-  for row in app_tables.stars.search(user1=user):
-    yield row['user2']
-  
 
 class ServerItem:
   def relay(self, method, kwargs=None):

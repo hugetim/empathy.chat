@@ -113,7 +113,7 @@ def _init_matcher(user, trust_level):
 def _prune_all_expired_items():
   #Proposal.prune_all() # Not needed because this is done with every get_proposals
   _prune_newer_matches()
-  #sm.prune_chat_messages() # moved to scheduled task
+  #sm.prune_chat_messages() # moved to scheduled task (and now in network_interactor module)
 
 
 @anvil.tables.in_transaction

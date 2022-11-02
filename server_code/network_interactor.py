@@ -1,5 +1,6 @@
 from anvil import secrets
 from .server_misc import authenticated_callable
+from anvil.server import background_task
 from anvil_extras.server_utils import timed
 from . import server_misc as sm
 from .network_gateway import NetworkRepository
@@ -58,3 +59,45 @@ def get_messages(user2, user1):
             } for m in messages]
   else:
     return []
+
+
+@background_task
+def prune_chat_messages():
+  """Prune messages from fully completed matches"""
+  from anvil.tables import app_tables
+  if sm.DEBUG:
+    print("prune_chat_messages()")
+  all_messages = app_tables.chat.search()
+  matches = {message['match'] for message in all_messages}
+  for match in matches:
+    if min(match['complete']) == 1:
+      for row in app_tables.chat.search(match=match):
+        row.delete()
+
+    
+@authenticated_callable
+def save_starred(new_starred, user2_id, user_id=""):
+  from anvil.tables import app_tables
+  from . import matcher
+  user = sm.get_acting_user(user_id)
+  user2 = sm.get_other_user(user2_id)
+  _star_row = star_row(user2, user)
+  if new_starred and not _star_row:
+    app_tables.stars.add_row(user1=user, user2=user2)
+  elif not new_starred and _star_row:
+    _star_row.delete()
+  else:
+    sm.warning("Redundant save_starred call.")
+  matcher.propagate_update_needed()
+
+    
+def star_row(user2, user1):
+  from anvil.tables import app_tables
+  return app_tables.stars.get(user1=user1, user2=user2)
+
+
+def starred_users(user):
+  from anvil.tables import app_tables
+  for row in app_tables.stars.search(user1=user):
+    yield row['user2']
+  
