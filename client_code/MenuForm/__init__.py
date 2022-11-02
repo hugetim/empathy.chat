@@ -39,6 +39,7 @@ class MenuForm(MenuFormTemplate):
     #   auto_test.client_auto_tests()
     self.set_test_link()
     self.timer_1.interval = 30*60 #kludge to prevent cache from becoming *too* stale
+    self.dash = None
     
   def form_show(self, **event_args):
     self.reset_status(self.item['state'])
@@ -62,7 +63,8 @@ class MenuForm(MenuFormTemplate):
     else:
       if state['status'] not in [None]:
         h.warning(f'{state["status"]} not in [None]')
-      self.go_dash(state) 
+      self.load_dash(state)
+      self.go_dash()
 
   def clear_page(self):
     self.link_bar_home.visible = True
@@ -78,11 +80,14 @@ class MenuForm(MenuFormTemplate):
     self.clear_page()
     self.content = content
     self.content_column_panel.add_component(self.content)  
-    
-  def go_dash(self, state):
-    self.title_label.text = "Dashboard"
+
+  def load_dash(self, state):
     item = {k: state[k] for k in DashForm.state_keys}
-    self.reset_and_load(DashForm(item=item))
+    self.dash = DashForm(item=item)
+  
+  def go_dash(self):
+    self.title_label.text = "Dashboard"
+    self.reset_and_load(self.dash)
     self.home_link.role = "selected"
 
   def go_match(self, state):
@@ -144,7 +149,10 @@ class MenuForm(MenuFormTemplate):
   def home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     self.hide_sidebar_mobile()
-    self.reset_status(anvil.server.call('get_state'))
+    if self.dash:
+      self.go_dash()
+    else:
+      self.reset_status(anvil.server.call('get_state'))
     
   def connections_link_click(self, **event_args):
     """This method is called when the link is clicked"""
