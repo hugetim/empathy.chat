@@ -167,11 +167,14 @@ class Invite(invites.Invite):
     if validation_errors:
       raise InvalidInviteError("\n".join(validation_errors))
     if self.invitee:
+      from . import connections as c
       if not self.invitee['phone']:
         raise InvalidInviteError(f"{sm.name(self.invitee)} does not have a confirmed phone number.")
       elif not phone_match(self.inviter_guess, self.invitee):
         sm.warning(f"{user['email']} mistaken guess ({self.inviter_guess}) of {self.invitee['email']}'s phone last 4.")
         raise MistakenGuessError(f"The digits you entered do not match {sm.name(self.invitee)}'s confirmed phone number.")
+      elif c.distance(self.invitee, user, up_to_distance=1) == 1: #specific to phone buddy invites
+        raise InvalidInviteError(f"You are already phone buddies with {sm.name(self.invitee)}.")
       self.invitee['update_needed'] = True  # app_tables.users 
     else: # link invite
       user['last_invite'] = sm.now()
