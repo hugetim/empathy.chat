@@ -141,7 +141,8 @@ def _profiles_and_their_groups(user, c_users, records, starred_users):
   members_to_group_names, their_groups_dict = _group_info(user)
   records += [_connection_record(user2, user, port.UNLINKED, port.UNLINKED, starred=(user2 in starred_users)) 
               for user2 in set(members_to_group_names.keys()) - c_users.union({user})]
-  users_dict = {record['user_id']: _get_port_profile(record, members_to_group_names) for record in records}
+  invite_dict = _get_invite_dict(user)
+  users_dict = {record['user_id']: _get_port_profile(record, members_to_group_names, invite_dict) for record in records}
   return users_dict, their_groups_dict
 
 
@@ -176,7 +177,7 @@ def _port_group(group_row, group_members):
                      )
 
 
-def _get_port_profile(record, members_to_group_names):
+def _get_port_profile(record, members_to_group_names, invite_dict):
   from . import relationship as rel
   user = record.pop('user')
   relationship = rel.Relationship(distance=record['distance'])
@@ -186,6 +187,7 @@ def _get_port_profile(record, members_to_group_names):
     'profile': user['profile'],
     'profile_updated': user['profile_updated'],
     'profile_url': user['profile_url'] if relationship.profile_url_visible else "",
+    'status': _invite_status(user, invite_dict) if record['distance'] > 1 else "",
   })
   return port.UserProfile(**record)
 
@@ -201,7 +203,6 @@ def _connection_record(user2, user1, _distance=None, degree=None, starred=None):
   record.update({'me': is_me,
                  'degree': degree, 
                  'last_active': user2['init_date'],
-                 'status': _invite_status(user2, user1) if _distance > 1 else "",
                  'unread_message': None, # True/False
                  'first': user2['first_name'],
                  'last': port.last_name(user2['last_name'], relationship),
@@ -211,15 +212,19 @@ def _connection_record(user2, user1, _distance=None, degree=None, starred=None):
                  'user': user2,
                 })
   return record
-  
 
-def _invite_status(user2, user1):
-  invites = app_tables.invites.search(user1=user1, user2=user2, origin=True, current=True)
-  if len(invites) > 0:
+
+def _get_invite_dict(user):
+  return dict(users_inviting={row['user2'] for row in app_tables.invites.search(user1=user, origin=True, current=True)},
+              users_invited_by={row['user1'] for row in app_tables.invites.search(user2=user, origin=True, current=True)},
+             )
+
+
+def _invite_status(user2, invite_dict):
+  if user2 in invite_dict['users_inviting']:
     return "invite"
   else:
-    inviteds = app_tables.invites.search(user1=user2, user2=user1, origin=True, current=True)
-    if len(inviteds) > 0:
+    if user2 in invite_dict['users_invited_by']:
       return "invited"
     else:
       return ""
