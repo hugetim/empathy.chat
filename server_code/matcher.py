@@ -96,13 +96,13 @@ def _init_bg(time_zone, user):
   anvil.users.force_login(user)
   trust_level = accounts.initialize_session(time_zone, user)
   anvil.server.task_state['init_dict'] = _init_matcher(user, trust_level)
+  propagate_update_needed(user)
   anvil.server.task_state['out'] = ni.init_cache(user)
 
 
 def _init_matcher(user, trust_level):
   partial_state_if_unchanged = _init_user_status(user)
   state = _get_state(user, partial_state_if_unchanged)
-  propagate_update_needed(user)
   return {'trust_level': trust_level,
           'test_mode': trust_level >= sm.TEST_TRUST_LEVEL,
           'name': user['first_name'],
@@ -218,7 +218,7 @@ def get_partial_state(user):
       from .exchange_gateway import ExchangeRepository
       from .exceptions import RowMissingError
       try:
-        this_exchange = ExchangeRepository().get_exchange(user.get_id())
+        this_exchange = ExchangeRepository().get_user_exchange(user)
         status = "matched"
         ping_start = this_exchange.start_dt
       except RowMissingError:

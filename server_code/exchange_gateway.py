@@ -38,6 +38,9 @@ class ExchangeRepository:
   def get_exchange(self, user_id, to_join=False):
     from .server_misc import get_acting_user
     user = get_acting_user(user_id)
+    return self.get_user_exchange(user, to_join)
+
+  def get_user_exchange(self, user, to_join=False):
     this_match, i = _current_exchange_i(user, to_join)
     if this_match:
       match_dict = dict(this_match)

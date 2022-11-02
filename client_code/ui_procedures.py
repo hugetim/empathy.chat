@@ -81,14 +81,14 @@ def _get_init_from_bg():
   time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone
   glob.clear_lazy_vars()
   glob.cache_task = h.robust_server_call_s('init', time_zone)
-  time.sleep(0.75)
+  time.sleep(0.5)
   while True:
     try:
       return glob.cache_task.get_state()['init_dict']
     except KeyError:
       if glob.cache_task.get_termination_status() in ['failed', 'killed', 'missing']:
         glob.cache_task.get_error()
-      time.sleep(.1)
+      time.sleep(.01)
 
   
 def copy_to_clipboard(text, desc="It"):

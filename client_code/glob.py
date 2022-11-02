@@ -32,7 +32,7 @@ def __getattr__(name):
         if trial_get is not None:
           return trial_get
         import time
-        time.sleep(.25)
+        time.sleep(.1)
           # populate_lazy_vars()          
           # return _lazy_dict.get(name)
   raise AttributeError(name)
