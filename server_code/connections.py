@@ -119,27 +119,27 @@ def init_connections(user=None):
     up_to_degree = 3
     dset, connections_list = _get_connections(logged_in_user, up_to_degree, cache_override=True, output_conn_list=True)
     timer.check('_get_connections')
-    records, c_users = _get_records_and_c_users(logged_in_user, dset, up_to_degree)
+    records, c_users, starred_users = _get_records_and_c_users(logged_in_user, dset, up_to_degree)
     timer.check('_get_records_and_c_users')
-    users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records)
+    users_dict, their_groups_dict = _profiles_and_their_groups(logged_in_user, c_users, records, starred_users)
     return users_dict, connections_list, their_groups_dict
 
 
 def _get_records_and_c_users(logged_in_user, dset, up_to_degree):
   from . import network_interactor as ni
-  records = [connection_record(logged_in_user, logged_in_user)]
+  records = [_connection_record(logged_in_user, logged_in_user)]
   starred_users = set(ni.starred_users(logged_in_user))
   connected_users = set()
   for d in range(1, up_to_degree+1):
-    records += [connection_record(user2, logged_in_user, _distance=d, degree=d, starred=(user2 in starred_users)) 
+    records += [_connection_record(user2, logged_in_user, _distance=d, degree=d, starred=(user2 in starred_users)) 
                 for user2 in dset[d]]
     connected_users.update(dset[d])
-  return records, connected_users
+  return records, connected_users, starred_users
 
 
-def _profiles_and_their_groups(user, c_users, records):
+def _profiles_and_their_groups(user, c_users, records, starred_users):
   members_to_group_names, their_groups_dict = _group_info(user)
-  records += [connection_record(user2, user, port.UNLINKED, port.UNLINKED) 
+  records += [_connection_record(user2, user, port.UNLINKED, port.UNLINKED, starred=(user2 in starred_users)) 
               for user2 in set(members_to_group_names.keys()) - c_users.union({user})]
   users_dict = {record['user_id']: _get_port_profile(record, members_to_group_names) for record in records}
   return users_dict, their_groups_dict
@@ -178,7 +178,7 @@ def _port_group(group_row, group_members):
 
 def _get_port_profile(record, members_to_group_names):
   from . import relationship as rel
-  user = sm.get_other_user(record['user_id'])
+  user = record.pop('user')
   relationship = rel.Relationship(distance=record['distance'])
   record.update({
     'common_group_names': members_to_group_names[user],
@@ -190,7 +190,7 @@ def _get_port_profile(record, members_to_group_names):
   return port.UserProfile(**record)
 
 
-def connection_record(user2, user1, _distance=None, degree=None, starred=None):
+def _connection_record(user2, user1, _distance=None, degree=None, starred=None):
   if degree is None:
     degree = _degree(user2, user1)
   if _distance is None:
@@ -201,13 +201,14 @@ def connection_record(user2, user1, _distance=None, degree=None, starred=None):
   record.update({'me': is_me,
                  'degree': degree, 
                  'last_active': user2['init_date'],
-                 'status': _invite_status(user2, user1),
+                 'status': _invite_status(user2, user1) if _distance > 1 else "",
                  'unread_message': None, # True/False
                  'first': user2['first_name'],
                  'last': port.last_name(user2['last_name'], relationship),
                  'url_confirmed_date': user2['url_confirmed_date'],
                  'trust_level': user2['trust_level'],
                  'trust_label': accounts.trust_label[user2['trust_level']],
+                 'user': user2,
                 })
   return record
   
