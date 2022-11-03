@@ -120,7 +120,11 @@ class MatchForm(MatchFormTemplate):
     )
     self.complete_button.text = "End Chat" if matched else "Cancel"
     self.complete_button.visible = True
-    
+    if matched:
+      self.how_empathy_drop_down.items = self.item.how_empathy_items
+      self.update_how_empathy_label()
+      self.info_flow_panel.visible = True
+  
   def update_status(self, dispatch=None):
     self.base_status_reset()
     if self.item.status == "matched":
@@ -285,6 +289,22 @@ class MatchForm(MatchFormTemplate):
     """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
     if not self._info_clicked and self.info_flow_panel.visible:
       self.info_button_click()  
+
+  def how_empathy_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    current = self.how_empathy_flow_panel.visible
+    self.set_how_empathy_visible(not current)
+  
+  def set_how_empathy_visible(self, visible):
+    self.how_empathy_flow_panel.visible = visible
+    if visible:
+      self.how_empathy_link.icon = "fa:chevron-down"
+    else:
+      self.how_empathy_link.icon = "fa:chevron-right"
+
+  def update_how_empathy_label(self, **event_args):
+    """This method is called when an item is selected"""
+    self.update_how_empathy_label.text = self.how_empathy_drop_down.selected_value
 
 
 def toggle_button_card(button, card):

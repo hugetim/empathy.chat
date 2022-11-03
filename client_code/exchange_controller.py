@@ -99,6 +99,11 @@ class ExchangeState(PendingState):
     out += self.message_items
     return h.add_new_day_to_message_list(out)
 
+  @property
+  def how_empathy_items(self):
+    return [(self.their_name, self.how_empathy_list[1]),
+            (f"{glob.name} (me)", self.how_empathy_list[0])]
+  
   def _format_how_empathy_as_messages(self):
     out = []
     for i, how_empathy in enumerate(self.how_empathy_list):
