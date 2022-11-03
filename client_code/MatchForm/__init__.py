@@ -107,6 +107,7 @@ class MatchForm(MatchFormTemplate):
     glob.publisher.subscribe("match.messages", self, self.update_messages)
     glob.publisher.subscribe("match.external", self, self.update_their_external)
     glob.publisher.subscribe("match.complete", self, self.update_their_complete)
+    glob.publisher.subscribe("match.update_how", self, self.update_how_empathy_items)
   
   def base_status_reset(self):
     if not self.item.status:
@@ -120,8 +121,11 @@ class MatchForm(MatchFormTemplate):
     )
     self.complete_button.text = "End Chat" if matched else "Cancel"
     self.complete_button.visible = True
-    if matched:
-      self.how_empathy_drop_down.items = self.item.how_empathy_items
+
+  def update_how_empathy_items(self, dispatch=None):
+    how_empathy_items = self.item.how_empathy_items
+    if how_empathy_items:
+      self.how_empathy_drop_down.items = how_empathy_items
       self.update_how_empathy_label()
       self.info_flow_panel.visible = True
   
@@ -304,7 +308,8 @@ class MatchForm(MatchFormTemplate):
 
   def update_how_empathy_label(self, **event_args):
     """This method is called when an item is selected"""
-    self.update_how_empathy_label.text = self.how_empathy_drop_down.selected_value
+    how_empathy = self.how_empathy_drop_down.selected_value
+    self.how_empathy_label.text = how_empathy if how_empathy else "[not specified]"
 
 
 def toggle_button_card(button, card):

@@ -101,8 +101,11 @@ class ExchangeState(PendingState):
 
   @property
   def how_empathy_items(self):
-    return [(self.their_name, self.how_empathy_list[1]),
-            (f"{glob.name} (me)", self.how_empathy_list[0])]
+    if self.how_empathy_list[0] or self.how_empathy_list[1]:
+      return [(self.their_name + ":", self.how_empathy_list[1]),
+              (f"{glob.name} (me):", self.how_empathy_list[0])]
+    else:
+      return []
   
   def _format_how_empathy_as_messages(self):
     out = []
@@ -140,6 +143,8 @@ class ExchangeState(PendingState):
       glob.publisher.publish("match.external", "their_external_change")
     if bool(self.their_complete) != bool(prev.their_complete):
       glob.publisher.publish("match.complete", "their_complete_change")
+    if self.how_empathy_list != prev.how_empathy_list:
+      glob.publisher.publish("match.update_how", "new_how_empathy")
 
   @staticmethod
   def initialized_state(status):
