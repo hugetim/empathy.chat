@@ -106,6 +106,10 @@ components:
         layout_properties: {}
         event_bindings: {click: lists_button_click}
         name: lists_button
+      - type: Spacer
+        properties: {height: 32}
+        name: spacer_3
+        layout_properties: {width: 8}
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle full-screen mode (not just the video chat),
           border: '', enabled: true, foreground: '', visible: true, text: Full Screen,
