@@ -20,7 +20,6 @@ class MatchForm(MatchFormTemplate):
     #
     self.jitsi_embed = None
     self.lists_url = ""
-    self._info_clicked = False
     self.first_messages_update = True
     self._doorbell_muted = glob.APPLE
     self._clips_loaded = False
@@ -127,7 +126,10 @@ class MatchForm(MatchFormTemplate):
     if how_empathy_items:
       self.how_empathy_drop_down.items = how_empathy_items
       self.update_how_empathy_label()
-      self.info_flow_panel.visible = True
+      if how_empathy_items[1][1]: # whether they have how_empathy
+        self.info_button.visible = True
+        if not self.info_flow_panel.visible:
+          self.info_button_click()
   
   def update_status(self, dispatch=None):
     self.base_status_reset()
@@ -287,29 +289,11 @@ class MatchForm(MatchFormTemplate):
   def info_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     toggle_button_card(self.info_button, self.info_flow_panel)
-    self._info_clicked = True
-
-  def info_timer_tick(self, **event_args):
-    """This method is called Every [interval] seconds. Does not trigger if [interval] is 0."""
-    if not self._info_clicked and self.info_flow_panel.visible:
-      self.info_button_click()  
-
-  def how_empathy_link_click(self, **event_args):
-    """This method is called when the link is clicked"""
-    current = self.how_empathy_flow_panel.visible
-    self.set_how_empathy_visible(not current)
-  
-  def set_how_empathy_visible(self, visible):
-    self.how_empathy_flow_panel.visible = visible
-    if visible:
-      self.how_empathy_link.icon = "fa:chevron-down"
-    else:
-      self.how_empathy_link.icon = "fa:chevron-right"
 
   def update_how_empathy_label(self, **event_args):
     """This method is called when an item is selected"""
     how_empathy = self.how_empathy_drop_down.selected_value
-    self.how_empathy_label.text = how_empathy if how_empathy else "[not specified]"
+    self.how_empathy_label.text = how_empathy
 
 
 def toggle_button_card(button, card):
