@@ -30,7 +30,7 @@ class LoginForm(LoginFormTemplate):
       glob.logged_in_user = user
       glob.logged_in_user_id = user_id
       ui.get_mobile_status()
-      self.new_form = ui.init_load(reload=False)
+      self.new_form, self.init_dict = ui.init_load(reload=False)
       from .. import parameters
       if parameters.DEBUG_MODE:
         self.enter_button_click()

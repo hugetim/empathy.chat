@@ -62,7 +62,7 @@ def init_load(reload=True):
   if reload:
     open_form(new_form)
   else:
-    return new_form
+    return new_form, init_dict
 
 
 @timed
