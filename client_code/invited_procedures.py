@@ -73,7 +73,6 @@ def _handle_group_invite(link_key):
 def _process_group_invite_visit(link_key, user):
   try:
     invite, group_name, group_host_name = server.call('visit_group_invite_link', link_key, user)
-    invite.relay('visit', {'user': user})
     if not user:
       user = invited_signup(invite)
     notification_message = f"You are now a member of the {group_name} group hosted by {group_host_name}."
