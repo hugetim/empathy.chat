@@ -238,6 +238,12 @@ class Invite(sm.ServerItem, groups.Invite):
       raise RowMissingError("Not enough information to retrieve group_invite row.")
     return row
 
+  def _unexpired_invite_row(self):
+    invite_row = self._invite_row()
+    if invite_row['expire_date'] < sm.now():
+      raise ExpiredInviteError("This group invite link is expired.")
+    return invite_row
+  
   def expire_date_update(self):
     row = self._invite_row()
     row['expire_date'] = self.expire_date
@@ -254,31 +260,27 @@ class Invite(sm.ServerItem, groups.Invite):
     return True
   
   def register(self, user):
-    invite_row = self._invite_row()
-    if invite_row['expire_date'] < sm.now():
-      raise ExpiredInviteError("This group invite link is expired.")
-    if invite_row and user:
-      Invite._register_user(user)
-      Invite._add_visitor(user, invite_row)
+    invite_row = self._unexpired_invite_row()
+    sm.my_assert(user, "register assumes a user")
+    Invite._register_user(user)
+    Invite._add_visitor(user, invite_row)
   
   def visit(self, user):
-    invite_row = self._invite_row()
-    if invite_row['expire_date'] < sm.now():
-      raise ExpiredInviteError("This group invite link is expired.")
+    invite_row = self._unexpired_invite_row()
     self.invite_id = invite_row.get_id()
-    if invite_row and user:
-      if user in invite_row['group']['hosts']:
-        this_group = invite_row['group']
-        raise MistakenVisitError(f"You have clicked/visited an invite link for a group you are a host of: {this_group['name']}.\n\n"
-                                 f"To invite someone else to join your group, instead send this group invite link to them "
-                                 "so they can visit the url, which will enable them to join the group (and also to create "
-                                 "an empathy.chat account if they are new)."
-                                )
+    if user:
       Invite._add_visitor(user, invite_row)
 
   @staticmethod
   @anvil.tables.in_transaction
   def _add_visitor(user, invite_row):
+    if user in invite_row['group']['hosts']:
+      this_group = invite_row['group']
+      raise MistakenVisitError(f"You have clicked/visited an invite link for a group you are a host of: {this_group['name']}.\n\n"
+                                f"To invite someone else to join your group, instead send this group invite link to them "
+                                "so they can visit the url, which will enable them to join the group (and also to create "
+                                "an empathy.chat account if they are new)."
+                              )
     MyGroup.add_member(user, invite_row)
     
   @staticmethod

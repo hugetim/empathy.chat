@@ -57,8 +57,11 @@ def _complete_close_invited_process(invite):
            title="", 
            buttons=[], large=True, dismissible=False):
     invite = invited_alert.item
-    if not anvil.users.get_user():
-      invited_signup(invite)
+    user = anvil.users.get_user()
+    if not user:
+      user = invited_signup(invite)
+    if user['phone']:
+      Notification("You have been successfully connected.", style="success").show()
 
 
 def _handle_group_invite(link_key):
@@ -73,7 +76,7 @@ def _process_group_invite_visit(invite, user):
   try:
     invite.relay('visit', {'user': user})
     if not user:
-      invited_signup(invite)
+      user = invited_signup(invite)
   except RowMissingError as err:
     _error_alert(err)
   except ExpiredInviteError as err:
@@ -120,6 +123,12 @@ def _handle_successful_response(invite):
 
 
 def invited_signup(invite):
+  new_user, method = _signup_dialog(invite)
+  _register_via_invite(invite, new_user, method)
+  return new_user
+
+
+def _signup_dialog(invite):
   from .Dialogs.Signup import Signup
   d = Signup()
   new_user = None
@@ -127,25 +136,7 @@ def invited_signup(invite):
     method = alert(d, title="Sign Up", buttons=[("Sign Up", "email", 'primary')])
     new_user = _process_signup_dialog(d, method, invite)
   publisher.close_channel("signup_error")
-  try:
-    invite.relay('register', dict(user=new_user))
-    if isinstance(invite, invites.Invite) and new_user['phone']:
-      Notification("You have been successfully connected.", style="success").show()
-    if new_user and method == "email":
-      _show_alert_re_pw_email(new_user["email"])
-  except MistakenGuessError as err:
-    _error_alert(err)
-  except RowMissingError as err:
-    _error_alert(err)
-    
-
-
-def _show_alert_re_pw_email(email_address):
-  alert((f'We have sent an email to {email_address} with "empathy.chat - (re)set your password" as the subject.\n\n'
-         'Click the link contained in that email to set your password and login.\n\nYou can now close this window/tab.'), 
-        large=True, 
-        dismissible=False,
-       )
+  return new_user, method
 
 
 def _process_signup_dialog(signup_dialog, method, invite):
@@ -175,4 +166,22 @@ def _submit_signup_email_to_server(email_address, invite):
   except InvalidInviteError as err:
     publisher.publish("signup_error", 
                       f"{err.args[0]}\nIf you already have an account, please login to your account normally and then try this invite link again.")
-    
+
+
+def _register_via_invite(invite, new_user, method):
+  try:
+    invite.relay('register', dict(user=new_user))
+    if new_user and method == "email":
+      _show_alert_re_pw_email(new_user["email"])
+  except MistakenGuessError as err:
+    _error_alert(err)
+  except RowMissingError as err:
+    _error_alert(err)
+
+
+def _show_alert_re_pw_email(email_address):
+  alert((f'We have sent an email to {email_address} with "empathy.chat - (re)set your password" as the subject.\n\n'
+         'Click the link contained in that email to set your password and login.\n\nYou can now close this window/tab.'), 
+        large=True, 
+        dismissible=False,
+       )
