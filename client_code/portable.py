@@ -49,7 +49,7 @@ def full_name(first, last, distance=UNLINKED, relationship=None):
   if relationship is None:
     relationship = rel.Relationship(distance=distance)
   maybe_last = last_name(last, relationship)
-  return first + (" " + maybe_last if maybe_last else "")
+  return first + " " + maybe_last if maybe_last else first
     
 
 @anvil.server.portable_class
