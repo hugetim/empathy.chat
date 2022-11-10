@@ -6,6 +6,7 @@ import anvil.tables.query as q
 from anvil import secrets
 from . import parameters as p
 from . import portable as port
+from .relationship import Relationship
 from anvil_extras.server_utils import timed
 
 
@@ -94,14 +95,14 @@ def phone(user):
   return secrets.decrypt_with_key("new_key", user['phone'])
   
 
-def name(user, to_user=None, distance=None):
-  if distance is None:
+def name(user, to_user=None, distance=None, rel=None):
+  if rel is None and distance is None:
     if to_user:
       from . import connections as c
       distance = c.distance(user, to_user, up_to_distance=2)
     else:
       distance = port.UNLINKED
-  return port.full_name(user['first_name'], user['last_name'], distance)  
+  return port.full_name(user['first_name'], user['last_name'], distance, rel)  
 
 
 def get_port_user(user2, distance=None, user1=None, simple=False, starred=None):

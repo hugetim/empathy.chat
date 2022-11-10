@@ -67,16 +67,17 @@ def _complete_close_invited_process(invite):
 def _handle_group_invite(link_key):
   print(f"_handle_group_invite: {link_key}")
   user = anvil.users.get_user()
-  invite = groups.Invite(link_key=link_key)
-  _process_group_invite_visit(invite, user)
+  _process_group_invite_visit(link_key, user)
   ui.clear_hash_and_open_form('LoginForm')
 
-
-def _process_group_invite_visit(invite, user):
+def _process_group_invite_visit(link_key, user):
   try:
+    invite, group_name, group_host_name = server.call('visit_group_invite_link', link_key, user)
     invite.relay('visit', {'user': user})
     if not user:
       user = invited_signup(invite)
+    notification_message = f"You are now a member of the {group_name} group hosted by {group_host_name}."
+    Notification(notification_message, style="success", timeout=5).show()
   except RowMissingError as err:
     _error_alert(err)
   except ExpiredInviteError as err:

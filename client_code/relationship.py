@@ -11,18 +11,17 @@ class Relationship:
                    )
   PROFILE_URL_NOTE = "Only phone buddies are allowed to see this profile URL, aside from the empathy.chat admin."
   
-  def __init__(self, distance=UNLINKED, degree=UNLINKED, group_host=False, my_group_member=False):
+  def __init__(self, distance=UNLINKED, degree=UNLINKED, group_host_to_member=False):
     self.distance = distance
     self.degree = degree if degree < UNLINKED else distance
-    self.group_host = group_host
-    self.my_group_member = my_group_member
+    self.group_host_to_member = group_host_to_member
     
   def __repr__(self):
-    return f"Relationship({self.distance}, {self.degree}, {self.group_host}, {self.my_group_member})"
+    return f"Relationship({self.distance}, {self.degree}, {self.group_host_to_member})"
     
   @property
   def last_name_visible(self):
-    return self.distance <= 1 or self.group_host or self.my_group_member
+    return self.distance <= 1 or self.group_host_to_member
     
   @property
   def last_initial_visible(self):

@@ -9,6 +9,7 @@ from . import accounts
 from . import parameters as p
 from . import helper as h
 from . import portable as port
+from .relationship import Relationship
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 
@@ -213,7 +214,19 @@ def update_guest_allowed(port_member):
   user2 = sm.get_other_user(port_member.user_id)
   member_row = app_tables.group_members.get(user=user2, group=group_row)
   member_row['guest_allowed'] = port_member.guest_allowed
-  
+
+
+@anvil.server.callable
+def visit_group_invite_link(link_key, user):
+  invite = _get_invite_from_link_key(link_key)
+  group_name, group_host_name = invite.visit(user)
+  return invite.portable(), group_name, group_host_name
+
+
+def _get_invite_from_link_key(link_key):
+  port_invite = groups.Invite(link_key=link_key)
+  return Invite(port_invite)
+
 
 class Invite(sm.ServerItem, groups.Invite): 
   def __init__(self, port_invite):
@@ -270,6 +283,7 @@ class Invite(sm.ServerItem, groups.Invite):
     self.invite_id = invite_row.get_id()
     if user:
       Invite._add_visitor(user, invite_row)
+    return self._group_name_and_host(invite_row)
 
   @staticmethod
   @anvil.tables.in_transaction
@@ -282,7 +296,14 @@ class Invite(sm.ServerItem, groups.Invite):
                                 "an empathy.chat account if they are new)."
                               )
     MyGroup.add_member(user, invite_row)
-    
+
+
+  def _group_name_and_host(self, invite_row):
+    this_group = invite_row['group']
+    rel = Relationship(group_host_to_member=True)
+    return this_group['name'], sm.name(this_group['hosts'][0], rel=rel)
+
+  
   @staticmethod
   @anvil.tables.in_transaction
   def _register_user(user):

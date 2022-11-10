@@ -45,8 +45,10 @@ def last_name(last, relationship=None):
     return ""
 
 
-def full_name(first, last, distance=UNLINKED):
-  maybe_last = last_name(last, rel.Relationship(distance=distance))
+def full_name(first, last, distance=UNLINKED, relationship=None):
+  if relationship is None:
+    relationship = rel.Relationship(distance=distance)
+  maybe_last = last_name(last, relationship)
   return first + (" " + maybe_last if maybe_last else "")
     
 
