@@ -101,7 +101,7 @@ class ExchangeState(PendingState):
 
   @property
   def how_empathy_items(self):
-    if self.how_empathy_list[0] or self.how_empathy_list[1]:
+    if self.how_empathy_list and (self.how_empathy_list[0] or self.how_empathy_list[1]):
       return [(self.their_name, self.how_empathy_list[1]),
               (f"{glob.name} (me)", self.how_empathy_list[0])]
     else:
