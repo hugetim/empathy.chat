@@ -107,6 +107,8 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
   def submit_url_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     anvil.server.call('submit_url_for_review', self.url_text_box.text)
+    Notification("Profile link submitted").show()
+    self.submit_url_button.enabled = False
 
   def explain_contribution_button_click(self, **event_args):
     """This method is called when the link is clicked"""
@@ -121,4 +123,5 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
                 buttons=[])
     if out is True:
       anvil.server.call('submit_contribution_desc', edit_form.item['text'])
-      self.explain_contribution_button.visible = False
+      Notification("Contribution description submitted").show()
+      self.explain_contribution_button.enabled = False
