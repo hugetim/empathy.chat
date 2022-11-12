@@ -19,8 +19,13 @@ class NetworkMenu(NetworkMenuTemplate):
   def clear_page(self):
     for button in self.tabs_flow_panel.get_components():
       button.background = p.NONSELECTED_TAB_COLOR
+      button.role = ""
     self.content_column_panel.clear()
-      
+
+  def select_tab_button(self, button):
+    button.background = p.SELECTED_TAB_COLOR
+    button.role = "raised"
+  
   def load_component(self, content):
     """Reset MenuForm and load content form"""
     self.clear_page()
@@ -30,17 +35,17 @@ class NetworkMenu(NetworkMenuTemplate):
   def go_connections(self):
     content = Connections(item={'user_id': ""})
     self.load_component(content)
-    self.network_tab_button.background = p.SELECTED_TAB_COLOR
+    self.select_tab_button(self.network_tab_button)
 
   def go_blocks(self):
     content = Blocks()
     self.load_component(content)
-    self.blocks_tab_button.background = p.SELECTED_TAB_COLOR
+    self.select_tab_button(self.blocks_tab_button)
     
   def go_invites(self):
     content = Invites()
     self.load_component(content)
-    self.invites_tab_button.background = p.SELECTED_TAB_COLOR
+    self.select_tab_button(self.invites_tab_button)
     
   def network_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -53,6 +58,3 @@ class NetworkMenu(NetworkMenuTemplate):
   def invites_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.go_invites()
-
-
-

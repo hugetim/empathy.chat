@@ -31,8 +31,13 @@ class UserMenu(UserMenuTemplate):
   def clear_page(self):
     for button in self.tabs_flow_panel.get_components():
       button.background = p.NONSELECTED_TAB_COLOR
+      button.role = ""
     self.content_column_panel.clear()
-      
+
+  def select_tab_button(self, button):
+    button.background = p.SELECTED_TAB_COLOR
+    button.role = "raised"
+  
   def load_component(self, content):
     """Reset MenuForm and load content form"""
     self.clear_page()
@@ -42,19 +47,19 @@ class UserMenu(UserMenuTemplate):
   def go_profile(self):
     self.content = Profile(self.item['user_id'])
     self.load_component(self.content)
-    self.profile_tab_button.background = p.SELECTED_TAB_COLOR    
+    self.select_tab_button(self.profile_tab_button)
     
   def go_connections(self):
     if self.item['user_id'] == glob.logged_in_user_id:
       h.warning(f"UserMenu.go_connections called on current user")
     self.content = Connections(item={'user_id': self.item['user_id']})
     self.load_component(self.content)
-    self.connections_tab_button.background = p.SELECTED_TAB_COLOR
+    self.select_tab_button(self.connections_tab_button)
 
   def go_history(self):
     self.content = History(item={'user_id': self.item['user_id']})
     self.load_component(self.content)
-    self.history_tab_button.background = p.SELECTED_TAB_COLOR
+    self.select_tab_button(self.history_tab_button)
     
   def profile_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""

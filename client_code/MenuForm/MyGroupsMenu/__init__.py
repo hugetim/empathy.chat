@@ -50,8 +50,13 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
   def clear_page(self):
     for button in self.tabs_flow_panel.get_components():
       button.background = p.NONSELECTED_TAB_COLOR
+      button.role = ""
     self.content_column_panel.clear()
 
+  def select_tab_button(self, button):
+    button.background = p.SELECTED_TAB_COLOR
+    button.role = "raised"
+  
   def load_component(self, content):
     """Reset MenuForm and load content form"""
     self.clear_page()
@@ -61,12 +66,12 @@ class MyGroupsMenu(MyGroupsMenuTemplate):
   def go_group_settings(self):
     content = MyGroupSettings(menu=self)
     self.load_component(content)
-    self.group_settings_tab_button.background = p.SELECTED_TAB_COLOR
+    self.select_tab_button(self.group_settings_tab_button)
 
   def go_members(self):
     content = MyGroupMembers(menu=self)
     self.load_component(content)
-    self.members_tab_button.background = p.SELECTED_TAB_COLOR
+    self.select_tab_button(self.members_tab_button)
     
   def group_settings_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
