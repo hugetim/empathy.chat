@@ -107,6 +107,7 @@ def _init_matcher(user, trust_level):
           'test_mode': trust_level >= sm.TEST_TRUST_LEVEL,
           'name': user['first_name'],
           'state': state,
+          'default_request': user['default_request'],
          }
 
 
@@ -324,6 +325,7 @@ def _add_proposal(user, port_prop, link_key=""):
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
+  accounts.update_default_request(port_prop, user)
   prop, other_prop_time_to_ping = _save_new_proposal(user, port_prop, link_key)
   if other_prop_time_to_ping:
     other_prop_time_to_ping.ping()
@@ -384,6 +386,7 @@ def _edit_proposal(user, port_prop):
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
   """
+  accounts.update_default_request(port_prop, user)
   prop = Proposal.get_by_id(port_prop.prop_id)
   old_port_prop = prop.portable(user)
   prop, other_prop_time_to_ping = _save_proposal_edit(user, port_prop, prop)
@@ -410,7 +413,6 @@ def _save_proposal_edit(user, port_prop, prop):
     return prop, None
   
 
-
 def _process_now_proposal_edit(user, port_prop, prop, status):
   """Return prop (None if cancelled or matching with another proposal), other_prop_time_to_ping (if applicable)
   
@@ -423,7 +425,6 @@ def _process_now_proposal_edit(user, port_prop, prop, status):
     prop.cancel_all_times()
     return None, None
   
-
 
 def _process_now_proposal_edit_available(user, port_prop, prop):
   """Return prop (None if matching with another proposal), other_prop_time_to_ping (if applicable)

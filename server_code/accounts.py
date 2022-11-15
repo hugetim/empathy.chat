@@ -6,6 +6,7 @@ import anvil.google.auth
 import anvil.tables.query as q
 from anvil import secrets
 from . import parameters as p
+from . import portable as port
 from .exceptions import InvalidInviteError
 from . import server_misc as sm
 from .server_misc import authenticated_callable
@@ -50,9 +51,28 @@ def init_user_info(user, time_zone=""):
       "email": {"eligible": 1, "eligible_users": [], "eligible_groups": [], "eligible_starred": True},
       "sms": {"eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False},
     }
-    user.update(notif_settings=notif_settings,
+    default_request = {
+      "prop_time": dict(start_now=False, duration=port.DURATION_DEFAULT_MINUTES, 
+                        cancel_buffer=port.CANCEL_DEFAULT_MINUTES),
+      "eligible": {"eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": True}
+    }
+    user.update(notif_settings=notif_settings, default_request=default_request,
                 first_name="", last_name="", how_empathy="", profile="", phone="", profile_url="")
   return starting_trust_level
+
+
+def update_default_request(port_prop, user):
+  from .proposals import get_eligibility_spec_from_port
+  t0 = port_prop.times[0]
+  prop_time_dict = dict(start_now=t0.start_now, duration=t0.duration)
+  if not t0.start_now:
+    prop_time_dict['cancel_buffer'] = round((t0.start_date - t0.expire_date).total_seconds()/60)
+  eligibility_dict = get_eligibility_spec_from_port(port_prop, user)
+  eligibility_dict.pop('user')
+  default_request = user['default_request']
+  default_request['prop_time'].update(prop_time_dict)
+  default_request['eligible'] = eligibility_dict
+  user['default_request'] = default_request
 
 
 def _new_trust_level(user, starting_trust_level):
