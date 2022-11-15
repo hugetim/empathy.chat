@@ -109,7 +109,7 @@ components:
       - type: Spacer
         properties: {height: 32}
         name: spacer_3
-        layout_properties: {width: 8}
+        layout_properties: {width: 14}
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle full-screen mode (not just the video chat),
           border: '', enabled: true, foreground: '', visible: true, text: Full Screen,
