@@ -197,6 +197,8 @@ class CreateForm(CreateFormTemplate):
 
   def save_button_click(self, **event_args):
     """This method is called when the button is clicked"""
+    from .... import glob
+    glob.default_request.update(self.proposal().get_default_request_update())
     self.raise_event("x-close-alert", value=True)
 
   def cancel_button_click(self, **event_args):

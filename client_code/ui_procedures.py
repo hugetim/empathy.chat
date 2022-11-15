@@ -52,6 +52,7 @@ def init_load(reload=True):
   init_dict = get_init() # spinner=reload
   glob.name = init_dict['name']
   glob.trust_level = init_dict['trust_level']
+  glob.default_request = init_dict['default_request']
   if init_dict['state']['status'] in ["matched", "requesting", "pinged"]:
     from .MatchForm import MatchForm
     item = {k: init_dict['state'][k] for k in MatchForm.state_keys}

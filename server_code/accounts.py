@@ -62,16 +62,10 @@ def init_user_info(user, time_zone=""):
 
 
 def update_default_request(port_prop, user):
-  from .proposals import get_eligibility_spec_from_port
-  t0 = port_prop.times[0]
-  prop_time_dict = dict(start_now=t0.start_now, duration=t0.duration)
-  if not t0.start_now:
-    prop_time_dict['cancel_buffer'] = round((t0.start_date - t0.expire_date).total_seconds()/60)
-  eligibility_dict = get_eligibility_spec_from_port(port_prop, user)
-  eligibility_dict.pop('user')
+  updated = port_prop.get_default_request_update()
   default_request = user['default_request']
-  default_request['prop_time'].update(prop_time_dict)
-  default_request['eligible'] = eligibility_dict
+  default_request['prop_time'].update(updated['prop_time'])
+  default_request['eligible'] = updated['eligible']
   user['default_request'] = default_request
 
 

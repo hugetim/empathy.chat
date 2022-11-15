@@ -347,6 +347,17 @@ class Proposal():
       for time in self.times:
         items.append(time.get_check_item())
     return items
+
+  def get_default_request_update(self):
+    item = self.create_form_item()
+    out = dict(prop_time={k: item[k] for k in ['start_now', 'duration']})
+    if not item['start_now']:
+      t0 = self.times[0]
+      out['prop_time']['cancel_buffer'] = round((t0.start_date - t0.expire_date).total_seconds()/60)      
+    out['eligible'] = {k: item[k] for k in ['eligible', 'eligible_starred']}
+    out['eligible']['eligible_users'] = [port_user.user_id for port_user in item['eligible_users']]
+    out['eligible']['eligible_groups'] = [group.group_id for group in item['eligible_groups']]
+    return out
   
   def create_form_item(self, status=None, conflict_checks=None):
     """Convert a proposal dictionary to the format of self.item"""

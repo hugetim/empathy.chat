@@ -12,6 +12,7 @@ name = ""
 invites = []
 logged_in_user = None
 logged_in_user_id = ""
+default_request = None
 publisher = Publisher(with_logging=False)
 
 
