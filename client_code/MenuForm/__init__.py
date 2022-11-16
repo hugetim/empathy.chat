@@ -10,7 +10,6 @@ from .NetworkMenu import NetworkMenu
 from .MyGroupsMenu import MyGroupsMenu
 from .UserMenu import UserMenu
 from .SettingsForm import SettingsForm
-from .DashForm.CreateForm import CreateForm
 from .. import parameters as p
 from .. import helper as h
 from .. import portable as t

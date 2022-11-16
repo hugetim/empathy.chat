@@ -2,6 +2,7 @@ from ._anvil_designer import CreateFormTemplate
 from anvil import *
 from .... import helper as h
 from .... import portable as t
+from .... import glob
 from datetime import timedelta
 from .Eligibility import Eligibility
 
@@ -167,7 +168,7 @@ class CreateForm(CreateFormTemplate):
     if not self.item['alt']:
       start_1 = h.now() if self.item['start_now'] else self.item['start_date']
       if self.item['cancel_buffer'] == 0:
-        cancel_buffer = t.CANCEL_DEFAULT_MINUTES  
+        cancel_buffer = t.CANCEL_DEFAULT_MINUTES
       else:
         cancel_buffer = self.item['cancel_buffer']
       self.item['alt'] = [{'start_date': (start_1 + t.DEFAULT_NEXT_DELTA),
@@ -197,7 +198,6 @@ class CreateForm(CreateFormTemplate):
 
   def save_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    from .... import glob
     glob.default_request.update(self.proposal().get_default_request_update())
     self.raise_event("x-close-alert", value=True)
 

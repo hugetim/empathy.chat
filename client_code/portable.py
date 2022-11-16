@@ -164,18 +164,26 @@ class UserProfile(UserFull):
 class ProposalTime():
 
   def __init__(self, time_id=None, start_now=False, start_date=None, #status=None, 
-               duration=DURATION_DEFAULT_MINUTES, expire_date=None,
+               duration=None, expire_date=None,
                accept_date=None, users_accepting=None, jitsi_code=None):
+    from .glob import default_request
     self.time_id = time_id
-    self.start_now = start_now 
+    self.start_now = start_now
     self.start_date = (start_date if (start_date or start_now)
                        else h.round_up_datetime(h.now() + datetime.timedelta(minutes=DEFAULT_NEXT_MINUTES)))
-    self.duration = duration
+    if duration is not None:
+      self.duration = duration
+    elif default_request is not None:
+      self.duration = default_request['prop_time']['duration']
+    else:
+      self.duration = DURATION_DEFAULT_MINUTES
     if expire_date or start_now:
       self.expire_date = expire_date
     else:
+      cancel_buffer = (CANCEL_DEFAULT_MINUTES if not default_request 
+                       else default_request['prop_time']['cancel_buffer'])
       self.expire_date = (self.start_date 
-                          - datetime.timedelta(minutes=CANCEL_DEFAULT_MINUTES))
+                          - datetime.timedelta(minutes=cancel_buffer))
     self.accept_date = accept_date
     self.users_accepting = users_accepting
     self.jitsi_code = jitsi_code
@@ -287,17 +295,35 @@ class ProposalTime():
 class Proposal():
 
   def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
-               eligible=0, eligible_users=[], eligible_groups=[], eligible_starred=True,):
+               eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,):
+    from .glob import default_request
     self.prop_id = prop_id
     self.own = own
     self.user = user # should rename proposer
-    self.times = times if times else [ProposalTime()]
+    if times is not None:
+      self.times = times 
+    elif default_request:
+      self.times = [ProposalTime(start_now=default_request['prop_time']['start_now'])]
+    else:
+      self.times = [ProposalTime()]
     self.min_size = min_size
     self.max_size = max_size
-    self.eligible = eligible
-    self.eligible_users = eligible_users
-    self.eligible_groups = eligible_groups
-    self.eligible_starred = eligible_starred
+    if eligible is not None:
+      self.eligible = eligible
+    else:
+      self.eligible = default_request['eligible']['eligible'] if default_request else 0
+    if eligible_users is not None:
+      self.eligible_users = eligible_users
+    else:
+      self.eligible_users = default_request['eligible']['eligible_users'] if default_request else []
+    if eligible_groups is not None:
+      self.eligible_groups = eligible_groups
+    else:
+      self.eligible_groups = default_request['eligible']['eligible_groups'] if default_request else []
+    if eligible_starred is not None:
+      self.eligible_starred = eligible_starred
+    else:
+      self.eligible_starred = default_request['eligible']['eligible_starred'] if default_request else True
 
   @property
   def start_now(self):
