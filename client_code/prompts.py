@@ -58,7 +58,7 @@ def get(spec_dict):
   elif spec_dict["name"] == "member-chat":
     def propose_members():
       top_form = get_open_form()
-      top_form.content.propose(specified_users=[portu.user_id for portu in spec_dict["members"]])
+      top_form.content.propose(specified_users=spec_dict["members"])
     return {"markdown": ("To become a full empathy.chat Member, which allows you to chat "
                          "with a broader network beyond your direct buddies, "
                          "please complete an empathy chat with a current Member like: "

@@ -145,7 +145,7 @@ class Profile(ProfileTemplate):
     top_form = get_open_form()
     top_form.reset_status(state)
     if state['status'] not in ["pinging", "matched"]:
-      top_form.content.propose(specified_users=[self.item['user_id']])
+      top_form.content.propose(specified_users=[self.item])
     else:
       alert("Unable to propose exchange just now. Please try again later.")
 
