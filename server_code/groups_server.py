@@ -163,12 +163,14 @@ def delete_group(port_my_group):
 
       
 def all_members_from_group_row(group_row):
+  """Returns all group members regardless of trust_level or allowed status"""
   member_set = {m['user'] for m in app_tables.group_members.search(group=group_row)}
   member_set.update(set(group_row['hosts']))
   return list(member_set)
 
 
 def member_dicts_from_group_row(group_row):
+  """Returns dicts for members (excluding hosts) with non-missing trust_level"""
   member_rows = [m for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']]
   member_ids = [m['user'].get_id() for m in member_rows]
   group_id = group_row.get_id()
@@ -177,17 +179,31 @@ def member_dicts_from_group_row(group_row):
   
 
 def user_groups(user):
+  """Returns all groups for which user in all_members_from_group_row"""
   memberships = {m['group'] for m in app_tables.group_members.search(user=user)}
   hosteds = {group for group in app_tables.groups.search(hosts=[user], current=True)}
   return memberships.union(hosteds)
 
 
-def allowed_members_from_group_row(group_row):
-  member_set = (
-    {m['user'] for m in app_tables.group_members.search(group=group_row) 
-     if m['user']['trust_level'] and (m['user']['trust_level'] >= 2 or (m['user']['trust_level'] >= 1 and m['guest_allowed']))}
-  )
-  member_set.update(set(group_row['hosts']))
+def allowed_members_from_group_row(group_row, user):
+  """Returns group members allowed to interact with `user`"""
+  group_hosts = group_row['hosts']
+  if user in group_hosts:
+    member_set = (
+      {m['user'] for m in app_tables.group_members.search(group=group_row) 
+       if m['user']['trust_level'] and m['user']['trust_level'] >= 1}
+    )
+    member_set.update(set(group_row['hosts']))
+  elif user_allowed_in_group(user, group_row):
+    member_set = (
+      {m['user'] for m in app_tables.group_members.search(group=group_row) 
+       if m['user']['trust_level'] and (m['user']['trust_level'] >= 2 or (m['user']['trust_level'] >= 1 and m['guest_allowed']))}
+    )
+    member_set.update(set(group_row['hosts']))
+  else:
+    member_set = {user}
+    if user['trust_level'] and user['trust_level'] >= 1:
+      member_set.update(set(group_hosts))
   return list(member_set)
 
 
@@ -199,8 +215,10 @@ def _guest_allowed_in_group(user, group_row):
 
 
 def user_allowed_in_group(user, group_row):
-  return (user['trust_level'] >= 2 
-          or (user['trust_level'] >= 1 and _guest_allowed_in_group(user, group_row))
+  return (user['trust_level'] 
+          and (user['trust_level'] >= 2 
+               or (user['trust_level'] >= 1 and _guest_allowed_in_group(user, group_row))
+              )
          )
 
   

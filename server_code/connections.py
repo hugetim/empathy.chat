@@ -161,12 +161,9 @@ def _group_info(user):
 def _group_and_members(user):
   from . import groups_server as g
   for group_row in g.user_groups(user):
-    if not g.user_allowed_in_group(user, group_row):
-      group_members = set(group_row['hosts'])
-    else:
-      group_members = {u for u in g.allowed_members_from_group_row(group_row)}
-    yield group_row, group_members
-
+    group_members = {u for u in g.allowed_members_from_group_row(group_row, user)}
+    yield (group_row, group_members)
+    
 
 def _port_group(group_row, group_members):
   from . import groups
