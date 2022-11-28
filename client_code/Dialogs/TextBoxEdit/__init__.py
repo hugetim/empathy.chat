@@ -9,16 +9,12 @@ class TextBoxEdit(TextBoxEditTemplate):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
 
-    # Any code you write here will run when the form opens.
-
   def text_box_change(self, **event_args):
-    """This method is called when the text in this text box is edited"""
     self.item['text'] = self.text_box.text.strip()
     self.save_button.enabled = self.item['text']
     self.error_label.visible = False
 
   def save_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     if self.save_button.enabled:
       if self.item['text'] not in self.item['disallowed_list']:
         self.raise_event("x-close-alert", value=True)
@@ -27,6 +23,4 @@ class TextBoxEdit(TextBoxEditTemplate):
         self.error_label.visible = True
 
   def cancel_button_click(self, **event_args):
-    """This method is called when the button is clicked"""
     self.raise_event("x-close-alert", value=False)
-
