@@ -22,6 +22,7 @@ class LoginForm(LoginFormTemplate):
       self.login_button.visible = True
       self.rich_text_1.visible = True
       user = ui.login()
+      user_id = user.get_id()
     if user:
       self.login_button.visible = False
       self.rich_text_1.visible = False
