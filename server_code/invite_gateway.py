@@ -104,6 +104,7 @@ def _try_removing_from_invite_proposal(invite_row, invitee):
 
 
 def _edit_row(row, guess, rel, now):
+  rel = rel.strip()
   row['guess'] = guess
   if rel != row['relationship2to1']:
     row['relationship2to1'] = rel

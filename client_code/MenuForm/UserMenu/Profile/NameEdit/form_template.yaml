@@ -30,7 +30,7 @@ components:
       name: first_name_text_box
       layout_properties: {}
       data_bindings:
-      - {property: text, code: 'self.item[''first'']', writeback: true}
+      - {property: text, code: 'self.item[''first'']', writeback: false}
       event_bindings: {change: text_box_change}
   - type: LinearPanel
     properties: {spacing_above: none, spacing_below: medium, background: '', foreground: '',
@@ -53,7 +53,7 @@ components:
       name: last_name_text_box
       layout_properties: {}
       data_bindings:
-      - {property: text, code: 'self.item[''last'']', writeback: true}
+      - {property: text, code: 'self.item[''last'']', writeback: false}
       event_bindings: {change: text_box_change, pressed_enter: save_button_click}
   - type: Label
     properties: {role: text, align: left, tooltip: '', border: '', foreground: '',

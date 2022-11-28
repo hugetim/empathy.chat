@@ -310,7 +310,7 @@ def save_relationship(item, user_id=""):
   user1 = sm.get_acting_user(user_id)
   user2 = sm.get_other_user(item['user2_id'])
   row = app_tables.connections.get(user1=user1, user2=user2, current=True)
-  row['relationship2to1'] = item['relationship']
+  row['relationship2to1'] = item['relationship'].strip()
   row['date_described'] = sm.now()
   return row['date_described']
 

@@ -124,7 +124,7 @@ def save_my_group_settings(group_id, name, user_id=""):
   print(f"save_my_group_settings({group_id}, {name}, {user_id})")
   check_my_group_auth()
   user = sm.get_acting_user(user_id)
-  app_tables.groups.get_by_id(group_id)['name'] = name
+  app_tables.groups.get_by_id(group_id)['name'] = name.strip()
 
 
 @sm.authenticated_callable
