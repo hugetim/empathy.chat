@@ -13,7 +13,8 @@ class TextBoxEdit(TextBoxEditTemplate):
 
   def text_box_change(self, **event_args):
     """This method is called when the text in this text box is edited"""
-    self.save_button.enabled = self.text_box.text
+    self.item['text'] = self.text_box.text.strip()
+    self.save_button.enabled = self.item['text']
     self.error_label.visible = False
 
   def save_button_click(self, **event_args):

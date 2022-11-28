@@ -16,7 +16,7 @@ components:
     name: text_box
     layout_properties: {}
     data_bindings:
-    - {property: text, code: 'self.item[''text'']', writeback: true}
+    - {property: text, code: 'self.item[''text'']', writeback: false}
     event_bindings: {change: text_box_change, pressed_enter: save_button_click}
   - type: Button
     properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: false,
