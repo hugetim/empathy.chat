@@ -33,7 +33,7 @@ components:
       layout_properties: {grid_position: 'LXCNAQ,JUHEKB'}
       data_bindings:
       - {property: tooltip, code: '"Name cannot be changed after it is confirmed"
-          if self.item[''confirmed_url''] else ""'}
+          if (self.item[''me''] and self.item[''confirmed_url'']) else ""'}
     - type: Button
       properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
         foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
