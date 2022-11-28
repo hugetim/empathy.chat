@@ -9,9 +9,11 @@ class TextBoxEdit(TextBoxEditTemplate):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
 
+    self._original_text = self.item['text']
+
   def text_box_change(self, **event_args):
     self.item['text'] = self.text_box.text.strip()
-    self.save_button.enabled = self.item['text']
+    self.save_button.enabled = self.item['text'] and self.item['text'] != self._original_text
     self.error_label.visible = False
 
   def save_button_click(self, **event_args):
