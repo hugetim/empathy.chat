@@ -6,7 +6,14 @@ from . import glob
 from anvil_extras.utils import timed
 
 
-def login():
+def get_user_and_id():
+  user, user_id = anvil.server.call('get_user', with_id=True)
+  if not user:
+    user, user_id = login(with_id=True)
+  return user, user_id
+
+
+def login(with_id=False):
   user = anvil.users.login_with_form(show_signup_option=False, allow_cancel=True)
   if user and (not user['init_date']):
     anvil.users.logout()
@@ -16,7 +23,11 @@ def login():
       import time
       time.sleep(4)
     user = None
-  return user
+  if with_id:
+    user_id = user.get_id() if user else ""
+    return user, user_id
+  else:
+    return user
 
 
 def clear_hash_and_open_form(form):

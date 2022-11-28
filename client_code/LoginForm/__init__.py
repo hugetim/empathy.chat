@@ -1,7 +1,5 @@
 from ._anvil_designer import LoginFormTemplate
 from anvil import *
-import anvil.users
-import anvil.server
 
 
 class LoginForm(LoginFormTemplate):
@@ -13,33 +11,32 @@ class LoginForm(LoginFormTemplate):
     
   def form_show(self, **event_args):
     # Do the code here to show this blank form.
-    self.login_sequence()
+    self._login_sequence()
     
-  def login_sequence(self):
+  def _login_sequence(self):
     from .. import ui_procedures as ui
-    user, user_id = anvil.server.call('get_user', with_id=True)
-    if not user:
-      self.login_button.visible = True
-      self.rich_text_1.visible = True
-      user = ui.login()
-      user_id = user.get_id()
+    from .. import glob
+    user, user_id = ui.get_user_and_id()
     if user:
-      self.login_button.visible = False
-      self.rich_text_1.visible = False
       self.card_1.visible = True
-      from .. import glob
       glob.logged_in_user = user
       glob.logged_in_user_id = user_id
-      ui.get_mobile_status()
-      self.new_form, self.init_dict = ui.init_load(reload=False)
-      from .. import parameters
-      if parameters.DEBUG_MODE:
-        self.enter_button_click()
-      else:
-        from anvil_extras import augment
-        self.enter_button.visible = True
-        self.enter_button.trigger('focus')
+      self._load_user()
+    else:
+      self.login_button.visible = True
+      self.rich_text_1.visible = True
 
+  def _load_user(self):
+    from .. import ui_procedures as ui
+    self.new_form, self.init_dict = ui.init_load(reload=False)
+    from .. import parameters
+    if parameters.DEBUG_MODE:
+      self.enter_button_click()
+    else:
+      from anvil_extras import augment
+      self.enter_button.visible = True
+      self.enter_button.trigger('focus')
+  
   def enter_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     open_form(self.new_form)
@@ -49,14 +46,15 @@ class LoginForm(LoginFormTemplate):
                    timeout=4, style="info").show()
 
   def timer_1_tick(self, **event_args):
-    """Async loading of Rosenberg quote"""
+    """Async loading of Rosenberg quote, other"""
     from .. import rosenberg
     from datetime import date
-    self.quote_label.text = rosenberg.quote_of_the_day(date.today())
     from .. import ui_procedures as ui
+    self.quote_label.text = rosenberg.quote_of_the_day(date.today())
+    ui.get_mobile_status()
     from .. import parameters
     self.timer_1.interval = 0
 
   def login_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.login_sequence()
+    self._login_sequence()
