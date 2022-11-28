@@ -28,6 +28,7 @@ class Profile(ProfileTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
+    self.relationship_repeating_panel.add_event_handler('x-update', self._update_relationship)
     self.star_button.tooltip = p.STAR_TOOLTIP
     self.relationship_repeating_panel.items = nc.get_relationships(user_id)
     self.relationship_flow_panel.visible = bool(self.relationship_repeating_panel.items)
@@ -50,7 +51,10 @@ class Profile(ProfileTemplate):
     if self.item['distance'] > 2:
       get_open_form().content.connections_tab_button.visible = False
     self.update()
-    
+
+  def _update_relationship(self, **event_args):
+    self._reload()
+  
   def update(self):
     if not self.item['me']:
       get_open_form().title_label.text = f"{self.item['first']}'s Profile"
@@ -152,19 +156,24 @@ class Profile(ProfileTemplate):
   def unconnect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if ui.disconnect_flow(self.item['user_id'], self.item['name']):
+      glob.update_lazy_vars()
       get_open_form().go_connections()
 
   def connect_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if prompts.invite_dialog(port.User(name=self.item['name'], user_id=self.item['user_id']),
                              title="Connect to a phone buddy",):
-      get_open_form().go_profile(self.item['user_id'])
+      self._reload()
 
   def confirm_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if invited.invited_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
-      get_open_form().go_profile(self.item['user_id'])
+      self._reload()
 
+  def _reload(self):
+    glob.update_lazy_vars()
+    get_open_form().go_profile(self.item['user_id'])
+  
   def star_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.item.toggle_starred()

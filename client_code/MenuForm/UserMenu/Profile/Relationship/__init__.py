@@ -15,6 +15,7 @@ class Relationship(RelationshipTemplate):
     self.update()
     self.label_1.tooltip = "You can only view your phone buddies' introductions / relationship descriptions."
     if self.item['child']:
+      self.child_column_panel.add_event_handler('x-update', self._parent_update)
       self.child_column_panel.add_component(Relationship(item=self.item['child']))
     else:
       their = self.item.get('their')
@@ -40,10 +41,14 @@ class Relationship(RelationshipTemplate):
                 buttons=[])
     if out is True:
       self.item['date'] = anvil.server.call('save_relationship', edit_form.item)
-      self.item['desc'] = edit_form.item['relationship']
+      self.item['desc'] = edit_form.item['relationship'].strip()
       self.refresh_data_bindings()
       self.update()
+      self.parent.raise_event('x-update')
 
+  def _parent_update(self, **event_args):
+    self.parent.raise_event('x-update')
+  
   def whose_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     get_open_form().go_profile(self.item['whose_id'])

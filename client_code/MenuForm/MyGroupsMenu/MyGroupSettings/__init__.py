@@ -42,6 +42,7 @@ class MyGroupSettings(MyGroupSettingsTemplate):
     anvil.server.call('save_my_group_settings', self.group.group_id, group_name)
     self.update()
     self.my_groups_menu.update_drop_down()
+    glob.update_lazy_vars(spinner=False)
   
   def _edit_name_alert(self):
     disallowed_list = glob.my_groups.names_taken + ["", self.group.default_name]
