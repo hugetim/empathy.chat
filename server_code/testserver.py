@@ -23,7 +23,7 @@ def add_now_proposal_old():
   print("add_now_proposal")
   if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     tester = sm.get_acting_user()
-    anvil.server.call('add_proposal', portable.Proposal(times=[portable.ProposalTime(start_now=True)]), user_id=tester.get_id())
+    anvil.server.call('add_proposal', portable.Proposal(times=[portable.ProposalTime(start_now=True)], eligible=1), user_id=tester.get_id())
     matcher.propagate_update_needed()
     tester_now_proptime = matcher.ProposalTime.get_now_proposing(tester)
     if tester_now_proptime:

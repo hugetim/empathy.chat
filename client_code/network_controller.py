@@ -84,6 +84,14 @@ def _group_item(group, my_group=False):
   return dict(key=group['name'], value=groups.Group(group['name'], group.group_id), subtext=subtext)
   
 
+def get_group_by_id(group_id):
+  for g in glob.my_groups:
+    if group_id == g.group_id:
+      return _group_item(g, my_group=True)['value']
+  for g in glob.their_groups.values():
+    if group_id == g.group_id:
+      return _group_item(g)['value']
+
 
 def get_create_user_items():
   """Return list with 1st---2nd""" # add pending connections to front

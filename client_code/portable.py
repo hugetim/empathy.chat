@@ -315,11 +315,13 @@ class Proposal():
     if eligible_users is not None:
       self.eligible_users = eligible_users
     else:
-      self.eligible_users = default_request['eligible']['eligible_users'] if default_request else []
+      from . import glob
+      self.eligible_users = [glob.users[id] for id in default_request['eligible']['eligible_users']] if default_request else []
     if eligible_groups is not None:
       self.eligible_groups = eligible_groups
     else:
-      self.eligible_groups = default_request['eligible']['eligible_groups'] if default_request else []
+      from . import network_controller as nc
+      self.eligible_groups = [nc.get_group_by_id(id) for id in default_request['eligible']['eligible_groups']] if default_request else []
     if eligible_starred is not None:
       self.eligible_starred = eligible_starred
     else:
