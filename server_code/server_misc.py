@@ -216,6 +216,7 @@ def _invite_guess_fail_prompt(s_invite):
              )
 
 
+@anvil.server.background_task
 def add_message_prompt(user2, user1):
   such_prompts = app_tables.prompts.search(user=user2, dismissed=False, spec={"name": "message", "from_id": user1.get_id()})
   if len(such_prompts) == 0:
@@ -225,6 +226,8 @@ def add_message_prompt(user2, user1):
                             )
     from . import notifies as n
     n.notify_message(user2, from_name)
+  from . import matcher
+  matcher.propagate_update_needed(user1)
 
 
 class ServerItem:

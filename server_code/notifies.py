@@ -71,7 +71,8 @@ def when_str(start, user):
   else: 
     return "now"  
   
-  
+
+@anvil.server.background_task
 def ping(user, start, duration):
   """Notify pinged user (or proposer of fully accepted "later" request)"""
   print(f"'ping', {start}, {duration}")

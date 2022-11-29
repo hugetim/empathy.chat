@@ -1,6 +1,6 @@
 from anvil import secrets
 from .server_misc import authenticated_callable
-from anvil.server import background_task
+from anvil.server import background_task, launch_background_task
 from anvil_extras.server_utils import timed
 from . import server_misc as sm
 from .network_gateway import NetworkRepository
@@ -34,9 +34,7 @@ def add_message(user2_id, user_id="", message="[blank test message]"):
                    to_user=user2,
                    message=secrets.encrypt_with_key("new_key", message),
                    time_stamp=sm.now())
-  sm.add_message_prompt(user2, user)
-  from . import matcher
-  matcher.propagate_update_needed(user)
+  launch_background_task('add_message_prompt', user2, user)
   return get_messages(user2, user)
 
 

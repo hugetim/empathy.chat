@@ -277,7 +277,7 @@ def cancel_match(match_id, user_id=""):
   user = sm.get_acting_user(user_id)
   users_to_notify, match_commence = _cancel_match(user, match_id)
   for u in users_to_notify:
-    n.notify_match_cancel(u, start=match_commence, canceler_name=sm.name(user, to_user=u))
+    n.notify_match_cancel_bg(u, start=match_commence, canceler_name=sm.name(user, to_user=u))
   propagate_update_needed(user)
   return _get_state(user)
 

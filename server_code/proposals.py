@@ -120,11 +120,13 @@ class ProposalTime():
       if own_now_proposal_time:
         ProposalTime(own_now_proposal_time).proposal.cancel_all_times()
 
-  def ping(self):   
-    n.ping(user=self.proposal.proposer,
-           start=None if self['start_now'] else self['start_date'],
-           duration=self['duration'],
-          )    
+  def ping(self):
+    anvil.server.launch_background_task(
+      'ping',
+      user=self.proposal.proposer,
+      start=None if self['start_now'] else self['start_date'],
+      duration=self['duration'],
+    )    
       
   def in_users_accepting(self, user):
     return self['users_accepting'] and user in self['users_accepting']
@@ -415,25 +417,13 @@ class Proposal():
         ProposalTime.add(proposal=self, port_time=port_time)
 
   def notify_add(self):
-#     keys_needed = ['user', 'eligible', 'eligible_users', 'eligible_starred', 'eligible_groups']
-#     anvil.server.launch_background_task('notify_add', {k: self[k] for k in keys_needed})
-    for other_user in all_eligible_users(self):
-      self._notify_add_to(other_user)
+    anvil.server.launch_background_task('notify_add', self._row)
    
   def notify_edit(self, port_prop, old_port_prop):
-    old_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(old_port_prop, self.proposer))
-    new_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(port_prop, self.proposer))
-    for other_user in new_all_eligible_users - old_all_eligible_users:
-      self._notify_add_to(other_user)
-    if port_prop.times_notify_info != old_port_prop.times_notify_info:
-      for other_user in new_all_eligible_users & old_all_eligible_users:
-        self._notify_edit_to(other_user)
-    for other_user in old_all_eligible_users - new_all_eligible_users:
-      self._notify_cancel_to(other_user)
+    anvil.server.launch_background_task('notify_edit', self._row, port_prop, old_port_prop)
 
   def notify_cancel(self):
-    for other_user in all_eligible_users(self):
-      self._notify_cancel_to(other_user)
+    anvil.server.launch_background_task('notify_cancel', self._row)
  
   def _notify_add_to(self, other_user):
     n.notify_proposal(other_user, self, f"empathy request", " has requested an empathy chat:")
@@ -518,6 +508,34 @@ class Proposal():
       proposals_to_check.add(proptime.proposal)
     for proposal in proposals_to_check:
       proposal.cancel_if_no_times()
+
+
+@anvil.server.background_task
+def notify_add(prop_row):
+  prop = Proposal(prop_row)
+  for other_user in all_eligible_users(prop):
+    prop._notify_add_to(other_user)
+
+
+@anvil.server.background_task
+def notify_edit(prop_row, port_prop, old_port_prop):
+  prop = Proposal(prop_row)
+  old_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(old_port_prop, prop.proposer))
+  new_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(port_prop, prop.proposer))
+  for other_user in new_all_eligible_users - old_all_eligible_users:
+    prop._notify_add_to(other_user)
+  if port_prop.times_notify_info != old_port_prop.times_notify_info:
+    for other_user in new_all_eligible_users & old_all_eligible_users:
+      prop._notify_edit_to(other_user)
+  for other_user in old_all_eligible_users - new_all_eligible_users:
+    prop._notify_cancel_to(other_user)
+
+
+@anvil.server.background_task
+def notify_cancel(prop_row):
+  prop = Proposal(prop_row)
+  for other_user in all_eligible_users(prop):
+    prop._notify_cancel_to(other_user)
 
       
 def get_eligibility_spec_from_port(port_prop, proposer):
