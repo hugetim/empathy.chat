@@ -11,16 +11,17 @@ components:
     properties:
       role: null
       columns:
-      - {id: FNAQAK, title: Group Name, data_key: group_name}
-      - {id: URLFTJ, title: Host, data_key: host}
-      - {id: BGOAIR, title: Members, data_key: members}
-      - {id: DSYVQA, title: '', data_key: buttons}
+      - {id: FNAQAK, title: Group Name, data_key: name, $$hashKey: 'object:1026'}
+      - {id: URLFTJ, title: Host, data_key: host, $$hashKey: 'object:1027'}
+      - {id: BGOAIR, title: Members, data_key: member_count, $$hashKey: 'object:1028'}
+      - {id: DSYVQA, title: '', data_key: buttons, $$hashKey: 'object:1029'}
       auto_header: true
       tooltip: ''
       border: ''
       foreground: ''
       rows_per_page: 20
       visible: true
+      wrap_on: never
       show_page_controls: true
       spacing_above: small
       spacing_below: small

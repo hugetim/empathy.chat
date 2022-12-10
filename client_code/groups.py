@@ -18,6 +18,16 @@ class Group(h.AttributeToKey):
   def __eq__(self, other):
     return isinstance(other, Group) and self.group_id == other.group_id
 
+  @property
+  def host(self):
+    from . import glob
+    return glob.users[self.hosts[0]].name
+
+  @property
+  def member_count(self):
+    return len(set(self.hosts).union(self.members))
+
+
   
 @anvil.server.portable_class
 class MyGroups():

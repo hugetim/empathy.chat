@@ -3,6 +3,7 @@ from anvil import *
 from .Connections import Connections
 from .Blocks import Blocks
 from .Invites import Invites
+from .Groups import Groups
 from ... import parameters as p
 from ... import glob
 
@@ -46,7 +47,12 @@ class NetworkMenu(NetworkMenuTemplate):
     content = Invites()
     self.load_component(content)
     self.select_tab_button(self.invites_tab_button)
-    
+
+  def go_groups(self):
+    content = Groups()
+    self.load_component(content)
+    self.select_tab_button(self.groups_tab_button)
+  
   def network_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.go_connections()
@@ -58,3 +64,7 @@ class NetworkMenu(NetworkMenuTemplate):
   def invites_tab_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.go_invites()
+
+  def groups_tab_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    self.go_groups()
