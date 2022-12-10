@@ -14,7 +14,7 @@ class NetworkMenu(NetworkMenuTemplate):
    
     # Any code you write here will run when the form opens.
     self.top_form = get_open_form()
-    self.invites_tab_button.visible = glob.trust_level >= 2
+    self.invites_tab_button.visible = glob.trust_level >= 3
     self.go_connections()
     
   def clear_page(self):
