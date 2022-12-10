@@ -60,7 +60,8 @@ def disconnect_flow(user2_id, user2_name, user1_id=""):
 
 def leave_flow(group, user1_id=""):
   if confirm(f"Really leave the {group.name} group? This cannot be undone."):
-    return anvil.server.call('leave_group', group.group_id, user1_id)
+    anvil.server.call('leave_group', group.group_id, user1_id)
+    return True
   else:
     return False
       
