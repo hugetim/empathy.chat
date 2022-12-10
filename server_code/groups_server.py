@@ -234,6 +234,18 @@ def update_guest_allowed(port_member):
   member_row['guest_allowed'] = port_member.guest_allowed
 
 
+@sm.authenticated_callable
+def leave_group(group_id, user_id):
+  user = sm.get_acting_user(user_id)
+  _remove_group_member(group_id, user)
+
+
+def _remove_group_member(group_id, user):
+  group_row = app_tables.groups.get_by_id(group_id)
+  member_row = app_tables.group_members.get(group=group_row, user=user)
+  member_row.delete()
+
+
 @anvil.server.callable
 def visit_group_invite_link(link_key, user):
   invite = _get_invite_from_link_key(link_key)

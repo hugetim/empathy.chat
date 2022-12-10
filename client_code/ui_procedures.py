@@ -57,6 +57,12 @@ def disconnect_flow(user2_id, user2_name, user1_id=""):
   else:
     return False
 
+
+def leave_flow(group, user1_id=""):
+  if confirm(f"Really leave the {group.name} group? This cannot be undone."):
+    return anvil.server.call('leave_group', group.group_id, user1_id)
+  else:
+    return False
       
 def init_load(reload=True):
   """Resest app after any potential change to trust_level or prompts"""
