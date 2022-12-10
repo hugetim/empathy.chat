@@ -79,11 +79,11 @@ class MatchForm(MatchFormTemplate):
     ec.update_my_external(False) 
       
   def complete_button_click(self, **event_args):
-    self.timer_2.interval = 0
-    if self.jitsi_embed:
-      self.hide_and_hangup_jitsi_embed()
-    self.item.exit()
-    ui.init_load()  
+    with h.PausedTimer(self.timer_2), h.Disabled(self.complete_button):
+      if self.jitsi_embed:
+        self.hide_and_hangup_jitsi_embed()
+      self.item.exit()
+      ui.init_load()  
     
   def init_slider_panel(self):
     slider_item = {'their_name': "", 'status': self.item.slider_status, 
