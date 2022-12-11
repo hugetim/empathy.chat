@@ -4,7 +4,7 @@ components:
   properties: {role: null, align: center, tooltip: Leave group, border: '', enabled: true,
     foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null, font: '',
     spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '',
-    bold: false, underline: false, icon: 'fa:times'}
+    bold: false, underline: false, icon: 'fa:user-times'}
   name: leave_button
   layout_properties: {column: DSYVQA}
   event_bindings: {click: leave_button_click}
