@@ -8,6 +8,7 @@ from ..... import prompts
 from ..... import glob
 from ..... import invited_procedures as invited
 from ..... import portable as port
+from ..... import my_groups_controller as mgc
 
 
 class MyGroupMembersRow(MyGroupMembersRowTemplate):
@@ -43,3 +44,8 @@ class MyGroupMembersRow(MyGroupMembersRowTemplate):
     """This method is called when this checkbox is checked or unchecked"""
     anvil.server.call('update_guest_allowed', self.item)
     self.refresh_data_bindings()
+
+  def remove_button_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    if mgc.remove_member_flow(self.item):
+      self.parent.raise_event('x-reset')

@@ -73,6 +73,14 @@ components:
       bold: false, underline: false, icon: 'fa:ban'}
     name: block_button
     layout_properties: {}
+  - type: Button
+    properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: true,
+      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      underline: false, icon: 'fa:user-times'}
+    name: remove_button
+    layout_properties: {}
+    event_bindings: {click: remove_button_click}
 - type: Label
   properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
     visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,

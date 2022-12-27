@@ -27,7 +27,6 @@ class Group(h.AttributeToKey):
   def member_count(self):
     return len(set(self.hosts).union(self.members))
 
-
   
 @anvil.server.portable_class
 class MyGroups():
