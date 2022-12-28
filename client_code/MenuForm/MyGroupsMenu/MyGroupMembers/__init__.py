@@ -2,6 +2,7 @@ from ._anvil_designer import MyGroupMembersTemplate
 from anvil import *
 from .... import network_controller as nc
 from .... import glob
+from ....groups import MyGroupMember
 
 class MyGroupMembers(MyGroupMembersTemplate):
   def __init__(self, menu, **properties):
@@ -13,6 +14,7 @@ class MyGroupMembers(MyGroupMembersTemplate):
     # Any code you write here will run when the form opens.
     self.update()
     self.repeating_panel_1.set_event_handler('x-reset', self.reset)
+    self.repeating_panel_1.set_event_handler('x-remove_member', self.remove_member)
 
   def update(self):
     port_members = [nc.my_group_member(**member_dict) for member_dict in self.group.members]
@@ -22,3 +24,11 @@ class MyGroupMembers(MyGroupMembersTemplate):
   def reset(self, **event_args):
     glob.update_lazy_vars()
     self.update()
+
+  def remove_member(self, member: MyGroupMember, **event_args):
+    self.group.members.remove(dict(member_id=member.user_id,
+                                   group_id=member.group_id,
+                                   guest_allowed=member.guest_allowed,
+                                  ))
+    self.reset()
+    

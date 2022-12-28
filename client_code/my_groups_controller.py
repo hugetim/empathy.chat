@@ -1,6 +1,6 @@
 from anvil import *
 import anvil.server
-from .network_controller import MyGroupMember
+from .groups import MyGroupMember
 
 
 def remove_member_flow(my_group_member: MyGroupMember, user1_id=""):

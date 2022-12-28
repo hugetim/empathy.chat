@@ -48,4 +48,4 @@ class MyGroupMembersRow(MyGroupMembersRowTemplate):
   def remove_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     if mgc.remove_member_flow(self.item):
-      self.parent.raise_event('x-reset')
+      self.parent.raise_event('x-remove_member', member=self.item)

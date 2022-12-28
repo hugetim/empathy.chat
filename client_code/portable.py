@@ -4,7 +4,6 @@ import datetime
 import anvil.tz
 from . import helper as h
 from . import parameters as p
-from .groups import Group
 from . import relationship as rel
 
 
@@ -377,6 +376,7 @@ class Proposal():
     return items
 
   def get_default_request_update(self):
+    from .groups import Group
     item = self.create_form_item()
     out = dict(prop_time={k: item[k] for k in ['start_now', 'duration']})
     if not item['start_now']:

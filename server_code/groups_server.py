@@ -94,13 +94,12 @@ class MyGroup(groups.MyGroup):
   def from_group_row(group_row, portable=False, user=None):
     if not user:
       user = sm.get_acting_user()
-    port_members = list(member_dicts_from_group_row(group_row))
     port_invites = [Invite.from_invite_row(i_row, portable=True, user=user)
                     for i_row in app_tables.group_invites.search(anvil.tables.order_by('expire_date', ascending=False), 
                                                                  group=group_row, current=True)]
     port_my_group = groups.MyGroup(name=group_row['name'],
                                    group_id=group_row.get_id(),
-                                   members=port_members,
+                                   members=list(member_dicts_from_group_row(group_row)),
                                    invites=port_invites,
                                   )
     return port_my_group if portable else MyGroup(port_my_group)
@@ -247,6 +246,14 @@ def _remove_group_member(group_id, user):
   member_row = app_tables.group_members.get(group=group_row, user=user)
   member_row.delete()
 
+
+@sm.authenticated_callable
+def remove_group_member(my_group_member: groups.MyGroupMember, user_id):
+  group_id = my_group_member.group_id
+  check_my_group_auth(group_id)
+  user2 = sm.get_other_user(my_group_member.user_id)
+  _remove_group_member(group_id, user2)
+  
 
 @anvil.server.callable
 def visit_group_invite_link(link_key, user):
