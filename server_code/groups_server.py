@@ -13,10 +13,12 @@ from .relationship import Relationship
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
 
 
-def check_my_group_auth():
+def check_my_group_auth(group_id=None):
   user = sm.get_acting_user()
   if not user or user['trust_level'] < 4:
     raise anvil.users.AuthenticationFailed("User not authorized to manage own groups.")
+  if group_id and user not in app_tables.groups.get_by_id(group_id)['hosts']:
+    raise anvil.users.AuthenticationFailed("User not authorized to manage this group.")
 
     
 @anvil.server.callable
@@ -122,7 +124,7 @@ class MyGroup(groups.MyGroup):
 @anvil.tables.in_transaction
 def save_my_group_settings(group_id, name, user_id=""):
   print(f"save_my_group_settings({group_id}, {name}, {user_id})")
-  check_my_group_auth()
+  check_my_group_auth(group_id)
   user = sm.get_acting_user(user_id)
   app_tables.groups.get_by_id(group_id)['name'] = name.strip()
 
@@ -131,7 +133,7 @@ def save_my_group_settings(group_id, name, user_id=""):
 @anvil.tables.in_transaction
 def create_group_invite(port_my_group):
   print(f"create_group_invite({port_my_group!r})")
-  check_my_group_auth()
+  check_my_group_auth(port_my_group.group_id)
   my_group = MyGroup(port_my_group)
   from datetime import timedelta
   now = sm.now()
