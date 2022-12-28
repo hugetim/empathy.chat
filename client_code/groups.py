@@ -2,6 +2,7 @@ import anvil.server
 from anvil import *
 from . import helper as h
 from . import parameters as p
+from . import portable as port
 
 
 @anvil.server.portable_class
@@ -63,7 +64,19 @@ class MyGroup(h.AttributeToKey):
   def update(self, new_self):
     for key, value in new_self.__dict__.items():
       setattr(self, key, value)
-      
+
+
+@anvil.server.portable_class
+class MyGroupMember(port.UserProfile):
+  def __init__(self, user_profile: port.UserProfile, group_id, guest_allowed=False):
+    self._init_user_profile_attributes(user_profile)
+    self.group_id = group_id
+    self.guest_allowed = guest_allowed
+
+  def _init_user_profile_attributes(self, user_profile):
+    for key in user_profile.__dict__:
+      self.__setattr__(key, user_profile.__dict__[key])  
+
 
 @anvil.server.portable_class
 class Invite(h.PortItem, h.AttributeToKey):

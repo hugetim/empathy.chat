@@ -15,7 +15,7 @@ class MyGroupMembers(MyGroupMembersTemplate):
     self.repeating_panel_1.set_event_handler('x-reset', self.reset)
 
   def update(self):
-    port_members = [nc.MyGroupMember(**member_dict) for member_dict in self.group.members]
+    port_members = [nc.my_group_member(**member_dict) for member_dict in self.group.members]
     sorted_port_members = sorted(port_members, key=lambda pu: pu['last_active'], reverse=True)
     self.repeating_panel_1.items = sorted_port_members
 

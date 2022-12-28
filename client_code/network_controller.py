@@ -3,7 +3,6 @@ from . import glob
 from . import helper as h
 from . import groups
 from . import portable as port
-import anvil.server
 
 
 def not_me(user_id):
@@ -183,14 +182,6 @@ def _get_connection(user1_id, user2_id):
   return results[0] if results else None
 
 
-@anvil.server.portable_class
-class MyGroupMember(port.UserProfile):
-  def __init__(self, member_id, group_id, guest_allowed=False):
-    self._init_user_profile_attributes(member_id)
-    self.group_id = group_id
-    self.guest_allowed = guest_allowed
-    
-  def _init_user_profile_attributes(self, member_id):
-    user_profile = glob.users[member_id]
-    for key in user_profile.__dict__:
-      self.__setattr__(key, user_profile.__dict__[key])   
+def my_group_member(member_id, group_id, guest_allowed=False):
+  user_profile = glob.users[member_id]
+  return groups.MyGroupMember(user_profile, group_id, guest_allowed)
