@@ -49,7 +49,7 @@ services:
         subject: empathy.chat - Login}
 startup: {type: module, module: startup}
 package_name: empathy_chat
-allow_embedding: true
+allow_embedding: false
 name: empathy.chat
 runtime_options: {version: 2, server_version: python3-full, client_version: '3', server_spec: null}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:child-large.PNG',
