@@ -22,7 +22,7 @@ def _add_request(user, port_prop, link_key=""):
 def _new_request(user, port_prop):
   """Return request"""
   port_time = port_prop.times[0]
-  return Request(id=port_time.time_id,
+  return Request(request_id=port_time.time_id,
                  or_group_id=port_prop.prop_id,
                  eformat=Eformat(port_time.duration),
                  expire_dt=port_time.expire_date,

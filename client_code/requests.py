@@ -28,15 +28,21 @@ class Request():
   # eligible_users: list
   # eligible_groups: list
   # eligible_starred: bool
-  def __init__(self, id=None, or_group_id=None, user=None, start_dt=None, eformat=None, expire_dt=None,
+  def __init__(self, request_id=None, or_group_id=None, user=None, start_dt=None, eformat=None, expire_dt=None,
                create_dt=None, edit_dt=None, min_size=2, max_size=2,
                eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
               ):
-    self.id = id
+    self.request_id = request_id
     self.or_group_id = or_group_id
     self.user = user
     self.start_dt = start_dt
     self.eformat = eformat
     self.expire_dt = expire_dt
     self.create_dt = create_dt
-                 
+    self.edit_dt = edit_dt
+    self.min_size = min_size
+    self.max_size = max_size
+    self.eligible = eligible
+    self.eligible_users = eligible_users if eligible_users else []
+    self.eligible_groups = eligible_groups if eligible_groups else []
+    self.eligible_starred = eligible_starred
