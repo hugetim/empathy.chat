@@ -477,6 +477,15 @@ db_schema:
     - name: current
       admin_ui: {width: 200}
       type: bool
+  requests:
+    title: Requests
+    client: none
+    server: full
+    columns:
+    - name: user
+      admin_ui: {width: 200}
+      type: link_single
+      target: users
   connections:
     title: Connections
     client: none
