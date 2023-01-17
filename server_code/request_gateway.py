@@ -27,7 +27,7 @@ class Record(ABC):
 
   @property
   def _table(self):
-    getattr(app_tables, self._table_name)
+    return getattr(app_tables, self._table_name)
   
   @abstractmethod
   def _add(self):
@@ -39,7 +39,7 @@ class Record(ABC):
   
   def __init__(self, entity, row_id=None):
     self._entity = entity
-    self.record_id = row_id
+    self._row_id = row_id
 
   def save(self):
     if not self._row_id:
@@ -58,10 +58,11 @@ class RequestRecord(Record):
   _table_name = 'requests'
 
   def _add(self):
-    self._table.add_row(_request_to_fields(self._entity))
+    self._row = self._table.add_row(**_request_to_fields(self._entity))
+    self._row_id = self._row.get_id()
 
   def _update(self):
-    self._row.update(_request_to_fields(self._entity))
+    self._row.update(**_request_to_fields(self._entity))
 
 
 def _request_to_fields(request):
@@ -88,7 +89,7 @@ def _request_to_fields(request):
 
 
 def _get_eformat_row(eformat):
-  row = app_tables.eformats.get(duration=self._entity.eformat.duration)
+  row = app_tables.eformats.get(duration=eformat.duration)
   if not row:
-    row = app_tables.eformats.add_row(duration=self._entity.eformat.duration)
+    row = app_tables.eformats.add_row(duration=eformat.duration)
   return row
