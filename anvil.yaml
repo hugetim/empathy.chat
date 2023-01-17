@@ -500,7 +500,14 @@ db_schema:
     - name: current
       admin_ui: {width: 90.015872}
       type: bool
+    - name: eformat
+      admin_ui: {width: 103.0119}
+      type: link_single
+      target: eformats
     - name: start_dt
+      admin_ui: {width: 200}
+      type: datetime
+    - name: expire_dt
       admin_ui: {width: 200}
       type: datetime
     - name: create_dt
