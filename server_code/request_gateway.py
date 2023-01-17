@@ -3,6 +3,7 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from abc import ABC, ABCMeta, abstractmethod, abstractproperty
 from .requests import Request, Eformat
+from . import server_misc as sm
 
 
 # class SimpleRecord(Record, metaclass=ABCMeta): 
@@ -69,6 +70,10 @@ def _request_to_fields(request):
   eformat = _get_eformat_row(request.eformat)
   out = dict(eformat=eformat)
   out['user'] = app_tables.users.get_by_id(request.user.user_id)
+  out['eligible_users'] = [sm.get_other_user(port_user.user_id)
+                           for port_user in request.eligible_users]
+  out['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
+                            for port_group in request.eligible_groups]
   simple_keys = [
     'or_group_id',
     'start_dt',
@@ -78,8 +83,6 @@ def _request_to_fields(request):
     'min_size',
     'max_size',
     'eligible',
-    'eligible_users',
-    'eligible_groups',
     'eligible_starred',
     'current',
   ]
