@@ -31,6 +31,7 @@ class Request():
   def __init__(self, request_id=None, or_group_id=None, user=None, start_dt=None, eformat=None, expire_dt=None,
                create_dt=None, edit_dt=None, min_size=2, max_size=2,
                eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
+               current=None,
               ):
     self.request_id = request_id
     self.or_group_id = or_group_id
@@ -46,3 +47,4 @@ class Request():
     self.eligible_users = eligible_users if eligible_users else []
     self.eligible_groups = eligible_groups if eligible_groups else []
     self.eligible_starred = eligible_starred
+    self.current = current

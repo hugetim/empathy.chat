@@ -142,6 +142,14 @@ db_schema:
     - name: time_stamp
       admin_ui: {width: 200}
       type: datetime
+  eformats:
+    title: Eformats
+    client: none
+    server: full
+    columns:
+    - name: duration
+      admin_ui: {width: 200}
+      type: number
   files:
     title: Files
     client: none
@@ -483,9 +491,44 @@ db_schema:
     server: full
     columns:
     - name: user
-      admin_ui: {width: 200}
+      admin_ui: {width: 93.015872}
       type: link_single
       target: users
+    - name: or_group_id
+      admin_ui: {width: 130.015872}
+      type: string
+    - name: current
+      admin_ui: {width: 90.015872}
+      type: bool
+    - name: start_dt
+      admin_ui: {width: 200}
+      type: datetime
+    - name: create_dt
+      admin_ui: {width: 200}
+      type: datetime
+    - name: edit_dt
+      admin_ui: {width: 117.0119}
+      type: datetime
+    - name: min_size
+      admin_ui: {width: 89.015872}
+      type: number
+    - name: max_size
+      admin_ui: {width: 100.015872}
+      type: number
+    - name: eligible
+      admin_ui: {width: 87.015872}
+      type: number
+    - name: eligible_users
+      admin_ui: {width: 112.015872}
+      type: link_multiple
+      target: users
+    - name: eligible_groups
+      admin_ui: {width: 121.0119}
+      type: link_multiple
+      target: groups
+    - name: eligible_starred
+      admin_ui: {width: 200}
+      type: bool
   connections:
     title: Connections
     client: none
