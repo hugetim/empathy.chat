@@ -1,5 +1,7 @@
 import anvil.server
 from .requests import Request, Eformat
+from . import server_misc as sm
+from . import accounts
 
 
 def reset_repo():
@@ -16,16 +18,28 @@ def _add_request(user, port_prop, link_key=""):
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
-  return True
+  accounts.update_default_request(port_prop, user)
+  requests = tuple(_new_requests(user, port_prop))
+  repo.save_requests(requests)
+  return requests[0].or_group_id
 
 
-def _new_request(user, port_prop):
+def _new_requests(user, port_prop):
   """Return request"""
-  port_time = port_prop.times[0]
-  return Request(request_id=port_time.time_id,
-                 or_group_id=port_prop.prop_id,
-                 eformat=Eformat(port_time.duration),
-                 expire_dt=port_time.expire_date,
-                 user=port_prop.user,
-                 
-                )
+  now = sm.now()
+  for port_time in port_prop.times:
+    yield Request(request_id=port_time.time_id,
+                  or_group_id=port_prop.prop_id,
+                  eformat=Eformat(port_time.duration),
+                  expire_dt=port_time.expire_date,
+                  user=port_prop.user,
+                  start_dt=port_time.start_date,
+                  create_dt=now,
+                  edit_dt=now,
+                  min_size=port_prop.min_size,
+                  max_size=port_prop.max_size,
+                  eligible=port_prop.eligible,
+                  eligible_users=port_prop.eligible_users,
+                  eligible_groups=port_prop.eligible_groups,
+                  eligible_starred=port_prop.eligible_starred,
+                 )
