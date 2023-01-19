@@ -23,7 +23,7 @@ def _add_request(user, port_prop, link_key=""):
   """
   accounts.update_default_request(port_prop, user)
   requests = tuple(_new_requests(user, port_prop))
-  # get user's other requests (and status) to confirm validity
+  # get this user's other requests (and status) to confirm validity
   # get requests that might match with one of these
   # confirm validity
   _save_new_requests(requests)
