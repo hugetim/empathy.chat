@@ -48,3 +48,9 @@ class Request():
     self.eligible_groups = eligible_groups if eligible_groups else []
     self.eligible_starred = eligible_starred
     self.current = current
+
+  @property
+  def start_now(self, now=None):
+    if now is None:
+      now = datetime.now()
+    return self.start_dt < now and self.expire_dt > now

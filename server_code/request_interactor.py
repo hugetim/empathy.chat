@@ -25,8 +25,9 @@ def _add_request(user, port_prop, link_key=""):
   requests = tuple(_new_requests(user, port_prop))
   # get this user's other requests (and status) to confirm validity
   status = get_partial_state(user)['status']
-  # get requests that might match with one of these
   # confirm validity
+  # get requests that might match with one of these
+  
   _save_new_requests(requests)
   # ping other request if match
   # otherwise notify invited

@@ -96,3 +96,13 @@ def _get_eformat_row(eformat):
   if not row:
     row = app_tables.eformats.add_row(duration=eformat.duration)
   return row
+
+
+# def get_potential_matching_requests(requests):
+#   """Return requests with same start time and eformat as any of `requests`"""
+#   out = {}
+#   eformats = {r.eformat for r in requests}
+#   for ef in eformats:
+#     ef_row = _get_eformat_row(ef)
+#     start_dts = 
+#     out.extend(app_tables.requests.search(eformat=ef_row))
