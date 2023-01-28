@@ -204,6 +204,7 @@ class ProposalTime():
     return h.now() if self.start_now else self.start_date
 
   def has_conflict(self, conflict_checks):
+    # keep in sync with requests.have_no_conflicts
     this = self.get_check_item()
     for check_item in conflict_checks:
       if this['start'] < check_item['end'] and check_item['start'] < this['end']:
@@ -242,6 +243,8 @@ class ProposalTime():
                                       - datetime.timedelta(minutes=CANCEL_MIN_MINUTES))):
           messages['cancel_buffer'] = ('The "Cancel" time must be at least ' 
                                       + str(CANCEL_MIN_MINUTES) + ' minutes prior to the Start Time.')
+    if self.has_conflict(conflict_checks):
+      messages['start_date'] = ("Time/duration overlaps with one of your existing requests.")
     return messages
   
   def create_form_item(self):

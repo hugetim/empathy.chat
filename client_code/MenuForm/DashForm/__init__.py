@@ -110,13 +110,15 @@ class DashForm(DashFormTemplate):
     state = anvil.server.call_s('get_state')
     self.update_status(state)    
 
-  def get_conflict_checks(self):
+  def get_conflict_checks(self, edit_prop_id=None):
     conflict_checks = [{'start': match_dict['start_date'],
                         'end': (match_dict['start_date']
                                 + timedelta(minutes=match_dict['duration_minutes']))} 
                        for match_dict in self.item['upcomings']]
     for port_prop in t.Proposal.props_from_view_items(self.item['proposals']):
-      conflict_checks += port_prop.get_check_items()
+      if port_prop.prop_id != edit_prop_id:
+        conflict_checks += port_prop.get_check_items()
+    return conflict_checks
     
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -159,7 +161,7 @@ class DashForm(DashFormTemplate):
     """This method is called when the button is clicked"""
     prop_to_edit = self._prop_from_id(prop_id)
     form_item = prop_to_edit.create_form_item(self.item['status'],
-                                              self.get_conflict_checks())
+                                              self.get_conflict_checks(edit_prop_id=prop_id))
     content = CreateForm(item=form_item)
     self.top_form.proposal_alert = content
     out = alert(content=self.top_form.proposal_alert,

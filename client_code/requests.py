@@ -54,3 +54,11 @@ class Request():
     if now is None:
       now = datetime.now()
     return self.start_dt < now and self.expire_dt > now
+
+
+def have_no_conflicts(requests):
+  # keep in sync with portable.Proposal.has_conflict
+  or_groups = {r.or_group_id for r in requests}
+  for i, or_group in enumerate(or_groups):
+    for r in [r for r in requests if r.or_group_id == or_group]:
+      pass      
