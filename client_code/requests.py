@@ -2,7 +2,7 @@ import anvil.server
 from .cluegen import Datum
 from .portable import User
 from .groups import Group
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 @anvil.server.portable_class 
@@ -55,10 +55,25 @@ class Request():
       now = datetime.now()
     return self.start_dt < now and self.expire_dt > now
 
+  @property
+  def end_dt(self):
+    return self.start_dt + timedelta(minutes=self.eformat.duration)
+  
+  def has_conflict(self, non_or_requests):
+    # keep in sync with requests.have_no_conflicts
+    for other in non_or_requests:
+      if self.start_dt < other.end_dt and other.start_dt < self.end_dt:
+        return True
+    return False
+
 
 def have_no_conflicts(requests):
   # keep in sync with portable.Proposal.has_conflict
-  or_groups = {r.or_group_id for r in requests}
+  or_groups = list({r.or_group_id for r in requests})
   for i, or_group in enumerate(or_groups):
+    remaining_or_groups = or_groups[i+1:]
+    non_or_requests = [r for r in requests if r.or_group_id in remaining_or_groups]
     for r in [r for r in requests if r.or_group_id == or_group]:
-      pass      
+      if r.has_conflict(non_or_requests):
+        return False
+  return True
