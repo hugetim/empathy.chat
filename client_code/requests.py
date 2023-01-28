@@ -67,7 +67,7 @@ class Request():
     return False
 
 
-def have_no_conflicts(requests):
+def have_conflicts(requests):
   # keep in sync with portable.Proposal.has_conflict
   or_groups = list({r.or_group_id for r in requests})
   for i, or_group in enumerate(or_groups):
@@ -75,5 +75,5 @@ def have_no_conflicts(requests):
     non_or_requests = [r for r in requests if r.or_group_id in remaining_or_groups]
     for r in [r for r in requests if r.or_group_id == or_group]:
       if r.has_conflict(non_or_requests):
-        return False
-  return True
+        return True
+  return False

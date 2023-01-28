@@ -47,3 +47,9 @@ class MistakenVisitError(NamedError):
 @portable_exception
 class MistakenGuessError(NamedError):
     pass
+
+
+@portable_exception
+class InvalidRequestError(NamedError):
+    pass
+  

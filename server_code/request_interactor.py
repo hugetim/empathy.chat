@@ -1,10 +1,11 @@
 import anvil.server
 from anvil import tables
 import uuid
-from .requests import Request, Eformat
+from .requests import Request, Eformat, have_conflicts
 from . import server_misc as sm
 from . import accounts
 from . import request_gateway
+from .exceptions import InvalidRequestError
 
 
 def reset_repo():
@@ -24,9 +25,11 @@ def _add_request(user, port_prop, link_key=""):
   accounts.update_default_request(port_prop, user)
   requests = tuple(_new_requests(user, port_prop))
   # get this user's other requests (and status) to confirm validity
-  user_prev_requests = repo.requests_by(user)
+  user_prev_requests = repo.requests_by_user(user)
   # status = matcher.get_partial_state(user)['status']
   # confirm validity
+  if have_conflicts(list(requests) + list(user_prev_requests)):
+    raise InvalidRequestError("New requests have a time conflict with your existing requests.")
   # get requests that might match with one of these
   
   _save_new_requests(requests)
@@ -44,9 +47,9 @@ def _check_valid_requests(requests):
 @tables.in_transaction(relaxed=True)
 def _save_new_requests(requests):
   for request in requests:
-      new_request_record = repo.RequestRecord(request)
-      new_request_record.save()
-      request.request_id = new_request_record.record_id
+    new_request_record = repo.RequestRecord(request)
+    new_request_record.save()
+    request.request_id = new_request_record.record_id
 
 
 def _new_requests(user, port_prop):

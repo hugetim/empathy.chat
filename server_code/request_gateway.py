@@ -125,7 +125,7 @@ def _get_eformat_row(eformat):
   return row
 
 
-def requests_by(user):
+def requests_by_user(user):
   request_rows = app_tables.requests.search(user=user, current=True)
   for request_row in request_rows:
     yield _row_to_request(request_row, user)
