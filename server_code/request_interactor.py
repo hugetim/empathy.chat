@@ -24,7 +24,8 @@ def _add_request(user, port_prop, link_key=""):
   accounts.update_default_request(port_prop, user)
   requests = tuple(_new_requests(user, port_prop))
   # get this user's other requests (and status) to confirm validity
-  status = get_partial_state(user)['status']
+  user_prev_requests = repo.requests_by(user)
+  # status = matcher.get_partial_state(user)['status']
   # confirm validity
   # get requests that might match with one of these
   
