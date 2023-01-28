@@ -137,6 +137,10 @@ class CreateForm(CreateFormTemplate):
     """This method is called when the selected date changes"""
     self.update()    
 
+  def drop_down_duration_change(self, **event_args):
+    """This method is called when an item is selected"""
+    self.check_times()
+  
   def check_times(self):
     self.label_start.visible = False
     self.label_cancel.visible = False
