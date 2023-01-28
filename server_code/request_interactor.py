@@ -22,15 +22,19 @@ def _add_request(user, port_prop, link_key=""):
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
+  user_id = user.get_id()
   accounts.update_default_request(port_prop, user)
   requests = tuple(_new_requests(user, port_prop))
-  # get this user's other requests (and status) to confirm validity
-  user_prev_requests = repo.requests_by_user(user)
-  # status = matcher.get_partial_state(user)['status']
+  prev_requests = repo.current_requests()
+  user_prev_requests = [r for r in prev_requests if r.user.user_id == user_id]
   # confirm validity
   if have_conflicts(list(requests) + list(user_prev_requests)):
     raise InvalidRequestError("New requests have a time conflict with your existing requests.")
-  # get requests that might match with one of these
+  # also check for current/upcoming exchange conflicts
+    
+  # check for previous requests that match with one of these
+  other_prev_requests = [r for r in prev_requests if r.user.user_id != user_id]
+
   
   _save_new_requests(requests)
   # ping other request if match

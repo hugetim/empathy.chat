@@ -130,6 +130,11 @@ def requests_by_user(user):
   for request_row in request_rows:
     yield _row_to_request(request_row, user)
 
+
+def current_requests():
+  for request_row in app_tables.requests.search(current=True):
+    yield _row_to_request(request_row, user)
+    
     
 # def get_potential_matching_requests(requests):
 #   """Return requests with same start time and eformat as any of `requests`"""
