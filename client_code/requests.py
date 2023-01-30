@@ -66,6 +66,17 @@ class Request():
         return True
     return False
 
+  def get_potential_matches(self, other_user_requests):
+    out = []
+    for other in other_user_requests:
+      if (self.start_dt == other.start_dt 
+          and self.eformat == other.eformat
+          and self.min_size <= other.max_size
+          and self.max_size >= other.min_size
+         ):
+        out.append({self, other})
+    return out
+
 
 def have_conflicts(requests):
   # keep in sync with portable.Proposal.has_conflict
@@ -77,3 +88,10 @@ def have_conflicts(requests):
       if r.has_conflict(non_or_requests):
         return True
   return False
+
+
+def potential_matches(new_requests, other_user_requests):
+  out = []
+  for new_request in new_requests:
+    out.extend(new_request.get_potential_matches(other_user_requests))
+  return out
