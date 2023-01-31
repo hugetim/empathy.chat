@@ -202,10 +202,10 @@ class MatchForm(MatchFormTemplate):
   def _update_doorbell_link(self):
     if self._doorbell_muted:
       self.mute_doorbell_link.icon = 'fa:bell-slash'
-      self.mute_doorbell_link.text = "doorbell sound (upon arrival) muted"
+      self.mute_doorbell_link.text = "doorbell muted (click to play sound upon arrival)"
     else:
       self.mute_doorbell_link.icon = 'fa:bell'
-      self.mute_doorbell_link.text = "doorbell sound will play upon arrival"
+      self.mute_doorbell_link.text = "doorbell sound will play upon arrival (click to mute)"
   
   def mute_doorbell_link_click(self, **event_args):
     """This method is called when the link is clicked"""
