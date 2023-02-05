@@ -1,7 +1,7 @@
 import anvil.server
 from anvil import tables
 import datetime
-from .requests import Request, Eformat, have_conflicts, prop_to_requests
+from .requests import Request, Eformat, have_conflicts, prop_to_requests, exchange_formed
 from . import accounts
 from . import request_gateway
 from .exceptions import InvalidRequestError
@@ -29,13 +29,20 @@ def _add_request(user, port_prop, link_key=""):
   # confirm validity
   if have_conflicts(list(requests) + list(user_prev_requests)):
     raise InvalidRequestError("New requests have a time conflict with your existing requests.")
-  # also check for current/upcoming exchange conflicts
+  # also check for current/upcoming exchange conflicts...
+  # ...by pulling in requests associated with upcoming exchanges to have_conflicts() call
     
   # check for previous requests that match with one of these
   other_prev_requests = [r for r in prev_requests if r.user.user_id != user_id]
-  
-  
-  _save_new_requests(requests)
+  _exchange = exchange_formed(requests, other_prev_requests)
+  if _exchange:
+    # drop other or_group requests before saving
+    # save matched request and resulting exchange
+    # update status
+    # trigger ping if needed
+    pass
+  else:
+    _save_new_requests(requests)
   # ping other request if match
   # otherwise notify invited
   return requests[0].or_group_id

@@ -86,10 +86,13 @@ class Request:
 @anvil.server.portable_class 
 class ExchangeProspect:
   def __init__(self, requests):
-    if not requests or len(requests) < 1 or not isinstance(requests[0], Request):
+    if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
       raise ValueError("Input 'requests' must contain at least one Request")
     self._requests = tuple(requests)
 
+  def __eq__(self, other):
+    return isinstance(other, ExchangeProspect) and set(self._requests) == set(other._requests)
+  
   def __repr__(self):
     return f"ExchangeProspect({', '.join(repr(r) for r in self._requests)})"
 
@@ -143,6 +146,10 @@ class ExchangeProspect:
   def start_now(self):
     return self._rep_request.start_now
 
+  @property
+  def create_dt(self):
+    return min([r.create_dt for r in self._requests])    
+
 
 def have_conflicts(requests):
   # keep in sync with portable.Proposal.has_conflict
@@ -161,7 +168,7 @@ def potential_matches(new_requests, other_user_requests):
   exchange_prospects = []
   for new_request in new_requests:
     exchange_prospects.extend(new_request.get_prospects(other_exchange_prospects))
-  return [set(ep) for ep in exchange_prospects]
+  return exchange_prospects #[set(ep) for ep in exchange_prospects]
 
 
 def all_exchange_prospects(requests):
@@ -184,6 +191,28 @@ def _combine_requests_w_prospects(this_proposer_requests, prospects_so_far):
   for r in this_proposer_requests:
     new_prospects.extend(r.get_prospects(prospects_so_far) + [ExchangeProspect([r])])
   return new_prospects
+
+
+def exchange_formed(new_requests, other_user_requests):
+  """If a 'has_enough' exchange exists, return one"""
+  exchange_prospects = potential_matches(new_requests, other_user_requests)
+  has_enough_exchanges = [ep for ep in exchange_prospects if ep.has_enough]
+  if has_enough_exchanges:
+    return _selected_exchange(has_enough_exchanges)
+  else:
+    return None
+
+
+def _selected_exchange(has_enough_exchanges):
+  min_start_dt = min((ep.start_dt for ep in has_enough_exchanges))
+  earliest_eps = [ep for ep in has_enough_exchanges if ep.start_dt == min_start_dt]
+  if len(earliest_eps) == 1:
+    return earliest_eps[0]
+  max_size = max((len(ep) for ep in earliest_eps))
+  largest_eps = [ep for ep in earliest_eps if len(ep) == max_size]
+  if len(largest_eps) == 1:
+    return largest_eps[0]
+  return min(largest_eps, key=lambda x: x.create_dt)
 
 
 def prop_to_requests(user, port_prop, create_dt=None, edit_dt=None, current=True):
