@@ -1,10 +1,7 @@
 import anvil.server
 from anvil import tables
-import uuid
 import datetime
-from .requests import Request, Eformat, have_conflicts
-from . import parameters as p
-from . import server_misc as sm
+from .requests import Request, Eformat, have_conflicts, prop_to_requests
 from . import accounts
 from . import request_gateway
 from .exceptions import InvalidRequestError
@@ -26,7 +23,7 @@ def _add_request(user, port_prop, link_key=""):
   """
   user_id = user.get_id()
   accounts.update_default_request(port_prop, user)
-  requests = tuple(_new_requests(user, port_prop))
+  requests = tuple(prop_to_requests(user, port_prop))
   prev_requests = repo.current_requests()
   user_prev_requests = [r for r in prev_requests if r.user.user_id == user_id]
   # confirm validity
@@ -56,47 +53,3 @@ def _save_new_requests(requests):
     new_request_record = repo.RequestRecord(request)
     new_request_record.save()
     request.request_id = new_request_record.record_id
-
-
-def _new_requests(user, port_prop):
-  """Return request"""
-  now = sm.now()
-  or_group_id = str(uuid.uuid4())
-  for port_time in port_prop.times:
-    start_dt = port_time.start_date
-    expire_dt = port_time.expire_date
-    if port_time.start_now:
-      start_dt = now
-      expire_dt = now + datetime.timedelta(seconds=p.WAIT_SECONDS)
-    yield Request(or_group_id=or_group_id,                  
-                  user=port_prop.user,
-                  start_dt=start_dt,
-                  expire_dt=expire_dt,
-                  eformat=Eformat(port_time.duration),
-                  create_dt=now,
-                  edit_dt=now,
-                  min_size=port_prop.min_size,
-                  max_size=port_prop.max_size,
-                  eligible=port_prop.eligible,
-                  eligible_users=port_prop.eligible_users,
-                  eligible_groups=port_prop.eligible_groups,
-                  eligible_starred=port_prop.eligible_starred,
-                  current=True,
-                 )
-
-    # yield Request(request_id=port_time.time_id,
-    #               or_group_id=port_prop.prop_id,
-    #               eformat=Eformat(port_time.duration),
-    #               expire_dt=port_time.expire_date,
-    #               user=port_prop.user,
-    #               start_dt=port_time.start_date,
-    #               create_dt=now,
-    #               edit_dt=now,
-    #               min_size=port_prop.min_size,
-    #               max_size=port_prop.max_size,
-    #               eligible=port_prop.eligible,
-    #               eligible_users=port_prop.eligible_users,
-    #               eligible_groups=port_prop.eligible_groups,
-    #               eligible_starred=port_prop.eligible_starred,
-    #               current=True,
-    #              )

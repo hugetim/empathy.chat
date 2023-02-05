@@ -2,7 +2,10 @@ import anvil.server
 from .cluegen import Datum
 from .portable import User
 from .groups import Group
+from . import helper as h
+from . import parameters as p
 from datetime import datetime, timedelta
+import uuid
 
 
 @anvil.server.portable_class 
@@ -181,3 +184,29 @@ def _combine_requests_w_prospects(this_proposer_requests, prospects_so_far):
   for r in this_proposer_requests:
     new_prospects.extend(r.get_prospects(prospects_so_far) + [ExchangeProspect([r])])
   return new_prospects
+
+
+def prop_to_requests(user, port_prop, create_dt=None, edit_dt=None, current=True):
+  now = h.now()
+  or_group_id = port_prop.prop_id if port_prop.prop_id else str(uuid.uuid4())
+  for port_time in port_prop.times:
+    start_dt = port_time.start_date
+    expire_dt = port_time.expire_date
+    if port_time.start_now:
+      start_dt = now
+      expire_dt = now + timedelta(seconds=p.WAIT_SECONDS)
+    yield Request(or_group_id=or_group_id,                  
+                  user=port_prop.user,
+                  start_dt=start_dt,
+                  expire_dt=expire_dt,
+                  eformat=Eformat(port_time.duration),
+                  create_dt=create_dt if create_dt else now,
+                  edit_dt=create_dt if create_dt else now,
+                  min_size=port_prop.min_size,
+                  max_size=port_prop.max_size,
+                  eligible=port_prop.eligible,
+                  eligible_users=port_prop.eligible_users,
+                  eligible_groups=port_prop.eligible_groups,
+                  eligible_starred=port_prop.eligible_starred,
+                  current=current,
+                 )
