@@ -23,7 +23,7 @@ def _add_request(user, port_prop, link_key=""):
   """
   user_id = user.get_id()
   accounts.update_default_request(port_prop, user)
-  requests = tuple(prop_to_requests(user, port_prop))
+  requests = tuple(prop_to_requests(port_prop))
   prev_requests = repo.current_requests()
   user_prev_requests = [r for r in prev_requests if r.user.user_id == user_id]
   # confirm validity

@@ -215,7 +215,7 @@ def _selected_exchange(has_enough_exchanges):
   return min(largest_eps, key=lambda x: x.create_dt)
 
 
-def prop_to_requests(user, port_prop, create_dt=None, edit_dt=None, current=True):
+def prop_to_requests(port_prop, create_dt=None, edit_dt=None, current=True):
   now = h.now()
   or_group_id = port_prop.prop_id if port_prop.prop_id else str(uuid.uuid4())
   for port_time in port_prop.times:
