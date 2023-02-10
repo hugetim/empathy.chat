@@ -19,7 +19,7 @@ class Request:
                user=None,
                start_dt=None, eformat=None, expire_dt=None,
                create_dt=None, edit_dt=None,
-               min_size=2, max_size=2,
+               min_size=2, max_size=2, with_users=None,
                eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
                current=None,
               ):
@@ -33,6 +33,7 @@ class Request:
     self.edit_dt = edit_dt
     self.min_size = min_size
     self.max_size = max_size
+    self.with_users = list(with_users) if with_users else []
     self.eligible = eligible
     self.eligible_users = eligible_users if eligible_users else []
     self.eligible_groups = eligible_groups if eligible_groups else []
@@ -79,7 +80,9 @@ class Request:
           and not other.is_full
           and (self.start_dt == other.start_dt or (self.start_now and other.start_now))
          ):
-        out.append(other.plus_request(self))
+        _possible_ep = other.plus_request(self)
+        if _possible_ep.is_possible_to_satisfy_all_with_users:
+          out.append(_possible_ep)
     return out
 
 
@@ -111,6 +114,20 @@ class ExchangeProspect:
     return self._requests[index]
 
   @property
+  def is_possible_to_satisfy_all_with_users(self):
+    users_set = set(self.users)
+    with_users_missing = {u for r in self for u in set(r.with_users) - users_set}
+    return len(self) + len(with_users_missing) <= self.max_size
+    
+  @property
+  def is_with_users_satisfied(self):
+    users = self.users
+    for r in self:
+      if not set(r.with_users).issubset(users):
+        return False
+    return True
+  
+  @property
   def min_size(self):
     return max([r.min_size for r in self._requests])
 
@@ -120,12 +137,16 @@ class ExchangeProspect:
 
   @property
   def has_enough(self):
-    return len(self) >= self.min_size
+    return len(self) >= self.min_size and self.is_with_users_satisfied
 
   @property
   def is_full(self):
     return len(self) >= self.max_size
-    
+
+  @property
+  def users(self):
+    return (r.user for r in self)
+  
   @property
   def _rep_request(self):
     return self._requests[0]
@@ -215,7 +236,7 @@ def _selected_exchange(has_enough_exchanges):
   return min(largest_eps, key=lambda x: x.create_dt)
 
 
-def prop_to_requests(port_prop, create_dt=None, edit_dt=None, current=True):
+def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, current=True):
   now = h.now()
   or_group_id = port_prop.prop_id if port_prop.prop_id else str(uuid.uuid4())
   for port_time in port_prop.times:
@@ -233,6 +254,7 @@ def prop_to_requests(port_prop, create_dt=None, edit_dt=None, current=True):
                   edit_dt=create_dt if create_dt else now,
                   min_size=port_prop.min_size,
                   max_size=port_prop.max_size,
+                  with_users=with_users if with_users else [],
                   eligible=port_prop.eligible,
                   eligible_users=port_prop.eligible_users,
                   eligible_groups=port_prop.eligible_groups,

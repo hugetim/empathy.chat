@@ -53,7 +53,6 @@ def full_name(first, last, distance=UNLINKED, relationship=None):
 
 @anvil.server.portable_class
 class User(h.AttributeToKey):
-  
   def __init__(self, user_id=None, name=None, url_confirmed=None, distance=UNLINKED, seeking=None, starred=None):
     self.user_id = user_id
     self.name = name
@@ -71,6 +70,9 @@ class User(h.AttributeToKey):
   
   def __eq__(self, other):
     return isinstance(other, User) and self.user_id == other.user_id
+
+  def __hash__(self):
+    return hash((self.user_id,))
   
   @property
   def distance_str(self):
