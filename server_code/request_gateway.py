@@ -64,6 +64,28 @@ class RequestRecord(Record):
   def _update(self):
     self._row.update(**_request_to_fields(self._entity))
 
+  @property
+  def user(self):
+    if self._row:
+      return self._row['user']
+    else:
+      return sm.get_other_user(self._entity.user)
+
+  @property
+  def eligibility_spec(self):
+    spec = {}
+    spec['user'] = self.user
+    spec['eligible'] = self._entity.eligible
+    spec['eligible_starred'] = self._entity.eligible_starred
+    if self._row:
+      spec['eligible_users'] = self._row['eligible_users']
+      spec['eligible_groups'] = self._row['eligible_groups']
+    else:
+      spec['eligible_users'] = [sm.get_other_user(user_id) for user_id in self._entity.eligible_users]
+      spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
+                                for port_group in self._entity.eligible_groups]
+    return spec
+  
   @staticmethod
   def from_row(row):
     request = _row_to_request(row)
@@ -131,12 +153,12 @@ def _get_eformat_row(eformat):
 def requests_by_user(user):
   request_rows = app_tables.requests.search(user=user, current=True)
   for request_row in request_rows:
-    yield _row_to_request(request_row, user)
+    yield _row_to_request(request_row)
 
 
-def current_requests():
+def current_requests(records=False):
   for request_row in app_tables.requests.search(current=True):
-    yield _row_to_request(request_row, user)
+    yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
 # def get_potential_matching_requests(requests):

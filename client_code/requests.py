@@ -246,7 +246,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
       start_dt = now
       expire_dt = now + timedelta(seconds=p.WAIT_SECONDS)
     yield Request(or_group_id=or_group_id,                  
-                  user=port_prop.user,
+                  user=port_prop.user.user_id,
                   start_dt=start_dt,
                   expire_dt=expire_dt,
                   eformat=Eformat(port_time.duration),
@@ -256,7 +256,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   max_size=port_prop.max_size,
                   with_users=with_users if with_users else [],
                   eligible=port_prop.eligible,
-                  eligible_users=port_prop.eligible_users,
+                  eligible_users=[port_user.user_id for port_user in port_prop.eligible_users],
                   eligible_groups=port_prop.eligible_groups,
                   eligible_starred=port_prop.eligible_starred,
                   current=current,

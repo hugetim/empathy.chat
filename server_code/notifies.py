@@ -143,7 +143,8 @@ def notify_late_for_chat(user, start, waiting_users=[]):
       
 def notify_proposal_cancel(user, proposal, title):
   """Notify recipient of cancelled proposal if settings permit"""
-  from .proposals import ProposalTime, is_eligible
+  from .proposals import ProposalTime
+  from .request_interactor import is_eligible
   eligibility_specs = accounts.get_eligibility_specs(user)
   if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], proposal.proposer):
     _notify_proposal_cancel_by(user, proposal, title, 'sms')
@@ -174,7 +175,8 @@ def _notify_proposal_cancel_by(user, proposal, title, medium):
     
 def notify_proposal(user, proposal, title, desc):
   """Notify recipient of added/edited proposal if settings permit"""
-  from .proposals import ProposalTime, is_eligible
+  from .proposals import ProposalTime
+  from .request_interactor import is_eligible
   eligibility_specs = accounts.get_eligibility_specs(user)
   if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], proposal.proposer):
     _notify_proposal_by(user, proposal, title, desc, 'sms')

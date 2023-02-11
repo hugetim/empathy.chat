@@ -359,6 +359,7 @@ class Proposal():
     return self._prop_row['user']
   
   def is_visible(self, user, distance=None):
+    from .request_interactor import is_eligible
     return is_eligible(self, user, distance)
 
   def hide_unaccepted_times(self):
@@ -512,6 +513,7 @@ class Proposal():
 
 @anvil.server.background_task
 def notify_add(prop_row):
+  from .request_interactor import all_eligible_users
   prop = Proposal(prop_row)
   for other_user in all_eligible_users(prop):
     prop._notify_add_to(other_user)
@@ -519,6 +521,7 @@ def notify_add(prop_row):
 
 @anvil.server.background_task
 def notify_edit(prop_row, port_prop, old_port_prop):
+  from .request_interactor import all_eligible_users
   prop = Proposal(prop_row)
   old_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(old_port_prop, prop.proposer))
   new_all_eligible_users = all_eligible_users(get_eligibility_spec_from_port(port_prop, prop.proposer))
@@ -533,6 +536,7 @@ def notify_edit(prop_row, port_prop, old_port_prop):
 
 @anvil.server.background_task
 def notify_cancel(prop_row):
+  from .request_interactor import all_eligible_users
   prop = Proposal(prop_row)
   for other_user in all_eligible_users(prop):
     prop._notify_cancel_to(other_user)
@@ -548,34 +552,3 @@ def get_eligibility_spec_from_port(port_prop, proposer):
                                for port_group in port_prop.eligible_groups]
     return spec
   
-      
-def is_eligible(eligibility_spec, other_user, distance=None):
-  from . import connections as c
-  from . import groups_server as g
-  if distance is None:
-    distance = c.distance(eligibility_spec['user'], other_user)
-  if (distance <= eligibility_spec['eligible'] or (other_user in eligibility_spec['eligible_users'] and distance < port.UNLINKED)):
-    return True
-  elif (eligibility_spec['eligible_starred'] and ni.star_row(other_user, eligibility_spec['user'])):
-    return True
-  else:
-    for group in eligibility_spec['eligible_groups']:
-      if other_user in g.allowed_members_from_group_row(group, eligibility_spec['user']):
-        return True
-    return False
-  
-  
-def all_eligible_users(eligibility_spec):
-  from . import connections as c
-  from . import groups_server as g
-  user = eligibility_spec['user']
-  all_eligible = set()
-  if eligibility_spec['eligible']:
-    all_eligible.update(set(c.get_connected_users(user, up_to_degree=eligibility_spec['eligible'])))
-  if eligibility_spec['eligible_starred']:
-    all_eligible.update(set(ni.starred_users(user)))
-  if eligibility_spec['eligible_users']:
-    all_eligible.update(set(eligibility_spec['eligible_users']))
-  for group in eligibility_spec['eligible_groups']:
-    all_eligible.update(set(g.allowed_members_from_group_row(group, user))-{user})
-  return all_eligible
