@@ -105,6 +105,22 @@ def name(user, to_user=None, distance=None, rel=None):
   return port.full_name(user['first_name'], user['last_name'], distance, rel)  
 
 
+def get_simple_port_user(user2, distance=None, user1=None):
+  if not user2:
+    return None
+  if distance is not None:
+    _name = name(user2, distance=distance)
+  else:
+    explicit_user1 = True
+    if not user1:
+      explicit_user1 = False
+      user1 = get_acting_user()
+    if user1 == user2:
+      distance = 0
+    _name = name(user2, user1 if explicit_user1 else None, distance)
+  return port.User(user2.get_id(), _name)
+
+
 def get_port_user(user2, distance=None, user1=None, simple=False, starred=None):
   from . import network_interactor as ni
   if not user2:

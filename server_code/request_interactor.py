@@ -53,6 +53,20 @@ class RequestAdder:
       _save_new_requests(self.requests)
 
 
+def current_visible_requests(user):
+  from . import connections as c
+  all_requests = repo.current_requests()
+  all_requesters = {r.user for r in all_requests}
+  distances = c.distances(all_requesters, user)
+  out_requests = []
+  for r in all_requests:
+    if is_eligible(r, user, distances[r.user]):
+      out_requests.append(r)
+
+
+def is_eligible(request, user, distance=None):
+
+
 def _check_requests_valid(user, requests, user_prev_requests):
   if user['trust_level'] < 3:
     for request in requests:

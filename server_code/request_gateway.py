@@ -20,9 +20,6 @@ from . import groups
 
 
 class Record(ABC): 
-  _row = None
-  _row_id = None
-
   @abstractproperty
   def _table_name(self):
     pass
@@ -39,9 +36,10 @@ class Record(ABC):
   def _update(self):
     pass
   
-  def __init__(self, entity, row_id=None):
+  def __init__(self, entity, row_id=None, row=None):
     self._entity = entity
     self._row_id = row_id
+    self._row = row
 
   def save(self):
     if not self._row_id:
@@ -66,13 +64,18 @@ class RequestRecord(Record):
   def _update(self):
     self._row.update(**_request_to_fields(self._entity))
 
+  @staticmethod
+  def from_row(row):
+    request = _row_to_request(row)
+    return RequestRecord(r, row.get_id(), row)
+
 
 def _request_to_fields(request):
   eformat = _get_eformat_row(request.eformat)
   out = dict(eformat=eformat)
-  out['user'] = app_tables.users.get_by_id(request.user.user_id)
-  out['eligible_users'] = [sm.get_other_user(port_user.user_id)
-                           for port_user in request.eligible_users]
+  out['user'] = app_tables.users.get_by_id(request.user)
+  out['eligible_users'] = [sm.get_other_user(user_id)
+                           for user_id in request.eligible_users]
   out['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
                             for port_group in request.eligible_groups]
   simple_keys = [
@@ -92,12 +95,12 @@ def _request_to_fields(request):
   return out
 
 
-def _row_to_request(row, user):
+def _row_to_request(row):
   eformat = Eformat(duration=row['eformat']['duration'])
   kwargs = dict(eformat=eformat)
   kwargs['request_id'] = row.get_id()
-  kwargs['user'] = sm.get_port_user(row['user'], user1=user, simple=True)
-  kwargs['eligible_users'] = [sm.get_port_user(user2, user1=user, simple=True)
+  kwargs['user'] = row['user'].get_id()
+  kwargs['eligible_users'] = [user2.get_id()
                               for user2 in row['eligible_users']]
   out['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id())
                             for group_row in row['eligible_groups']]
@@ -134,8 +137,8 @@ def requests_by_user(user):
 def current_requests():
   for request_row in app_tables.requests.search(current=True):
     yield _row_to_request(request_row, user)
-    
-    
+
+
 # def get_potential_matching_requests(requests):
 #   """Return requests with same start time and eformat as any of `requests`"""
 #   out = {}
