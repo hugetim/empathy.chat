@@ -46,7 +46,7 @@ class RequestAdder:
     other_prev_requests = current_visible_requests(self.user) #[r for r in prev_requests if r.user.user_id != user_id]
     self.exchange = exchange_formed(self.requests, other_prev_requests)
     if self.exchange:
-      # drop other or_group requests before saving
+      # drop other or_group requests before saving (or just don't save them)
       # save matched request and resulting exchange
       # update status
       # trigger ping if needed
