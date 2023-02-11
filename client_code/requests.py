@@ -116,7 +116,7 @@ class ExchangeProspect:
   @property
   def is_possible_to_satisfy_all_with_users(self):
     users_set = set(self.users)
-    with_users_missing = {u for r in self for u in set(r.with_users) - users_set}
+    with_users_missing = {u for r in self for u in (set(r.with_users) - users_set)}
     return len(self) + len(with_users_missing) <= self.max_size
     
   @property
