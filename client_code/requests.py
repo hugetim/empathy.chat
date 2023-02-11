@@ -145,7 +145,7 @@ class ExchangeProspect:
 
   @property
   def users(self):
-    return (r.user for r in self)
+    return tuple((r.user for r in self))
   
   @property
   def _rep_request(self):
