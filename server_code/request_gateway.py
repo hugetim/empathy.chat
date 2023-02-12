@@ -64,6 +64,17 @@ class RequestRecord(Record):
   def _update(self):
     self._row.update(**_request_to_fields(self._entity))
 
+  def expired(self, now):
+    return self._entity.expired(now)
+
+  def cancel(self, now):
+    self._row['current'] = False
+    self._entity.current = False
+
+  @property
+  def current(self):
+    return self._entity.current
+  
   @property
   def user(self):
     if self._row:
@@ -160,6 +171,18 @@ def current_requests(records=False):
   for request_row in app_tables.requests.search(current=True):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
+
+def partially_matching_requests(partial_request_dicts, now, records=False):
+  q_expressions = [
+    q.all_of(eformat=_get_eformat_row(prd['eformat']),
+             **(dict(start_dt=q.less_than(now)) if prd['start_now'] else dict(start_dt=prd['start_dt']))
+            )
+    for prd in partial_request_dicts
+  ]
+  rows = app_tables.requests.search(q.any_of(*q_expressions), current=True)
+  for request_row in rows:
+    yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
+    
 
 # def get_potential_matching_requests(requests):
 #   """Return requests with same start time and eformat as any of `requests`"""

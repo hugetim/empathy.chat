@@ -59,10 +59,13 @@ class Request:
   @property
   def start_now(self):
     return self.start_dt < self.expire_dt
-
+  
   @property
   def end_dt(self):
     return self.start_dt + timedelta(minutes=self.eformat.duration)
+
+  def expired(self, now):
+    return self.expire_dt < now
   
   def has_conflict(self, non_or_requests):
     # keep in sync with requests.have_no_conflicts

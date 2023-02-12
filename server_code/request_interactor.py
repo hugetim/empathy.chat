@@ -6,6 +6,7 @@ from . import accounts
 from . import request_gateway
 from . import portable as port
 from . import network_interactor as ni
+from . import server_misc as sm
 from .exceptions import InvalidRequestError
 
 
@@ -41,9 +42,13 @@ class RequestAdder:
   def check_and_save(self):
     user_id = self.user.get_id()
     #prev_requests = repo.current_requests()
-    user_prev_requests = repo.requests_by_user(self.user) #[r for r in prev_requests if r.user.user_id == user_id]
+    user_prev_requests = repo.requests_by_user(self.user)
     _check_requests_valid(self.user, self.requests, user_prev_requests)
-    other_prev_requests = current_visible_requests(self.user) #[r for r in prev_requests if r.user.user_id != user_id]
+    now = sm.now()
+    other_request_records = potential_matching_request_records(self.requests, now)
+    _prune_request_records(other_request_records, now)
+    still_current_other_request_records = [rr for rr in other_request_records if rr.current]
+    other_prev_requests = current_visible_requests(self.user, still_current_other_request_records)
     self.exchange = exchange_formed(self.requests, other_prev_requests)
     if self.exchange:
       # drop other or_group requests before saving (or just don't save them)
@@ -55,17 +60,31 @@ class RequestAdder:
       _save_new_requests(self.requests)
 
 
-def current_visible_requests(user):
+def _prune_request_records(other_request_records, now):
+  for rr in other_request_records:
+    if rr.expired(now):
+      rr.cancel()
+
+
+def potential_matching_request_records(requests, now):
+  partial_request_dicts = [
+    dict(start_now=r.start_now, start_dt=r.start_dt, eformat=r.eformat)
+    for r in requests
+  ]
+  return repo.partially_matching_requests(partial_request_dicts, now, records=True)
+
+
+def current_visible_requests(user, request_records):
   from . import connections as c
-  all_request_records = repo.current_requests(records=True)
+  request_records = repo.current_requests(records=True)
   # group_memberships = 
   # starred_by_list =
-  all_requesters = {rr.user for rr in all_request_records}
+  all_requesters = {rr.user for rr in request_records}
   # max_eligible_dict = {user_id: max((r.eligible for r in all_requests if r.user=user_id))
   #                      for user_id in all_requester_ids}
   distances = c.distances(all_requesters, user)
   out_requests = []
-  for rr in all_request_records:
+  for rr in request_records:
     if is_eligible(rr.elgibility_spec, user, distances[rr.user]):
       out_requests.append(r)
   return out_requests
