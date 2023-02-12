@@ -28,7 +28,7 @@ def _add_request(user, port_prop, link_key=""):
   requests = tuple(prop_to_requests(port_prop))
   request_adder = RequestAdder(user, requests)
   request_adder.check_and_save()
-  # ping other request if match
+  # ping other request if request_adder.exchange
   # otherwise notify invited
   return requests[0].or_group_id
 
@@ -51,10 +51,9 @@ class RequestAdder:
     other_prev_requests = current_visible_requests(self.user, still_current_other_request_records)
     self.exchange = exchange_formed(self.requests, other_prev_requests)
     if self.exchange:
-      # drop other or_group requests before saving (or just don't save them)
-      # save matched request and resulting exchange
+      # save matched request only* and resulting exchange
+      # *cancel other or_group requests before saving (or just don't save them)
       # update status
-      # trigger ping if needed
       pass
     else:
       _save_new_requests(self.requests)
