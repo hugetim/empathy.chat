@@ -100,13 +100,15 @@ class RequestRecord(Record):
   @staticmethod
   def from_row(row):
     request = _row_to_request(row)
-    return RequestRecord(r, row.get_id(), row)
+    return RequestRecord(request, row.get_id(), row)
 
 
 def _request_to_fields(request):
   eformat = _get_eformat_row(request.eformat)
   out = dict(eformat=eformat)
   out['user'] = app_tables.users.get_by_id(request.user)
+  out['with_users'] = [sm.get_other_user(user_id)
+                       for user_id in request.with_users]
   out['eligible_users'] = [sm.get_other_user(user_id)
                            for user_id in request.eligible_users]
   out['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
@@ -133,6 +135,8 @@ def _row_to_request(row):
   kwargs = dict(eformat=eformat)
   kwargs['request_id'] = row.get_id()
   kwargs['user'] = row['user'].get_id()
+  kwargs['with_users'] = [user2.get_id()
+                          for user2 in row['with_users']]
   kwargs['eligible_users'] = [user2.get_id()
                               for user2 in row['eligible_users']]
   kwargs['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id())
