@@ -135,8 +135,8 @@ def _row_to_request(row):
   kwargs['user'] = row['user'].get_id()
   kwargs['eligible_users'] = [user2.get_id()
                               for user2 in row['eligible_users']]
-  out['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id())
-                            for group_row in row['eligible_groups']]
+  kwargs['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id())
+                               for group_row in row['eligible_groups']]
   simple_keys = [
     'or_group_id',
     'start_dt',
