@@ -28,8 +28,10 @@ def _add_request(user, port_prop, link_key=""):
   requests = tuple(prop_to_requests(port_prop))
   request_adder = RequestAdder(user, requests)
   request_adder.check_and_save()
-  # ping other request if request_adder.exchange
-  # otherwise notify invited
+  if request_adder.exchange:
+    raise NotImplementedError("add_request -> exchange ping/notify")
+    # ping other request if request_adder.exchange
+    # otherwise notify invited
   return requests[0].or_group_id
 
 
@@ -54,7 +56,7 @@ class RequestAdder:
       # save matched request only* and resulting exchange
       # *cancel other or_group requests before saving (or just don't save them)
       # update status
-      pass
+      raise NotImplementedError("add_request -> exchange")
     else:
       _save_new_requests(self.requests)
 
@@ -138,3 +140,10 @@ def _save_new_requests(requests):
     new_request_record = repo.RequestRecord(request)
     new_request_record.save()
     request.request_id = new_request_record.record_id
+
+
+def _cancel_request(user, proptime_id):
+  raise NotImplementedError("_cancel_request")
+  # proptime = ProposalTime.get_by_id(proptime_id)
+  # if proptime:
+  #   proptime.cancel_this(user)
