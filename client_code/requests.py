@@ -91,6 +91,9 @@ class Request:
           out.append(_possible_ep)
     return out
 
+  def has_room_for(self, other_user):
+    return 1 + len(self.with_users) + (0 if other_user in self.with_users else 1) <= self.max_size
+
 
 @anvil.server.portable_class 
 class ExchangeProspect:

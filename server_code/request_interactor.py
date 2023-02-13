@@ -77,6 +77,7 @@ def potential_matching_request_records(requests, now):
 
 def current_visible_requests(user, request_records=None):
   from . import connections as c
+  user_id = user.get_id()
   if request_records == None:
     request_records = repo.current_requests(records=True)
   # group_memberships = 
@@ -87,7 +88,7 @@ def current_visible_requests(user, request_records=None):
   distances = c.distances(all_requesters, user)
   out_requests = []
   for rr in request_records:
-    if is_eligible(rr.eligibility_spec, user, distances[rr.user]):
+    if is_eligible(rr.eligibility_spec, user, distances[rr.user]) and rr.entity.has_room_for(user_id):
       out_requests.append(rr.entity)
   return out_requests
 
