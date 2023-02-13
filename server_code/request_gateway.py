@@ -37,7 +37,7 @@ class Record(ABC):
     pass
   
   def __init__(self, entity, row_id=None, row=None):
-    self._entity = entity
+    self.entity = entity
     self._row_id = row_id
     self._row = row
 
@@ -58,43 +58,43 @@ class RequestRecord(Record):
   _table_name = 'requests'
 
   def _add(self):
-    self._row = self._table.add_row(**_request_to_fields(self._entity))
+    self._row = self._table.add_row(**_request_to_fields(self.entity))
     self._row_id = self._row.get_id()
 
   def _update(self):
-    self._row.update(**_request_to_fields(self._entity))
+    self._row.update(**_request_to_fields(self.entity))
 
   def expired(self, now):
-    return self._entity.expired(now)
+    return self.entity.expired(now)
 
   def cancel(self, now):
     self._row['current'] = False
-    self._entity.current = False
+    self.entity.current = False
 
   @property
   def current(self):
-    return self._entity.current
+    return self.entity.current
   
   @property
   def user(self):
     if self._row:
       return self._row['user']
     else:
-      return sm.get_other_user(self._entity.user)
+      return sm.get_other_user(self.entity.user)
 
   @property
   def eligibility_spec(self):
     spec = {}
     spec['user'] = self.user
-    spec['eligible'] = self._entity.eligible
-    spec['eligible_starred'] = self._entity.eligible_starred
+    spec['eligible'] = self.entity.eligible
+    spec['eligible_starred'] = self.entity.eligible_starred
     if self._row:
       spec['eligible_users'] = self._row['eligible_users']
       spec['eligible_groups'] = self._row['eligible_groups']
     else:
-      spec['eligible_users'] = [sm.get_other_user(user_id) for user_id in self._entity.eligible_users]
+      spec['eligible_users'] = [sm.get_other_user(user_id) for user_id in self.entity.eligible_users]
       spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
-                                for port_group in self._entity.eligible_groups]
+                                for port_group in self.entity.eligible_groups]
     return spec
   
   @staticmethod

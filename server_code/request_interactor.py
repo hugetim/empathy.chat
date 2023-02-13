@@ -75,9 +75,10 @@ def potential_matching_request_records(requests, now):
   return repo.partially_matching_requests(partial_request_dicts, now, records=True)
 
 
-def current_visible_requests(user, request_records):
+def current_visible_requests(user, request_records=None):
   from . import connections as c
-  request_records = repo.current_requests(records=True)
+  if request_records == None:
+    request_records = repo.current_requests(records=True)
   # group_memberships = 
   # starred_by_list =
   all_requesters = {rr.user for rr in request_records}
@@ -86,8 +87,8 @@ def current_visible_requests(user, request_records):
   distances = c.distances(all_requesters, user)
   out_requests = []
   for rr in request_records:
-    if is_eligible(rr.elgibility_spec, user, distances[rr.user]):
-      out_requests.append(r)
+    if is_eligible(rr.eligibility_spec, user, distances[rr.user]):
+      out_requests.append(rr.entity)
   return out_requests
 
 
@@ -96,7 +97,7 @@ def is_eligible(eligibility_spec, other_user, distance=None):
   from . import groups_server as g
   if distance is None:
     distance = c.distance(eligibility_spec['user'], other_user)
-  if (distance <= eligibility_spec['eligible'] or (other_user in eligibility_spec['eligible_users'] and distance < port.UNLINKED)):
+  if (distance <= eligibility_spec['eligible'] or other_user in eligibility_spec['eligible_users']):# and distance < port.UNLINKED)):
     return True
   elif (eligibility_spec['eligible_starred'] and ni.star_row(other_user, eligibility_spec['user'])):
     return True
