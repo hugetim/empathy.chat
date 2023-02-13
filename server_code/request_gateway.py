@@ -123,6 +123,7 @@ def _request_to_fields(request):
     'max_size',
     'eligible',
     'eligible_starred',
+    'pref_order',
     'current',
   ]
   for key in simple_keys:
@@ -151,6 +152,7 @@ def _row_to_request(row):
     'max_size',
     'eligible',
     'eligible_starred',
+    'pref_order',
     'current',
   ]
   for key in simple_keys:

@@ -15,14 +15,16 @@ class Eformat(Datum):
 
 @anvil.server.portable_class
 class Request:
-  def __init__(self, request_id=None, or_group_id=None,
-               user=None,
-               start_dt=None, eformat=None, expire_dt=None,
-               create_dt=None, edit_dt=None,
-               min_size=2, max_size=2, with_users=None,
-               eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
-               current=None,
-              ):
+  def __init__(
+    self, request_id=None, or_group_id=None,
+    user=None,
+    start_dt=None, eformat=None, expire_dt=None,
+    create_dt=None, edit_dt=None,
+    min_size=2, max_size=2, with_users=None,
+    eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
+    pref_order=None,
+    current=None,
+  ):
     self.request_id = request_id
     self.or_group_id = or_group_id
     self.user = user
@@ -38,6 +40,7 @@ class Request:
     self.eligible_users = eligible_users if eligible_users else []
     self.eligible_groups = eligible_groups if eligible_groups else []
     self.eligible_starred = eligible_starred
+    self.pref_order = pref_order
     self.current = current
 
   def __repr__(self):
@@ -45,7 +48,7 @@ class Request:
       f"Request({self.request_id!r}, {self.or_group_id!r}, {self.user!r}, {self.start_dt!r}, {self.eformat!r}, {self.expire_dt!r}, "
       f"{self.create_dt!r}, {self.edit_dt!r}, {self.min_size!r}, {self.max_size!r}, "
       f"{self.eligible!r}, {self.eligible_users!r}, {self.eligible_groups!r}, {self.eligible_starred!r}, "
-      f"{self.current!r})"
+      f"{self.pref_order!r}), {self.current!r})"
     )
   
   def __str__(self):
@@ -53,7 +56,7 @@ class Request:
       f"Request({self.request_id!s}, {self.or_group_id!s}, {self.user!s}, {self.start_dt!s}, {self.eformat!s}, {self.expire_dt!s}, "
       f"{self.create_dt!s}, {self.edit_dt!s}, {self.min_size!s}, {self.max_size!s}, "
       f"{self.eligible!s}, {self.eligible_users!s}, {self.eligible_groups!s}, {self.eligible_starred!s}, "
-      f"{self.current!s})"
+      f"{self.pref_order!s}), {self.current!s})"
     )
   
   @property
@@ -242,7 +245,7 @@ def _selected_exchange(has_enough_exchanges):
 def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, current=True):
   now = h.now()
   or_group_id = port_prop.prop_id if port_prop.prop_id else str(uuid.uuid4())
-  for port_time in port_prop.times:
+  for i, port_time in enumerate(port_prop.times):
     start_dt = port_time.start_date
     expire_dt = port_time.expire_date
     if port_time.start_now:
@@ -262,5 +265,6 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   eligible_users=[port_user.user_id for port_user in port_prop.eligible_users],
                   eligible_groups=port_prop.eligible_groups,
                   eligible_starred=port_prop.eligible_starred,
+                  pref_order=i,
                   current=current,
                  )

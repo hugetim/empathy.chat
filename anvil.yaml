@@ -497,6 +497,9 @@ db_schema:
     - name: or_group_id
       admin_ui: {width: 130.015872}
       type: string
+    - name: pref_order
+      admin_ui: {width: 200}
+      type: number
     - name: current
       admin_ui: {width: 90.015872}
       type: bool
@@ -522,6 +525,10 @@ db_schema:
     - name: max_size
       admin_ui: {width: 100.015872}
       type: number
+    - name: with_users
+      admin_ui: {width: 200}
+      type: link_multiple
+      target: users
     - name: eligible
       admin_ui: {width: 87.015872}
       type: number
