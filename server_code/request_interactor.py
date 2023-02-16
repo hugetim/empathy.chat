@@ -163,7 +163,7 @@ def requests_to_props(requests, user):
     sm.my_assert(_all_equal([(r.user, r.min_size, r.max_size) for r in this_or_group]), "same proposer, sizes")
     times = []
     for r in sorted(this_or_group, key=lambda x: x.pref_order):
-      #sm.my_assert(not r.with_users, "no with_users")
+      sm.my_assert(not r.with_users, "no with_users")
       times.append(port.ProposalTime(
         time_id=r.request_id,
         start_now=r.start_now,
