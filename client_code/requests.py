@@ -275,39 +275,3 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   pref_order=i,
                   current=current,
                  )
-
-
-def _all_equal(lst):
-  return lst[:-1] == lst[1:] # https://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
-
-
-def requests_to_prop(requests):
-  or_groups = [[r for r in requests if r.or_group_id == or_group_id]
-                for or_group_id in {r.or_group_id for r in requests}]
-  for this_or_group in or_groups:
-    h.my_assert(_all_equal([r.elig_with_dict for r in this_or_group]))
-    times = []
-    for r in sorted(this_or_group, key=lambda x: x.pref_order):
-      times.append(ProposalTime())
-    start_dt = port_time.start_date
-    expire_dt = port_time.expire_date
-    if port_time.start_now:
-      start_dt = now
-      expire_dt = now + timedelta(seconds=p.WAIT_SECONDS)
-    yield Request(or_group_id=or_group_id,                  
-                  user=port_prop.user.user_id,
-                  start_dt=start_dt,
-                  expire_dt=expire_dt,
-                  eformat=Eformat(port_time.duration),
-                  create_dt=create_dt if create_dt else now,
-                  edit_dt=create_dt if create_dt else now,
-                  min_size=port_prop.min_size,
-                  max_size=port_prop.max_size,
-                  with_users=with_users if with_users else [],
-                  eligible=port_prop.eligible,
-                  eligible_users=[port_user.user_id for port_user in port_prop.eligible_users],
-                  eligible_groups=port_prop.eligible_groups,
-                  eligible_starred=port_prop.eligible_starred,
-                  pref_order=i,
-                  current=current,
-                 )

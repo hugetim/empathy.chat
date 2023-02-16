@@ -149,3 +149,38 @@ def _cancel_request(user, proptime_id):
   # proptime = ProposalTime.get_by_id(proptime_id)
   # if proptime:
   #   proptime.cancel_this(user)
+
+
+def _all_equal(lst):
+  return lst[:-1] == lst[1:] # https://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
+
+
+def requests_to_props(requests, user):
+  or_groups = [[r for r in requests if r.or_group_id == or_group_id]
+                for or_group_id in {r.or_group_id for r in requests}]
+  for this_or_group in or_groups:
+    sm.my_assert(_all_equal([r.elig_with_dict for r in this_or_group]), "same eligibility")
+    sm.my_assert(_all_equal([(r.user, r.min_size, r.max_size) for r in this_or_group]), "same proposer, sizes")
+    times = []
+    for r in sorted(this_or_group, key=lambda x: x.pref_order):
+      #sm.my_assert(not r.with_users, "no with_users")
+      times.append(port.ProposalTime(
+        time_id=r.request_id,
+        start_now=r.start_now,
+        start_date = None if r.start_now else r.start_dt,
+        expire_date=r.expire_dt,
+        duration=r.eformat.duration,
+      ))
+    user2 = sm.get_other_user(this_or_group[0].user)
+    or_group_id = this_or_group[0].or_group_id
+    yield port.Proposal(
+      prop_id=or_group_id,
+      user=sm.get_simple_port_user(user2, user1=user),
+      min_size=r.min_size,
+      max_size=r.max_size,
+      eligible=r.eligible,
+      eligible_users=[sm.get_simple_port_user(sm.get_other_user(user_id), user1=user) for user_id in r.eligible_users],
+      eligible_groups=r.eligible_groups,
+      eligible_starred=r.eligible_starred,
+      times=times
+    )
