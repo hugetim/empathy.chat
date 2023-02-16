@@ -306,6 +306,9 @@ db_schema:
     - name: last_invite
       admin_ui: {width: 144}
       type: datetime
+    - name: status
+      admin_ui: {order: 5.25, width: 200}
+      type: string
   proposal_times:
     title: Proposal Times
     client: none

@@ -79,7 +79,7 @@ def current_visible_requests(user, request_records=None):
   from . import connections as c
   user_id = user.get_id()
   if request_records == None:
-    request_records = repo.current_requests(records=True)
+    request_records = [rr for rr in repo.current_requests(records=True) if rr.user != user]
   # group_memberships = 
   # starred_by_list =
   all_requesters = {rr.user for rr in request_records}
