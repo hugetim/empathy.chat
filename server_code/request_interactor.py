@@ -8,6 +8,7 @@ from . import portable as port
 from . import network_interactor as ni
 from . import server_misc as sm
 from . import exchange_interactor as ei
+from . import notifies as n
 from .exceptions import InvalidRequestError
 
 
@@ -75,11 +76,13 @@ class RequestAdder:
 
   def notify_add(self):
     eligibility_spec = self.request_records[0].eligibility_spec
+    requester = self.request_records[0].user
     for rr in self.request_records[1:]:
       sm.my_assert(rr.entity.or_group_id == self.request_records[0].entity.or_group_id, "notify_add assumes same or_group_id")
       sm.my_assert(rr.eligibility_spec == eligibility_spec, "notify_add assumes same eligibility_spec")
+      sm.my_assert(rr.user == requester, "notify_add assumes same requester")
     for other_user in all_eligible_users(eligibility_spec):
-      n.notify_requests(other_user, self.requests, f"empathy request", " has requested an empathy chat:")
+      n.notify_requests(other_user, requester, self.requests, f"empathy request", " has requested an empathy chat:")
 
 
 def _prune_request_records(other_request_records, now):

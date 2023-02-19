@@ -184,20 +184,19 @@ def _notify_proposal_cancel_by(user, proposal, title, medium):
 ''')
 
 
-def notify_requests(user, requests, title, desc):
+def notify_requests(user, requester, requests, title, desc):
   """Notify recipient of added/edited requests if settings permit"""
   from .request_interactor import is_eligible
   eligibility_specs = accounts.get_eligibility_specs(user)
-  requester = requests[0].user
   if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], requester):
-    _notify_requests_by(user, requests, title, desc, 'sms')
+    _notify_requests_by(user, requester, requests, title, desc, 'sms')
   elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], requester):
-    _notify_requests_by(user, requests, title, desc, 'email')
+    _notify_requests_by(user, requester, requests, title, desc, 'email')
 
 
-def _notify_requests_by(user, requests, title, desc, medium):
+def _notify_requests_by(user, requester, requests, title, desc, medium):
   print(f"'_notify_requests_by', {user['email']}, {requests[0].or_group_id}, {title}, {desc}, {medium}")
-  requester_name = sm.name(requests[0].user, to_user=user)
+  requester_name = sm.name(requester, to_user=user)
   subject = f"empathy.chat - {title}"
   if len(requests) > 1:
     times_str = "\n" + "either " + "\n or ".join([duration_start_str(request, user) for request in requests])
