@@ -1,7 +1,7 @@
 import anvil.server
 from anvil import tables
 import datetime
-from .requests import Request, Eformat, have_conflicts, prop_to_requests, exchange_formed
+from .requests import Request, Eformat, have_conflicts, prop_to_requests, exchange_to_save
 from . import accounts
 from . import request_gateway
 from . import portable as port
@@ -32,7 +32,8 @@ def _add_request(user, port_prop, link_key=""):
   if request_adder.exchange:
     raise NotImplementedError("add_request -> exchange ping/notify")
     # ping other request if request_adder.exchange
-    # otherwise notify invited
+  else:
+    request_adder.notify_add()
   return requests[0].or_group_id
 
 
@@ -49,7 +50,7 @@ class RequestAdder:
     now = sm.now()
     other_request_records = potential_matching_request_records(self.requests, now)
     _prune_request_records(other_request_records, now)
-    still_current_other_request_records = [rr for rr in other_request_records if rr.current]
+    still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
     other_prev_requests = current_visible_requests(self.user, still_current_other_request_records)
     exchange_prospect = exchange_to_save(self.requests, other_prev_requests)
     if exchange_prospect:
@@ -60,12 +61,30 @@ class RequestAdder:
       # update status
       raise NotImplementedError("add_request -> exchange")
     else:
-      _save_new_requests(self.requests)
+      self._save_new_requests()
+
+  def _save_new_requests(self):
+    self.request_records = []
+    for request in self.requests:
+      new_request_record = repo.RequestRecord(request)
+      self.request_records.append(new_request_record)
+      new_request_record.save()
+      request.request_id = new_request_record.record_id
+      if request.start_now:
+        raise NotImplementedError("save now request")
+
+  def notify_add(self):
+    eligibility_spec = self.request_records[0].eligibility_spec
+    for rr in self.request_records[1:]:
+      sm.my_assert(rr.entity.or_group_id == self.request_records[0].entity.or_group_id, "notify_add assumes same or_group_id")
+      sm.my_assert(rr.eligibility_spec == eligibility_spec, "notify_add assumes same eligibility_spec")
+    for other_user in all_eligible_users(eligibility_spec):
+      n.notify_requests(other_user, self.requests, f"empathy request", " has requested an empathy chat:")
 
 
 def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
-    if rr.expired(now):
+    if rr.entity.expired(now):
       rr.cancel()
 
 
@@ -137,13 +156,6 @@ def _check_requests_valid(user, requests, user_prev_requests):
     raise InvalidRequestError("New requests have a time conflict with your existing requests.")
   # also check for current/upcoming exchange conflicts...
   # ...by pulling in requests associated with upcoming exchanges to have_conflicts() call
-
-
-def _save_new_requests(requests):
-  for request in requests:
-    new_request_record = repo.RequestRecord(request)
-    new_request_record.save()
-    request.request_id = new_request_record.record_id
 
 
 def _cancel_request(user, proptime_id):

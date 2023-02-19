@@ -5,6 +5,7 @@ from . import server_misc as sm
 from . import accounts
 from . import parameters as p
 from . import helper as h
+from . import portable as port
 from anvil_extras.server_utils import timed
 
   
@@ -55,6 +56,7 @@ def _from_name_for_email(name=""):
 def _email_unsubscribe(detail='click the pencil button beneath "Email me (otherwise) regarding empathy requests from:", uncheck all boxes, and click "OK"'):
   return f'To unsubscribe: Login to empathy.chat, go to Settings, {detail}.'
 
+
 def when_str(start, user):
   if start:
     start_user_tz = sm.as_user_tz(start, user)
@@ -70,7 +72,16 @@ def when_str(start, user):
     return out
   else: 
     return "now"  
-  
+
+
+def duration_start_str(request, user):
+  out = port.DURATION_TEXT[request.eformat.duration]
+  if request.start_now:
+    out += ", starting now"
+  else:
+    out += f", {when_str(request.start_dt, user)}"
+  return out
+    
 
 @anvil.server.background_task
 def ping(user, start, duration):
@@ -168,6 +179,45 @@ def _notify_proposal_cancel_by(user, proposal, title, medium):
       text=f'''Dear {_addressee_name(user)},
 
 {content1}
+
+{_email_unsubscribe()}
+''')
+
+
+def notify_requests(user, requests, title, desc):
+  """Notify recipient of added/edited requests if settings permit"""
+  from .request_interactor import is_eligible
+  eligibility_specs = accounts.get_eligibility_specs(user)
+  requester = requests[0].user
+  if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], requester):
+    _notify_requests_by(user, requests, title, desc, 'sms')
+  elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], requester):
+    _notify_requests_by(user, requests, title, desc, 'email')
+
+
+def _notify_requests_by(user, requests, title, desc, medium):
+  print(f"'_notify_requests_by', {user['email']}, {requests[0].or_group_id}, {title}, {desc}, {medium}")
+  requester_name = sm.name(requests[0].user, to_user=user)
+  subject = f"empathy.chat - {title}"
+  if len(requests) > 1:
+    times_str = "\n" + "either " + "\n or ".join([duration_start_str(request, user) for request in requests])
+    content2 = f"Login to {p.URL} to accept one."
+  else:
+    times_str = "\n " + duration_start_str(requests[0], user)
+    content2 = f"Login to {p.URL} to accept."
+  content1 = f"{_other_name(requester_name)}{desc}{times_str}."
+  if medium == 'sms':
+    send_sms(sm.phone(user), f"empathy.chat: {content1}\n{content2}")
+  elif medium == 'email':
+    email_send(
+      to_user=user,
+      from_name=_from_name_for_email(requester_name),
+      subject=f"{subject} from {requester_name}",
+      text=f'''Dear {_addressee_name(user)},
+
+{content1}
+
+{content2}
 
 {_email_unsubscribe()}
 ''')

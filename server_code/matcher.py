@@ -307,14 +307,14 @@ def _accept_proposal(proptime, user):
 
 
 @authenticated_callable
-def add_proposal(proposal, link_key="", user_id=""):
+def add_proposal(proposal, invite_link_key="", user_id=""):
   """Return state, prop_id (None if cancelled or matching with another proposal)
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
   print(f"add_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
-  prop_id = _add_proposal(user, proposal, link_key)
+  prop_id = _add_proposal(user, proposal, invite_link_key)
   propagate_update_needed(user)
   return _get_state(user), prop_id
 

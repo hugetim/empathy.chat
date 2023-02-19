@@ -64,16 +64,9 @@ class RequestRecord(Record):
   def _update(self):
     self._row.update(**_request_to_fields(self.entity))
 
-  def expired(self, now):
-    return self.entity.expired(now)
-
   def cancel(self, now):
     self._row['current'] = False
     self.entity.current = False
-
-  @property
-  def current(self):
-    return self.entity.current
   
   @property
   def user(self):

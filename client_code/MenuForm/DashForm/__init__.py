@@ -150,7 +150,7 @@ class DashForm(DashFormTemplate):
                 buttons=[])
     if out is True:
       proposal = content.proposal()
-      self._handle_prop_call(*anvil.server.call('add_proposal', proposal, link_key=link_key))
+      self._handle_prop_call(*anvil.server.call('add_proposal', proposal, invite_link_key=link_key))
       
   def _handle_prop_call(self, state, prop_id):
     if prop_id is None:
