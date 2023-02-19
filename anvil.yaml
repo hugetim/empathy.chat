@@ -102,6 +102,31 @@ db_schema:
     - name: current
       admin_ui: {width: 200}
       type: bool
+  participants:
+    client: none
+    server: full
+    columns:
+    - name: user
+      admin_ui: {order: 0, width: 200}
+      type: link_single
+      target: users
+    - name: appearances
+      admin_ui: {order: 1, width: 200}
+      type: link_multiple
+      target: appearances
+    - name: enter_dt
+      admin_ui: {order: 2, width: 200}
+      type: datetime
+    - name: slider_value
+      admin_ui: {order: 3, width: 200}
+      type: number
+    - name: video_embedded
+      admin_ui: {order: 4, width: 200}
+      type: bool
+    - name: complete_dt
+      admin_ui: {order: 5, width: 200}
+      type: datetime
+    title: Participants
   codes:
     title: Codes
     client: none
@@ -123,6 +148,17 @@ db_schema:
     - name: date
       admin_ui: {width: 200}
       type: datetime
+  appearances:
+    client: none
+    server: full
+    columns:
+    - name: start_dt
+      admin_ui: {order: 0, width: 200}
+      type: datetime
+    - name: end_dt
+      admin_ui: {order: 1, width: 200}
+      type: datetime
+    title: Appearances
   chat:
     title: Chat
     client: none
@@ -352,6 +388,25 @@ db_schema:
     - name: missed_pings
       admin_ui: {width: 142}
       type: number
+  exchanges:
+    client: none
+    server: full
+    columns:
+    - name: room_code
+      admin_ui: {order: 0, width: 200}
+      type: string
+    - name: requests
+      admin_ui: {order: 1, width: 200}
+      type: link_multiple
+      target: requests
+    - name: start_dt
+      admin_ui: {order: 2, width: 200}
+      type: datetime
+    - name: Column3
+      admin_ui: {order: 3, width: 200}
+      type: link_multiple
+      target: participants
+    title: Exchanges
   stars:
     title: Stars
     client: none
