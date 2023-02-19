@@ -7,6 +7,7 @@ from . import request_gateway
 from . import portable as port
 from . import network_interactor as ni
 from . import server_misc as sm
+from . import exchange_interactor as ei
 from .exceptions import InvalidRequestError
 
 
@@ -43,7 +44,6 @@ class RequestAdder:
   @tables.in_transaction
   def check_and_save(self):
     user_id = self.user.get_id()
-    #prev_requests = repo.current_requests()
     user_prev_requests = repo.requests_by_user(self.user)
     _check_requests_valid(self.user, self.requests, user_prev_requests)
     now = sm.now()
@@ -51,10 +51,12 @@ class RequestAdder:
     _prune_request_records(other_request_records, now)
     still_current_other_request_records = [rr for rr in other_request_records if rr.current]
     other_prev_requests = current_visible_requests(self.user, still_current_other_request_records)
-    self.exchange = exchange_formed(self.requests, other_prev_requests)
-    if self.exchange:
-      # save matched request only* and resulting exchange
+    exchange_prospect = exchange_to_save(self.requests, other_prev_requests)
+    if exchange_prospect:
+      self.exchange = exchange_prospect #later make it an exchange
+      # save matched request only*
       # *cancel other or_group requests before saving (or just don't save them)
+      # ei.
       # update status
       raise NotImplementedError("add_request -> exchange")
     else:

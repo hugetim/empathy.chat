@@ -104,27 +104,27 @@ class ExchangeProspect:
   def __init__(self, requests):
     if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
       raise ValueError("Input 'requests' must contain at least one Request")
-    self._requests = tuple(requests)
+    self.requests = tuple(requests)
 
   def __eq__(self, other):
-    return isinstance(other, ExchangeProspect) and set(self._requests) == set(other._requests)
+    return isinstance(other, ExchangeProspect) and set(self.requests) == set(other.requests)
   
   def __repr__(self):
-    return f"ExchangeProspect({', '.join(repr(r) for r in self._requests)})"
+    return f"ExchangeProspect({', '.join(repr(r) for r in self.requests)})"
 
   def __str__(self):
-    return f"{{{', '.join(str(r) for r in self._requests)}}}"
+    return f"{{{', '.join(str(r) for r in self.requests)}}}"
   
   def plus_request(self, request):
     if self.is_full:
       raise RuntimeError("Cannot add request because ExchangeProspect is full")
-    return ExchangeProspect(self._requests + (request,))
+    return ExchangeProspect(self.requests + (request,))
   
   def __len__(self):
-    return len(self._requests)
+    return len(self.requests)
 
   def __getitem__(self, index):
-    return self._requests[index]
+    return self.requests[index]
 
   @property
   def is_possible_to_satisfy_all_with_users(self):
@@ -142,11 +142,11 @@ class ExchangeProspect:
   
   @property
   def min_size(self):
-    return max([r.min_size for r in self._requests])
+    return max([r.min_size for r in self.requests])
 
   @property
   def max_size(self):
-    return min([r.max_size for r in self._requests])
+    return min([r.max_size for r in self.requests])
 
   @property
   def has_enough(self):
@@ -162,7 +162,7 @@ class ExchangeProspect:
   
   @property
   def _rep_request(self):
-    return self._requests[0]
+    return self.requests[0]
   
   @property
   def eformat(self):
@@ -182,7 +182,7 @@ class ExchangeProspect:
 
   @property
   def create_dt(self):
-    return min([r.create_dt for r in self._requests])    
+    return min([r.create_dt for r in self.requests])    
 
 
 def have_conflicts(requests):
@@ -227,7 +227,7 @@ def _combine_requests_w_prospects(this_proposer_requests, prospects_so_far):
   return new_prospects
 
 
-def exchange_formed(new_requests, other_user_requests):
+def exchange_to_save(new_requests, other_user_requests):
   """If a 'has_enough' exchange exists, return one"""
   exchange_prospects = potential_matches(new_requests, other_user_requests)
   has_enough_exchanges = [ep for ep in exchange_prospects if ep.has_enough]
