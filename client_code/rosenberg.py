@@ -16,6 +16,9 @@ quotes = ["We need to receive empathy to give empathy.",
            + "or reassurance and to explain our own position or feeling. "
            + "Empathy, however, calls upon us to empty our mind and listen to others with our whole being."),
           "The most important use of NVC may be in developing self-compassion.",
+          ("NVC was designed to keep us in a dance with other people. "
+           "A dance in which the whole purpose is to let what happens between us, "
+           "happen according to a rhythm of compassion."),
          ]
 
 outtakes = ["It may be most difficult to empathize with those we are closest to.",
