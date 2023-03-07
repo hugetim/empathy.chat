@@ -15,7 +15,7 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
   """Return dictionary from degree to set of connections"""
   if up_to_degree not in range(1, 98):
     sm.warning(f"_get_connections(user, {up_to_degree}) not expected")
-  if not cache_override and user == sm.get_acting_user():
+  if not cache_override: # and user == sm.get_acting_user():
     return _cached_get_connections(user, up_to_degree)
   conn_rows = {}
   conn_rows[0] = app_tables.connections.search(user1=user, current=True)
@@ -49,22 +49,22 @@ def _port_conn_row(row, distance):
 
 
 _cached_connections = {}
-_cached_up_to = -1
+_cached_up_to = {}
 
-def _cached_get_connections(logged_in_user, up_to_degree):
+def _cached_get_connections(user, up_to_degree):
   global _cached_connections
   global _cached_up_to
-  if up_to_degree > _cached_up_to:
-    _cached_connections = _get_connections(logged_in_user, up_to_degree=up_to_degree, cache_override=True)
-    _cached_up_to = up_to_degree
-  return {key: _cached_connections[key].copy() for key in range(up_to_degree+1)}
+  if user not in _cached_connections or up_to_degree > _cached_up_to[user]:
+    _cached_connections[user] = _get_connections(user, up_to_degree=up_to_degree, cache_override=True)
+    _cached_up_to[user] = up_to_degree
+  return {key: _cached_connections[user][key].copy() for key in range(up_to_degree+1)}
 
 
 def _clear_cached_connections():
   global _cached_connections
   global _cached_up_to
   _cached_connections = {}
-  _cached_up_to = -1
+  _cached_up_to = {}
 
   
 def member_close_connections(user):
