@@ -297,7 +297,6 @@ class ProposalTime():
       
 @anvil.server.portable_class 
 class Proposal():
-
   def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
                eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,):
     from .glob import default_request

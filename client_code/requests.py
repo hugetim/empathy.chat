@@ -100,6 +100,24 @@ class Request:
 
 
 @anvil.server.portable_class 
+class Requests:
+  def __init__(self, requests):
+    if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
+      raise ValueError("Input 'requests' must contain at least one Request")
+    self.requests = tuple(requests)
+
+  def __len__(self):
+    return len(self.requests)
+
+  def __getitem__(self, index):
+    return self.requests[index]
+  
+  @property
+  def times_notify_info(self):
+    return {(r.start_now, r.start_dt, r.eformat.duration) for r in self.requests}
+    
+
+@anvil.server.portable_class 
 class ExchangeProspect:
   def __init__(self, requests):
     if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):

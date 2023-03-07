@@ -1,7 +1,7 @@
 import anvil.server
 from anvil import tables
 import datetime
-from .requests import Request, Eformat, have_conflicts, prop_to_requests, exchange_to_save
+from .requests import Request, Requests, Eformat, have_conflicts, prop_to_requests, exchange_to_save
 from . import accounts
 from . import request_gateway
 from . import portable as port
@@ -106,7 +106,7 @@ def _edit_request(user, port_prop):
 
 class RequestEditor:
   def __init__(self, user, requests):
-    self.user,self.requests = user,requests
+    self.user,self.requests = user,Requests(requests)
     self.exchange = None
   
   @tables.in_transaction
@@ -141,25 +141,23 @@ class RequestEditor:
     return {r.or_group_id for r in self.requests}
 
   def _categorize_user_prev_requests(self, user_prev_requests):
-    self.unrelated_prev_requests = [
+    self.unrelated_prev_requests = Requests([
       r for r in user_prev_requests
       if r.request_id not in self.requests_ids and r.or_group_id not in self.or_group_ids
-    ]
-    self.related_prev_requests = [
+    ])
+    self.related_prev_requests = Requests([
       r for r in user_prev_requests
       if r.request_id in self.requests_ids or r.or_group_id in self.or_group_ids
-    ]
+    ])
 
   def _cancel_missing_or_group_requests(self, user_prev_requests):
-    self.cancelled_request_records = []
-    requests_to_cancel = [
+    self.requests_to_cancel = Requests([
       r for r in user_prev_requests
       if r.or_group_id in self.or_group_ids and r.request_id not in self.requests_ids
-    ]
-    for r in requests_to_cancel:
+    ])
+    for r in self.requests_to_cancel:
       rr = repo.RequestRecord(r, r.request_id)
       rr.cancel()
-      self.cancelled_request_records.append(rr)
   
   def _save_requests(self):
     self.request_records = []
@@ -187,16 +185,13 @@ class RequestEditor:
       prev_old_rr = old_rr
     new_all_eligible_users = all_eligible_users(new_eligibility_spec)
     old_all_eligible_users = all_eligible_users(old_eligibility_spec)
-    # for other_user in all_eligible_users(eligibility_spec):
-    #   n.notify_requests(other_user, requester, self.requests, f"empathy request", " has requested an empathy chat:")
-  
-  # for other_user in new_all_eligible_users - old_all_eligible_users:
-  #   prop._notify_add_to(other_user)
-  # if port_prop.times_notify_info != old_port_prop.times_notify_info:
-  #   for other_user in new_all_eligible_users & old_all_eligible_users:
-  #     prop._notify_edit_to(other_user)
-  # for other_user in old_all_eligible_users - new_all_eligible_users:
-  #   prop._notify_cancel_to(other_user)
+    for other_user in new_all_eligible_users - old_all_eligible_users:
+      n.notify_requests(other_user, requester, self.requests, f"empathy request", " has requested an empathy chat:")
+    if self.requests.times_notify_info != self.related_prev_requests.times_notify_info:
+      for other_user in new_all_eligible_users & old_all_eligible_users:
+        n.notify_requests(other_user, requester, self.requests, "empathy request", " has changed their empathy chat request to:")
+    for other_user in old_all_eligible_users - new_all_eligible_users:
+      n.notify_proposal_cancel(other_user, requester, self.requests_to_cancel, "empathy request")
 
 def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
