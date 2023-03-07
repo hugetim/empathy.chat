@@ -85,6 +85,54 @@ class RequestAdder:
       n.notify_requests(other_user, requester, self.requests, f"empathy request", " has requested an empathy chat:")
 
 
+def _edit_request(user, port_prop):
+  """Return prop_id (None if cancelled or matching with another proposal)
+  
+  Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
+  """
+  accounts.update_default_request(port_prop, user)
+  requests = tuple(prop_to_requests(port_prop))
+  request_editor = RequestEditor(user, requests)
+  # request_adder.check_and_save()
+  # if request_adder.exchange:
+  #   raise NotImplementedError("add_request -> exchange ping/notify")
+  #   # ping other request if request_adder.exchange
+  # else:
+  #   request_adder.notify_add()
+  # return requests[0].or_group_id
+
+
+class RequestEditor:
+  def __init__(self, user, requests):
+    self.user,self.requests = user,requests
+    self.exchange = None
+
+  @tables.in_transaction
+  def check_and_save(self):
+    user_id = self.user.get_id()
+    user_prev_requests = repo.requests_by_user(self.user)
+    unrelated_prev_requests = self._unrelated_to_edit(user_prev_requests)
+    _check_requests_valid(self.user, self.requests, user_prev_requests)
+    now = sm.now()
+    other_request_records = potential_matching_request_records(self.requests, now)
+    _prune_request_records(other_request_records, now)
+    still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
+    other_prev_requests = current_visible_requests(self.user, still_current_other_request_records)
+    exchange_prospect = exchange_to_save(self.requests, other_prev_requests)
+    if exchange_prospect:
+      self.exchange = exchange_prospect #later make it an exchange
+      # save matched request only*
+      # *cancel other or_group requests before saving (or just don't save them)
+      # ei.
+      # update status
+      raise NotImplementedError("add_request -> exchange")
+    else:
+      self._save_new_requests()
+
+  def _unrelated_to_edit(self, user_prev_requests):
+    pass
+
+
 def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
     if rr.entity.expired(now):
