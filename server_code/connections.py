@@ -76,7 +76,10 @@ def member_close_connections(user):
 
 def _degree(user2, user1, up_to_degree=3):
   """Returns port.UNLINKED if no degree <= up_to_degree found"""
-  return _degrees([user2], user1, up_to_degree)[user2]
+  if user1 in _cached_connections and up_to_degree <= _cached_up_to[user1]:
+    return _degrees([user1], user2, up_to_degree)[user1]
+  else:
+    return _degrees([user2], user1, up_to_degree)[user2]
 
   
 def _degree_from_dset(user2, dset):
