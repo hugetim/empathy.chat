@@ -151,11 +151,11 @@ class RequestEditor:
     ])
 
   def _cancel_missing_or_group_requests(self, user_prev_requests):
-    self.requests_to_cancel = Requests([
+    requests_to_cancel = Requests([
       r for r in user_prev_requests
       if r.or_group_id in self.or_group_ids and r.request_id not in self.requests_ids
     ])
-    for r in self.requests_to_cancel:
+    for r in requests_to_cancel:
       rr = repo.RequestRecord(r, r.request_id)
       rr.cancel()
   
@@ -191,7 +191,7 @@ class RequestEditor:
       for other_user in new_all_eligible_users & old_all_eligible_users:
         n.notify_requests(other_user, requester, self.requests, "empathy request", " has changed their empathy chat request to:")
     for other_user in old_all_eligible_users - new_all_eligible_users:
-      n.notify_requests_cancel(other_user, requester, self.requests_to_cancel, "empathy request")
+      n.notify_requests_cancel(other_user, requester, "empathy request")
 
 
 def _prune_request_records(other_request_records, now):

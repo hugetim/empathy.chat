@@ -184,18 +184,18 @@ def _notify_proposal_cancel_by(user, proposal, title, medium):
 ''')
 
 
-def notify_requests_cancel(user, requester, requests, title):
+def notify_requests_cancel(user, requester, title):
   """Notify recipient of cancelled proposal if settings permit"""
   from .request_interactor import is_eligible
   eligibility_specs = accounts.get_eligibility_specs(user)
   if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], requester):
-    _notify_requests_cancel_by(user, requester, requests, title, 'sms')
+    _notify_requests_cancel_by(user, requester, title, 'sms')
   elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], requester):
-    _notify_requests_cancel_by(user, requester, requests, title, 'email')
+    _notify_requests_cancel_by(user, requester, title, 'email')
 
 
-def _notify_requests_cancel_by(user, requester, requests, title, medium):
-  print(f"'_notify_requests_cancel_by', {user['email']}, {requests[0].or_group_id}, {title}, {medium}")
+def _notify_requests_cancel_by(user, requester, title, medium):
+  print(f"'_notify_requests_cancel_by', {user['email']}, {title}, {medium}")
   requester_name = sm.name(requester, to_user=user)
   subject = f"empathy.chat - {title}"
   content1 = f"{_other_name(requester_name)} has cancelled their empathy chat request."
