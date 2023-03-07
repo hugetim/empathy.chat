@@ -28,6 +28,7 @@ def _add_request(user, port_prop, link_key=""):
   """
   accounts.update_default_request(port_prop, user)
   requests = tuple(prop_to_requests(port_prop))
+  sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_adder = RequestAdder(user, requests)
   request_adder.check_and_save()
   if request_adder.exchange:
@@ -92,27 +93,28 @@ def _edit_request(user, port_prop):
   """
   accounts.update_default_request(port_prop, user)
   requests = tuple(prop_to_requests(port_prop))
+  sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestEditor(user, requests)
-  # request_adder.check_and_save()
-  # if request_adder.exchange:
-  #   raise NotImplementedError("add_request -> exchange ping/notify")
-  #   # ping other request if request_adder.exchange
-  # else:
-  #   request_adder.notify_add()
-  # return requests[0].or_group_id
+  request_editor.check_and_save()
+  if request_editor.exchange:
+    raise NotImplementedError("_edit_request -> exchange ping/notify")
+    # ping other request if request_adder.exchange
+  else:
+    request_editor.notify_edit()
+  return requests[0].or_group_id
 
 
 class RequestEditor:
   def __init__(self, user, requests):
     self.user,self.requests = user,requests
     self.exchange = None
-
+  
   @tables.in_transaction
   def check_and_save(self):
     user_id = self.user.get_id()
     user_prev_requests = repo.requests_by_user(self.user)
-    unrelated_prev_requests = self._unrelated_to_edit(user_prev_requests)
-    _check_requests_valid(self.user, self.requests, user_prev_requests)
+    self._categorize_user_prev_requests(user_prev_requests)
+    _check_requests_valid(self.user, self.requests, self.unrelated_prev_requests)
     now = sm.now()
     other_request_records = potential_matching_request_records(self.requests, now)
     _prune_request_records(other_request_records, now)
@@ -127,11 +129,74 @@ class RequestEditor:
       # update status
       raise NotImplementedError("add_request -> exchange")
     else:
-      self._save_new_requests()
+      self._cancel_missing_or_group_requests(user_prev_requests)
+      self._save_requests()
 
-  def _unrelated_to_edit(self, user_prev_requests):
-    pass
+  @property
+  def requests_ids(self):
+    return {r.request_id for r in self.requests}
 
+  @property
+  def or_group_ids(self):
+    return {r.or_group_id for r in self.requests}
+
+  def _categorize_user_prev_requests(self, user_prev_requests):
+    self.unrelated_prev_requests = [
+      r for r in user_prev_requests
+      if r.request_id not in self.requests_ids and r.or_group_id not in self.or_group_ids
+    ]
+    self.related_prev_requests = [
+      r for r in user_prev_requests
+      if r.request_id in self.requests_ids or r.or_group_id in self.or_group_ids
+    ]
+
+  def _cancel_missing_or_group_requests(self, user_prev_requests):
+    self.cancelled_request_records = []
+    requests_to_cancel = [
+      r for r in user_prev_requests
+      if r.or_group_id in self.or_group_ids and r.request_id not in self.requests_ids
+    ]
+    for r in requests_to_cancel:
+      rr = repo.RequestRecord(r, r.request_id)
+      rr.cancel()
+      self.cancelled_request_records.append(rr)
+  
+  def _save_requests(self):
+    self.request_records = []
+    for request in self.requests:
+      request_record = repo.RequestRecord(request, request.request_id)
+      self.request_records.append(request_record)
+      request_record.save()
+      request.request_id = request_record.record_id
+      if request.start_now:
+        raise NotImplementedError("save now request")
+
+  def notify_edit(self):
+    new_eligibility_spec = self.request_records[0].eligibility_spec
+    requester = self.request_records[0].user
+    for rr in self.request_records[1:]:
+      sm.my_assert(rr.entity.or_group_id == self.request_records[0].entity.or_group_id, "notify_edit assumes same or_group_id")
+      sm.my_assert(rr.eligibility_spec == new_eligibility_spec, "notify_edit assumes same eligibility_spec")
+      sm.my_assert(rr.user == requester, "notify_edit assumes same requester")
+    prev_old_rr = None
+    for old_r in self.related_prev_requests:
+      old_rr = repo.RequestRecord(old_r, old_r.request_id)
+      old_eligibility_spec = old_rr.eligibility_spec
+      if prev_old_rr is not None:
+        sm.my_assert(old_rr.eligibility_spec == old_eligibility_spec, "notify_edit assumes same old_eligibility_spec")
+      prev_old_rr = old_rr
+    new_all_eligible_users = all_eligible_users(new_eligibility_spec)
+    old_all_eligible_users = all_eligible_users(old_eligibility_spec)
+    # for other_user in all_eligible_users(eligibility_spec):
+    #   n.notify_requests(other_user, requester, self.requests, f"empathy request", " has requested an empathy chat:")
+  
+  # for other_user in new_all_eligible_users - old_all_eligible_users:
+  #   prop._notify_add_to(other_user)
+  # if port_prop.times_notify_info != old_port_prop.times_notify_info:
+  #   for other_user in new_all_eligible_users & old_all_eligible_users:
+  #     prop._notify_edit_to(other_user)
+  # for other_user in old_all_eligible_users - new_all_eligible_users:
+  #   prop._notify_cancel_to(other_user)
 
 def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
