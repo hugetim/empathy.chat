@@ -184,14 +184,15 @@ class RequestEditor:
         sm.my_assert(old_rr.eligibility_spec == old_eligibility_spec, "notify_edit assumes same old_eligibility_spec")
       prev_old_rr = old_rr
     new_all_eligible_users = all_eligible_users(new_eligibility_spec)
-    old_all_eligible_users = all_eligible_users(old_eligibility_spec)
+    old_all_eligible_users = all_eligible_users(old_eligibility_spec) if prev_old_rr else set()
     for other_user in new_all_eligible_users - old_all_eligible_users:
       n.notify_requests(other_user, requester, self.requests, f"empathy request", " has requested an empathy chat:")
     if self.requests.times_notify_info != self.related_prev_requests.times_notify_info:
       for other_user in new_all_eligible_users & old_all_eligible_users:
         n.notify_requests(other_user, requester, self.requests, "empathy request", " has changed their empathy chat request to:")
     for other_user in old_all_eligible_users - new_all_eligible_users:
-      n.notify_proposal_cancel(other_user, requester, self.requests_to_cancel, "empathy request")
+      n.notify_requests_cancel(other_user, requester, self.requests_to_cancel, "empathy request")
+
 
 def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
