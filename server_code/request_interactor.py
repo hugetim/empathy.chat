@@ -229,17 +229,18 @@ def current_visible_requests(user, request_records=None):
 def is_eligible(eligibility_spec, other_user, distance=None):
   from . import connections as c
   from . import groups_server as g
+  if other_user in eligibility_spec['eligible_users']: # and distance < port.UNLINKED)):
+    return True
+  if (eligibility_spec['eligible_starred'] and ni.star_row(other_user, eligibility_spec['user'])):
+    return True
+  for group in eligibility_spec['eligible_groups']:
+    if other_user in g.allowed_members_from_group_row(group, eligibility_spec['user']):
+      return True
   if distance is None:
     distance = c.distance(eligibility_spec['user'], other_user)
-  if (distance <= eligibility_spec['eligible'] or other_user in eligibility_spec['eligible_users']):# and distance < port.UNLINKED)):
+  if distance <= eligibility_spec['eligible']:
     return True
-  elif (eligibility_spec['eligible_starred'] and ni.star_row(other_user, eligibility_spec['user'])):
-    return True
-  else:
-    for group in eligibility_spec['eligible_groups']:
-      if other_user in g.allowed_members_from_group_row(group, eligibility_spec['user']):
-        return True
-    return False
+  return False
 
 
 def all_eligible_users(eligibility_spec):
