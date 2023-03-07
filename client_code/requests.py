@@ -277,7 +277,8 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
     if port_time.start_now:
       start_dt = now
       expire_dt = now + timedelta(seconds=p.WAIT_SECONDS)
-    yield Request(or_group_id=or_group_id,                  
+    yield Request(request_id=port_time.time_id,
+                  or_group_id=or_group_id,                  
                   user=port_prop.user.user_id,
                   start_dt=start_dt,
                   expire_dt=expire_dt,

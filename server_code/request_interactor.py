@@ -47,7 +47,7 @@ class RequestAdder:
   @tables.in_transaction
   def check_and_save(self):
     user_id = self.user.get_id()
-    user_prev_requests = repo.requests_by_user(self.user)
+    user_prev_requests = list(repo.requests_by_user(self.user))
     _check_requests_valid(self.user, self.requests, user_prev_requests)
     now = sm.now()
     other_request_records = potential_matching_request_records(self.requests, now)
@@ -112,7 +112,7 @@ class RequestEditor:
   @tables.in_transaction
   def check_and_save(self):
     user_id = self.user.get_id()
-    user_prev_requests = repo.requests_by_user(self.user)
+    user_prev_requests = list(repo.requests_by_user(self.user))
     self._categorize_user_prev_requests(user_prev_requests)
     _check_requests_valid(self.user, self.requests, self.unrelated_prev_requests)
     now = sm.now()
@@ -205,7 +205,7 @@ def potential_matching_request_records(requests, now):
     dict(start_now=r.start_now, start_dt=r.start_dt, eformat=r.eformat)
     for r in requests
   ]
-  return repo.partially_matching_requests(partial_request_dicts, now, records=True)
+  return list(repo.partially_matching_requests(partial_request_dicts, now, records=True))
 
 
 def current_visible_requests(user, request_records=None):
