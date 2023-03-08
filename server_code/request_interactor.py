@@ -12,13 +12,11 @@ from . import notifies as n
 from .exceptions import InvalidRequestError
 
 
+repo = request_gateway
+
 def reset_repo():
   global repo
   repo = request_gateway
-
-
-repo = None
-reset_repo()
 
 
 def _add_request(user, port_prop, link_key=""):
@@ -151,19 +149,49 @@ class RequestManager:
       prev_old_rr = old_rr
     new_all_eligible_users = all_eligible_users(new_eligibility_spec)
     old_all_eligible_users = all_eligible_users(old_eligibility_spec) if prev_old_rr else set()
-    for other_user in new_all_eligible_users - old_all_eligible_users:
-      n.notify_requests(other_user, requester, self.requests, f"empathy request", " has requested an empathy chat:")
+    _notify_add(new_all_eligible_users - old_all_eligible_users, requester, self.requests)
     if self.requests.times_notify_info != self.related_prev_requests.times_notify_info:
-      for other_user in new_all_eligible_users & old_all_eligible_users:
-        n.notify_requests(other_user, requester, self.requests, "empathy request", " has changed their empathy chat request to:")
-    for other_user in old_all_eligible_users - new_all_eligible_users:
-      n.notify_requests_cancel(other_user, requester, "empathy request")
+      _notify_edit(new_all_eligible_users & old_all_eligible_users, requester, self.requests)
+    _notify_cancel(old_all_eligible_users - new_all_eligible_users, requester)
+
+
+def _notify_add(users, requester, requests):
+  for other_user in users:
+    n.notify_requests(other_user, requester, requests, f"empathy request", " has requested an empathy chat:")
+
+
+def _notify_edit(users, requester, requests):
+  for other_user in users:
+    n.notify_requests(other_user, requester, requests, "empathy request", " has changed their empathy chat request to:")
+
+
+def _notify_cancel(users, requester):
+  for other_user in users:
+    n.notify_requests_cancel(other_user, requester, "empathy request")
 
 
 def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
     if rr.entity.expired(now):
       rr.cancel()
+
+
+def _cancel_request(user, proptime_id):
+  rr = repo.RequestRecord.from_id(proptime_id)
+  other_or_group_requests = _other_or_group_requests(user, rr)
+  if other_or_group_requests:
+    _notify_edit(all_eligible_users(rr.eligibility_spec), user, other_or_group_requests)
+  else:
+    _notify_cancel(all_eligible_users(rr.eligibility_spec), user)
+  rr.cancel()
+
+
+def _other_or_group_requests(user, rr):
+  user_prev_requests = list(repo.requests_by_user(user))
+  return Requests([
+    r for r in user_prev_requests
+    if r.request_id != rr.entity.request_id and r.or_group_id == rr.entity.or_group_id
+  ])
 
 
 def current_visible_requests(user, request_records=None):
@@ -215,13 +243,6 @@ def all_eligible_users(eligibility_spec):
   for group in eligibility_spec['eligible_groups']:
     all_eligible.update(set(g.allowed_members_from_group_row(group, user))-{user})
   return all_eligible
-
-
-def _cancel_request(user, proptime_id):
-  raise NotImplementedError("_cancel_request")
-  # proptime = ProposalTime.get_by_id(proptime_id)
-  # if proptime:
-  #   proptime.cancel_this(user)
 
 
 def _all_equal(lst):

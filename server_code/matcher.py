@@ -454,6 +454,12 @@ def cancel_time(proptime_id, user_id=""):
   """Remove proptime"""
   print(f"cancel_time, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
+  _cancel_request(user, proptime_id)
+  propagate_update_needed(user)
+  return _get_state(user)
+
+
+def _cancel_request(user, proptime_id):
   proptime = ProposalTime.get_by_id(proptime_id)
   port_prop = proptime.proposal.portable(user)
   if len(port_prop.times) > 1:
@@ -463,8 +469,6 @@ def cancel_time(proptime_id, user_id=""):
   else:
     proptime.notify_cancel()
     _cancel_in_transaction(user, proptime_id)
-  propagate_update_needed(user)
-  return _get_state(user)
 
 
 def _cancel(user, proptime_id=None):

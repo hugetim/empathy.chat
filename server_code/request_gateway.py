@@ -95,6 +95,11 @@ class RequestRecord(Record):
     request = _row_to_request(row)
     return RequestRecord(request, row.get_id(), row)
 
+  @staticmethod
+  def from_id(request_id):
+    row = RequestRecord._table.get_by_id(request_id)
+    return RequestRecord.from_row(row)
+
 
 def _request_to_fields(request):
   eformat = _get_eformat_row(request.eformat)
