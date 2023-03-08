@@ -27,7 +27,7 @@ def _add_request(user, port_prop, link_key=""):
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
   accounts.update_default_request(port_prop, user)
-  requests = tuple(prop_to_requests(port_prop))
+  requests = Requests(prop_to_requests(port_prop))
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_adder = RequestManager(user, requests)
   request_adder.check_and_save()
@@ -36,7 +36,7 @@ def _add_request(user, port_prop, link_key=""):
     # ping other request if request_adder.exchange
   else:
     request_adder.notify_edit()
-  return requests[0].or_group_id
+  return requests.or_group_id
 
 
 def _edit_request(user, port_prop):
@@ -45,7 +45,7 @@ def _edit_request(user, port_prop):
   Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
   """
   accounts.update_default_request(port_prop, user)
-  requests = tuple(prop_to_requests(port_prop))
+  requests = Requests(prop_to_requests(port_prop))
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager(user, requests)
   request_editor.check_and_save()
@@ -54,7 +54,7 @@ def _edit_request(user, port_prop):
     # ping other request if request_adder.exchange
   else:
     request_editor.notify_edit()
-  return requests[0].or_group_id
+  return requests.or_group_id
 
 
 class RequestManager:

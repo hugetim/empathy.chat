@@ -109,14 +109,24 @@ class Requests:
 
   def __getitem__(self, index):
     return self.requests[index]
+
+  def __bool__(self):
+    return bool(self.requests)
   
   @property
   def times_notify_info(self):
     return {(r.start_now, r.start_dt, r.eformat.duration) for r in self.requests}
 
-  def __bool__(self):
-    return bool(self.requests)
-    
+  @property
+  def or_group_id(self):
+    if not self.requests:
+      return None
+    or_group_id0 = self.requests[0].or_group_id
+    for r in self.requests[1:]:
+      if r.or_group_id != or_group_id0:
+        raise RuntimeError("Requests have differing or_group_id's")
+    return or_group_id0
+
 
 @anvil.server.portable_class 
 class ExchangeProspect:
