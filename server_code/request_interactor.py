@@ -57,6 +57,18 @@ def _edit_request(user, port_prop):
   return requests.or_group_id
 
 
+def _check_requests_valid(user, requests, user_prev_requests):
+  if user['trust_level'] < 3:
+    for request in requests:
+      if request.eligible > 2:
+        raise InvalidRequestError("Not allowed to invite beyond 2nd degree links")
+      # also check eligibility to invite specific users and groups?
+  if have_conflicts(list(requests) + list(user_prev_requests)):
+    raise InvalidRequestError("New requests have a time conflict with your existing requests.")
+  # also check for current/upcoming exchange conflicts...
+  # ...by pulling in requests associated with upcoming exchanges to have_conflicts() call
+
+
 class RequestManager:
   def __init__(self, user, requests):
     self.user,self.requests = user,Requests(requests)
@@ -210,18 +222,6 @@ def all_eligible_users(eligibility_spec):
   for group in eligibility_spec['eligible_groups']:
     all_eligible.update(set(g.allowed_members_from_group_row(group, user))-{user})
   return all_eligible
-
-
-def _check_requests_valid(user, requests, user_prev_requests):
-  if user['trust_level'] < 3:
-    for request in requests:
-      if request.eligible > 2:
-        raise InvalidRequestError("Not allowed to invite beyond 2nd degree links")
-      # also check eligibility to invite specific users and groups?
-  if have_conflicts(list(requests) + list(user_prev_requests)):
-    raise InvalidRequestError("New requests have a time conflict with your existing requests.")
-  # also check for current/upcoming exchange conflicts...
-  # ...by pulling in requests associated with upcoming exchanges to have_conflicts() call
 
 
 def _cancel_request(user, proptime_id):
