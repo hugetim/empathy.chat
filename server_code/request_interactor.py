@@ -73,19 +73,15 @@ class RequestManager:
   def __init__(self, user, requests):
     self.user,self.requests = user,Requests(requests)
     self.exchange = None
+    self.now = sm.now()
   
   @tables.in_transaction
   def check_and_save(self):
-    user_id = self.user.get_id()
-    user_prev_requests = list(repo.requests_by_user(self.user))
-    self._categorize_user_prev_requests(user_prev_requests)
+    self.related_prev_requests, self.unrelated_prev_requests = self._user_prev_requests()
     _check_requests_valid(self.user, self.requests, self.unrelated_prev_requests)
-    now = sm.now()
-    other_request_records = potential_matching_request_records(self.requests, now)
-    _prune_request_records(other_request_records, now)
-    still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
-    other_prev_requests = current_visible_requests(self.user, still_current_other_request_records)
-    exchange_prospect = exchange_to_save(self.requests, other_prev_requests)
+    other_request_records = self.potential_matching_request_records()
+    _prune_request_records(other_request_records, self.now)
+    exchange_prospect = self._exchange_prospect(other_request_records)
     if exchange_prospect:
       self.exchange = exchange_prospect #later make it an exchange
       # save matched request only*
@@ -94,7 +90,7 @@ class RequestManager:
       # update status
       raise NotImplementedError("add_request -> exchange")
     else:
-      self._cancel_missing_or_group_requests(user_prev_requests)
+      self._cancel_missing_or_group_requests()
       self._save_requests()
 
   @property
@@ -105,19 +101,33 @@ class RequestManager:
   def or_group_ids(self):
     return {r.or_group_id for r in self.requests}
 
-  def _categorize_user_prev_requests(self, user_prev_requests):
-    self.unrelated_prev_requests = Requests([
+  def _user_prev_requests(self):
+    user_prev_requests = list(repo.requests_by_user(self.user))
+    unrelated_prev_requests = Requests([
       r for r in user_prev_requests
       if r.request_id not in self.requests_ids and r.or_group_id not in self.or_group_ids
     ])
-    self.related_prev_requests = Requests([
+    related_prev_requests = Requests([
       r for r in user_prev_requests
       if r.request_id in self.requests_ids or r.or_group_id in self.or_group_ids
     ])
+    return related_prev_requests, unrelated_prev_requests
 
-  def _cancel_missing_or_group_requests(self, user_prev_requests):
+  def potential_matching_request_records(self):
+    partial_request_dicts = [
+      dict(start_now=r.start_now, start_dt=r.start_dt, eformat=r.eformat)
+      for r in self.requests
+    ]
+    return list(repo.partially_matching_requests(self.user, partial_request_dicts, self.now, records=True))
+
+  def _exchange_prospect(self, other_request_records):
+    still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
+    other_prev_requests = current_visible_requests(self.user, still_current_other_request_records)
+    return exchange_to_save(self.requests, other_prev_requests)
+
+  def _cancel_missing_or_group_requests(self):
     requests_to_cancel = Requests([
-      r for r in user_prev_requests
+      r for r in self.related_prev_requests
       if r.or_group_id in self.or_group_ids and r.request_id not in self.requests_ids
     ])
     for r in requests_to_cancel:
@@ -163,14 +173,6 @@ def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
     if rr.entity.expired(now):
       rr.cancel()
-
-
-def potential_matching_request_records(requests, now):
-  partial_request_dicts = [
-    dict(start_now=r.start_now, start_dt=r.start_dt, eformat=r.eformat)
-    for r in requests
-  ]
-  return list(repo.partially_matching_requests(partial_request_dicts, now, records=True))
 
 
 def current_visible_requests(user, request_records=None):

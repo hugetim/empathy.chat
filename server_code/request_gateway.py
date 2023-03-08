@@ -171,14 +171,14 @@ def current_requests(records=False):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
-def partially_matching_requests(partial_request_dicts, now, records=False):
+def partially_matching_requests(user, partial_request_dicts, now, records=False):
   q_expressions = [
     q.all_of(eformat=_get_eformat_row(prd['eformat']),
              **(dict(start_dt=q.less_than(now)) if prd['start_now'] else dict(start_dt=prd['start_dt']))
             )
     for prd in partial_request_dicts
   ]
-  rows = app_tables.requests.search(q.any_of(*q_expressions), current=True)
+  rows = app_tables.requests.search(q.any_of(*q_expressions), user=q.not_(user), current=True)
   for request_row in rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
     
