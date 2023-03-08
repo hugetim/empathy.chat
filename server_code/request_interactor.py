@@ -26,17 +26,8 @@ def _add_request(user, port_prop, link_key=""):
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
-  accounts.update_default_request(port_prop, user)
-  requests = Requests(prop_to_requests(port_prop))
-  sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
-  request_adder = RequestManager(user, requests)
-  request_adder.check_and_save()
-  if request_adder.exchange:
-    raise NotImplementedError("add_request -> exchange ping/notify")
-    # ping other request if request_adder.exchange
-  else:
-    request_adder.notify_edit()
-  return requests.or_group_id
+  return _edit_request(user, port_prop)
+  ############ But still need to handle link_key
 
 
 def _edit_request(user, port_prop):
