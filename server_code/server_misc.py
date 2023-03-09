@@ -3,6 +3,7 @@ import anvil.server
 import anvil.tables
 from anvil.tables import app_tables, order_by
 import anvil.tables.query as q
+from abc import ABC, abstractproperty, abstractmethod
 from anvil import secrets
 from . import parameters as p
 from . import portable as port
@@ -251,7 +252,61 @@ class ServerItem:
     if not kwargs:
       kwargs = {}
     return getattr(self, method)(**kwargs)
+
+
+class Record(ABC):
+  @abstractproperty
+  def _table_name(self):
+    pass
+
+  @staticmethod
+  @abstractmethod
+  def _row_to_entity(row):
+    pass
+
+  @staticmethod
+  @abstractmethod
+  def _entity_to_fields(entity):
+    pass
   
+  @property
+  def _table(self):
+    return getattr(app_tables, self._table_name)
+  
+  def _add(self):
+    self._row = self._table.add_row(**self._entity_to_fields(self.entity))
+    self._row_id = self._row.get_id()
+
+  def _update(self):
+    self._row.update(**self._entity_to_fields(self.entity))
+  
+  def __init__(self, entity, row_id=None, row=None):
+    self.entity = entity
+    self._row_id = row_id
+    self._row = row
+
+  def save(self):
+    if not self._row_id:
+      self._add()
+      return
+    if not self._row:
+      self._row = self._table.get_by_id(self._row_id)
+    self._update()
+
+  @property
+  def record_id(self):
+    return self._row_id
+
+  @classmethod
+  def from_row(cls, row):
+    entity = cls._row_to_entity(row)
+    return cls(entity, row.get_id(), row)
+
+  @classmethod
+  def from_id(cls, record_id):
+    row = getattr(app_tables, cls._table_name).get_by_id(record_id)
+    return cls.from_row(row)
+
 
 def new_jitsi_code():
   if DEBUG:
