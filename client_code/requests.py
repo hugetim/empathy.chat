@@ -118,6 +118,16 @@ class Requests:
     return {(r.start_now, r.start_dt, r.eformat.duration) for r in self.requests}
 
   @property
+  def user(self):
+    if not self.requests:
+      return None
+    user0 = self.requests[0].user
+    for r in self.requests[1:]:
+      if r.user != user0:
+        raise RuntimeError("Requests have differing user_id's")
+    return user0
+  
+  @property
   def or_group_id(self):
     if not self.requests:
       return None
@@ -126,6 +136,16 @@ class Requests:
       if r.or_group_id != or_group_id0:
         raise RuntimeError("Requests have differing or_group_id's")
     return or_group_id0
+
+  @property
+  def elig_with_dict(self):
+    if not self.requests:
+      return None
+    elig_with_dict0 = self.requests[0].elig_with_dict
+    for r in self.requests[1:]:
+      if r.elig_with_dict != elig_with_dict0:
+        raise RuntimeError("Requests have differing elig_with_dict's")
+    return elig_with_dict0
 
 
 @anvil.server.portable_class 

@@ -134,25 +134,34 @@ class RequestManager:
         raise NotImplementedError("save now request")
 
   def notify_edit(self):
-    new_eligibility_spec = self.request_records[0].eligibility_spec
-    requester = self.request_records[0].user
-    for rr in self.request_records[1:]:
-      sm.my_assert(rr.entity.or_group_id == self.request_records[0].entity.or_group_id, "notify_edit assumes same or_group_id")
-      sm.my_assert(rr.eligibility_spec == new_eligibility_spec, "notify_edit assumes same eligibility_spec")
-      sm.my_assert(rr.user == requester, "notify_edit assumes same requester")
-    prev_old_rr = None
-    for old_r in self.related_prev_requests:
-      old_rr = repo.RequestRecord(old_r, old_r.request_id)
-      old_eligibility_spec = old_rr.eligibility_spec
-      if prev_old_rr is not None:
-        sm.my_assert(old_rr.eligibility_spec == old_eligibility_spec, "notify_edit assumes same old_eligibility_spec")
-      prev_old_rr = old_rr
-    new_all_eligible_users = all_eligible_users(new_eligibility_spec)
-    old_all_eligible_users = all_eligible_users(old_eligibility_spec) if prev_old_rr else set()
-    _notify_add(new_all_eligible_users - old_all_eligible_users, requester, self.requests)
+    new_all_eligible_users = self._get_new_eligible_users()
+    old_all_eligible_users = self._get_old_eligible_users()
+    _notify_add(new_all_eligible_users - old_all_eligible_users, self.user, self.requests)
     if self.requests.times_notify_info != self.related_prev_requests.times_notify_info:
-      _notify_edit(new_all_eligible_users & old_all_eligible_users, requester, self.requests)
-    _notify_cancel(old_all_eligible_users - new_all_eligible_users, requester)
+      _notify_edit(new_all_eligible_users & old_all_eligible_users, self.user, self.requests)
+    _notify_cancel(old_all_eligible_users - new_all_eligible_users, self.user)
+
+  def _get_new_eligible_users(self):
+    try:
+      (self.requests.user, self.requests.or_group_id, self.requests.elig_with_dict)
+    except RuntimeError:
+      sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
+    sm.my_assert(self.user == self.request_records[0].user, "notify_edit: user is requester")
+    new_eligibility_spec = self.request_records[0].eligibility_spec
+    new_all_eligible_users = all_eligible_users(new_eligibility_spec)
+    return new_all_eligible_users
+
+  def _get_old_eligible_users(self):
+    if not self.related_prev_requests:
+      return set()
+    else:
+      try:
+        self.related_prev_requests.elig_with_dict # checks all equal
+      except RuntimeError:
+        sm.warning("notify_edit old requests no common elig_with_dict")
+      old_r0 = self.related_prev_requests[0]
+      old_eligibility_spec = repo.RequestRecord(old_r0, old_r0.request_id).eligibility_spec
+      return all_eligible_users(old_eligibility_spec)
 
 
 def _notify_add(users, requester, requests):

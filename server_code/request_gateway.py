@@ -97,7 +97,7 @@ class RequestRecord(sm.Record):
     else:
       spec['eligible_users'] = [sm.get_other_user(user_id) for user_id in self.entity.eligible_users]
       spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
-                                for port_group in self.entity.eligible_groups]
+                                 for port_group in self.entity.eligible_groups]
     return spec
 
 

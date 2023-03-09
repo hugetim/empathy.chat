@@ -273,26 +273,30 @@ class Record(ABC):
   def _table(self):
     return getattr(app_tables, self._table_name)
   
-  def _add(self):
-    self._row = self._table.add_row(**self._entity_to_fields(self.entity))
-    self._row_id = self._row.get_id()
-
-  def _update(self):
-    self._row.update(**self._entity_to_fields(self.entity))
-  
   def __init__(self, entity, row_id=None, row=None):
     self.entity = entity
     self._row_id = row_id
-    self._row = row
+    self.__row = row
 
+  @property
+  def _row(self):
+    if self.__row is None and self._row_id is not None:
+      self.__row = self._table.get_by_id(self._row_id)
+    return self.__row
+
+  def _add(self):
+    self.__row = self._table.add_row(**self._entity_to_fields(self.entity))
+    self._row_id = self._row.get_id()
+  
+  def _update(self):
+    self._row.update(**self._entity_to_fields(self.entity))
+  
   def save(self):
-    if not self._row_id:
+    if self._row_id is None:
       self._add()
       return
-    if not self._row:
-      self._row = self._table.get_by_id(self._row_id)
     self._update()
-
+  
   @property
   def record_id(self):
     return self._row_id
