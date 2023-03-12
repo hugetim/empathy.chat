@@ -1,5 +1,5 @@
 from collections import namedtuple
-from . import helpers as h
+from . import helper as h
 from .requests import Request, ExchangeProspect, ExchangeFormat
 
 

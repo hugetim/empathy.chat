@@ -4,7 +4,8 @@ from . import server_misc as sm
 from . import network_interactor as ni
 from .exceptions import RowMissingError
 from .exchange_gateway import ExchangeRepository
-from .exchanges import Exchange, Format
+from .exchanges import Exchange
+from .requests import ExchangeFormat
 
 
 repo = ExchangeRepository()
@@ -115,7 +116,7 @@ def create_new_match_from_proptime(proptime, user, present):
                        external=0,
                       ) for u in proptime.all_users()]
   # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-  exchange = Exchange(None, room_code, participants, proptime['start_now'], match_start, Format(duration), user.get_id())
+  exchange = Exchange(None, room_code, participants, proptime['start_now'], match_start, ExchangeFormat(duration), user.get_id())
   #exchange.my['present'] = int(present)
   repo.create_exchange(exchange, proptime)
 
