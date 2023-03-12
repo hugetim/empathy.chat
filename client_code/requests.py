@@ -9,7 +9,7 @@ import uuid
 
 
 @anvil.server.portable_class 
-class Eformat(Datum):
+class ExchangeFormat(Datum):
   duration: int
 
 
@@ -18,7 +18,7 @@ class Request:
   def __init__(
     self, request_id=None, or_group_id=None,
     user=None,
-    start_dt=None, eformat=None, expire_dt=None,
+    start_dt=None, exchange_format=None, expire_dt=None,
     create_dt=None, edit_dt=None,
     min_size=2, max_size=2, with_users=None,
     eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
@@ -29,7 +29,7 @@ class Request:
     self.or_group_id = or_group_id
     self.user = user
     self.start_dt = start_dt
-    self.eformat = eformat
+    self.exchange_format = exchange_format
     self.expire_dt = expire_dt
     self.create_dt = create_dt
     self.edit_dt = edit_dt
@@ -49,7 +49,7 @@ class Request:
   
   def __repr__(self):
     return (
-      f"Request({self.request_id!r}, {self.or_group_id!r}, {self.user!r}, {self.start_dt!r}, {self.eformat!r}, {self.expire_dt!r}, "
+      f"Request({self.request_id!r}, {self.or_group_id!r}, {self.user!r}, {self.start_dt!r}, {self.exchange_format!r}, {self.expire_dt!r}, "
       f"{self.create_dt!r}, {self.edit_dt!r}, {self.min_size!r}, {self.max_size!r}, "
       f"{self.eligible!r}, {self.eligible_users!r}, {self.eligible_groups!r}, {self.eligible_starred!r}, "
       f"{self.pref_order!r}), {self.current!r})"
@@ -57,7 +57,7 @@ class Request:
   
   def __str__(self):
     return (
-      f"Request({self.request_id!s}, {self.or_group_id!s}, {self.user!s}, {self.start_dt!s}, {self.eformat!s}, {self.expire_dt!s}, "
+      f"Request({self.request_id!s}, {self.or_group_id!s}, {self.user!s}, {self.start_dt!s}, {self.exchange_format!s}, {self.expire_dt!s}, "
       f"{self.create_dt!s}, {self.edit_dt!s}, {self.min_size!s}, {self.max_size!s}, "
       f"{self.eligible!s}, {self.eligible_users!s}, {self.eligible_groups!s}, {self.eligible_starred!s}, "
       f"{self.pref_order!s}), {self.current!s})"
@@ -69,7 +69,7 @@ class Request:
   
   @property
   def end_dt(self):
-    return self.start_dt + timedelta(minutes=self.eformat.duration)
+    return self.start_dt + timedelta(minutes=self.exchange_format.duration)
 
   def expired(self, now):
     return self.expire_dt < now
@@ -84,7 +84,7 @@ class Request:
   def get_prospects(self, other_exchange_prospects):
     out = []
     for other in other_exchange_prospects:
-      if (self.eformat == other.eformat
+      if (self.exchange_format == other.exchange_format
           and self.min_size <= other.max_size
           and self.max_size >= other.min_size
           and not other.is_full
@@ -115,7 +115,7 @@ class Requests:
   
   @property
   def times_notify_info(self):
-    return {(r.start_now, r.start_dt, r.eformat.duration) for r in self.requests}
+    return {(r.start_now, r.start_dt, r.exchange_format.duration) for r in self.requests}
 
   @property
   def user(self):
@@ -214,8 +214,8 @@ class ExchangeProspect:
     return self.requests[0]
   
   @property
-  def eformat(self):
-    return self._rep_request.eformat
+  def exchange_format(self):
+    return self._rep_request.exchange_format
 
   @property
   def start_dt(self):
@@ -223,7 +223,7 @@ class ExchangeProspect:
 
   @property
   def end_dt(self):
-    return self.start_dt + timedelta(minutes=self.eformat.duration)
+    return self.start_dt + timedelta(minutes=self.exchange_format.duration)
   
   @property
   def start_now(self):
@@ -312,7 +312,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   user=port_prop.user.user_id,
                   start_dt=start_dt,
                   expire_dt=expire_dt,
-                  eformat=Eformat(port_time.duration),
+                  exchange_format=ExchangeFormat(port_time.duration),
                   create_dt=create_dt if create_dt else now,
                   edit_dt=create_dt if create_dt else now,
                   min_size=port_prop.min_size,

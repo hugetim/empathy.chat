@@ -1,7 +1,7 @@
 import anvil.server
 from anvil import tables
 import datetime
-from .requests import Request, Requests, Eformat, have_conflicts, prop_to_requests, exchange_to_save
+from .requests import Request, Requests, ExchangeFormat, have_conflicts, prop_to_requests, exchange_to_save
 from . import accounts
 from . import request_gateway
 from . import portable as port
@@ -104,7 +104,7 @@ class RequestManager:
 
   def potential_matching_request_records(self):
     partial_request_dicts = [
-      dict(start_now=r.start_now, start_dt=r.start_dt, eformat=r.eformat)
+      dict(start_now=r.start_now, start_dt=r.start_dt, exchange_format=r.exchange_format)
       for r in self.requests
     ]
     return list(repo.partially_matching_requests(self.user, partial_request_dicts, self.now, records=True))
@@ -272,7 +272,7 @@ def requests_to_props(requests, user):
         start_now=r.start_now,
         start_date = None if r.start_now else r.start_dt,
         expire_date=r.expire_dt,
-        duration=r.eformat.duration,
+        duration=r.exchange_format.duration,
       ))
     user2 = sm.get_other_user(this_or_group[0].user)
     or_group_id = this_or_group[0].or_group_id

@@ -9,6 +9,7 @@ from . import parameters as p
 from . import portable as port
 from .exceptions import InvalidInviteError
 from . import server_misc as sm
+from . import helper as h
 from .server_misc import authenticated_callable
 from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
@@ -201,7 +202,7 @@ def send_verification_sms(number, user_id=""):
     return "number unavailable"
   else:
     user = sm.get_acting_user()
-    code = sm.random_code(num_chars=6, digits_only=True)
+    code = h.random_code(num_chars=6, digits_only=True)
     from . import notifies as n
     error_message = n.send_sms(
       number,

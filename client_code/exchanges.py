@@ -1,13 +1,14 @@
 from collections import namedtuple
-from .server_misc import warning
+from . import helpers as h
+from .requests import Request, ExchangeProspect, ExchangeFormat
 
 
 # Participant = namedtuple('Participant', ['user_id', 'present', 'complete', 'slider_value', 'late_notified', 'external'])
-Format = namedtuple('Format', ['duration'])
+# Format = namedtuple('Format', ['duration'])
 
 
 class Exchange:
-  def __init__(self, exchange_id, room_code, participants, start_now, start_dt, exchange_format, user_id, my_i=None):
+  def __init__(self, exchange_id, room_code, participants, start_now, start_dt, exchange_format, user_id=None, my_i=None, requests=None):
     self.exchange_id = exchange_id
     self.room_code = room_code
     self.participants = participants
@@ -17,11 +18,24 @@ class Exchange:
     if my_i:
       self._my_i = my_i
       self._their_i = self.participants.index(self._their())
-    else:
+    elif user_id:
       [participant] = [p for p in self.participants if p['user_id'] == user_id]
       self._my_i = self.participants.index(participant)
       self._their_i = self.participants.index(self._their())
+    self.requests = requests
 
+  @staticmethod
+  def from_exchange_prospect(ep: ExchangeProspect):
+    return Exchange(
+      exchange_id=None,
+      room_code=h.new_jitsi_code(),
+      participants=[dict(user_id=r.user,) for r in ep.requests],
+      start_now=ep.start_now,
+      start_dt=ep.start_dt if not start_now else None,
+      exchange_format=ep.exchange_format,
+      requests=ep.requests,
+    )
+  
   @property
   def my(self):
     return self.participants[self._my_i]
@@ -34,7 +48,7 @@ class Exchange:
     other_participants = [p for p in self.participants]
     del other_participants[self._my_i]
     if len(other_participants) > 1:
-      warning(f"len(temp_values) > 1, but this function assumes dyads only")
+      h.warning(f"len(temp_values) > 1, but this function assumes dyads only")
     if other_participants:
       return other_participants[0]
 

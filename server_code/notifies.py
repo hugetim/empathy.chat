@@ -75,7 +75,7 @@ def when_str(start, user):
 
 
 def duration_start_str(request, user):
-  out = port.DURATION_TEXT[request.eformat.duration]
+  out = port.DURATION_TEXT[request.exchange_format.duration]
   if request.start_now:
     out += ", starting now"
   else:

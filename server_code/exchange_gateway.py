@@ -3,7 +3,8 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 from . import parameters as p
 from .exceptions import RowMissingError
-from .exchanges import Exchange, Format
+from .exchanges import Exchange
+from .requests import ExchangeFormat
 
 
 def _current_exchange_i(user, to_join):
@@ -55,7 +56,7 @@ class ExchangeRepository:
                       participants=participants,
                       start_now=match_dict['proposal_time']['start_now'],
                       start_dt=match_dict['match_commence'],
-                      exchange_format=Format(match_dict['proposal_time']['duration']),
+                      exchange_format=ExchangeFormat(match_dict['proposal_time']['duration']),
                       user_id=user.get_id(),
                       my_i=i,
                      )

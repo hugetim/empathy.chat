@@ -312,22 +312,6 @@ class Record(ABC):
     return cls.from_row(row)
 
 
-def new_jitsi_code():
-  if DEBUG:
-    print("server_misc.new_jitsi_code()")
-  return "empathy-chat-" + random_code()
-
-
-def random_code(num_chars=5, digits_only=False):
-  import random
-  if digits_only:
-    charset = "1234567890"
-  else:
-    charset = "abcdefghijkmnopqrstuvwxyz23456789"
-  random.seed()
-  return "".join([random.choice(charset) for i in range(num_chars)])
-
-
 @anvil.server.callable
 def get_url(name):
   media = app_tables.files.get(name=name)['file']

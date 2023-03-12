@@ -6,6 +6,7 @@ from . import parameters as p
 from . import server_misc as sm
 from . import notifies as n
 from . import portable as port
+from . import helper as h
 from . import groups
 from . import network_interactor as ni
 from anvil_extras.server_utils import timed
@@ -220,7 +221,7 @@ class ProposalTime():
                                                    cancelled=False,
                                                    users_accepting=[],
                                                    fully_accepted=False,
-                                                   jitsi_code=sm.new_jitsi_code(),
+                                                   jitsi_code=h.new_jitsi_code(),
                                                    missed_pings=0,
                                                   )).confirm_wait(port_time.start_now)
   

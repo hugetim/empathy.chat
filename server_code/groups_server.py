@@ -149,7 +149,7 @@ def create_group_invite(port_my_group):
 def new_link_key():
   unique_key_found = False
   while not unique_key_found:
-    random_key = sm.random_code(num_chars=p.NEW_LINK_KEY_LENGTH)
+    random_key = h.random_code(num_chars=p.NEW_LINK_KEY_LENGTH)
     matching_rows = app_tables.group_invites.search(link_key=random_key)
     unique_key_found = not len(matching_rows)
   return random_key

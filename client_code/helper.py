@@ -174,8 +174,22 @@ def _robust_server_call(n, call_fn, fn_name, *args, **kwargs):
       return call_fn(fn_name, *args, **kwargs)
     except anvil.server.TimeoutError:
       from . import helper as h
-      h.warning("Re-trying {fn_name} server call due to TimeoutError")
+      warning("Re-trying {fn_name} server call due to TimeoutError")
       return _robust_server_call(n-1, call_fn, fn_name, *args, **kwargs)
+
+
+def new_jitsi_code():
+  return "empathy-chat-" + random_code()
+
+
+def random_code(num_chars=5, digits_only=False):
+  import random
+  if digits_only:
+    charset = "1234567890"
+  else:
+    charset = "abcdefghijkmnopqrstuvwxyz23456789"
+  random.seed()
+  return "".join([random.choice(charset) for i in range(num_chars)])
 
     
 class reverse_compare:

@@ -1,14 +1,14 @@
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-from .requests import Request, Eformat
+from .requests import Request, ExchangeFormat
 from . import server_misc as sm
 from . import groups
 
 
 def _row_to_request(row):
-  eformat = Eformat(duration=row['eformat']['duration'])
-  kwargs = dict(eformat=eformat)
+  exchange_format = ExchangeFormat(duration=row['exchange_format']['duration'])
+  kwargs = dict(exchange_format=exchange_format)
   kwargs['request_id'] = row.get_id()
   kwargs['user'] = row['user'].get_id()
   kwargs['with_users'] = [user2.get_id()
@@ -36,8 +36,8 @@ def _row_to_request(row):
 
 
 def _request_to_fields(request):
-  eformat = _get_eformat_row(request.eformat)
-  out = dict(eformat=eformat)
+  exchange_format = _get_exchange_format_row(request.exchange_format)
+  out = dict(exchange_format=exchange_format)
   out['user'] = app_tables.users.get_by_id(request.user)
   out['with_users'] = [sm.get_other_user(user_id)
                        for user_id in request.with_users]
@@ -101,10 +101,10 @@ class RequestRecord(sm.Record):
     return spec
 
 
-def _get_eformat_row(eformat):
-  row = app_tables.eformats.get(duration=eformat.duration)
+def _get_exchange_format_row(exchange_format):
+  row = app_tables.exchange_formats.get(duration=exchange_format.duration)
   if not row:
-    row = app_tables.eformats.add_row(duration=eformat.duration)
+    row = app_tables.exchange_formats.add_row(duration=exchange_format.duration)
   return row
 
 
@@ -121,7 +121,7 @@ def current_requests(records=False):
 
 def partially_matching_requests(user, partial_request_dicts, now, records=False):
   q_expressions = [
-    q.all_of(eformat=_get_eformat_row(prd['eformat']),
+    q.all_of(exchange_format=_get_exchange_format_row(prd['exchange_format']),
              **(dict(start_dt=q.less_than(now)) if prd['start_now'] else dict(start_dt=prd['start_dt']))
             )
     for prd in partial_request_dicts

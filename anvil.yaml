@@ -178,14 +178,6 @@ db_schema:
     - name: time_stamp
       admin_ui: {width: 200}
       type: datetime
-  eformats:
-    title: Eformats
-    client: none
-    server: full
-    columns:
-    - name: duration
-      admin_ui: {width: 200}
-      type: number
   files:
     title: Files
     client: none
@@ -489,6 +481,14 @@ db_schema:
     - name: external
       admin_ui: {width: 200}
       type: simpleObject
+  exchange_formats:
+    title: Exchange_Formats
+    client: none
+    server: full
+    columns:
+    - name: duration
+      admin_ui: {width: 200}
+      type: number
   messages:
     title: Messages
     client: none
@@ -561,10 +561,10 @@ db_schema:
     - name: current
       admin_ui: {width: 90.015872}
       type: bool
-    - name: eformat
+    - name: exchange_format
       admin_ui: {width: 103.0119}
       type: link_single
-      target: eformats
+      target: exchange_formats
     - name: start_dt
       admin_ui: {width: 200}
       type: datetime
