@@ -5,6 +5,7 @@ from . import parameters as p
 from .exceptions import RowMissingError
 from .exchanges import Exchange
 from .requests import ExchangeFormat
+from .request_gateway import get_exchange_format_row, RequestRecord
 
 
 def _current_exchange_i(user, to_join):
@@ -100,3 +101,35 @@ class ExchangeRepository:
   
   def _match_row(self, exchange):
     return app_tables.matches.get_by_id(exchange.exchange_id)
+
+
+class ExchangeRecord(sm.Record):
+  _table_name = 'exchanges'
+
+  # @staticmethod
+  # def _row_to_entity(row):
+  #   return _row_to_request(row)
+
+  @staticmethod
+  def _entity_to_fields(entity):
+    return _exchange_to_fields(entity)
+
+
+def _exchange_to_fields(exchange):
+  # keys_to_update = list(exchange.participants[0].keys())
+  # keys_to_update.remove('user_id')
+  # update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
+  # update_dict['slider_values'] = update_dict.pop('slider_value')
+  participants?
+
+  exchange_format = get_exchange_format_row(exchange.exchange_format)
+  out = dict(exchange_format=exchange_format)
+  out['requests'] = [app_tables.requests.get_by_id(r.request_id) for r in exchange.requests]
+  
+  simple_keys = [
+    'room_code',
+    'start_dt',
+  ]
+  for key in simple_keys:
+    out[key] = getattr(request, key)
+  return out
