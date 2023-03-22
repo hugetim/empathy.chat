@@ -75,7 +75,7 @@ def _new_trust_level(user, starting_trust_level):
   def matched_with_distance1_member():
     import connections as c
     for user2 in c.member_close_connections(user):
-      user2_matches = app_tables.matches.search(users=[user,user2])
+      user2_matches = app_tables.matches.search(users=[user,user2]) # switching to exchange_log table
       for match in user2_matches:
         both_present = 1
         for i, u in enumerate(match['users']):

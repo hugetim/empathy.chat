@@ -14,7 +14,7 @@ def _current_exchange_i(user, to_join):
   from .server_misc import now
   this_match, i = None, None
   now_plus = now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
-  current_matches = app_tables.matches.search(tables.order_by('match_commence', ascending=True), users=[user], complete=[0],
+  current_matches = app_tables.matches.search(tables.order_by('match_commence', ascending=True), users=[user], complete=[0],  # participants
                                               match_commence=q.less_than_or_equal_to(now_plus))
   for row in current_matches:
     temp_i = row['users'].index(user)

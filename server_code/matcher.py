@@ -43,7 +43,7 @@ def prune_old_matches():
   now = sm.now()
   cutoff_m = now - assume_complete
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-  old_matches = app_tables.matches.search(complete=[0],
+  old_matches = app_tables.matches.search(complete=[0],  #switching to participants table
                                           match_commence=q.less_than(cutoff_m),
                                          )
   for row in old_matches:
@@ -56,7 +56,7 @@ def _prune_newer_matches():
     print("_prune_newer_matches")
   import datetime
   now = sm.now()
-  newer_matches = app_tables.matches.search(complete=[0],
+  newer_matches = app_tables.matches.search(complete=[0],  #switching to participants table
                                             match_commence=q.less_than(now),
                                             present=q.not_([1]),
                                            )
@@ -234,7 +234,7 @@ def _get_upcomings(user):
   match_dicts = []
   now = sm.now()
   # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-  my_incomplete_matches = app_tables.matches.search(users=[user], complete=[0])
+  my_incomplete_matches = app_tables.matches.search(users=[user], complete=[0]) # switching to participants table
   for match in my_incomplete_matches:
     my_index = match['users'].index(user)
     if match['complete'][my_index] == 0:
@@ -259,7 +259,7 @@ def _match_dict(match, user):
 def _cancel_match(user, match_id):
   if sm.DEBUG:
     print(f"_cancel_match, {match_id}")
-  match = app_tables.matches.get_by_id(match_id)
+  match = app_tables.matches.get_by_id(match_id) # switch to participants (changing all to current=False)
   if match:
     users_to_notify = [u for u in match['users'] if u != user]    
     match_commence = match['match_commence']

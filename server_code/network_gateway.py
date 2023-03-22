@@ -21,7 +21,7 @@ class NetworkRepository:
       yield dict(message_row)
 
   def _get_chat_messages(self, user2, user1):
-    matches = app_tables.matches.search(users=[user2, user1])
+    matches = app_tables.matches.search(users=[user2, user1])  # maybe change to normal messages
     chat_rows = app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=q.any_of(*list(matches)))
     for chat_row in chat_rows:
       yield dict(from_user=chat_row['user'], message=chat_row['message'], time_stamp=chat_row['time_stamp'])
