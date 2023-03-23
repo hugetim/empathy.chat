@@ -14,7 +14,7 @@ def _current_exchange_i(user, to_join):
   from .server_misc import now
   this_match, i = None, None
   now_plus = now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
-  current_matches = app_tables.matches.search(tables.order_by('match_commence', ascending=True), users=[user], complete=[0],  # participants
+  current_matches = app_tables.matches.search(tables.order_by('match_commence', ascending=True), users=[user], complete=[0],
                                               match_commence=q.less_than_or_equal_to(now_plus))
   for row in current_matches:
     temp_i = row['users'].index(user)
@@ -103,33 +103,61 @@ class ExchangeRepository:
     return app_tables.matches.get_by_id(exchange.exchange_id)
 
 
-class ExchangeRecord(sm.Record):
-  _table_name = 'exchanges'
+# class ExchangeRecord(sm.Record):
+#   def __init__(self, entity, row_id=None, row=None):
+#     self.entity = entity
+#     self._row_id = row_id
+#     self.__row = row
 
-  # @staticmethod
-  # def _row_to_entity(row):
-  #   return _row_to_request(row)
+#   @property
+#   def _row(self):
+#     if self.__row is None and self._row_id is not None:
+#       self.__row = self._table.get_by_id(self._row_id)
+#     return self.__row
 
-  @staticmethod
-  def _entity_to_fields(entity):
-    return _exchange_to_fields(entity)
-
-
-def _exchange_to_fields(exchange):
-  # keys_to_update = list(exchange.participants[0].keys())
-  # keys_to_update.remove('user_id')
-  # update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
-  # update_dict['slider_values'] = update_dict.pop('slider_value')
-  participants?
-
-  exchange_format = get_exchange_format_row(exchange.exchange_format)
-  out = dict(exchange_format=exchange_format)
-  out['requests'] = [app_tables.requests.get_by_id(r.request_id) for r in exchange.requests]
+#   def _add(self):
+#     self.__row = self._table.add_row(**self._entity_to_fields(self.entity))
+#     self._row_id = self._row.get_id()
   
-  simple_keys = [
-    'room_code',
-    'start_dt',
-  ]
-  for key in simple_keys:
-    out[key] = getattr(request, key)
-  return out
+#   def _update(self):
+#     self._row.update(**self._entity_to_fields(self.entity))
+  
+#   def save(self):
+#     if self._row_id is None:
+#       self._add()
+#       return
+#     self._update()
+  
+#   @property
+#   def record_id(self):
+#     return self._row_id
+
+#   @classmethod
+#   def from_row(cls, row):
+#     entity = cls._row_to_entity(row)
+#     return cls(entity, row.get_id(), row)
+
+#   @classmethod
+#   def from_id(cls, record_id):
+#     row = getattr(app_tables, cls._table_name).get_by_id(record_id)
+#     return cls.from_row(row)
+
+
+# def _exchange_to_fields(exchange):
+#   # keys_to_update = list(exchange.participants[0].keys())
+#   # keys_to_update.remove('user_id')
+#   # update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
+#   # update_dict['slider_values'] = update_dict.pop('slider_value')
+#   participants?
+
+#   exchange_format = get_exchange_format_row(exchange.exchange_format)
+#   out = dict(exchange_format=exchange_format)
+#   out['requests'] = [app_tables.requests.get_by_id(r.request_id) for r in exchange.requests]
+  
+#   simple_keys = [
+#     'room_code',
+#     'start_dt',
+#   ]
+#   for key in simple_keys:
+#     out[key] = getattr(request, key)
+#   return out

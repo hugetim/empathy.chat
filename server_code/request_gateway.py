@@ -63,7 +63,7 @@ def _request_to_fields(request):
   return out
 
 
-class RequestRecord(sm.Record):
+class RequestRecord(sm.SimpleRecord):
   _table_name = 'requests'
 
   @staticmethod

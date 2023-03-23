@@ -255,6 +255,30 @@ class ServerItem:
 
 
 class Record(ABC):
+  @abstractmethod
+  def __init__(self, entity, row_id=None, row=None):
+    pass
+
+  @abstractmethod
+  def save(self):
+    pass
+  
+  @abstractproperty
+  def record_id(self):
+    pass
+
+  @classmethod
+  @abstractmethod
+  def from_row(cls, row):
+    pass
+
+  @classmethod
+  @abstractmethod
+  def from_id(cls, record_id):
+    pass
+
+
+class SimpleRecord(Record):
   @abstractproperty
   def _table_name(self):
     pass
