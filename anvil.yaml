@@ -615,6 +615,10 @@ db_schema:
     - name: eligible_starred
       admin_ui: {width: 200}
       type: bool
+    - name: eligible_invites
+      admin_ui: {order: 16, width: 200}
+      type: link_multiple
+      target: invites
   connections:
     title: Connections
     client: none

@@ -20,6 +20,9 @@ class Invite(h.PortItem, h.AttributeToKey):
     self.invitee_guess = invitee_guess
     self.connection_successful = False
 
+  def __str__(self):
+    return f"my {self.rel_to_inviter} ({self.link_key})"
+  
   @property
   def url(self):
     return f"{p.URL}#?invite={self.link_key}"

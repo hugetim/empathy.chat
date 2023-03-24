@@ -22,6 +22,7 @@ class Request:
     create_dt=None, edit_dt=None,
     min_size=2, max_size=2, with_users=None,
     eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
+    eligible_invites=None,
     pref_order=None,
     current=None,
   ):
@@ -40,19 +41,20 @@ class Request:
     self.eligible_users = eligible_users if eligible_users else []
     self.eligible_groups = eligible_groups if eligible_groups else []
     self.eligible_starred = eligible_starred
+    self.eligible_invites = eligible_invites if eligible_invites else []
     self.pref_order = pref_order
     self.current = current
 
   @property
   def elig_with_dict(self):
-    return {key: getattr(self, key) for key in ['with_users', 'eligible', 'eligible_users', 'eligible_groups', 'eligible_starred']}
+    return {key: getattr(self, key) for key in ['with_users', 'eligible', 'eligible_users', 'eligible_groups', 'eligible_starred', 'eligible_invites']}
   
   def __repr__(self):
     return (
       f"Request({self.request_id!r}, {self.or_group_id!r}, {self.user!r}, {self.start_dt!r}, {self.exchange_format!r}, {self.expire_dt!r}, "
       f"{self.create_dt!r}, {self.edit_dt!r}, {self.min_size!r}, {self.max_size!r}, "
       f"{self.eligible!r}, {self.eligible_users!r}, {self.eligible_groups!r}, {self.eligible_starred!r}, "
-      f"{self.pref_order!r}), {self.current!r})"
+      f"{self.eligible_invites!r}, {self.pref_order!r}), {self.current!r})"
     )
   
   def __str__(self):
@@ -60,7 +62,7 @@ class Request:
       f"Request({self.request_id!s}, {self.or_group_id!s}, {self.user!s}, {self.start_dt!s}, {self.exchange_format!s}, {self.expire_dt!s}, "
       f"{self.create_dt!s}, {self.edit_dt!s}, {self.min_size!s}, {self.max_size!s}, "
       f"{self.eligible!s}, {self.eligible_users!s}, {self.eligible_groups!s}, {self.eligible_starred!s}, "
-      f"{self.pref_order!s}), {self.current!s})"
+      f"{self.eligible_invites!s}, {self.pref_order!s}), {self.current!s})"
     )
   
   @property
@@ -322,6 +324,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   eligible_users=[port_user.user_id for port_user in port_prop.eligible_users],
                   eligible_groups=port_prop.eligible_groups,
                   eligible_starred=port_prop.eligible_starred,
+                  eligible_invites=port_prop.eligible_invites,
                   pref_order=i,
                   current=current,
                  )

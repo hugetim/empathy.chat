@@ -298,7 +298,8 @@ class ProposalTime():
 @anvil.server.portable_class 
 class Proposal():
   def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
-               eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,):
+               eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
+               eligible_invites=None,):
     from .glob import default_request
     self.prop_id = prop_id
     self.own = own
@@ -329,6 +330,7 @@ class Proposal():
       self.eligible_starred = eligible_starred
     else:
       self.eligible_starred = default_request['eligible']['eligible_starred'] if default_request else True
+    self.eligible_invites = eligible_invites if eligible_invites else []
 
   @property
   def start_now(self):
@@ -353,6 +355,8 @@ class Proposal():
   @property
   def eligibility_desc(self):
     items = []
+    if self.eligible_invites:
+      items.append(", ".join([str(i) for i in self.eligible_invites]))
     if self.eligible_starred:
       items.append('Starred')
     if self.eligible_users:
@@ -361,7 +365,7 @@ class Proposal():
       desc = {1: "1st degree buddies", 2: "buddies up to 2 degrees", 3: "buddies up to 3 degrees"}
       items.append(desc[self.eligible])
     if self.eligible_groups:
-      items.append(", ".join([str(u) for u in self.eligible_groups]))
+      items.append(", ".join([str(g) for g in self.eligible_groups]))
     return "; ".join(items)
   
   @property
@@ -401,6 +405,7 @@ class Proposal():
             'eligible_groups': self.eligible_groups,
             'conflict_checks': conflict_checks,
             'eligible_starred': self.eligible_starred,
+            'eligible_invites': self.eligible_invites,
            }
     first, *alts = self.times
     item['now_allowed'] = not(status and first.start_now == False)
@@ -420,6 +425,7 @@ class Proposal():
                     eligible_users=item['eligible_users'],
                     eligible_groups=item['eligible_groups'],
                     eligible_starred=item['eligible_starred'],
+                    eligible_invites=item['eligible_invites'],
                    )
 
   @staticmethod
