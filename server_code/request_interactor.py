@@ -285,5 +285,6 @@ def requests_to_props(requests, user):
       eligible_users=[sm.get_simple_port_user(sm.get_other_user(user_id), user1=user) for user_id in r.eligible_users],
       eligible_groups=r.eligible_groups,
       eligible_starred=r.eligible_starred,
+      eligible_invites=r.eligible_invites,
       times=times
     )
