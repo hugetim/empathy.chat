@@ -221,7 +221,7 @@ class ExchangeProspect:
 
   @property
   def start_dt(self):
-    return self._rep_request.start_dt
+    return min([r.start_dt for r in self.requests])
 
   @property
   def end_dt(self):

@@ -2,9 +2,12 @@ import anvil.server
 from anvil import tables
 import datetime
 from .requests import Request, Requests, ExchangeFormat, have_conflicts, prop_to_requests, exchange_to_save
+from .exchanges import Exchange
 from . import accounts
 from . import request_gateway
+from . import exchange_gateway
 from . import portable as port
+from . import parameters as p
 from . import network_interactor as ni
 from . import server_misc as sm
 from . import exchange_interactor as ei
@@ -13,10 +16,12 @@ from .exceptions import InvalidRequestError
 
 
 repo = request_gateway
+exchange_repo = exchange_gateway
 
 def reset_repo():
-  global repo
+  global repo, exchange_repo
   repo = request_gateway
+  exchange_repo = exchange_gateway
 
 
 def _add_request(user, port_prop, link_key=""):
@@ -24,8 +29,9 @@ def _add_request(user, port_prop, link_key=""):
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
+  if link_key and not [invite for invite in port_prop.eligible_invites if invite.link_key==link_key]:
+    sm.warning("_add_request port_prop missing {link_key} eligible_invite")
   return _edit_request(user, port_prop)
-  ############ But still need to handle link_key
 
 
 def _edit_request(user, port_prop):
@@ -39,11 +45,21 @@ def _edit_request(user, port_prop):
   request_editor = RequestManager(user, requests)
   request_editor.check_and_save()
   if request_editor.exchange:
-    raise NotImplementedError("_edit_request -> exchange ping/notify")
-    # ping other request if request_adder.exchange
+    ping(user, request_editor.exchange)
   else:
     request_editor.notify_edit()
   return requests.or_group_id
+
+
+def ping(user, exchange):
+  user_ids = exchange.user_ids.copy()
+  user_ids.remove(user.get_id())
+  anvil.server.launch_background_task(
+    'pings',
+    user_ids=user_ids,
+    start=None if exchange.start_now else exchange.start_dt,
+    duration=exchange.exchange_format.duration,
+  )    
 
 
 def _check_requests_valid(user, requests, user_prev_requests):
@@ -60,7 +76,7 @@ def _check_requests_valid(user, requests, user_prev_requests):
 
 class RequestManager:
   def __init__(self, user, requests):
-    self.user,self.requests = user,Requests(requests)
+    (self.user,self.requests) = (user,Requests(requests))
     self.exchange = None
     self.now = sm.now()
   
@@ -72,12 +88,24 @@ class RequestManager:
     _prune_request_records(other_request_records, self.now)
     exchange_prospect = self._exchange_prospect(other_request_records)
     if exchange_prospect:
-      self.exchange = exchange_prospect #later make it an exchange
       # save matched request only*
       # *cancel other or_group requests before saving (or just don't save them)
-      # ei.
-      # update status
-      raise NotImplementedError("add_request -> exchange")
+      matched_request = next([r for r in exchange_prospect if r.user==self.requests.user])
+      self.requests = Requests([matched_request])
+      self._cancel_missing_or_group_requests()
+      self._save_requests()
+      self.exchange = Exchange.from_exchange_prospect(exchange_prospect)
+      exchange_record = exchange_repo.ExchangeRecord(self.exchange)
+      exchange_record.save()
+      self.exchange.exchange_id = exchange_record.record_id
+      if self.exchange.start_now and self.exchange.size > 2:
+        raise NotImplemented("Larger now requests check_and_save")
+      if self.exchange.start_now:
+        raise NotImplemented("check_and_save: need to also update status of other user(s)")
+      if self.exchange.start_now and (self.now - (self.exchange.start_dt)).total_seconds() <= p.BUFFER_SECONDS:
+        self.user['status'] = "matched"
+      elif self.exchange.start_now:
+        self.user['status'] = "pinging"
     else:
       self._cancel_missing_or_group_requests()
       self._save_requests()

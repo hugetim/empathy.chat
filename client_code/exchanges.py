@@ -37,6 +37,14 @@ class Exchange:
       exchange_format=ep.exchange_format,
       current=True,
     )
+
+  @property
+  def size(self):
+    return len(self.participants)
+
+  @property
+  def user_ids(self):
+    return [p['user_id'] for p in self.participants]
   
   @property
   def my(self):
