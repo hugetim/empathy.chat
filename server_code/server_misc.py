@@ -256,7 +256,7 @@ class ServerItem:
 
 class Record(ABC):
   @abstractmethod
-  def __init__(self, entity, row_id=None, row=None):
+  def __init__(self, entity, record_id=None, row=None):
     pass
 
   @abstractmethod
@@ -297,9 +297,16 @@ class SimpleRecord(Record):
   def _table(self):
     return getattr(app_tables, self._table_name)
   
-  def __init__(self, entity, row_id=None, row=None):
+  def __init__(self, entity, record_id=None, row=None):
+    try:
+      _record_id = getattr(self, self.__class__.__name__.lower()[:-6] + "_id")
+    except AttributeError:
+      pass
+    else:
+      if _record_id and not record_id:
+        my_assert(not (_record_id and not record_id), "entity row id present but record_id not supplied")
     self.entity = entity
-    self._row_id = row_id
+    self._row_id = record_id
     self.__row = row
 
   @property

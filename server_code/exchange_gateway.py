@@ -115,24 +115,41 @@ class ExchangeRecord(sm.SimpleRecord):
   def _entity_to_fields(entity):
     return _exchange_to_fields(entity)
 
-  def _add_participants(self):
-    raise NotImplementedError("ExchangeRecord._add_participants()")
+  def _update_participants(self):
+    participant_rows = []
+    for p in self.entity.participants:
+      p_record = ParticipantRecord(p, record_id=p.get('participant_id'))
+      p_record.save()
+      participant_rows.append(p_record._row)
+    self._row['participants'] = participant_rows
   
-  @property
-  def _my_participant_record(self):
-    raise NotImplementedError("ExchangeRecord._my_participant_record")
+  # @property
+  # def _my_participant_record(self):
+  #   raise NotImplementedError("ExchangeRecord._my_participant_record")
   
   def save(self):
     if self._row_id is None:
       self._add()
-      self._add_participants()
-      return
-    self._update()
-    self._my_participant_record.save()
+    else:
+      self._update()
+    self._update_participants()
 
 
 def _row_to_exchange(row):
-  raise NotImplementedError("_row_to_exchange(row)")
+  exchange_format = ExchangeFormat(duration=row['exchange_format']['duration'])
+  kwargs = dict(exchange_format=exchange_format)
+  kwargs['exchange_id'] = row.get_id()
+  kwargs['participants'] = [_row_to_participant(participant_row)
+                            for participant_row in row['participants']]
+  simple_keys = [
+    'room_code',
+    'start_dt',
+    'start_now',
+    'current',
+  ]
+  for key in simple_keys:
+    kwargs[key] = row[key]
+  return Exchange(**kwargs)
 
   
 def _exchange_to_fields(exchange):
@@ -140,11 +157,81 @@ def _exchange_to_fields(exchange):
   exchange_format = get_exchange_format_row(exchange.exchange_format)
   out = dict(exchange_format=exchange_format)
   out['users'] = [app_tables.users.get_by_id(p['user_id']) for p in exchange.participants]
-  out['current'] = True
   simple_keys = [
     'room_code',
     'start_dt',
+    'start_now',
+    'current',
   ]
   for key in simple_keys:
     out[key] = getattr(exchange, key)
   return out
+
+
+class ParticipantRecord(sm.SimpleRecord):
+  _table_name = 'participants'
+
+  @staticmethod
+  def _row_to_entity(row):
+    return _row_to_participant(row)
+  
+  @staticmethod
+  def _entity_to_fields(entity):
+    return _participant_to_fields(entity)
+
+  def _update_appearances(self):
+    appearance_rows = []
+    for a in self.entity.get('appearances', []):
+      a_record = AppearanceRecord(a, record_id=a.get('appearance_id'))
+      a_record.save()
+      appearance_rows.append(a_record._row)
+    self._row['appearances'] = appearance_rows
+
+  def save(self):
+    if self._row_id is None:
+      self._add()
+    else:
+      self._update()
+    self._update_appearances()
+
+
+def _row_to_participant(participant_row):
+  participant = dict(participant_row)
+  participant['user_id'] = participant.pop('user').get_id()
+  participant['request_id'] = participant.pop('request').get_id()
+  participant['appearances'] = [_row_to_appearance(a)
+                                for a in participant.pop('appearances')]
+  return participant
+
+
+def _participant_to_fields(participant):
+  fields = participant.copy()
+  fields.pop('appearances', []) # appearances handled separately
+  fields.pop('participant_id', None)
+  fields['user'] = app_tables.users.get_by_id(fields.pop('user_id'))
+  fields['request'] = app_tables.requests.get_by_id(fields.pop('request_id'))
+  sm.my_assert(fields['request'] is not None, "Can't save exchange/participant for an unsaved request.")
+  return fields
+  
+
+class AppearanceRecord(sm.SimpleRecord):
+  _table_name = 'appearances'
+
+  @staticmethod
+  def _row_to_entity(row):
+    return _row_to_appearance(row)
+  
+  @staticmethod
+  def _entity_to_fields(entity):
+    return _appearance_to_fields(entity)
+
+
+def _row_to_appearance(appearance_row):
+  return dict(appearance_id=appearance_row.get_id(), **dict(appearance_row))
+
+
+def _appearance_to_fields(appearance):
+  fields = appearance.copy()
+  fields.pop('appearance_id', None)
+  return fields
+  

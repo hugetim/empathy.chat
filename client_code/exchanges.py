@@ -8,7 +8,8 @@ from .requests import Request, ExchangeProspect, ExchangeFormat
 
 
 class Exchange:
-  def __init__(self, exchange_id, room_code, participants, start_now, start_dt, exchange_format, user_id=None, my_i=None, requests=None):
+  def __init__(self, exchange_id, room_code, participants, # list of dicts
+               start_now, start_dt, exchange_format, user_id=None, my_i=None, current=None):
     self.exchange_id = exchange_id
     self.room_code = room_code
     self.participants = participants
@@ -22,18 +23,19 @@ class Exchange:
       [participant] = [p for p in self.participants if p['user_id'] == user_id]
       self._my_i = self.participants.index(participant)
       self._their_i = self.participants.index(self._their())
-    self.requests = requests
+    self.current = current
 
   @staticmethod
   def from_exchange_prospect(ep: ExchangeProspect):
+    start_now = ep.start_now
     return Exchange(
       exchange_id=None,
       room_code=h.new_jitsi_code(),
-      participants=[dict(user_id=r.user,) for r in ep.requests],
-      start_now=ep.start_now,
-      start_dt=ep.start_dt if not start_now else None,
+      participants=[dict(user_id=r.user, request_id=r.request_id) for r in ep.requests],
+      start_now=start_now,
+      start_dt=ep.start_dt if not start_now else h.now(),
       exchange_format=ep.exchange_format,
-      requests=ep.requests,
+      current=True,
     )
   
   @property

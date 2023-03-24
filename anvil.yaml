@@ -103,30 +103,34 @@ db_schema:
       admin_ui: {width: 200}
       type: bool
   participants:
+    title: Participants
     client: none
     server: full
     columns:
     - name: user
-      admin_ui: {order: 0, width: 200}
+      admin_ui: {width: 200}
       type: link_single
       target: users
     - name: appearances
-      admin_ui: {order: 1, width: 200}
+      admin_ui: {width: 200}
       type: link_multiple
       target: appearances
-    - name: enter_dt
-      admin_ui: {order: 2, width: 200}
+    - name: entered_dt
+      admin_ui: {width: 200}
       type: datetime
     - name: slider_value
-      admin_ui: {order: 3, width: 200}
+      admin_ui: {width: 200}
       type: number
     - name: video_embedded
-      admin_ui: {order: 4, width: 200}
+      admin_ui: {width: 200}
       type: bool
     - name: complete_dt
-      admin_ui: {order: 5, width: 200}
+      admin_ui: {width: 200}
       type: datetime
-    title: Participants
+    - name: request
+      admin_ui: {width: 200}
+      type: link_single
+      target: requests
   codes:
     title: Codes
     client: none
@@ -149,16 +153,16 @@ db_schema:
       admin_ui: {width: 200}
       type: datetime
   appearances:
+    title: Appearances
     client: none
     server: full
     columns:
     - name: start_dt
-      admin_ui: {order: 0, width: 200}
+      admin_ui: {width: 200}
       type: datetime
     - name: end_dt
-      admin_ui: {order: 1, width: 200}
+      admin_ui: {width: 200}
       type: datetime
-    title: Appearances
   chat:
     title: Chat
     client: none
@@ -274,6 +278,9 @@ db_schema:
     - name: trust_level
       admin_ui: {width: 86}
       type: number
+    - name: status
+      admin_ui: {width: 70.6}
+      type: string
     - name: phone
       admin_ui: {width: 118}
       type: string
@@ -302,7 +309,7 @@ db_schema:
       admin_ui: {width: 186}
       type: string
     - name: notif_settings
-      admin_ui: {width: 1945.013872}
+      admin_ui: {width: 1368.2}
       type: simpleObject
     - name: default_request
       admin_ui: {width: 200}
@@ -334,9 +341,6 @@ db_schema:
     - name: last_invite
       admin_ui: {width: 144}
       type: datetime
-    - name: status
-      admin_ui: {order: 5.25, width: 200}
-      type: string
   proposal_times:
     title: Proposal Times
     client: none
@@ -381,24 +385,34 @@ db_schema:
       admin_ui: {width: 142}
       type: number
   exchanges:
+    title: Exchanges
     client: none
     server: full
     columns:
     - name: room_code
-      admin_ui: {order: 0, width: 200}
+      admin_ui: {width: 200}
       type: string
-    - name: users
-      admin_ui: {order: 1, width: 200}
-      type: link_multiple
-      target: requests
     - name: start_dt
-      admin_ui: {order: 2, width: 200}
+      admin_ui: {width: 200}
       type: datetime
+    - name: users
+      admin_ui: {width: 200}
+      type: link_multiple
+      target: users
     - name: participants
-      admin_ui: {order: 3, width: 200}
+      admin_ui: {width: 200}
       type: link_multiple
       target: participants
-    title: Exchanges
+    - name: current
+      admin_ui: {width: 200}
+      type: bool
+    - name: exchange_format
+      admin_ui: {width: 200}
+      type: link_single
+      target: exchange_formats
+    - name: start_now
+      admin_ui: {order: 2.5, width: 200}
+      type: bool
   stars:
     title: Stars
     client: none
