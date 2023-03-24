@@ -142,7 +142,6 @@ def match_complete(user_id=""):
   from . import matcher
   try:
     exchange = repo.get_exchange(user_id)
-    # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
     exchange = _complete_exchange(exchange)
     repo.save_exchange(exchange)
     matcher.propagate_update_needed()
@@ -152,6 +151,7 @@ def match_complete(user_id=""):
 
 def _complete_exchange(exchange):
   from . import notifies as n
+  # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   exchange.my['complete'] = 1
   if exchange.their['present'] == 0:
     user = sm.get_acting_user()
