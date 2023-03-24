@@ -387,14 +387,14 @@ db_schema:
     - name: room_code
       admin_ui: {order: 0, width: 200}
       type: string
-    - name: requests
+    - name: users
       admin_ui: {order: 1, width: 200}
       type: link_multiple
       target: requests
     - name: start_dt
       admin_ui: {order: 2, width: 200}
       type: datetime
-    - name: Column3
+    - name: participants
       admin_ui: {order: 3, width: 200}
       type: link_multiple
       target: participants

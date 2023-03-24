@@ -5,6 +5,7 @@ from . import parameters as p
 from .exceptions import RowMissingError
 from .exchanges import Exchange
 from .requests import ExchangeFormat
+from . import server_misc as sm
 from .request_gateway import get_exchange_format_row, RequestRecord
 
 
@@ -103,61 +104,47 @@ class ExchangeRepository:
     return app_tables.matches.get_by_id(exchange.exchange_id)
 
 
-# class ExchangeRecord(sm.Record):
-#   def __init__(self, entity, row_id=None, row=None):
-#     self.entity = entity
-#     self._row_id = row_id
-#     self.__row = row
+class ExchangeRecord(sm.SimpleRecord):
+  _table_name = 'exchanges'
 
-#   @property
-#   def _row(self):
-#     if self.__row is None and self._row_id is not None:
-#       self.__row = self._table.get_by_id(self._row_id)
-#     return self.__row
-
-#   def _add(self):
-#     self.__row = self._table.add_row(**self._entity_to_fields(self.entity))
-#     self._row_id = self._row.get_id()
+  @staticmethod
+  def _row_to_entity(row):
+    return _row_to_exchange(row)
   
-#   def _update(self):
-#     self._row.update(**self._entity_to_fields(self.entity))
+  @staticmethod
+  def _entity_to_fields(entity):
+    return _exchange_to_fields(entity)
+
+  def _add_participants(self):
+    raise NotImplementedError("ExchangeRecord._add_participants()")
   
-#   def save(self):
-#     if self._row_id is None:
-#       self._add()
-#       return
-#     self._update()
+  @property
+  def _my_participant_record(self):
+    raise NotImplementedError("ExchangeRecord._my_participant_record")
   
-#   @property
-#   def record_id(self):
-#     return self._row_id
-
-#   @classmethod
-#   def from_row(cls, row):
-#     entity = cls._row_to_entity(row)
-#     return cls(entity, row.get_id(), row)
-
-#   @classmethod
-#   def from_id(cls, record_id):
-#     row = getattr(app_tables, cls._table_name).get_by_id(record_id)
-#     return cls.from_row(row)
+  def save(self):
+    if self._row_id is None:
+      self._add()
+      self._add_participants()
+      return
+    self._update()
+    self._my_participant_record.save()
 
 
-# def _exchange_to_fields(exchange):
-#   # keys_to_update = list(exchange.participants[0].keys())
-#   # keys_to_update.remove('user_id')
-#   # update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
-#   # update_dict['slider_values'] = update_dict.pop('slider_value')
-#   participants?
+def _row_to_exchange(row):
+  raise NotImplementedError("_row_to_exchange(row)")
 
-#   exchange_format = get_exchange_format_row(exchange.exchange_format)
-#   out = dict(exchange_format=exchange_format)
-#   out['requests'] = [app_tables.requests.get_by_id(r.request_id) for r in exchange.requests]
   
-#   simple_keys = [
-#     'room_code',
-#     'start_dt',
-#   ]
-#   for key in simple_keys:
-#     out[key] = getattr(request, key)
-#   return out
+def _exchange_to_fields(exchange):
+  # participants handled separately
+  exchange_format = get_exchange_format_row(exchange.exchange_format)
+  out = dict(exchange_format=exchange_format)
+  out['users'] = [app_tables.users.get_by_id(p['user_id']) for p in exchange.participants]
+  out['current'] = True
+  simple_keys = [
+    'room_code',
+    'start_dt',
+  ]
+  for key in simple_keys:
+    out[key] = getattr(exchange, key)
+  return out
