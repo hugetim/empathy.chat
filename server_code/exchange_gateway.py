@@ -104,6 +104,11 @@ class ExchangeRepository:
     return app_tables.matches.get_by_id(exchange.exchange_id)
 
 
+def exchanges_by_user(user, records=False):
+  for exchange_row in app_tables.exchanges.search(users=[user], current=True):
+    yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
+
+
 class ExchangeRecord(sm.SimpleRecord):
   _table_name = 'exchanges'
 

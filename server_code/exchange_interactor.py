@@ -15,6 +15,20 @@ def reset_repo():
   global repo
   repo = ExchangeRepository()
 
+
+# def upcoming_match_dicts(user):
+#   pass
+
+  
+# def _match_dict(match, user):
+#   port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
+#                 if u != user]
+#   return {'port_users': port_users,
+#           'start_date': match['match_commence'],
+#           'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
+#           'match_id': match.get_id(),
+#          }
+
   
 @authenticated_callable
 def init_match_form(user_id=""):
