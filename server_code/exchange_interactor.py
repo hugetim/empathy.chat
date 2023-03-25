@@ -16,18 +16,21 @@ def reset_repo():
   repo = ExchangeRepository()
 
 
-# def upcoming_match_dicts(user):
-#   pass
+def upcoming_match_dicts(user):
+  # can shift to just returning exchanges
+  return [_match_dict(user, exchange) for exchange in exchanges_by_user(user)]
 
-  
-# def _match_dict(match, user):
-#   port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
-#                 if u != user]
-#   return {'port_users': port_users,
-#           'start_date': match['match_commence'],
-#           'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
-#           'match_id': match.get_id(),
-#          }
+
+def _match_dict(user, exchange):
+  other_user_ids = [p['user_id'] for p in exchange.participants
+                    if p['user_id'] != user.get_id()]
+  port_users = [port.User(user_id=user_id, name=app_tables.users.get_by_id(user_id)['first_name']) 
+                for user_id in other_user_ids]
+  return {'port_users': port_users,
+          'start_date': exchange.start_dt,
+          'duration_minutes': exchange.exchange_format.duration,
+          'match_id': exchange.exchange_id,
+         }
 
   
 @authenticated_callable
