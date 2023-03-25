@@ -35,7 +35,7 @@ def _seconds_left(status, expire_date=None, ping_start=None):
     print("matcher.seconds_left(s,lc,ps): " + status)
 
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 def prune_old_matches():
   """Complete old commenced matches for all users"""
   import datetime
@@ -88,7 +88,7 @@ def init(time_zone):
   return task
 
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 @timed
 def _init_bg(time_zone, user):
   import anvil.users

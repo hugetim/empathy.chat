@@ -512,7 +512,7 @@ class Proposal():
       proposal.cancel_if_no_times()
 
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 def notify_add(prop_row):
   from .request_interactor import all_eligible_users
   prop = Proposal(prop_row)
@@ -520,7 +520,7 @@ def notify_add(prop_row):
     prop._notify_add_to(other_user)
 
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 def notify_edit(prop_row, port_prop, old_port_prop):
   from .request_interactor import all_eligible_users
   prop = Proposal(prop_row)
@@ -535,7 +535,7 @@ def notify_edit(prop_row, port_prop, old_port_prop):
     prop._notify_cancel_to(other_user)
 
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 def notify_cancel(prop_row):
   from .request_interactor import all_eligible_users
   prop = Proposal(prop_row)

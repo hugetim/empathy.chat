@@ -9,11 +9,33 @@ from . import parameters as p
 from . import portable as port
 from .relationship import Relationship
 from anvil_extras.server_utils import timed
+from functools import wraps 
 
 
 DEBUG = False #p.DEBUG_MODE
 TEST_TRUST_LEVEL = 10
 authenticated_callable = anvil.server.callable(require_user=True)
+
+
+def background_task_with_reporting(func):
+   return anvil.server.background_task(with_error_reporting(func))
+
+
+def with_error_reporting(func):
+  @wraps(func)
+  def out_function(*args, **kwargs):
+    try:
+      func(*args, **kwargs)
+    except Exception as err:
+      import traceback
+      app_info_dict = {'id': anvil.app.id,
+            'branch': anvil.app.branch,
+            'environment.name': anvil.app.environment.name,
+          }
+      context = anvil.server.context
+      report_error(traceback.format_exc(), app_info_dict, repr(context))
+      raise err
+  return out_function
 
 
 def now():
@@ -233,7 +255,7 @@ def _invite_guess_fail_prompt(s_invite):
              )
 
 
-@anvil.server.background_task
+@background_task_with_reporting
 def add_message_prompt(user2, user1):
   such_prompts = app_tables.prompts.search(user=user2, dismissed=False, spec={"name": "message", "from_id": user1.get_id()})
   if len(such_prompts) == 0:

@@ -14,6 +14,7 @@ from . import exchange_interactor as ei
 from . import notifies as n
 from .exceptions import InvalidRequestError
 from anvil_extras.logging import TimerLogger
+import time
 
 
 repo = request_gateway
@@ -184,14 +185,14 @@ class RequestManager:
     )  
 
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 def _notify_edit(user, requests, related_prev_requests):
-    new_all_eligible_users = _get_new_eligible_users(user, requests)
-    old_all_eligible_users = _get_old_eligible_users(related_prev_requests)
-    _notify_add(new_all_eligible_users - old_all_eligible_users, user, requests)
-    if requests.times_notify_info != related_prev_requests.times_notify_info:
-      _notify_edit(new_all_eligible_users & old_all_eligible_users, user, requests)
-    _notify_cancel(old_all_eligible_users - new_all_eligible_users, user)
+  new_all_eligible_users = _get_new_eligible_users(user, requests)
+  old_all_eligible_users = _get_old_eligible_users(related_prev_requests)
+  _notify_add(new_all_eligible_users - old_all_eligible_users, user, requests)
+  if requests.times_notify_info != related_prev_requests.times_notify_info:
+    _notify_edit(new_all_eligible_users & old_all_eligible_users, user, requests)
+  _notify_cancel(old_all_eligible_users - new_all_eligible_users, user)
 
 
 def _get_new_eligible_users(user, requests):
@@ -200,7 +201,7 @@ def _get_new_eligible_users(user, requests):
   except RuntimeError:
     sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
   sm.my_assert(user.get_id() == requests.user, "notify_edit: user is requester")
-  new_eligibility_spec = repo.RequestRecord(requests[0], requests[0].request_id).eligibility_spec
+  new_eligibility_spec = repo.eligibility_spec(requests[0])
   new_all_eligible_users = all_eligible_users(new_eligibility_spec)
   return new_all_eligible_users
 

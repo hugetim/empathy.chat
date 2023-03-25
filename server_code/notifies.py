@@ -83,14 +83,14 @@ def duration_start_str(request, user):
   return out
 
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 def pings(user_ids, start, duration):
   for user_id in user_ids:
     user = sm.get_other_user(user_id)
     ping(user, start, duration)
   
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 def ping(user, start, duration):
   """Notify pinged user (or proposer of fully accepted "later" request)"""
   print(f"'ping', {start}, {duration}")
@@ -117,7 +117,7 @@ def notify_match_cancel_bg(user, start, canceler_name=""):
   anvil.server.launch_background_task('notify_match_cancel', user, start, canceler_name)
 
 
-@anvil.server.background_task
+@sm.background_task_with_reporting
 def notify_match_cancel(user, start, canceler_name=""):
   """Notify cancelled-on user"""
   print(f"'notify_match_cancel', {start}, {canceler_name}")
