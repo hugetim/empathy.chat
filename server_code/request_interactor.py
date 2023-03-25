@@ -88,31 +88,42 @@ class RequestManager:
     _prune_request_records(other_request_records, self.now)
     exchange_prospect = self._exchange_prospect(other_request_records)
     if exchange_prospect:
-      # save matched request only*
-      # *cancel other or_group requests before saving (or just don't save them)
+      _process_exchange_requests(exchange_prospect)
       requests_matched = [r for r in exchange_prospect if r.user!=self.requests.user]
       _cancel_other_or_group_requests(requests_matched)
-      matched_request = next((r for r in exchange_prospect if r.user==self.requests.user))
-      self.requests = Requests([matched_request])
+      matching_request = next((r for r in exchange_prospect if r.user==self.requests.user))
+      self.requests = Requests([matching_request]) # save matching request only
       self._cancel_missing_or_group_requests()
       self._save_requests()
       self.exchange = Exchange.from_exchange_prospect(exchange_prospect)
-      exchange_record = exchange_repo.ExchangeRecord(self.exchange)
-      exchange_record.save()
-      self.exchange.exchange_id = exchange_record.record_id
-      if self.exchange.start_now and self.exchange.size > 2:
-        raise NotImplemented("Larger now requests check_and_save")
-      if self.exchange.start_now:
-        raise NotImplemented("check_and_save: need to also update status of other user(s)")
+      self._save_exchange(requests_matched)
       if self.exchange.start_now and (self.now - (self.exchange.start_dt)).total_seconds() <= p.BUFFER_SECONDS:
-        for u in exchange_record.users:
+        for u in self.exchange_record.users:
           u['status'] = "matched" #app_tables.users
       elif self.exchange.start_now:
-        # other "pinged"
         self.user['status'] = "pinging"
+        for u in self.exchange_record.users:
+          if u != self.user:
+            u['status'] = "pinged"
     else:
       self._cancel_missing_or_group_requests()
       self._save_requests()
+      if self.requests.start_now:
+        self.user['status'] = "requesting"
+
+  def _save_exchange(self, requests_matched):
+    #check whether adding to pre-existing exchange
+    request_records_matched = []
+    for r in requests_matched:
+      rr = repo.RequestRecord(r, r.request_id)
+      rr.save()
+      request_records_matched.append(rr)
+    existing_exchange_record = exchange_repo.exchange_record_with_any_request_records(request_records_matched)
+    if existing_exchange_record:
+      self.exchange.exchange_id = existing_exchange_record.record_id
+    self.exchange_record = exchange_repo.ExchangeRecord(self.exchange, self.exchange.exchange_id)
+    self.exchange_record.save()
+    self.exchange.exchange_id = self.exchange_record.record_id # for the new record case
 
   @property
   def requests_ids(self):
@@ -162,8 +173,6 @@ class RequestManager:
       self.request_records.append(request_record)
       request_record.save()
       request.request_id = request_record.record_id
-      if request.start_now:
-        raise NotImplementedError("save now request")
 
   def notify_edit(self):
     new_all_eligible_users = self._get_new_eligible_users()
@@ -196,6 +205,16 @@ class RequestManager:
       return all_eligible_users(old_eligibility_spec)
 
 
+def _process_exchange_requests(exchange_prospect):
+  is_full = exchange_prospect.is_full
+  for request in exchange_prospect:
+    if is_full:
+      request.current = False
+    else:
+      other_ep_users = set(exchange_prospect.users) - set(request.user)
+      request.with_users.update(other_ep_users)
+
+
 def _cancel_other_or_group_requests(requests_matched):
   request_ids = [r.request_id for r in requests_matched]
   or_group_ids = [r.or_group_id for r in requests_matched]
@@ -221,7 +240,7 @@ def _notify_cancel(users, requester):
 
 def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
-    if rr.entity.expired(now):
+    if rr.entity.is_expired(now):
       rr.cancel()
 
 

@@ -73,7 +73,7 @@ class Request:
   def end_dt(self):
     return self.start_dt + timedelta(minutes=self.exchange_format.duration)
 
-  def expired(self, now):
+  def is_expired(self, now):
     return self.expire_dt < now
   
   def has_conflict(self, non_or_requests):
@@ -119,35 +119,32 @@ class Requests:
   def times_notify_info(self):
     return {(r.start_now, r.start_dt, r.exchange_format.duration) for r in self.requests}
 
-  @property
-  def user(self):
+  def _attribute(self, attr_name):
     if not self.requests:
       return None
-    user0 = self.requests[0].user
+    attr0 = get_attr(self.requests[0], attr_name)
     for r in self.requests[1:]:
-      if r.user != user0:
-        raise RuntimeError("Requests have differing user_id's")
-    return user0
+      if get_attr(r, attr_name) != attr0:
+        raise RuntimeError("Requests have differing {attr_name}'s")
+    return attr0
+  
+  @property
+  def user(self):
+    return self._attribute('user')
   
   @property
   def or_group_id(self):
-    if not self.requests:
-      return None
-    or_group_id0 = self.requests[0].or_group_id
-    for r in self.requests[1:]:
-      if r.or_group_id != or_group_id0:
-        raise RuntimeError("Requests have differing or_group_id's")
-    return or_group_id0
+    return self._attribute('or_group_id')
+
+  @property
+  def start_now(self):
+    out = self._attribute('start_now')
+    h.my_assert(not (out and len(self)>1), "multiple start_now requests?")
+    return out
 
   @property
   def elig_with_dict(self):
-    if not self.requests:
-      return None
-    elig_with_dict0 = self.requests[0].elig_with_dict
-    for r in self.requests[1:]:
-      if r.elig_with_dict != elig_with_dict0:
-        raise RuntimeError("Requests have differing elig_with_dict's")
-    return elig_with_dict0
+    return self._attribute('elig_with_dict')
 
 
 @anvil.server.portable_class 

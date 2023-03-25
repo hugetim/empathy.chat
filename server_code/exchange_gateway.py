@@ -108,6 +108,15 @@ def exchanges_by_user(user, records=False):
     yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
 
 
+def exchange_record_with_any_request_records(request_records):
+  request_rows = [rr._row for rr in request_records]
+  participant_rows_with = app_tables.participants.search(request=q.any_of(*request_rows))
+  if len(participant_rows_with) > 0:
+    return ExchangeRecord.from_row(app_tables.exchanges.get(participants=list(participant_rows_with)))
+  else:
+    return None
+
+
 class ExchangeRecord(sm.SimpleRecord):
   _table_name = 'exchanges'
 
