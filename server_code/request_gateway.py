@@ -80,12 +80,13 @@ class RequestRecord(sm.SimpleRecord):
     return _request_to_fields(entity)
 
   def cancel(self):
-    self._row['current'] = False
+    if self._row_id:
+      self._row['current'] = False
     self.entity.current = False
   
   @property
   def user(self):
-    if self._row:
+    if self._row_id:
       return self._row['user']
     else:
       return sm.get_other_user(self.entity.user)
@@ -96,7 +97,7 @@ class RequestRecord(sm.SimpleRecord):
     spec['user'] = self.user
     spec['eligible'] = self.entity.eligible
     spec['eligible_starred'] = self.entity.eligible_starred
-    if self._row:
+    if self._row_id:
       spec['eligible_users'] = self._row['eligible_users']
       spec['eligible_groups'] = self._row['eligible_groups']
     else:
@@ -104,6 +105,17 @@ class RequestRecord(sm.SimpleRecord):
       spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
                                  for port_group in self.entity.eligible_groups]
     return spec
+
+
+def eligibility_spec(request):
+  spec = {}
+  spec['user'] = sm.get_other_user(request.user)
+  spec['eligible'] = request.eligible
+  spec['eligible_starred'] = request.eligible_starred
+  spec['eligible_users'] = [sm.get_other_user(user_id) for user_id in request.eligible_users]
+  spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
+                             for port_group in request.eligible_groups]
+  return spec
 
 
 def get_exchange_format_row(exchange_format):

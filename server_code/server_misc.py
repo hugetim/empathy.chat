@@ -298,16 +298,18 @@ class SimpleRecord(Record):
     return getattr(app_tables, self._table_name)
   
   def __init__(self, entity, record_id=None, row=None):
+    self.entity = entity
+    self._row_id = record_id
+    if record_id is None and row:
+      record_id = row.get_id()
+    self.__row = row
     try:
-      _record_id = getattr(self, self.__class__.__name__.lower()[:-6] + "_id")
+      _record_id = getattr(entity, self.__class__.__name__.lower()[:-6] + "_id")
     except AttributeError:
       pass
     else:
-      if _record_id and not record_id:
+      if _record_id and not self._row_id:
         my_assert(not (_record_id and not record_id), "entity row id present but record_id not supplied")
-    self.entity = entity
-    self._row_id = record_id
-    self.__row = row
 
   @property
   def _row(self):

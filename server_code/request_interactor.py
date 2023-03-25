@@ -13,6 +13,7 @@ from . import server_misc as sm
 from . import exchange_interactor as ei
 from . import notifies as n
 from .exceptions import InvalidRequestError
+from anvil_extras.logging import TimerLogger
 
 
 repo = request_gateway
@@ -175,34 +176,46 @@ class RequestManager:
       request.request_id = request_record.record_id
 
   def notify_edit(self):
-    new_all_eligible_users = self._get_new_eligible_users()
-    old_all_eligible_users = self._get_old_eligible_users()
-    _notify_add(new_all_eligible_users - old_all_eligible_users, self.user, self.requests)
-    if self.requests.times_notify_info != self.related_prev_requests.times_notify_info:
-      _notify_edit(new_all_eligible_users & old_all_eligible_users, self.user, self.requests)
-    _notify_cancel(old_all_eligible_users - new_all_eligible_users, self.user)
+    anvil.server.launch_background_task(
+      '_notify_edit',
+      user=self.user,
+      requests=self.requests,
+      related_prev_requests=self.related_prev_requests,
+    )  
 
-  def _get_new_eligible_users(self):
+
+@anvil.server.background_task
+def _notify_edit(user, requests, related_prev_requests):
+    new_all_eligible_users = _get_new_eligible_users(user, requests)
+    old_all_eligible_users = _get_old_eligible_users(related_prev_requests)
+    _notify_add(new_all_eligible_users - old_all_eligible_users, user, requests)
+    if requests.times_notify_info != related_prev_requests.times_notify_info:
+      _notify_edit(new_all_eligible_users & old_all_eligible_users, user, requests)
+    _notify_cancel(old_all_eligible_users - new_all_eligible_users, user)
+
+
+def _get_new_eligible_users(user, requests):
+  try:
+    (requests.user, requests.or_group_id, requests.elig_with_dict)
+  except RuntimeError:
+    sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
+  sm.my_assert(user.get_id() == requests.user, "notify_edit: user is requester")
+  new_eligibility_spec = repo.RequestRecord(requests[0], requests[0].request_id).eligibility_spec
+  new_all_eligible_users = all_eligible_users(new_eligibility_spec)
+  return new_all_eligible_users
+
+
+def _get_old_eligible_users(related_prev_requests):
+  if not related_prev_requests:
+    return set()
+  else:
     try:
-      (self.requests.user, self.requests.or_group_id, self.requests.elig_with_dict)
+      related_prev_requests.elig_with_dict # checks all equal
     except RuntimeError:
-      sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
-    sm.my_assert(self.user == self.request_records[0].user, "notify_edit: user is requester")
-    new_eligibility_spec = self.request_records[0].eligibility_spec
-    new_all_eligible_users = all_eligible_users(new_eligibility_spec)
-    return new_all_eligible_users
-
-  def _get_old_eligible_users(self):
-    if not self.related_prev_requests:
-      return set()
-    else:
-      try:
-        self.related_prev_requests.elig_with_dict # checks all equal
-      except RuntimeError:
-        sm.warning("notify_edit old requests no common elig_with_dict")
-      old_r0 = self.related_prev_requests[0]
-      old_eligibility_spec = repo.RequestRecord(old_r0, old_r0.request_id).eligibility_spec
-      return all_eligible_users(old_eligibility_spec)
+      sm.warning("notify_edit old requests no common elig_with_dict")
+    old_r0 = related_prev_requests[0]
+    old_eligibility_spec = repo.eligibility_spec(old_r0)
+    return all_eligible_users(old_eligibility_spec)
 
 
 def _process_exchange_requests(exchange_prospect):

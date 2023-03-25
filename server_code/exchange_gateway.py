@@ -149,7 +149,7 @@ class ExchangeRecord(sm.SimpleRecord):
 
   @property
   def users(self):
-    if self._row:
+    if self._row_id:
       return self._row['users']
     else:
       return [sm.get_other_user(p['user_id']) for p in self.entity.participants]
