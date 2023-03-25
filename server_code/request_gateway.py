@@ -41,7 +41,7 @@ def _row_to_request(row):
 def _request_to_fields(request):
   exchange_format = get_exchange_format_row(request.exchange_format)
   out = dict(exchange_format=exchange_format)
-  out['user'] = app_tables.users.get_by_id(request.user)
+  out['user'] = sm.get_other_user(request.user)
   out['with_users'] = [sm.get_other_user(user_id)
                        for user_id in request.with_users]
   out['eligible_users'] = [sm.get_other_user(user_id)

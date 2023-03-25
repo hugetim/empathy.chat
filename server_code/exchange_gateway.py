@@ -88,7 +88,7 @@ def create_exchange(exchange, proptime):
 
 def add_chat(message, now, exchange):
   match_row = _match_row(exchange)
-  user = app_tables.users.get_by_id(exchange.my['user_id'])
+  user = sm.get_other_user(exchange.my['user_id'])
   app_tables.chat.add_row(match=match_row,
                           user=user,
                           message=message,
@@ -138,6 +138,13 @@ class ExchangeRecord(sm.SimpleRecord):
       self._update()
     self._update_participants()
 
+  @property
+  def users(self):
+    if self._row:
+      return self._row['users']
+    else:
+      return [sm.get_other_user(p['user_id']) for p in self.entity.participants]
+
 
 def _row_to_exchange(row):
   exchange_format = ExchangeFormat(duration=row['exchange_format']['duration'])
@@ -160,7 +167,7 @@ def _exchange_to_fields(exchange):
   # participants handled separately
   exchange_format = get_exchange_format_row(exchange.exchange_format)
   out = dict(exchange_format=exchange_format)
-  out['users'] = [app_tables.users.get_by_id(p['user_id']) for p in exchange.participants]
+  out['users'] = [sm.get_other_user(p['user_id']) for p in exchange.participants]
   simple_keys = [
     'room_code',
     'start_dt',
@@ -212,7 +219,7 @@ def _participant_to_fields(participant):
   fields = participant.copy()
   fields.pop('appearances', []) # appearances handled separately
   fields.pop('participant_id', None)
-  fields['user'] = app_tables.users.get_by_id(fields.pop('user_id'))
+  fields['user'] = sm.get_other_user(fields.pop('user_id'))
   fields['request'] = app_tables.requests.get_by_id(fields.pop('request_id'))
   sm.my_assert(fields['request'] is not None, "Can't save exchange/participant for an unsaved request.")
   return fields

@@ -1,5 +1,4 @@
 import anvil.secrets
-from anvil.tables import app_tables
 from .server_misc import authenticated_callable
 from . import server_misc as sm
 from . import network_interactor as ni
@@ -26,7 +25,7 @@ def upcoming_match_dicts(user):
 def _match_dict(user, exchange):
   other_user_ids = [p['user_id'] for p in exchange.participants
                     if p['user_id'] != user.get_id()]
-  port_users = [port.User(user_id=user_id, name=app_tables.users.get_by_id(user_id)['first_name']) 
+  port_users = [port.User(user_id=user_id, name=sm.get_other_user(user_id)['first_name']) 
                 for user_id in other_user_ids]
   return {'port_users': port_users,
           'start_date': exchange.start_dt,

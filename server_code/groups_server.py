@@ -76,7 +76,7 @@ def add_my_group(port_my_groups, user_id=""):
 class MyGroup(groups.MyGroup): 
   def __init__(self, port_my_group):
     self.update(port_my_group)
-    self.members = [app_tables.users.get_by_id(member_dict['member_id']) for member_dict in port_my_group.members]
+    self.members = [sm.get_other_user(member_dict['member_id']) for member_dict in port_my_group.members]
     self.invites = [Invite(port_invite) for port_invite in port_my_group.invites]
 
   def portable(self):

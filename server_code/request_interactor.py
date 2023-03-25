@@ -105,8 +105,10 @@ class RequestManager:
       if self.exchange.start_now:
         raise NotImplemented("check_and_save: need to also update status of other user(s)")
       if self.exchange.start_now and (self.now - (self.exchange.start_dt)).total_seconds() <= p.BUFFER_SECONDS:
-        self.user['status'] = "matched"
+        for u in exchange_record.users:
+          u['status'] = "matched" #app_tables.users
       elif self.exchange.start_now:
+        # other "pinged"
         self.user['status'] = "pinging"
     else:
       self._cancel_missing_or_group_requests()

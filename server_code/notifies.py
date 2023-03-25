@@ -86,7 +86,7 @@ def duration_start_str(request, user):
 @anvil.server.background_task
 def pings(user_ids, start, duration):
   for user_id in user_ids:
-    user = app_tables.users.get_by_id(user_id)
+    user = sm.get_other_user(user_id)
     ping(user, start, duration)
   
 
