@@ -130,10 +130,10 @@ def get_exchange_format_row(exchange_format):
   return row
 
 
-def requests_by_user(user):
+def requests_by_user(user, records=False):
   request_rows = app_tables.requests.search(user=user, current=True)
   for request_row in request_rows:
-    yield _row_to_request(request_row)
+    yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
 def current_requests(records=False):

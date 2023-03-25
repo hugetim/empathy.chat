@@ -30,7 +30,7 @@ def accept_pair_request(user, request_id):
   accept_request = Request.to_accept_pair_request(accepted_request_record.entity)
   port_prop = requests_to_props([accept_request])
   add_request(user, port_prop)
-  
+
 
 def add_request(user, port_prop, link_key=""):
   """Return prop_id (None if cancelled or matching with another proposal)
@@ -48,7 +48,7 @@ def edit_request(user, port_prop):
   Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
   """
   accounts.update_default_request(port_prop, user)
-  requests = Requests(prop_to_requests(port_prop))
+  requests = Requests(prop_to_requests(port_prop, user_id=user.get_id()))
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager(user, requests)
   request_editor.check_and_save()
@@ -264,7 +264,18 @@ def _prune_request_records(other_request_records, now):
       rr.cancel()
 
 
-def _cancel_request(user, proptime_id):
+def cancel_now(user, request_id=None):
+  status = user['status']
+  if request_id:
+    request_record = repo.RequestRecord.from_id(request_id)
+  else:
+    request_record = now_request(user, record=True)
+  request_record.cancel()
+  if status == 'requesting':
+    _notify_cancel(all_eligible_users(request_record.eligibility_spec), user)
+
+
+def cancel_request(user, proptime_id):
   rr = repo.RequestRecord.from_id(proptime_id)
   other_or_group_requests = _other_or_group_requests(user, rr)
   if other_or_group_requests:
@@ -370,16 +381,20 @@ def requests_to_props(requests, user):
 
 
 def get_visible_requests_as_port_view_items(user):
-  requests = current_visible_requests(user)
-  port_proposals = requests_to_props(requests, user)
+  current_rrs = list(repo.current_requests(records=True))
+  user_requests = [rr.entity for rr in current_rrs if rr.user == user]
+  others_request_records = [rr for rr in current_rrs if rr.user != user]
+  requests = list(current_visible_requests(user, others_request_records)) + user_requests
+  port_proposals = list(requests_to_props(requests, user))
+  print(len(port_proposals))
   return port.Proposal.create_view_items(port_proposals)
 
 
-def now_request(user):
-  current_requests = repo.requests_by_user(user)
-  for r in current_requests:
-    if r.start_now:
-      return r
+def now_request(user, record=False):
+  current_request_records = repo.requests_by_user(user, records=True)
+  for rr in current_request_records:
+    if rr.entity.start_now:
+      return rr if record else r
 
 
 def ping_dt(exchange):

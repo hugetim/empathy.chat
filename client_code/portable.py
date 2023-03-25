@@ -186,7 +186,7 @@ class ProposalTime():
       self.expire_date = (self.start_date 
                           - datetime.timedelta(minutes=cancel_buffer))
     self.accept_date = accept_date
-    self.users_accepting = users_accepting
+    self.users_accepting = users_accepting if users_accepting else []
     self.jitsi_code = jitsi_code
 
   def __serialize__(self, global_data):

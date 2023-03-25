@@ -10,7 +10,7 @@ from . import exchange_interactor as ei
 from . import request_interactor as ri
 from .server_misc import authenticated_callable
 from . import portable as port
-from .proposals import Proposal, ProposalTime
+# from .proposals import Proposal, ProposalTime
 from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
 
@@ -462,38 +462,38 @@ def cancel_time(proptime_id, user_id=""):
   """Remove proptime"""
   print(f"cancel_time, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  _cancel_request(user, proptime_id)
+  ri.cancel_request(user, proptime_id)
   propagate_update_needed(user)
   return _get_state(user)
 
 
-def _cancel_request(user, proptime_id):
-  proptime = ProposalTime.get_by_id(proptime_id)
-  port_prop = proptime.proposal.portable(user)
-  if len(port_prop.times) > 1:
-    [port_time_to_cancel] = [port_time for port_time in port_prop.times if port_time.time_id == proptime_id]
-    port_prop.times.remove(port_time_to_cancel)
-    prop_id = _edit_proposal(user, port_prop) # can ignore prop_id because not port_prop.start_now
-  else:
-    proptime.notify_cancel()
-    _cancel_in_transaction(user, proptime_id)
+# def _cancel_request(user, proptime_id):
+#   proptime = ProposalTime.get_by_id(proptime_id)
+#   port_prop = proptime.proposal.portable(user)
+#   if len(port_prop.times) > 1:
+#     [port_time_to_cancel] = [port_time for port_time in port_prop.times if port_time.time_id == proptime_id]
+#     port_prop.times.remove(port_time_to_cancel)
+#     prop_id = _edit_proposal(user, port_prop) # can ignore prop_id because not port_prop.start_now
+#   else:
+#     proptime.notify_cancel()
+#     _cancel_in_transaction(user, proptime_id)
 
 
-def _cancel(user, proptime_id=None):
-  if sm.DEBUG:
-    print(f"_cancel, {proptime_id}")
-  if proptime_id:
-    proptime = ProposalTime.get_by_id(proptime_id)
-  else:
-    proptime = ProposalTime.get_now(user)
-  if proptime:
-    proptime.cancel_this(user)
+# def _cancel(user, proptime_id=None):
+#   if sm.DEBUG:
+#     print(f"_cancel, {proptime_id}")
+#   if proptime_id:
+#     proptime = ProposalTime.get_by_id(proptime_id)
+#   else:
+#     proptime = ProposalTime.get_now(user)
+#   if proptime:
+#     proptime.cancel_this(user)
 
 
-@anvil.tables.in_transaction
-@timed
-def _cancel_in_transaction(user, proptime_id=None):
-  return _cancel(user, proptime_id)
+# @anvil.tables.in_transaction
+# @timed
+# def _cancel_in_transaction(user, proptime_id=None):
+#   return _cancel(user, proptime_id)
 
 
 @authenticated_callable
@@ -501,7 +501,8 @@ def cancel_accept(proptime_id=None, user_id=""):
   """Remove user accepting"""
   print(f"cancel_accept, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  _cancel_in_transaction(user, proptime_id)
+  # _cancel_in_transaction(user, proptime_id)
+  ri.cancel_now(user)
   propagate_update_needed(user)
   return _get_state(user)
 
@@ -511,11 +512,12 @@ def cancel_now(proptime_id=None, user_id=""):
   """Remove proptime and cancel pending match (if applicable)"""
   print(f"cancel_now, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  if proptime_id:
-    proptime = ProposalTime.get_by_id(proptime_id)
-    if proptime:
-      proptime.notify_cancel()
-  _cancel_in_transaction(user, proptime_id)
+  ri.cancel_now(user, proptime_id)
+  # if proptime_id:
+  #   proptime = ProposalTime.get_by_id(proptime_id)
+  #   if proptime:
+  #     proptime.notify_cancel()
+  # _cancel_in_transaction(user, proptime_id)
   propagate_update_needed()
   return _get_state(user)
 
@@ -557,48 +559,48 @@ def match_commence(proptime_id=None, user_id=""):
   """
   print(f"match_commence, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  _match_commence(user, proptime_id)
+  ei.commence_user_exchange(user)
   propagate_update_needed(user)
   return _get_state(user)
 
 
-@timed
-def _match_commence(user, proptime_id=None):
-  if sm.DEBUG:
-    print("_match_commence")
-  if proptime_id:
-    print("proptime_id")
-    proptime = ProposalTime.get_by_id(proptime_id)
-  else:
-    proptime = ProposalTime.get_now(user)
-  if proptime and proptime['fully_accepted']:
-    ping_needed = _commit_proptime_to_match_in_transaction(proptime, user, present=True)
-    sm.my_assert((not ping_needed), "ping_needed when responding to ping?")
-    # if ping_needed:
-    #   proptime.ping()
+# @timed
+# def _match_commence(user, proptime_id=None):
+#   if sm.DEBUG:
+#     print("_match_commence")
+#   if proptime_id:
+#     print("proptime_id")
+#     proptime = ProposalTime.get_by_id(proptime_id)
+#   else:
+#     proptime = ProposalTime.get_now(user)
+#   if proptime and proptime['fully_accepted']:
+#     ping_needed = _commit_proptime_to_match_in_transaction(proptime, user, present=True)
+#     sm.my_assert((not ping_needed), "ping_needed when responding to ping?")
+#     # if ping_needed:
+#     #   proptime.ping()
 
 
-def _match_commence_wo_transaction(user):
-  """Return proptime_to_ping (if applicable)"""
-  current_proptime = ProposalTime.get_now(user)
-  if current_proptime and current_proptime['fully_accepted']:
-    ping_needed = commit_proptime_to_match(current_proptime, user, present=True)
-    if ping_needed:
-      return current_proptime
+# def _match_commence_wo_transaction(user):
+#   """Return proptime_to_ping (if applicable)"""
+#   current_proptime = ProposalTime.get_now(user)
+#   if current_proptime and current_proptime['fully_accepted']:
+#     ping_needed = commit_proptime_to_match(current_proptime, user, present=True)
+#     if ping_needed:
+#       return current_proptime
 
 
-@anvil.tables.in_transaction
-def _commit_proptime_to_match_in_transaction(proptime, user, present):
-  return commit_proptime_to_match(proptime, user, present)
+# @anvil.tables.in_transaction
+# def _commit_proptime_to_match_in_transaction(proptime, user, present):
+#   return commit_proptime_to_match(proptime, user, present)
 
 
-def commit_proptime_to_match(proptime, user, present=False):
-  """Return True if "ping" needed (which includes notification of accepted "later" request)
+# def commit_proptime_to_match(proptime, user, present=False):
+#   """Return True if "ping" needed (which includes notification of accepted "later" request)
   
-  Side effects: cancel proposal and create new match row"""
-  from . import exchange_interactor as ei
-  print("commit_proptime_to_match")
-  ei.create_new_match_from_proptime(proptime, user, present)
-  proposal = proptime.proposal
-  proposal.cancel_all_times()
-  return (not proptime['start_now'])
+#   Side effects: cancel proposal and create new match row"""
+#   from . import exchange_interactor as ei
+#   print("commit_proptime_to_match")
+#   ei.create_new_match_from_proptime(proptime, user, present)
+#   proposal = proptime.proposal
+#   proposal.cancel_all_times()
+#   return (not proptime['start_now'])

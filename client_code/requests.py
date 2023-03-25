@@ -317,7 +317,7 @@ def _selected_exchange(has_enough_exchanges):
   return min(largest_eps, key=lambda x: x.create_dt)
 
 
-def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, current=True):
+def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, current=True, user_id=None):
   now = h.now()
   or_group_id = port_prop.prop_id if port_prop.prop_id else str(uuid.uuid4())
   for i, port_time in enumerate(port_prop.times):
@@ -328,7 +328,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
       expire_dt = now + timedelta(seconds=p.WAIT_SECONDS)
     yield Request(request_id=port_time.time_id,
                   or_group_id=or_group_id,                  
-                  user=port_prop.user.user_id,
+                  user=port_prop.user.user_id if port_prop.user else user_id,
                   start_dt=start_dt,
                   expire_dt=expire_dt,
                   exchange_format=ExchangeFormat(port_time.duration),
