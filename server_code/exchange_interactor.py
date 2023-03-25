@@ -33,6 +33,52 @@ def _match_dict(user, exchange):
           'match_id': exchange.exchange_id,
          }
 
+
+def current_user_exchange(user, to_join=False, record=False):
+  """Return earliest if multiple current"""
+  import datetime
+  out = None
+  now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
+  exchange_records = list(repo.exchanges_by_user_starting_prior_to(user, now_plus, records=True))
+  user_id = user.get_id()
+  for er in sorted(er, key=lambda er: er.entity.start_dt):
+    er.entity.set_my(user_id)
+    if (to_join or er.entity.my('entered_dt')) and not er.entity.my('complete'):
+      out = er if record else er.entity
+      break
+  return out
+
+
+def commence_user_exchange(user):
+  exchange_record = current_user_exchange(user, to_join=True, record=True)
+  exchange_record.commence()
+
+
+@sm.background_task_with_reporting
+def prune_old_exchanges():
+  """Switch to current=False old commenced exchanges for all users"""
+  import datetime
+  assume_complete = datetime.timedelta(hours=p.ASSUME_COMPLETE_HOURS)
+  now = sm.now()
+  cutoff_dt = now - assume_complete
+  old_exchange_records = repo.exchanges_starting_prior_to(cutoff_dt, records=True)
+  for er in old_exchange_records:
+    er.end()
+
+
+def prune_no_show_exchanges():
+  """Complete no-show exchanges for all users"""
+  if sm.DEBUG:
+    print("_prune_no_show_exchanges")
+  import datetime
+  now = sm.now()
+  exchange_records = repo.exchanges_starting_prior_to(now, records=True)
+  for er in exchange_records:
+    if not er.entity.any_entered:
+      duration = datetime.timedelta(minutes=self.entity.exchange_format.duration)
+      if now > er.entity.start_dt + duration:
+        er.end()
+
   
 @authenticated_callable
 def init_match_form(user_id=""):

@@ -16,6 +16,10 @@ class Exchange:
     self.start_now = start_now
     self.start_dt = start_dt
     self.exchange_format = exchange_format
+    self.set_my(user_id, my_i)
+    self.current = current
+
+  def set_my_i(self, user_id=None, my_i=None):
     if my_i:
       self._my_i = my_i
       self._their_i = self.participants.index(self._their())
@@ -23,8 +27,7 @@ class Exchange:
       [participant] = [p for p in self.participants if p['user_id'] == user_id]
       self._my_i = self.participants.index(participant)
       self._their_i = self.participants.index(self._their())
-    self.current = current
-
+  
   @staticmethod
   def from_exchange_prospect(ep: ExchangeProspect):
     start_now = ep.start_now
@@ -42,6 +45,14 @@ class Exchange:
   def size(self):
     return len(self.participants)
 
+  @property
+  def any_entered(self):
+    return bool([p for p in self.participants if p.get('entered_dt')])
+
+  @property
+  def request_ids(self):
+    return [p['request_id'] for p in self.participants]
+  
   @property
   def user_ids(self):
     return [p['user_id'] for p in self.participants]

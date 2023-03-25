@@ -6,6 +6,8 @@ from . import parameters as p
 from . import notifies as n
 from . import accounts
 from . import server_misc as sm
+from . import exchange_interactor as ei
+from . import request_interactor as ri
 from .server_misc import authenticated_callable
 from . import portable as port
 from .proposals import Proposal, ProposalTime
@@ -38,40 +40,42 @@ def _seconds_left(status, expire_date=None, ping_start=None):
 @sm.background_task_with_reporting
 def prune_old_matches():
   """Complete old commenced matches for all users"""
-  import datetime
-  assume_complete = datetime.timedelta(hours=p.ASSUME_COMPLETE_HOURS)
-  now = sm.now()
-  cutoff_m = now - assume_complete
-  # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-  old_matches = app_tables.matches.search(complete=[0],
-                                          match_commence=q.less_than(cutoff_m),
-                                         )
-  for row in old_matches:
-    _mark_matches_row_complete(row)
+  ei.prune_old_exchanges()
+  # import datetime
+  # assume_complete = datetime.timedelta(hours=p.ASSUME_COMPLETE_HOURS)
+  # now = sm.now()
+  # cutoff_m = now - assume_complete
+  # # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
+  # old_matches = app_tables.matches.search(complete=[0],
+  #                                         match_commence=q.less_than(cutoff_m),
+  #                                        )
+  # for row in old_matches:
+  #   _mark_matches_row_complete(row)
     
     
 def _prune_newer_matches():
   """Complete no-show matches for all users"""
-  if sm.DEBUG:
-    print("_prune_newer_matches")
-  import datetime
-  now = sm.now()
-  newer_matches = app_tables.matches.search(complete=[0],
-                                            match_commence=q.less_than(now),
-                                            present=q.not_([1]),
-                                           )
-  for row in newer_matches:
-    duration = datetime.timedelta(minutes=row['proposal_time']['duration'])
-    if now > row['match_commence'] + duration:
-      _mark_matches_row_complete(row)
+  ei.prune_no_show_exchanges()
+  # if sm.DEBUG:
+  #   print("_prune_newer_matches")
+  # import datetime
+  # now = sm.now()
+  # newer_matches = app_tables.matches.search(complete=[0],
+  #                                           match_commence=q.less_than(now),
+  #                                           present=q.not_([1]),
+  #                                          )
+  # for row in newer_matches:
+  #   duration = datetime.timedelta(minutes=row['proposal_time']['duration'])
+  #   if now > row['match_commence'] + duration:
+  #     _mark_matches_row_complete(row)
 
 
-def _mark_matches_row_complete(row):
-  temp = row['complete']
-  for i in range(len(temp)):
-    # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
-    temp[i] = 1
-  row['complete'] = temp
+# def _mark_matches_row_complete(row):
+#   temp = row['complete']
+#   for i in range(len(temp)):
+#     # Note: 1 used for 'complete' field b/c True not allowed in SimpleObjects
+#     temp[i] = 1
+#   row['complete'] = temp
     
 
 @authenticated_callable
@@ -101,8 +105,8 @@ def _init_bg(time_zone, user):
 
 
 def _init_matcher(user, trust_level):
-  partial_state_if_unchanged = _init_user_status(user)
-  state = _get_state(user, partial_state_if_unchanged)
+  _init_user_status(user)
+  state = _get_state(user)
   return {'trust_level': trust_level,
           'test_mode': trust_level >= sm.TEST_TRUST_LEVEL,
           'name': user['first_name'],
@@ -122,36 +126,33 @@ def _init_user_status(user):
   with TimerLogger("  _init_user_status", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
     _prune_all_expired_items()
     timer.check("_prune_all_expired_items")
-    partial_state = get_partial_state(user)
-    timer.check("get_partial_state")
-    if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
-      _cancel_other(user)
-    elif partial_state['status'] in ['pinged', 'requesting'] and partial_state['seconds_left'] <= 0:
-      _cancel(user)
-    elif partial_state['status'] == 'pinged':
-      proptime_to_ping = _match_commence_wo_transaction(user)
-      confirm_wait_helper(user)
-      sm.my_assert((not proptime_to_ping), "ping_needed when responding to ping?")
-    elif partial_state['status'] in ['requesting', 'pinging']:
-      confirm_wait_helper(user)
-    else:
-      return partial_state
-    return None
+    status = user['status']
+    # if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
+    #   _cancel_other(user)
+    if status in ["requesting", "pinging", "pinged"]:
+      request_record = ri.now_request(user, record=True)
+      expire_dt = request_record.entity.expire_dt
+      if _seconds_left("requesting", expire_date=expire_dt) <= 0:
+        request_record.cancel()
+      elif status == "pinged":
+        ei.commence_user_exchange(user)
+      else:
+        ri.confirm_wait(request_record)
 
  
-def confirm_wait_helper(user):
-  """updates expire_date for current request"""
-  if sm.DEBUG:
-    print("confirm_wait_helper")
-  current_proptime = ProposalTime.get_now_proposing(user)
-  if current_proptime:
-    current_proptime.confirm_wait()
+# def confirm_wait_helper(user):
+#   """updates expire_date for current request"""
+#   if sm.DEBUG:
+#     print("confirm_wait_helper")
+#   current_proptime = ProposalTime.get_now_proposing(user)
+#   if current_proptime:
+#     current_proptime.confirm_wait()
 
 
 @anvil.tables.in_transaction(relaxed=True)
 def _get_proposals_upcomings(user):
   print("                      _get_proposals_upcomings")
-  proposals = Proposal.get_port_view_items(user)
+  proposals = ri.get_visible_requests_as_port_view_items(user)
   upcomings = _get_upcomings(user)
   return proposals, upcomings
 
@@ -199,60 +200,66 @@ def get_partial_state(user):
   ping_start: accept_date or, for "matched", match_commence
   assumes 2-person matches only
   """
-  expire_date = None
-  ping_start = None
-  current_proptime = ProposalTime.get_now_proposing(user)
-  if current_proptime:
-    expire_date = current_proptime['expire_date']
-    if current_proptime['fully_accepted']:
-      status = "pinged"
-      ping_start = current_proptime.ping_start
-    else:
-      status = "requesting"
-  else:
-    current_accept_time = ProposalTime.get_now_accepting(user)
-    if current_accept_time:
-      status = "pinging"
-      ping_start = current_accept_time.ping_start
-      expire_date = current_accept_time['expire_date']
-    else:
-      from .exchange_gateway import ExchangeRepository
-      from .exceptions import RowMissingError
-      try:
-        this_exchange = ExchangeRepository().get_user_exchange(user)
-        status = "matched"
-        ping_start = this_exchange.start_dt
-      except RowMissingError:
-        status = None
+  # expire_dt = None
+  # ping_start_dt = None
+  # current_proptime = ProposalTime.get_now_proposing(user)
+  # if current_proptime:
+  #   expire_date = current_proptime['expire_date']
+  #   if current_proptime['fully_accepted']:
+  #     status = "pinged"
+  #     ping_start = current_proptime.ping_start
+  #   else:
+  #     status = "requesting"
+  # else:
+  #   current_accept_time = ProposalTime.get_now_accepting(user)
+  #   if current_accept_time:
+  #     status = "pinging"
+  #     ping_start = current_accept_time.ping_start
+  #     expire_date = current_accept_time['expire_date']
+  #   else:
+  #     from .exchange_gateway import ExchangeRepository
+  #     from .exceptions import RowMissingError
+  #     try:
+  #       this_exchange = ExchangeRepository().get_user_exchange(user)
+  #       status = "matched"
+  #       ping_start = this_exchange.start_dt
+  #     except RowMissingError:
+  #       status = None
+  status = user['status']
+  # if status == "requesting":
+  #   expire_dt = ri.now_request(user).expire_dt
+  # elif status in ["pinged"]: #, "pinging"
+  #   ping_start_dt = ri.ping_dt(ei.current_user_exchange(user, to_join=True))
   return {'status': status, 
-          'seconds_left': _seconds_left(status, expire_date, ping_start), 
+          #'seconds_left': _seconds_left(status, expire_dt, ping_start_dt), 
          }
 
 
 def _get_upcomings(user):
   """Return list of user's upcoming matches"""
-  match_dicts = []
-  now = sm.now()
-  # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-  my_incomplete_matches = app_tables.matches.search(users=[user], complete=[0])
-  for match in my_incomplete_matches:
-    my_index = match['users'].index(user)
-    if match['complete'][my_index] == 0:
-      import datetime
-      duration = datetime.timedelta(minutes=match['proposal_time']['duration'])
-      if now < match['match_commence'] + duration:
-        match_dicts.append(_match_dict(match, user))
-  return match_dicts
+  return ei.upcoming_match_dicts(user)
+  # match_dicts = []
+  # now = sm.now()
+  # # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
+  # my_incomplete_matches = app_tables.matches.search(users=[user], complete=[0])
+  # for match in my_incomplete_matches:
+  #   my_index = match['users'].index(user)
+  #   if match['complete'][my_index] == 0:
+  #     import datetime
+  #     duration = datetime.timedelta(minutes=match['proposal_time']['duration'])
+  #     if now < match['match_commence'] + duration:
+  #       match_dicts.append(_match_dict(match, user))
+  # return match_dicts
 
 
-def _match_dict(match, user):
-  port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
-                if u != user]
-  return {'port_users': port_users,
-          'start_date': match['match_commence'],
-          'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
-          'match_id': match.get_id(),
-         }
+# def _match_dict(match, user):
+#   port_users = [port.User(user_id=u.get_id(), name=u['first_name']) for u in match['users']
+#                 if u != user]
+#   return {'port_users': port_users,
+#           'start_date': match['match_commence'],
+#           'duration_minutes': ProposalTime(match['proposal_time'])['duration'],
+#           'match_id': match.get_id(),
+#          }
 
 
 @anvil.tables.in_transaction(relaxed=True)
@@ -290,20 +297,21 @@ def accept_proposal(proptime_id, user_id=""):
   """
   print(f"accept_proposal, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  proptime = ProposalTime.get_by_id(proptime_id)
-  ping_needed = _accept_proposal(proptime, user)
-  if ping_needed:
-    proptime.ping()
+  ri.accept_pair_request(user, request_id=proptime_id)
+  # proptime = ProposalTime.get_by_id(proptime_id)
+  # ping_needed = _accept_proposal(proptime, user)
+  # if ping_needed:
+  #   proptime.ping()
   propagate_update_needed(user)
   return _get_state(user)
 
 
-@anvil.tables.in_transaction
-@timed
-def _accept_proposal(proptime, user):
-  partial_state = get_partial_state(user)
-  ping_needed = proptime.attempt_accept(user, partial_state)
-  return ping_needed
+# @anvil.tables.in_transaction
+# @timed
+# def _accept_proposal(proptime, user):
+#   partial_state = get_partial_state(user)
+#   ping_needed = proptime.attempt_accept(user, partial_state)
+#   return ping_needed
 
 
 @authenticated_callable
@@ -314,57 +322,57 @@ def add_proposal(proposal, invite_link_key="", user_id=""):
   """
   print(f"add_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
-  prop_id = _add_proposal(user, proposal, invite_link_key)
+  prop_id = ri.add_request(user, proposal, invite_link_key)
   propagate_update_needed(user)
   return _get_state(user), prop_id
 
 
-@timed
-def _add_proposal(user, port_prop, link_key=""):
-  """Return prop_id (None if cancelled or matching with another proposal)
+# @timed
+# def _add_proposal(user, port_prop, link_key=""):
+#   """Return prop_id (None if cancelled or matching with another proposal)
   
-  Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
-  """
-  accounts.update_default_request(port_prop, user)
-  prop, other_prop_time_to_ping = _save_new_proposal(user, port_prop, link_key)
-  if other_prop_time_to_ping:
-    other_prop_time_to_ping.ping()
-  if prop:
-    prop.notify_add()
-    return prop.get_id()
-  else:
-    return None
+#   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
+#   """
+#   accounts.update_default_request(port_prop, user)
+#   prop, other_prop_time_to_ping = _save_new_proposal(user, port_prop, link_key)
+#   if other_prop_time_to_ping:
+#     other_prop_time_to_ping.ping()
+#   if prop:
+#     prop.notify_add()
+#     return prop.get_id()
+#   else:
+#     return None
 
 
-@anvil.tables.in_transaction
-def _save_new_proposal(user, port_prop, link_key):
-  """Return prop (None if cancelled or matching with another proposal), other_prop_to_ping (if applicable)
+# @anvil.tables.in_transaction
+# def _save_new_proposal(user, port_prop, link_key):
+#   """Return prop (None if cancelled or matching with another proposal), other_prop_to_ping (if applicable)
   
-  Side effects: Update proposal tables with additions, if valid; match if appropriate
-  """
-  if sm.DEBUG:
-    print(f"_save_new_proposal, {port_prop}")
-  status = get_partial_state(user)['status']
-  prop = Proposal.add(user, port_prop)
-  if port_prop.start_now:
-    prop, other_prop_time_to_ping = _process_now_proposal_edit(user, port_prop, prop, status)
-  else:
-    other_prop_time_to_ping = None
-  if prop and link_key:
-    prop.add_to_invite(link_key)
-  return prop, other_prop_time_to_ping
+#   Side effects: Update proposal tables with additions, if valid; match if appropriate
+#   """
+#   if sm.DEBUG:
+#     print(f"_save_new_proposal, {port_prop}")
+#   status = get_partial_state(user)['status']
+#   prop = Proposal.add(user, port_prop)
+#   if port_prop.start_now:
+#     prop, other_prop_time_to_ping = _process_now_proposal_edit(user, port_prop, prop, status)
+#   else:
+#     other_prop_time_to_ping = None
+#   if prop and link_key:
+#     prop.add_to_invite(link_key)
+#   return prop, other_prop_time_to_ping
 
 
-def _overlapping_others_now_proposal(user, my_now_proposal, my_now_port_prop):
-  my_duration = my_now_port_prop.times[0].duration
-  current_port_props = Proposal.get_port_proposals(user)
-  now_port_props = [p for p in current_port_props if p.start_now and not p.own]
-  for other_port_prop in now_port_props:
-    if (my_now_proposal.is_visible(sm.get_other_user(other_port_prop.user.user_id))
-        and my_duration == other_port_prop.times[0].duration):
-      other_prop_time = ProposalTime.get_by_id(other_port_prop.times[0].time_id)
-      return other_prop_time
-  return None
+# def _overlapping_others_now_proposal(user, my_now_proposal, my_now_port_prop):
+#   my_duration = my_now_port_prop.times[0].duration
+#   current_port_props = Proposal.get_port_proposals(user)
+#   now_port_props = [p for p in current_port_props if p.start_now and not p.own]
+#   for other_port_prop in now_port_props:
+#     if (my_now_proposal.is_visible(sm.get_other_user(other_port_prop.user.user_id))
+#         and my_duration == other_port_prop.times[0].duration):
+#       other_prop_time = ProposalTime.get_by_id(other_port_prop.times[0].time_id)
+#       return other_prop_time
+#   return None
   
 
 @authenticated_callable
@@ -375,78 +383,78 @@ def edit_proposal(port_prop, user_id=""):
   """
   print(f"edit_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
-  prop_id = _edit_proposal(user, port_prop)
+  prop_id = ri.edit_request(user, port_prop)
   propagate_update_needed(user)
   return _get_state(user), prop_id
 
 
-@timed
-def _edit_proposal(user, port_prop):
-  """Return prop_id (None if cancelled or matching with another proposal)
+# @timed
+# def _edit_proposal(user, port_prop):
+#   """Return prop_id (None if cancelled or matching with another proposal)
   
-  Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
-  """
-  accounts.update_default_request(port_prop, user)
-  prop = Proposal.get_by_id(port_prop.prop_id)
-  old_port_prop = prop.portable(user)
-  prop, other_prop_time_to_ping = _save_proposal_edit(user, port_prop, prop)
-  if other_prop_time_to_ping:
-    other_prop_time_to_ping.ping()
-  if prop:
-    prop.notify_edit(port_prop, old_port_prop)
-    return prop.get_id()
-  else:
-    return None
+#   Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
+#   """
+#   accounts.update_default_request(port_prop, user)
+#   prop = Proposal.get_by_id(port_prop.prop_id)
+#   old_port_prop = prop.portable(user)
+#   prop, other_prop_time_to_ping = _save_proposal_edit(user, port_prop, prop)
+#   if other_prop_time_to_ping:
+#     other_prop_time_to_ping.ping()
+#   if prop:
+#     prop.notify_edit(port_prop, old_port_prop)
+#     return prop.get_id()
+#   else:
+#     return None
 
 
-@anvil.tables.in_transaction
-def _save_proposal_edit(user, port_prop, prop):
-  """Return prop (None if cancelled or matching with another proposal), other_prop_time_to_ping (if applicable)
+# @anvil.tables.in_transaction
+# def _save_proposal_edit(user, port_prop, prop):
+#   """Return prop (None if cancelled or matching with another proposal), other_prop_time_to_ping (if applicable)
   
-  Side effects: Update proposal tables with revision, if valid; match if appropriate
-  """
-  status = get_partial_state(user)['status']
-  prop.update(port_prop)
-  if port_prop.start_now:
-    return _process_now_proposal_edit(user, port_prop, prop, status)
-  else:
-    return prop, None
-  
-
-def _process_now_proposal_edit(user, port_prop, prop, status):
-  """Return prop (None if cancelled or matching with another proposal), other_prop_time_to_ping (if applicable)
-  
-  Side effects: Update proposal tables with additional revisions, if any; match if appropriate
-  """
-  available_for_now_proposal = (status is None)
-  if available_for_now_proposal:
-    return _process_now_proposal_edit_available(user, port_prop, prop)
-  else:
-    prop.cancel_all_times()
-    return None, None
+#   Side effects: Update proposal tables with revision, if valid; match if appropriate
+#   """
+#   status = get_partial_state(user)['status']
+#   prop.update(port_prop)
+#   if port_prop.start_now:
+#     return _process_now_proposal_edit(user, port_prop, prop, status)
+#   else:
+#     return prop, None
   
 
-def _process_now_proposal_edit_available(user, port_prop, prop):
-  """Return prop (None if matching with another proposal), other_prop_time_to_ping (if applicable)
+# def _process_now_proposal_edit(user, port_prop, prop, status):
+#   """Return prop (None if cancelled or matching with another proposal), other_prop_time_to_ping (if applicable)
   
-  Side effects: Update proposal tables with additional revisions, if any; match if appropriate
-  """
-  overlapping_prop_time = _overlapping_others_now_proposal(user, prop, port_prop)
-  if overlapping_prop_time:
-    prop.cancel_all_times()
-    other_prop_time_to_ping = _accept_overlapping_proposal(user, overlapping_prop_time)
-    return None, other_prop_time_to_ping
-  else:
-    return prop, None
+#   Side effects: Update proposal tables with additional revisions, if any; match if appropriate
+#   """
+#   available_for_now_proposal = (status is None)
+#   if available_for_now_proposal:
+#     return _process_now_proposal_edit_available(user, port_prop, prop)
+#   else:
+#     prop.cancel_all_times()
+#     return None, None
   
 
-def _accept_overlapping_proposal(user, overlapping_prop_time):
-  """Return overlapping proposal if ping needed (else None)
+# def _process_now_proposal_edit_available(user, port_prop, prop):
+#   """Return prop (None if matching with another proposal), other_prop_time_to_ping (if applicable)
   
-  Side effects: match
-  """
-  ping_needed = overlapping_prop_time.accept(user, status=None)
-  return overlapping_prop_time if ping_needed else None
+#   Side effects: Update proposal tables with additional revisions, if any; match if appropriate
+#   """
+#   overlapping_prop_time = _overlapping_others_now_proposal(user, prop, port_prop)
+#   if overlapping_prop_time:
+#     prop.cancel_all_times()
+#     other_prop_time_to_ping = _accept_overlapping_proposal(user, overlapping_prop_time)
+#     return None, other_prop_time_to_ping
+#   else:
+#     return prop, None
+  
+
+# def _accept_overlapping_proposal(user, overlapping_prop_time):
+#   """Return overlapping proposal if ping needed (else None)
+  
+#   Side effects: match
+#   """
+#   ping_needed = overlapping_prop_time.accept(user, status=None)
+#   return overlapping_prop_time if ping_needed else None
 
   
 @authenticated_callable
@@ -512,15 +520,15 @@ def cancel_now(proptime_id=None, user_id=""):
   return _get_state(user)
 
 
-def _cancel_other(user, proptime_id=None):
-  if sm.DEBUG:
-    print("_cancel_other", proptime_id)
-  if proptime_id:
-    proptime = ProposalTime.get_by_id(proptime_id)
-  else:
-    proptime = ProposalTime.get_now(user)
-  if proptime:
-    proptime.cancel_other(user)
+# def _cancel_other(user, proptime_id=None):
+#   if sm.DEBUG:
+#     print("_cancel_other", proptime_id)
+#   if proptime_id:
+#     proptime = ProposalTime.get_by_id(proptime_id)
+#   else:
+#     proptime = ProposalTime.get_now(user)
+#   if proptime:
+#     proptime.cancel_other(user)
 
     
 # @anvil.tables.in_transaction

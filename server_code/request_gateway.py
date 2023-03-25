@@ -83,6 +83,11 @@ class RequestRecord(sm.SimpleRecord):
     if self._row_id:
       self._row['current'] = False
     self.entity.current = False
+    if self.entity.start_now:
+      self.user['status'] = None
+
+  def update_expire_dt(self, expire_dt):
+    self._row['expire_dt'] = expire_dt
   
   @property
   def user(self):

@@ -108,6 +108,17 @@ def exchanges_by_user(user, records=False):
     yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
 
 
+def exchanges_by_user_starting_prior_to(user, cutoff_dt, records=False):
+  rows = app_tables.exchanges.search(users=[user], start_dt=q.less_than(cutoff_dt), current=True)
+  for exchange_row in rows:
+    yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
+
+
+def exchanges_starting_prior_to(cutoff_dt, records=False):
+  for exchange_row in app_tables.exchanges.search(start_dt=q.less_than(cutoff_dt), current=True):
+    yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
+
+
 def exchange_record_with_any_request_records(request_records):
   request_rows = [rr._row for rr in request_records]
   participant_rows_with = app_tables.participants.search(request=q.any_of(*request_rows))
@@ -153,6 +164,18 @@ class ExchangeRecord(sm.SimpleRecord):
       return self._row['users']
     else:
       return [sm.get_other_user(p['user_id']) for p in self.entity.participants]
+
+  def end(self):
+    if self._row_id:
+      self._row['current'] = False
+    self.entity.current = False
+
+  def commence(self):
+    for participant in self.entity.participants:
+      participant['entered_dt'] = sm.now()
+    self.save()
+    for user in self.users:
+      user['status'] = "matched"
 
 
 def _row_to_exchange(row):

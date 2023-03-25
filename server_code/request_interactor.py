@@ -1,6 +1,5 @@
 import anvil.server
 from anvil import tables
-import datetime
 from .requests import Request, Requests, ExchangeFormat, have_conflicts, prop_to_requests, exchange_to_save
 from .exchanges import Exchange
 from . import accounts
@@ -26,17 +25,24 @@ def reset_repo():
   exchange_repo = exchange_gateway
 
 
-def _add_request(user, port_prop, link_key=""):
+def accept_pair_request(user, request_id):
+  accepted_request_record = repo.RequestRecord.from_id(request_id)
+  accept_request = Request.to_accept_pair_request(accepted_request_record.entity)
+  port_prop = requests_to_props([accept_request])
+  add_request(user, port_prop)
+  
+
+def add_request(user, port_prop, link_key=""):
   """Return prop_id (None if cancelled or matching with another proposal)
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
   if link_key and not [invite for invite in port_prop.eligible_invites if invite.link_key==link_key]:
-    sm.warning("_add_request port_prop missing {link_key} eligible_invite")
-  return _edit_request(user, port_prop)
+    sm.warning("add_request port_prop missing {link_key} eligible_invite")
+  return edit_request(user, port_prop)
 
 
-def _edit_request(user, port_prop):
+def edit_request(user, port_prop):
   """Return prop_id (None if cancelled or matching with another proposal)
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
@@ -361,3 +367,26 @@ def requests_to_props(requests, user):
       eligible_invites=r.eligible_invites,
       times=times
     )
+
+
+def get_visible_requests_as_port_view_items(user):
+  requests = current_visible_requests(user)
+  port_proposals = requests_to_props(requests, user)
+  return port.Proposal.create_view_items(port_proposals)
+
+
+def now_request(user):
+  current_requests = repo.requests_by_user(user)
+  for r in current_requests:
+    if r.start_now:
+      return r
+
+
+def ping_dt(exchange):
+  request_records = [repo.RequestRecord.from_id(p['request_id']) for p in exchange.participants]
+  return max([rr.entity.edit_dt for rr in request_records])
+
+
+def confirm_wait(request_record):
+  import datetime
+  request_record.update_expire_dt(sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS))

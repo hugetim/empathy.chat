@@ -37,7 +37,7 @@ class Request:
     self.min_size = min_size
     self.max_size = max_size
     self.with_users = list(with_users) if with_users else []
-    self.eligible = eligible
+    self.eligible = eligible if eligible else 0
     self.eligible_users = eligible_users if eligible_users else []
     self.eligible_groups = eligible_groups if eligible_groups else []
     self.eligible_starred = eligible_starred
@@ -45,6 +45,26 @@ class Request:
     self.pref_order = pref_order
     self.current = current
 
+  @staticmethod
+  def to_accept_pair_request(user_id, accepted_request):
+    now = h.now()
+    or_group_id = str(uuid.uuid4())
+    return Request(
+      or_group_id=or_group_id,
+      user=user_id,
+      start_dt=now if accepted_request.start_now else accepted_request.start_dt,
+      expire_dt=now + timedelta(seconds=p.WAIT_SECONDS) if accepted_request.start_now else accepted_request.expire_dt,
+      exchange_format=accepted_request.exchange_format,
+      create_dt=now,
+      edit_dt=now,
+      min_size=accepted_request.min_size,
+      max_size=accepted_request.max_size,
+      with_users=[accepted_request.user_id],
+      eligible_users=[accepted_request.user_id],
+      pref_order=0,
+      current=True
+    )
+  
   @property
   def elig_with_dict(self):
     return {key: getattr(self, key) for key in ['with_users', 'eligible', 'eligible_users', 'eligible_groups', 'eligible_starred', 'eligible_invites']}
