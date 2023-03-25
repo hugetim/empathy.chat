@@ -90,6 +90,8 @@ class RequestManager:
     if exchange_prospect:
       # save matched request only*
       # *cancel other or_group requests before saving (or just don't save them)
+      requests_matched = [r for r in exchange_prospect if r.user!=self.requests.user]
+      _cancel_other_or_group_requests(requests_matched)
       matched_request = next((r for r in exchange_prospect if r.user==self.requests.user))
       self.requests = Requests([matched_request])
       print(matched_request)
@@ -191,6 +193,14 @@ class RequestManager:
       old_r0 = self.related_prev_requests[0]
       old_eligibility_spec = repo.RequestRecord(old_r0, old_r0.request_id).eligibility_spec
       return all_eligible_users(old_eligibility_spec)
+
+
+def _cancel_other_or_group_requests(requests_matched):
+  request_ids = [r.request_id for r in requests_matched]
+  or_group_ids = [r.or_group_id for r in requests_matched]
+  for rr in repo.requests_by_or_group(or_group_ids, records=True):
+    if rr.entity.request_id not in request_ids:
+      rr.cancel()
 
 
 def _notify_add(users, requester, requests):

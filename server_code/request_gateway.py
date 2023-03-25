@@ -124,6 +124,11 @@ def current_requests(records=False):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
+def requests_by_or_group(or_group_ids, records=False):
+  for request_row in app_tables.requests.search(current=True, or_group_id=q.any_of(*or_group_ids)):
+    yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
+
+
 def partially_matching_requests(user, partial_request_dicts, now, records=False):
   q_expressions = [
     q.all_of(exchange_format=get_exchange_format_row(prd['exchange_format']),
