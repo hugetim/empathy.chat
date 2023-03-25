@@ -122,9 +122,9 @@ class Requests:
   def _attribute(self, attr_name):
     if not self.requests:
       return None
-    attr0 = get_attr(self.requests[0], attr_name)
+    attr0 = getattr(self.requests[0], attr_name)
     for r in self.requests[1:]:
-      if get_attr(r, attr_name) != attr0:
+      if getattr(r, attr_name) != attr0:
         raise RuntimeError("Requests have differing {attr_name}'s")
     return attr0
   
