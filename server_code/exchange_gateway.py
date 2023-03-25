@@ -37,71 +37,70 @@ def _get_participant(match_dict, i):
 #                      **{k: match_row[k][i] for k in keys})
 
 
-class ExchangeRepository:
-  def get_exchange(self, user_id, to_join=False):
-    from .server_misc import get_acting_user
-    user = get_acting_user(user_id)
-    return self.get_user_exchange(user, to_join)
+def get_exchange(user_id, to_join=False):
+  from .server_misc import get_acting_user
+  user = get_acting_user(user_id)
+  return get_user_exchange(user, to_join)
 
-  def get_user_exchange(self, user, to_join=False):
-    this_match, i = _current_exchange_i(user, to_join)
-    if this_match:
-      match_dict = dict(this_match)
-      num_participants = len(match_dict['users'])
+def get_user_exchange(user, to_join=False):
+  this_match, i = _current_exchange_i(user, to_join)
+  if this_match:
+    match_dict = dict(this_match)
+    num_participants = len(match_dict['users'])
 #       participants = [_get_participant(match_dict, i)]
 #       for j in range(len(match_dict['users'])):
 #         if j != i:
 #           participants.append(_get_participant(match_dict, j))
-      participants = [_get_participant(match_dict, j) for j in range(num_participants)]
-      return Exchange(exchange_id=this_match.get_id(),
-                      room_code=match_dict['proposal_time']['jitsi_code'],
-                      participants=participants,
-                      start_now=match_dict['proposal_time']['start_now'],
-                      start_dt=match_dict['match_commence'],
-                      exchange_format=ExchangeFormat(match_dict['proposal_time']['duration']),
-                      user_id=user.get_id(),
-                      my_i=i,
-                     )
-    else:
-      raise RowMissingError("Current empathy chat not found for this user")
+    participants = [_get_participant(match_dict, j) for j in range(num_participants)]
+    return Exchange(exchange_id=this_match.get_id(),
+                    room_code=match_dict['proposal_time']['jitsi_code'],
+                    participants=participants,
+                    start_now=match_dict['proposal_time']['start_now'],
+                    start_dt=match_dict['match_commence'],
+                    exchange_format=ExchangeFormat(match_dict['proposal_time']['duration']),
+                    user_id=user.get_id(),
+                    my_i=i,
+                    )
+  else:
+    raise RowMissingError("Current empathy chat not found for this user")
 
-  @tables.in_transaction(relaxed=True)
-  def save_exchange(self, exchange):
-    """Update participant statuses"""
-    self.save_exchange_wo_transaction(exchange)
+@tables.in_transaction(relaxed=True)
+def save_exchange(exchange):
+  """Update participant statuses"""
+  save_exchange_wo_transaction(exchange)
 
-  def save_exchange_wo_transaction(self, exchange):
-    match_row = self._match_row(exchange)
-    keys_to_update = list(exchange.participants[0].keys())
-    keys_to_update.remove('user_id')
-    update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
-    update_dict['slider_values'] = update_dict.pop('slider_value')
-    match_row.update(**update_dict)
+def save_exchange_wo_transaction(exchange):
+  match_row = _match_row(exchange)
+  keys_to_update = list(exchange.participants[0].keys())
+  keys_to_update.remove('user_id')
+  update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
+  update_dict['slider_values'] = update_dict.pop('slider_value')
+  match_row.update(**update_dict)
 
-  def create_exchange(self, exchange, proptime):
-    match_row = app_tables.matches.add_row(users=proptime.all_users(),
-                                           proposal_time=proptime._row,
-                                           match_commence=exchange.start_dt,
-                                          )
-    exchange.exchange_id = match_row.get_id()
-    self.save_exchange_wo_transaction(exchange)
-    return exchange
+def create_exchange(exchange, proptime):
+  match_row = app_tables.matches.add_row(users=proptime.all_users(),
+                                          proposal_time=proptime._row,
+                                          match_commence=exchange.start_dt,
+                                        )
+  exchange.exchange_id = match_row.get_id()
+  save_exchange_wo_transaction(exchange)
+  return exchange
 
-  def add_chat(self, message, now, exchange):
-    match_row = self._match_row(exchange)
-    user = app_tables.users.get_by_id(exchange.my['user_id'])
-    app_tables.chat.add_row(match=match_row,
-                            user=user,
-                            message=message,
-                            time_stamp=now,
-                           )
-      
-  # def get_chat_messages(self, exchange):
-  #   match_row = self._match_row(exchange)
-  #   return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=match_row)
-  
-  def _match_row(self, exchange):
-    return app_tables.matches.get_by_id(exchange.exchange_id)
+def add_chat(message, now, exchange):
+  match_row = _match_row(exchange)
+  user = app_tables.users.get_by_id(exchange.my['user_id'])
+  app_tables.chat.add_row(match=match_row,
+                          user=user,
+                          message=message,
+                          time_stamp=now,
+                          )
+    
+# def get_chat_messages(exchange):
+#   match_row = _match_row(exchange)
+#   return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=match_row)
+
+def _match_row(self, exchange):
+  return app_tables.matches.get_by_id(exchange.exchange_id)
 
 
 def exchanges_by_user(user, records=False):

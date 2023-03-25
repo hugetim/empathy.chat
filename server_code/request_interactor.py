@@ -94,7 +94,6 @@ class RequestManager:
       _cancel_other_or_group_requests(requests_matched)
       matched_request = next((r for r in exchange_prospect if r.user==self.requests.user))
       self.requests = Requests([matched_request])
-      print(matched_request)
       self._cancel_missing_or_group_requests()
       self._save_requests()
       self.exchange = Exchange.from_exchange_prospect(exchange_prospect)

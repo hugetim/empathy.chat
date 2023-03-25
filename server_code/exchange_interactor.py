@@ -1,24 +1,26 @@
 import anvil.secrets
+from anvil.tables import app_tables
 from .server_misc import authenticated_callable
 from . import server_misc as sm
 from . import network_interactor as ni
 from .exceptions import RowMissingError
-from .exchange_gateway import ExchangeRepository
+from . import exchange_gateway
 from .exchanges import Exchange
 from .requests import ExchangeFormat
+from . import portable as port
 
 
-repo = ExchangeRepository()
+repo = exchange_gateway
 
 
 def reset_repo():
   global repo
-  repo = ExchangeRepository()
+  repo = exchange_gateway
 
 
 def upcoming_match_dicts(user):
   # can shift to just returning exchanges
-  return [_match_dict(user, exchange) for exchange in exchanges_by_user(user)]
+  return [_match_dict(user, exchange) for exchange in repo.exchanges_by_user(user)]
 
 
 def _match_dict(user, exchange):
