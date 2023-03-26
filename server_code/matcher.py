@@ -53,9 +53,8 @@ def prune_old_matches():
   #   _mark_matches_row_complete(row)
     
     
-def _prune_newer_matches():
-  """Complete no-show matches for all users"""
-  ei.prune_no_show_exchanges()
+# def _prune_newer_matches():
+#   """Complete no-show matches for all users"""
   # if sm.DEBUG:
   #   print("_prune_newer_matches")
   # import datetime
@@ -115,16 +114,16 @@ def _init_matcher(user, trust_level):
          }
 
 
-def _prune_all_expired_items():
-  #Proposal.prune_all() # Not needed because this is done with every get_proposals
-  _prune_newer_matches()
-  #sm.prune_chat_messages() # moved to scheduled task (and now in network_interactor module)
+# def _prune_all_expired_items():
+#   #Proposal.prune_all() # Not needed because this is done with every get_proposals
+#   _prune_newer_matches()
+#   #sm.prune_chat_messages() # moved to scheduled task (and now in network_interactor module)
 
 
 @anvil.tables.in_transaction
 def _init_user_status(user):
   with TimerLogger("  _init_user_status", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
-    _prune_all_expired_items()
+    ei.prune_no_show_exchanges()
     timer.check("_prune_all_expired_items")
     status = user['status']
     # if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
