@@ -173,6 +173,9 @@ class ExchangeRecord(sm.SimpleRecord):
   def commence(self):
     for participant in self.entity.participants:
       participant['entered_dt'] = sm.now()
+      rr = RequestRecord.from_id(participant['request_id'])
+      rr.entity.current = False
+      rr.save()
     self.save()
     for user in self.users:
       user['status'] = "matched"
