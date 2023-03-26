@@ -388,7 +388,6 @@ def get_visible_requests_as_port_view_items(user):
   others_request_records = [rr for rr in still_current_rrs if rr.user != user]
   requests = list(current_visible_requests(user, others_request_records)) + user_requests
   port_proposals = list(requests_to_props(requests, user))
-  print(len(port_proposals))
   return port.Proposal.create_view_items(port_proposals)
 
 
