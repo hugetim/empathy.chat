@@ -396,6 +396,7 @@ def now_request(user, record=False):
   for rr in current_request_records:
     if rr.entity.start_now:
       return rr if record else r
+  return None
 
 
 def ping_dt(exchange):

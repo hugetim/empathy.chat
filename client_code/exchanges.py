@@ -56,6 +56,9 @@ class Exchange:
   @property
   def user_ids(self):
     return [p['user_id'] for p in self.participants]
+
+  def start_appearance(self, time_dt):
+    my['appearances'] += dict(start_dt=time_dt, end_dt=time_dt)
   
   @property
   def my(self):

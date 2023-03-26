@@ -2,11 +2,13 @@ import anvil.secrets
 from .server_misc import authenticated_callable
 from . import server_misc as sm
 from . import network_interactor as ni
+from . import request_interactor as ri
 from .exceptions import RowMissingError
 from . import exchange_gateway
 from .exchanges import Exchange
 from .requests import ExchangeFormat
 from . import portable as port
+from . import helper as h
 
 
 repo = exchange_gateway
@@ -43,7 +45,7 @@ def current_user_exchange(user, to_join=False, record=False):
   user_id = user.get_id()
   for er in sorted(er, key=lambda er: er.entity.start_dt):
     er.entity.set_my(user_id)
-    if (to_join or er.entity.my('entered_dt')) and not er.entity.my('complete'):
+    if (to_join or er.entity.my['entered_dt']) and not er.entity.my['complete']:
       out = er if record else er.entity
       break
   return out
@@ -93,28 +95,30 @@ def init_match_form(user_id=""):
 
 
 def _init_match_form_already_matched(user_id):
-  exchange = repo.get_exchange(user_id, to_join=True)
-  exchange.my['present'] = 1
-  repo.save_exchange(exchange)
+  user = sm.get_acting_user(user_id)
+  exchange_record = current_user_exchange(user, to_join=True, record=True)
+  if not exchange_record: raise RowMissingError("no current exchange")
+  exchange = exchange_record.entity
+  exchange.start_appearance(sm.now())
+  exchange_record.save()
   other_user = sm.get_other_user(exchange.their['user_id'])
   other_user['update_needed'] = True
   return None, exchange.room_code, exchange.exchange_format.duration, exchange.my['slider_value']
 
 
 def _init_match_form_not_matched(user_id):
-  from .proposals import ProposalTime
   user = sm.get_acting_user(user_id)
-  current_proptime = ProposalTime.get_now(user)
-  if current_proptime:
-    return _init_match_form_requesting(current_proptime)
+  current_request = ri.now_request(user)
+  if current_request:
+    return _init_match_form_requesting(current_request)
   else:
     sm.warning(f"_init_match_form_not_matched request not found for {user_id}")
     return None, None, None, ""
 
 
-def _init_match_form_requesting(current_proptime):
-  jitsi_code, duration = current_proptime.get_match_info()
-  return current_proptime.get_id(), jitsi_code, duration, ""
+def _init_match_form_requesting(current_request):
+  jitsi_code = h.new_jitsi_code()
+  return current_request.request_id, jitsi_code, current_request.exchange_format.duration, ""
 
 
 @authenticated_callable
@@ -122,15 +126,15 @@ def update_match_form(user_id=""):
   """Return match_state dict
   
   Side effects: Update match['present'], late notifications, confirm_wait"""
-  try:
-    exchange = repo.get_exchange(user_id, to_join=True)
-    return _update_match_form_already_matched(user_id, exchange)
-  except RowMissingError as err:
+  user = sm.get_acting_user(user_id)
+  exchange = current_user_exchange(user, to_join=True)
+  if exchange:
+    return _update_match_form_already_matched(user, exchange)
+  else:
     return _update_match_form_not_matched(user_id)
   
 
-def _update_match_form_already_matched(user_id, exchange):
-  user = sm.get_acting_user(user_id)
+def _update_match_form_already_matched(user, exchange):
   changed = not exchange.my['present']
   exchange.my['present'] = 1
   #this_match, i = repo.exchange_i()
@@ -141,7 +145,8 @@ def _update_match_form_already_matched(user_id, exchange):
     changed = True
     exchange.their['late_notified'] = 1
   if changed:
-    repo.save_exchange(exchange)
+    er = repo.ExchangeRecord(exchange, exchange.exchange_id)
+    er.save()
     other_user['update_needed'] = True
   how_empathy_list = [user['how_empathy'], other_user['how_empathy']]
   messages_out = ni.get_messages(other_user, user)
@@ -158,31 +163,30 @@ def _update_match_form_already_matched(user_id, exchange):
   )
 
   
-def _update_match_form_not_matched(user_id):
+def _update_match_form_not_matched(user):
   from . import matcher
-  user = sm.get_acting_user(user_id)
-  matcher.confirm_wait_helper(user)
-  partial_state = matcher.get_partial_state(user)
+  request_record = ri.now_request(user, record=True)
+  ri.confirm_wait(request_record)
   matcher.propagate_update_needed(user)
   return dict(
-    status=partial_state['status'],
+    status=user['status'],
   )
 
 
-def create_new_match_from_proptime(proptime, user, present):
-  room_code, duration = proptime.get_match_info()
-  match_start = sm.now() if proptime['start_now'] else proptime['start_date']
-  participants = [dict(user_id=u.get_id(),
-                       present=int(present), # if result of a start_now request, go directly in
-                       complete=0,
-                       slider_value="", # see exchange_controller._slider_value_missing()
-                       late_notified=0,
-                       external=0,
-                      ) for u in proptime.all_users()]
-  # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-  exchange = Exchange(None, room_code, participants, proptime['start_now'], match_start, ExchangeFormat(duration), user.get_id())
-  #exchange.my['present'] = int(present)
-  repo.create_exchange(exchange, proptime)
+# def create_new_match_from_proptime(proptime, user, present):
+#   room_code, duration = proptime.get_match_info()
+#   match_start = sm.now() if proptime['start_now'] else proptime['start_date']
+#   participants = [dict(user_id=u.get_id(),
+#                        present=int(present), # if result of a start_now request, go directly in
+#                        complete=0,
+#                        slider_value="", # see exchange_controller._slider_value_missing()
+#                        late_notified=0,
+#                        external=0,
+#                       ) for u in proptime.all_users()]
+#   # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
+#   exchange = Exchange(None, room_code, participants, proptime['start_now'], match_start, ExchangeFormat(duration), user.get_id())
+#   #exchange.my['present'] = int(present)
+#   repo.create_exchange(exchange, proptime)
 
 
 @authenticated_callable
@@ -190,13 +194,10 @@ def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user"""
   print(f"match_complete, {user_id}")
   from . import matcher
-  try:
-    exchange = repo.get_exchange(user_id)
-    exchange = _complete_exchange(exchange)
-    repo.save_exchange(exchange)
-    matcher.propagate_update_needed()
-  except RowMissingError as err:
-    sm.warning(f"match_complete: match not found {user_id}")
+  exchange_record = current_user_exchange(user, record=True) # repo.get_exchange(user_id)
+  exchange_record.entity = _complete_exchange(exchange_record.entity) ####################### clean up
+  exchange_record.save()
+  matcher.propagate_update_needed()
 
 
 def _complete_exchange(exchange):
@@ -214,22 +215,22 @@ def _complete_exchange(exchange):
 @authenticated_callable
 def add_chat_message(message="[blank test message]", user_id=""):
   print(f"add_chat_message, {user_id}, '[redacted]'")
-  exchange = repo.get_exchange(user_id)
+  exchange = current_user_exchange(user)
   repo.add_chat(message=anvil.secrets.encrypt_with_key("new_key", message),
                 now=sm.now(),
                 exchange=exchange,
                )
-  return _update_match_form_already_matched(user_id, exchange)
+  return _update_match_form_already_matched(sm.get_acting_user(user_id), exchange)
 
 
 @authenticated_callable
 def update_my_external(my_external, user_id=""):
   print(f"update_my_external, {my_external}, {user_id}")
-  try:
-    exchange = repo.get_exchange(user_id)
-    exchange.my['external'] = int(my_external)
-    repo.save_exchange(exchange)
-  except RowMissingError:
+  exchange_record = current_user_exchange(user, record=True)
+  if exchange_record:
+    exchange_record.entity.my['external'] = int(my_external)
+    exchange_record.save()
+  else:
     print("Exchange record not available to record my_external")
 
 
@@ -237,7 +238,7 @@ def update_my_external(my_external, user_id=""):
 def submit_slider(value, user_id=""):
   """Return their_value"""
   print(f"submit_slider, '[redacted]', {user_id}")
-  exchange = repo.get_exchange(user_id)
-  exchange.my['slider_value'] = value
-  repo.save_exchange(exchange)
-  return exchange.their['slider_value']
+  exchange_record = current_user_exchange(user, record=True)
+  exchange_record.entity.my['slider_value'] = value
+  exchange_record.save()
+  return exchange_record.entity.their['slider_value']
