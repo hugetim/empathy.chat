@@ -19,7 +19,7 @@ class Exchange:
     self.set_my(user_id, my_i)
     self.current = current
 
-  def set_my_i(self, user_id=None, my_i=None):
+  def set_my(self, user_id=None, my_i=None):
     if my_i:
       self._my_i = my_i
       self._their_i = self.participants.index(self._their())

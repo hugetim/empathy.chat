@@ -216,12 +216,15 @@ def _complete_exchange(exchange):
 @authenticated_callable
 def add_chat_message(message="[blank test message]", user_id=""):
   print(f"add_chat_message, {user_id}, '[redacted]'")
-  exchange = current_user_exchange(user)
-  repo.add_chat(message=anvil.secrets.encrypt_with_key("new_key", message),
-                now=sm.now(),
-                exchange=exchange,
-               )
-  return _update_match_form_already_matched(sm.get_acting_user(user_id), exchange)
+  user = sm.get_acting_user(user_id)
+  exchange_record = current_user_exchange(user, record=True)
+  repo.add_chat(
+    from_user=user,
+    message=anvil.secrets.encrypt_with_key("new_key", message),
+    now=sm.now(),
+    users=exchange_record.users,
+  )
+  return _update_match_form_already_matched(user, exchange_record.entity)
 
 
 @authenticated_callable

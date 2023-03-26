@@ -136,6 +136,12 @@ def requests_by_user(user, records=False):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
+def requests_by_invite_row(invite_row, records=False):
+  request_rows = app_tables.requests.search(user=user, current=True)
+  for request_row in request_rows:
+    yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
+
+
 def current_requests(records=False):
   for request_row in app_tables.requests.search(current=True):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)

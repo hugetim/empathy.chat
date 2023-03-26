@@ -251,23 +251,23 @@ def _invited_item_to_row_dict(invited_item, user, distance=1):
              ) 
 
 
-def try_adding_to_invite_proposal(invite, user):
-  if invite['proposal']:
-    from .proposals import Proposal
-    proposal = Proposal(invite['proposal'])
-    if proposal['current'] and user not in proposal['eligible_users']:
-      proposal['eligible_users'] += [user]
+def try_adding_to_invite_proposal(invite_row, invitee_user):
+  from .request_gateway import requests_by_invite_row
+  user_id = invitee_user.get_id()
+  for rr in requests_by_invite_row(invite_row, records=True):
+    if user_id not in rr.entity.eligible_users:
+      rr.entity.eligible_users += [user_id]
+      rr.save()
       # Don't try to notify new_user invitee here because missing time_zone, first_name, and notif_settings
 
       
-def try_removing_from_invite_proposal(invite, user):
-  if invite['proposal']:
-    from .proposals import Proposal
-    proposal = Proposal(invite['proposal'])
-    if user in proposal['eligible_users']:
-      temp = proposal['eligible_users']
-      temp.remove(user)
-      proposal['eligible_users'] = temp
+def try_removing_from_invite_proposal(invite_row, invitee_user):
+  from .request_gateway import requests_by_invite_row
+  user_id = invitee_user.get_id()
+  for rr in requests_by_invite_row(invite_row, records=True):
+    if user_id in rr.entity.eligible_users:
+      rr.entity.eligible_users.remove(user_id)
+      rr.save()
       
   
 def try_connect(invite, invite_reply):

@@ -85,21 +85,22 @@ from .request_gateway import get_exchange_format_row, RequestRecord
 #   save_exchange_wo_transaction(exchange)
 #   return exchange
 
-def add_chat(message, now, exchange):
-  match_row = _match_row(exchange)
-  user = sm.get_other_user(exchange.my['user_id'])
-  app_tables.chat.add_row(match=match_row,
-                          user=user,
-                          message=message,
-                          time_stamp=now,
-                          )
+def add_chat(from_user, message, now, users):
+  to_users = set(users) - set(user)
+  if len(to_users) > 1:
+    raise NotImplementedError("text chat for more than 2 participants not yet supported")
+  to_user = to_users.pop()
+  app_tables.messages.add_row(from_user=from_user,
+                              to_user=to_user,
+                              message=message,
+                              time_stamp=now)
     
 # def get_chat_messages(exchange):
 #   match_row = _match_row(exchange)
 #   return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=match_row)
 
-def _match_row(self, exchange):
-  return app_tables.matches.get_by_id(exchange.exchange_id)
+# def _match_row(self, exchange):
+#   return app_tables.matches.get_by_id(exchange.exchange_id)
 
 
 def exchanges_by_user(user, records=False):
