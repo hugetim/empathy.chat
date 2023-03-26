@@ -1,7 +1,6 @@
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-from . import parameters as p
 from .exceptions import RowMissingError
 from .exchanges import Exchange
 from .requests import ExchangeFormat
@@ -9,82 +8,82 @@ from . import server_misc as sm
 from .request_gateway import get_exchange_format_row, RequestRecord
 
 
-def _current_exchange_i(user, to_join):
-  """Return earliest if multiple current"""
-  import datetime
-  from .server_misc import now
-  this_match, i = None, None
-  now_plus = now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
-  current_matches = app_tables.matches.search(tables.order_by('match_commence', ascending=True), users=[user], complete=[0],
-                                              match_commence=q.less_than_or_equal_to(now_plus))
-  for row in current_matches:
-    temp_i = row['users'].index(user)
-    # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
-    if (to_join or row['present'][temp_i] == 1) and row['complete'][temp_i] == 0:
-      this_match = row
-      i = temp_i
-      break
-  return this_match, i
+# def _current_exchange_i(user, to_join):
+#   """Return earliest if multiple current"""
+#   import datetime
+#   from .server_misc import now
+#   this_match, i = None, None
+#   now_plus = now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
+#   current_matches = app_tables.matches.search(tables.order_by('match_commence', ascending=True), users=[user], complete=[0],
+#                                               match_commence=q.less_than_or_equal_to(now_plus))
+#   for row in current_matches:
+#     temp_i = row['users'].index(user)
+#     # Note: 0 used for 'complete' field b/c False not allowed in SimpleObjects
+#     if (to_join or row['present'][temp_i] == 1) and row['complete'][temp_i] == 0:
+#       this_match = row
+#       i = temp_i
+#       break
+#   return this_match, i
 
 
-def _get_participant(match_dict, i):
-  keys = ['present', 'complete', 'late_notified', 'external']
-  participant = {k: match_dict[k][i] for k in keys}
-  participant['user_id'] = match_dict['users'][i].get_id()
-  participant['slider_value'] = match_dict['slider_values'][i]
-  return participant
-#   return Participant(user_id=match_row['users'][i].get_id(), 
-#                      **{k: match_row[k][i] for k in keys})
+# def _get_participant(match_dict, i):
+#   keys = ['present', 'complete', 'late_notified', 'external']
+#   participant = {k: match_dict[k][i] for k in keys}
+#   participant['user_id'] = match_dict['users'][i].get_id()
+#   participant['slider_value'] = match_dict['slider_values'][i]
+#   return participant
+# #   return Participant(user_id=match_row['users'][i].get_id(), 
+# #                      **{k: match_row[k][i] for k in keys})
 
 
-def get_exchange(user_id, to_join=False):
-  from .server_misc import get_acting_user
-  user = get_acting_user(user_id)
-  return get_user_exchange(user, to_join)
+# def get_exchange(user_id, to_join=False):
+#   from .server_misc import get_acting_user
+#   user = get_acting_user(user_id)
+#   return get_user_exchange(user, to_join)
 
-def get_user_exchange(user, to_join=False):
-  this_match, i = _current_exchange_i(user, to_join)
-  if this_match:
-    match_dict = dict(this_match)
-    num_participants = len(match_dict['users'])
-#       participants = [_get_participant(match_dict, i)]
-#       for j in range(len(match_dict['users'])):
-#         if j != i:
-#           participants.append(_get_participant(match_dict, j))
-    participants = [_get_participant(match_dict, j) for j in range(num_participants)]
-    return Exchange(exchange_id=this_match.get_id(),
-                    room_code=match_dict['proposal_time']['jitsi_code'],
-                    participants=participants,
-                    start_now=match_dict['proposal_time']['start_now'],
-                    start_dt=match_dict['match_commence'],
-                    exchange_format=ExchangeFormat(match_dict['proposal_time']['duration']),
-                    user_id=user.get_id(),
-                    my_i=i,
-                    )
-  else:
-    raise RowMissingError("Current empathy chat not found for this user")
+# def get_user_exchange(user, to_join=False):
+#   this_match, i = _current_exchange_i(user, to_join)
+#   if this_match:
+#     match_dict = dict(this_match)
+#     num_participants = len(match_dict['users'])
+# #       participants = [_get_participant(match_dict, i)]
+# #       for j in range(len(match_dict['users'])):
+# #         if j != i:
+# #           participants.append(_get_participant(match_dict, j))
+#     participants = [_get_participant(match_dict, j) for j in range(num_participants)]
+#     return Exchange(exchange_id=this_match.get_id(),
+#                     room_code=match_dict['proposal_time']['jitsi_code'],
+#                     participants=participants,
+#                     start_now=match_dict['proposal_time']['start_now'],
+#                     start_dt=match_dict['match_commence'],
+#                     exchange_format=ExchangeFormat(match_dict['proposal_time']['duration']),
+#                     user_id=user.get_id(),
+#                     my_i=i,
+#                     )
+#   else:
+#     raise RowMissingError("Current empathy chat not found for this user")
 
-@tables.in_transaction(relaxed=True)
-def save_exchange(exchange):
-  """Update participant statuses"""
-  save_exchange_wo_transaction(exchange)
+# @tables.in_transaction(relaxed=True)
+# def save_exchange(exchange):
+#   """Update participant statuses"""
+#   save_exchange_wo_transaction(exchange)
 
-def save_exchange_wo_transaction(exchange):
-  match_row = _match_row(exchange)
-  keys_to_update = list(exchange.participants[0].keys())
-  keys_to_update.remove('user_id')
-  update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
-  update_dict['slider_values'] = update_dict.pop('slider_value')
-  match_row.update(**update_dict)
+# def save_exchange_wo_transaction(exchange):
+#   match_row = _match_row(exchange)
+#   keys_to_update = list(exchange.participants[0].keys())
+#   keys_to_update.remove('user_id')
+#   update_dict = {k: [p[k] for p in exchange.participants] for k in keys_to_update}
+#   update_dict['slider_values'] = update_dict.pop('slider_value')
+#   match_row.update(**update_dict)
 
-def create_exchange(exchange, proptime):
-  match_row = app_tables.matches.add_row(users=proptime.all_users(),
-                                          proposal_time=proptime._row,
-                                          match_commence=exchange.start_dt,
-                                        )
-  exchange.exchange_id = match_row.get_id()
-  save_exchange_wo_transaction(exchange)
-  return exchange
+# def create_exchange(exchange, proptime):
+#   match_row = app_tables.matches.add_row(users=proptime.all_users(),
+#                                           proposal_time=proptime._row,
+#                                           match_commence=exchange.start_dt,
+#                                         )
+#   exchange.exchange_id = match_row.get_id()
+#   save_exchange_wo_transaction(exchange)
+#   return exchange
 
 def add_chat(message, now, exchange):
   match_row = _match_row(exchange)

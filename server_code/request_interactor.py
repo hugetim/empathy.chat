@@ -395,7 +395,7 @@ def now_request(user, record=False):
   current_request_records = repo.requests_by_user(user, records=True)
   for rr in current_request_records:
     if rr.entity.start_now:
-      return rr if record else r
+      return rr if record else rr.entity
   return None
 
 

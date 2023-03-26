@@ -9,6 +9,7 @@ from .exchanges import Exchange
 from .requests import ExchangeFormat
 from . import portable as port
 from . import helper as h
+from . import parameters as p
 
 
 repo = exchange_gateway
@@ -43,7 +44,7 @@ def current_user_exchange(user, to_join=False, record=False):
   now_plus = sm.now() + datetime.timedelta(minutes=p.START_EARLY_MINUTES)
   exchange_records = list(repo.exchanges_by_user_starting_prior_to(user, now_plus, records=True))
   user_id = user.get_id()
-  for er in sorted(er, key=lambda er: er.entity.start_dt):
+  for er in sorted(exchange_records, key=lambda er: er.entity.start_dt):
     er.entity.set_my(user_id)
     if (to_join or er.entity.my['entered_dt']) and not er.entity.my['complete']:
       out = er if record else er.entity
@@ -131,7 +132,7 @@ def update_match_form(user_id=""):
   if exchange:
     return _update_match_form_already_matched(user, exchange)
   else:
-    return _update_match_form_not_matched(user_id)
+    return _update_match_form_not_matched(user)
   
 
 def _update_match_form_already_matched(user, exchange):
