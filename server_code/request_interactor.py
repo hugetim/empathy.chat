@@ -366,6 +366,7 @@ def requests_to_props(requests, user):
     yield port.Proposal(
       prop_id=or_group_id,
       user=sm.get_simple_port_user(user2, user1=user),
+      own=user2==user,
       min_size=r.min_size,
       max_size=r.max_size,
       eligible=r.eligible,

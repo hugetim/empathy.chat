@@ -22,14 +22,20 @@ def reset_repo():
 
 def upcoming_match_dicts(user):
   # can shift to just returning exchanges
-  return [_match_dict(user, exchange) for exchange in repo.exchanges_by_user(user)]
+  out = []
+  user_id = user.get_id()
+  for exchange in repo.exchanges_by_user(user):
+    exchange.set_my(user_id)
+    if not exchange.my['complete_dt']:
+      out.append(_match_dict(user, exchange))
+  return out
 
 
-def _match_dict(user, exchange):
+def _match_dict(user_id, exchange):
   other_user_ids = [p['user_id'] for p in exchange.participants
-                    if p['user_id'] != user.get_id()]
-  port_users = [port.User(user_id=user_id, name=sm.get_other_user(user_id)['first_name']) 
-                for user_id in other_user_ids]
+                    if p['user_id'] != user_id]
+  port_users = [port.User(user_id=u_id, name=sm.get_other_user(u_id)['first_name']) 
+                for u_id in other_user_ids]
   return {'port_users': port_users,
           'start_date': exchange.start_dt,
           'duration_minutes': exchange.exchange_format.duration,
@@ -162,6 +168,7 @@ def _update_match_form_already_matched(user, exchange):
     their_slider_value=exchange.their['slider_value'],
     their_external=exchange.their['video_external'],
     their_complete=exchange.their['complete_dt'],
+    jitsi_code=exchange.room_code,
   )
 
   

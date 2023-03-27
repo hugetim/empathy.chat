@@ -52,9 +52,11 @@ class MatchForm(MatchFormTemplate):
     self.jitsi_link.visible = True
 
   def reset_jitsi(self):
-    if not self.jitsi_embed:
+    if self.jitsi_embed:
+      self.hide_and_hangup_jitsi_embed()
+      self.remove_jitsi_embed()
+    else:
       Notification("The previous video chat was just the waiting room. You have now entered the empathy chat room.", timeout=None, style="warning").show()
-    self.remove_jitsi_embed()
     self.add_jitsi_embed()
     self.jitsi_link.url = self.item.jitsi_url
   
@@ -141,7 +143,8 @@ class MatchForm(MatchFormTemplate):
   def update_status(self, dispatch=None):
     self.base_status_reset()
     if self.item.status == "matched":
-      ec.update_my_external(not bool(self.jitsi_embed))
+      #ec.update_my_external(not bool(self.jitsi_embed))
+      self.reset_jitsi()
     if self.item.status == "pinged":
       self.pinged()
 
@@ -161,8 +164,6 @@ class MatchForm(MatchFormTemplate):
       self.item.start_exchange()
       if self.item.status == "requesting":
         Notification("The user who had asked to join has now cancelled their request.", timeout=None, style="warning").show()
-      else:
-        self.reset_jitsi()
     else:
       self.item.exit()
       ui.init_load()
