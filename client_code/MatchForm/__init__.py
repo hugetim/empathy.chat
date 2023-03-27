@@ -45,12 +45,19 @@ class MatchForm(MatchFormTemplate):
     self.item.update()
   
   def init_jitsi(self):
-    """Initialize or destroy embedded Jitsi Meet instance"""
+    """Initialize embedded Jitsi Meet instance"""
     self.add_jitsi_embed()
     self.jitsi_column_panel.visible = True
     self.jitsi_link.url = self.item.jitsi_url
     self.jitsi_link.visible = True
-    
+
+  def reset_jitsi(self):
+    if not self.jitsi_embed:
+      Notification("The previous video chat was just the waiting room. You have now entered the empathy chat room.", timeout=None, style="warning").show()
+    self.remove_jitsi_embed()
+    self.add_jitsi_embed()
+    self.jitsi_link.url = self.item.jitsi_url
+  
   def add_jitsi_embed(self):
     if not self.jitsi_embed:
       self.jitsi_embed = MyJitsi(item={'room_name': self.item.jitsi_code, 'name': glob.name, 'domain': self.item.jitsi_domain})
@@ -154,6 +161,8 @@ class MatchForm(MatchFormTemplate):
       self.item.start_exchange()
       if self.item.status == "requesting":
         Notification("The user who had asked to join has now cancelled their request.", timeout=None, style="warning").show()
+      else:
+        self.reset_jitsi()
     else:
       self.item.exit()
       ui.init_load()
