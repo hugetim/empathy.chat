@@ -58,7 +58,7 @@ class SliderPanel(SliderPanelTemplate):
     self.item['status'] = "submitted"
     self.update_status()
     their_value = ec.submit_slider(self.my_slider.value)
-    if type(their_value) != str:
+    if not ec.slider_value_missing(their_value):
       self.receive_value(their_value)
 
   def receive_value(self, their_value):
