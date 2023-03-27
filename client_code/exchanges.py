@@ -35,7 +35,7 @@ class Exchange:
       exchange_id=None,
       room_code=h.new_jitsi_code(),
       participants=[
-        dict(user_id=r.user, request_id=r.request_id, entered_dt=None, appearances=[], late_notified=None, slider_value=None, video_embedded=None, complete_dt=None) 
+        dict(participant_id=None, user_id=r.user, request_id=r.request_id, entered_dt=None, appearances=[], late_notified=None, slider_value=None, video_external=None, complete_dt=None) 
         for r in ep.requests
       ],
       start_now=start_now,
@@ -61,7 +61,7 @@ class Exchange:
     return [p['user_id'] for p in self.participants]
 
   def start_appearance(self, time_dt):
-    my['appearances'] += dict(start_dt=time_dt, end_dt=time_dt)
+    self.my['appearances'].append(dict(start_dt=time_dt, end_dt=time_dt, appearance_id=None))
   
   @property
   def my(self):

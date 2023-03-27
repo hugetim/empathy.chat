@@ -86,7 +86,7 @@ from .request_gateway import get_exchange_format_row, RequestRecord
 #   return exchange
 
 def add_chat(from_user, message, now, users):
-  to_users = set(users) - set(user)
+  to_users = set(users) - set([from_user])
   if len(to_users) > 1:
     raise NotImplementedError("text chat for more than 2 participants not yet supported")
   to_user = to_users.pop()
@@ -243,6 +243,7 @@ class ParticipantRecord(sm.SimpleRecord):
 
 def _row_to_participant(participant_row):
   participant = dict(participant_row)
+  participant['participant_id'] = participant_row.get_id()
   participant['user_id'] = participant.pop('user').get_id()
   participant['request_id'] = participant.pop('request').get_id()
   participant['appearances'] = [_row_to_appearance(a)

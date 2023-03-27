@@ -121,7 +121,7 @@ db_schema:
     - name: slider_value
       admin_ui: {width: 200}
       type: number
-    - name: video_embedded
+    - name: video_external
       admin_ui: {width: 200}
       type: bool
     - name: complete_dt

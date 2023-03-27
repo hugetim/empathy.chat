@@ -27,7 +27,7 @@ def reset_repo():
 def accept_pair_request(user, request_id):
   accepted_request_record = repo.RequestRecord.from_id(request_id)
   accept_request = Request.to_accept_pair_request(user.get_id(), accepted_request_record.entity)
-  port_prop = requests_to_props([accept_request], user)
+  port_prop = next(requests_to_props([accept_request], user))
   add_request(user, port_prop)
 
 

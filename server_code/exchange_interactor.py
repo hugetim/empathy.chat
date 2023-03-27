@@ -160,7 +160,7 @@ def _update_match_form_already_matched(user, exchange):
     message_items=messages_out,
     my_slider_value=exchange.my['slider_value'],
     their_slider_value=exchange.their['slider_value'],
-    their_external=not exchange.their['video_embedded'],
+    their_external=exchange.their['video_external'],
     their_complete=exchange.their['complete_dt'],
   )
 
@@ -196,6 +196,7 @@ def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user"""
   print(f"match_complete, {user_id}")
   from . import matcher
+  user = sm.get_acting_user(user_id)
   exchange_record = current_user_exchange(user, record=True) # repo.get_exchange(user_id)
   exchange_record.entity = _complete_exchange(exchange_record.entity)
   exchange_record.save()
@@ -204,9 +205,10 @@ def match_complete(user_id=""):
 
 def _complete_exchange(exchange):
   from . import notifies as n
-  # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
   exchange.my['complete_dt'] = sm.now()
-  exchange.current = False
+  sm.my_assert(exchange.size <= 2, "_complete_exchange code below assumes dyads")
+  if exchange.their['complete_dt']:
+    exchange.current = False
   if not exchange.their['entered_dt']:
     user = sm.get_acting_user()
     other_user = sm.get_other_user(exchange.their['user_id'])
@@ -216,8 +218,8 @@ def _complete_exchange(exchange):
 
 def cancel_exchange(user, exchange_id):
   if sm.DEBUG:
-    print(f"cancel_exchange, {match_id}")
-  exchange_record = repo.ExchangeRecord.from_id(match_id)
+    print(f"cancel_exchange, {exchange_id}")
+  exchange_record = repo.ExchangeRecord.from_id(exchange_id)
   users_to_notify = [u for u in exchange_record.users if u != user]
   exchange_record.end()
   return users_to_notify, exchange_record.entity.start_dt
@@ -226,7 +228,7 @@ def cancel_exchange(user, exchange_id):
 @authenticated_callable
 def add_chat_message(message="[blank test message]", user_id=""):
   print(f"add_chat_message, {user_id}, '[redacted]'")
-  user = sm.get_acting_user(user_id)
+  user = sm.get_other_user(user_id)
   exchange_record = current_user_exchange(user, record=True)
   repo.add_chat(
     from_user=user,
@@ -240,9 +242,10 @@ def add_chat_message(message="[blank test message]", user_id=""):
 @authenticated_callable
 def update_my_external(my_external, user_id=""):
   print(f"update_my_external, {my_external}, {user_id}")
+  user = sm.get_acting_user(user_id)
   exchange_record = current_user_exchange(user, record=True)
   if exchange_record:
-    exchange_record.entity.my['video_embedded'] = not bool(my_external)
+    exchange_record.entity.my['video_external'] = bool(my_external)
     exchange_record.save()
   else:
     print("Exchange record not available to record my_external")
@@ -252,6 +255,7 @@ def update_my_external(my_external, user_id=""):
 def submit_slider(value, user_id=""):
   """Return their_value"""
   print(f"submit_slider, '[redacted]', {user_id}")
+  user = sm.get_acting_user(user_id)
   exchange_record = current_user_exchange(user, record=True)
   exchange_record.entity.my['slider_value'] = value
   exchange_record.save()
