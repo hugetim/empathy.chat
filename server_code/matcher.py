@@ -8,6 +8,7 @@ from . import accounts
 from . import server_misc as sm
 from . import exchange_interactor as ei
 from . import request_interactor as ri
+from .requests import Requests, prop_to_requests
 from .server_misc import authenticated_callable
 from . import portable as port
 # from .proposals import Proposal, ProposalTime
@@ -326,7 +327,8 @@ def add_proposal(port_prop, invite_link_key="", user_id=""):
   print(f"add_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
   accounts.update_default_request(port_prop, user)
-  prop_id = ri.add_request(user, port_prop, invite_link_key)
+  requests = Requests(prop_to_requests(port_prop, user_id=user_id))
+  prop_id = ri.add_requests(user, requests, invite_link_key)
   propagate_update_needed(user)
   return _get_state(user), prop_id
 
@@ -388,7 +390,8 @@ def edit_proposal(port_prop, user_id=""):
   print(f"edit_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
   accounts.update_default_request(port_prop, user)
-  prop_id = ri.edit_request(user, port_prop)
+  requests = Requests(prop_to_requests(port_prop, user_id=user_id))
+  prop_id = ri.edit_requests(user, requests)
   propagate_update_needed(user)
   return _get_state(user), prop_id
 

@@ -8,6 +8,7 @@ from anvil import secrets
 from . import parameters as p
 from . import portable as port
 from .relationship import Relationship
+from .exceptions import RowMissingError
 from anvil_extras.server_utils import timed
 from functools import wraps 
 
@@ -337,6 +338,8 @@ class SimpleRecord(Record):
   def _row(self):
     if self.__row is None and self._row_id is not None:
       self.__row = self._table.get_by_id(self._row_id)
+    if self.__row is None:
+      raise RowMissingError(f"No {self._table_name} database row known for this record")
     return self.__row
 
   def _add(self):

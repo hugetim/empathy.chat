@@ -27,26 +27,25 @@ def reset_repo():
 def accept_pair_request(user, request_id):
   accepted_request_record = repo.RequestRecord.from_id(request_id)
   accept_request = Request.to_accept_pair_request(user.get_id(), accepted_request_record.entity)
-  port_prop = next(requests_to_props([accept_request], user))
-  add_request(user, port_prop)
+  # port_prop = next(requests_to_props([accept_request], user))
+  add_requests(user, Requests([accept_request]))
 
 
-def add_request(user, port_prop, link_key=""):
+def add_requests(user, requests, link_key=""):
   """Return prop_id (None if cancelled or matching with another proposal)
   
   Side effects: Update proposal tables with additions, if valid; match if appropriate; notify
   """
-  if link_key and not [invite for invite in port_prop.eligible_invites if invite.link_key==link_key]:
-    sm.warning("add_request port_prop missing {link_key} eligible_invite")
-  return edit_request(user, port_prop)
+  if link_key and not [invite for invite in requests.eligible_invites if invite.link_key==link_key]:
+    sm.warning("add_requests requests missing {link_key} eligible_invite")
+  return edit_requests(user, requests)
 
 
-def edit_request(user, port_prop):
+def edit_requests(user, requests):
   """Return prop_id (None if cancelled or matching with another proposal)
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
   """
-  requests = Requests(prop_to_requests(port_prop, user_id=user.get_id()))
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager(user, requests)
   request_editor.check_and_save()
