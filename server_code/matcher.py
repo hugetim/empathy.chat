@@ -130,9 +130,12 @@ def _init_user_status(user):
     #   _cancel_other(user)
     if status in ["requesting", "pinging", "pinged"]:
       request_record = ri.now_request(user, record=True)
+      print(request_record.entity)
       expire_dt = request_record.entity.expire_dt
       if _seconds_left("requesting", expire_date=expire_dt) <= 0:
+        print("canceling")
         request_record.cancel()
+        print(user['status'])
       elif status == "pinged":
         ei.commence_user_exchange(user)
       else:
