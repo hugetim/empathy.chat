@@ -59,8 +59,8 @@ class Request:
       edit_dt=now,
       min_size=accepted_request.min_size,
       max_size=accepted_request.max_size,
-      with_users=[accepted_request.user_id],
-      eligible_users=[accepted_request.user_id],
+      with_users=[accepted_request.user],
+      eligible_users=[accepted_request.user],
       pref_order=0,
       current=True
     )

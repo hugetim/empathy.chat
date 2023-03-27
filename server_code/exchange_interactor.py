@@ -212,6 +212,15 @@ def _complete_exchange(exchange):
     exchange.their['complete'] = 1
   return exchange
 
+
+def cancel_exchange(user, exchange_id):
+  if sm.DEBUG:
+    print(f"cancel_exchange, {match_id}")
+  exchange_record = repo.ExchangeRecord.from_id(match_id)
+  users_to_notify = [u for u in exchange_record.users if u != user]
+  exchange_record.end()
+  return users_to_notify, exchange_record.entity.start_dt
+
  
 @authenticated_callable
 def add_chat_message(message="[blank test message]", user_id=""):

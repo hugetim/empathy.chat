@@ -261,18 +261,18 @@ def _get_upcomings(user):
 #          }
 
 
-@anvil.tables.in_transaction(relaxed=True)
-def _cancel_match(user, match_id):
-  if sm.DEBUG:
-    print(f"_cancel_match, {match_id}")
-  match = app_tables.matches.get_by_id(match_id)
-  if match:
-    users_to_notify = [u for u in match['users'] if u != user]    
-    match_commence = match['match_commence']
-    match.delete()
-    return users_to_notify, match_commence
-  else:
-    return [], None
+# @anvil.tables.in_transaction(relaxed=True)
+# def _cancel_match(user, match_id):
+#   if sm.DEBUG:
+#     print(f"_cancel_match, {match_id}")
+#   match = app_tables.matches.get_by_id(match_id)
+#   if match:
+#     users_to_notify = [u for u in match['users'] if u != user]    
+#     match_commence = match['match_commence']
+#     match.delete()
+#     return users_to_notify, match_commence
+#   else:
+#     return [], None
     
 
   
@@ -281,7 +281,7 @@ def cancel_match(match_id, user_id=""):
   """Cancel pending match"""
   print(f"cancel_match, {match_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  users_to_notify, match_commence = _cancel_match(user, match_id)
+  users_to_notify, match_commence = ei.cancel_exchange(user, match_id)
   for u in users_to_notify:
     n.notify_match_cancel_bg(u, start=match_commence, canceler_name=sm.name(user, to_user=u))
   propagate_update_needed(user)
