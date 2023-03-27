@@ -12,7 +12,7 @@ def get_urls():
 
   
 def _slider_value_missing(value):
-  return type(value) == str
+  return value is None
 
 
 def submit_slider(value):
@@ -24,7 +24,7 @@ def update_my_external(value):
 
   
 class PendingState(h.AttributeToKey):
-  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value="", jitsi_domain="meet.jit.si", how_empathy_list=None):
+  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value=None, jitsi_domain="meet.jit.si", how_empathy_list=None):
     self.status = status
     self.proptime_id = proptime_id
     self.jitsi_code = jitsi_code
@@ -62,7 +62,7 @@ class PendingState(h.AttributeToKey):
 class ExchangeState(PendingState):
   channels = ["match.status", "match.slider", "match.messages", "match.external", "match.complete"]
   
-  def __init__(self, message_items=None, their_slider_value="", their_external=None, their_complete=None, their_name="", **kwargs):
+  def __init__(self, message_items=None, their_slider_value=None, their_external=None, their_complete=None, their_name="", **kwargs):
     super().__init__(**kwargs)
     self.their_slider_value = their_slider_value
     self.their_external = their_external
@@ -152,9 +152,9 @@ class ExchangeState(PendingState):
       server.call('init_match_form')
     )
     return ExchangeState(status=status,
-                        proptime_id=proptime_id,
-                        jitsi_code=jitsi_code,
-                        duration=duration,
-                        my_slider_value=my_slider_value,
-                       )        
+                         proptime_id=proptime_id,
+                         jitsi_code=jitsi_code,
+                         duration=duration,
+                         my_slider_value=my_slider_value,
+                        )
   

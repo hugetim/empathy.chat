@@ -46,7 +46,7 @@ def current_user_exchange(user, to_join=False, record=False):
   user_id = user.get_id()
   for er in sorted(exchange_records, key=lambda er: er.entity.start_dt):
     er.entity.set_my(user_id)
-    if (to_join or er.entity.my['entered_dt']) and not er.entity.my['complete']:
+    if (to_join or er.entity.my['entered_dt']) and not er.entity.my['complete_dt']:
       out = er if record else er.entity
       break
   return out
@@ -79,7 +79,7 @@ def prune_no_show_exchanges():
   exchange_records = repo.exchanges_starting_prior_to(now, records=True)
   for er in exchange_records:
     if not er.entity.any_entered:
-      duration = datetime.timedelta(minutes=self.entity.exchange_format.duration)
+      duration = datetime.timedelta(minutes=er.entity.exchange_format.duration)
       if now > er.entity.start_dt + duration:
         er.end()
 
@@ -137,15 +137,15 @@ def update_match_form(user_id=""):
   
 
 def _update_match_form_already_matched(user, exchange):
-  changed = not exchange.my['present']
-  exchange.my['present'] = 1
+  changed = not exchange.my['entered_dt']
+  exchange.my['entered_dt'] = sm.now()
   #this_match, i = repo.exchange_i()
   other_user = sm.get_other_user(exchange.their['user_id'])
   if exchange.late_notify_needed(sm.now()):
     from . import notifies as n
     n.notify_late_for_chat(other_user, exchange.start_dt, [user])
     changed = True
-    exchange.their['late_notified'] = 1
+    exchange.their['late_notified'] = True
   if changed:
     er = repo.ExchangeRecord(exchange, exchange.exchange_id)
     er.save()
@@ -160,8 +160,8 @@ def _update_match_form_already_matched(user, exchange):
     message_items=messages_out,
     my_slider_value=exchange.my['slider_value'],
     their_slider_value=exchange.their['slider_value'],
-    their_external=exchange.their['external'],
-    their_complete=exchange.their['complete'],
+    their_external=not exchange.their['video_embedded'],
+    their_complete=exchange.their['complete_dt'],
   )
 
   
@@ -197,7 +197,7 @@ def match_complete(user_id=""):
   print(f"match_complete, {user_id}")
   from . import matcher
   exchange_record = current_user_exchange(user, record=True) # repo.get_exchange(user_id)
-  exchange_record.entity = _complete_exchange(exchange_record.entity) ####################### clean up
+  exchange_record.entity = _complete_exchange(exchange_record.entity)
   exchange_record.save()
   matcher.propagate_update_needed()
 
@@ -205,12 +205,12 @@ def match_complete(user_id=""):
 def _complete_exchange(exchange):
   from . import notifies as n
   # Note: 0/1 used for 'complete' b/c Booleans not allowed in SimpleObjects
-  exchange.my['complete'] = 1
-  if exchange.their['present'] == 0:
+  exchange.my['complete_dt'] = sm.now()
+  exchange.current = False
+  if not exchange.their['entered_dt']:
     user = sm.get_acting_user()
     other_user = sm.get_other_user(exchange.their['user_id'])
     n.notify_match_cancel_bg(other_user, exchange.start_dt, canceler_name=sm.name(user, to_user=other_user))
-    exchange.their['complete'] = 1
   return exchange
 
 
@@ -242,7 +242,7 @@ def update_my_external(my_external, user_id=""):
   print(f"update_my_external, {my_external}, {user_id}")
   exchange_record = current_user_exchange(user, record=True)
   if exchange_record:
-    exchange_record.entity.my['external'] = int(my_external)
+    exchange_record.entity.my['video_embedded'] = not bool(my_external)
     exchange_record.save()
   else:
     print("Exchange record not available to record my_external")

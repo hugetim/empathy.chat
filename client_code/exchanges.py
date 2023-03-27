@@ -34,7 +34,10 @@ class Exchange:
     return Exchange(
       exchange_id=None,
       room_code=h.new_jitsi_code(),
-      participants=[dict(user_id=r.user, request_id=r.request_id) for r in ep.requests],
+      participants=[
+        dict(user_id=r.user, request_id=r.request_id, entered_dt=None, appearances=[], late_notified=None, slider_value=None, video_embedded=None, complete_dt=None) 
+        for r in ep.requests
+      ],
       start_now=start_now,
       start_dt=ep.start_dt if not start_now else h.now(),
       exchange_format=ep.exchange_format,
@@ -47,7 +50,7 @@ class Exchange:
 
   @property
   def any_entered(self):
-    return bool([p for p in self.participants if p.get('entered_dt')])
+    return bool([p for p in self.participants if p['entered_dt']])
 
   @property
   def request_ids(self):
@@ -77,7 +80,7 @@ class Exchange:
       return other_participants[0]
 
   def late_notify_needed(self, now):
-    if self.their['present'] or self.their['late_notified']:
+    if self.their['entered_dt'] or self.their['late_notified']:
       return False
     past_start_time = self.start_dt < now
     return (not self.start_now) and past_start_time

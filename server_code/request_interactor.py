@@ -2,7 +2,6 @@ import anvil.server
 from anvil import tables
 from .requests import Request, Requests, ExchangeFormat, have_conflicts, prop_to_requests, exchange_to_save
 from .exchanges import Exchange
-from . import accounts
 from . import request_gateway
 from . import exchange_gateway
 from . import portable as port
@@ -28,7 +27,7 @@ def reset_repo():
 def accept_pair_request(user, request_id):
   accepted_request_record = repo.RequestRecord.from_id(request_id)
   accept_request = Request.to_accept_pair_request(user.get_id(), accepted_request_record.entity)
-  port_prop = requests_to_props([accept_request])
+  port_prop = requests_to_props([accept_request], user)
   add_request(user, port_prop)
 
 
@@ -47,7 +46,6 @@ def edit_request(user, port_prop):
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
   """
-  accounts.update_default_request(port_prop, user)
   requests = Requests(prop_to_requests(port_prop, user_id=user.get_id()))
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager(user, requests)

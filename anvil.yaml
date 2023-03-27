@@ -131,6 +131,9 @@ db_schema:
       admin_ui: {width: 200}
       type: link_single
       target: requests
+    - name: late_notified
+      admin_ui: {order: 1.5, width: 200}
+      type: bool
   codes:
     title: Codes
     client: none

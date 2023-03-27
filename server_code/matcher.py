@@ -124,7 +124,9 @@ def _init_matcher(user, trust_level):
 def _init_user_status(user):
   with TimerLogger("  _init_user_status", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
     ei.prune_no_show_exchanges()
-    timer.check("_prune_all_expired_items")
+    if user['status'] == "matched" and not ei.current_user_exchange(user):
+      user['status'] = None
+    timer.check("prune_no_show_exchanges")
     status = user['status']
     # if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
     #   _cancel_other(user)
@@ -323,6 +325,7 @@ def add_proposal(proposal, invite_link_key="", user_id=""):
   """
   print(f"add_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
+  accounts.update_default_request(port_prop, user)
   prop_id = ri.add_request(user, proposal, invite_link_key)
   propagate_update_needed(user)
   return _get_state(user), prop_id
@@ -384,6 +387,7 @@ def edit_proposal(port_prop, user_id=""):
   """
   print(f"edit_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
+  accounts.update_default_request(port_prop, user)
   prop_id = ri.edit_request(user, port_prop)
   propagate_update_needed(user)
   return _get_state(user), prop_id
