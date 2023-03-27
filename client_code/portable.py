@@ -207,10 +207,11 @@ class ProposalTime():
 
   def has_conflict(self, conflict_checks):
     # keep in sync with requests.have_no_conflicts
-    this = self.get_check_item()
-    for check_item in conflict_checks:
-      if this['start'] < check_item['end'] and check_item['start'] < this['end']:
-        return True
+    if conflict_checks:
+      this = self.get_check_item()
+      for check_item in conflict_checks:
+        if this['start'] < check_item['end'] and check_item['start'] < this['end']:
+          return True
     return False
     
   def get_check_item(self):
