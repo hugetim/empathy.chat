@@ -214,7 +214,7 @@ def _get_new_eligible_users(user, requests):
     (requests.user, requests.or_group_id, requests.elig_with_dict)
   except RuntimeError:
     sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
-  sm.my_assert(user.get_id() == requests.user, "notify_edit: user is requester")
+  sm.my_assert(user.get_id() == requests.user, f"notify_edit: user ({user.get_id()}) should be requester ({requests.user})")
   new_eligibility_spec = repo.eligibility_spec(requests[0])
   new_all_eligible_users = all_eligible_users(new_eligibility_spec)
   return new_all_eligible_users
