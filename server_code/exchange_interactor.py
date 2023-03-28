@@ -175,7 +175,8 @@ def _update_match_form_already_matched(user, exchange):
 def _update_match_form_not_matched(user):
   from . import matcher
   request_record = ri.now_request(user, record=True)
-  ri.confirm_wait(request_record)
+  if request_record:
+    ri.confirm_wait(request_record)
   matcher.propagate_update_needed(user)
   return dict(
     status=user['status'],

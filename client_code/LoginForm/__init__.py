@@ -18,6 +18,7 @@ class LoginForm(LoginFormTemplate):
     from .. import glob
     user, user_id = ui.get_user_and_id()
     if user:
+      self.rich_text_1.visible = False
       self.card_1.visible = True
       glob.logged_in_user = user
       glob.logged_in_user_id = user_id
