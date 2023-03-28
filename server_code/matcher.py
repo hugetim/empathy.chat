@@ -136,7 +136,7 @@ def _init_user_status(user):
     #   _cancel_other(user)
     if status == "requesting":
       request_record = ri.now_request(user, record=True)
-      if request_record is None:
+      if request_record is None and not ei.current_user_exchange(user):
         user['status'] = None
       else:
         expire_dt = request_record.entity.expire_dt
