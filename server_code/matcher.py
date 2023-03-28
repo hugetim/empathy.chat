@@ -327,7 +327,7 @@ def add_proposal(port_prop, invite_link_key="", user_id=""):
   print(f"add_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
   accounts.update_default_request(port_prop, user)
-  requests = Requests(prop_to_requests(port_prop, user_id=user_id))
+  requests = Requests(prop_to_requests(port_prop, user_id=user.get_id()))
   prop_id = ri.add_requests(user, requests, invite_link_key)
   propagate_update_needed(user)
   return _get_state(user), prop_id
@@ -390,7 +390,7 @@ def edit_proposal(port_prop, user_id=""):
   print(f"edit_proposal, {user_id}")
   user = sm.get_acting_user(user_id)
   accounts.update_default_request(port_prop, user)
-  requests = Requests(prop_to_requests(port_prop, user_id=user_id))
+  requests = Requests(prop_to_requests(port_prop, user_id=user.get_id()))
   prop_id = ri.edit_requests(user, requests)
   propagate_update_needed(user)
   return _get_state(user), prop_id
