@@ -1,10 +1,10 @@
 scheduled_tasks:
-- task_name: prune_old_matches
+- task_name: prune_old_exchanges
   time_spec:
     n: 1
     every: hour
-    at: {minute: 52}
-  job_id: CCYSLUDQ
+    at: {minute: 53}
+  job_id: CTIKZHRE
 dependencies:
 - app_id: MFQJNLWQIOGGXL4W
   version: {dev: false}

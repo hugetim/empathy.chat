@@ -38,10 +38,10 @@ def _seconds_left(status, expire_date=None, ping_start=None):
     print("matcher.seconds_left(s,lc,ps): " + status)
 
 
-@sm.background_task_with_reporting
-def prune_old_matches():
-  """Complete old commenced matches for all users"""
-  ei.prune_old_exchanges()
+# @sm.background_task_with_reporting
+# def prune_old_matches():
+#   """Complete old commenced matches for all users"""
+#   ei.prune_old_exchanges()
   # import datetime
   # assume_complete = datetime.timedelta(hours=p.ASSUME_COMPLETE_HOURS)
   # now = sm.now()
@@ -125,13 +125,16 @@ def _init_matcher(user, trust_level):
 def _init_user_status(user):
   with TimerLogger("  _init_user_status", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
     ei.prune_no_show_exchanges()
-    if user['status'] == "matched" and not ei.current_user_exchange(user):
-      user['status'] = None
     timer.check("prune_no_show_exchanges")
     status = user['status']
+    if status in ["matched", "pinging", "pinged"]:
+      if not ei.current_user_exchange(user):
+        user['status'] = None
+      elif status == "pinged":
+        ei.commence_user_exchange(user)
     # if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
     #   _cancel_other(user)
-    if status in ["requesting", "pinging", "pinged"]:
+    if status == "requesting":
       request_record = ri.now_request(user, record=True)
       if request_record is None:
         user['status'] = None
@@ -140,8 +143,6 @@ def _init_user_status(user):
         if _seconds_left("requesting", expire_date=expire_dt) <= 0:
           request_record.cancel()
           user.update()
-        elif status == "pinged":
-          ei.commence_user_exchange(user)
         else:
           ri.confirm_wait(request_record)
 

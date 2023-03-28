@@ -160,7 +160,7 @@ def _update_match_form_already_matched(user, exchange):
   messages_out = ni.get_messages(other_user, user)
   their_name = other_user['first_name']
   return dict(
-    status="matched",
+    status=user['status'],
     how_empathy_list=how_empathy_list,
     their_name=their_name,
     message_items=messages_out,
