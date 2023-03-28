@@ -1,6 +1,3 @@
-import anvil.tables
-from anvil.tables import app_tables
-import anvil.tables.query as q
 import anvil.server
 from . import parameters as p
 from . import notifies as n
@@ -10,7 +7,6 @@ from . import exchange_interactor as ei
 from . import request_interactor as ri
 from .requests import Requests, prop_to_requests
 from .server_misc import authenticated_callable
-from . import portable as port
 # from .proposals import Proposal, ProposalTime
 from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
@@ -165,6 +161,7 @@ def _get_proposals_upcomings(user):
 
 
 def propagate_update_needed(user=None):
+  from anvil.tables import app_tables
   all_users = app_tables.users.search(update_needed=False)
   for u in all_users:
     if u != user:
