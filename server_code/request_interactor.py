@@ -100,6 +100,7 @@ class RequestManager:
       matching_request = next((r for r in exchange_prospect if r.user==self.requests.user))
       self.requests = Requests([matching_request]) # save matching request only
       self._cancel_missing_or_group_requests()
+      print(self.requests.requests)
       self._save_requests()
       self.exchange = Exchange.from_exchange_prospect(exchange_prospect)
       self._save_exchange(requests_matched)
