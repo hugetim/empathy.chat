@@ -93,6 +93,7 @@ class RequestManager:
     _prune_request_records(other_request_records, self.now)
     exchange_prospect = self._exchange_prospect(other_request_records)
     if exchange_prospect:
+      earliest_request_start_dt = exchange_prospect.start_dt
       _process_exchange_requests(exchange_prospect)
       requests_matched = [r for r in exchange_prospect if r.user!=self.requests.user]
       _cancel_other_or_group_requests(requests_matched)
@@ -102,7 +103,7 @@ class RequestManager:
       self._save_requests()
       self.exchange = Exchange.from_exchange_prospect(exchange_prospect)
       self._save_exchange(requests_matched)
-      if self.exchange.start_now and (self.now - (exchange_prospect.start_dt)).total_seconds() <= p.BUFFER_SECONDS:
+      if self.exchange.start_now and (self.now - earliest_request_start_dt).total_seconds() <= p.BUFFER_SECONDS:
         for u in self.exchange_record.users:
           u['status'] = "matched" #app_tables.users
       elif self.exchange.start_now:
