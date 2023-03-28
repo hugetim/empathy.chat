@@ -102,7 +102,7 @@ class RequestManager:
       self._save_requests()
       self.exchange = Exchange.from_exchange_prospect(exchange_prospect)
       self._save_exchange(requests_matched)
-      if self.exchange.start_now and (self.now - (self.exchange.start_dt)).total_seconds() <= p.BUFFER_SECONDS:
+      if self.exchange.start_now and (self.now - (exchange_prospect.start_dt)).total_seconds() <= p.BUFFER_SECONDS:
         for u in self.exchange_record.users:
           u['status'] = "matched" #app_tables.users
       elif self.exchange.start_now:
@@ -174,6 +174,7 @@ class RequestManager:
   def _save_requests(self):
     self.request_records = []
     for request in self.requests:
+      print(f"_save_requests request_id: {request.request_id}")
       request_record = repo.RequestRecord(request, request.request_id)
       self.request_records.append(request_record)
       request_record.save()
@@ -181,7 +182,7 @@ class RequestManager:
 
   def notify_edit(self):
     anvil.server.launch_background_task(
-      '_notify_edit',
+      'notify_edit_bg',
       user=self.user,
       requests=self.requests,
       related_prev_requests=self.related_prev_requests,
@@ -189,7 +190,7 @@ class RequestManager:
 
 
 @sm.background_task_with_reporting
-def _notify_edit(user, requests, related_prev_requests):
+def notify_edit_bg(user, requests, related_prev_requests):
   new_all_eligible_users = _get_new_eligible_users(user, requests)
   old_all_eligible_users = _get_old_eligible_users(related_prev_requests)
   _notify_add(new_all_eligible_users - old_all_eligible_users, user, requests)
