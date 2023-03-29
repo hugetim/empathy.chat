@@ -331,8 +331,8 @@ class SimpleRecord(Record):
     except AttributeError:
       pass
     else:
-      if _record_id and not self._row_id:
-        my_assert(not (_record_id and not record_id), "entity row id present but record_id not supplied")
+      my_assert(not (_record_id and not self._row_id), "entity row should not be present if record_id not supplied")
+      my_assert(_record_id == self._row_id, "entity row id should be equal to record_id")
 
   @property
   def _row(self):
