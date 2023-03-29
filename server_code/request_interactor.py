@@ -51,11 +51,8 @@ def edit_requests(user, requests):
   request_editor = RequestManager()
   request_editor.check_and_save(user, requests)
   if request_editor.exchange:
-    request_editor.update_exchange_user_statuses()
     ping(user, request_editor.exchange)
   else:
-    if request_editor.requests.start_now:
-      request_editor.user['status'] = "requesting"
     request_editor.notify_edit()
   return requests.or_group_id
 
@@ -97,7 +94,7 @@ class RequestManager:
     _prune_request_records(other_request_records, self.now)
     exchange_prospect = _exchange_prospect(self.user, requests, other_request_records)
     if exchange_prospect:
-      self.earliest_request_start_dt = exchange_prospect.start_dt
+      earliest_request_start_dt = exchange_prospect.start_dt
       _process_exchange_requests(exchange_prospect)
       requests_matched = [r for r in exchange_prospect if r.user!=requests.user]
       _cancel_other_or_group_requests(requests_matched)
@@ -107,8 +104,11 @@ class RequestManager:
       self._save_requests(requests)
       self.exchange = Exchange.from_exchange_prospect(exchange_prospect)
       self._save_exchange(requests_matched)
+      self._update_exchange_user_statuses(earliest_request_start_dt)
     else:
       _cancel_missing_or_group_requests(requests, self.related_prev_requests)
+      if requests.start_now:
+        self.user['status'] = "requesting"
       self._save_requests(requests)
     self.requests = requests
 
@@ -135,10 +135,9 @@ class RequestManager:
       request_record.save()
       request.request_id = request_record.record_id
 
-  @tables.in_transaction
-  def update_exchange_user_statuses(self):
+  def _update_exchange_user_statuses(self, earliest_request_start_dt):
     if (self.exchange.start_now 
-        and (self.now - self.earliest_request_start_dt).total_seconds() <= p.BUFFER_SECONDS):
+        and (self.now - earliest_request_start_dt).total_seconds() <= p.BUFFER_SECONDS):
       for u in self.exchange_record.users:
         u['status'] = "matched" #app_tables.users
     elif self.exchange.start_now:
