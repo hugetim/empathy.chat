@@ -127,11 +127,11 @@ class RequestManager:
     self.exchange_record.save()
     self.exchange.exchange_id = self.exchange_record.record_id # for the new record case
   
-  def _save_requests(self, requests):
+  def _save_requests(self, requests, format_record_dict=None):
     #self.request_records = []
     for request in requests:
       print(f"_save_requests request_id: {request.request_id}")
-      request_record = repo.RequestRecord(request, request.request_id)
+      request_record = repo.RequestRecord(request, request.request_id, format_record_dict=format_record_dict)
       #self.request_records.append(request_record)
       request_record.save()
       request.request_id = request_record.record_id

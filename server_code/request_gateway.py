@@ -73,6 +73,7 @@ def _request_to_fields(request, format_record_dict=None):
 
 class RequestRecord(sm.SimpleRecord):
   _table_name = 'requests'
+  format_record_dict = None
 
   @staticmethod
   def _row_to_entity(row):
@@ -82,6 +83,13 @@ class RequestRecord(sm.SimpleRecord):
   def _entity_to_fields(entity):
     return _request_to_fields(entity)
 
+  def _entity_to_fields(self, entity):
+    return _request_to_fields(entity, format_record_dict=self.format_record_dict)
+
+  def __init__(self, entity, record_id=None, row=None, format_record_dict=None):
+    self.format_record_dict = format_record_dict
+    super().__init__(entity, record_id=record_id, row=row)
+  
   def cancel(self):
     if self._row_id:
       self._row['current'] = False
