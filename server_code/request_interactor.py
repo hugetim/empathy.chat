@@ -90,7 +90,8 @@ class RequestManager:
     self.exchange = None
     self.related_prev_requests, unrelated_prev_requests = _user_prev_requests(self.user, requests)
     _check_requests_valid(self.user, requests, unrelated_prev_requests)
-    other_request_records = _potential_matching_request_records(requests, self.user, self.now)
+    _exchange_format_record_dict = repo.exchange_format_record_dict({r.exchange_format for r in requests})
+    other_request_records = _potential_matching_request_records(requests, self.user, format_record_dict=_exchange_format_record_dict)
     _prune_request_records(other_request_records, self.now)
     exchange_prospect = _exchange_prospect(self.user, requests, other_request_records)
     if exchange_prospect:
@@ -184,12 +185,12 @@ def _cancel_missing_or_group_requests(requests, related_prev_requests):
     rr.cancel()
 
 
-def _potential_matching_request_records(requests, user, now):
+def _potential_matching_request_records(requests, user, format_record_dict=None):
   partial_request_dicts = [
     dict(start_now=r.start_now, start_dt=r.start_dt, exchange_format=r.exchange_format)
     for r in requests
   ]
-  return list(repo.partially_matching_requests(user, partial_request_dicts, now, records=True))
+  return list(repo.partially_matching_requests(user, partial_request_dicts, format_record_dict=format_record_dict, records=True))
 
 
 def _exchange_prospect(user, requests, other_request_records):
