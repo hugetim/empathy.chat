@@ -8,7 +8,7 @@ from . import invite_gateway as ig
 
 
 def _row_to_request(row):
-  exchange_format = ExchangeFormat(duration=row['exchange_format']['duration'])
+  exchange_format = _row_to_exchange_format(row['exchange_format'])
   kwargs = dict(exchange_format=exchange_format)
   kwargs['request_id'] = row.get_id()
   kwargs['user'] = row['user'].get_id()
@@ -38,9 +38,12 @@ def _row_to_request(row):
   return Request(**kwargs)
 
 
-def _request_to_fields(request):
-  exchange_format = get_exchange_format_row(request.exchange_format)
-  out = dict(exchange_format=exchange_format)
+def _request_to_fields(request, format_record_dict=None):
+  if format_record_dict and request.exchange_format in format_record_dict:
+    exchange_format_row = format_record_dict[request.exchange_format]._row
+  else:
+    exchange_format_row = get_exchange_format_row(request.exchange_format)
+  out = dict(exchange_format=exchange_format_row)
   out['user'] = sm.get_other_user(request.user)
   out['with_users'] = [sm.get_other_user(user_id)
                        for user_id in request.with_users]
@@ -78,6 +81,13 @@ class RequestRecord(sm.SimpleRecord):
   @staticmethod
   def _entity_to_fields(entity):
     return _request_to_fields(entity)
+
+  def _entity_to_fields(self, entity):
+    return _request_to_fields(entity, format_record_dict=self.format_record_dict)
+  
+  def __init__(self, entity, record_id=None, row=None, format_record_dict=None):
+    self.format_record_dict = format_record_dict
+    super().__init__(entity, record_id=None, row=None)
 
   def cancel(self):
     if self._row_id:
@@ -123,6 +133,28 @@ def eligibility_spec(request):
   return spec
 
 
+class ExchangeFormatRecord(sm.SimpleRecord):
+  _table_name = 'exchange_formats'
+
+  @staticmethod
+  def _row_to_entity(row):
+    return _row_to_exchange_format(row)
+
+  @staticmethod
+  def _entity_to_fields(entity):
+    return dict(duration=entity.duration)
+
+  def save(self):
+    if self._row_id and self._row_to_entity(self._row) == self.entity:
+      return
+    self.__row = get_exchange_format_row(self.entity)
+    self._row_id = self._row.get_id()
+
+
+def _row_to_exchange_format(row):
+  return ExchangeFormat(duration=row['duration'])
+
+
 def get_exchange_format_row(exchange_format):
   row = app_tables.exchange_formats.get(duration=exchange_format.duration)
   if not row:
@@ -152,13 +184,21 @@ def requests_by_or_group(or_group_ids, records=False):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
-def partially_matching_requests(user, partial_request_dicts, now, records=False):
+def partially_matching_requests(user, partial_request_dicts, format_record_dict=None, records=False):
+  if format_record_dict is None:
+    exchange_formats = {prd['exchange_format'] for prd in partial_request_dicts}
+    format_record_dict = exchange_format_record_dict(exchange_formats)
+  exchange_format_row_dict = {ef: format_record_dict[ef]._row for ef in format_record_dict}
   q_expressions = [
-    q.all_of(exchange_format=get_exchange_format_row(prd['exchange_format']),
-             **(dict(start_dt=q.less_than(now)) if prd['start_now'] else dict(start_dt=prd['start_dt']))
+    q.all_of(exchange_format=exchange_format_row_dict[prd['exchange_format']],
+             **(dict(start_now=True) if prd['start_now'] else dict(start_dt=prd['start_dt']))
             )
     for prd in partial_request_dicts
   ]
   rows = app_tables.requests.search(q.any_of(*q_expressions), user=q.not_(user), current=True)
   for request_row in rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
+
+
+def exchange_format_record_dict(exchange_formats):
+  return {ef: ExchangeFormatRecord.from_row(get_exchange_format_row(ef)) for ef in exchange_formats}

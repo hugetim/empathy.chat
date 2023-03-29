@@ -322,17 +322,17 @@ class SimpleRecord(Record):
   
   def __init__(self, entity, record_id=None, row=None):
     self.entity = entity
-    self._row_id = record_id
     if record_id is None and row:
       record_id = row.get_id()
+    self._row_id = record_id
     self.__row = row
     try:
       _record_id = getattr(entity, self.__class__.__name__.lower()[:-6] + "_id")
     except AttributeError:
       pass
     else:
-      if _record_id and not self._row_id:
-        my_assert(not (_record_id and not record_id), "entity row id present but record_id not supplied")
+      my_assert(not (_record_id and not self._row_id), "entity row should not be present if record_id not supplied")
+      my_assert(_record_id == self._row_id, "entity row id should be equal to record_id")
 
   @property
   def _row(self):
