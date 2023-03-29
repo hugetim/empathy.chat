@@ -84,7 +84,7 @@ components:
         name: timer_button
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle text chat card,
-          border: '', enabled: true, foreground: '', visible: true, text: Messages/History,
+          border: '', enabled: true, foreground: '', visible: true, text: Messages,
           font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
           italic: false, background: '', bold: false, underline: false, icon: 'fa:comment'}
         layout_properties: {}
@@ -107,9 +107,10 @@ components:
         event_bindings: {click: lists_button_click}
         name: lists_button
       - type: Spacer
-        properties: {height: 32}
+        properties: {visible: true, spacing_above: small, spacing_below: small, height: 6,
+          tooltip: ''}
         name: spacer_3
-        layout_properties: {width: 14}
+        layout_properties: {width: 14, expand: false}
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle full-screen mode (not just the video chat),
           border: '', enabled: true, foreground: '', visible: true, text: Full Screen,
@@ -136,19 +137,21 @@ components:
           layout_properties: {grid_position: 'ADNINT,BAITJS'}
           name: button_1
           event_bindings: {click: jitsi_link_click}
-      - type: Spacer
-        properties: {visible: true, spacing_above: small, spacing_below: small, height: 7.999992370605469,
-          tooltip: ''}
-        layout_properties: {width: null, expand: true}
-        name: spacer_2
-      - type: Button
-        properties: {role: secondary-color, align: right, tooltip: '', border: '',
-          enabled: true, foreground: '', visible: false, text: Cancel, font_size: 13,
-          font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: ''}
-        layout_properties: {grid_position: 'NLWDED,PWPLEY'}
-        event_bindings: {click: complete_button_click}
-        name: complete_button
+      - type: FlowPanel
+        properties: {role: null, spacing: medium, align: right, tooltip: '', border: '',
+          foreground: '', visible: true, spacing_above: none, spacing_below: none,
+          background: ''}
+        name: flow_panel_2
+        layout_properties: {expand: true, width: null}
+        components:
+        - type: Button
+          properties: {role: secondary-color, align: right, tooltip: '', border: '',
+            enabled: true, foreground: '', visible: false, text: Cancel, font_size: 13,
+            font: '', spacing_above: small, icon_align: left, spacing_below: small,
+            italic: false, background: '', bold: false, underline: false, icon: ''}
+          layout_properties: {grid_position: 'NLWDED,PWPLEY'}
+          event_bindings: {click: complete_button_click}
+          name: complete_button
     - type: LinearPanel
       properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
         border: '', visible: true, role: null, tooltip: ''}
