@@ -322,9 +322,9 @@ class SimpleRecord(Record):
   
   def __init__(self, entity, record_id=None, row=None):
     self.entity = entity
-    self._row_id = record_id
     if record_id is None and row:
       record_id = row.get_id()
+    self._row_id = record_id
     self.__row = row
     try:
       _record_id = getattr(entity, self.__class__.__name__.lower()[:-6] + "_id")
