@@ -8,7 +8,7 @@ from . import invite_gateway as ig
 
 
 def _row_to_request(row):
-  exchange_format = ExchangeFormat(duration=row['exchange_format']['duration'])
+  exchange_format = _row_to_exchange_format(row['exchange_format'])
   kwargs = dict(exchange_format=exchange_format)
   kwargs['request_id'] = row.get_id()
   kwargs['user'] = row['user'].get_id()
@@ -121,6 +121,10 @@ def eligibility_spec(request):
   spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
                              for port_group in request.eligible_groups]
   return spec
+
+
+def _row_to_exchange_format(row):
+  return ExchangeFormat(duration=row['duration'])
 
 
 def get_exchange_format_row(exchange_format):
