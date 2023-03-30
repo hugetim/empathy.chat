@@ -142,11 +142,12 @@ def get_exchange_format_row(exchange_format):
 
 basic_requests_fields = ['or_group_id', 'pref_order', 'current', 'exchange_format', 'start_dt', 'expire_dt',
                          'create_dt', 'edit_dt', 'min_size', 'max_size', 'eligible', 'eligible_starred']
-requests_fetch = q.fetch_only(user=q.fetch_only(), 
-                              with_users=q.fetch_only(), 
-                              eligible_users=q.fetch_only(), 
+requests_fetch = q.fetch_only(*basic_requests_fields,
+                              user=q.fetch_only('first_name'), 
+                              with_users=q.fetch_only('first_name'), 
+                              eligible_users=q.fetch_only('first_name'), 
                               eligible_groups=q.fetch_only('name'),
-                              *basic_requests_fields)
+                             )
 
 
 def requests_by_user(user, records=False):
@@ -156,7 +157,7 @@ def requests_by_user(user, records=False):
 
 
 def requests_by_invite_row(invite_row, records=False):
-  request_rows = app_tables.requests.search(requests_fetch, user=user, current=True)
+  request_rows = app_tables.requests.search(requests_fetch, eligible_invites=invite_row, current=True)
   for request_row in request_rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 

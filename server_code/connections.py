@@ -9,7 +9,10 @@ from . import parameters as p
 from . import helper as h
 from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
-  
+
+
+quick_c_fetch = q.fetch_only('distance', user1=q.fetch_only('first_name'), user2=q.fetch_only('first_name'))
+
 
 def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_list=False):
   """Return dictionary from degree to set of connections"""
@@ -18,13 +21,13 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
   if not cache_override: # and user == sm.get_acting_user():
     return _cached_get_connections(user, up_to_degree)
   conn_rows = {}
-  conn_rows[0] = app_tables.connections.search(user1=user, current=True)
+  conn_rows[0] = app_tables.connections.search(quick_c_fetch, user1=user, current=True)
   degree1s = {row['user2'] for row in conn_rows[0]}
   out = {0: {user}, 1: degree1s}
   prev = {user}
   for d in range(1, up_to_degree):
     prev.update(out[d])
-    conn_rows[d] = app_tables.connections.search(user1=q.any_of(*out[d]), current=True)
+    conn_rows[d] = app_tables.connections.search(quick_c_fetch, user1=q.any_of(*out[d]), current=True)
     current = {row['user2'] for row in conn_rows[d]}
     out[d+1] = current - prev
   if not output_conn_list:
@@ -286,7 +289,7 @@ def try_connect(invite, invite_reply):
 
 
 def _already_connected(invite):
-  already = app_tables.connections.search(user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']), current=True)
+  already = app_tables.connections.search(quick_c_fetch, user1=q.any_of(invite['user1'], invite['user2']), user2=q.any_of(invite['user1'], invite['user2']), current=True)
   return len(already) > 0
 
 
@@ -343,10 +346,10 @@ def _disconnect(user2, user1):
     
   
 def _remove_connection_prompts(user1, user2):
-  prompts = app_tables.prompts.search(user=user1, spec={'name': 'connected', 'to_id': user2.get_id()})
+  prompts = app_tables.prompts.search(q.fetch_only('dismissed'), user=user1, spec={'name': 'connected', 'to_id': user2.get_id()})
   for prompt in prompts:
     prompt.delete()
-  prompts = app_tables.prompts.search(user=user2, spec={'name': 'connected', 'to_id': user1.get_id()})
+  prompts = app_tables.prompts.search(q.fetch_only('dismissed'), user=user2, spec={'name': 'connected', 'to_id': user1.get_id()})
   for prompt in prompts:
     prompt.delete()
     

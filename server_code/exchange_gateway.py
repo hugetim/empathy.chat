@@ -102,26 +102,34 @@ def add_chat(from_user, message, now, users):
 # def _match_row(self, exchange):
 #   return app_tables.matches.get_by_id(exchange.exchange_id)
 
+basic_participants_fields = ['entered_dt', 'complete_dt', 'appearances', 'late_notified', 'slider_value', 'video_external']
+participants_fetch = q.fetch_only(*basic_participants_fields, user=q.fetch_only('first_name'), request=q.fetch_only('current'))
+basic_exchange_fields = ['room_code', 'start_dt', 'current', 'start_now', 'exchange_format']
+exchanges_fetch = q.fetch_only(*basic_exchange_fields,
+                               users=q.fetch_only('first_name'),
+                               participants=participants_fetch,
+                              )
+
 
 def exchanges_by_user(user, records=False):
-  for exchange_row in app_tables.exchanges.search(users=[user], current=True):
+  for exchange_row in app_tables.exchanges.search(exchanges_fetch, users=[user], current=True):
     yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
 
 
 def exchanges_by_user_starting_prior_to(user, cutoff_dt, records=False):
-  rows = app_tables.exchanges.search(users=[user], start_dt=q.less_than(cutoff_dt), current=True)
+  rows = app_tables.exchanges.search(exchanges_fetch, users=[user], start_dt=q.less_than(cutoff_dt), current=True)
   for exchange_row in rows:
     yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
 
 
 def exchanges_starting_prior_to(cutoff_dt, records=False):
-  for exchange_row in app_tables.exchanges.search(start_dt=q.less_than(cutoff_dt), current=True):
+  for exchange_row in app_tables.exchanges.search(exchanges_fetch, start_dt=q.less_than(cutoff_dt), current=True):
     yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
 
 
 def exchange_record_with_any_request_records(request_records):
   request_rows = [rr._row for rr in request_records]
-  participant_rows_with = app_tables.participants.search(request=q.any_of(*request_rows))
+  participant_rows_with = app_tables.participants.search(participants_fetch, request=q.any_of(*request_rows))
   if len(participant_rows_with) > 0:
     return ExchangeRecord.from_row(app_tables.exchanges.get(participants=list(participant_rows_with)))
   else:

@@ -187,10 +187,9 @@ def get_prompts(user):
   print("                      get_prompts")
   import datetime
   out = []
-  other_prompts = app_tables.prompts.search(user=user)
+  other_prompts = app_tables.prompts.search(q.fetch_only('spec'), user=user, dismissed=q.not_(True))
   if len(other_prompts) > 0:
     for prompt in other_prompts:
-      if prompt['dismissed']: continue
       spec = prompt['spec']
       spec['prompt_id'] = prompt.get_id() 
       out.append(spec)
@@ -258,7 +257,7 @@ def _invite_guess_fail_prompt(s_invite):
 
 @background_task_with_reporting
 def add_message_prompt(user2, user1):
-  such_prompts = app_tables.prompts.search(user=user2, dismissed=False, spec={"name": "message", "from_id": user1.get_id()})
+  such_prompts = app_tables.prompts.search(q.fetch_only('dismissed'), user=user2, dismissed=False, spec={"name": "message", "from_id": user1.get_id()})
   if len(such_prompts) == 0:
     from_name = name(user1, to_user=user2)
     app_tables.prompts.add_row(user=user2, date=now(), dismissed=False,

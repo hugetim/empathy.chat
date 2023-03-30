@@ -42,7 +42,7 @@ class MyGroups(groups.MyGroups):
 
     
 def get_names_taken():
-  return [row['name'] for row in app_tables.groups.search(current=True)]
+  return [row['name'] for row in app_tables.groups.search(q.fetch_only('name'), current=True)]
 
 
 @sm.authenticated_callable
@@ -51,7 +51,7 @@ def load_my_groups(user_id="", user=None):
   print(f"load_my_groups({user_id})")
   if not user:
     user = sm.get_acting_user(user_id)
-  rows = app_tables.groups.search(hosts=[user], current=True)
+  rows = app_tables.groups.search(q.fetch_only('name', hosts=q.fetch_only('first_name')), hosts=[user], current=True)
   _groups = [MyGroup.from_group_row(row, portable=True, user=user) for row in rows]
   return groups.MyGroups(_groups, get_names_taken())
 
@@ -95,7 +95,7 @@ class MyGroup(groups.MyGroup):
     if not user:
       user = sm.get_acting_user()
     port_invites = [Invite.from_invite_row(i_row, portable=True, user=user)
-                    for i_row in app_tables.group_invites.search(anvil.tables.order_by('expire_date', ascending=False), 
+                    for i_row in app_tables.group_invites.search(q.fetch_only('link_key', 'spec', 'created', 'expire_date'), anvil.tables.order_by('expire_date', ascending=False), 
                                                                  group=group_row, current=True)]
     port_my_group = groups.MyGroup(name=group_row['name'],
                                    group_id=group_row.get_id(),
@@ -150,7 +150,7 @@ def new_link_key():
   unique_key_found = False
   while not unique_key_found:
     random_key = h.random_code(num_chars=p.NEW_LINK_KEY_LENGTH)
-    matching_rows = app_tables.group_invites.search(link_key=random_key)
+    matching_rows = app_tables.group_invites.search(q.fetch_only('link_key'), link_key=random_key)
     unique_key_found = not len(matching_rows)
   return random_key
 
@@ -165,14 +165,14 @@ def delete_group(port_my_group):
       
 def all_members_from_group_row(group_row):
   """Returns all group members regardless of trust_level or allowed status"""
-  member_set = {m['user'] for m in app_tables.group_members.search(group=group_row)}
+  member_set = {m['user'] for m in app_tables.group_members.search(q.fetch_only(user=q.fetch_only('first_name')), group=group_row)}
   member_set.update(set(group_row['hosts']))
   return list(member_set)
 
 
 def member_dicts_from_group_row(group_row):
   """Returns dicts for members (excluding hosts) with non-missing trust_level"""
-  member_rows = [m for m in app_tables.group_members.search(group=group_row) if m['user']['trust_level']]
+  member_rows = [m for m in app_tables.group_members.search(q.fetch_only('guest_allowed', user=q.fetch_only('first_name')), group=group_row) if m['user']['trust_level']]
   member_ids = [m['user'].get_id() for m in member_rows]
   group_id = group_row.get_id()
   for i, member_id in enumerate(member_ids):
@@ -181,8 +181,8 @@ def member_dicts_from_group_row(group_row):
 
 def user_groups(user):
   """Returns all groups for which user in all_members_from_group_row"""
-  memberships = {m['group'] for m in app_tables.group_members.search(user=user)}
-  hosteds = {group for group in app_tables.groups.search(hosts=[user], current=True)}
+  memberships = {m['group'] for m in app_tables.group_members.search(q.fetch_only(group=q.fetch_only('name')), user=user)}
+  hosteds = {group for group in app_tables.groups.search(q.fetch_only('name'), hosts=[user], current=True)}
   return memberships.union(hosteds)
 
 
@@ -191,13 +191,13 @@ def allowed_members_from_group_row(group_row, user):
   group_hosts = group_row['hosts']
   if user in group_hosts:
     member_set = (
-      {m['user'] for m in app_tables.group_members.search(group=group_row) 
+      {m['user'] for m in app_tables.group_members.search(q.fetch_only(user=q.fetch_only('trust_level')), group=group_row) 
        if m['user']['trust_level'] and m['user']['trust_level'] >= 1}
     )
     member_set.update(set(group_row['hosts']))
   elif user_allowed_in_group(user, group_row):
     member_set = (
-      {m['user'] for m in app_tables.group_members.search(group=group_row) 
+      {m['user'] for m in app_tables.group_members.search(q.fetch_only('guest_allowed', user=q.fetch_only('trust_level')), group=group_row) 
        if m['user']['trust_level'] and (m['user']['trust_level'] >= 2 or (m['user']['trust_level'] >= 1 and m['guest_allowed']))}
     )
     member_set.update(set(group_row['hosts']))
@@ -351,7 +351,7 @@ class Invite(sm.ServerItem, groups.Invite):
   @staticmethod
   def from_invite_row(invite_row, portable=False, user=None):
     if not user:
-      user = sm.get_acting_user(user_id)
+      user = sm.get_acting_user()
     port_invite = groups.Invite(link_key=invite_row['link_key'],
                                 invite_id=invite_row.get_id(),
                                 expire_date=sm.as_user_tz(invite_row['expire_date'], user),
