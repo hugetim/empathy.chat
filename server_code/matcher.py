@@ -123,24 +123,18 @@ def _init_user_status(user):
     ei.prune_no_show_exchanges()
     timer.check("prune_no_show_exchanges")
     status = user['status']
-    if status in ["matched", "pinging", "pinged"]:
-      if not ei.current_user_exchange(user):
-        user['status'] = None
-      elif status == "pinged":
-        ei.commence_user_exchange(user)
+    if status == "pinged":
+      ei.commence_user_exchange(user)
     # if partial_state['status'] == 'pinging' and partial_state['seconds_left'] <= 0:
     #   _cancel_other(user)
     if status == "requesting":
       request_record = ri.now_request(user, record=True)
-      if request_record is None and not ei.current_user_exchange(user):
-        user['status'] = None
+      expire_dt = request_record.entity.expire_dt
+      if _seconds_left("requesting", expire_date=expire_dt) <= 0:
+        request_record.cancel()
+        user.update()
       else:
-        expire_dt = request_record.entity.expire_dt
-        if _seconds_left("requesting", expire_date=expire_dt) <= 0:
-          request_record.cancel()
-          user.update()
-        else:
-          ri.confirm_wait(request_record)
+        ri.confirm_wait(request_record)
 
  
 # def confirm_wait_helper(user):
@@ -286,9 +280,9 @@ def cancel_match(match_id, user_id=""):
   """Cancel pending match"""
   print(f"cancel_match, {match_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  users_to_notify, match_commence = ei.cancel_exchange(user, match_id)
+  users_to_notify, start_dt = ei.cancel_exchange(user, match_id)
   for u in users_to_notify:
-    n.notify_match_cancel_bg(u, start=match_commence, canceler_name=sm.name(user, to_user=u))
+    n.notify_match_cancel_bg(u, start=start_dt, canceler_name=sm.name(user, to_user=u))
   propagate_update_needed(user)
   return _get_state(user)
 

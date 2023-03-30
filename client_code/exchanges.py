@@ -29,17 +29,30 @@ class Exchange:
       self._their_i = self.participants.index(self._their())
   
   @staticmethod
-  def from_exchange_prospect(ep: ExchangeProspect):
+  def from_exchange_prospect(ep: ExchangeProspect, now=None):
     start_now = ep.start_now
+    now = now if now is not None else h.now()
+    if (start_now and (now - ep.start_dt).total_seconds() <= p.BUFFER_SECONDS):
+      entered_dt = now
+    else:
+      entered_dt = None
     return Exchange(
       exchange_id=None,
       room_code=h.new_jitsi_code(),
       participants=[
-        dict(participant_id=None, user_id=r.user, request_id=r.request_id, entered_dt=None, appearances=[], late_notified=None, slider_value=None, video_external=None, complete_dt=None) 
+        dict(participant_id=None,
+             user_id=r.user,
+             request_id=r.request_id,
+             entered_dt=entered_dt,
+             appearances=[],
+             late_notified=None,
+             slider_value=None,
+             video_external=None,
+             complete_dt=None) 
         for r in ep.requests
       ],
       start_now=start_now,
-      start_dt=ep.start_dt if not start_now else h.now(),
+      start_dt=ep.start_dt if not start_now else now,
       exchange_format=ep.exchange_format,
       current=True,
     )
@@ -49,8 +62,8 @@ class Exchange:
     return len(self.participants)
 
   @property
-  def any_entered(self):
-    return bool([p for p in self.participants if p['entered_dt']])
+  def any_appeared(self):
+    return bool([p for p in self.participants if p['appearances']])
 
   @property
   def request_ids(self):
@@ -62,6 +75,13 @@ class Exchange:
 
   def start_appearance(self, time_dt):
     self.my['appearances'].append(dict(start_dt=time_dt, end_dt=time_dt, appearance_id=None))
+
+  def continue_appearance(self, time_dt):
+    if self.my['appearances']:
+      appearance = self.my['appearances'][-1]
+      appearance['end_dt'] = time_dt
+    else:
+      self.start_appearance(time_dt)
   
   @property
   def my(self):
@@ -79,8 +99,18 @@ class Exchange:
     if other_participants:
       return other_participants[0]
 
+  def participant_by_id(self, user_id):
+    return next((p for p in self.participants if p['user_id'] == user_id))
+
+  @property
+  def currently_matched_user_ids(self):
+    if self.current:
+      return [p['user_id'] for p in self.participants if p['entered_dt'] and not p['complete_dt']]
+    else:
+      return []
+  
   def late_notify_needed(self, now):
-    if self.their['entered_dt'] or self.their['late_notified']:
+    if self.their['appearances'] or self.their['late_notified']:
       return False
     past_start_time = self.start_dt < now
     return (not self.start_now) and past_start_time

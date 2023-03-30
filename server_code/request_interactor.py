@@ -94,7 +94,6 @@ class RequestManager:
     _prune_request_records(other_request_records, self.now)
     exchange_prospect = _exchange_prospect(self.user, requests, other_request_records)
     if exchange_prospect:
-      earliest_request_start_dt = exchange_prospect.start_dt
       _process_exchange_requests(exchange_prospect)
       requests_matched = [r for r in exchange_prospect if r.user!=requests.user]
       _cancel_other_or_group_requests(requests_matched)
@@ -102,9 +101,9 @@ class RequestManager:
       requests = Requests([matching_request]) # save matching request only
       _cancel_missing_or_group_requests(requests, self.related_prev_requests)
       self._save_requests(requests)
-      self.exchange = Exchange.from_exchange_prospect(exchange_prospect)
+      self.exchange = Exchange.from_exchange_prospect(exchange_prospect, self.now)
       self._save_exchange(requests_matched)
-      self._update_exchange_user_statuses(earliest_request_start_dt)
+      self._update_exchange_user_statuses()
     else:
       _cancel_missing_or_group_requests(requests, self.related_prev_requests)
       if requests.start_now:
@@ -135,9 +134,8 @@ class RequestManager:
       request_record.save()
       request.request_id = request_record.record_id
 
-  def _update_exchange_user_statuses(self, earliest_request_start_dt):
-    if (self.exchange.start_now 
-        and (self.now - earliest_request_start_dt).total_seconds() <= p.BUFFER_SECONDS):
+  def _update_exchange_user_statuses(self):
+    if (self.exchange.start_now and self.exchange.participants[0]['entered_dt']):
       for u in self.exchange_record.users:
         u['status'] = "matched" #app_tables.users
     elif self.exchange.start_now:
@@ -277,7 +275,7 @@ def cancel_now(user, request_id=None):
     request_record = repo.RequestRecord.from_id(request_id)
   else:
     request_record = now_request(user, record=True)
-  request_record.cancel()
+  request_record.cancel_in_transaction()
   if status == 'requesting':
     _notify_cancel(all_eligible_users(request_record.eligibility_spec), user)
 
@@ -289,7 +287,7 @@ def cancel_request(user, proptime_id):
     _notify_edit(all_eligible_users(rr.eligibility_spec), user, other_or_group_requests)
   else:
     _notify_cancel(all_eligible_users(rr.eligibility_spec), user)
-  rr.cancel()
+  rr.cancel_in_transaction()
 
 
 def _other_or_group_requests(user, rr):

@@ -1,4 +1,5 @@
 import anvil.secrets
+from anvil import tables
 from .server_misc import authenticated_callable
 from . import server_misc as sm
 from . import network_interactor as ni
@@ -73,7 +74,7 @@ def prune_old_exchanges():
   cutoff_dt = now - assume_complete
   old_exchange_records = repo.exchanges_starting_prior_to(cutoff_dt, records=True)
   for er in old_exchange_records:
-    er.end()
+    er.end_in_transaction()
 
 
 def prune_no_show_exchanges():
@@ -84,7 +85,7 @@ def prune_no_show_exchanges():
   now = sm.now()
   exchange_records = repo.exchanges_starting_prior_to(now, records=True)
   for er in exchange_records:
-    if not er.entity.any_entered:
+    if not er.entity.any_appeared:
       duration = datetime.timedelta(minutes=er.entity.exchange_format.duration)
       if now > er.entity.start_dt + duration:
         er.end()
@@ -143,8 +144,8 @@ def update_match_form(user_id=""):
   
 
 def _update_match_form_already_matched(user, exchange):
-  changed = not exchange.my['entered_dt']
-  exchange.my['entered_dt'] = sm.now()
+  changed = bool(not exchange.my['appearances'])
+  exchange.continue_appearance(sm.now())
   #this_match, i = repo.exchange_i()
   other_user = sm.get_other_user(exchange.their['user_id'])
   if exchange.late_notify_needed(sm.now()):
@@ -204,24 +205,27 @@ def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user"""
   print(f"match_complete, {user_id}")
   from . import matcher
+  from . import notifies as n
   user = sm.get_acting_user(user_id)
   exchange_record = current_user_exchange(user, record=True) # repo.get_exchange(user_id)
-  exchange_record.entity = _complete_exchange(exchange_record.entity)
-  exchange_record.save()
+  exchange = exchange_record.entity
+  _complete_exchange(exchange_record)
+  if not exchange.their['entered_dt']:
+    other_user = sm.get_other_user(exchange.their['user_id'])
+    n.notify_match_cancel_bg(other_user, exchange.start_dt, canceler_name=sm.name(user, to_user=other_user))
   matcher.propagate_update_needed()
 
 
-def _complete_exchange(exchange):
-  from . import notifies as n
+@tables.in_transaction
+def _complete_exchange(exchange_record):
+  exchange = exchange_record.entity
+  if exchange.current and exchange.my['entered_dt'] and not exchange.my['complete_dt']:
+    user['status'] = None
   exchange.my['complete_dt'] = sm.now()
   sm.my_assert(exchange.size <= 2, "_complete_exchange code below assumes dyads")
-  if exchange.their['complete_dt']:
+  if exchange.their['complete_dt'] or not exchange.their['entered_dt']:
     exchange.current = False
-  if not exchange.their['entered_dt']:
-    user = sm.get_acting_user()
-    other_user = sm.get_other_user(exchange.their['user_id'])
-    n.notify_match_cancel_bg(other_user, exchange.start_dt, canceler_name=sm.name(user, to_user=other_user))
-  return exchange
+  exchange_record.save()
 
 
 def cancel_exchange(user, exchange_id):
@@ -229,7 +233,7 @@ def cancel_exchange(user, exchange_id):
     print(f"cancel_exchange, {exchange_id}")
   exchange_record = repo.ExchangeRecord.from_id(exchange_id)
   users_to_notify = [u for u in exchange_record.users if u != user]
-  exchange_record.end()
+  exchange_record.end_in_transaction()
   return users_to_notify, exchange_record.entity.start_dt
 
  

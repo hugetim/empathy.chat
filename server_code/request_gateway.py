@@ -80,12 +80,16 @@ class RequestRecord(sm.SimpleRecord):
   def _entity_to_fields(entity):
     return _request_to_fields(entity)
 
+  @tables.in_transaction
+  def cancel_in_transaction(self):
+    self.cancel()
+  
   def cancel(self):
+    if self.entity.current and self.entity.start_now:
+      self.user['status'] = None
     if self._row_id:
       self._row['current'] = False
     self.entity.current = False
-    if self.entity.start_now:
-      self.user['status'] = None
 
   def update_expire_dt(self, expire_dt):
     self._row['expire_dt'] = expire_dt

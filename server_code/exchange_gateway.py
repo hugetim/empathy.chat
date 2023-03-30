@@ -165,7 +165,13 @@ class ExchangeRecord(sm.SimpleRecord):
     else:
       return [sm.get_other_user(p['user_id']) for p in self.entity.participants]
 
+  @tables.in_transaction
+  def end_in_transaction(self):
+    self.end()
+  
   def end(self):
+    for u_id in self.entity.currently_matched_user_ids:
+      sm.get_other_user(u_id)['status'] = None
     if self._row_id:
       self._row['current'] = False
     self.entity.current = False
