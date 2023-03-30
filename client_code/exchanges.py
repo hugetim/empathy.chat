@@ -1,5 +1,6 @@
 from collections import namedtuple
 from . import helper as h
+from . import parameters as p
 from .requests import Request, ExchangeProspect, ExchangeFormat
 
 
