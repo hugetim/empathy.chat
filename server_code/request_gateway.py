@@ -157,7 +157,7 @@ def requests_by_user(user, records=False):
 
 
 def requests_by_invite_row(invite_row, records=False):
-  request_rows = app_tables.requests.search(requests_fetch, eligible_invites=invite_row, current=True)
+  request_rows = app_tables.requests.search(requests_fetch, eligible_invites=[invite_row], current=True)
   for request_row in request_rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
