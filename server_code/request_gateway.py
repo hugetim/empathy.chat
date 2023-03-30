@@ -5,6 +5,7 @@ from .requests import Request, ExchangeFormat
 from . import server_misc as sm
 from . import groups
 from . import invite_gateway as ig
+from functools import lru_cache
 
 
 def _row_to_request(row):
@@ -127,6 +128,7 @@ def _row_to_exchange_format(row):
   return ExchangeFormat(duration=row['duration'])
 
 
+@lru_cache(maxsize=None)
 def get_exchange_format_row(exchange_format):
   row = app_tables.exchange_formats.get(duration=exchange_format.duration)
   if not row:
