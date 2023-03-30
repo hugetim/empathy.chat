@@ -12,13 +12,14 @@ class NetworkRepository:
 
   def _get_messages(self, user2, user1):
     message_rows = app_tables.messages.search(
+      q.fetch_only('message', 'time_stamp', from_user=q.fetch_only('first_name')),
       tables.order_by("time_stamp", ascending=True),
       q.any_of(q.all_of(from_user=user2, to_user=user1),
-              q.all_of(from_user=user1, to_user=user2),
+               q.all_of(from_user=user1, to_user=user2),
               )
     )
     for message_row in message_rows:
-      yield dict(message_row)
+      yield dict(from_user=message_row['from_user'], message=message_row['message'], time_stamp=message_row['time_stamp'])
 
   def _get_chat_messages(self, user2, user1):
     matches = app_tables.matches.search(users=[user2, user1])  # maybe change to normal messages

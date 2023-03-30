@@ -96,6 +96,6 @@ def star_row(user2, user1):
 
 def starred_users(user):
   from anvil.tables import app_tables
-  for row in app_tables.stars.search(user1=user):
+  for row in app_tables.stars.search(q.fetch_only(user2=q.fetch_only('first_name')), user1=user):
     yield row['user2']
   
