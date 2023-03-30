@@ -86,7 +86,7 @@ class RequestManager:
   
   @tables.in_transaction
   def check_and_save(self, user, requests):
-    (self.user,requests) = (user,Requests(deepcopy(requests)))
+    (self.user, requests) = (user, Requests(deepcopy(requests)))
     self.exchange = None
     self.related_prev_requests, unrelated_prev_requests = _user_prev_requests(self.user, requests)
     _check_requests_valid(self.user, requests, unrelated_prev_requests)

@@ -19,8 +19,8 @@ def _row_to_request(row):
                               for user2 in row['eligible_users']]
   kwargs['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id())
                                for group_row in row['eligible_groups']]
-  kwargs['eligible_invites'] = [ig.get_invite_from_link_key(row['link_key']).portable()
-                               for row in row['eligible_invites']]  
+  kwargs['eligible_invites'] = [ig.from_invite_row(row)
+                                for row in row['eligible_invites']]  
   simple_keys = [
     'or_group_id',
     'start_dt',
@@ -140,25 +140,34 @@ def get_exchange_format_row(exchange_format):
   return row
 
 
+basic_requests_fields = ['or_group_id', 'pref_order', 'current', 'exchange_format', 'start_dt', 'expire_dt',
+                         'create_dt', 'edit_dt', 'min_size', 'max_size', 'eligible', 'eligible_starred']
+requests_fetch = q.fetch_only(user=q.fetch_only(), 
+                              with_users=q.fetch_only(), 
+                              eligible_users=q.fetch_only(), 
+                              eligible_groups=q.fetch_only('name'),
+                              *basic_requests_fields)
+
+
 def requests_by_user(user, records=False):
-  request_rows = app_tables.requests.search(user=user, current=True)
+  request_rows = app_tables.requests.search(requests_fetch, user=user, current=True)
   for request_row in request_rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
 def requests_by_invite_row(invite_row, records=False):
-  request_rows = app_tables.requests.search(user=user, current=True)
+  request_rows = app_tables.requests.search(requests_fetch, user=user, current=True)
   for request_row in request_rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
 def current_requests(records=False):
-  for request_row in app_tables.requests.search(current=True):
+  for request_row in app_tables.requests.search(requests_fetch, current=True):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
 def requests_by_or_group(or_group_ids, records=False):
-  for request_row in app_tables.requests.search(current=True, or_group_id=q.any_of(*or_group_ids)):
+  for request_row in app_tables.requests.search(requests_fetch, current=True, or_group_id=q.any_of(*or_group_ids)):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
@@ -169,6 +178,6 @@ def partially_matching_requests(user, partial_request_dicts, now, records=False)
             )
     for prd in partial_request_dicts
   ]
-  rows = app_tables.requests.search(q.any_of(*q_expressions), user=q.not_(user), current=True)
+  rows = app_tables.requests.search(requests_fetch, q.any_of(*q_expressions), user=q.not_(user), current=True)
   for request_row in rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
