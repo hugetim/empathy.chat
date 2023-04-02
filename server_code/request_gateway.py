@@ -42,14 +42,14 @@ def _row_to_request(row):
 def _request_to_fields(request):
   exchange_format = get_exchange_format_row(request.exchange_format)
   out = dict(exchange_format=exchange_format)
-  out['user'] = sm.get_other_user(request.user)
-  out['with_users'] = [sm.get_other_user(user_id)
+  out['user'] = get_user_row_by_id(request.user)
+  out['with_users'] = [get_user_row_by_id(user_id)
                        for user_id in request.with_users]
-  out['eligible_users'] = [sm.get_other_user(user_id)
+  out['eligible_users'] = [get_user_row_by_id(user_id)
                            for user_id in request.eligible_users]
-  out['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
+  out['eligible_groups'] = [get_group_row_by_id(port_group.group_id)
                             for port_group in request.eligible_groups]
-  out['eligible_invites'] = [app_tables.invites.get_by_id(port_invite.invite_id)
+  out['eligible_invites'] = [get_invite_row_by_id(port_invite.invite_id)
                              for port_invite in request.eligible_invites]
   simple_keys = [
     'or_group_id',
@@ -140,10 +140,26 @@ def get_exchange_format_row(exchange_format):
   return row
 
 
+@lru_cache(maxsize=None)
+def get_user_row_by_id(user_id):
+  return app_tables.users.get_by_id(user_id)
+
+
+@lru_cache(maxsize=None)
+def get_group_row_by_id(group_id):
+  return app_tables.groups.get_by_id(group_id)
+
+
+@lru_cache(maxsize=None)
+def get_invite_row_by_id(invite_id):
+  return app_tables.invites.get_by_id(invite_id)
+
+
 basic_requests_fields = ['or_group_id', 'pref_order', 'current', 'exchange_format', 'start_dt', 'expire_dt',
                          'create_dt', 'edit_dt', 'min_size', 'max_size', 'eligible', 'eligible_starred']
 requests_fetch = q.fetch_only(*basic_requests_fields,
-                              user=q.fetch_only('first_name'), 
+                              user=q.fetch_only('first_name'
+                                               ), 
                               with_users=q.fetch_only('first_name'), 
                               eligible_users=q.fetch_only('first_name'), 
                               eligible_groups=q.fetch_only('name'),

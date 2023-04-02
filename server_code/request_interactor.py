@@ -49,7 +49,7 @@ def edit_requests(user, requests):
   """
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager()
-  _fetch_exchange_formats(requests)
+  _pre_fetch_relevant_rows(requests)
   request_editor.check_and_save(user, requests)
   if request_editor.exchange:
     ping(user, request_editor.exchange)
@@ -81,9 +81,19 @@ def _check_requests_valid(user, requests, user_prev_requests):
   # ...by pulling in requests associated with upcoming exchanges to have_conflicts() call
 
 
-def _fetch_exchange_formats(requests):
-  for ef in [r.exchange_format for r in requests]:
-    repo.get_exchange_format_row(ef) # to initialize relevant cache pre-transaction
+def _pre_fetch_relevant_rows(requests):
+  repo.get_user_row_by_id(requests.user)
+  for request in requests:
+    repo.get_exchange_format_row(request.exchange_format) # to initialize relevant cache pre-transaction
+    out = {}
+    out['with_users'] = [repo.get_user_row_by_id(user_id)
+                        for user_id in request.with_users]
+    out['eligible_users'] = [repo.get_user_row_by_id(user_id)
+                            for user_id in request.eligible_users]
+    out['eligible_groups'] = [repo.get_group_row_by_id(port_group.group_id)
+                              for port_group in request.eligible_groups]
+    out['eligible_invites'] = [repo.get_invite_row_by_id(port_invite.invite_id)
+                              for port_invite in request.eligible_invites]
 
 
 class RequestManager:
@@ -124,6 +134,7 @@ class RequestManager:
         self._save_exchange(requests_matched)
         timer.check("_save_exchange")
         self._update_exchange_user_statuses()
+        timer.check("_update_exchange_user_statuses")
       else:
         _cancel_missing_or_group_requests(requests, self.related_prev_requests)
         timer.check("_cancel_missing_or_group_requests")
@@ -131,6 +142,7 @@ class RequestManager:
           self.user['status'] = "requesting"
         timer.check("update requesting status")
         self._save_requests(requests)
+        timer.check("_save_requests")
       self.requests = requests
 
   def _save_exchange(self, requests_matched):
@@ -150,7 +162,7 @@ class RequestManager:
   def _save_requests(self, requests):
     #self.request_records = []
     for request in requests:
-      #print(f"_save_requests request_id: {request.request_id}")
+      print(f"_save_requests request_id: {request.request_id}")
       request_record = repo.RequestRecord(request, request.request_id)
       #self.request_records.append(request_record)
       request_record.save()

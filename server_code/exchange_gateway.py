@@ -5,7 +5,7 @@ from .exceptions import RowMissingError
 from .exchanges import Exchange
 from .requests import ExchangeFormat
 from . import server_misc as sm
-from .request_gateway import get_exchange_format_row, RequestRecord
+from .request_gateway import get_exchange_format_row, RequestRecord, get_user_row_by_id
 
 
 # def _current_exchange_i(user, to_join):
@@ -216,7 +216,7 @@ def _exchange_to_fields(exchange):
   # participants handled separately
   exchange_format = get_exchange_format_row(exchange.exchange_format)
   out = dict(exchange_format=exchange_format)
-  out['users'] = [sm.get_other_user(p['user_id']) for p in exchange.participants]
+  out['users'] = [get_user_row_by_id(p['user_id']) for p in exchange.participants]
   simple_keys = [
     'room_code',
     'start_dt',
@@ -269,7 +269,7 @@ def _participant_to_fields(participant):
   fields = participant.copy()
   fields.pop('appearances', []) # appearances handled separately
   fields.pop('participant_id', None)
-  fields['user'] = sm.get_other_user(fields.pop('user_id'))
+  fields['user'] = get_user_row_by_id(fields.pop('user_id'))
   fields['request'] = app_tables.requests.get_by_id(fields.pop('request_id'))
   sm.my_assert(fields['request'] is not None, "Can't save exchange/participant for an unsaved request.")
   return fields
