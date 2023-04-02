@@ -49,6 +49,7 @@ def edit_requests(user, requests):
   """
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager()
+  _fetch_exchange_formats(requests)
   request_editor.check_and_save(user, requests)
   if request_editor.exchange:
     ping(user, request_editor.exchange)
@@ -78,6 +79,11 @@ def _check_requests_valid(user, requests, user_prev_requests):
     raise InvalidRequestError("New requests have a time conflict with your existing requests.")
   # also check for current/upcoming exchange conflicts...
   # ...by pulling in requests associated with upcoming exchanges to have_conflicts() call
+
+
+def _fetch_exchange_formats(requests):
+  for ef in [r.exchange_format for r in requests]:
+    repo.get_exchange_format_row(ef) # to initialize relevant cache pre-transaction
 
 
 class RequestManager:
