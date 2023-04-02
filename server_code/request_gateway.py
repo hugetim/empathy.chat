@@ -172,10 +172,10 @@ def requests_by_or_group(or_group_ids, records=False):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
-def partially_matching_requests(user, partial_request_dicts, now, records=False):
+def partially_matching_requests(user, partial_request_dicts, records=False):
   q_expressions = [
     q.all_of(exchange_format=get_exchange_format_row(prd['exchange_format']),
-             **(dict(start_dt=q.less_than(now)) if prd['start_now'] else dict(start_dt=prd['start_dt']))
+             **(dict(start_now=True) if prd['start_now'] else dict(start_dt=prd['start_dt']))
             )
     for prd in partial_request_dicts
   ]

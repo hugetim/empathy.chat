@@ -94,7 +94,7 @@ class RequestManager:
       timer.check("_user_prev_requests")
       _check_requests_valid(self.user, requests, unrelated_prev_requests)
       timer.check("_check_requests_valid")
-      other_request_records = _potential_matching_request_records(requests, self.user, self.now)
+      other_request_records = _potential_matching_request_records(requests, self.user)
       timer.check("_potential_matching_request_records")
       _prune_request_records(other_request_records, self.now)
       timer.check("_prune_request_records")
@@ -198,12 +198,12 @@ def _cancel_missing_or_group_requests(requests, related_prev_requests):
     rr.cancel()
 
 
-def _potential_matching_request_records(requests, user, now):
+def _potential_matching_request_records(requests, user):
   partial_request_dicts = [
     dict(start_now=r.start_now, start_dt=r.start_dt, exchange_format=r.exchange_format)
     for r in requests
   ]
-  return list(repo.partially_matching_requests(user, partial_request_dicts, now, records=True))
+  return list(repo.partially_matching_requests(user, partial_request_dicts, records=True))
 
 
 def _exchange_prospect(user, requests, other_request_records):
