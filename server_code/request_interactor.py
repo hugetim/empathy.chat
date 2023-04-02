@@ -123,6 +123,7 @@ class RequestManager:
         timer.check("_cancel_missing_or_group_requests")
         if requests.start_now:
           self.user['status'] = "requesting"
+        timer.check("update requesting status")
         self._save_requests(requests)
       self.requests = requests
 
