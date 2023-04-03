@@ -3,10 +3,10 @@ from .server_misc import authenticated_callable
 from anvil.server import background_task, launch_background_task
 from anvil_extras.server_utils import timed
 from . import server_misc as sm
-from .network_gateway import NetworkRepository
+from . import network_gateway
 
 
-repo = NetworkRepository()
+repo = network_gateway
 
 
 @authenticated_callable
