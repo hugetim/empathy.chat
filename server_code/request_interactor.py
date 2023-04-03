@@ -9,6 +9,7 @@ from . import parameters as p
 from . import network_interactor as ni
 from . import server_misc as sm
 from . import exchange_interactor as ei
+from . import connections as c
 from . import notifies as n
 from .exceptions import InvalidRequestError
 from anvil_extras.logging import TimerLogger
@@ -49,7 +50,7 @@ def edit_requests(user, requests):
   """
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager()
-  _pre_fetch_relevant_rows(requests)
+  _pre_fetch_relevant_rows(requests, user)
   request_editor.check_and_save(user, requests)
   if request_editor.exchange:
     ping(user, request_editor.exchange)
@@ -81,7 +82,7 @@ def _check_requests_valid(user, requests, user_prev_requests):
   # ...by pulling in requests associated with upcoming exchanges to have_conflicts() call
 
 
-def _pre_fetch_relevant_rows(requests):
+def _pre_fetch_relevant_rows(requests, user):
   repo.get_user_row_by_id(requests.user)
   for request in requests:
     repo.get_exchange_format_row(request.exchange_format) # to initialize relevant cache pre-transaction
@@ -94,6 +95,8 @@ def _pre_fetch_relevant_rows(requests):
                               for port_group in request.eligible_groups]
     out['eligible_invites'] = [repo.get_invite_row_by_id(port_invite.invite_id)
                               for port_invite in request.eligible_invites]
+  if _potential_matching_request_records(requests, user):
+    c.get_connected_users(user, up_to_degree=3)
 
 
 class RequestManager:
@@ -333,7 +336,6 @@ def _other_or_group_requests(user, rr):
 
 
 def current_visible_requests(user, request_records=None):
-  from . import connections as c
   user_id = user.get_id()
   if request_records == None:
     request_records = [rr for rr in repo.current_requests(records=True) if rr.user != user]
@@ -351,7 +353,6 @@ def current_visible_requests(user, request_records=None):
 
 
 def is_eligible(eligibility_spec, other_user, distance=None):
-  from . import connections as c
   from . import groups_server as g
   if other_user in eligibility_spec['eligible_users']: # and distance < port.UNLINKED)):
     return True
@@ -368,7 +369,6 @@ def is_eligible(eligibility_spec, other_user, distance=None):
 
 
 def all_eligible_users(eligibility_spec):
-  from . import connections as c
   from . import groups_server as g
   user = eligibility_spec['user']
   all_eligible = set()
