@@ -343,7 +343,7 @@ class SimpleRecord(Record):
 
   def _add(self):
     self.__row = self._table.add_row(**self._entity_to_fields(self.entity))
-    self._row_id = self._row.get_id()
+    self._row_id = self.__row.get_id()
   
   def _update(self):
     self._row.update(**self._entity_to_fields(self.entity))

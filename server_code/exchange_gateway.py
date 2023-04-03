@@ -161,7 +161,7 @@ class ExchangeRecord(sm.SimpleRecord):
 
   def _add(self):
     self.__row = self._table.add_row(participants=self._participant_rows, **self._entity_to_fields(self.entity))
-    self._row_id = self._row.get_id()
+    self._row_id = self.__row.get_id()
   
   def _update(self):
     self._row.update(participants=self._participant_rows, **self._entity_to_fields(self.entity))
