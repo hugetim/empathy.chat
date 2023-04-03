@@ -27,7 +27,7 @@ services:
 - source: /runtime/services/google.yml
   client_config: {}
   server_config: {client_id: 241428580212-4q2brrbaghlmsgq4brfn9ulnp7tmlnlj.apps.googleusercontent.com,
-    client_secret: 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, app_origin_redirect: true}
+    client_secret: null, app_origin_redirect: true, client_secret_enc: mQQmzSBf12Qu+dxUHfy4VEqjfsBKTcnF9rRRag7Qklxtm6sfnKRYx0znOt7Ly04WEaGwC3cJJmG5TCqHW0pw9V1zG/1my6IqiyYgRZ/BAXeczm2Z4i9zb4/cFOOHLtWWqx4+hC5QLfEYEAmB1khJiAPIbtQ2FlYDXZ5XUsR881Mj+yv8f+MTLxIsDWL0l5BBbIiGr/R+B19xk67c9A==}
 - source: /runtime/services/anvil/users.yml
   client_config: {require_secure_passwords: true, use_token: false, use_email: true,
     allow_remember_me: true, allow_signup: true, enable_automatically: true, confirm_email: false,
