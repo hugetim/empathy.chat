@@ -108,7 +108,7 @@ class RequestManager:
     with TimerLogger("check_and_save", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
       (self.user, requests) = (user, Requests(deepcopy(requests)))
       self.exchange = None
-      self.related_prev_requests, unrelated_prev_requests = _user_prev_requests(self.user, requests)
+      self.related_prev_request_records, unrelated_prev_requests = _user_prev_requests(self.user, requests)
       timer.check("_user_prev_requests")
       _check_requests_valid(self.user, requests, unrelated_prev_requests)
       other_request_records = _potential_matching_request_records(requests, self.user)
@@ -123,7 +123,7 @@ class RequestManager:
         timer.check("_cancel_other_or_group_requests")
         matching_request = next((r for r in exchange_prospect if r.user==requests.user))
         requests = Requests([matching_request]) # save matching request only
-        _cancel_missing_or_group_requests(requests, self.related_prev_requests)
+        _cancel_missing_or_group_requests(requests, self.related_prev_request_records)
         self._save_requests(requests)
         timer.check("_save_requests")
         self.exchange = Exchange.from_exchange_prospect(exchange_prospect, self.now)
@@ -131,7 +131,7 @@ class RequestManager:
         timer.check("_save_exchange")
         self._update_exchange_user_statuses()
       else:
-        _cancel_missing_or_group_requests(requests, self.related_prev_requests)
+        _cancel_missing_or_group_requests(requests, self.related_prev_request_records)
         timer.check("_cancel_missing_or_group_requests")
         if requests.start_now:
           self.user['status'] = "requesting"
@@ -182,37 +182,33 @@ class RequestManager:
       'notify_edit_bg',
       user=self.user,
       requests=self.requests,
-      related_prev_requests=self.related_prev_requests,
+      related_prev_requests=Requests([rr.entity for rr in self.related_prev_request_records]),
     )  
 
 
 def _user_prev_requests(user, requests):
-  user_prev_requests = list(repo.requests_by_user(user))
+  user_prev_request_records = list(repo.requests_by_user(user, records=True))
   requests_ids, or_group_ids = _requests_ids(requests)
   unrelated_prev_requests = Requests([
-    r for r in user_prev_requests
-    if r.request_id not in requests_ids and r.or_group_id not in or_group_ids
+    rr.entity for rr in user_prev_request_records
+    if rr.entity.request_id not in requests_ids and rr.entity.or_group_id not in or_group_ids
   ])
-  related_prev_requests = Requests([
-    r for r in user_prev_requests
-    if r.request_id in requests_ids or r.or_group_id in or_group_ids
+  related_prev_request_records = Requests([
+    rr for rr in user_prev_request_records
+    if rr.entity.request_id in requests_ids or rr.entity.or_group_id in or_group_ids
   ])
-  return related_prev_requests, unrelated_prev_requests
+  return related_prev_request_records, unrelated_prev_requests
 
 
 def _requests_ids(requests):
   return {r.request_id for r in requests}, {r.or_group_id for r in requests}
 
 
-def _cancel_missing_or_group_requests(requests, related_prev_requests):
+def _cancel_missing_or_group_requests(requests, related_prev_request_records):
   requests_ids, or_group_ids = _requests_ids(requests)
-  requests_to_cancel = Requests([
-    r for r in related_prev_requests
-    if r.or_group_id in or_group_ids and r.request_id not in requests_ids
-  ])
-  for r in requests_to_cancel:
-    rr = repo.RequestRecord(r, r.request_id)
-    rr.cancel()
+  for rr in related_prev_request_records:
+    if rr.entity.or_group_id in or_group_ids and rr.entity.request_id not in requests_ids:
+      rr.cancel()
 
 
 def _potential_matching_request_records(requests, user):
