@@ -146,7 +146,7 @@ def get_simple_port_user(user2, distance=None, user1=None):
 
 
 def get_port_user(user2, distance=None, user1=None, simple=False, starred=None):
-  from . import network_interactor as ni
+  from . import network_gateway as ng
   if not user2:
     return None
   explicit_user1 = True
@@ -160,7 +160,7 @@ def get_port_user(user2, distance=None, user1=None, simple=False, starred=None):
     return port.User(user2.get_id(), _name)
   else:
     if starred is None:
-      starred = bool(ni.star_row(user2, user1)) if user2 != user1 else None
+      starred = bool(ng.star_row(user2, user1)) if user2 != user1 else None
     return port.User(user_id=user2.get_id(),
                      name=_name,
                      url_confirmed=bool(user2['url_confirmed_date']),

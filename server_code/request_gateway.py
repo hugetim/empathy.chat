@@ -5,6 +5,7 @@ from .requests import Request, ExchangeFormat
 from . import server_misc as sm
 from . import groups
 from . import invite_gateway as ig
+from . import network_gateway as ng
 from functools import lru_cache
 
 
@@ -214,3 +215,13 @@ def partially_matching_requests(user, partial_request_dicts, records=False):
   rows = app_tables.requests.search(requests_fetch, q.any_of(*q_expressions), user=q.not_(user), current=True)
   for request_row in rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
+
+
+@lru_cache(maxsize=None)
+def starred_users(user):
+  return ng.starred_users(user)
+
+
+@lru_cache(maxsize=None)
+def star_row(user2, user1):
+  return (user2 in starred_users(user1))

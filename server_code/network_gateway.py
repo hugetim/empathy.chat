@@ -32,3 +32,13 @@ def _get_chat_messages(user2, user1):
 def get_messages(user2, user1):
   messages = list(_get_messages(user2, user1)) + list(_get_chat_messages(user2, user1))
   return sorted(messages, key=lambda m: m['time_stamp'])
+
+
+def star_row(user2, user1):
+  return app_tables.stars.get(user1=user1, user2=user2)
+
+
+def starred_users(user):
+  for row in app_tables.stars.search(q.fetch_only(user2=q.fetch_only('first_name')), user1=user):
+    yield row['user2']
+  

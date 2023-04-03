@@ -95,8 +95,9 @@ def _pre_fetch_relevant_rows(requests, user):
                               for port_group in request.eligible_groups]
     out['eligible_invites'] = [repo.get_invite_row_by_id(port_invite.invite_id)
                               for port_invite in request.eligible_invites]
-  if _potential_matching_request_records(requests, user):
-    c.get_connected_users(user, up_to_degree=3)
+  other_request_records = _potential_matching_request_records(requests, user)
+  if other_request_records:
+    current_visible_requests(user, other_request_records)
 
 
 class RequestManager:
@@ -221,8 +222,8 @@ def _potential_matching_request_records(requests, user):
 
 def _exchange_prospect(user, requests, other_request_records):
   still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
-  other_prev_requests = current_visible_requests(user, still_current_other_request_records)
-  return exchange_to_save(requests, other_prev_requests)
+  also_visible_other_requests = current_visible_requests(user, still_current_other_request_records)
+  return exchange_to_save(requests, also_visible_other_requests)
 
 
 @sm.background_task_with_reporting
@@ -348,7 +349,7 @@ def is_eligible(eligibility_spec, other_user, distance=None):
   from . import groups_server as g
   if other_user in eligibility_spec['eligible_users']: # and distance < port.UNLINKED)):
     return True
-  if (eligibility_spec['eligible_starred'] and ni.star_row(other_user, eligibility_spec['user'])):
+  if (eligibility_spec['eligible_starred'] and repo.star_row(other_user, eligibility_spec['user'])):
     return True
   for group in eligibility_spec['eligible_groups']:
     if other_user in g.allowed_members_from_group_row(group, eligibility_spec['user']):
@@ -367,7 +368,7 @@ def all_eligible_users(eligibility_spec):
   if eligibility_spec['eligible']:
     all_eligible.update(set(c.get_connected_users(user, up_to_degree=eligibility_spec['eligible'])))
   if eligibility_spec['eligible_starred']:
-    all_eligible.update(set(ni.starred_users(user)))
+    all_eligible.update(set(repo.starred_users(user)))
   if eligibility_spec['eligible_users']:
     all_eligible.update(set(eligibility_spec['eligible_users']))
   for group in eligibility_spec['eligible_groups']:

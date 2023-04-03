@@ -79,7 +79,7 @@ def save_starred(new_starred, user2_id, user_id=""):
   from . import matcher
   user = sm.get_acting_user(user_id)
   user2 = sm.get_other_user(user2_id)
-  _star_row = star_row(user2, user)
+  _star_row = repo.star_row(user2, user)
   if new_starred and not _star_row:
     app_tables.stars.add_row(user1=user, user2=user2)
   elif not new_starred and _star_row:
@@ -87,16 +87,3 @@ def save_starred(new_starred, user2_id, user_id=""):
   else:
     sm.warning("Redundant save_starred call.")
   matcher.propagate_update_needed()
-
-    
-def star_row(user2, user1):
-  from anvil.tables import app_tables
-  return app_tables.stars.get(user1=user1, user2=user2)
-
-
-def starred_users(user):
-  from anvil.tables import app_tables
-  import anvil.tables.query as q
-  for row in app_tables.stars.search(q.fetch_only(user2=q.fetch_only('first_name')), user1=user):
-    yield row['user2']
-  
