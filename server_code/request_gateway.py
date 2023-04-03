@@ -99,7 +99,7 @@ class RequestRecord(sm.SimpleRecord):
     if self._row_id:
       return self._row['user']
     else:
-      return sm.get_other_user(self.entity.user)
+      return get_user_row_by_id(self.entity.user)
 
   @property
   def eligibility_spec(self):
@@ -111,19 +111,19 @@ class RequestRecord(sm.SimpleRecord):
       spec['eligible_users'] = self._row['eligible_users']
       spec['eligible_groups'] = self._row['eligible_groups']
     else:
-      spec['eligible_users'] = [sm.get_other_user(user_id) for user_id in self.entity.eligible_users]
-      spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
+      spec['eligible_users'] = [get_user_row_by_id(user_id) for user_id in self.entity.eligible_users]
+      spec['eligible_groups'] = [get_group_row_by_id(port_group.group_id)
                                  for port_group in self.entity.eligible_groups]
     return spec
 
 
 def eligibility_spec(request):
   spec = {}
-  spec['user'] = sm.get_other_user(request.user)
+  spec['user'] = get_user_row_by_id(request.user)
   spec['eligible'] = request.eligible
   spec['eligible_starred'] = request.eligible_starred
-  spec['eligible_users'] = [sm.get_other_user(user_id) for user_id in request.eligible_users]
-  spec['eligible_groups'] = [app_tables.groups.get_by_id(port_group.group_id)
+  spec['eligible_users'] = [get_user_row_by_id(user_id) for user_id in request.eligible_users]
+  spec['eligible_groups'] = [get_group_row_by_id(port_group.group_id)
                              for port_group in request.eligible_groups]
   return spec
 
