@@ -138,6 +138,7 @@ def exchange_record_with_any_request_records(request_records):
 
 class ExchangeRecord(sm.SimpleRecord):
   _table_name = 'exchanges'
+  _participant_rows = []
 
   @staticmethod
   def _row_to_entity(row):
@@ -148,23 +149,29 @@ class ExchangeRecord(sm.SimpleRecord):
     return _exchange_to_fields(entity)
 
   def _update_participants(self):
-    participant_rows = []
+    self._participant_rows = []
     for p in self.entity.participants:
       p_record = ParticipantRecord(p, record_id=p.get('participant_id'))
       p_record.save()
-      participant_rows.append(p_record._row)
-    self._row['participants'] = participant_rows
+      self._participant_rows.append(p_record._row)
   
   # @property
   # def _my_participant_record(self):
   #   raise NotImplementedError("ExchangeRecord._my_participant_record")
+
+  def _add(self):
+    self.__row = self._table.add_row(participants=self._participant_rows, **self._entity_to_fields(self.entity))
+    self._row_id = self._row.get_id()
+  
+  def _update(self):
+    self._row.update(participants=self._participant_rows, **self._entity_to_fields(self.entity))
   
   def save(self):
+    self._update_participants()
     if self._row_id is None:
       self._add()
     else:
       self._update()
-    self._update_participants()
 
   @property
   def users(self):
