@@ -155,6 +155,22 @@ def get_invite_row_by_id(invite_id):
   return app_tables.invites.get_by_id(invite_id)
 
 
+_request_row_dict = {}
+
+
+def cache_request_record_rows(request_records):
+  for rr in request_records:
+    if rr.record_id:
+      _request_row_dict[rr.record_id] = rr._row
+
+
+def get_request_row_by_id(request_id):
+  if request_id in _request_row_dict:
+    return _request_row_dict[request_id]
+  else:
+    return app_tables.requests.get_by_id(request_id)
+
+
 basic_requests_fields = ['or_group_id', 'pref_order', 'current', 'exchange_format', 'start_dt', 'expire_dt',
                          'create_dt', 'edit_dt', 'min_size', 'max_size', 'eligible', 'eligible_starred']
 requests_fetch = q.fetch_only(*basic_requests_fields,

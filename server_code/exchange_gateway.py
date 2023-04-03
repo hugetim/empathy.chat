@@ -5,7 +5,7 @@ from .exceptions import RowMissingError
 from .exchanges import Exchange
 from .requests import ExchangeFormat
 from . import server_misc as sm
-from .request_gateway import get_exchange_format_row, RequestRecord, get_user_row_by_id
+from .request_gateway import get_exchange_format_row, RequestRecord, get_user_row_by_id, get_request_row_by_id
 
 
 # def _current_exchange_i(user, to_join):
@@ -270,7 +270,7 @@ def _participant_to_fields(participant):
   fields.pop('appearances', []) # appearances handled separately
   fields.pop('participant_id', None)
   fields['user'] = get_user_row_by_id(fields.pop('user_id'))
-  fields['request'] = app_tables.requests.get_by_id(fields.pop('request_id'))
+  fields['request'] = get_request_row_by_id(fields.pop('request_id'))
   sm.my_assert(fields['request'] is not None, "Can't save exchange/participant for an unsaved request.")
   return fields
   

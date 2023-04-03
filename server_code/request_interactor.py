@@ -150,17 +150,21 @@ class RequestManager:
 
   def _save_exchange(self, requests_matched):
     #check whether adding to pre-existing exchange
-    request_records_matched = []
-    for r in requests_matched:
-      rr = repo.RequestRecord(r, r.request_id)
-      rr.save()
-      request_records_matched.append(rr)
-    existing_exchange_record = exchange_repo.exchange_record_with_any_request_records(request_records_matched)
-    if existing_exchange_record:
-      self.exchange.exchange_id = existing_exchange_record.record_id
-    self.exchange_record = exchange_repo.ExchangeRecord(self.exchange, self.exchange.exchange_id)
-    self.exchange_record.save()
-    self.exchange.exchange_id = self.exchange_record.record_id # for the new record case
+    with TimerLogger("  _save_exchange", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
+      request_records_matched = []
+      for r in requests_matched:
+        rr = repo.RequestRecord(r, r.request_id)
+        rr.save()
+        request_records_matched.append(rr)
+      repo.cache_request_record_rows(request_records_matched)
+      timer.check("  requests_matched saved")
+      existing_exchange_record = exchange_repo.exchange_record_with_any_request_records(request_records_matched)
+      timer.check("  exchange_record_with_any_request_records")
+      if existing_exchange_record:
+        self.exchange.exchange_id = existing_exchange_record.record_id
+      self.exchange_record = exchange_repo.ExchangeRecord(self.exchange, self.exchange.exchange_id)
+      self.exchange_record.save()
+      self.exchange.exchange_id = self.exchange_record.record_id # for the new record case
   
   def _save_requests(self, requests):
     #self.request_records = []
@@ -170,6 +174,7 @@ class RequestManager:
       #self.request_records.append(request_record)
       request_record.save()
       request.request_id = request_record.record_id
+      repo.cache_request_record_rows([request_record])
 
   def _update_exchange_user_statuses(self):
     if (self.exchange.start_now and self.exchange.participants[0]['entered_dt']):
