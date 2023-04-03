@@ -107,37 +107,29 @@ class RequestManager:
   def check_and_save(self, user, requests):
     with TimerLogger("check_and_save", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
       (self.user, requests) = (user, Requests(deepcopy(requests)))
-      timer.check("init")
       self.exchange = None
       self.related_prev_requests, unrelated_prev_requests = _user_prev_requests(self.user, requests)
       timer.check("_user_prev_requests")
       _check_requests_valid(self.user, requests, unrelated_prev_requests)
-      timer.check("_check_requests_valid")
       other_request_records = _potential_matching_request_records(requests, self.user)
       timer.check("_potential_matching_request_records")
       _prune_request_records(other_request_records, self.now)
-      timer.check("_prune_request_records")
       exchange_prospect = _exchange_prospect(self.user, requests, other_request_records)
       timer.check("_exchange_prospect")
       if exchange_prospect:
         _process_exchange_requests(exchange_prospect)
-        timer.check("_process_exchange_requests")
         requests_matched = [r for r in exchange_prospect if r.user!=requests.user]
         _cancel_other_or_group_requests(requests_matched)
         timer.check("_cancel_other_or_group_requests")
         matching_request = next((r for r in exchange_prospect if r.user==requests.user))
         requests = Requests([matching_request]) # save matching request only
-        timer.check("matching_request -> revise requests")
         _cancel_missing_or_group_requests(requests, self.related_prev_requests)
-        timer.check("_cancel_missing_or_group_requests")
         self._save_requests(requests)
         timer.check("_save_requests")
         self.exchange = Exchange.from_exchange_prospect(exchange_prospect, self.now)
-        timer.check("from_exchange_prospect")
         self._save_exchange(requests_matched)
         timer.check("_save_exchange")
         self._update_exchange_user_statuses()
-        timer.check("_update_exchange_user_statuses")
       else:
         _cancel_missing_or_group_requests(requests, self.related_prev_requests)
         timer.check("_cancel_missing_or_group_requests")
@@ -145,7 +137,6 @@ class RequestManager:
           self.user['status'] = "requesting"
         timer.check("update requesting status")
         self._save_requests(requests)
-        timer.check("_save_requests")
       self.requests = requests
 
   def _save_exchange(self, requests_matched):
@@ -169,7 +160,7 @@ class RequestManager:
   def _save_requests(self, requests):
     #self.request_records = []
     for request in requests:
-      print(f"_save_requests request_id: {request.request_id}")
+      #print(f"_save_requests request_id: {request.request_id}")
       request_record = repo.RequestRecord(request, request.request_id)
       #self.request_records.append(request_record)
       request_record.save()
