@@ -11,6 +11,7 @@ from . import helper as h
 from . import portable as port
 from .relationship import Relationship
 from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
+from functools import lru_cache
 
 
 def check_my_group_auth(group_id=None):
@@ -186,6 +187,7 @@ def user_groups(user):
   return memberships.union(hosteds)
 
 
+@lru_cache(maxsize=None)
 def allowed_members_from_group_row(group_row, user):
   """Returns group members allowed to interact with `user`"""
   group_hosts = group_row['hosts']
