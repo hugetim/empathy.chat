@@ -119,7 +119,7 @@ class RequestManager:
       timer.check("_exchange_prospect")
       if exchange_prospect:
         _process_exchange_requests(exchange_prospect)
-        requests_matched = [r for r in exchange_prospect if r.user!=requests.user]
+        requests_matched = [r for r in exchange_prospect if r.user != requests.user]
         _cancel_other_or_group_requests(requests_matched)
         timer.check("_cancel_other_or_group_requests")
         matching_request = next((r for r in exchange_prospect if r.user==requests.user))
@@ -222,8 +222,10 @@ def _potential_matching_request_records(requests, user):
 
 def _exchange_prospect(user, requests, other_request_records):
   still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
-  also_visible_other_requests = current_visible_requests(user, still_current_other_request_records)
-  return exchange_to_save(requests, also_visible_other_requests)
+  viable_other_requests = eligible_visible_requests(user, requests, still_current_other_request_records)
+  if viable_other_requests:
+    repo.cache_request_record_rows(still_current_other_request_records)
+  return exchange_to_save(requests, viable_other_requests)
 
 
 @sm.background_task_with_reporting
@@ -326,6 +328,24 @@ def _other_or_group_requests(user, rr):
     r for r in user_prev_requests
     if r.request_id != rr.entity.request_id and r.or_group_id == rr.entity.or_group_id
   ])
+
+
+def eligible_visible_requests(user, requests, other_request_records):
+  user_id = user.get_id()
+  all_requesters = {rr.user for rr in other_request_records}
+  distances = c.distances(all_requesters, user)
+  requests_eligibility_spec = repo.eligibility_spec(requests[0])
+  eligible_requesters = set()
+  for u in all_requesters:
+    if is_eligible(requests_eligibility_spec, u, distances[u]) and requests[0].has_room_for(u.get_id()):
+      eligible_requesters.add(u)
+  out_requests = []
+  for rr in other_request_records:
+    if (rr.user in eligible_requesters
+        and is_eligible(rr.eligibility_spec, user, distances[rr.user]) 
+        and rr.entity.has_room_for(user_id)):
+      out_requests.append(rr.entity)
+  return out_requests
 
 
 def current_visible_requests(user, request_records=None):
