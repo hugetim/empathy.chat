@@ -79,7 +79,9 @@ class User(h.AttributeToKey):
     return h.add_num_suffix(self.distance) if (self.distance is not None and self.distance < UNLINKED) else ""
  
   def toggle_starred(self):
+    from . import glob
     self.starred = not self.starred
+    glob.reset_get_create_user_items()
 
   @staticmethod
   def from_name_item(item):

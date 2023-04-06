@@ -60,7 +60,16 @@ def _set_lazy_vars(out):
     'user_items': _user_items, 'group_items': _group_items, 'starred_name_list': _starred_name_list,
   })
   lazy_loaded = True
-  
+
+
+def reset_get_create_user_items():
+  from . import network_controller as nc
+  global _lazy_dict
+  _user_items, _starred_name_list = nc.get_create_user_items()
+  _lazy_dict.update({
+    'user_items': _user_items, 'starred_name_list': _starred_name_list,
+  })
+
   
 def populate_lazy_vars(spinner=True):
   if spinner:
