@@ -133,6 +133,7 @@ def phone_match(last4, user):
 
 class Invite(invites.Invite):
   no_auth_methods = ['visit', 'register', 'respond']
+  not_authorized_message = "Sorry, signup is not authorized by this invite and response."
   
   def __init__(self, port_invite):
     self.update(port_invite)
@@ -205,7 +206,7 @@ class Invite(invites.Invite):
       else:
         self[key] = ""
 
-  def authorizes_signup(self):
+  def authorizes_signup(self, email=""):
     try:
       ig.check_id_and_link_key_and_ensure_correct_inviter(self)
     except RowMissingError:

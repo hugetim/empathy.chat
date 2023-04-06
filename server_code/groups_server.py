@@ -10,7 +10,7 @@ from . import parameters as p
 from . import helper as h
 from . import portable as port
 from .relationship import Relationship
-from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError
+from .exceptions import RowMissingError, ExpiredInviteError, MistakenVisitError, InvalidInviteError
 from functools import lru_cache
 
 
@@ -108,9 +108,11 @@ class MyGroup(groups.MyGroup):
   @staticmethod
   def add_member(user, invite_row):
     if user not in all_members_from_group_row(invite_row['group']):
+      guest_allowed = invite_row['spec'].get('guest_allowed')
       app_tables.group_members.add_row(user=user,
                                        group=invite_row['group'],
                                        invite=invite_row,
+                                       guest_allowed=guest_allowed,
                                       )
     else:
       this_group = invite_row['group']
@@ -269,7 +271,9 @@ def _get_invite_from_link_key(link_key):
   return Invite(port_invite)
 
 
-class Invite(sm.ServerItem, groups.Invite): 
+class Invite(sm.ServerItem, groups.Invite):
+  not_authorized_message = "Sorry, signup is not authorized by this invite."
+  
   def __init__(self, port_invite):
     self.update(port_invite)
 
@@ -302,7 +306,7 @@ class Invite(sm.ServerItem, groups.Invite):
     row = self._invite_row()
     row['expire_date'] = self.expire_date
 
-  def authorizes_signup(self):
+  def authorizes_signup(self, email=""):
     try:
       invite_row = self._invite_row()
     except RowMissingError:
@@ -310,6 +314,10 @@ class Invite(sm.ServerItem, groups.Invite):
     if invite_row['link_key'] != self.link_key or invite_row.get_id() != self.invite_id:
       return False
     if invite_row['expire_date'] < sm.now():
+      return False
+    emails_allowed = invite_row['spec'].get('emails_allowed')
+    if emails_allowed is not None and not accounts.in_email_list(email, emails_allowed):
+      self.not_authorized_message = f"Sorry, signup for {email} is not authorized by this invite."
       return False
     return True
   
@@ -336,6 +344,9 @@ class Invite(sm.ServerItem, groups.Invite):
                                 "so they can visit the url, which will enable them to join the group (and also to create "
                                 "an empathy.chat account if they are new)."
                               )
+    emails_allowed = invite_row['spec'].get('emails_allowed')
+    if emails_allowed is not None and not accounts.in_email_list(email, emails_allowed):
+      raise InvalidInviteError(f"Sorry, {email} is not authorized by this invite.")
     MyGroup.add_member(user, invite_row)
 
 

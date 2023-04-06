@@ -81,6 +81,8 @@ def _process_group_invite_visit(link_key, user):
     _error_alert(err)
   except ExpiredInviteError as err:
     _error_alert(err)
+  except InvalidInviteError as err:
+    _error_alert(err)
   except MistakenVisitError as err:
     _error_alert(err, large=True)
 
@@ -176,6 +178,8 @@ def _register_via_invite(invite, new_user, method):
   except MistakenGuessError as err:
     _error_alert(err)
   except RowMissingError as err:
+    _error_alert(err)
+  except InvalidInviteError as err:
     _error_alert(err)
 
 

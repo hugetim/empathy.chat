@@ -123,8 +123,8 @@ def get_invite_from_port(port_invite):
 def do_signup(email, port_invite):
   """Returns user (existing user if existing email, else creates new user and sends login email)"""
   invite = get_invite_from_port(port_invite)
-  if not invite.authorizes_signup():
-    raise InvalidInviteError("Sorry, signup is not authorized by this invite and response.")
+  if not invite.authorizes_signup(email):
+    raise InvalidInviteError(invite.not_authorized_message)
   user, newly_created = _create_user_if_needed_and_return_whether_created(email)
   if newly_created:
     anvil.users.send_password_reset_email(email) # This can also raise AuthenticationFailed, but shouldn't
@@ -170,7 +170,15 @@ def _emails_equal(a, b):
   a_match = em_re.search(a)
   b_match = em_re.search(b)
   return a_match.group(1) == b_match.group(1) and a_match.group(2).lower() == b_match.group(2).lower()
-  
+
+
+def in_email_list(email_address, list_of_email_addresses):
+  if _email_invalid(email_address):
+    return False
+  for em in list_of_email_addresses:
+    if _emails_equal(email_address, em):
+      return True
+  return False
   
 # @anvil.server.callable
 # @anvil.tables.in_transaction
