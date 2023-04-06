@@ -95,7 +95,7 @@ def _pre_fetch_relevant_rows(requests, user):
                               for port_group in request.eligible_groups]
     out['eligible_invites'] = [repo.get_invite_row_by_id(port_invite.invite_id)
                               for port_invite in request.eligible_invites]
-  other_request_records = _potential_matching_request_records(requests, user)
+  other_request_records = _potential_matching_request_records(requests, user, sm.now())
   if other_request_records:
     current_visible_requests(user, other_request_records)
 
@@ -112,7 +112,7 @@ class RequestManager:
       self.related_prev_request_records, unrelated_prev_requests = _user_prev_requests(self.user, requests)
       timer.check("_user_prev_requests")
       _check_requests_valid(self.user, requests, unrelated_prev_requests)
-      other_request_records = _potential_matching_request_records(requests, self.user)
+      other_request_records = _potential_matching_request_records(requests, self.user, self.now)
       timer.check("_potential_matching_request_records")
       _prune_request_records(other_request_records, self.now)
       exchange_prospect = _exchange_prospect(self.user, requests, other_request_records)
@@ -212,12 +212,12 @@ def _cancel_missing_or_group_requests(requests, related_prev_request_records):
       rr.cancel()
 
 
-def _potential_matching_request_records(requests, user):
+def _potential_matching_request_records(requests, user, now):
   partial_request_dicts = [
     dict(start_now=r.start_now, start_dt=r.start_dt, exchange_format=r.exchange_format)
     for r in requests
   ]
-  return list(repo.partially_matching_requests(user, partial_request_dicts, records=True))
+  return list(repo.partially_matching_requests(user, partial_request_dicts, now, records=True))
 
 
 def _exchange_prospect(user, requests, other_request_records):

@@ -257,8 +257,8 @@ class MatchForm(MatchFormTemplate):
   def message_textbox_pressed_enter(self, **event_args):
     message_text = self.message_textbox.text
     if message_text:
-      self.item.add_chat_message(message_text)
       self.message_textbox.text = ""
+      self.item.add_chat_message(message_text)
       self.chat_repeating_panel.items = self.item.messages_plus
 
   def slider_button_click(self, **event_args):

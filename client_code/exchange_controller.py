@@ -88,7 +88,7 @@ class ExchangeState(PendingState):
       glob.publisher.close_channel(channel)
 
   def add_chat_message(self, message):
-    self.message_items += {'me': True, 'message': message, 'time_stamp': h.now()}
+    self.message_items += [{'me': True, 'message': message, 'time_stamp': h.now()}]
     glob.publisher.publish("match.messages", "messages_update")
     new_match_state = server.call_s('add_chat_message', message=message)
     for key, value in new_match_state.items():
