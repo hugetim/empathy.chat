@@ -38,7 +38,7 @@ class Eligibility(EligibilityTemplate):
         if abbrev_list_str != name_list_str:
           self.starred_check_box.tooltip = f"currently: {name_list_str}"
       else:
-        self.starred_check_box.text = "My Starred list (you currently have no Starred users)"
+        self.starred_check_box.text = 'My Starred list (to add users, go to "My Network" and click the stars by their names)'
     has_phone_buddy = self.item['user_items'] and self.item['user_items'][0]['value'].distance == 1
     self.network_flow_panel.visible = self.trust_level >= 2 and has_phone_buddy
     self.network_check_box.checked = self.item['eligible']
