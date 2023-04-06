@@ -217,14 +217,28 @@ components:
       event_bindings: {}
     event_bindings: {}
     data_bindings: []
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time,
-      border: '', enabled: true, foreground: '', visible: true, text: Request An Empathy Chat,
-      font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
-    name: propose_button
-    layout_properties: {grid_position: 'HGROFB,AHVFHK'}
-    event_bindings: {click: propose_button_click}
+  - type: FlowPanel
+    properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
+      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
+    name: flow_panel_1
+    layout_properties: {grid_position: 'JIMYHZ,YLBSYG'}
+    components:
+    - type: Button
+      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time,
+        border: '', enabled: true, foreground: '', visible: true, text: Initiate a Chat Now,
+        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+        italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
+      name: propose_button
+      layout_properties: {grid_position: 'CDRPGT,AFJOMV'}
+      event_bindings: {click: propose_button_click}
+    - type: Button
+      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time,
+        border: '', enabled: true, foreground: '', visible: true, text: Propose time(s) to chat later,
+        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+        italic: false, background: '', bold: false, underline: false, icon: 'fa:calendar-plus-o'}
+      name: propose_later_button
+      layout_properties: {grid_position: 'JIMYHZ,AWLNZN'}
+      event_bindings: {click: propose_button_click}
 - name: timer_1
   type: Timer
   properties: {interval: 0}

@@ -119,13 +119,15 @@ class DashForm(DashFormTemplate):
       if port_prop.prop_id != edit_prop_id:
         conflict_checks += port_prop.get_check_items()
     return conflict_checks
-    
+
   def propose_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    with h.PausedTimer(self.timer_2), h.Disabled(self.propose_button):
-      self.propose()
+    button_clicked = event_args['sender']
+    with h.PausedTimer(self.timer_2), h.Disabled(button_clicked):
+      start_now = button_clicked == self.propose_button
+      self.propose(start_now=start_now)
     
-  def propose(self, specified_users=[], link_key=""):
+  def propose(self, specified_users=[], link_key="", start_now=None):
     if link_key:
       new_prop = t.Proposal(eligible=0, eligible_users=[], eligible_groups=[], eligible_starred=False)
       form_item = new_prop.create_form_item("now not allowed",
@@ -133,7 +135,8 @@ class DashForm(DashFormTemplate):
       form_item['user_items'] = []
       form_item['group_items'] = []
     else:
-      new_prop = t.Proposal()
+      new_prop = (t.Proposal() if start_now is None 
+                  else t.Proposal(times=[t.ProposalTime(start_now=start_now)]))
       form_item = new_prop.create_form_item(self.item['status'],
                                             self.get_conflict_checks())
     if specified_users:
