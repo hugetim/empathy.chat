@@ -209,7 +209,7 @@ def match_complete(user_id=""):
   user = sm.get_acting_user(user_id)
   exchange_record = current_user_exchange(user, record=True) # repo.get_exchange(user_id)
   exchange = exchange_record.entity
-  _complete_exchange(exchange_record)
+  _complete_exchange(exchange_record, user)
   if not exchange.their['entered_dt']:
     other_user = sm.get_other_user(exchange.their['user_id'])
     n.notify_match_cancel_bg(other_user, exchange.start_dt, canceler_name=sm.name(user, to_user=other_user))
@@ -217,7 +217,7 @@ def match_complete(user_id=""):
 
 
 @tables.in_transaction
-def _complete_exchange(exchange_record):
+def _complete_exchange(exchange_record, user):
   exchange = exchange_record.entity
   if exchange.current and exchange.my['entered_dt'] and not exchange.my['complete_dt']:
     user['status'] = None
