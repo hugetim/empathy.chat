@@ -345,6 +345,7 @@ class Invite(sm.ServerItem, groups.Invite):
                                 "an empathy.chat account if they are new)."
                               )
     emails_allowed = invite_row['spec'].get('emails_allowed')
+    email = user['email']
     if emails_allowed is not None and not accounts.in_email_list(email, emails_allowed):
       raise InvalidInviteError(f"Sorry, {email} is not authorized by this invite.")
     MyGroup.add_member(user, invite_row)
