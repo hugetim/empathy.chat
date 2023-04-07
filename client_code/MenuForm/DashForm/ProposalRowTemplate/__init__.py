@@ -54,6 +54,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     if time.start_now:
       self.item['start_time'] = "Now (ready to start)"
       self.accept_button.text = "Join"
+      self.accept_button.icon = "fa:child"
       self.accept_button.tooltip = "Click to join for an empathy chat for the duration listed"
     else:
       self.item['start_time'] = h.day_time_str(h.as_local_tz(time.start_date))

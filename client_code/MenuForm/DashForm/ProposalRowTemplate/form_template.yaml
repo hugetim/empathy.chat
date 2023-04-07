@@ -23,7 +23,7 @@ components:
     properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: Start Now, font_size: 11, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+      underline: false, icon: 'fa:child'}
     name: start_button
     layout_properties: {}
     event_bindings: {click: start_button_click}

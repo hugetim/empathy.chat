@@ -70,12 +70,15 @@ class CreateForm(CreateFormTemplate):
   def update_times(self):
     if self.item['alt']:
       self.now_radio_button.enabled = False
+      self.now_radio_button.foreground = "theme:Gray 600"
       self.now_radio_button.tooltip = 'To switch to "Now", first remove the Alternate Times'
     else:
       self.now_radio_button.enabled = True
+      self.now_radio_button.foreground = "theme:Black"
       self.now_radio_button.tooltip = ''
     if self.item['start_now']:
       self.save_button.text = "START"
+      self.save_button.icon = "fa:child"
       self.date_picker_start.visible = False
       self.button_add_alternate.visible = False
       if not self.item['alt']:
@@ -88,6 +91,7 @@ class CreateForm(CreateFormTemplate):
         self.date_picker_cancel.visible = False      
     else: # Later...
       self.save_button.text = "SAVE"
+      self.save_button.icon = ""
       if not self.date_picker_start_initialized:
         self.init_date_picker_start()
       self.date_picker_start.visible = True

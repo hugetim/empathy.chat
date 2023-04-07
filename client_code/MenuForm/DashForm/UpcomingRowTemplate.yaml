@@ -9,7 +9,7 @@ components:
     properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: Join, font_size: null, font: '', spacing_above: none,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+      underline: false, icon: 'fa:child'}
     name: join_button
     layout_properties: {}
     event_bindings: {click: join_button_click}
