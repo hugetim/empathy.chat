@@ -191,4 +191,5 @@ def _show_alert_re_pw_email(email_address):
          'Click the link contained in that email to set your password and login.\n\nYou can now close this window/tab.'), 
         large=True, 
         dismissible=False,
+        buttons=[],
        )
