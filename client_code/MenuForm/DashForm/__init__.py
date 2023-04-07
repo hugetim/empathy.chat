@@ -40,8 +40,12 @@ class DashForm(DashFormTemplate):
                   dismissible=False,
                   buttons=[])
       if out is True:
-        anvil.server.call('save_name', edit_form.item)
         self.top_form.item['name'] = edit_form.item['first']
+        glob.name = self.top_form.item['name']
+        user_record = glob.users[glob.logged_in_user_id]
+        user_record['last'] = edit_form.item['last']
+        user_record['name'] = f"{glob.name} {user_record['last']}"
+        anvil.server.call_s('save_name', edit_form.item)
     name = self.top_form.item['name']
     if name:
       self.welcome_label.text = "Hi, " + name + "!"

@@ -95,13 +95,13 @@ class Profile(ProfileTemplate):
                 dismissible=False,
                 buttons=[])
     if out is True:
-      anvil.server.call('save_name', edit_form.item)
       self.item['first'] = edit_form.item['first']
       glob.name = self.item['first']
       get_open_form().item['name'] = glob.name
       self.item['last'] = edit_form.item['last']
       self.item['name'] = f"{self.item['first']} {self.item['last']}"
       self.update()
+      anvil.server.call_s('save_name', edit_form.item)
 
   def seeking_toggleswitch_change(self, **event_args):
     anvil.server.call('set_seeking_buddy', self.item['seeking'])
