@@ -49,7 +49,7 @@ class DashForm(DashFormTemplate):
         anvil.server.call_s('save_name', edit_form.item)
     name = self.top_form.item['name']
     if name:
-      self.welcome_label.text = "Hi, " + name + "!"
+      self.welcome_label.text = "Hi, " + name + "."
     self.timer_1.interval = 0.1 # so it loads new name for My Profile
     self.update_form()
 
