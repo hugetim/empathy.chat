@@ -41,6 +41,7 @@ class Phone(PhoneTemplate):
   
   def phone_text_box_change(self, **event_args):
     self.phone_button.enabled = bool(self.phone_text_box.text)
+    self.phone_error_label.visible = False
       
   def phone_button_click(self, **event_args):
     raw = self.phone_text_box.text
