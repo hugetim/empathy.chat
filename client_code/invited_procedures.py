@@ -59,7 +59,7 @@ def _complete_close_invited_process(invite):
     invite = invited_alert.item
     user = anvil.users.get_user()
     if not user:
-      user = invited_signup(invite)
+      user, method = invited_signup(invite)
     if user['phone']:
       Notification("You have been successfully connected.", style="success").show()
 
@@ -74,9 +74,12 @@ def _process_group_invite_visit(link_key, user):
   try:
     invite, group_name, group_host_name = server.call('visit_group_invite_link', link_key, user)
     if not user:
-      user = invited_signup(invite)
-    notification_message = f"You are now a member of the {group_name} group hosted by {group_host_name}."
-    Notification(notification_message, style="success", timeout=5).show()
+      user, method = invited_signup(invite)
+    else:
+      method = "login"
+    if method != "email":
+      notification_message = f"You are now a member of the {group_name} group hosted by {group_host_name}."
+      Notification(notification_message, style="success", timeout=5).show()
   except RowMissingError as err:
     _error_alert(err)
   except ExpiredInviteError as err:
@@ -127,7 +130,7 @@ def _handle_successful_response(invite):
 def invited_signup(invite):
   new_user, method = _signup_dialog(invite)
   _register_via_invite(invite, new_user, method)
-  return new_user
+  return new_user, method
 
 
 def _signup_dialog(invite):
