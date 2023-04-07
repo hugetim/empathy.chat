@@ -93,6 +93,7 @@ def init(time_zone):
 def _init_bg(time_zone, user):
   import anvil.users
   from . import network_interactor as ni
+  user['confirmed_email'] = True # because login (either Google or via password reset email) required to get here
   anvil.users.force_login(user)
   trust_level = accounts.initialize_session(time_zone, user)
   anvil.server.task_state['init_dict'] = _init_matcher(user, trust_level)
