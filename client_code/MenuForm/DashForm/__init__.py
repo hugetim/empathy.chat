@@ -20,7 +20,7 @@ class DashForm(DashFormTemplate):
     
     self.proposals_card.visible = glob.trust_level >= 2 # show if guest_allowed (timer_1)
     specific_now_prop = any(
-      [(item['prop'].start_now and item['prop'].specific_user_eligible)
+      [item['prop'].start_now #and item['prop'].specific_user_eligible)
        for item in self.item['proposals']]
     )
     self.set_prompts_visible(not specific_now_prop)

@@ -371,13 +371,13 @@ class Proposal():
       items.append(", ".join([str(g) for g in self.eligible_groups]))
     return "; ".join(items)
   
-  @property
-  def specific_user_eligible(self):
-    if (self.eligible == 0 and len(self.eligible_users) == 1 
-        and not self.eligible_groups and not self.eligible_starred):
-      return self.eligible_users[0]
-    else:
-      return None
+  # @property
+  # def specific_user_eligible(self):
+  #   if (self.eligible == 0 and len(self.eligible_users) == 1 
+  #       and not self.eligible_groups and not self.eligible_starred):
+  #     return self.eligible_users[0]
+  #   else:
+  #     return None
    
   def get_check_items(self):
     items = []

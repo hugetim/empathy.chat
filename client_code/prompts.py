@@ -24,8 +24,8 @@ def get(spec_dict):
     top_form.go_settings()
     top_form.content.phone_form.phone_text_box.focus()
   if spec_dict["name"] == "phone":
-    return {"markdown": "To unlock basic empathy.chat features, please provide (and confirm) your phone number ", 
-            "tooltip": "We require a phone number to verify identity and foster trust",
+    return {"markdown": "To unlock more empathy.chat features, please provide (and confirm) your phone number ", 
+            "tooltip": "Confirming a phone number helps verify identity and foster trust",
             "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Blue",
             "click_fn": add_phone,
@@ -35,7 +35,7 @@ def get(spec_dict):
                          f"to {spec_dict['inviter']} (and unlock basic empathy.chat features), "
                          "please provide (and confirm) your phone number."
                         ), 
-            "tooltip": "We require a phone number to verify identity and foster trust",
+            "tooltip": "Confirming a phone number helps verify identity and foster trust",
             "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Blue",
             "click_fn": add_phone,
