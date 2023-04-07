@@ -162,6 +162,10 @@ class UserProfile(UserFull):
   def profile_updated_date_str(self):
     return h.short_date_str(h.as_local_tz(self.profile_updated_dt)) if self.profile_updated_dt else ""
 
+  @property
+  def profile_text_tooltip(self):
+    return "To edit, click the pencil button to the right." if self.me else ""
+
     
 @anvil.server.portable_class
 class ProposalTime():

@@ -301,6 +301,7 @@ components:
     layout_properties: {grid_position: 'XDKGUH,DGCFZA'}
     data_bindings:
     - {property: text, code: 'self.item[''how_empathy'']', writeback: true}
+    - {property: tooltip, code: self.item.profile_text_tooltip}
   - type: Button
     properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
@@ -331,6 +332,7 @@ components:
       grid_position: LYKAUF,WAVKUR
     data_bindings:
     - {property: text, code: 'self.item[''profile'']', writeback: true}
+    - {property: tooltip, code: self.item.profile_text_tooltip}
   - type: Button
     properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
