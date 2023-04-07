@@ -41,10 +41,11 @@ class DashForm(DashFormTemplate):
                   buttons=[])
       if out is True:
         self.top_form.item['name'] = edit_form.item['first']
-        glob.name = self.top_form.item['name']
+        glob.name = edit_form.item['first']
         user_record = glob.users[glob.logged_in_user_id]
+        user_record['first'] = edit_form.item['first']
         user_record['last'] = edit_form.item['last']
-        user_record['name'] = f"{glob.name} {user_record['last']}"
+        user_record['name'] = f"{user_record['first']} {user_record['last']}"
         anvil.server.call_s('save_name', edit_form.item)
     name = self.top_form.item['name']
     if name:
