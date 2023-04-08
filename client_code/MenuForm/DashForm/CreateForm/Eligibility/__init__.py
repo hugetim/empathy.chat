@@ -25,6 +25,8 @@ class Eligibility(EligibilityTemplate):
     
   def init(self):
     self.specific_users_check_box.checked = self.item['eligible_users']
+    self.user_multi_select_drop_down.enable_select_all = len(self.item['user_items']) >= 4
+    self.user_multi_select_drop_down.enable_filtering = len(self.item['user_items']) >= 8
     if not self.item['eligible_users'] and len(self.item['user_items']) == 1:
       self.user_multi_select_drop_down.selected = [self.item['user_items'][0]['value']]
     else:
@@ -53,6 +55,8 @@ class Eligibility(EligibilityTemplate):
                                      ]
     self.drop_down_eligible.selected_value = self.item['eligible'] if self.item['eligible'] else 1
     self.groups_check_box.checked = self.item['eligible_groups']
+    self.group_multi_select_drop_down.enable_select_all = len(self.item['group_items']) >= 4
+    self.group_multi_select_drop_down.enable_filtering = len(self.item['group_items']) >= 8
     if not self.item['eligible_groups'] and len(self.item['group_items']) == 1:
       self.group_multi_select_drop_down.selected = [self.item['group_items'][0]['value']]
     else:
