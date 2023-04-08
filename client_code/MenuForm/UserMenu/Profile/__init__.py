@@ -60,6 +60,12 @@ class Profile(ProfileTemplate):
       get_open_form().title_label.text = f"{self.item['first']}'s Profile"
     self.name_label.text = self.item['name']
     self.degree_label.text = self.item.distance_str
+    hosted_group_names = nc.get_group_names_hosted_by(self.item['user_id'])
+    self.hosteds_label.text = ", ".join(hosted_group_names)
+    self.hosteds_flow_panel.visible = hosted_group_names
+    common_group_names = set(self.item['common_group_names']) - set(hosted_group_names)
+    self.common_groups_label.text = ", ".join(common_group_names)
+    self.common_groups_flow_panel.visible = common_group_names
     if self.item['status'] == "invite":
       self.degree_label.text += " (pending invite)"
     name_likes = ("I like" if self.item['me'] 

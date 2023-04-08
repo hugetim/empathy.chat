@@ -81,7 +81,15 @@ def _group_item(group, my_group=False):
     host_id = group['hosts'][0]
     subtext = f"(host: {glob.users[host_id].name})"
   return dict(key=group['name'], value=groups.Group(group['name'], group.group_id), subtext=subtext)
-  
+
+
+def get_group_names_hosted_by(user_id):
+  """Returns list of group names (assuming single host per group)"""
+  if user_id == glob.logged_in_user_id:
+    return [g['name'] for g in glob.my_groups]
+  else:
+    return [g['name'] for g in glob.their_groups.values() if user_id in g['hosts']]
+
 
 def get_group_by_id(group_id):
   for g in glob.my_groups:
