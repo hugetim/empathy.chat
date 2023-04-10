@@ -143,6 +143,7 @@ def create_group_invite(port_my_group):
                                              expire_date=now+timedelta(days=30),
                                              group=my_group.group_row,
                                              link_key=new_link_key(),
+                                             spec={},
                                              current=True,
                                             )
   my_group.invites.insert(0, Invite.from_invite_row(new_row))
