@@ -198,6 +198,8 @@ def remove_user(user):
   sm.warning(f"Removing user {user['email']}")
   if user and (not user['init_date']):
     user['enabled'] = False
+    if not user['trust_level'] and not user['confirmed_email'] and not user['time_zone']:
+      user.delete()
 
     
 def _number_already_taken(number):
