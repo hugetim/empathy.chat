@@ -228,16 +228,16 @@ def user_allowed_in_group(user, group_row):
          )
 
   
-@sm.authenticated_callable
-def update_guest_allowed(port_member):
-  user = sm.get_acting_user()
-  group_row = app_tables.groups.get_by_id(port_member.group_id)
-  if user not in group_row['hosts']:
-    sm.warning(f"update_guest_allowed not authorized")
-    return
-  user2 = sm.get_other_user(port_member.user_id)
-  member_row = app_tables.group_members.get(user=user2, group=group_row)
-  member_row['guest_allowed'] = port_member.guest_allowed
+# @sm.authenticated_callable
+# def update_guest_allowed(port_member):
+#   user = sm.get_acting_user()
+#   group_row = app_tables.groups.get_by_id(port_member.group_id)
+#   if user not in group_row['hosts']:
+#     sm.warning(f"update_guest_allowed not authorized")
+#     return
+#   user2 = sm.get_other_user(port_member.user_id)
+#   member_row = app_tables.group_members.get(user=user2, group=group_row)
+#   member_row['guest_allowed'] = port_member.guest_allowed
 
 
 @sm.authenticated_callable

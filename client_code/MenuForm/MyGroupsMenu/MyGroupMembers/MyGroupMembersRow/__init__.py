@@ -39,11 +39,11 @@ class MyGroupMembersRow(MyGroupMembersRowTemplate):
     if invited.invited_dialog(port.User(name=self.item['name'], user_id=self.item['user_id'])):
       self.parent.raise_event('x-reset')
 
-  @wait_for_writeback
-  def guest_allowed_check_box_change(self, **event_args):
-    """This method is called when this checkbox is checked or unchecked"""
-    anvil.server.call('update_guest_allowed', self.item)
-    self.refresh_data_bindings()
+  # @wait_for_writeback
+  # def guest_allowed_check_box_change(self, **event_args):
+  #   """This method is called when this checkbox is checked or unchecked"""
+  #   anvil.server.call('update_guest_allowed', self.item)
+  #   self.refresh_data_bindings()
 
   def remove_button_click(self, **event_args):
     """This method is called when the button is clicked"""
