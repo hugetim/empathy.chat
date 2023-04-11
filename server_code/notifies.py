@@ -157,38 +157,6 @@ def notify_late_for_chat(user, start, waiting_users=[]):
 
 {content2}
 ''')
-      
-      
-# def notify_proposal_cancel(user, proposal, title):
-#   """Notify recipient of cancelled proposal if settings permit"""
-#   from .proposals import ProposalTime
-#   from .request_interactor import is_eligible
-#   eligibility_specs = accounts.get_eligibility_specs(user)
-#   if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], proposal.proposer):
-#     _notify_proposal_cancel_by(user, proposal, title, 'sms')
-#   elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], proposal.proposer):
-#     _notify_proposal_cancel_by(user, proposal, title, 'email')
-
-
-# def _notify_proposal_cancel_by(user, proposal, title, medium):
-#   print(f"'_notify_proposal_cancel_by', {user['email']}, {proposal.get_id()}, {title}, {medium}")
-#   from .proposals import ProposalTime
-#   proposer_name = sm.name(proposal.proposer, to_user=user)
-#   subject = f"empathy.chat - {title}"
-#   content1 = f"{_other_name(proposer_name)} has cancelled their empathy chat request."
-#   if medium == 'sms':
-#     send_sms(sm.phone(user), f"empathy.chat: {content1}")
-#   elif medium == 'email':
-#     email_send(
-#       to_user=user,
-#       from_name=_from_name_for_email(proposer_name),
-#       subject=f"{subject} from {proposer_name}",
-#       text=f'''Dear {_addressee_name(user)},
-
-# {content1}
-
-# {_email_unsubscribe()}
-# ''')
 
 
 def notify_requests_cancel(user, requester, title):
@@ -258,48 +226,7 @@ def _notify_requests_by(user, requester, requests, title, desc, medium):
 {_email_unsubscribe()}
 ''')
 
-    
-# def notify_proposal(user, proposal, title, desc):
-#   """Notify recipient of added/edited proposal if settings permit"""
-#   from .proposals import ProposalTime
-#   from .request_interactor import is_eligible
-#   eligibility_specs = accounts.get_eligibility_specs(user)
-#   if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], proposal.proposer):
-#     _notify_proposal_by(user, proposal, title, desc, 'sms')
-#   elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], proposal.proposer):
-#     _notify_proposal_by(user, proposal, title, desc, 'email')
-  
 
-# def _notify_proposal_by(user, proposal, title, desc, medium):
-#   print(f"'_notify_proposal_by', {user['email']}, {proposal.get_id()}, {title}, {desc}, {medium}")
-#   from .proposals import ProposalTime
-#   proposer_name = sm.name(proposal.proposer, to_user=user)
-#   subject = f"empathy.chat - {title}"
-#   proptimes = list(ProposalTime.times_from_proposal(proposal, require_current=True))
-#   if len(proptimes) > 1:
-#     times_str = "\n" + "either " + "\n or ".join([pt.duration_start_str(user) for pt in proptimes])
-#     content2 = f"Login to {p.URL} to accept one."
-#   else:
-#     times_str = "\n " + proptimes[0].duration_start_str(user)
-#     content2 = f"Login to {p.URL} to accept."
-#   content1 = f"{_other_name(proposer_name)}{desc}{times_str}."
-#   if medium == 'sms':
-#     send_sms(sm.phone(user), f"empathy.chat: {content1}\n{content2}")
-#   elif medium == 'email':
-#     email_send(
-#       to_user=user,
-#       from_name=_from_name_for_email(proposer_name),
-#       subject=f"{subject} from {proposer_name}",
-#       text=f'''Dear {_addressee_name(user)},
-
-# {content1}
-
-# {content2}
-
-# {_email_unsubscribe()}
-# ''')
-
-    
 def notify_message(user, from_name=""):
   """Notify messaged user"""
   print(f"'_notify_message', {user.get_id()}, {from_name}")
@@ -319,57 +246,3 @@ def notify_message(user, from_name=""):
 {_email_unsubscribe("and select 'don't notify' in the drop-down next to 'me when someone sends me a message'")}
 '''
     )
-
-    
-# def users_to_email_re_notif(user=None):
-#   """Return list of users to email notifications triggered by user
-
-#   Side effect: prune request_em (i.e. switch expired request_em to false)
-#   """
-#   return []
-# import datetime
-  #from . import matcher
-  #now = sm.now()
-  #_prune_request_em()
-  #assume_inactive = datetime.timedelta(days=p.ASSUME_INACTIVE_DAYS)
-  #min_between = datetime.timedelta(minutes=p.MIN_BETWEEN_R_EM)
-  #cutoff_e = now - assume_inactive
-  #### comprehension below should probably be converted to loop
-  #return [u for u in app_tables.users.search(enabled=True, request_em=True)
-  #                if (u['init_date'] > cutoff_e
-  #                    and ((not u['last_request_em']) or now > u['last_request_em'] + min_between)
-  #                    and u != user
-  #                    and c.is_visible(u, user)
-  #                    and not matcher.has_status(u))]
-
-
-# def request_emails(request_type, user):
-#   """Email non-active with request_em_check_box checked who logged in recently
-
-#   Non-active means not requesting or matched currently"""
-#   if request_type == "receive_first":
-#     request_type_text = 'an empathy exchange with someone willing to offer empathy first.'
-#   else:
-#     assert request_type == "will_offer_first"
-#     request_type_text = 'an empathy exchange.'
-#   users_to_email = users_to_email_re_notif(user)
-#   for u in users_to_email:
-#     name = u['name']
-#     if not name:
-#       name = "empathy.chat user"
-#     #anvil.google.mail.send(to=u['email'],
-#     #                       subject="empathy.chat - Request active",
-#     text=(
-# "Dear " + name + ''',
-
-# Someone has requested ''' + request_type_text + '''
-
-# Return to ''' + p.URL + ''' and request empathy to be connected for an empathy exchange (if you are first to do so).
-
-# Thanks!
-# Tim
-# empathy.chat
-
-# p.s. You are receiving this email because you checked the box: "Notify me of requests by email." To stop receiving these emails, return to the link above and change this setting.
-# ''')
-#   return len(users_to_email)    
