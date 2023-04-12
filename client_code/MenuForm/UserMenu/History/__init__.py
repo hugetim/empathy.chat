@@ -40,5 +40,5 @@ class History(HistoryTemplate):
       self.chat_repeating_panel.items += [{'me': True, 'message': message, 'time_stamp': h.now()}]
       self.message_textbox.text = ""
       self.call_js('scrollCardLong')
-      temp = anvil.server.call_s('add_message', self.item['user_id'], message=self.message_textbox.text)
+      temp = anvil.server.call_s('add_message', self.item['user_id'], message=message)
       self.update_messages(temp)
