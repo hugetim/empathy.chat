@@ -169,14 +169,15 @@ class RequestManager:
       repo.cache_request_record_rows([request_record])
 
   def _update_exchange_user_statuses(self):
-    if (self.exchange.start_now and self.exchange.participants[0]['entered_dt']):
-      for u in self.exchange_record.users:
-        u['status'] = "matched" #app_tables.users
-    elif self.exchange.start_now:
-      self.user['status'] = "pinging"
-      for u in self.exchange_record.users:
-        if u != self.user:
-          u['status'] = "pinged"
+    with tables.batch_update:
+      if (self.exchange.start_now and self.exchange.participants[0]['entered_dt']):
+        for u in self.exchange_record.users:
+          u['status'] = "matched" #app_tables.users
+      elif self.exchange.start_now:
+        self.user['status'] = "pinging"
+        for u in self.exchange_record.users:
+          if u != self.user:
+            u['status'] = "pinged"
   
   def notify_edit(self):
     anvil.server.launch_background_task(

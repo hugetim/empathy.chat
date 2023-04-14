@@ -295,8 +295,7 @@ def set_seeking_buddy(seeking, user_id=""):
 def save_name(name_item, user_id=""):
   from . import matcher
   user = sm.get_acting_user(user_id)
-  user['first_name'] = name_item['first'].strip()
-  user['last_name'] = name_item['last'].strip()
+  user.update(first_name=name_item['first'].strip(), last_name=name_item['last'].strip())
   matcher.propagate_update_needed(user)
   
   

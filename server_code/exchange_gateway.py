@@ -185,21 +185,25 @@ class ExchangeRecord(sm.SimpleRecord):
     self.end()
   
   def end(self):
-    for u_id in self.entity.currently_matched_user_ids:
-      sm.get_other_user(u_id)['status'] = None
-    if self._row_id:
-      self._row['current'] = False
+    currently_matched_users = [sm.get_other_user(u_id) for u_id in self.entity.currently_matched_user_ids]
+    with tables.batch_update:
+      for u in currently_matched_users:
+        u['status'] = None
+      if self._row_id:
+        self._row['current'] = False
     self.entity.current = False
 
   def commence(self):
     for participant in self.entity.participants:
-      participant['entered_dt'] = sm.now()
       rr = RequestRecord.from_id(participant['request_id'])
       rr.entity.current = False
       rr.save()
     self.save()
-    for user in self.users:
-      user['status'] = "matched"
+    with tables.batch_update:
+      for participant in self.entity.participants:
+        participant['entered_dt'] = sm.now()
+      for user in self.users:
+        user['status'] = "matched"
 
 
 def _row_to_exchange(row):
