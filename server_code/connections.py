@@ -336,9 +336,10 @@ def _disconnect(user2, user1):
   if user2:
     r1to2 = app_tables.connections.get(user1=user1, user2=user2, current=True)
     r2to1 = app_tables.connections.get(user1=user2, user2=user1, current=True)
-    if r1to2 and r2to1: 
-      r1to2['current'] = False
-      r2to1['current'] = False
+    if r1to2 and r2to1:
+      with anvil.tables.batch_update:
+        r1to2['current'] = False
+        r2to1['current'] = False
       _clear_cached_connections()
       _remove_connection_prompts(user1, user2)
       return True
@@ -346,10 +347,11 @@ def _disconnect(user2, user1):
     
   
 def _remove_connection_prompts(user1, user2):
-  prompts = app_tables.prompts.search(q.fetch_only('dismissed'), user=user1, spec={'name': 'connected', 'to_id': user2.get_id()})
-  for prompt in prompts:
-    prompt.delete()
-  prompts = app_tables.prompts.search(q.fetch_only('dismissed'), user=user2, spec={'name': 'connected', 'to_id': user1.get_id()})
-  for prompt in prompts:
-    prompt.delete()
+  prompts1 = app_tables.prompts.search(q.fetch_only('dismissed'), user=user1, spec={'name': 'connected', 'to_id': user2.get_id()})
+  prompts2 = app_tables.prompts.search(q.fetch_only('dismissed'), user=user2, spec={'name': 'connected', 'to_id': user1.get_id()})
+  with anvil.tables.batch_delete:
+    for prompt in prompts1:
+      prompt.delete()
+    for prompt in prompts2:
+      prompt.delete()
     
