@@ -1,7 +1,7 @@
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-from .requests import Request, ExchangeFormat
+from .requests import Request, ExchangeFormat, ExchangeProspect
 from . import server_misc as sm
 from . import groups
 from . import invite_gateway as ig
@@ -207,7 +207,12 @@ def requests_by_or_group(or_group_ids, records=False):
 
 
 def request_records_prospects(request_records):
-  for ep_row in app_tables.exchange_prospects.search()
+  request_row_set = {rr._row for rr in request_records}
+  for ep_row in app_tables.exchange_prospects.search(requests=q.fetch_only()):
+    if request_row_set.issuperset(set(ep_row['requests'])):
+      r_ids = [r.get_id() for r in ep_row['requests']]
+      requests = [rr.entity for rr in request_records if rr.record_id in r_ids]
+      yield ExchangeProspect(requests)
 
 
 def partially_matching_requests(user, partial_request_dicts, now, records=False):

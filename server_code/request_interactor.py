@@ -1,6 +1,6 @@
 import anvil.server
 from anvil import tables
-from .requests import Request, Requests, ExchangeFormat, have_conflicts, prop_to_requests, exchange_to_save
+from .requests import Request, Requests, ExchangeFormat, ExchangeProspect, have_conflicts, prop_to_requests, exchange_to_save
 from .exchanges import Exchange
 from . import request_gateway
 from . import exchange_gateway
