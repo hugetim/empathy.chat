@@ -441,6 +441,7 @@ def get_visible_requests_as_port_view_items(user):
   user_requests = [rr.entity for rr in still_current_rrs if rr.user == user]
   others_request_records = [rr for rr in still_current_rrs if rr.user != user]
   exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
+  ########### next: remove exchange_prospects requests from requests_to_props call, new eps_to_props instead
   requests = list(current_visible_requests(user, others_request_records)) + user_requests
   port_proposals = list(requests_to_props(requests, user))
   return port.Proposal.create_view_items(port_proposals)
