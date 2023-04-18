@@ -86,11 +86,15 @@ class RequestRecord(sm.SimpleRecord):
     self.cancel()
   
   def cancel(self):
+    if self.entity.current and self.entity.start_now:
+      user = self.user
+    if self._row_id:
+      _row = self._row
     with tables.batch_update:
       if self.entity.current and self.entity.start_now:
-        self.user['status'] = None
+        user['status'] = None
       if self._row_id:
-        self._row['current'] = False
+        _row['current'] = False
     self.entity.current = False
 
   def update_expire_dt(self, expire_dt):
