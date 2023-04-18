@@ -200,8 +200,9 @@ class ExchangeRecord(sm.SimpleRecord):
       rr.save()
       participant['entered_dt'] = sm.now()
     self.save()
+    users = self.users
     with tables.batch_update:
-      for user in self.users:
+      for user in users:
         user['status'] = "matched"
 
 
