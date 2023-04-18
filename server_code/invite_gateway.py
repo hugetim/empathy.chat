@@ -106,9 +106,10 @@ def _try_removing_from_invite_proposal(invite_row, invitee):
 
 def _edit_row(row, guess, rel, now):
   rel = rel.strip()
+  rel_update_needed = (rel != row['relationship2to1'])
   with tables.batch_update:
     row['guess'] = guess
-    if rel != row['relationship2to1']:
+    if rel_update_needed:
       row['relationship2to1'] = rel
       row['date_described'] = now
 

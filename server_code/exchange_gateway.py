@@ -198,10 +198,9 @@ class ExchangeRecord(sm.SimpleRecord):
       rr = RequestRecord.from_id(participant['request_id'])
       rr.entity.current = False
       rr.save()
+      participant['entered_dt'] = sm.now()
     self.save()
     with tables.batch_update:
-      for participant in self.entity.participants:
-        participant['entered_dt'] = sm.now()
       for user in self.users:
         user['status'] = "matched"
 
