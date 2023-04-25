@@ -162,7 +162,14 @@ class RequestManager:
     #self.request_records = []
     for request in requests:
       #print(f"_save_requests request_id: {request.request_id}")
-      request_record = repo.RequestRecord(request, request.request_id)
+      matching_prev_records = [rr for rr in self.related_prev_request_records if rr.record_id == request.request_id]
+      if matching_prev_records:
+        request_record = matching_prev_records[0]
+        request.create_dt = request_record.entity.create_dt
+        request.with_users = request.with_users if request.with_users else request_record.entity.with_users
+        request_record.entity = request
+      else:
+        request_record = repo.RequestRecord(request, request.request_id)
       #self.request_records.append(request_record)
       request_record.save()
       request.request_id = request_record.record_id
