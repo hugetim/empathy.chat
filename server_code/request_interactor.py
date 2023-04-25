@@ -318,7 +318,8 @@ def cancel_now(user, request_id=None):
     request_record = repo.RequestRecord.from_id(request_id)
   else:
     request_record = now_request(user, record=True)
-  request_record.cancel_in_transaction()
+  if request_record.entity.current:
+    request_record.cancel_in_transaction()
   if status == 'requesting':
     _notify_cancel(all_eligible_users(request_record.eligibility_spec), user)
 
