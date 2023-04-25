@@ -333,7 +333,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   expire_dt=expire_dt,
                   exchange_format=ExchangeFormat(port_time.duration),
                   create_dt=create_dt if create_dt else now,
-                  edit_dt=create_dt if create_dt else now,
+                  edit_dt=edit_dt if edit_dt else now,
                   min_size=port_prop.min_size,
                   max_size=port_prop.max_size,
                   with_users=with_users if with_users else [],
