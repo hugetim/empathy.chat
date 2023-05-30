@@ -73,6 +73,11 @@ def join_exchange(exchange_id):
   if user_id not in exchange_record.entity.user_ids:
     raise UnauthorizedError("You are not a participant in that exchange.")
   exchange_record.entity.set_my(user_id)
+  _join_exchange_update(exchange_record)
+
+
+@tables.in_transaction
+def _join_exchange_update(user, exchange_record):
   exchange_record.entity.my['entered_dt'] = sm.now()
   exchange_record.save()
   user['status'] = "matched"
