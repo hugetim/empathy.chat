@@ -4,7 +4,7 @@ from . import helper as h
 
 
 def join_exchange(exchange_id):
-  server.call_s('join_exchange', exchange_id)
+  server.call('join_exchange', exchange_id)
   return dict(status="matched")
 
 
