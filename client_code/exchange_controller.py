@@ -133,7 +133,9 @@ class ExchangeState(PendingState):
   def update(self):
     state_dict = self.__dict__
     prev = ExchangeState(**state_dict)
+    print(state_dict)
     state_dict.update(server.call_s('update_match_form'))
+    print(state_dict)
     self = ExchangeState(**state_dict)
     if self.status != prev.status:
       glob.publisher.publish("match.status", "new_status")
