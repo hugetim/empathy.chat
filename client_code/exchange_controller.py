@@ -3,6 +3,11 @@ from . import glob
 from . import helper as h
 
 
+def join_exchange(exchange_id):
+  server.call_s('join_exchange', exchange_id)
+  return dict(status="matched")
+
+
 def get_urls():
   return server.call_s('get_urls', ['nycnvc_feelings_needs',
                                     'doorbell_mp3',
@@ -133,9 +138,7 @@ class ExchangeState(PendingState):
   def update(self):
     state_dict = self.__dict__
     prev = ExchangeState(**state_dict)
-    print(state_dict)
     state_dict.update(server.call_s('update_match_form'))
-    print(state_dict)
     self = ExchangeState(**state_dict)
     if self.status != prev.status:
       glob.publisher.publish("match.status", "new_status")

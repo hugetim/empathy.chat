@@ -52,4 +52,8 @@ class MistakenGuessError(NamedError):
 @portable_exception
 class InvalidRequestError(NamedError):
     pass
-  
+
+
+@portable_exception
+class UnauthorizedError(NamedError):
+    pass

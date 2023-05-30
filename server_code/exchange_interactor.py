@@ -4,7 +4,7 @@ from .server_misc import authenticated_callable
 from . import server_misc as sm
 from . import network_interactor as ni
 from . import request_interactor as ri
-from .exceptions import RowMissingError
+from .exceptions import RowMissingError, UnauthorizedError
 from . import exchange_gateway
 from .exchanges import Exchange
 from .requests import ExchangeFormat
@@ -63,6 +63,19 @@ def commence_user_exchange(user):
   exchange_record = current_user_exchange(user, to_join=True, record=True)
   exchange_record.commence()
   user.update()
+
+
+@authenticated_callable
+def join_exchange(exchange_id):
+  user = sm.get_acting_user()
+  user_id = user.get_id()
+  exchange_record = repo.ExchangeRecord.from_id(exchange_id)
+  if user_id not in exchange_record.entity.user_ids:
+    raise UnauthorizedError("You are not a participant in that exchange.")
+  exchange_record.entity.set_my(user_id)
+  exchange_record.entity.my['entered_dt'] = sm.now()
+  exchange_record.save()
+  user['status'] = "matched"
 
 
 @sm.background_task_with_reporting

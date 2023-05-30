@@ -7,6 +7,7 @@ from ... import helper as h
 from ... import parameters as p
 from ...portable import DURATION_TEXT
 from ...Name import Name
+from ... import exchange_controller as ec
 
 
 class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
@@ -43,4 +44,4 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
 
   def join_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.update_dash(dict(status="matched"))
+    self.update_dash(ec.join_exchange(self.item['match_id']))
