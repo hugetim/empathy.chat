@@ -200,8 +200,11 @@ class MatchForm(MatchFormTemplate):
 
   def load_lists_and_sounds(self):
     [self.lists_url, *clip_urls] = ec.get_urls()
-    self.call_js('loadClips', *clip_urls)
-    self._clips_loaded = True
+    try:
+      self.call_js('loadClips', *clip_urls)
+      self._clips_loaded = True
+    except ExternalError as err:
+      Notification(f"Error loading sound clips: {repr(err)}").show()
     self._update_doorbell_visible()
     if self.lists_card.visible:
       self.add_lists_pdf_viewer()
