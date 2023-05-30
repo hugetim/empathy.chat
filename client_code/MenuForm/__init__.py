@@ -199,8 +199,7 @@ class MenuForm(MenuFormTemplate):
   def logout_user(self):
     print("logout")
     anvil.users.logout()
-    glob.logged_in_user = None
-    glob.logged_in_user_id = ""
+    glob.logout()
     open_form('LoginForm')
 
   def autotest_butten_click(self, **event_args):

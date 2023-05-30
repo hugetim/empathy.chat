@@ -19,6 +19,17 @@ cache_task = None
 CACHE_KEYS = {'users', 'connections', 'my_groups', 'their_groups', 'user_items', 'group_items', 'starred_name_list'}
 
 
+def logout():
+  global trust_level, name, invites, logged_in_user, logged_in_user_id, default_request
+  trust_level = 0
+  name = ""
+  invites = []
+  logged_in_user = None
+  logged_in_user_id = ""
+  default_request = None
+  clear_lazy_vars()
+  
+
 def __getattr__(name):
   if name in CACHE_KEYS: 
     return _get_cached(name)
