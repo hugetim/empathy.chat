@@ -57,12 +57,22 @@ def _complete_close_invited_process(invite):
            title="", 
            buttons=[], large=True, dismissible=False):
     invite = invited_alert.item
+    _close_invited_signup(invite)
+
+
+def _close_invited_signup(invite):
+  try:
     user = anvil.users.get_user()
     if not user:
       user, method = invited_signup(invite)
     if user['phone']:
       Notification("You have been successfully connected.", style="success").show()
-
+  except MistakenGuessError as err:
+    _error_alert(err)
+  except RowMissingError as err:
+    _error_alert(err)
+  except InvalidInviteError as err:
+    _error_alert(err)
 
 def _handle_group_invite(link_key):
   print(f"_handle_group_invite: {link_key}")
@@ -88,6 +98,8 @@ def _process_group_invite_visit(link_key, user):
     _error_alert(err)
   except MistakenVisitError as err:
     _error_alert(err, large=True)
+  except MistakenGuessError as err:
+    _error_alert(err)
 
 
 def submit_response(invite):
@@ -174,16 +186,9 @@ def _submit_signup_email_to_server(email_address, invite):
 
 
 def _register_via_invite(invite, new_user, method):
-  try:
-    invite.relay('register', dict(user=new_user))
-    if new_user and method == "email":
-      _show_alert_re_pw_email(new_user["email"])
-  except MistakenGuessError as err:
-    _error_alert(err)
-  except RowMissingError as err:
-    _error_alert(err)
-  except InvalidInviteError as err:
-    _error_alert(err)
+  invite.relay('register', dict(user=new_user))
+  if new_user and method == "email":
+    _show_alert_re_pw_email(new_user["email"])
 
 
 def _show_alert_re_pw_email(email_address):
