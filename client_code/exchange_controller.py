@@ -1,10 +1,11 @@
 import anvil.server as server
 from . import glob
 from . import helper as h
+from anvil_extras.non_blocking import call_async
 
 
 def join_exchange(exchange_id):
-  server.call_s('join_exchange', exchange_id)
+  call_async('join_exchange', exchange_id)
   return dict(status="matched")
 
 
