@@ -37,8 +37,8 @@ class History(HistoryTemplate):
   def message_textbox_pressed_enter(self, **event_args):
     message = self.message_textbox.text
     if message:
-      self.chat_repeating_panel.items += [{'me': True, 'message': message, 'time_stamp': h.now()}]
       self.message_textbox.text = ""
-      self.call_js('scrollCardLong')
+      new_items = self.chat_repeating_panel.items + [{'me': True, 'message': message, 'time_stamp': h.now()}]
+      self.update_messages(new_items)
       temp = anvil.server.call_s('add_message', self.item['user_id'], message=message)
       self.update_messages(temp)
