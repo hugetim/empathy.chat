@@ -85,13 +85,13 @@ class DashForm(DashFormTemplate):
       later_prop_visible = any([not item['prop'].start_now
                                 for item in self.item['proposals']])
       if later_prop_visible and not now_prop_visible:
-        self.status_label.text = "You can accept an existing empathy chat request or create your own."
+        self.status_label.text = "You can accept an existing empathy chat proposal or create your own."
       elif not later_prop_visible and now_prop_visible:
-        self.status_label.text = "You can join an empathy chat now or create a new empathy chat request."
+        self.status_label.text = "You can join an empathy chat now or propose your own empathy chat."
         self.status_label.bold = True
       else:
         self.status_label.text = (
-          "You can join an empathy chat now, accept a request to chat later, or create a new empathy chat request."
+          "You can join an empathy chat now, accept a proposal to chat later, or propose your own empathy chat."
         )
         self.status_label.bold = True
       self.status_label.align = "center"

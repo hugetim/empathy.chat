@@ -241,7 +241,7 @@ components:
       writeback: true}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: 'Who would you like to be able to see and accept this request?', font_size: null,
+    text: 'Who would you like to be able to see and join this chat?', font_size: null,
     font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
     background: '', bold: true, underline: false, icon: ''}
   name: eligible_label
