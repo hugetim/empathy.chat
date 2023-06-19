@@ -64,7 +64,8 @@ class DashForm(DashFormTemplate):
     
   def update_proposal_table(self):
     """Update form based on proposals state"""
-    self.repeating_panel_1.items = sorted(deepcopy(self.item['proposals']), key=lambda x:x['prop_time'].start_for_order)
+    self.repeating_panel_1.items = sorted(deepcopy(self.item['proposals']), 
+                                          key=lambda x:x['prop_time'].start_for_order)
     self.data_grid_1.visible = bool(self.item['proposals'])
     others_props_visible = (self.data_grid_1.visible
                             and any([not item['prop'].own
@@ -73,31 +74,30 @@ class DashForm(DashFormTemplate):
                          and any([item['prop'].own
                                   for item in self.item['proposals']]))
     self.status_label.bold = False
-    if own_props_visible and not others_props_visible:
-      self.status_label.text = "Your current empathy chat requests:"
-      self.status_label.align = "left"
-      self.status_label.role = ""
-      self.status_label.spacing_below = "none"
-      self.status_label.visible = True
-    elif others_props_visible:
+    self.status_label.align = "center"
+    self.status_label.role = "subheading"
+    self.status_label.spacing_below = "small"
+    self.status_label.visible = True
+    if others_props_visible:
       now_prop_visible = any([item['prop'].start_now
                               for item in self.item['proposals']])
       later_prop_visible = any([not item['prop'].start_now
                                 for item in self.item['proposals']])
-      if later_prop_visible and not now_prop_visible:
+      if now_prop_visible:
+        self.status_label.bold = True
+        if later_prop_visible:
+          self.status_label.text = (
+            "You can join an empathy chat now, accept a request to chat later, or create a new empathy chat request."
+          )
+        else:
+          self.status_label.text = "You can join an empathy chat now or create a new empathy chat request."
+      else: # only later_prop_visible
         self.status_label.text = "You can accept an existing empathy chat request or create your own."
-      elif not later_prop_visible and now_prop_visible:
-        self.status_label.text = "You can join an empathy chat now or create a new empathy chat request."
-        self.status_label.bold = True
-      else:
-        self.status_label.text = (
-          "You can join an empathy chat now, accept a request to chat later, or create a new empathy chat request."
-        )
-        self.status_label.bold = True
-      self.status_label.align = "center"
-      self.status_label.role = "subheading"
-      self.status_label.spacing_below = "small"
-      self.status_label.visible = True
+    elif own_props_visible:
+      self.status_label.text = "Your current empathy chat requests:"
+      self.status_label.align = "left"
+      self.status_label.role = ""
+      self.status_label.spacing_below = "none"
     else:
       self.status_label.visible = False
   
