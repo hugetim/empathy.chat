@@ -29,7 +29,7 @@ def update_my_external(value):
 
   
 class PendingState(h.AttributeToKey):
-  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value=None, jitsi_domain="meet.jit.si", how_empathy_list=None):
+  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value=None, jitsi_domain="8x8.vc", how_empathy_list=None):
     self.status = status
     self.proptime_id = proptime_id
     self.jitsi_code = jitsi_code
@@ -46,7 +46,7 @@ class PendingState(h.AttributeToKey):
   def jitsi_url(self):
     """Initialize or destroy embedded Jitsi Meet instance"""
     # https://jitsi.github.io/handbook/docs/user-guide/user-guide-advanced
-    base = f"https://{self.jitsi_domain}/" #if p.DEBUG_MODE else "https://8x8.vc/vpaas-magic-cookie-848c456481fc4755aeb61d02b9d9dab2/"
+    base = f"https://{self.jitsi_domain}/vpaas-magic-cookie-848c456481fc4755aeb61d02b9d9dab2/"
     return base + self.jitsi_code + "#config.prejoinPageEnabled=false"    
  
   @property
