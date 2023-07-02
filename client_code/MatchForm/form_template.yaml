@@ -126,7 +126,7 @@ components:
           spacing_below: none, italic: false, background: '', bold: false, underline: false,
           icon: ''}
         layout_properties: {grid_position: 'WOLXYM,LIOMWJ', width: null, expand: false}
-        event_bindings: {}
+        event_bindings: {click: jitsi_link_click}
         name: jitsi_link
         components:
         - type: Button
