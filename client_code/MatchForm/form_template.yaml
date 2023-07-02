@@ -126,7 +126,7 @@ components:
           spacing_below: none, italic: false, background: '', bold: false, underline: false,
           icon: ''}
         layout_properties: {grid_position: 'WOLXYM,LIOMWJ', width: null, expand: false}
-        event_bindings: {click: jitsi_link_click}
+        event_bindings: {}
         name: jitsi_link
         components:
         - type: Button
@@ -136,7 +136,7 @@ components:
             background: '', bold: false, underline: false, icon: 'fa:external-link'}
           layout_properties: {grid_position: 'ADNINT,BAITJS', full_width_row: true}
           name: button_1
-          event_bindings: {}
+          event_bindings: {click: jitsi_link_click}
       - type: FlowPanel
         properties: {role: null, spacing: medium, align: right, tooltip: '', border: '',
           foreground: '', visible: true, spacing_above: none, spacing_below: none,
