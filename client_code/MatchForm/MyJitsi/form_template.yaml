@@ -9,7 +9,8 @@ container:
       \             enableWelcomePage: false,\n                               prejoinPageEnabled:\
       \ false,\n                               enableClosePage: true,\n          \
       \                     disableThirdPartyRequests: true,\n                   \
-      \            disableDeepLinking: true,\n                               localRecording:\
+      \            disableDeepLinking: true,\n                               deeplinking:\
+      \ { disabled: true, hideLogo: true,},\n                               localRecording:\
       \ { enabled: false,},\n                               enableNoisyMicDetection:\
       \ false,\n                               readOnlyName: true,\n             \
       \                  toolbarButtons: ['microphone', 'camera', \n             \
