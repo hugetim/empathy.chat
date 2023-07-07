@@ -5,10 +5,10 @@ components:
 - type: RichText
   properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
     foreground: '', visible: true, font_size: null, content: "Our video conferencing\
-      \ service ([Jitsi](https://www.nytimes.com/wirecutter/reviews/best-video-conferencing-service/))\
-      \ may not work reliably on mobile *web browsers*, but a [mobile *app*](https://jitsi.org/downloads/)\
-      \ is available as an alternative. \nTo use it, click the  {info_button}  button\
-      \ near the top of the page (after clicking \"OK\" below).", font: '', spacing_above: none,
+      \ service ([8x8](https://www.8x8.com/products/apis/video?asset=ke882v1gs0morlj5evfsi02smq))\
+      \ may not work on all mobile *web browsers*, but a mobile *app* is available\
+      \ as an alternative. \nTo get and use it, click the  {info_button}  button near\
+      \ the top of the page (after clicking \"OK\" below).", font: '', spacing_above: none,
     spacing_below: none, data: null, background: '', format: markdown}
   name: rich_text_1
   layout_properties: {grid_position: 'SOLZCH,JMZXCR'}
