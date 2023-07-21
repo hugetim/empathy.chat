@@ -234,15 +234,20 @@ def match_complete(user_id=""):
   matcher.propagate_update_needed()
 
 
-@tables.in_transaction
 def _complete_exchange(exchange_record, user):
   exchange = exchange_record.entity
-  if exchange.current and exchange.my['entered_dt'] and not exchange.my['complete_dt']:
-    user['status'] = None
+  reset_my_status = exchange.current and exchange.my['entered_dt'] and not exchange.my['complete_dt']
   exchange.my['complete_dt'] = sm.now()
   sm.my_assert(exchange.size <= 2, "_complete_exchange code below assumes dyads")
   if exchange.their['complete_dt'] or not exchange.their['entered_dt']:
     exchange.current = False
+  _save_complete_exchange(exchange_record, user, reset_my_status)
+
+
+@tables.in_transaction
+def _save_complete_exchange(exchange_record, user, reset_my_status):
+  if reset_my_status:
+    user['status'] = None
   exchange_record.save()
 
 
