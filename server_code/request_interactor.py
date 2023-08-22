@@ -377,6 +377,14 @@ def current_visible_requests(user, request_records=None):
   return out_requests
 
 
+def current_visible_prospects(user, exchange_prospects):
+  out_prospects = []
+  for ep in exchange_prospects:
+    if eligible_for_prospect(user, ep):
+      out_prospects.append(ep)
+  return out_prospects
+
+
 def is_eligible(eligibility_spec, other_user, distance=None):
   from . import groups_server as g
   if other_user in eligibility_spec['eligible_users']: # and distance < port.UNLINKED)):
@@ -489,7 +497,7 @@ def get_visible_requests_as_port_view_items(user):
   exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
   user_requests = [rr.entity for rr in still_current_rrs if rr.user == user and not _request_in_eps(rr.entity, exchange_prospects)]
   others_request_records = [rr for rr in still_current_rrs if rr.user != user and not _request_in_eps(rr.entity, exchange_prospects)]
-  ########### next: test eps_to_props, write current_visible_prospects, then find a way to test this function
+  ########### next: test eps_to_props, write eligible_for_prospect, then find a way to test this function
   visible_requests = list(current_visible_requests(others_request_records))
   visible_exchange_prospects = list(current_visible_prospects(user, exchange_prospects))
   port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
