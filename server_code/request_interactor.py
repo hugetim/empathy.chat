@@ -445,16 +445,54 @@ def requests_to_props(requests, user):
     )
 
 
+def eps_to_props(exhange_prospects, user):
+  user_id = user.get_id()
+  for this_ep in exchange_prospects:
+    my_requests = [r for r in this_ep if user_id == r.user]
+    own = bool(my_requests)
+    rep_request = my_requests[0] if own else this_ep[0]
+    times = [port.ProposalTime(
+        time_id=rep_request.request_id, ### problem
+        start_now=rep_request.start_now,
+        start_date = None if rep_request.start_now else rep_request.start_dt,
+        expire_date=rep_request.expire_dt,
+        duration=rep_request.exchange_format.duration,
+    )]
+    user2 = user if own else sm.get_other_user(rep_request.user)
+    or_group_id = rep_request.or_group_id ### problem
+    yield port.Proposal(
+      prop_id=or_group_id,
+      user=sm.get_simple_port_user(user2, user1=user),
+      own=own,
+      min_size=rep_request.min_size, ### problem
+      max_size=rep_request.max_size, ### problem
+      eligible=rep_request.eligible, ### problem
+      eligible_users=[sm.get_simple_port_user(sm.get_other_user(user_id), user1=user) for user_id in rep_request.eligible_users], ### problem
+      eligible_groups=rep_request.eligible_groups, ### problem
+      eligible_starred=rep_request.eligible_starred, ### problem
+      eligible_invites=rep_request.eligible_invites, ### problem
+      times=times
+    )
+
+
+def _request_in_eps(request, exchange_prospects):
+  for ep in exchange_prospects:
+    if any((request.request_id == r.request_id) for r in ep):
+      return True
+  return False
+
+
 def get_visible_requests_as_port_view_items(user):
   current_rrs = list(repo.current_requests(records=True))
   _prune_request_records(current_rrs, sm.now())
   still_current_rrs = [rr for rr in current_rrs if rr.entity.current]
-  user_requests = [rr.entity for rr in still_current_rrs if rr.user == user]
-  others_request_records = [rr for rr in still_current_rrs if rr.user != user]
   exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
-  ########### next: remove exchange_prospects requests from requests_to_props call, new eps_to_props instead (wait, but need to determine visible eps)
-  requests = list(current_visible_requests(user, others_request_records)) + user_requests
-  port_proposals = list(requests_to_props(requests, user))
+  user_requests = [rr.entity for rr in still_current_rrs if rr.user == user and not _request_in_eps(rr.entity, exchange_prospects)]
+  others_request_records = [rr for rr in still_current_rrs if rr.user != user and not _request_in_eps(rr.entity, exchange_prospects)]
+  ########### next: test eps_to_props, write current_visible_prospects, then find a way to test this function
+  visible_requests = list(current_visible_requests(others_request_records))
+  visible_exchange_prospects = list(current_visible_prospects(user, exchange_prospects))
+  port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
   return port.Proposal.create_view_items(port_proposals)
 
 
