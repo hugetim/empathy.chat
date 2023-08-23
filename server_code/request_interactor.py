@@ -453,7 +453,7 @@ def requests_to_props(requests, user):
     )
 
 
-def eps_to_props(exhange_prospects, user):
+def eps_to_props(exchange_prospects, user):
   user_id = user.get_id()
   for this_ep in exchange_prospects:
     my_requests = [r for r in this_ep if user_id == r.user]
