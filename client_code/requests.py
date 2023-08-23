@@ -169,10 +169,12 @@ class Requests:
 
 @anvil.server.portable_class 
 class ExchangeProspect:
-  def __init__(self, requests):
+  def __init__(self, requests, prospect_id=None):
     if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
       raise ValueError("Input 'requests' must contain at least one Request")
     self.requests = tuple(requests)
+    self.prospect_id = prospect_id
+    self._min_size = None
 
   def __eq__(self, other):
     return isinstance(other, ExchangeProspect) and set(self.requests) == set(other.requests)
@@ -210,7 +212,12 @@ class ExchangeProspect:
   
   @property
   def min_size(self):
-    return max([r.min_size for r in self.requests])
+    return self._min_size if self._min_size else max([r.min_size for r in self.requests])
+
+  @min_size.setter
+  def min_size(self, value):
+    if value > self.min_size:
+      self._min_size = value
 
   @property
   def max_size(self):
@@ -227,6 +234,14 @@ class ExchangeProspect:
   @property
   def users(self):
     return tuple((r.user for r in self))
+
+  @property
+  def request_ids(self):
+    return tuple((r.request_id for r in self))
+
+  @property
+  def expire_dt(self):
+    return min([r.expire_dt for r in self.requests])
   
   @property
   def _rep_request(self):

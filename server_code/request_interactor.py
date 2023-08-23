@@ -461,19 +461,18 @@ def eps_to_props(exhange_prospects, user):
     rep_request = my_requests[0] if own else this_ep[0]
     times = [port.ProposalTime(
         time_id=rep_request.request_id, ### problem
-        start_now=rep_request.start_now,
-        start_date = None if rep_request.start_now else rep_request.start_dt,
-        expire_date=rep_request.expire_dt,
-        duration=rep_request.exchange_format.duration,
+        start_now=this_ep.start_now,
+        start_date = None if this_ep.start_now else this_ep.start_dt,
+        expire_date=this_ep.expire_dt,
+        duration=this_ep.exchange_format.duration,
     )]
     user2 = user if own else sm.get_other_user(rep_request.user)
-    or_group_id = rep_request.or_group_id ### problem
     yield port.Proposal(
-      prop_id=or_group_id,
+      prop_id=this_ep.prospect_id,
       user=sm.get_simple_port_user(user2, user1=user),
       own=own,
-      min_size=rep_request.min_size, ### problem
-      max_size=rep_request.max_size, ### problem
+      min_size=this_ep.min_size,
+      max_size=this_ep.max_size,
       eligible=rep_request.eligible, ### problem
       eligible_users=[sm.get_simple_port_user(sm.get_other_user(user_id), user1=user) for user_id in rep_request.eligible_users], ### problem
       eligible_groups=rep_request.eligible_groups, ### problem
@@ -485,22 +484,24 @@ def eps_to_props(exhange_prospects, user):
 
 def _request_in_eps(request, exchange_prospects):
   for ep in exchange_prospects:
-    if any((request.request_id == r.request_id) for r in ep):
+    if request.request_id in ep.request_ids:
       return True
   return False
 
 
 def get_visible_requests_as_port_view_items(user):
+  user_id = user.get_id()
   current_rrs = list(repo.current_requests(records=True))
   _prune_request_records(current_rrs, sm.now())
   still_current_rrs = [rr for rr in current_rrs if rr.entity.current]
   exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
   user_requests = [rr.entity for rr in still_current_rrs if rr.user == user and not _request_in_eps(rr.entity, exchange_prospects)]
   others_request_records = [rr for rr in still_current_rrs if rr.user != user and not _request_in_eps(rr.entity, exchange_prospects)]
-  ########### next: test eps_to_props, write eligible_for_prospect, then find a way to test this function
   visible_requests = list(current_visible_requests(others_request_records))
-  visible_exchange_prospects = list(current_visible_prospects(user, exchange_prospects))
-  port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
+  user_exchange_prospects = [ep for ep in exchange_prospects if user_id in ep.users]
+  other_exchange_prospects = [ep for ep in exchange_prospects if user_id not in ep.users]
+  visible_exchange_prospects = list(current_visible_prospects(user, other_exchange_prospects))
+  port_proposals = list(eps_to_props(visible_exchange_prospects + user_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
   return port.Proposal.create_view_items(port_proposals)
 
 
