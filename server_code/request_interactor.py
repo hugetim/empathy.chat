@@ -349,13 +349,12 @@ def eligible_visible_requests(user, requests, other_request_records):
   requests_eligibility_spec = repo.eligibility_spec(requests[0])
   eligible_requesters = set()
   for u in all_requesters:
-    if is_eligible(requests_eligibility_spec, u, distances[u]) and requests[0].has_room_for(u.get_id()):
+    if is_eligible(requests[0], u, distances[u], requests_eligibility_spec):
       eligible_requesters.add(u)
   out_requests = []
   for rr in other_request_records:
     if (rr.user in eligible_requesters
-        and is_eligible(rr.eligibility_spec, user, distances[rr.user]) 
-        and rr.entity.has_room_for(user_id)):
+        and is_eligible(rr.entity, user, distances[rr.user], rr.eligibility_spec)):
       out_requests.append(rr.entity)
   return out_requests
 
@@ -372,7 +371,7 @@ def current_visible_requests(user, request_records=None):
   distances = c.distances(all_requesters, user)
   out_requests = []
   for rr in request_records:
-    if is_eligible(rr.eligibility_spec, user, distances[rr.user]) and rr.entity.has_room_for(user_id):
+    if is_eligible(rr, user, distances[rr.user]):
       out_requests.append(rr.entity)
   return out_requests
 
@@ -385,7 +384,16 @@ def current_visible_prospects(user, exchange_prospects):
   return out_prospects
 
 
-def is_eligible(eligibility_spec, other_user, distance=None):
+def is_eligible(request, other_user, distance, eligibility_spec=None):
+  if not eligibility_spec:
+    eligibility_spec = repo.eligibility_spec(request)
+  return (
+    is_included(eligibility_spec, other_user, distance)
+    and request.has_room_for(other_user.get_id())
+  )
+
+
+def is_included(eligibility_spec, other_user, distance=None):
   from . import groups_server as g
   if other_user in eligibility_spec['eligible_users']: # and distance < port.UNLINKED)):
     return True

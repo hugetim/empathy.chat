@@ -161,11 +161,11 @@ def notify_late_for_chat(user, start, waiting_users=[]):
 
 def notify_requests_cancel(user, requester, title):
   """Notify recipient of cancelled proposal if settings permit"""
-  from .request_interactor import is_eligible
+  from .request_interactor import is_included
   eligibility_specs = accounts.get_eligibility_specs(user)
-  if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], requester):
+  if user['phone'] and eligibility_specs.get('sms') and is_included(eligibility_specs['sms'], requester):
     _notify_requests_cancel_by(user, requester, title, 'sms')
-  elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], requester):
+  elif eligibility_specs.get('email') and is_included(eligibility_specs['email'], requester):
     _notify_requests_cancel_by(user, requester, title, 'email')
 
 
@@ -191,11 +191,11 @@ def _notify_requests_cancel_by(user, requester, title, medium):
 
 def notify_requests(user, requester, requests, title, desc):
   """Notify recipient of added/edited requests if settings permit"""
-  from .request_interactor import is_eligible
+  from .request_interactor import is_included
   eligibility_specs = accounts.get_eligibility_specs(user)
-  if user['phone'] and eligibility_specs.get('sms') and is_eligible(eligibility_specs['sms'], requester):
+  if user['phone'] and eligibility_specs.get('sms') and is_included(eligibility_specs['sms'], requester):
     _notify_requests_by(user, requester, requests, title, desc, 'sms')
-  elif eligibility_specs.get('email') and is_eligible(eligibility_specs['email'], requester):
+  elif eligibility_specs.get('email') and is_included(eligibility_specs['email'], requester):
     _notify_requests_by(user, requester, requests, title, desc, 'email')
 
 
