@@ -503,13 +503,12 @@ def get_visible_requests_as_port_view_items(user):
   _prune_request_records(current_rrs, sm.now())
   still_current_rrs = [rr for rr in current_rrs if rr.entity.current]
   exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
-  user_requests = [rr.entity for rr in still_current_rrs if rr.user == user and not _request_in_eps(rr.entity, exchange_prospects)]
+  user_requests = [rr.entity for rr in still_current_rrs if rr.user == user] # just display user_requests simply, whether or not part of exchange_prospects
   others_request_records = [rr for rr in still_current_rrs if rr.user != user and not _request_in_eps(rr.entity, exchange_prospects)]
   visible_requests = list(current_visible_requests(others_request_records))
-  user_exchange_prospects = [ep for ep in exchange_prospects if user_id in ep.users]
   other_exchange_prospects = [ep for ep in exchange_prospects if user_id not in ep.users]
   visible_exchange_prospects = list(current_visible_prospects(user, other_exchange_prospects))
-  port_proposals = list(eps_to_props(visible_exchange_prospects + user_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
+  port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
   return port.Proposal.create_view_items(port_proposals)
 
 
