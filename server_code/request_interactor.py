@@ -371,7 +371,7 @@ def current_visible_requests(user, request_records=None):
   distances = c.distances(all_requesters, user)
   out_requests = []
   for rr in request_records:
-    if is_eligible(rr, user, distances[rr.user]):
+    if is_eligible(rr.entity, user, distances[rr.user], rr.eligibility_spec):
       out_requests.append(rr.entity)
   return out_requests
 
