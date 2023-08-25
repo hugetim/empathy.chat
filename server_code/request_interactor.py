@@ -2,6 +2,7 @@ import anvil.server
 from anvil import tables
 from .requests import Request, Requests, ExchangeFormat, ExchangeProspect, have_conflicts, prop_to_requests, exchange_to_save
 from .exchanges import Exchange
+from .relationship import Relationship
 from . import request_gateway
 from . import exchange_gateway
 from . import portable as port
@@ -342,19 +343,24 @@ def _other_or_group_requests(user, rr):
   ])
 
 
+def relationships(other_users, user):
+  distances = c.distances(other_users, user)
+  return {u: Relationship(distance=distances[u]) for u in other_users}
+
+
 def eligible_visible_requests(user, requests, other_request_records):
   user_id = user.get_id()
   all_requesters = {rr.user for rr in other_request_records}
-  distances = c.distances(all_requesters, user)
+  rels = relationships(all_requesters, user)
   requests_eligibility_spec = repo.eligibility_spec(requests[0])
   eligible_requesters = set()
   for u in all_requesters:
-    if is_eligible(requests[0], u, distances[u], requests_eligibility_spec):
+    if is_eligible(requests[0], u, rels[u], requests_eligibility_spec):
       eligible_requesters.add(u)
   out_requests = []
   for rr in other_request_records:
     if (rr.user in eligible_requesters
-        and is_eligible(rr.entity, user, distances[rr.user], rr.eligibility_spec)):
+        and is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec)):
       out_requests.append(rr.entity)
   return out_requests
 
@@ -368,10 +374,10 @@ def current_visible_requests(user, request_records=None):
   all_requesters = {rr.user for rr in request_records}
   # max_eligible_dict = {user_id: max((r.eligible for r in all_requests if r.user=user_id))
   #                      for user_id in all_requester_ids}
-  distances = c.distances(all_requesters, user)
+  rels = relationships(all_requesters, user)
   out_requests = []
   for rr in request_records:
-    if is_eligible(rr.entity, user, distances[rr.user], rr.eligibility_spec):
+    if is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec):
       out_requests.append(rr.entity)
   return out_requests
 
@@ -384,11 +390,10 @@ def current_visible_prospects(user, exchange_prospects):
   return out_prospects
 
 
-def is_eligible(request, other_user, distance, eligibility_spec=None):
-  if not eligibility_spec:
-    eligibility_spec = repo.eligibility_spec(request)
+def is_eligible(request, other_user, rel, eligibility_spec):
   return (
-    is_included(eligibility_spec, other_user, distance)
+    (rel.pair_eligible or (request.max_size >= 3 and rel.group_authorized))
+    and is_included(eligibility_spec, other_user, rel.distance)
     and request.has_room_for(other_user.get_id())
   )
 
@@ -505,7 +510,7 @@ def get_visible_requests_as_port_view_items(user):
   exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
   user_requests = [rr.entity for rr in still_current_rrs if rr.user == user] # just display user_requests simply, whether or not part of exchange_prospects
   others_request_records = [rr for rr in still_current_rrs if rr.user != user and not _request_in_eps(rr.entity, exchange_prospects)]
-  visible_requests = list(current_visible_requests(others_request_records))
+  visible_requests = list(current_visible_requests(user, others_request_records))
   other_exchange_prospects = [ep for ep in exchange_prospects if user_id not in ep.users]
   visible_exchange_prospects = list(current_visible_prospects(user, other_exchange_prospects))
   port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
