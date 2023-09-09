@@ -345,7 +345,12 @@ def _other_or_group_requests(user, rr):
 
 def relationships(other_users, user):
   distances = c.distances(other_users, user)
-  return {u: Relationship(distance=distances[u]) for u in other_users}
+  group_relationships = gs.group_relationships(other_users, users)
+  return {u: Relationship(distance=distances[u],
+                          min_trust_level=min(user['trust_level'], u['trust_level']),
+                          **group_relationships[u],
+                         )
+          for u in other_users}
 
 
 def eligible_visible_requests(user, requests, other_request_records):
