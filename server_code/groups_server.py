@@ -229,7 +229,7 @@ def user_allowed_in_group(user, group_row):
 
 
 def group_relationships(other_users, user):
-  allowed_members_to_groups, groups = _group_info(user)
+  allowed_members_to_groups = _group_info(other_users, user)
   gr_dict = {}
   for user2 in other_users:
     gr_dict[user2] = _group_relationship(user2, user, allowed_members_to_groups[user2])
@@ -263,7 +263,7 @@ def _group_info(other_users, user):
   for group_row, group_members in _group_and_allowed_members(user):
     for user2 in set(group_members) & set(other_users):
       allowed_members_to_groups[user2].append(group_row)
-  return allowed_members_to_group_names, groups
+  return allowed_members_to_groups
 
 
 def _group_and_allowed_members(user):
