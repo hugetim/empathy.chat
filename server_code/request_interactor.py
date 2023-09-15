@@ -257,7 +257,7 @@ def _get_new_eligible_users(user, requests):
     sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
   sm.my_assert(user.get_id() == requests.user, f"notify_edit: user ({user.get_id()}) should be requester ({requests.user})")
   new_eligibility_spec = repo.eligibility_spec(requests[0])
-  new_all_eligible_users = all_eligible_users(new_eligibility_spec)
+  new_all_eligible_users = all_eligible_users(requests[0], new_eligibility_spec)
   return new_all_eligible_users
 
 
@@ -271,7 +271,7 @@ def _get_old_eligible_users(related_prev_requests):
       sm.warning("notify_edit old requests no common elig_with_dict")
     old_r0 = related_prev_requests[0]
     old_eligibility_spec = repo.eligibility_spec(old_r0)
-    return all_eligible_users(old_eligibility_spec)
+    return all_eligible_users(old_r0, old_eligibility_spec)
 
 
 def _process_exchange_requests(exchange_prospect):
@@ -322,16 +322,16 @@ def cancel_now(user, request_id=None):
   if request_record.entity.current:
     request_record.cancel_in_transaction()
   if status == 'requesting':
-    _notify_cancel(all_eligible_users(request_record.eligibility_spec), user)
+    _notify_cancel(all_eligible_users(request_record.entity, request_record.eligibility_spec), user)
 
 
 def cancel_request(user, proptime_id):
   rr = repo.RequestRecord.from_id(proptime_id)
   other_or_group_requests = _other_or_group_requests(user, rr)
   if other_or_group_requests:
-    _notify_edit(all_eligible_users(rr.eligibility_spec), user, other_or_group_requests)
+    _notify_edit(all_eligible_users(rr.entity, rr.eligibility_spec), user, other_or_group_requests)
   else:
-    _notify_cancel(all_eligible_users(rr.eligibility_spec), user)
+    _notify_cancel(all_eligible_users(rr.entity, rr.eligibility_spec), user)
   rr.cancel_in_transaction()
 
 
@@ -395,10 +395,12 @@ def current_visible_prospects(user, exchange_prospects):
   return out_prospects
 
 
-def is_eligible(request, other_user, rel, eligibility_spec):
+def is_eligible(request, other_user, rel, eligibility_spec, included=None):
+  if included is None:
+    included = is_included(eligibility_spec, other_user, rel.distance)
   return (
     (rel.pair_eligible or (request.max_size >= 3 and rel.group_authorized))
-    and is_included(eligibility_spec, other_user, rel.distance)
+    and included
     and request.has_room_for(other_user.get_id())
   )
 
@@ -419,7 +421,18 @@ def is_included(eligibility_spec, other_user, distance=None):
   return False
 
 
-def all_eligible_users(eligibility_spec):
+def all_eligible_users(request, eligibility_spec):
+  user = eligibility_spec['user']
+  included_users = _all_included_users(eligibility_spec)
+  rels = relationships(included_users, user)
+  eligible_users = set()
+  for user2 in _all_included_users(eligibility_spec):
+    if is_eligible(request, user2, rels[user2], eligibility_spec, included=True):
+      eligible_users.add(user2)
+  return eligible_users
+
+
+def _all_included_users(eligibility_spec):
   from . import groups_server as g
   user = eligibility_spec['user']
   all_eligible = set()
