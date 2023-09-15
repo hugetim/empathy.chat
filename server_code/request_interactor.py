@@ -395,15 +395,17 @@ def current_visible_prospects(user, exchange_prospects):
   return out_prospects
 
 
-def is_eligible(request, other_user, rel, eligibility_spec, included=None):
-  if included is None:
-    included = is_included(eligibility_spec, other_user, rel.distance)
+def is_eligible(request, other_user, rel, eligibility_spec):
+  included = is_included(eligibility_spec, other_user, rel.distance)
+  return _is_eligible(request, other_user, rel, included)
+
+
+def _is_eligible(request, other_user, rel, included):
   return (
     (rel.pair_eligible or (request.max_size >= 3 and rel.group_authorized))
     and included
     and request.has_room_for(other_user.get_id())
   )
-
 
 def is_included(eligibility_spec, other_user, distance=None):
   from . import groups_server as g
@@ -427,7 +429,7 @@ def all_eligible_users(request, eligibility_spec):
   rels = relationships(included_users, user)
   eligible_users = set()
   for user2 in _all_included_users(eligibility_spec):
-    if is_eligible(request, user2, rels[user2], eligibility_spec, included=True):
+    if _is_eligible(request, user2, rels[user2], included=True):
       eligible_users.add(user2)
   return eligible_users
 
