@@ -345,7 +345,7 @@ def _other_or_group_requests(user, rr):
 
 def relationships(other_users, user):
   distances = c.distances(other_users, user)
-  group_relationships = gs.group_relationships(other_users, users)
+  group_relationships = gs.group_relationships(other_users, user)
   return {u: Relationship(distance=distances[u],
                           min_trust_level=min(user['trust_level'], u['trust_level']),
                           **group_relationships[u],
