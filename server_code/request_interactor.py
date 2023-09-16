@@ -1,7 +1,8 @@
 import anvil.server
 from anvil import tables
-from .requests import Request, Requests, ExchangeFormat, have_conflicts, prop_to_requests, exchange_to_save
+from .requests import Request, Requests, ExchangeFormat, ExchangeProspect, have_conflicts, prop_to_requests, exchange_to_save
 from .exchanges import Exchange
+from .relationship import Relationship
 from . import request_gateway
 from . import exchange_gateway
 from . import portable as port
@@ -162,7 +163,14 @@ class RequestManager:
     #self.request_records = []
     for request in requests:
       #print(f"_save_requests request_id: {request.request_id}")
-      request_record = repo.RequestRecord(request, request.request_id)
+      matching_prev_records = [rr for rr in self.related_prev_request_records if rr.record_id == request.request_id]
+      if matching_prev_records:
+        request_record = matching_prev_records[0]
+        request.create_dt = request_record.entity.create_dt
+        request.with_users = request.with_users if request.with_users else request_record.entity.with_users
+        request_record.entity = request
+      else:
+        request_record = repo.RequestRecord(request, request.request_id)
       #self.request_records.append(request_record)
       request_record.save()
       request.request_id = request_record.record_id
@@ -249,7 +257,7 @@ def _get_new_eligible_users(user, requests):
     sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
   sm.my_assert(user.get_id() == requests.user, f"notify_edit: user ({user.get_id()}) should be requester ({requests.user})")
   new_eligibility_spec = repo.eligibility_spec(requests[0])
-  new_all_eligible_users = all_eligible_users(new_eligibility_spec)
+  new_all_eligible_users = all_eligible_users(requests[0], new_eligibility_spec)
   return new_all_eligible_users
 
 
@@ -263,7 +271,7 @@ def _get_old_eligible_users(related_prev_requests):
       sm.warning("notify_edit old requests no common elig_with_dict")
     old_r0 = related_prev_requests[0]
     old_eligibility_spec = repo.eligibility_spec(old_r0)
-    return all_eligible_users(old_eligibility_spec)
+    return all_eligible_users(old_r0, old_eligibility_spec)
 
 
 def _process_exchange_requests(exchange_prospect):
@@ -311,18 +319,19 @@ def cancel_now(user, request_id=None):
     request_record = repo.RequestRecord.from_id(request_id)
   else:
     request_record = now_request(user, record=True)
-  request_record.cancel_in_transaction()
+  if request_record.entity.current:
+    request_record.cancel_in_transaction()
   if status == 'requesting':
-    _notify_cancel(all_eligible_users(request_record.eligibility_spec), user)
+    _notify_cancel(all_eligible_users(request_record.entity, request_record.eligibility_spec), user)
 
 
 def cancel_request(user, proptime_id):
   rr = repo.RequestRecord.from_id(proptime_id)
   other_or_group_requests = _other_or_group_requests(user, rr)
   if other_or_group_requests:
-    _notify_edit(all_eligible_users(rr.eligibility_spec), user, other_or_group_requests)
+    _notify_edit(all_eligible_users(rr.entity, rr.eligibility_spec), user, other_or_group_requests)
   else:
-    _notify_cancel(all_eligible_users(rr.eligibility_spec), user)
+    _notify_cancel(all_eligible_users(rr.entity, rr.eligibility_spec), user)
   rr.cancel_in_transaction()
 
 
@@ -334,20 +343,30 @@ def _other_or_group_requests(user, rr):
   ])
 
 
+def relationships(other_users, user):
+  from . import groups_server as g
+  distances = c.distances(other_users, user)
+  group_relationships = g.group_relationships(other_users, user)
+  return {u: Relationship(distance=distances[u],
+                          min_trust_level=min(user['trust_level'], u['trust_level']),
+                          **group_relationships[u],
+                         )
+          for u in other_users}
+
+
 def eligible_visible_requests(user, requests, other_request_records):
   user_id = user.get_id()
   all_requesters = {rr.user for rr in other_request_records}
-  distances = c.distances(all_requesters, user)
+  rels = relationships(all_requesters, user)
   requests_eligibility_spec = repo.eligibility_spec(requests[0])
   eligible_requesters = set()
   for u in all_requesters:
-    if is_eligible(requests_eligibility_spec, u, distances[u]) and requests[0].has_room_for(u.get_id()):
+    if is_eligible(requests[0], u, rels[u], requests_eligibility_spec):
       eligible_requesters.add(u)
   out_requests = []
   for rr in other_request_records:
     if (rr.user in eligible_requesters
-        and is_eligible(rr.eligibility_spec, user, distances[rr.user]) 
-        and rr.entity.has_room_for(user_id)):
+        and is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec)):
       out_requests.append(rr.entity)
   return out_requests
 
@@ -361,15 +380,61 @@ def current_visible_requests(user, request_records=None):
   all_requesters = {rr.user for rr in request_records}
   # max_eligible_dict = {user_id: max((r.eligible for r in all_requests if r.user=user_id))
   #                      for user_id in all_requester_ids}
-  distances = c.distances(all_requesters, user)
+  rels = relationships(all_requesters, user)
   out_requests = []
   for rr in request_records:
-    if is_eligible(rr.eligibility_spec, user, distances[rr.user]) and rr.entity.has_room_for(user_id):
+    if is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec):
       out_requests.append(rr.entity)
   return out_requests
 
 
-def is_eligible(eligibility_spec, other_user, distance=None):
+def current_visible_prospects(user, exchange_prospects):
+  out_prospects = []
+  for ep in exchange_prospects:
+    if is_eligible_for_prospect(user, ep):
+      out_prospects.append(ep)
+  return out_prospects
+
+
+def is_eligible_for_prospect(user, ep):
+  other_users = [sm.get_other_user(r.user) for r in ep]
+  rels = relationships(other_users, user)
+  ep_rels = _extend_relationships(rels, ep.distances)
+  for request in ep:
+    other_user = next([u for u in other_users if u.get_id() == request.user])
+    rel = ep_rels[other_user]
+    eligibility_spec = repo.eligibility_spec(request)
+    if not is_eligible(ep, other_user, rel, eligibility_spec):
+      return False
+  return True
+
+
+def _extend_relationships(rels, ep_distances):
+  pair_eligible_distances = {u.get_id(): rels[u].distance for u in rels.keys() if rels[u].pair_eligible}
+  if pair_eligible_distances:
+    return {u: _new_rel(u.get_id(), rels[u], pair_eligible_users, ep_distances) for u in rels.keys()}
+  else:
+    return rels
+
+
+def _new_rel(other_user_id, rel, pair_eligible_distances, ep_distances):
+  new_distance = min(rel.distance, *[pair_eligible_distances[u_id] + ep_distances[u_id][other_user_id] for u_id in pair_eligible_distances.keys()])
+  return rel.update_distance(new_distance)
+
+
+def is_eligible(request, other_user, rel, eligibility_spec):
+  included = is_included(eligibility_spec, other_user, rel.distance)
+  return _is_eligible(request, other_user, rel, included)
+
+
+def _is_eligible(request, other_user, rel, included):
+  return (
+    (rel.pair_eligible or (request.max_size >= 3 and rel.eligible))
+    and included
+    and request.has_room_for(other_user.get_id())
+  )
+
+def is_included(eligibility_spec, other_user, distance=None):
   from . import groups_server as g
   if other_user in eligibility_spec['eligible_users']: # and distance < port.UNLINKED)):
     return True
@@ -385,7 +450,18 @@ def is_eligible(eligibility_spec, other_user, distance=None):
   return False
 
 
-def all_eligible_users(eligibility_spec):
+def all_eligible_users(request, eligibility_spec):
+  user = eligibility_spec['user']
+  included_users = _all_included_users(eligibility_spec)
+  rels = relationships(included_users, user)
+  eligible_users = set()
+  for user2 in _all_included_users(eligibility_spec):
+    if _is_eligible(request, user2, rels[user2], included=True):
+      eligible_users.add(user2)
+  return eligible_users
+
+
+def _all_included_users(eligibility_spec):
   from . import groups_server as g
   user = eligibility_spec['user']
   all_eligible = set()
@@ -437,14 +513,54 @@ def requests_to_props(requests, user):
     )
 
 
+def eps_to_props(exchange_prospects, user):
+  user_id = user.get_id()
+  for this_ep in exchange_prospects:
+    my_requests = [r for r in this_ep if user_id == r.user]
+    own = bool(my_requests)
+    rep_request = my_requests[0] if own else this_ep[0]
+    times = [port.ProposalTime(
+        time_id=rep_request.request_id, ### problem
+        start_now=this_ep.start_now,
+        start_date = None if this_ep.start_now else this_ep.start_dt,
+        expire_date=this_ep.expire_dt,
+        duration=this_ep.exchange_format.duration,
+    )]
+    user2 = user if own else sm.get_other_user(rep_request.user)
+    yield port.Proposal(
+      prop_id=this_ep.prospect_id,
+      user=sm.get_simple_port_user(user2, user1=user),
+      own=own,
+      min_size=this_ep.min_size,
+      max_size=this_ep.max_size,
+      eligible=rep_request.eligible, ### problem
+      eligible_users=[sm.get_simple_port_user(sm.get_other_user(user_id), user1=user) for user_id in rep_request.eligible_users], ### problem
+      eligible_groups=rep_request.eligible_groups, ### problem
+      eligible_starred=rep_request.eligible_starred, ### problem
+      eligible_invites=rep_request.eligible_invites, ### problem
+      times=times
+    )
+
+
+def _request_in_eps(request, exchange_prospects):
+  for ep in exchange_prospects:
+    if request.request_id in ep.request_ids:
+      return True
+  return False
+
+
 def get_visible_requests_as_port_view_items(user):
+  user_id = user.get_id()
   current_rrs = list(repo.current_requests(records=True))
   _prune_request_records(current_rrs, sm.now())
   still_current_rrs = [rr for rr in current_rrs if rr.entity.current]
-  user_requests = [rr.entity for rr in still_current_rrs if rr.user == user]
-  others_request_records = [rr for rr in still_current_rrs if rr.user != user]
-  requests = list(current_visible_requests(user, others_request_records)) + user_requests
-  port_proposals = list(requests_to_props(requests, user))
+  exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
+  user_requests = [rr.entity for rr in still_current_rrs if rr.user == user] # just display user_requests simply, whether or not part of exchange_prospects
+  others_request_records = [rr for rr in still_current_rrs if rr.user != user and not _request_in_eps(rr.entity, exchange_prospects)]
+  visible_requests = list(current_visible_requests(user, others_request_records))
+  other_exchange_prospects = [ep for ep in exchange_prospects if user_id not in ep.users]
+  visible_exchange_prospects = list(current_visible_prospects(user, other_exchange_prospects))
+  port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
   return port.Proposal.create_view_items(port_proposals)
 
 

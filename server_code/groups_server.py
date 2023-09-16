@@ -227,6 +227,49 @@ def user_allowed_in_group(user, group_row):
               )
          )
 
+
+def group_relationships(other_users, user):
+  allowed_members_to_groups = _group_info(other_users, user)
+  gr_dict = {}
+  for user2 in other_users:
+    gr_dict[user2] = _group_relationship(user2, user, allowed_members_to_groups[user2])
+  return gr_dict
+
+
+def _group_relationship(user2, user, common_groups):
+  return _group_tie_level_to_relationship(_group_tie_level(user2, user, common_groups))
+
+
+def _group_tie_level(user2, user, groups_allowed_in):
+  for group_row in groups_allowed_in:
+    if {user2, user} & set(group_row['hosts']):
+      return 3
+    else:
+      return 2
+  return 0
+
+
+def _group_tie_level_to_relationship(group_tie_level):  
+  return dict(
+    group_host_to_member=(group_tie_level >= 3),
+    group_authorized=(group_tie_level >= 1),
+    group_authorized_pair=(group_tie_level >= 2),
+  )
+
+
+def _group_info(other_users, user):
+  import collections
+  allowed_members_to_groups = collections.defaultdict(list)
+  for group_row, group_members in _group_and_allowed_members(user):
+    for user2 in set(group_members) & set(other_users):
+      allowed_members_to_groups[user2].append(group_row)
+  return allowed_members_to_groups
+
+
+def _group_and_allowed_members(user):
+  for group_row in user_groups(user):
+    group_members = {u for u in allowed_members_from_group_row(group_row, user)}
+    yield (group_row, group_members)
   
 # @sm.authenticated_callable
 # def update_guest_allowed(port_member):

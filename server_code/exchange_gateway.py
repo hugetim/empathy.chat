@@ -186,11 +186,13 @@ class ExchangeRecord(sm.SimpleRecord):
   
   def end(self):
     currently_matched_users = [sm.get_other_user(u_id) for u_id in self.entity.currently_matched_user_ids]
+    if self._row_id:
+      _row = self._row
     with tables.batch_update:
       for u in currently_matched_users:
         u['status'] = None
       if self._row_id:
-        self._row['current'] = False
+        _row['current'] = False
     self.entity.current = False
 
   def commence(self):

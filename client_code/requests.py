@@ -169,10 +169,13 @@ class Requests:
 
 @anvil.server.portable_class 
 class ExchangeProspect:
-  def __init__(self, requests):
+  def __init__(self, requests, distances, prospect_id=None):
     if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
       raise ValueError("Input 'requests' must contain at least one Request")
     self.requests = tuple(requests)
+    self.distances = distances
+    self.prospect_id = prospect_id
+    self._min_size = None
 
   def __eq__(self, other):
     return isinstance(other, ExchangeProspect) and set(self.requests) == set(other.requests)
@@ -199,7 +202,13 @@ class ExchangeProspect:
     users_set = set(self.users)
     with_users_missing = {u for r in self for u in (set(r.with_users) - users_set)}
     return len(self) + len(with_users_missing) <= self.max_size
-    
+
+  def has_room_for(self, other_user):
+    hypothetical_users_set = set(self.users)
+    hypothetical_users_set.add(other_user)
+    with_users_missing = {u for r in self for u in (set(r.with_users) - hypothetical_users_set)}
+    return len(hypothetical_users_set) + len(with_users_missing) <= self.max_size
+  
   @property
   def is_with_users_satisfied(self):
     users = self.users
@@ -210,7 +219,12 @@ class ExchangeProspect:
   
   @property
   def min_size(self):
-    return max([r.min_size for r in self.requests])
+    return self._min_size if self._min_size else max([r.min_size for r in self.requests])
+
+  @min_size.setter
+  def min_size(self, value):
+    if value > self.min_size:
+      self._min_size = value
 
   @property
   def max_size(self):
@@ -223,10 +237,18 @@ class ExchangeProspect:
   @property
   def is_full(self):
     return len(self) >= self.max_size
-
+  
   @property
   def users(self):
     return tuple((r.user for r in self))
+
+  @property
+  def request_ids(self):
+    return tuple((r.request_id for r in self))
+
+  @property
+  def expire_dt(self):
+    return min([r.expire_dt for r in self.requests])
   
   @property
   def _rep_request(self):
@@ -333,7 +355,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   expire_dt=expire_dt,
                   exchange_format=ExchangeFormat(port_time.duration),
                   create_dt=create_dt if create_dt else now,
-                  edit_dt=create_dt if create_dt else now,
+                  edit_dt=edit_dt if edit_dt else now,
                   min_size=port_prop.min_size,
                   max_size=port_prop.max_size,
                   with_users=with_users if with_users else [],
