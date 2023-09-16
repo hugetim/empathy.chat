@@ -169,10 +169,13 @@ class Requests:
 
 @anvil.server.portable_class 
 class ExchangeProspect:
-  def __init__(self, requests, distances, prospect_id=None):
+  def __init__(self, requests, distances=None, prospect_id=None):
     if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
       raise ValueError("Input 'requests' must contain at least one Request")
     self.requests = tuple(requests)
+    if distances is None:
+      h.my_assert(len(self.requests) == 1, "only new ExchangeProspect should be missing distances")
+      distances = {self.requests[0].user: {}}
     self.distances = distances
     self.prospect_id = prospect_id
     self._min_size = None
@@ -181,7 +184,7 @@ class ExchangeProspect:
     return isinstance(other, ExchangeProspect) and set(self.requests) == set(other.requests)
   
   def __repr__(self):
-    return f"ExchangeProspect({', '.join(repr(r) for r in self.requests)})"
+    return f"ExchangeProspect(requests=({', '.join(repr(r) for r in self.requests)}), distances={self.distances}, prospect_id={self.prospect_id})"
 
   def __str__(self):
     return f"{{{', '.join(str(r) for r in self.requests)}}}"
@@ -189,7 +192,7 @@ class ExchangeProspect:
   def plus_request(self, request):
     if self.is_full:
       raise RuntimeError("Cannot add request because ExchangeProspect is full")
-    return ExchangeProspect(self.requests + (request,))
+    return ExchangeProspect(self.requests + (request,), prospect_id=self.prospect_id)
   
   def __len__(self):
     return len(self.requests)

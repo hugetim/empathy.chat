@@ -507,6 +507,9 @@ db_schema:
       admin_ui: {width: 200}
       type: link_multiple
       target: requests
+    - name: distances
+      type: simpleObject
+      admin_ui: {width: 200, order: 1}
   exchange_formats:
     title: Exchange Formats
     client: none

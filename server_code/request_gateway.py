@@ -212,11 +212,11 @@ def requests_by_or_group(or_group_ids, records=False):
 
 def request_records_prospects(request_records):
   request_row_set = {rr._row for rr in request_records}
-  for ep_row in app_tables.exchange_prospects.search(q.fetch_only(requests=q.fetch_only())):
+  for ep_row in app_tables.exchange_prospects.search(q.fetch_only('distances', requests=q.fetch_only())):
     if request_row_set.issuperset(set(ep_row['requests'])):
       r_ids = [r.get_id() for r in ep_row['requests']]
       requests = [rr.entity for rr in request_records if rr.record_id in r_ids]
-      yield ExchangeProspect(requests)
+      yield ExchangeProspect(requests, ep_row['distances'], ep_row.get_id())
 
 
 def partially_matching_requests(user, partial_request_dicts, now, records=False):
