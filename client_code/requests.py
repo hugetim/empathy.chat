@@ -169,10 +169,11 @@ class Requests:
 
 @anvil.server.portable_class 
 class ExchangeProspect:
-  def __init__(self, requests, prospect_id=None):
+  def __init__(self, requests, distances, prospect_id=None):
     if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
       raise ValueError("Input 'requests' must contain at least one Request")
     self.requests = tuple(requests)
+    self.distances = distances
     self.prospect_id = prospect_id
     self._min_size = None
 
@@ -201,7 +202,13 @@ class ExchangeProspect:
     users_set = set(self.users)
     with_users_missing = {u for r in self for u in (set(r.with_users) - users_set)}
     return len(self) + len(with_users_missing) <= self.max_size
-    
+
+  def has_room_for(self, other_user):
+    hypothetical_users_set = set(self.users)
+    hypothetical_users_set.add(other_user)
+    with_users_missing = {u for r in self for u in (set(r.with_users) - hypothetical_users_set)}
+    return len(hypothetical_users_set) + len(with_users_missing) <= self.max_size
+  
   @property
   def is_with_users_satisfied(self):
     users = self.users
@@ -230,7 +237,7 @@ class ExchangeProspect:
   @property
   def is_full(self):
     return len(self) >= self.max_size
-
+  
   @property
   def users(self):
     return tuple((r.user for r in self))

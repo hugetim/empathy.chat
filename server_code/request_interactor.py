@@ -391,9 +391,35 @@ def current_visible_requests(user, request_records=None):
 def current_visible_prospects(user, exchange_prospects):
   out_prospects = []
   for ep in exchange_prospects:
-    if eligible_for_prospect(user, ep):
+    if is_eligible_for_prospect(user, ep):
       out_prospects.append(ep)
   return out_prospects
+
+
+def is_eligible_for_prospect(user, ep):
+  other_users = [sm.get_other_user(r.user) for r in ep]
+  rels = relationships(other_users, user)
+  ep_rels = _extend_relationships(rels, ep.distances)
+  for request in ep:
+    other_user = next([u for u in other_users if u.get_id() == request.user])
+    rel = ep_rels[other_user]
+    eligibility_spec = repo.eligibility_spec(request)
+    if not is_eligible(ep, other_user, rel, eligibility_spec):
+      return False
+  return True
+
+
+def _extend_relationships(rels, ep_distances):
+  pair_eligible_distances = {u.get_id(): rels[u].distance for u in rels.keys() if rels[u].pair_eligible}
+  if pair_eligible_distances:
+    return {u: _new_rel(u.get_id(), rels[u], pair_eligible_users, ep_distances) for u in rels.keys()}
+  else:
+    return rels
+
+
+def _new_rel(other_user_id, rel, pair_eligible_distances, ep_distances):
+  new_distance = min(rel.distance, *[pair_eligible_distances[u_id] + ep_distances[u_id][other_user_id] for u_id in pair_eligible_distances.keys()])
+  return rel.update_distance(new_distance)
 
 
 def is_eligible(request, other_user, rel, eligibility_spec):
@@ -403,7 +429,7 @@ def is_eligible(request, other_user, rel, eligibility_spec):
 
 def _is_eligible(request, other_user, rel, included):
   return (
-    (rel.pair_eligible or (request.max_size >= 3 and rel.group_authorized))
+    (rel.pair_eligible or (request.max_size >= 3 and rel.eligible))
     and included
     and request.has_room_for(other_user.get_id())
   )

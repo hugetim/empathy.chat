@@ -20,7 +20,7 @@ class Relationship:
     self.group_authorized_pair = group_authorized_pair    
     
   def __repr__(self):
-    return (f"Relationship(distanc={self.distance}, degree={self.degree}, min_trust_level={self.min_trust_level}, "
+    return (f"Relationship(distance={self.distance}, degree={self.degree}, min_trust_level={self.min_trust_level}, "
             f"group_host_to_member={self.group_host_to_member}, group_authorized={self.group_authorized}, "
             f"group_authorized_pair={self.group_authorized_pair})")
     
@@ -39,7 +39,25 @@ class Relationship:
   @property
   def pair_eligible(self):
     return (
-      self.group_authorized_pair or self.group_host_to_member
+      self.group_authorized_pair
       or (self.min_trust_level >= 3 and self.distance <= 3)
       or (self.min_trust_level >= 2 and self.distince <= 2 and self.degree <= 1)
+    )
+
+  @property
+  def eligible(self):
+    return (
+      self.pair_eligible
+      or self.group_authorized
+      or (self.min_trust_level >= 3 and self.distance <= 6) # distance > 3 only via pair_eligible intermediary in exchange_prospect
+    )
+  
+  def update_distance(self, new_distance):
+    return Relationship(
+      distance=new_distance,
+      degree=self.degree,
+      min_trust_level=self.min_trust_level,
+      group_host_to_member=self.group_host_to_member,
+      group_authorized=self.group_authorized,
+      group_authorized_pair=self.group_authorized_pair,
     )
