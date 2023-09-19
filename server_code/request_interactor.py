@@ -116,19 +116,20 @@ class RequestManager:
       other_request_records = _potential_matching_request_records(requests, self.user, self.now)
       timer.check("_potential_matching_request_records")
       _prune_request_records(other_request_records, self.now)
-      exchange_prospect = _exchange_prospect(self.user, requests, other_request_records)
-      timer.check("_exchange_prospect")
-      if exchange_prospect:
-        _process_exchange_requests(exchange_prospect)
-        requests_matched = [r for r in exchange_prospect if r.user != requests.user]
+      viable_other_request_records, rels = _viable_request_records(self.user, requests, other_request_records)
+      exchange_to_be = exchange_to_save(requests, [rr.entity for rr in viable_other_request_records])
+      timer.check("exchange_to_save")
+      if exchange_to_be:
+        _process_exchange_requests(exchange_to_be)
+        requests_matched = [r for r in exchange_to_be if r.user != requests.user]
         _cancel_other_or_group_requests(requests_matched)
         timer.check("_cancel_other_or_group_requests")
-        matching_request = next((r for r in exchange_prospect if r.user==requests.user))
+        matching_request = next((r for r in exchange_to_be if r.user==requests.user))
         requests = Requests([matching_request]) # save matching request only
         _cancel_missing_or_group_requests(requests, self.related_prev_request_records)
         self._save_requests(requests)
         timer.check("_save_requests")
-        self.exchange = Exchange.from_exchange_prospect(exchange_prospect, self.now)
+        self.exchange = Exchange.from_exchange_prospect(exchange_to_be, self.now)
         self._save_exchange(requests_matched)
         timer.check("_save_exchange")
         self._update_exchange_user_statuses()
@@ -231,13 +232,12 @@ def _potential_matching_request_records(requests, user, now):
   ]
   return list(repo.partially_matching_requests(user, partial_request_dicts, now, records=True))
 
-
-def _exchange_prospect(user, requests, other_request_records):
+def _viable_request_records(user, requests, other_request_records):
   still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
-  viable_other_requests = eligible_visible_requests(user, requests, still_current_other_request_records)
-  if viable_other_requests:
+  viable_other_rrs, rels = eligible_visible_requests(user, requests, still_current_other_request_records)
+  if viable_other_rrs:
     repo.cache_request_record_rows(still_current_other_request_records)
-  return exchange_to_save(requests, viable_other_requests)
+  return viable_other_rrs, rels
 
 
 @sm.background_task_with_reporting
@@ -363,12 +363,12 @@ def eligible_visible_requests(user, requests, other_request_records):
   for u in all_requesters:
     if is_eligible(requests[0], u, rels[u], requests_eligibility_spec):
       eligible_requesters.add(u)
-  out_requests = []
+  out_rrs = []
   for rr in other_request_records:
     if (rr.user in eligible_requesters
         and is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec)):
-      out_requests.append(rr.entity)
-  return out_requests
+      out_rrs.append(rr)
+  return out_rrs, rels
 
 
 def current_visible_requests(user, request_records=None):
