@@ -54,21 +54,10 @@ def edit_requests(user, requests):
   _pre_fetch_relevant_rows(requests, user)
   request_editor.check_and_save(user, requests)
   if request_editor.exchange:
-    ping(user, request_editor.exchange)
+    ei.ping(user, request_editor.exchange)
   else:
     request_editor.notify_edit()
   return requests.or_group_id
-
-
-def ping(user, exchange):
-  user_ids = exchange.user_ids.copy()
-  user_ids.remove(user.get_id())
-  anvil.server.launch_background_task(
-    'pings',
-    user_ids=user_ids,
-    start=None if exchange.start_now else exchange.start_dt,
-    duration=exchange.exchange_format.duration,
-  )    
 
 
 def _check_requests_valid(user, requests, user_prev_requests):
@@ -232,46 +221,13 @@ def _potential_matching_request_records(requests, user, now):
   ]
   return list(repo.partially_matching_requests(user, partial_request_dicts, now, records=True))
 
+
 def _viable_request_records(user, requests, other_request_records):
   still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
   viable_other_rrs, rels = eligible_visible_requests(user, requests, still_current_other_request_records)
   if viable_other_rrs:
     repo.cache_request_record_rows(still_current_other_request_records)
   return viable_other_rrs, rels
-
-
-@sm.background_task_with_reporting
-def notify_edit_bg(user, requests, related_prev_requests):
-  new_all_eligible_users = _get_new_eligible_users(user, requests)
-  old_all_eligible_users = _get_old_eligible_users(related_prev_requests)
-  _notify_add(new_all_eligible_users - old_all_eligible_users, user, requests)
-  if requests.times_notify_info != related_prev_requests.times_notify_info:
-    _notify_edit(new_all_eligible_users & old_all_eligible_users, user, requests)
-  _notify_cancel(old_all_eligible_users - new_all_eligible_users, user)
-
-
-def _get_new_eligible_users(user, requests):
-  try:
-    (requests.user, requests.or_group_id, requests.elig_with_dict)
-  except RuntimeError:
-    sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
-  sm.my_assert(user.get_id() == requests.user, f"notify_edit: user ({user.get_id()}) should be requester ({requests.user})")
-  new_eligibility_spec = repo.eligibility_spec(requests[0])
-  new_all_eligible_users = all_eligible_users(requests[0], new_eligibility_spec)
-  return new_all_eligible_users
-
-
-def _get_old_eligible_users(related_prev_requests):
-  if not related_prev_requests:
-    return set()
-  else:
-    try:
-      related_prev_requests.elig_with_dict # checks all equal
-    except RuntimeError:
-      sm.warning("notify_edit old requests no common elig_with_dict")
-    old_r0 = related_prev_requests[0]
-    old_eligibility_spec = repo.eligibility_spec(old_r0)
-    return all_eligible_users(old_r0, old_eligibility_spec)
 
 
 def _process_exchange_requests(exchange_prospect):
@@ -290,21 +246,6 @@ def _cancel_other_or_group_requests(requests_matched):
   for rr in repo.requests_by_or_group(or_group_ids, records=True):
     if rr.entity.request_id not in request_ids:
       rr.cancel()
-
-
-def _notify_add(users, requester, requests):
-  for other_user in users:
-    n.notify_requests(other_user, requester, requests, f"empathy request", " has requested an empathy chat:")
-
-
-def _notify_edit(users, requester, requests):
-  for other_user in users:
-    n.notify_requests(other_user, requester, requests, "empathy request", " has changed their empathy chat request to:")
-
-
-def _notify_cancel(users, requester):
-  for other_user in users:
-    n.notify_requests_cancel(other_user, requester, "empathy request")
 
 
 def _prune_request_records(other_request_records, now):
@@ -572,11 +513,55 @@ def now_request(user, record=False):
   return None
 
 
-def ping_dt(exchange):
-  request_records = [repo.RequestRecord.from_id(p['request_id']) for p in exchange.participants]
-  return max([rr.entity.edit_dt for rr in request_records])
-
-
 def confirm_wait(request_record):
   import datetime
   request_record.update_expire_dt(sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS))
+
+
+@sm.background_task_with_reporting
+def notify_edit_bg(user, requests, related_prev_requests):
+  new_all_eligible_users = _get_new_eligible_users(user, requests)
+  old_all_eligible_users = _get_old_eligible_users(related_prev_requests)
+  _notify_add(new_all_eligible_users - old_all_eligible_users, user, requests)
+  if requests.times_notify_info != related_prev_requests.times_notify_info:
+    _notify_edit(new_all_eligible_users & old_all_eligible_users, user, requests)
+  _notify_cancel(old_all_eligible_users - new_all_eligible_users, user)
+
+
+def _get_new_eligible_users(user, requests):
+  try:
+    (requests.user, requests.or_group_id, requests.elig_with_dict)
+  except RuntimeError:
+    sm.warning("notify_edit requests no common requester, or_group_id, or elig_with_dict")
+  sm.my_assert(user.get_id() == requests.user, f"notify_edit: user ({user.get_id()}) should be requester ({requests.user})")
+  new_eligibility_spec = repo.eligibility_spec(requests[0])
+  new_all_eligible_users = all_eligible_users(requests[0], new_eligibility_spec)
+  return new_all_eligible_users
+
+
+def _get_old_eligible_users(related_prev_requests):
+  if not related_prev_requests:
+    return set()
+  else:
+    try:
+      related_prev_requests.elig_with_dict # checks all equal
+    except RuntimeError:
+      sm.warning("notify_edit old requests no common elig_with_dict")
+    old_r0 = related_prev_requests[0]
+    old_eligibility_spec = repo.eligibility_spec(old_r0)
+    return all_eligible_users(old_r0, old_eligibility_spec)
+
+
+def _notify_add(users, requester, requests):
+  for other_user in users:
+    n.notify_requests(other_user, requester, requests, f"empathy request", " has requested an empathy chat:")
+
+
+def _notify_edit(users, requester, requests):
+  for other_user in users:
+    n.notify_requests(other_user, requester, requests, "empathy request", " has changed their empathy chat request to:")
+
+
+def _notify_cancel(users, requester):
+  for other_user in users:
+    n.notify_requests_cancel(other_user, requester, "empathy request")

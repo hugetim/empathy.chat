@@ -1,3 +1,4 @@
+import anvil.server
 import anvil.secrets
 from anvil import tables
 from .server_misc import authenticated_callable
@@ -107,6 +108,17 @@ def prune_no_show_exchanges():
       duration = datetime.timedelta(minutes=er.entity.exchange_format.duration)
       if now > er.entity.start_dt + duration:
         er.end()
+
+
+def ping(user, exchange):
+  user_ids = exchange.user_ids.copy()
+  user_ids.remove(user.get_id())
+  anvil.server.launch_background_task(
+    'pings',
+    user_ids=user_ids,
+    start=None if exchange.start_now else exchange.start_dt,
+    duration=exchange.exchange_format.duration,
+  )    
 
   
 @authenticated_callable
