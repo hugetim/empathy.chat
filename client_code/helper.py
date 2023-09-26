@@ -147,7 +147,7 @@ def warning(warning_str):
                    'branch': anvil.app.branch,
                    'environment.name': anvil.app.environment.name,
                   }
-  if app.environment.name[0:5] == "Debug":
+  if anvil.app.environment.name[0:5] == "Debug":
     print(f"Warning: {warning_str}")
   else:
     print(f"Reporting warning: {warning_str}")
