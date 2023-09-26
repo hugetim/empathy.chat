@@ -86,6 +86,7 @@ def report_error(err_repr, app_info_dict, context_str):
 @anvil.server.callable
 def warning(warning_str, app_info_dict=None, from_client=False):
   from . import notifies as n
+  from anvil import app
   admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
   current_user = anvil.users.get_user()
   if admin != current_user:
@@ -98,9 +99,12 @@ def warning(warning_str, app_info_dict=None, from_client=False):
       app_origin: {anvil.server.get_app_origin()}
       """
     )
-    if not from_client:
-      print(f"Reporting warning: {warning_str}")
-    n.email_send(admin, subject="empathy.chat warning", text=content, from_name="empathy.chat warning handling")
+    if app.environment.name[0:5] == "Debug":
+      print(f"Warning: {warning_str}")
+    else:
+      if not from_client:
+        print(f"Reporting warning: {warning_str}")
+      n.email_send(admin, subject="empathy.chat warning", text=content, from_name="empathy.chat warning handling")
 
 
 def my_assert(statement, id_str):
