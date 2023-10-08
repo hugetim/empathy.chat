@@ -41,7 +41,7 @@ class Relationship:
     return (
       self.group_authorized_pair
       or (self.min_trust_level >= 3 and self.distance <= 3)
-      or (self.min_trust_level >= 2 and self.distince <= 2 and self.degree <= 1)
+      or (self.min_trust_level >= 2 and self.distance <= 2 and self.degree <= 1)
     )
 
   @property
