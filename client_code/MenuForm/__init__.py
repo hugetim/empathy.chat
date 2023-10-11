@@ -24,18 +24,16 @@ class MenuForm(MenuFormTemplate):
     self.init_components(**properties)
     
     if glob.trust_level < 0:
-      alert('This account is not yet authorized, but '
-            + 'it can be used to test things out. Your actions will not impact '
-            + 'or be visible to other users. '
-            + 'For help, contact: ' + p.CONTACT_EMAIL,
-            dismissible=False)
+        alert('This account is not yet authorized, but '
+              + 'it can be used to test things out. Your actions will not impact '
+              + 'or be visible to other users. '
+              + 'For help, contact: ' + p.CONTACT_EMAIL,
+              dismissible=False)
     else:
-      self.set_help_link("https://www.loomio.org/join/group/G537YtVTZmNTW1S1KTJnDvUb/")
+        self.set_help_link("https://www.loomio.org/join/group/G537YtVTZmNTW1S1KTJnDvUb/")
     self.connections_link.visible = glob.trust_level >= 2 # show if guest_allowed (DashForm.timer_1)
     self.my_groups_link.visible = glob.trust_level >= 3
     self.test_column_panel.visible = self.item['test_mode']
-    # if p.DEBUG_MODE and self.item['test_mode']:
-    #   auto_test.client_auto_tests()
     self.set_test_link()
     self.timer_1.interval = 30*60 #kludge to prevent cache from becoming *too* stale
     self.dash = None
