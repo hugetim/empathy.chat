@@ -1,18 +1,18 @@
 from ._anvil_designer import ProfileTemplate
 from anvil import *
-import anvil.server
-from .... import helper as h
-from .... import ui_procedures as ui
-from .... import prompts
-from .... import glob
-from .... import invited_procedures as invited
-from .... import portable as port
-from .... import parameters as p
-from .... import relationship as rel
-from .... import network_controller as nc
 from .NameEdit import NameEdit
-from .TextAreaEdit import TextAreaEdit
 from .Relationship import Relationship
+from .TextAreaEdit import TextAreaEdit
+from .... import glob
+from .... import helper as h
+from .... import invited_procedures as invited
+from .... import network_controller as nc
+from .... import parameters as p
+from .... import portable as port
+from .... import prompts
+from .... import relationship as rel
+from .... import ui_procedures as ui
+import anvil.server
 
 
 class Profile(ProfileTemplate):
