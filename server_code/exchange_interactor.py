@@ -66,6 +66,11 @@ def commence_user_exchange(user):
   user.update()
 
 
+@tables.in_transaction
+def commence_user_exchange_in_transaction(user):
+  commence_user_exchange(user)
+
+
 @authenticated_callable
 def join_exchange(exchange_id):
   user = sm.get_acting_user()
