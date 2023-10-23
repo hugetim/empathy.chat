@@ -2,6 +2,8 @@
 
 A place to exchange NVC empathy. [Click here for more.](https://www.loomio.com/d/Wxhw4u3Z/aims-and-means-the-big-picture-)
 
+Note: The [published branch](https://github.com/hugetim/empathy.chat/tree/published) is the code deployed at https://empathy.chat.
+
 ## Built With
 
 * [Anvil](https://anvil.works) - web apps built entirely with Python (See below for more.)
