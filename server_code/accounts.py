@@ -169,7 +169,13 @@ def _emails_equal(a, b):
   em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
   a_match = em_re.search(a)
   b_match = em_re.search(b)
-  return a_match.group(1) == b_match.group(1) and a_match.group(2).lower() == b_match.group(2).lower()
+  a_local, a_domain = a_match.group(1), a_match.group(2).lower()
+  b_local, b_domain = b_match.group(1), b_match.group(2).lower()
+  if a_domain in ['gmail.com', 'googlemail.com']:
+    a_local = a_local.replace('.', '').split('+')[0]
+  if b_domain in ['gmail.com', 'googlemail.com']:
+    b_local = b_local.replace('.', '').split('+')[0]
+  return a_local == b_local and a_domain == b_domain
 
 
 def in_email_list(email_address, list_of_email_addresses):
