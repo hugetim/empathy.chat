@@ -162,21 +162,43 @@ def _email_invalid(email):
   # pattern source: https://stackoverflow.com/revisions/201378/26
   pattern = r"""(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
   return not bool(re.match(pattern, email))
-  
+
+
+class EmailAddress:
+  def __init__(self, email):
+    self.email = email
+    self.local, self.domain = self._parse_email(email)
+
+  def _parse_email(self, email):
+    em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
+    match = em_re.search(email)
+    if not match:
+      raise ValueError(f"Invalid email format: {email}")
+    local, domain = match.groups()
+    domain = domain.lower()
+    if domain in {"gmail.com", "googlemail.com"}:
+      local = local.split('+')[0].replace('.', '').lower()  # Gmail-specific normalization
+      domain = "gmail.com"  # Normalize domain
+    return local, domain
+
+  def __eq__(self, other):
+    if not isinstance(other, EmailAddress):
+      return NotImplemented
+    return self.local == other.local and self.domain == other.domain
+
 
 def _emails_equal(a, b):
-  import re
-  em_re = re.compile(r"^([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)$")
-  a_match = em_re.search(a)
-  b_match = em_re.search(b)
-  return a_match.group(1) == b_match.group(1) and a_match.group(2).lower() == b_match.group(2).lower()
+  email_a = EmailAddress(a)
+  email_b = EmailAddress(b)
+  return email_a == email_b
 
 
-def in_email_list(email_address, list_of_email_addresses):
-  if _email_invalid(email_address):
+def in_email_list(email_str, list_of_email_strs):
+  if _email_invalid(email_str):
     return False
-  for em in list_of_email_addresses:
-    if _emails_equal(email_address, em):
+  email_address = EmailAddress(email_str)
+  for em in list_of_email_strs:
+    if email_address == EmailAddress(em):
       return True
   return False
   
