@@ -4,26 +4,27 @@ A place to exchange NVC empathy. [Click here for more.](https://www.loomio.com/d
 
 Note: The [published branch](https://github.com/hugetim/empathy.chat/tree/published) is the code deployed at https://empathy.chat.
 
-## Built With
+### Built With
 
 * [Anvil](https://anvil.works) - web apps built entirely with Python (See below for more.)
 * [Jitsi](https://jitsi.org/) - open source video conferencing
 
-## License
+### License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.
 
-## Governance and Acknowledgments
+### Governance and Acknowledgments
 
 * [Click here](https://www.loomio.com/d/PQvJ9HEU/governance-who-makes-final-decisions-about-how-empathy-chat-works-)
 
-## Tests and Dependencies
+### Tests and Dependencies
 
 * Tests are in [a separate repo](https://github.com/hugetim/empathy.chat-tests)
 * Dependencies:
   * [anvil-extras](https://github.com/anvilistas/anvil-extras)
   * minor custom dependencies (not yet made public): "my slider_text_ticks", MyTimer, pdf_viewer
 
+---
 
 ## Using Anvil to edit this app
 
