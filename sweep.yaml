@@ -4,9 +4,8 @@
 # This setting contains a list of rules that Sweep will check for. If any of these rules are broken in a new commit, Sweep will create an pull request to fix the broken rule.
 rules:
 - "Fix typos in variable names"
-- "Use consistent naming conventions for variables and functions"
 - "Remove unused imports"
-- "Ensure code is properly indented"
+- "Preserve the indentation style used by each particular module (2 or 4 spaces)"
 
 # This is the branch that Sweep will develop from and make pull requests to. Most people use 'main' or 'master' but some users also use 'dev' or 'staging'.
 branch: 'master'
