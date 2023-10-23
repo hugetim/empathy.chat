@@ -248,6 +248,6 @@ def match_commence(proptime_id=None, user_id=""):
   """
   print(f"match_commence, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  ei.commence_user_exchange(user)
+  ei.commence_user_exchange_in_transaction(user)
   propagate_update_needed(user)
   return _get_state(user)

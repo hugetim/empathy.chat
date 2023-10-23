@@ -59,11 +59,15 @@ def current_user_exchange(user, to_join=False, record=False):
   return out
 
 
-@tables.in_transaction
 def commence_user_exchange(user):
   exchange_record = current_user_exchange(user, to_join=True, record=True)
   exchange_record.commence()
   user.update()
+
+
+@tables.in_transaction
+def commence_user_exchange_in_transaction(user):
+  commence_user_exchange(user)
 
 
 @authenticated_callable
