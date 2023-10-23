@@ -171,7 +171,7 @@ class RequestManager:
       if self.exchange.participants[0]['entered_dt']:
         with tables.batch_update:
           for u in users:
-            u['status'] = "matched" #app_tables.users
+            u['status'] = "matched"
       else:
         with tables.batch_update:
           self.user['status'] = "pinging"
