@@ -37,5 +37,5 @@ docs:
 
 # Sandbox executes commands in a sandboxed environment to validate code changes after every edit to guarantee pristine code. For more details, see the [Sandbox](./sandbox) page.
 sandbox:
-  install: []
-  check: []
+    install: []
+    check: []
