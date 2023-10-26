@@ -29,7 +29,7 @@ def upcoming_match_dicts(user):
   for exchange in repo.exchanges_by_user(user):
     exchange.set_my(user_id)
     if not exchange.my['complete_dt']:
-      out.append(_match_dict(user, exchange))
+      out.append(_match_dict(user_id, exchange))
   return out
 
 
