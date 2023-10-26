@@ -67,7 +67,7 @@ def leave_flow(group, user1_id=""):
 
 
 def init_load(reload=True, spinner=True):
-  """Resest app after any potential change to trust_level or prompts"""
+  """Reset app after any potential change to trust_level or prompts"""
   init_dict = get_init(spinner=spinner)
   glob.name = init_dict['name']
   glob.trust_level = init_dict['trust_level']
