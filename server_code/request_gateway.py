@@ -135,14 +135,14 @@ def eligibility_spec(request):
 
 
 def _row_to_exchange_format(row):
-  return ExchangeFormat(duration=row['duration'], spec=row['spec'])
+  return ExchangeFormat(duration=row['duration'], note=row['spec'].get('note', default=""))
 
 
 @lru_cache(maxsize=None)
 def get_exchange_format_row(exchange_format):
-  row = app_tables.exchange_formats.get(duration=exchange_format.duration)
+  row = app_tables.exchange_formats.get(duration=exchange_format.duration, spec=({'note': exchange_format.note} if exchange_format.note else {}))
   if not row:
-    row = app_tables.exchange_formats.add_row(duration=exchange_format.duration)
+    row = app_tables.exchange_formats.add_row(duration=exchange_format.duration, spec={'note': exchange_format.note})
   return row
 
 

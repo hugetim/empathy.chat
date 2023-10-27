@@ -11,7 +11,7 @@ import uuid
 @anvil.server.portable_class 
 class ExchangeFormat(Datum):
   duration: int
-  spec: dict
+  note: str
 
 
 @anvil.server.portable_class
