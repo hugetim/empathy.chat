@@ -135,7 +135,7 @@ def eligibility_spec(request):
 
 
 def _row_to_exchange_format(row):
-  return ExchangeFormat(duration=row['duration'])
+  return ExchangeFormat(duration=row['duration'], spec=row['spec'])
 
 
 @lru_cache(maxsize=None)
