@@ -1,4 +1,7 @@
 from ._anvil_designer import NoteTemplate
+from anvil_extras import popover
+
+
 class Note(NoteTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
