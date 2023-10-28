@@ -10,7 +10,7 @@ from functools import lru_cache
 
 
 def _row_to_request(row):
-  exchange_format = _row_to_exchange_format(row['exchange_format'])
+  exchange_format = row_to_exchange_format(row['exchange_format'])
   kwargs = dict(exchange_format=exchange_format)
   kwargs['request_id'] = row.get_id()
   kwargs['user'] = row['user'].get_id()
@@ -134,7 +134,7 @@ def eligibility_spec(request):
   return spec
 
 
-def _row_to_exchange_format(row):
+def row_to_exchange_format(row):
   return ExchangeFormat(duration=row['duration'], note=row['spec'].get('note', default=""))
 
 

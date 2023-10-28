@@ -1,0 +1,20 @@
+container:
+  type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '', spacing_below: none,
+    background: ''}
+components:
+- type: Link
+  properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Gray
+      600', visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
+    spacing_above: small, icon_align: left, col_widths: '', spacing_below: small,
+    italic: false, background: '', bold: false, underline: false, icon: 'fa:file-text-o'}
+  name: link_1
+  layout_properties:
+    col_widths: {}
+    grid_position: TMAIRN,RIWYWO
+  event_bindings: {click: link_1_click}
+is_package: true
+custom_component: true
+properties:
+- {name: text, type: string, default_value: '', multiline: true, default_binding_prop: true}

@@ -433,6 +433,7 @@ def requests_to_props(requests, user):
       eligible_groups=r.eligible_groups,
       eligible_starred=r.eligible_starred,
       eligible_invites=r.eligible_invites,
+      note=r.exchange_format.note,
       times=times
     )
 
