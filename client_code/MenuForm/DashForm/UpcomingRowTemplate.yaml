@@ -25,6 +25,25 @@ components:
   properties: {}
   name: users_flow_panel
   layout_properties: {column: LRZCRL}
+- type: FlowPanel
+  properties: {role: null, vertical_align: full, spacing: medium, align: justify,
+    tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none,
+    background: ''}
+  name: flow_panel_2
+  layout_properties: {column: YUYJUP}
+  components:
+  - type: Label
+    properties: {}
+    name: duration_label
+    layout_properties: {}
+    data_bindings:
+    - {property: text, code: 'self.item[''duration'']', writeback: false}
+  - type: form:Note
+    properties: {}
+    name: note_1
+    layout_properties: {}
+    data_bindings:
+    - {property: text, code: 'self.item[''note'']'}
 container:
   type: DataRowPanel
   event_bindings: {}

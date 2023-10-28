@@ -46,7 +46,9 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
   def init(self):    
     prop = self.item.pop('prop')
     self.item.update({'prop_id': prop.prop_id,
-                      'own': prop.own,})
+                      'own': prop.own,
+                      'note': prop.note,
+                     })
     time = self.item['prop_time']
     self.init_users_flow_panel(prop, time)
     self.item.update({'duration': t.DURATION_TEXT[time.duration],

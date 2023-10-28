@@ -52,4 +52,26 @@ components:
     foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: users_flow_panel
   layout_properties: {column: LRZCRL}
+- type: FlowPanel
+  properties: {role: null, vertical_align: full, spacing: medium, align: justify,
+    tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none,
+    background: ''}
+  name: flow_panel_2
+  layout_properties: {column: YUYJUP}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: none, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
+    name: duration_label
+    layout_properties: {}
+    data_bindings:
+    - {property: text, code: 'self.item[''duration'']', writeback: false}
+  - type: form:Note
+    properties: {}
+    name: note_1
+    layout_properties: {}
+    data_bindings:
+    - {property: text, code: 'self.item[''note'']'}
 is_package: true
