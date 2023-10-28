@@ -6,9 +6,9 @@ container:
 components:
 - type: Link
   properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Gray
-      600', visible: true, text: '', font_size: 20, wrap_on: mobile, font: '', col_spacing: medium,
-    spacing_above: small, icon_align: left, col_widths: '', spacing_below: none, italic: false,
-    background: '', bold: false, underline: false, icon: 'fa:file-text-o'}
+      600', visible: false, text: '', font_size: 20, wrap_on: mobile, font: '', col_spacing: medium,
+    spacing_above: medium, icon_align: left, col_widths: '', spacing_below: none,
+    italic: false, background: '', bold: false, underline: false, icon: 'fa:file-text-o'}
   name: link_1
   layout_properties:
     col_widths: {}

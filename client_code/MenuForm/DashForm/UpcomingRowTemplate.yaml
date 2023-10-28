@@ -42,8 +42,7 @@ components:
     properties: {}
     name: note_1
     layout_properties: {}
-    data_bindings:
-    - {property: text, code: 'self.item[''note'']'}
+    data_bindings: []
 container:
   type: DataRowPanel
   event_bindings: {}

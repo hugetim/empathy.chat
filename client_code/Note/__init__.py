@@ -8,11 +8,22 @@ class Note(NoteTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    self.link_1.popover(self.text, 
-                        placement = 'top', 
-                        trigger='manual',
-                       )
 
+
+  @property
+  def text(self):
+    return self._text
+  
+  @text.setter
+  def text(self, value):
+    self._text = value
+    if self._text:
+      self.link_1.popover(self._text,
+                          placement = 'top', 
+                          trigger='manual',
+                         )
+      self.link_1.visible = True
+  
   def link_1_click(self, **event_args):
     """This method is called when the link is clicked"""
     self.link_1.pop('toggle')

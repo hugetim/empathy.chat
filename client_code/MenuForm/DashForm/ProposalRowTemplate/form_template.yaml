@@ -57,21 +57,20 @@ components:
     tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none,
     background: ''}
   name: flow_panel_2
-  layout_properties: {column: YUYJUP}
+  layout_properties: {column: QGSDIT}
   components:
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
       visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
       spacing_below: none, italic: false, background: '', bold: false, underline: false,
       icon: ''}
-    name: duration_label
-    layout_properties: {}
+    name: expires_in_label
+    layout_properties: {column: QGSDIT}
     data_bindings:
-    - {property: text, code: 'self.item[''duration'']', writeback: false}
+    - {property: text, code: 'self.item[''expires_in'']'}
   - type: form:Note
     properties: {}
     name: note_1
     layout_properties: {}
-    data_bindings:
-    - {property: text, code: 'self.item[''note'']'}
+    data_bindings: []
 is_package: true

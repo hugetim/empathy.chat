@@ -61,6 +61,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     else:
       self.item['start_time'] = h.day_time_str(h.as_local_tz(time.start_date))
     self.top_form = get_open_form()
+    self.note_1.text = self.item['note']
 
   def init_users_flow_panel(self, prop, time):
     if self.item['own']:
@@ -85,6 +86,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.item['expires_in'] = f"{days_and_hours} hours"
     else:
       self.item['expires_in'] = h.seconds_to_words(time_left.total_seconds(), include_seconds=False)
+    self.refresh_data_bindings()
     
   def time_left(self):
     diff = self.item['expire_date'] - h.now()
@@ -96,6 +98,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     if self.item['prop_time'].start_now:
       self.item['expires_in'] = "n/a"
       self.timer_1.interval = 0
+      self.refresh_data_bindings()
     elif self.item['prop_time'].start_date == self.item['prop_time'].expire_date:
       self.item['expires_in'] = '(may become "Now" request at Start Time)'
       time_left = self.time_left()
@@ -106,6 +109,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
         self.timer_1.interval = 1
       else:
         self.timer_1.interval = 0
+      self.refresh_data_bindings()
     else:
       time_left = self.time_left()
       if time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:

@@ -27,6 +27,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     self.item['start_time'] = h.day_time_str(h.as_local_tz(self.start_dt))
     self.top_form = get_open_form()
     self.show_join_button_if_time()
+    self.note_1.text = self.item['note']
 
   def update_dash(self, state):
     self.top_form.content.update_status(state)
