@@ -13,7 +13,7 @@ def own_label(prop, item):
   full_desc = prop.eligibility_desc
   abbrev_desc = full_desc if len(full_desc) < 40 else full_desc[:36] + "..."
   id_desc = unique_row_desc(prop.times, item)
-  label = Label(text=f"My {id_desc} to:\n {abbrev_desc}", spacing_below="none", 
+  label = Label(text=f"My {id_desc} to:\n {abbrev_desc}", spacing_above="none", spacing_below="none", 
                 tooltip="One of my requested times")
   if abbrev_desc != full_desc:
     label.tooltip += f", to: {full_desc}"
@@ -71,7 +71,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.users_flow_panel.add_component(Name(item=prop.user))
     for port_user in time.users_accepting:
       if port_user.distance == 0:
-        self.users_flow_panel.add_component(Label(text="me,"), index=0)
+        self.users_flow_panel.add_component(Label(text="me,", spacing_above="none", spacing_below="none"), index=0)
         self.item['me_accepting'] = True
       else:
         self.users_flow_panel.add_component(Name(item=port_user))

@@ -15,22 +15,22 @@ components:
   - {property: item, code: self.item}
 - type: Label
   properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
+    text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none,
     italic: false, background: '', bold: false, underline: false, icon: ''}
   name: degree_label
   layout_properties: {column: CKNKJL}
   data_bindings: []
 - type: FlowPanel
   properties: {role: null, spacing: tiny, align: center, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
+    foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: flow_panel_2
   layout_properties: {column: NBEGGD}
   components:
   - type: Button
     properties: {role: primary-color, align: center, tooltip: Unread message, border: '',
-      enabled: true, foreground: '', visible: false, text: '', font_size: null, font: '',
-      spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
-      bold: false, underline: false, icon: 'fa:comment'}
+      enabled: true, foreground: '', visible: false, text: '', font_size: 10, font: '',
+      spacing_above: small, icon_align: left, spacing_below: none, italic: false,
+      background: '', bold: false, underline: false, icon: 'fa:comment'}
     name: unread_button
     layout_properties: {}
     data_bindings:
@@ -39,7 +39,7 @@ components:
   - type: Button
     properties: {role: primary-color, align: center, tooltip: 'This user has invited
         you to link, awaiting your confirmation', border: '', enabled: true, foreground: '',
-      visible: false, text: 'Confirm?', font_size: null, font: '', spacing_above: none,
+      visible: false, text: 'Confirm?', font_size: 10, font: '', spacing_above: small,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:link'}
     name: confirm_button
@@ -77,8 +77,8 @@ components:
     layout_properties: {}
 - type: Label
   properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
-    visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
-    spacing_below: small, italic: false, background: '', bold: false, underline: false,
+    visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
+    spacing_below: none, italic: false, background: '', bold: false, underline: false,
     icon: ''}
   name: last_active_label
   layout_properties: {column: VWXCEI}

@@ -1,13 +1,13 @@
 components:
 - type: FlowPanel
   properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
-    visible: true, spacing_above: small, spacing_below: small, background: ''}
+    visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: flow_panel_1
   layout_properties: {column: PHQQNP}
   components:
   - type: Button
     properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: false, text: Join, font_size: null, font: '', spacing_above: none,
+      foreground: '', visible: false, text: Join, font_size: 10, font: '', spacing_above: small,
       icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:child'}
     name: join_button
@@ -22,7 +22,7 @@ components:
     layout_properties: {grid_position: 'LKJQFF,DBDZKE'}
     event_bindings: {click: cancel_button_click}
 - type: FlowPanel
-  properties: {}
+  properties: {spacing_below: none}
   name: users_flow_panel
   layout_properties: {column: LRZCRL}
 - type: FlowPanel

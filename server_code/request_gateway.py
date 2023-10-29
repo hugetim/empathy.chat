@@ -140,7 +140,7 @@ def row_to_exchange_format(row):
 
 @lru_cache(maxsize=None)
 def get_exchange_format_row(exchange_format):
-  row = app_tables.exchange_formats.get(duration=exchange_format.duration, spec=({'note': exchange_format.note} if exchange_format.note else {}))
+  row = app_tables.exchange_formats.get(duration=exchange_format.duration, spec={'note': exchange_format.note})
   if not row:
     row = app_tables.exchange_formats.add_row(duration=exchange_format.duration, spec={'note': exchange_format.note})
   return row
