@@ -5,7 +5,7 @@ from .exceptions import RowMissingError
 from .exchanges import Exchange
 from .requests import ExchangeFormat
 from . import server_misc as sm
-from .request_gateway import get_exchange_format_row, RequestRecord, get_user_row_by_id, get_request_row_by_id
+from .request_gateway import get_exchange_format_row, RequestRecord, get_user_row_by_id, get_request_row_by_id, row_to_exchange_format
 
 
 # def _current_exchange_i(user, to_join):
@@ -209,7 +209,7 @@ class ExchangeRecord(sm.SimpleRecord):
 
 
 def _row_to_exchange(row):
-  exchange_format = ExchangeFormat(duration=row['exchange_format']['duration'])
+  exchange_format = row_to_exchange_format(row['exchange_format'])
   kwargs = dict(exchange_format=exchange_format)
   kwargs['exchange_id'] = row.get_id()
   kwargs['participants'] = [_row_to_participant(participant_row)

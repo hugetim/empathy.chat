@@ -1,0 +1,17 @@
+container:
+  type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '', spacing_below: none,
+    background: ''}
+components:
+- name: button_1
+  properties: {role: raised, tooltip: Click to see the attached note, enabled: true,
+    visible: false, text: '', font_size: null, spacing_above: none, icon_align: left,
+    spacing_below: none, bold: false, icon: 'fa:file-text-o'}
+  type: Button
+  layout_properties: {grid_position: 'PPPOBJ,SDRPNT'}
+  event_bindings: {click: button_1_click}
+is_package: true
+custom_component: true
+properties:
+- {name: text, type: string, default_value: '', multiline: true, default_binding_prop: true}

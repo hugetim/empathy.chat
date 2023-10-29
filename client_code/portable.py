@@ -306,7 +306,7 @@ class ProposalTime():
 class Proposal():
   def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
                eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
-               eligible_invites=None,):
+               eligible_invites=None, note=""):
     from .glob import default_request
     self.prop_id = prop_id
     self.own = own
@@ -338,6 +338,7 @@ class Proposal():
     else:
       self.eligible_starred = default_request['eligible']['eligible_starred'] if default_request else True
     self.eligible_invites = eligible_invites if eligible_invites else []
+    self.note = note
 
   @property
   def start_now(self):
@@ -413,6 +414,7 @@ class Proposal():
             'conflict_checks': conflict_checks,
             'eligible_starred': self.eligible_starred,
             'eligible_invites': self.eligible_invites,
+            'note': self.note,
            }
     first, *alts = self.times
     item['now_allowed'] = not(status and first.start_now == False)
@@ -433,6 +435,7 @@ class Proposal():
                     eligible_groups=item['eligible_groups'],
                     eligible_starred=item['eligible_starred'],
                     eligible_invites=item['eligible_invites'],
+                    note=item['note'],
                    )
 
   @staticmethod

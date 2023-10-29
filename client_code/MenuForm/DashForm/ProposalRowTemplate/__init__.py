@@ -13,7 +13,7 @@ def own_label(prop, item):
   full_desc = prop.eligibility_desc
   abbrev_desc = full_desc if len(full_desc) < 40 else full_desc[:36] + "..."
   id_desc = unique_row_desc(prop.times, item)
-  label = Label(text=f"My {id_desc} to:\n {abbrev_desc}", spacing_below="none", 
+  label = Label(text=f"My {id_desc} to:\n {abbrev_desc}", spacing_above="none", spacing_below="none", 
                 tooltip="One of my requested times")
   if abbrev_desc != full_desc:
     label.tooltip += f", to: {full_desc}"
@@ -46,7 +46,9 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
   def init(self):    
     prop = self.item.pop('prop')
     self.item.update({'prop_id': prop.prop_id,
-                      'own': prop.own,})
+                      'own': prop.own,
+                      'note': prop.note,
+                     })
     time = self.item['prop_time']
     self.init_users_flow_panel(prop, time)
     self.item.update({'duration': t.DURATION_TEXT[time.duration],
@@ -59,6 +61,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     else:
       self.item['start_time'] = h.day_time_str(h.as_local_tz(time.start_date))
     self.top_form = get_open_form()
+    self.note_1.text = self.item['note']
 
   def init_users_flow_panel(self, prop, time):
     if self.item['own']:
@@ -68,7 +71,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.users_flow_panel.add_component(Name(item=prop.user))
     for port_user in time.users_accepting:
       if port_user.distance == 0:
-        self.users_flow_panel.add_component(Label(text="me,"), index=0)
+        self.users_flow_panel.add_component(Label(text="me,", spacing_above="none", spacing_below="none"), index=0)
         self.item['me_accepting'] = True
       else:
         self.users_flow_panel.add_component(Name(item=port_user))
@@ -83,6 +86,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.item['expires_in'] = f"{days_and_hours} hours"
     else:
       self.item['expires_in'] = h.seconds_to_words(time_left.total_seconds(), include_seconds=False)
+    self.refresh_data_bindings()
     
   def time_left(self):
     diff = self.item['expire_date'] - h.now()
@@ -91,19 +95,27 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     return diff if diff.total_seconds() > zero.total_seconds() else zero
     
   def update(self):
+    self.expires_in_label.font_size = None
+    self.expires_in_label.spacing_above = 'small'
     if self.item['prop_time'].start_now:
       self.item['expires_in'] = "n/a"
       self.timer_1.interval = 0
+      self.refresh_data_bindings()
     elif self.item['prop_time'].start_date == self.item['prop_time'].expire_date:
+      self.expires_in_label.font_size = 12
+      self.expires_in_label.spacing_above = 'none'
       self.item['expires_in'] = '(may become "Now" request at Start Time)'
       time_left = self.time_left()
       if self.item['own'] and time_left.total_seconds() < 60*t.CANCEL_MIN_MINUTES:
         self.start_button.visible = True
+        self.expires_in_label.font_size = 12
+        self.expires_in_label.spacing_above = 'none'
         self.item['expires_in'] = '(at Start Time, becomes "Now" request)'
       if self.item['own'] and time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
         self.timer_1.interval = 1
       else:
         self.timer_1.interval = 0
+      self.refresh_data_bindings()
     else:
       time_left = self.time_left()
       if time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:

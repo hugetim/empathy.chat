@@ -41,6 +41,7 @@ def _match_dict(user_id, exchange):
   return {'port_users': port_users,
           'start_date': exchange.start_dt,
           'duration_minutes': exchange.exchange_format.duration,
+          'note': exchange.exchange_format.note,
           'match_id': exchange.exchange_id,
          }
 
