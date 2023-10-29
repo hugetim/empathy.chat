@@ -95,15 +95,18 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     return diff if diff.total_seconds() > zero.total_seconds() else zero
     
   def update(self):
+    self.expires_in_label.font_size = None
     if self.item['prop_time'].start_now:
       self.item['expires_in'] = "n/a"
       self.timer_1.interval = 0
       self.refresh_data_bindings()
     elif self.item['prop_time'].start_date == self.item['prop_time'].expire_date:
+      self.expires_in_label.font_size = 12
       self.item['expires_in'] = '(may become "Now" request at Start Time)'
       time_left = self.time_left()
       if self.item['own'] and time_left.total_seconds() < 60*t.CANCEL_MIN_MINUTES:
         self.start_button.visible = True
+        self.expires_in_label.font_size = 12
         self.item['expires_in'] = '(at Start Time, becomes "Now" request)'
       if self.item['own'] and time_left.total_seconds() <= WAIT_SECONDS + BUFFER_SECONDS:
         self.timer_1.interval = 1
