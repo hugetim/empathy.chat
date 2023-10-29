@@ -28,6 +28,7 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     self.top_form = get_open_form()
     self.show_join_button_if_time()
     self.note_1.text = self.item['note']
+    self.refresh_data_bindings()
 
   def update_dash(self, state):
     self.top_form.content.update_status(state)
