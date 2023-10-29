@@ -65,7 +65,7 @@ components:
       spacing_below: none, italic: false, background: '', bold: false, underline: false,
       icon: ''}
     name: expires_in_label
-    layout_properties: {column: QGSDIT}
+    layout_properties: {column: QGSDIT, expand: true}
     data_bindings:
     - {property: text, code: 'self.item[''expires_in'']'}
   - type: form:Note

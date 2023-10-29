@@ -35,7 +35,7 @@ components:
   - type: Label
     properties: {}
     name: duration_label
-    layout_properties: {}
+    layout_properties: {expand: true}
     data_bindings:
     - {property: text, code: 'self.item[''duration'']', writeback: false}
   - type: form:Note
