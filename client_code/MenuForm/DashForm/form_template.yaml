@@ -45,10 +45,12 @@ components:
         properties:
           role: null
           columns:
-          - {title: User(s), id: LRZCRL, data_key: users}
-          - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false}
-          - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false}
-          - {title: '', id: PHQQNP, data_key: buttons, expand: true}
+          - {title: User(s), id: LRZCRL, data_key: users, $$hashKey: 'object:398'}
+          - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false,
+            $$hashKey: 'object:399'}
+          - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false,
+            $$hashKey: 'object:400'}
+          - {title: '', id: PHQQNP, data_key: buttons, expand: true, $$hashKey: 'object:401'}
           auto_header: false
           tooltip: ''
           border: ''

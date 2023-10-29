@@ -7,14 +7,14 @@ container:
 components:
 - type: FlowPanel
   properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
-    visible: true, spacing_above: small, spacing_below: small, background: ''}
+    visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: flow_panel_1
   layout_properties: {column: PHQQNP}
   components:
   - type: Button
     properties: {role: primary-color, align: center, tooltip: Accept this request to meet here at the time specified and exchange empathy for the duration listed,
       border: '', enabled: true, foreground: '', visible: true, text: ACCEPT, font_size: 10,
-      font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
+      font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
       background: '', bold: false, underline: false, icon: ''}
     name: accept_button
     layout_properties: {column: PHQQNP, grid_position: 'LKJQFF,PFVHKT'}
@@ -22,7 +22,7 @@ components:
   - type: Button
     properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: false, text: Start Now, font_size: 11, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
+      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
       underline: false, icon: 'fa:child'}
     name: start_button
     layout_properties: {}
@@ -49,7 +49,28 @@ components:
   event_bindings: {tick: timer_1_tick}
 - type: FlowPanel
   properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
+    foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
   name: users_flow_panel
   layout_properties: {column: LRZCRL}
+- type: FlowPanel
+  properties: {role: null, vertical_align: full, spacing: medium, align: justify,
+    tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none,
+    background: ''}
+  name: flow_panel_2
+  layout_properties: {column: QGSDIT}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: none, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
+    name: expires_in_label
+    layout_properties: {column: QGSDIT}
+    data_bindings:
+    - {property: text, code: 'self.item[''expires_in'']'}
+  - type: form:Note
+    properties: {}
+    name: note_1
+    layout_properties: {}
+    data_bindings: []
 is_package: true
