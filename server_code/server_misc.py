@@ -376,7 +376,7 @@ class SimpleRecord(Record):
 @anvil.server.callable
 def get_url(name):
   media = app_tables.files.get(name=name)['file']
-  return media.url
+  return media.get_url(False)
 
 
 @anvil.server.callable
