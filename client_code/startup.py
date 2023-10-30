@@ -5,7 +5,7 @@ def error_handler(err):
   from . import error_helper as eh
   if isinstance(err, (anvil.server.AppOfflineError, anvil.server.TimeoutError)):
     eh.handle_server_connection_error(err)
-  if isinstance(err, anvil.users.AuthenticationFailed):
+  elif isinstance(err, anvil.users.AuthenticationFailed):
     eh.handle_authentication_error(err)
   else:
     eh.report_error(err)
