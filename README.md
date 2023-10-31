@@ -1,6 +1,6 @@
 # empathy.chat
 
-A place to exchange NVC empathy. [Click here for more.](https://www.loomio.com/d/Wxhw4u3Z/aims-and-means-the-big-picture-)
+A place to exchange NVC empathy. [Click here for more.](https://www.loomio.com/d/Wxhw4u3Z/aims-and-means-the-big-picture-/0)
 
 Note: The [published branch](https://github.com/hugetim/empathy.chat/tree/published) is the code deployed at https://empathy.chat.
 
@@ -15,7 +15,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) 
 
 ### Governance and Acknowledgments
 
-* [Click here](https://www.loomio.com/d/PQvJ9HEU/governance-who-makes-final-decisions-about-how-empathy-chat-works-)
+* [Click here](https://www.loomio.com/d/PQvJ9HEU/governance-who-makes-final-decisions-about-how-empathy-chat-works-/0)
 
 ### Tests and Dependencies
 
