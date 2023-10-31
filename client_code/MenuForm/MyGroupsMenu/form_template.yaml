@@ -87,7 +87,7 @@ components:
       layout_properties: {slot: explain}
       event_bindings: {click: explain_contribution_button_click}
     - type: Link
-      properties: {role: null, url: 'https://www.loomio.org/d/w6fHgyJ1/reputable-external-web-sites-list-for-profiles-verifying-identity-',
+      properties: {role: null, url: 'https://www.loomio.org/d/w6fHgyJ1/reputable-external-web-sites-list-for-profiles-verifying-identity-/0',
         align: left, tooltip: '', border: '', foreground: '', visible: true, text: reputable external web site,
         font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none,
         icon_align: left, col_widths: '', spacing_below: none, italic: false, background: '',
