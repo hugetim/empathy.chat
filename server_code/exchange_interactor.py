@@ -236,6 +236,17 @@ def _update_match_form_not_matched(user):
 #   repo.create_exchange(exchange, proptime)
 
 
+class ExchangeManager:
+  @tables.in_transaction
+  def complete_exchange(self, user):
+    exchange_record = current_user_exchange(user, record=True)
+    exchange = exchange_record.entity
+    self.start_dt = exchange.start_dt
+    sm.my_assert(exchange.size <= 2, "code below and _complete_exchange assumes dyads")
+    self.user_ids_not_yet_entered = [exchange.their['user_id']] if not exchange.their['entered_dt'] else []
+    _complete_exchange(exchange_record, user)
+
+
 @authenticated_callable
 def match_complete(user_id=""):
   """Switch 'complete' to true in matches table for user"""
@@ -243,12 +254,11 @@ def match_complete(user_id=""):
   from . import matcher
   from . import notifies as n
   user = sm.get_acting_user(user_id)
-  exchange_record = current_user_exchange(user, record=True) # repo.get_exchange(user_id)
-  exchange = exchange_record.entity
-  _complete_exchange(exchange_record, user)
-  if not exchange.their['entered_dt']:
-    other_user = sm.get_other_user(exchange.their['user_id'])
-    n.notify_match_cancel_bg(other_user, exchange.start_dt, canceler_name=sm.name(user, to_user=other_user))
+  exchange_manager = ExchangeManager()
+  exchange_manager.complete_exchange(user)
+  for other_user_id in exchange_manager.user_ids_not_yet_entered:
+    other_user = sm.get_other_user(other_user_id)
+    n.notify_match_cancel_bg(other_user, exchange_manager.start_dt, canceler_name=sm.name(user, to_user=other_user))
   matcher.propagate_update_needed()
 
 
@@ -256,13 +266,11 @@ def _complete_exchange(exchange_record, user):
   exchange = exchange_record.entity
   reset_my_status = exchange.current and exchange.my['entered_dt'] and not exchange.my['complete_dt']
   exchange.my['complete_dt'] = sm.now()
-  sm.my_assert(exchange.size <= 2, "_complete_exchange code below assumes dyads")
   if exchange.their['complete_dt'] or not exchange.their['entered_dt']:
     exchange.current = False
   _save_complete_exchange(exchange_record, user, reset_my_status)
 
 
-@tables.in_transaction
 def _save_complete_exchange(exchange_record, user, reset_my_status):
   if reset_my_status:
     user['status'] = None
