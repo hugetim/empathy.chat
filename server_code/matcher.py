@@ -154,18 +154,6 @@ def _get_upcomings(user):
   """Return list of user's upcoming matches"""
   return ei.upcoming_match_dicts(user)
 
-  
-@authenticated_callable
-def cancel_match(match_id, user_id=""):
-  """Cancel pending match"""
-  print(f"cancel_match, {match_id}, {user_id}")
-  user = sm.get_acting_user(user_id)
-  users_to_notify, start_dt = ei.cancel_exchange(user, match_id)
-  for u in users_to_notify:
-    n.notify_match_cancel_bg(u, start=start_dt, canceler_name=sm.name(user, to_user=u))
-  propagate_update_needed(user)
-  return _get_state(user)
-
 
 @authenticated_callable
 def accept_proposal(proptime_id, user_id=""):
