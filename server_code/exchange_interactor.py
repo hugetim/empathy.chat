@@ -74,16 +74,16 @@ def commence_user_exchange_in_transaction(user):
 @authenticated_callable
 def join_exchange(exchange_id):
   user = sm.get_acting_user()
+  _join_exchange_update(user, exchange_id)
+
+
+@tables.in_transaction
+def _join_exchange_update(user, exchange_id):
   user_id = user.get_id()
   exchange_record = repo.ExchangeRecord.from_id(exchange_id)
   if user_id not in exchange_record.entity.user_ids:
     raise UnauthorizedError("You are not a participant in that exchange.")
   exchange_record.entity.set_my(user_id)
-  _join_exchange_update(user, exchange_record)
-
-
-@tables.in_transaction
-def _join_exchange_update(user, exchange_record):
   exchange_record.entity.my['entered_dt'] = sm.now()
   exchange_record.save()
   user['status'] = "matched"
@@ -234,6 +234,15 @@ class ExchangeManager:
     self.user_ids_not_yet_entered = [exchange.their['user_id']] if not exchange.their['entered_dt'] else []
     _complete_exchange(exchange_record, user)
 
+  @tables.in_transaction
+  def cancel_exchange(self, user, exchange_id):
+    if sm.DEBUG:
+      print(f"cancel_exchange, {exchange_id}")
+    exchange_record = repo.ExchangeRecord.from_id(exchange_id)
+    self.users_to_notify = [u for u in exchange_record.users if u != user]
+    exchange_record.end()
+    self.start_dt = exchange_record.entity.start_dt
+
 
 @authenticated_callable
 def match_complete(user_id=""):
@@ -265,13 +274,19 @@ def _save_complete_exchange(exchange_record, user, reset_my_status):
   exchange_record.save()
 
 
-def cancel_exchange(user, exchange_id):
-  if sm.DEBUG:
-    print(f"cancel_exchange, {exchange_id}")
-  exchange_record = repo.ExchangeRecord.from_id(exchange_id)
-  users_to_notify = [u for u in exchange_record.users if u != user]
-  exchange_record.end_in_transaction()
-  return users_to_notify, exchange_record.entity.start_dt
+@authenticated_callable
+def cancel_match(match_id, user_id=""):
+  """Cancel pending match"""
+  from . import matcher
+  from . import notifies as n
+  print(f"cancel_match, {match_id}, {user_id}")
+  user = sm.get_acting_user(user_id)
+  exchange_manager = ExchangeManager()
+  exchange_manager.cancel_exchange(user, match_id)
+  for u in exchange_manager.users_to_notify:
+    n.notify_match_cancel_bg(u, start=exchange_manager.start_dt, canceler_name=sm.name(user, to_user=u))
+  matcher.propagate_update_needed(user)
+  return matcher.get_state(user.get_id(), force_refresh=True)
 
  
 @authenticated_callable
