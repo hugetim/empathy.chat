@@ -1,6 +1,6 @@
 import anvil.server
 from anvil import tables
-from .requests import Request, Requests, ExchangeFormat, ExchangeProspect, have_conflicts, prop_to_requests, exchange_to_save
+from .requests import Request, Requests, ExchangeFormat, ExchangeProspect, have_conflicts, prop_to_requests, selected_exchange, potential_matches
 from .exchanges import Exchange
 from .relationship import Relationship
 from . import request_gateway
@@ -105,9 +105,11 @@ class RequestManager:
       timer.check("_potential_matching_request_records")
       _prune_request_records(other_request_records, self.now)
       viable_other_request_records, rels = _viable_request_records(self.user, requests, other_request_records)
-      exchange_to_be = exchange_to_save(requests, [rr.entity for rr in viable_other_request_records])
+      exchange_prospects = potential_matches(requests, [rr.entity for rr in viable_other_request_records])
+      has_enough_exchanges = [ep for ep in exchange_prospects if ep.has_enough]
       timer.check("exchange_to_save")
-      if exchange_to_be:
+      if has_enough_exchanges:
+        exchange_to_be = selected_exchange(has_enough_exchanges)
         _process_exchange_requests(exchange_to_be)
         requests_matched = [r for r in exchange_to_be if r.user != requests.user]
         _cancel_other_or_group_requests(requests_matched)
@@ -122,6 +124,8 @@ class RequestManager:
         timer.check("_save_exchange")
         self._update_exchange_user_statuses()
       else:
+        if exchange_prospects:
+          pass # save exchange_prospects
         _cancel_missing_or_group_requests(requests, self.related_prev_request_records)
         timer.check("_cancel_missing_or_group_requests")
         if requests.start_now:

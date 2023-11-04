@@ -326,12 +326,12 @@ def exchange_to_save(new_requests, other_user_requests):
   exchange_prospects = potential_matches(new_requests, other_user_requests)
   has_enough_exchanges = [ep for ep in exchange_prospects if ep.has_enough]
   if has_enough_exchanges:
-    return _selected_exchange(has_enough_exchanges)
+    return selected_exchange(has_enough_exchanges)
   else:
     return None
 
 
-def _selected_exchange(has_enough_exchanges):
+def selected_exchange(has_enough_exchanges):
   min_start_dt = min((ep.start_dt for ep in has_enough_exchanges))
   earliest_eps = [ep for ep in has_enough_exchanges if ep.start_dt == min_start_dt]
   if len(earliest_eps) == 1:

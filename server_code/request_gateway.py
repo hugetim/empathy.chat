@@ -123,6 +123,31 @@ class RequestRecord(sm.SimpleRecord):
     return spec
 
 
+def _row_to_ep(ep_row):
+  requests = [_row_to_request(rr) for rr in ep_row['requests']]
+  return ExchangeProspect(requests, ep_row['distances'], ep_row.get_id())
+
+
+def _ep_to_fields(ep):
+  sm.my_assert(all([r.request_id for r in ep.requests]), "Requests already saved")
+  return dict(
+    requests=[get_request_row_by_id(r.request_id) for r in ep.requests],
+    distances=ep.distances,
+  )
+  
+
+class ExchangeProspectRecord(sm.SimpleRecord):
+  _table_name = 'exchange_prospects'
+
+  @staticmethod
+  def _row_to_entity(row):
+    return _row_to_ep(row)
+
+  @staticmethod
+  def _entity_to_fields(entity):
+    return _ep_to_fields(entity)
+
+
 def eligibility_spec(request):
   spec = {}
   spec['user'] = get_user_row_by_id(request.user)
@@ -210,13 +235,16 @@ def requests_by_or_group(or_group_ids, records=False):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
-def request_records_prospects(request_records):
+def request_records_prospects(request_records, records=False):
   request_row_set = {rr._row for rr in request_records}
   for ep_row in app_tables.exchange_prospects.search(q.fetch_only('distances', requests=q.fetch_only())):
     if request_row_set.issuperset(set(ep_row['requests'])):
-      r_ids = [r.get_id() for r in ep_row['requests']]
-      requests = [rr.entity for rr in request_records if rr.record_id in r_ids]
-      yield ExchangeProspect(requests, ep_row['distances'], ep_row.get_id())
+      if records:
+        yield ExchangeProspectRecord.from_row(ep_row)
+      else:
+        r_ids = [r.get_id() for r in ep_row['requests']]
+        requests = [rr.entity for rr in request_records if rr.record_id in r_ids]
+        yield ExchangeProspect(requests, ep_row['distances'], ep_row.get_id())
 
 
 def partially_matching_requests(user, partial_request_dicts, now, records=False):
