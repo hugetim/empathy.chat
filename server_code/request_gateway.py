@@ -247,6 +247,13 @@ def request_records_prospects(request_records, records=False):
         yield ExchangeProspect(requests, ep_row['distances'], ep_row.get_id())
 
 
+def clear_eprs_for_rrs(request_records):
+  request_row_set = {rr._row for rr in request_records}
+  for ep_row in app_tables.exchange_prospects.search(q.fetch_only('distances', requests=q.fetch_only())):
+    if request_row_set.intersection(set(ep_row['requests'])):
+      ep_row.delete()
+
+
 def partially_matching_requests(user, partial_request_dicts, now, records=False):
   q_expressions = [
     q.all_of(exchange_format=get_exchange_format_row(prd['exchange_format']),

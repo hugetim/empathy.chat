@@ -104,10 +104,9 @@ class RequestManager:
       other_request_records = _potential_matching_request_records(requests, self.user, self.now)
       timer.check("_potential_matching_request_records")
       _prune_request_records(other_request_records, self.now)
-      viable_other_request_records, rels = _viable_request_records(self.user, requests, other_request_records)
-      exchange_prospects = potential_matches(requests, [rr.entity for rr in viable_other_request_records])
+      exchange_prospects = _potential_matches(self.user, requests, other_request_records)
       has_enough_exchanges = [ep for ep in exchange_prospects if ep.has_enough]
-      timer.check("exchange_to_save")
+      timer.check("exchange_prospects")
       if has_enough_exchanges:
         exchange_to_be = selected_exchange(has_enough_exchanges)
         _process_exchange_requests(exchange_to_be)
@@ -124,16 +123,15 @@ class RequestManager:
         timer.check("_save_exchange")
         self._update_exchange_user_statuses()
       else:
-        if exchange_prospects:
-          pass # save exchange_prospects
         _cancel_missing_or_group_requests(requests, self.related_prev_request_records)
         timer.check("_cancel_missing_or_group_requests")
         if requests.start_now:
           self.user['status'] = "requesting"
         timer.check("update requesting status")
         self._save_requests(requests)
+        self._save_exchange_prospects(exchange_prospects)
       self.requests = requests
-
+  
   def _save_exchange(self, requests_matched):
     #check whether adding to pre-existing exchange
     with TimerLogger("  _save_exchange", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
@@ -169,6 +167,11 @@ class RequestManager:
       request.request_id = request_record.record_id
       repo.cache_request_record_rows([request_record])
 
+  def _save_exchange_prospects(self, exchange_prospects):
+    repo.clear_eprs_for_rrs(self.related_prev_request_records)
+    for ep in exchange_prospects:
+      repo.ExchangeProspectRecord(exchange_prospect).save()
+  
   def _update_exchange_user_statuses(self):
     if self.exchange.start_now:
       users = self.exchange_record.users
@@ -225,12 +228,22 @@ def _potential_matching_request_records(requests, user, now):
   return list(repo.partially_matching_requests(user, partial_request_dicts, now, records=True))
 
 
-def _viable_request_records(user, requests, other_request_records):
+def _potential_matches(user, requests, other_request_records): #new_requests, other_user_request_records):
   still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
-  viable_other_rrs, rels = eligible_visible_requests(user, requests, still_current_other_request_records)
-  if viable_other_rrs:
-    repo.cache_request_record_rows(still_current_other_request_records)
-  return viable_other_rrs, rels
+  # viable_other_rrs, rels = eligible_visible_requests(user, requests, still_current_other_request_records)
+  # if viable_other_rrs:
+  #   repo.cache_request_record_rows(still_current_other_request_records)
+  # return viable_other_rrs, rels
+  other_exchange_prospect_records = repo.request_records_prospects(still_current_other_request_records)
+  other_exchange_prospects = (
+    [epr.entity for epr in other_exchange_prospect_records] 
+    + [ExchangeProspect([rr.entity]) for rr in other_user_request_records]
+  )
+  visible_other_prospects = eligible_visible_prospects(user, requests, other_user_request_records, other_exchange_prospects)
+  exchange_prospects = []
+  for new_request in new_requests:
+    exchange_prospects.extend(new_request.get_prospects(visible_other_prospects))
+  return exchange_prospects
 
 
 def _process_exchange_requests(exchange_prospect):
@@ -315,6 +328,14 @@ def eligible_visible_requests(user, requests, other_request_records):
   return out_rrs, rels
 
 
+def eligible_visible_prospects(user, requests, other_request_records, other_exchange_prospects):
+  user_id = user.get_id()
+  all_requesters = {rr.user for rr in other_request_records}
+  rels = relationships(all_requesters, user)
+  requests_eligibility_spec = repo.eligibility_spec(requests[0])
+  return [ep for ep in other_exchange_prospects if prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, rels, ep)]
+
+
 def current_visible_requests(user, request_records=None):
   user_id = user.get_id()
   if request_records == None:
@@ -339,6 +360,20 @@ def current_visible_prospects(user, exchange_prospects):
       out_prospects.append(ep)
   return out_prospects
 
+
+def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, ep):
+  other_users = [sm.get_other_user(r.user) for r in ep]
+  ep_rels = _extend_relationships(rels, ep.distances)
+  new_ep = ExchangeProspect(list(ep.requests)+[request])
+  for request in ep:
+    other_user = next([u for u in other_users if u.get_id() == request.user])
+    rel = ep_rels[other_user]
+    if not is_eligible(new_ep, other_user, rel, requests_eligibility_spec): # instead of requests[0] and ep below, need new combined ep
+      return False
+    eligibility_spec = repo.eligibility_spec(request)
+    if not is_eligible(new_ep, other_user, rel, eligibility_spec):
+      return False
+  return True
 
 def is_eligible_for_prospect(user, ep):
   other_users = [sm.get_other_user(r.user) for r in ep]
