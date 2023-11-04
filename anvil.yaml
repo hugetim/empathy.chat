@@ -518,6 +518,9 @@ db_schema:
     - name: duration
       admin_ui: {width: 200}
       type: number
+    - name: spec
+      admin_ui: {width: 200}
+      type: simpleObject
   messages:
     title: Messages
     client: none
