@@ -370,7 +370,7 @@ def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, e
     if not is_eligible(new_ep, other_user, rel, requests_eligibility_spec): # instead of requests[0] and ep below, need new combined ep
       return False
     eligibility_spec = repo.eligibility_spec(request)
-    if not is_eligible(new_ep, other_user, rel, eligibility_spec):
+    if not is_eligible(new_ep, user, rel, eligibility_spec):
       return False
   return True
 
