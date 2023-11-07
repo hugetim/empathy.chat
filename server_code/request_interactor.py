@@ -1,6 +1,6 @@
 import anvil.server
 from anvil import tables
-from .requests import Request, Requests, ExchangeFormat, ExchangeProspect, have_conflicts, prop_to_requests, selected_exchange, potential_matches
+from .requests import Request, Requests, ExchangeFormat, ExchangeProspect, have_conflicts, prop_to_requests, selected_exchange
 from .exchanges import Exchange
 from .relationship import Relationship
 from . import request_gateway
@@ -309,23 +309,6 @@ def relationships(other_users, user):
                           **group_relationships[u],
                          )
           for u in other_users}
-
-
-def eligible_visible_requests(user, requests, other_request_records):
-  user_id = user.get_id()
-  all_requesters = {rr.user for rr in other_request_records}
-  rels = relationships(all_requesters, user)
-  requests_eligibility_spec = repo.eligibility_spec(requests[0])
-  eligible_requesters = set()
-  for u in all_requesters:
-    if is_eligible(requests[0], u, rels[u], requests_eligibility_spec):
-      eligible_requesters.add(u)
-  out_rrs = []
-  for rr in other_request_records:
-    if (rr.user in eligible_requesters
-        and is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec)):
-      out_rrs.append(rr)
-  return out_rrs, rels
 
 
 def eligible_visible_prospects(user, requests, other_request_records, other_exchange_prospects):
