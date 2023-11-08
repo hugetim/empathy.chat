@@ -316,7 +316,17 @@ def eligible_visible_prospects(user, requests, other_request_records, other_exch
   all_requesters = {rr.user for rr in other_request_records}
   rels = relationships(all_requesters, user)
   requests_eligibility_spec = repo.eligibility_spec(requests[0])
-  return [ep for ep in other_exchange_prospects if prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, rels, ep)]
+  out = []
+  for ep in other_exchange_prospects:
+    ep_rels = _extend_relationships(rels, ep.distances)
+    if prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, ep_rels, ep):
+      ep.distances = _distances_update(ep.distances, ep_rels, user_id)
+      out.append(ep)
+  return out
+
+
+def _distances_update(old_distances, ep_rels, user_id):
+  raise NotImplementedError("ri._distances_update not yet coded")
 
 
 def current_visible_requests(user, request_records=None):
@@ -345,11 +355,10 @@ def current_visible_prospects(user, exchange_prospects):
 
 
 def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, ep):
-  ep_rels = _extend_relationships(rels, ep.distances)
   new_ep = ExchangeProspect(list(ep.requests)+[request])
   for request in ep:
     other_user = sm.get_other_user(request.user)
-    rel = ep_rels[other_user]
+    rel = rels[other_user]
     if not is_eligible(new_ep, other_user, rel, requests_eligibility_spec): # instead of requests[0] and ep below, need new combined ep
       return False
     eligibility_spec = repo.eligibility_spec(request)
