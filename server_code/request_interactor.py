@@ -329,7 +329,11 @@ def eligible_visible_prospects(user, requests, other_request_records, other_exch
 
 
 def _distances_update(old_distances, ep_rels, user_id):
-  raise NotImplementedError("ri._distances_update not yet coded")
+  out = {user_id: {u_id: ep_rels[u_id].distance for u_id in ep_rels}}
+  for u_id in old_distances:
+    out[u_id] = old_distances[u_id]
+    out[u_id][user_id] = ep_rels[u_id].distance
+  return out
 
 
 def current_visible_requests(user, request_records=None):
