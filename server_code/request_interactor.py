@@ -96,6 +96,7 @@ class RequestManager:
   @tables.in_transaction
   def check_and_save(self, user, requests):
     with TimerLogger("check_and_save", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
+      user.update()
       (self.user, requests) = (user, Requests(deepcopy(requests)))
       self.exchange = None
       self.related_prev_request_records, unrelated_prev_requests = _user_prev_requests(self.user, requests)
