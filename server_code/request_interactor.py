@@ -315,12 +315,14 @@ def relationships(other_users, user):
 def eligible_visible_prospects(user, requests, other_request_records, other_exchange_prospects):
   user_id = user.get_id()
   all_requesters = {rr.user for rr in other_request_records}
+  other_request_especs = {rr.record_id: rr.eligibility_spec for rr in other_request_records}
+  other_users = {u_id: u for u in all_requesters}
   rels = relationships(all_requesters, user)
   requests_eligibility_spec = repo.eligibility_spec(requests[0])
   out = []
   for ep in other_exchange_prospects:
     ep_rels = _extend_relationships(rels, ep.distances)
-    if prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, ep_rels, ep):
+    if prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, ep_rels, ep, other_request_especs, other_users):
       ep.distances = _distances_update(ep.distances, ep_rels, user_id)
       out.append(ep)
   return out
@@ -355,14 +357,14 @@ def current_visible_prospects(user, exchange_prospects):
   return out_prospects
 
 
-def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, ep):
+def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, ep, other_request_especs, other_users):
   new_ep = ExchangeProspect(list(ep.requests)+[request])
   for request in ep:
-    other_user = sm.get_other_user(request.user)
+    other_user = other_users.get(request.user, sm.get_other_user(request.user))
     rel = rels[other_user]
-    if not is_eligible(new_ep, other_user, rel, requests_eligibility_spec): # instead of requests[0] and ep below, need new combined ep
+    if not is_eligible(new_ep, other_user, rel, requests_eligibility_spec):
       return False
-    eligibility_spec = repo.eligibility_spec(request)
+    eligibility_spec = other_request_especs.get(request.request_id, repo.eligibility_spec(request))
     if not is_eligible(new_ep, user, rel, eligibility_spec):
       return False
   return True
@@ -414,7 +416,7 @@ def _is_eligible(request, other_user, rel, included):
 
 def is_included(eligibility_spec, other_user, distance=None):
   from . import groups_server as g
-  if other_user in eligibility_spec['eligible_users']: # and distance < port.UNLINKED)):
+  if other_user in eligibility_spec['eligible_users']:
     return True
   if (eligibility_spec['eligible_starred'] and repo.star_row(other_user, eligibility_spec['user'])):
     return True
