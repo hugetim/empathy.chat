@@ -240,10 +240,10 @@ def _potential_matches(user, requests, other_request_records):
     [epr.entity for epr in other_exchange_prospect_records] 
     + [ExchangeProspect([rr.entity]) for rr in still_current_other_request_records]
   )
-  visible_other_prospects = eligible_visible_prospects(user, requests, still_current_other_request_records, other_exchange_prospects)
+  visible_other_prospects_w_expanded_distances = eligible_visible_prospects(user, requests, still_current_other_request_records, other_exchange_prospects)
   exchange_prospects = []
   for new_request in requests:
-    exchange_prospects.extend(new_request.get_prospects(visible_other_prospects))
+    exchange_prospects.extend(new_request.get_prospects(visible_other_prospects_w_expanded_distances))
   return exchange_prospects
 
 
@@ -316,7 +316,7 @@ def eligible_visible_prospects(user, requests, other_request_records, other_exch
   user_id = user.get_id()
   all_requesters = {rr.user for rr in other_request_records}
   other_request_especs = {rr.record_id: rr.eligibility_spec for rr in other_request_records}
-  other_users = {u_id: u for u in all_requesters}
+  other_users = {u.get_id(): u for u in all_requesters}
   rels = relationships(all_requesters, user)
   requests_eligibility_spec = repo.eligibility_spec(requests[0])
   out = []
@@ -329,10 +329,12 @@ def eligible_visible_prospects(user, requests, other_request_records, other_exch
 
 
 def _distances_update(old_distances, ep_rels, user_id):
-  out = {user_id: {u_id: ep_rels[u_id].distance for u_id in ep_rels}}
+  _ep_rels = {u.get_id(): ep_rels[u] for u in ep_rels.keys()}
+  out = {user_id: {u_id: _ep_rels[u_id].distance for u_id in _ep_rels}}
   for u_id in old_distances:
-    out[u_id] = old_distances[u_id]
-    out[u_id][user_id] = ep_rels[u_id].distance
+    if u_id != user_id:
+      out[u_id] = old_distances[u_id]
+      out[u_id][user_id] = _ep_rels[u_id].distance
   return out
 
 
@@ -362,7 +364,7 @@ def current_visible_prospects(user, exchange_prospects):
 
 
 def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, ep, other_request_especs, other_users):
-  new_ep = ExchangeProspect(list(ep.requests)+[request])
+  new_ep = ExchangeProspect(list(ep.requests)+[request], temp=True)
   for request in ep:
     other_user = other_users.get(request.user, sm.get_other_user(request.user))
     rel = rels[other_user]

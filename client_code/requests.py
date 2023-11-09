@@ -104,7 +104,7 @@ class Request:
         return True
     return False
 
-  def get_prospects(self, other_exchange_prospects):
+  def get_prospects(self, other_exchange_prospects, temp=False):
     out = []
     for other in other_exchange_prospects:
       if (self.exchange_format == other.exchange_format
@@ -113,7 +113,7 @@ class Request:
           and not other.is_full
           and (self.start_dt == other.start_dt or (self.start_now and other.start_now))
          ):
-        _possible_ep = other.plus_request(self)
+        _possible_ep = ExchangeProspect(other.requests + (self,), other.distances, temp=temp) # assumes other.distances already includes self.user
         if _possible_ep.is_possible_to_satisfy_all_with_users:
           out.append(_possible_ep)
     return out
@@ -170,11 +170,11 @@ class Requests:
 
 @anvil.server.portable_class 
 class ExchangeProspect:
-  def __init__(self, requests, distances=None, prospect_id=None):
+  def __init__(self, requests, distances=None, prospect_id=None, temp=False):
     if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
       raise ValueError("Input 'requests' must contain at least one Request")
     self.requests = tuple(requests)
-    if distances is None:
+    if distances is None and not temp:
       h.my_assert(len(self.requests) == 1, "only new ExchangeProspect should be missing distances")
       distances = {self.requests[0].user: {}}
     self.distances = distances
@@ -189,11 +189,6 @@ class ExchangeProspect:
 
   def __str__(self):
     return f"{{{', '.join(str(r) for r in self.requests)}}}"
-  
-  def plus_request(self, request):
-    if self.is_full:
-      raise RuntimeError("Cannot add request because ExchangeProspect is full")
-    return ExchangeProspect(self.requests + (request,), prospect_id=self.prospect_id)
   
   def __len__(self):
     return len(self.requests)
@@ -291,39 +286,39 @@ def have_conflicts(requests):
   return False
 
 
-def potential_matches(new_requests, other_user_requests):
-  other_exchange_prospects = all_exchange_prospects(other_user_requests)
+def potential_matches(new_requests, other_user_requests, temp=True):
+  other_exchange_prospects = all_exchange_prospects(other_user_requests, temp)
   exchange_prospects = []
   for new_request in new_requests:
-    exchange_prospects.extend(new_request.get_prospects(other_exchange_prospects))
+    exchange_prospects.extend(new_request.get_prospects(other_exchange_prospects, temp=temp))
   return exchange_prospects #[set(ep) for ep in exchange_prospects]
 
 
-def all_exchange_prospects(requests):
-  return _gather_exchange_prospects(requests)
+def all_exchange_prospects(requests, temp=True):
+  return _gather_exchange_prospects(requests, temp=temp)
                             
                           
-def _gather_exchange_prospects(remaining_requests, prospects_so_far=None):
+def _gather_exchange_prospects(remaining_requests, prospects_so_far=None, temp=True):
   if prospects_so_far is None: prospects_so_far = []
   if not remaining_requests:
     return prospects_so_far
   this_proposer = remaining_requests[0].user
   this_proposer_requests = [r for r in remaining_requests if r.user == this_proposer]
-  new_prospects = _combine_requests_w_prospects(this_proposer_requests, prospects_so_far)
+  new_prospects = _combine_requests_w_prospects(this_proposer_requests, prospects_so_far, temp)
   other_user_requests = [r for r in remaining_requests if r.user != this_proposer]
-  return _gather_exchange_prospects(other_user_requests, prospects_so_far + new_prospects)
+  return _gather_exchange_prospects(other_user_requests, prospects_so_far + new_prospects, temp)
 
 
-def _combine_requests_w_prospects(this_proposer_requests, prospects_so_far):
+def _combine_requests_w_prospects(this_proposer_requests, prospects_so_far, temp=True):
   new_prospects = []
   for r in this_proposer_requests:
-    new_prospects.extend(r.get_prospects(prospects_so_far) + [ExchangeProspect([r])])
+    new_prospects.extend(r.get_prospects(prospects_so_far, temp=temp) + [ExchangeProspect([r])])
   return new_prospects
 
 
-def exchange_to_save(new_requests, other_user_requests):
+def exchange_to_save(new_requests, other_user_requests, temp=True):
   """If a 'has_enough' exchange exists, return one"""
-  exchange_prospects = potential_matches(new_requests, other_user_requests)
+  exchange_prospects = potential_matches(new_requests, other_user_requests, temp)
   has_enough_exchanges = [ep for ep in exchange_prospects if ep.has_enough]
   if has_enough_exchanges:
     return selected_exchange(has_enough_exchanges)
