@@ -104,7 +104,7 @@ class Request:
         return True
     return False
 
-  def get_prospects(self, other_exchange_prospects, temp=False):
+  def get_prospects(self, other_exchange_prospects, distances=None, temp=False):
     out = []
     for other in other_exchange_prospects:
       if (self.exchange_format == other.exchange_format
@@ -113,7 +113,7 @@ class Request:
           and not other.is_full
           and (self.start_dt == other.start_dt or (self.start_now and other.start_now))
          ):
-        _possible_ep = ExchangeProspect(other.requests + (self,), other.distances, temp=temp) # assumes other.distances already includes self.user
+        _possible_ep = ExchangeProspect(other.requests + (self,), distances, temp=temp) # assumes other.distances already includes self.user
         if _possible_ep.is_possible_to_satisfy_all_with_users:
           out.append(_possible_ep)
     return out

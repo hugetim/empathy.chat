@@ -240,11 +240,7 @@ def _potential_matches(user, requests, other_request_records):
     [epr.entity for epr in other_exchange_prospect_records] 
     + [ExchangeProspect([rr.entity]) for rr in still_current_other_request_records]
   )
-  visible_other_prospects_w_expanded_distances = eligible_visible_prospects(user, requests, still_current_other_request_records, other_exchange_prospects)
-  exchange_prospects = []
-  for new_request in requests:
-    exchange_prospects.extend(new_request.get_prospects(visible_other_prospects_w_expanded_distances))
-  return exchange_prospects
+  return get_new_prospects(user, requests, still_current_other_request_records, other_exchange_prospects)
 
 
 def _process_exchange_requests(exchange_prospect):
@@ -312,7 +308,14 @@ def relationships(other_users, user):
           for u in other_users}
 
 
-def eligible_visible_prospects(user, requests, other_request_records, other_exchange_prospects):
+def _get_new_prospects(exchange_prospect, new_requests, distances):
+  new_exchange_prospects = []
+  for new_request in new_requests:
+    new_exchange_prospects.extend(new_request.get_prospects([exchange_prospect], distances))
+  return new_exchange_prospects
+
+
+def get_new_prospects(user, requests, other_request_records, other_exchange_prospects):
   user_id = user.get_id()
   all_requesters = {rr.user for rr in other_request_records}
   other_request_especs = {rr.record_id: rr.eligibility_spec for rr in other_request_records}
@@ -323,8 +326,8 @@ def eligible_visible_prospects(user, requests, other_request_records, other_exch
   for ep in other_exchange_prospects:
     ep_rels = _extend_relationships(rels, ep.distances)
     if prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, ep_rels, ep, other_request_especs, other_users):
-      ep.distances = _distances_update(ep.distances, ep_rels, user_id)
-      out.append(ep)
+      new_ep_distances = _distances_update(ep.distances, ep_rels, user_id)
+      out.extend(_get_new_prospects(ep, requests, new_ep_distances))
   return out
 
 
