@@ -197,7 +197,9 @@ def cache_request_record_rows(request_records):
 
 def get_request_row_by_id(request_id):
   if request_id in _request_row_dict:
-    return _request_row_dict[request_id]
+    row = _request_row_dict[request_id]
+    row.update()
+    return row
   else:
     return app_tables.requests.get_by_id(request_id)
 
