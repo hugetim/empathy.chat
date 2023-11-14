@@ -100,6 +100,7 @@ class RequestManager:
       (self.user, requests) = (user, Requests(deepcopy(requests)))
       self.exchange = None
       self.related_prev_request_records, unrelated_prev_requests = _user_prev_requests(self.user, requests)
+      self.related_prev_requests = Requests([rr.entity for rr in self.related_prev_request_records])
       timer.check("_user_prev_requests")
       _check_requests_valid(self.user, requests, unrelated_prev_requests)
       other_request_records = _potential_matching_request_records(requests, self.user, self.now)
@@ -192,7 +193,7 @@ class RequestManager:
       'notify_edit_bg',
       user=self.user,
       requests=self.requests,
-      related_prev_requests=Requests([rr.entity for rr in self.related_prev_request_records]),
+      related_prev_requests=self.related_prev_requests,
     )  
 
 
