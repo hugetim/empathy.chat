@@ -581,7 +581,7 @@ db_schema:
     server: full
     columns:
     - name: user
-      admin_ui: {width: 93.015872}
+      admin_ui: {order: 0, width: 142.02}
       type: link_single
       target: users
     - name: or_group_id
