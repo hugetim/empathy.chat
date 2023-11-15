@@ -15,7 +15,7 @@ class TestNow(): #not unittest.TestCase
       time.sleep(15)
       anvil.server.call('accept_now_proposal_old', user_id=accept_user_id)
       time.sleep(15)
-      anvil.server.call('cancel_accept', user_id=accept_user_id)
+      anvil.server.call('cancel_now', user_id=accept_user_id)
       time.sleep(10)
       anvil.server.call('cancel_now')
       time.sleep(15)

@@ -24,7 +24,7 @@ class WaitForm(WaitFormTemplate):
     self.top_form.reset_status(state)
     
   def cancel_button_click(self, **event_args):
-    state = anvil.server.call('cancel_accept')
+    state = anvil.server.call('cancel_now')
     self.reset_status(state)
 
   def timer_2_tick(self, **event_args):

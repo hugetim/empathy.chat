@@ -209,18 +209,8 @@ def cancel_time(proptime_id, user_id=""):
 
 
 @authenticated_callable
-def cancel_accept(proptime_id=None, user_id=""):
-  """Remove user accepting"""
-  print(f"cancel_accept, {proptime_id}, {user_id}")
-  user = sm.get_acting_user(user_id)
-  ri.cancel_now(user)
-  propagate_update_needed(user)
-  return _get_state(user)
-
-
-@authenticated_callable
 def cancel_now(proptime_id=None, user_id=""):
-  """Remove proptime and cancel pending match (if applicable)"""
+  """Cancel now request (including accept)"""
   print(f"cancel_now, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
   ri.cancel_now(user, proptime_id)
