@@ -7,7 +7,7 @@ components:
   properties: {role: null, align: center, tooltip: '', enable_slots: true, border: '',
     foreground: '', visible: true, font_size: null, content: '### Welcome!
 
-      To verify that you and {inviter} are "phone buddies,"
+      To verify that {inviter} is your close connection,
 
       we ask each of you to demonstrate you know the other''s personal phone number.',
     font: '', spacing_above: small, spacing_below: none, data: null, background: '',
@@ -57,7 +57,7 @@ components:
 - type: RichText
   properties: {role: richtext-text, align: center, tooltip: '', enable_slots: true,
     border: '', foreground: '', visible: true, font_size: null, content: 'We also
-      ask members to virtually introduce their phone buddies to each other.
+      ask members to virtually introduce their close connections to each other.
 
       For example, {inviter} describes you as their *{rel_to_inviter}*. ', font: '',
     spacing_above: small, spacing_below: none, data: null, background: '', format: markdown}

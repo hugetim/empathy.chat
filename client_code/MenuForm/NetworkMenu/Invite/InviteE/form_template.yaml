@@ -9,14 +9,14 @@ components:
   components:
   - type: Label
     properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Your new phone buddy will, at first, be able to chat only
-        with you (and any other direct connections they are able to form). In order
-        to become a full Member and be able to chat with others, they will need to
-        first participate in an empathy chat with you (or another Member). To help
-        them along, you may propose some times to chat with them now, enabling them
-        to hit the ground running as soon as your connection is confirmed.', font_size: null,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: ''}
+      visible: true, text: 'Your new close connection will, at first, be able to chat
+        only with you. In order to become a full Member and be able to chat with others,
+        they will need to first participate in an empathy chat with you (or another
+        Member). To help them along, you may propose some times to chat with them
+        now, enabling them to hit the ground running as soon as your connection is
+        confirmed.', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
     name: label_1
     layout_properties: {grid_position: 'YBAGYL,ALDORO'}
   - type: FlowPanel
