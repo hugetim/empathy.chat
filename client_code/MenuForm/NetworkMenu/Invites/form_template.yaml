@@ -9,7 +9,7 @@ components:
   components:
   - type: Button
     properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Invite New Phone Buddy, font_size: null,
+      foreground: '', visible: true, text: Invite CLOSE CONNECTION, font_size: null,
       font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
       background: '', bold: false, underline: false, icon: 'fa:user-plus'}
     name: invite_button
