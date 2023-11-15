@@ -1,6 +1,6 @@
 from anvil import secrets
-from .server_misc import authenticated_callable
-from anvil.server import background_task, launch_background_task
+from .server_misc import authenticated_callable, background_task_with_reporting
+from anvil.server import launch_background_task
 from anvil_extras.server_utils import timed
 from . import server_misc as sm
 from . import network_gateway
@@ -59,7 +59,7 @@ def get_messages(user2, user1):
     return []
 
 
-@background_task
+@background_task_with_reporting
 def prune_chat_messages():
   """Prune messages from fully completed matches"""
   from anvil.tables import app_tables
