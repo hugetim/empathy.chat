@@ -112,10 +112,10 @@ def propagate_update_needed(user=None):
 @authenticated_callable
 def get_state(user_id="", force_refresh=False, from_wait_form=False):
   user = sm.get_acting_user(user_id)
-  if from_wait_form:
-    pinging_rr = ri.now_request(user, record=True)
-    if pinging_rr:
-      ri.confirm_wait(pinging_rr)
+  # if from_wait_form:
+  #   pinging_rr = ri.now_request(user, record=True)
+  #   if pinging_rr:
+  #     ri.confirm_wait(pinging_rr)
   saved_state = anvil.server.session.get('state')
   if user['update_needed'] or not saved_state or force_refresh:
     _get_state(user)
@@ -146,6 +146,7 @@ def _get_state(user, partial_state_if_known=None):
 
 def get_partial_state(user):
   """Returns status dict (only 'status')"""
+  user.update()
   status = user['status']
   return {'status': status, 
          }
@@ -215,6 +216,16 @@ def cancel_now(proptime_id=None, user_id=""):
   print(f"cancel_now, {proptime_id}, {user_id}")
   user = sm.get_acting_user(user_id)
   ri.cancel_now(user, proptime_id)
+  propagate_update_needed()
+  return _get_state(user)
+
+
+@authenticated_callable
+def ping_cancel(user_id=""):
+  """Cancel now request (including accept)"""
+  print(f"ping_cancel, {user_id}")
+  user = sm.get_acting_user(user_id)
+  ei.ping_cancel(user)
   propagate_update_needed()
   return _get_state(user)
 

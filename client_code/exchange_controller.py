@@ -87,8 +87,11 @@ class ExchangeState(PendingState):
   def exit(self):
     if self.status == "matched":
       server.call('match_complete')
-    else:
+    elif self.status == "requesting":
       server.call('cancel_now', self.proptime_id)
+    else:
+      h.my_assert(self.status == "pinged", "ec.ExchangeState.exit status else")
+      server.call('ping_cancel')
     for channel in self.channels:
       glob.publisher.close_channel(channel)
 

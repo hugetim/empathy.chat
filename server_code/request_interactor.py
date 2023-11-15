@@ -285,7 +285,7 @@ class CancelManager:
       request_record = repo.RequestRecord.from_id(request_id)
     else:
       request_record = now_request(user, record=True)
-    if request_record.entity.current:
+    if request_record and request_record.entity.current:
       request_record.cancel()
     self.request_record = request_record
 

@@ -195,6 +195,16 @@ class ExchangeRecord(sm.SimpleRecord):
         _row['current'] = False
     self.entity.current = False
 
+  def ping_cancel(self, users):
+    if self._row_id:
+      _row = self._row
+    with tables.batch_update:
+      for u in users:
+        u['status'] = None
+      if self._row_id:
+        _row['current'] = False
+    self.entity.current = False
+  
   def commence(self):
     for participant in self.entity.participants:
       rr = RequestRecord.from_id(participant['request_id'])

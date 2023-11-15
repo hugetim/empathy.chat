@@ -236,6 +236,14 @@ def _update_match_form_not_matched(user):
 #   repo.create_exchange(exchange, proptime)
 
 
+def ping_cancel(user):
+  from . import notifies as n
+  exchange_manager = ExchangeManager()
+  exchange_manager.ping_cancel(user)
+  for u in exchange_manager.users_to_notify:
+    n.notify_match_cancel_bg(u, start=None, canceler_name=sm.name(user, to_user=u))
+
+
 class ExchangeManager:
   @tables.in_transaction
   def complete_exchange(self, user):
@@ -253,6 +261,15 @@ class ExchangeManager:
     exchange_record = repo.ExchangeRecord.from_id(exchange_id)
     self.users_to_notify = [u for u in exchange_record.users if u != user]
     exchange_record.end()
+    self.start_dt = exchange_record.entity.start_dt
+
+  @tables.in_transaction
+  def ping_cancel(self, user):
+    exchange_record = current_user_exchange(user, to_join=True, record=True)
+    if sm.DEBUG:
+      print(f"ping_cancel, {exchange_record.record_id}")
+    self.users_to_notify = [u for u in exchange_record.users if u != user]
+    exchange_record.ping_cancel(exchange_record.users)
     self.start_dt = exchange_record.entity.start_dt
 
 
