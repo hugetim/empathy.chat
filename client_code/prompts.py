@@ -6,7 +6,7 @@ from . import portable as port
 from . import helper as h
 
 
-def invite_dialog(invitee=None, title="Invite a phone buddy to empathy.chat"):
+def invite_dialog(invitee=None, title="Invite a close connection to empathy.chat"):
   """Specifying a `name` leads to connect-existing-user dialog"""
   invite = invites.Invite(inviter=port.User.from_logged_in(), invitee=invitee)
   #item = {"relationship": "", "phone_last4": "", "name": name, "user_id": user_id}
@@ -31,7 +31,7 @@ def get(spec_dict):
             "click_fn": add_phone,
            }
   elif spec_dict["name"] == "phone-invited":
-    return {"markdown": ("To complete your phone buddy connection "
+    return {"markdown": ("To confirm your close connection "
                          f"to {spec_dict['inviter']} (and unlock basic empathy.chat features), "
                          "please provide (and confirm) your phone number."
                         ), 
@@ -41,7 +41,7 @@ def get(spec_dict):
             "click_fn": add_phone,
            }
   elif spec_dict["name"] == "invited":
-    return {"markdown": (f"{spec_dict['inviter']} has requested to add you as a phone buddy. "
+    return {"markdown": (f"{spec_dict['inviter']} has requested to add you as a close connection. "
                          "Click to confirm this connection."), 
             "tooltip": f"Connect to {spec_dict['inviter']} and their network",
             "dismissable": False, ################### TEMPORARY
@@ -49,7 +49,7 @@ def get(spec_dict):
             "click_fn": partial(invited.invited_dialog, port.User(user_id=spec_dict["inviter_id"], name=spec_dict["inviter"])), ## spec_dict["rel"]
            }
   elif spec_dict["name"] == "invite-close":
-    return {"markdown": "Invite a new phone buddy to join you on empathy.chat", 
+    return {"markdown": "Invite a new close connection to join you on empathy.chat", 
             "tooltip": "Do you have an empathy buddy you haven't invited yet?",
             "dismissable": False, ################### TEMPORARY
             "background": "theme:Light Mint",

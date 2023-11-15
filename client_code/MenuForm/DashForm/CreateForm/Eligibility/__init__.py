@@ -51,7 +51,7 @@ class Eligibility(EligibilityTemplate):
     else: 
       self.drop_down_eligible.items = []
       self.item['eligible'] = min(self.item['eligible'], 1)
-    self.drop_down_eligible.items += [("my phone buddies (1st degree only)", 1),
+    self.drop_down_eligible.items += [("close connections (1st degree only)", 1),
                                      ]
     self.drop_down_eligible.selected_value = self.item['eligible'] if self.item['eligible'] else 1
     self.groups_check_box.checked = self.item['eligible_groups']
