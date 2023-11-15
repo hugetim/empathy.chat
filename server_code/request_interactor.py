@@ -271,7 +271,7 @@ def _prune_request_records(other_request_records, now):
 def cancel_now(user, request_id=None):
   manager = CancelManager()
   manager.cancel_now(user, request_id)
-  if manager.user_orig_status == 'requesting': # as opposed to 'waiting'
+  if manager.user_orig_status == 'requesting': # as opposed to 'pinging'
     rr = manager.request_record
     _notify_cancel(all_eligible_users(rr.entity, rr.eligibility_spec), user)
 

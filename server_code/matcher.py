@@ -110,8 +110,12 @@ def propagate_update_needed(user=None):
 
       
 @authenticated_callable
-def get_state(user_id="", force_refresh=False):
+def get_state(user_id="", force_refresh=False, from_wait_form=False):
   user = sm.get_acting_user(user_id)
+  if from_wait_form:
+    pinging_rr = ri.now_request(user, record=True)
+    if pinging_rr:
+      ri.confirm_wait(pinging_rr)
   saved_state = anvil.server.session.get('state')
   if user['update_needed'] or not saved_state or force_refresh:
     _get_state(user)
@@ -141,10 +145,7 @@ def _get_state(user, partial_state_if_known=None):
   
 
 def get_partial_state(user):
-  """Returns status dict (only 'status' and 'seconds_left')
-  ping_start: accept_date or, for "matched", match_commence
-  assumes 2-person matches only
-  """
+  """Returns status dict (only 'status')"""
   status = user['status']
   return {'status': status, 
          }

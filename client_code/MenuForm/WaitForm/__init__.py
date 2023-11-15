@@ -30,6 +30,6 @@ class WaitForm(WaitFormTemplate):
   def timer_2_tick(self, **event_args):
     """This method is called every 5 seconds, checking for status changes"""
     if self.item['status'] == "pinging":
-      state = anvil.server.call_s('get_state')
+      state = anvil.server.call_s('get_state', from_wait_form=True)
       if state['status'] != self.item['status']:
         self.reset_status(state)
