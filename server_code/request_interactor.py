@@ -269,15 +269,25 @@ def _prune_request_records(other_request_records, now):
 
 
 def cancel_now(user, request_id=None):
-  status = user['status']
-  if request_id:
-    request_record = repo.RequestRecord.from_id(request_id)
-  else:
-    request_record = now_request(user, record=True)
-  if request_record.entity.current:
-    request_record.cancel_in_transaction()
-  if status == 'requesting':
-    _notify_cancel(all_eligible_users(request_record.entity, request_record.eligibility_spec), user)
+  manager = CancelManager()
+  manager.cancel_now(user, request_id)
+  if manager.user_orig_status == 'requesting':
+    rr = manager.request_record
+    _notify_cancel(all_eligible_users(rr.entity, rr.eligibility_spec), user)
+
+
+class CancelManager:
+  @tables.in_transaction
+  def cancel_now(self, user, request_id):
+    user.update()
+    self.user_orig_status = user['status']
+    if request_id:
+      request_record = repo.RequestRecord.from_id(request_id)
+    else:
+      request_record = now_request(user, record=True)
+    if request_record.entity.current:
+      request_record.cancel()
+    self.request_record = request_record
 
 
 def cancel_request(user, proptime_id):
