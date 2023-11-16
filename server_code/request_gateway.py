@@ -173,12 +173,12 @@ def get_exchange_format_row(exchange_format):
 
 @lru_cache(maxsize=None)
 def get_user_row_by_id(user_id):
-  return app_tables.users.get_by_id(user_id)
+  return app_tables.users.get_by_id(user_id, q.fetch_only('first_name', 'trust_level'))
 
 
 @lru_cache(maxsize=None)
 def get_group_row_by_id(group_id):
-  return app_tables.groups.get_by_id(group_id)
+  return app_tables.groups.get_by_id(group_id, q.fetch_only('name'))
 
 
 @lru_cache(maxsize=None)
@@ -199,16 +199,15 @@ def get_request_row_by_id(request_id):
   if request_id in _request_row_dict:
     return _request_row_dict[request_id]
   else:
-    return app_tables.requests.get_by_id(request_id)
+    return app_tables.requests.get_by_id(request_id, requests_fetch)
 
 
 basic_requests_fields = ['or_group_id', 'pref_order', 'current', 'exchange_format', 'start_dt', 'expire_dt',
                          'create_dt', 'edit_dt', 'min_size', 'max_size', 'eligible', 'eligible_starred']
 requests_fetch = q.fetch_only(*basic_requests_fields,
-                              user=q.fetch_only('first_name'
-                                               ), 
-                              with_users=q.fetch_only('first_name'), 
-                              eligible_users=q.fetch_only('first_name'), 
+                              user=q.fetch_only('first_name', 'trust_level'), 
+                              with_users=q.fetch_only('first_name', 'trust_level'), 
+                              eligible_users=q.fetch_only('first_name', 'trust_level'), 
                               eligible_groups=q.fetch_only('name'),
                              )
 
