@@ -363,9 +363,6 @@ def _distances_update(old_distances, ep_rels, user_id):
 
 
 def current_visible_requests(user, request_records=None):
-  user_id = user.get_id()
-  if request_records == None:
-    request_records = [rr for rr in repo.current_requests(records=True) if rr.user != user]
   # group_memberships = 
   # starred_by_list =
   all_requesters = {rr.user for rr in request_records}
