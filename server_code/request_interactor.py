@@ -29,7 +29,6 @@ def reset_repo():
 def accept_pair_request(user, request_id):
   accepted_request_record = repo.RequestRecord.from_id(request_id)
   accept_request = Request.to_accept_pair_request(user.get_id(), accepted_request_record.entity)
-  # port_prop = next(requests_to_props([accept_request], user))
   add_requests(user, Requests([accept_request]))
 
 
@@ -136,7 +135,6 @@ class RequestManager:
       self.requests = requests
   
   def _save_exchange(self, requests_matched):
-    #check whether adding to pre-existing exchange
     with TimerLogger("  _save_exchange", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
       request_records_matched = []
       for r in requests_matched:
@@ -154,7 +152,6 @@ class RequestManager:
       self.exchange.exchange_id = self.exchange_record.record_id # for the new record case
   
   def _save_requests(self, requests):
-    #self.request_records = []
     for request in requests:
       #print(f"_save_requests request_id: {request.request_id}")
       matching_prev_records = [rr for rr in self.related_prev_request_records if rr.record_id == request.request_id]
@@ -165,7 +162,6 @@ class RequestManager:
         request_record.entity = request
       else:
         request_record = repo.RequestRecord(request, request.request_id)
-      #self.request_records.append(request_record)
       request_record.save()
       request.request_id = request_record.record_id
       repo.cache_request_record_rows([request_record])
@@ -267,6 +263,19 @@ def _prune_request_records(other_request_records, now):
   for rr in other_request_records:
     if rr.entity.is_expired(now):
       rr.cancel()
+
+
+def confirm_wait(request_record):
+  import datetime
+  request_record.update_expire_dt(sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS))
+
+
+def now_request(user, record=False):
+  current_request_records = repo.requests_by_user(user, records=True)
+  for rr in current_request_records:
+    if rr.entity.start_now:
+      return rr if record else rr.entity
+  return None
 
 
 def cancel_now(user, request_id=None):
@@ -422,7 +431,6 @@ def _new_rel(other_user_id, rel, pair_eligible_distances, ep_distances):
     return rel
 
 
-
 def is_eligible(request, other_user, rel, eligibility_spec):
   included = is_included(eligibility_spec, other_user, rel.distance)
   return _is_eligible(request, other_user, rel, included)
@@ -451,17 +459,6 @@ def is_included(eligibility_spec, other_user, distance=None):
   return False
 
 
-def all_eligible_users(request, eligibility_spec):
-  user = eligibility_spec['user']
-  included_users = _all_included_users(eligibility_spec)
-  rels = relationships(included_users, user)
-  eligible_users = set()
-  for user2 in _all_included_users(eligibility_spec):
-    if _is_eligible(request, user2, rels[user2], included=True):
-      eligible_users.add(user2)
-  return eligible_users
-
-
 def _all_included_users(eligibility_spec):
   from . import groups_server as g
   user = eligibility_spec['user']
@@ -475,6 +472,17 @@ def _all_included_users(eligibility_spec):
   for group in eligibility_spec['eligible_groups']:
     all_eligible.update(set(g.allowed_members_from_group_row(group, user))-{user})
   return all_eligible
+
+
+def all_eligible_users(request, eligibility_spec):
+  user = eligibility_spec['user']
+  included_users = _all_included_users(eligibility_spec)
+  rels = relationships(included_users, user)
+  eligible_users = set()
+  for user2 in _all_included_users(eligibility_spec):
+    if _is_eligible(request, user2, rels[user2], included=True):
+      eligible_users.add(user2)
+  return eligible_users
 
 
 def _all_equal(lst):
@@ -564,19 +572,6 @@ def get_visible_requests_as_port_view_items(user):
   visible_exchange_prospects = list(current_visible_prospects(user, other_exchange_prospects))
   port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
   return port.Proposal.create_view_items(port_proposals)
-
-
-def now_request(user, record=False):
-  current_request_records = repo.requests_by_user(user, records=True)
-  for rr in current_request_records:
-    if rr.entity.start_now:
-      return rr if record else rr.entity
-  return None
-
-
-def confirm_wait(request_record):
-  import datetime
-  request_record.update_expire_dt(sm.now() + datetime.timedelta(seconds=p.WAIT_SECONDS))
 
 
 @sm.background_task_with_reporting
