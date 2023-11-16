@@ -178,14 +178,14 @@ class ExchangeRecord(sm.SimpleRecord):
     if self._row_id:
       return self._row['users']
     else:
-      return [sm.get_other_user(p['user_id']) for p in self.entity.participants]
+      return [get_user_row_by_id(p['user_id']) for p in self.entity.participants]
 
   @tables.in_transaction(relaxed=True)
   def end_in_transaction(self):
     self.end()
   
   def end(self):
-    currently_matched_users = [sm.get_other_user(u_id) for u_id in self.entity.currently_matched_user_ids]
+    currently_matched_users = [get_user_row_by_id(u_id) for u_id in self.entity.currently_matched_user_ids]
     if self._row_id:
       _row = self._row
     with tables.batch_update:

@@ -387,7 +387,7 @@ def current_visible_prospects(user, exchange_prospects):
 def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, ep, other_request_especs, other_users):
   new_ep = ExchangeProspect(list(ep.requests)+[request], temp=True)
   for request in ep:
-    other_user = other_users.get(request.user, sm.get_other_user(request.user))
+    other_user = other_users.get(request.user, repo.get_user_row_by_id(request.user))
     rel = rels[other_user]
     if not is_eligible(new_ep, other_user, rel, requests_eligibility_spec):
       return False
@@ -398,7 +398,7 @@ def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, e
 
 
 def is_eligible_for_prospect(user, ep):
-  other_users = [sm.get_other_user(r.user) for r in ep]
+  other_users = [repo.get_user_row_by_id(r.user) for r in ep]
   rels = relationships(other_users, user)
   ep_rels = _extend_relationships(rels, ep.distances)
   for request in ep:
@@ -502,7 +502,7 @@ def requests_to_props(requests, user):
         expire_date=r.expire_dt,
         duration=r.exchange_format.duration,
       ))
-    user2 = sm.get_other_user(this_or_group[0].user)
+    user2 = repo.get_user_row_by_id(this_or_group[0].user)
     or_group_id = this_or_group[0].or_group_id
     yield port.Proposal(
       prop_id=or_group_id,
@@ -511,7 +511,7 @@ def requests_to_props(requests, user):
       min_size=r.min_size,
       max_size=r.max_size,
       eligible=r.eligible,
-      eligible_users=[sm.get_simple_port_user(sm.get_other_user(user_id), user1=user) for user_id in r.eligible_users],
+      eligible_users=[sm.get_simple_port_user(repo.get_user_row_by_id(user_id), user1=user) for user_id in r.eligible_users],
       eligible_groups=r.eligible_groups,
       eligible_starred=r.eligible_starred,
       eligible_invites=r.eligible_invites,
@@ -533,7 +533,7 @@ def eps_to_props(exchange_prospects, user):
         expire_date=this_ep.expire_dt,
         duration=this_ep.exchange_format.duration,
     )]
-    user2 = user if own else sm.get_other_user(rep_request.user)
+    user2 = user if own else repo.get_user_row_by_id(rep_request.user)
     yield port.Proposal(
       prop_id=this_ep.prospect_id,
       user=sm.get_simple_port_user(user2, user1=user),
@@ -541,7 +541,7 @@ def eps_to_props(exchange_prospects, user):
       min_size=this_ep.min_size,
       max_size=this_ep.max_size,
       eligible=rep_request.eligible, ### problem
-      eligible_users=[sm.get_simple_port_user(sm.get_other_user(user_id), user1=user) for user_id in rep_request.eligible_users], ### problem
+      eligible_users=[sm.get_simple_port_user(repo.get_user_row_by_id(user_id), user1=user) for user_id in rep_request.eligible_users], ### problem
       eligible_groups=rep_request.eligible_groups, ### problem
       eligible_starred=rep_request.eligible_starred, ### problem
       eligible_invites=rep_request.eligible_invites, ### problem

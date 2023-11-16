@@ -173,7 +173,7 @@ def get_exchange_format_row(exchange_format):
 
 @lru_cache(maxsize=None)
 def get_user_row_by_id(user_id):
-  return app_tables.users.get_by_id(user_id, q.fetch_only('first_name', 'trust_level'))
+  return app_tables.users.get_by_id(user_id, q.fetch_only('first_name', 'last_name', 'trust_level', 'status', 'notif_settings'))
 
 
 @lru_cache(maxsize=None)
