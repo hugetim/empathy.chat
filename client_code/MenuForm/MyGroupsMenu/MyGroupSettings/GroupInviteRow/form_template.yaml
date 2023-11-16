@@ -17,7 +17,7 @@ components:
     properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
       foreground: '', visible: true, text: Copy Link, font_size: null, font: '', spacing_above: small,
       icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+      underline: false, icon: 'fa:copy'}
     name: copy_button
     layout_properties: {grid_position: 'EQUXEF,LSHXUI'}
     event_bindings: {click: copy_button_click}
