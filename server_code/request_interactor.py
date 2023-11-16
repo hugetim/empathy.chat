@@ -444,9 +444,9 @@ def is_included(eligibility_spec, other_user, distance=None):
   for group in eligibility_spec['eligible_groups']:
     if other_user in g.allowed_members_from_group_row(group, eligibility_spec['user']):
       return True
-  if distance is None:
+  if eligibility_spec['eligible'] and distance is None:
     distance = c.distance(eligibility_spec['user'], other_user)
-  if distance <= eligibility_spec['eligible']:
+  if eligibility_spec['eligible'] and distance <= eligibility_spec['eligible']:
     return True
   return False
 
