@@ -180,7 +180,7 @@ class ExchangeRecord(sm.SimpleRecord):
     else:
       return [sm.get_other_user(p['user_id']) for p in self.entity.participants]
 
-  @tables.in_transaction
+  @tables.in_transaction(relaxed=True)
   def end_in_transaction(self):
     self.end()
   

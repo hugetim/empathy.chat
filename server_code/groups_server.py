@@ -123,7 +123,7 @@ class MyGroup(groups.MyGroup):
 
 
 @sm.authenticated_callable
-@anvil.tables.in_transaction
+@anvil.tables.in_transaction(relaxed=True)
 def save_my_group_settings(group_id, name, user_id=""):
   print(f"save_my_group_settings({group_id}, {name}, {user_id})")
   check_my_group_auth(group_id)
@@ -132,7 +132,7 @@ def save_my_group_settings(group_id, name, user_id=""):
 
 
 @sm.authenticated_callable
-@anvil.tables.in_transaction
+@anvil.tables.in_transaction(relaxed=True)
 def create_group_invite(port_my_group):
   print(f"create_group_invite({port_my_group!r})")
   check_my_group_auth(port_my_group.group_id)
@@ -402,7 +402,7 @@ class Invite(sm.ServerItem, groups.Invite):
 
   
   @staticmethod
-  @anvil.tables.in_transaction
+  @anvil.tables.in_transaction(relaxed=True)
   def _register_user(user):
     accounts.init_user_info(user)
       

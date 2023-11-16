@@ -78,7 +78,7 @@ def join_exchange(exchange_id):
   _join_exchange_update(user, exchange_id)
 
 
-@tables.in_transaction
+@tables.in_transaction(relaxed=True)
 def _join_exchange_update(user, exchange_id):
   user_id = user.get_id()
   exchange_record = repo.ExchangeRecord.from_id(exchange_id)
@@ -254,7 +254,7 @@ class ExchangeManager:
     self.user_ids_not_yet_entered = [exchange.their['user_id']] if not exchange.their['entered_dt'] else []
     _complete_exchange(exchange_record, user)
 
-  @tables.in_transaction
+  @tables.in_transaction(relaxed=True)
   def cancel_exchange(self, user, exchange_id):
     if sm.DEBUG:
       print(f"cancel_exchange, {exchange_id}")

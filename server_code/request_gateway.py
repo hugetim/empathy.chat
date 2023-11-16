@@ -81,7 +81,7 @@ class RequestRecord(sm.SimpleRecord):
   def _entity_to_fields(entity):
     return _request_to_fields(entity)
 
-  @tables.in_transaction
+  @tables.in_transaction(relaxed=True)
   def cancel_in_transaction(self):
     self.cancel()
   

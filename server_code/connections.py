@@ -311,7 +311,7 @@ def _connected_prompt(invite, invite_reply):
 
 
 @authenticated_callable
-@anvil.tables.in_transaction
+@anvil.tables.in_transaction(relaxed=True)
 def save_relationship(item, user_id=""):
   user1 = sm.get_acting_user(user_id)
   user2 = sm.get_other_user(item['user2_id'])
