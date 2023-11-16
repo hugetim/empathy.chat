@@ -148,9 +148,9 @@ class ExchangeProspectRecord(sm.SimpleRecord):
     return _ep_to_fields(entity)
 
 
-def eligibility_spec(request):
+def eligibility_spec(request, user=None):
   spec = {}
-  spec['user'] = get_user_row_by_id(request.user)
+  spec['user'] = user if user else get_user_row_by_id(request.user)
   spec['eligible'] = request.eligible
   spec['eligible_starred'] = request.eligible_starred
   spec['eligible_users'] = [get_user_row_by_id(user_id) for user_id in request.eligible_users]

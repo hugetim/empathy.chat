@@ -50,7 +50,7 @@ def edit_requests(user, requests):
   """
   sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager()
-  _pre_fetch_relevant_rows(requests, user)
+  _pre_fetch_relevant_rows(requests, user, request_editor.now)
   request_editor.check_and_save(user, requests)
   if request_editor.exchange:
     ei.ping(user, request_editor.exchange)
@@ -71,7 +71,7 @@ def _check_requests_valid(user, requests, user_prev_requests):
   # ...by pulling in requests associated with upcoming exchanges to have_conflicts() call
 
 
-def _pre_fetch_relevant_rows(requests, user):
+def _pre_fetch_relevant_rows(requests, user, now):
   repo.get_user_row_by_id(requests.user)
   for request in requests:
     repo.get_exchange_format_row(request.exchange_format) # to initialize relevant cache pre-transaction
@@ -84,7 +84,8 @@ def _pre_fetch_relevant_rows(requests, user):
                               for port_group in request.eligible_groups]
     out['eligible_invites'] = [repo.get_invite_row_by_id(port_invite.invite_id)
                               for port_invite in request.eligible_invites]
-  other_request_records = _potential_matching_request_records(requests, user, sm.now())
+  other_request_records = _potential_matching_request_records(requests, user, now)
+  _prune_request_records(other_request_records, now)
   if other_request_records:
     current_visible_requests(user, other_request_records)
 
@@ -332,7 +333,7 @@ def get_new_prospects(user, requests, other_request_records, other_exchange_pros
   other_request_especs = {rr.record_id: rr.eligibility_spec for rr in other_request_records}
   other_users = {u.get_id(): u for u in all_requesters}
   rels = relationships(all_requesters, user)
-  requests_eligibility_spec = repo.eligibility_spec(requests[0])
+  requests_eligibility_spec = repo.eligibility_spec(requests[0], user)
   out = []
   for ep in other_exchange_prospects:
     ep_rels = _extend_relationships(rels, ep.distances)
