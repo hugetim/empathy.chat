@@ -11,28 +11,6 @@ from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
 
 
-def _seconds_left(status, expire_date=None, ping_start=None):
-  now = sm.now()
-  if status in ["pinging", "pinged"]:
-    if ping_start:
-      confirm_match = p.CONFIRM_MATCH_SECONDS - (now - ping_start).total_seconds()
-    else:
-      confirm_match = p.CONFIRM_MATCH_SECONDS
-    if status == "pinging":
-      return confirm_match + 2*p.BUFFER_SECONDS # accounts for delay in response arriving
-    elif status == "pinged":
-      return confirm_match + p.BUFFER_SECONDS # accounts for delay in ping arriving
-  elif status == "requesting":
-    if expire_date:
-      return (expire_date - now).total_seconds()
-    else:
-      return p.WAIT_SECONDS
-  elif status in [None, "matched"]:
-    return None
-  else:
-    print("matcher.seconds_left(s,lc,ps): " + status)
-
-
 @authenticated_callable
 def init(time_zone):
   """Runs upon initializing app
@@ -83,8 +61,7 @@ def _init_user_status(user):
     #   _cancel_other(user)
     if status == "requesting":
       request_record = ri.now_request(user, record=True)
-      expire_dt = request_record.entity.expire_dt
-      if _seconds_left("requesting", expire_date=expire_dt) <= 0:
+      if request_record.entity.is_expired(sm.now()):
         request_record.cancel()
         user.update()
       else:
