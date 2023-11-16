@@ -6,6 +6,7 @@ from . import helper as h
 from . import parameters as p
 from datetime import datetime, timedelta
 import uuid
+from collections import namedtuple
 
 
 @anvil.server.portable_class 
@@ -122,6 +123,9 @@ class Request:
     return 1 + len(self.with_users) + (0 if other_user in self.with_users else 1) <= self.max_size
 
 
+NotifyInfo = namedtuple('NotifyInfo', ['start_now', 'start_dt', 'duration'])
+
+
 @anvil.server.portable_class 
 class Requests:
   def __init__(self, requests):
@@ -137,8 +141,8 @@ class Requests:
     return bool(self.requests)
   
   @property
-  def times_notify_info(self):
-    return {(r.start_now, r.start_dt, r.exchange_format.duration) for r in self.requests}
+  def notify_info(self):
+    return {NotifyInfo(start_now=r.start_now, start_dt=r.start_dt, duration=r.exchange_format.duration) for r in self.requests}
 
   def _attribute(self, attr_name):
     if not self.requests:

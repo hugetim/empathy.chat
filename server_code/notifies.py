@@ -74,12 +74,12 @@ def when_str(start, user):
     return "now"  
 
 
-def duration_start_str(request, user):
-  out = port.DURATION_TEXT[request.exchange_format.duration]
-  if request.start_now:
+def _duration_start_str(request_info, user):
+  out = port.DURATION_TEXT[request_info.duration]
+  if request_info.start_now:
     out += ", starting now"
   else:
-    out += f", {when_str(request.start_dt, user)}"
+    out += f", {when_str(request_info.start_dt, user)}"
   return out
 
 
@@ -189,25 +189,25 @@ def _notify_requests_cancel_by(user, requester, title, medium):
 ''')
 
 
-def notify_requests(user, requester, requests, title, desc):
+def notify_requests(user, requester, requests_info, title, desc):
   """Notify recipient of added/edited requests if settings permit"""
   from .request_interactor import is_included
   eligibility_specs = accounts.get_eligibility_specs(user)
   if user['phone'] and eligibility_specs.get('sms') and is_included(eligibility_specs['sms'], requester):
-    _notify_requests_by(user, requester, requests, title, desc, 'sms')
+    _notify_requests_by(user, requester, requests_info, title, desc, 'sms')
   elif eligibility_specs.get('email') and is_included(eligibility_specs['email'], requester):
-    _notify_requests_by(user, requester, requests, title, desc, 'email')
+    _notify_requests_by(user, requester, requests_info, title, desc, 'email')
 
 
-def _notify_requests_by(user, requester, requests, title, desc, medium):
-  print(f"'_notify_requests_by', {user['email']}, {requests[0].or_group_id}, {title}, {desc}, {medium}")
+def _notify_requests_by(user, requester, requests_info, title, desc, medium):
+  print(f"'_notify_requests_by', {user['email']}, {next(iter(requests_info)).start_dt}, {title}, {desc}, {medium}")
   requester_name = sm.name(requester, to_user=user)
   subject = f"empathy.chat - {title}"
-  if len(requests) > 1:
-    times_str = "\n" + "either " + "\n or ".join([duration_start_str(request, user) for request in requests])
+  if len(requests_info) > 1:
+    times_str = "\n" + "either " + "\n or ".join([_duration_start_str(info, user) for info in requests_info])
     content2 = f"Login to {p.URL} to accept one."
   else:
-    times_str = "\n " + duration_start_str(requests[0], user)
+    times_str = "\n " + _duration_start_str(next(iter(requests_info)), user)
     content2 = f"Login to {p.URL} to accept."
   content1 = f"{_other_name(requester_name)}{desc}{times_str}."
   if medium == 'sms':

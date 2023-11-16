@@ -304,7 +304,7 @@ def cancel_request(user, proptime_id):
   rr = repo.RequestRecord.from_id(proptime_id)
   other_or_group_requests = _other_or_group_requests(user, rr)
   if other_or_group_requests:
-    _notify_edit(all_eligible_users(rr.entity, rr.eligibility_spec), user, other_or_group_requests)
+    _notify_edit(all_eligible_users(rr.entity, rr.eligibility_spec), user, other_or_group_requests.notify_info)
   else:
     _notify_cancel(all_eligible_users(rr.entity, rr.eligibility_spec), user)
   rr.cancel_in_transaction()
@@ -578,9 +578,9 @@ def get_visible_requests_as_port_view_items(user):
 def notify_edit_bg(user, requests, related_prev_requests):
   new_all_eligible_users = _get_new_eligible_users(user, requests)
   old_all_eligible_users = _get_old_eligible_users(related_prev_requests)
-  _notify_add(new_all_eligible_users - old_all_eligible_users, user, requests)
-  if requests.times_notify_info != related_prev_requests.times_notify_info:
-    _notify_edit(new_all_eligible_users & old_all_eligible_users, user, requests)
+  _notify_add(new_all_eligible_users - old_all_eligible_users, user, requests.notify_info)
+  if requests.notify_info != related_prev_requests.notify_info:
+    _notify_edit(new_all_eligible_users & old_all_eligible_users, user, requests.notify_info)
   _notify_cancel(old_all_eligible_users - new_all_eligible_users, user)
 
 
@@ -608,14 +608,14 @@ def _get_old_eligible_users(related_prev_requests):
     return all_eligible_users(old_r0, old_eligibility_spec)
 
 
-def _notify_add(users, requester, requests):
+def _notify_add(users, requester, requests_info):
   for other_user in users:
-    n.notify_requests(other_user, requester, requests, f"empathy request", " has requested an empathy chat:")
+    n.notify_requests(other_user, requester, requests_info, f"empathy request", " has requested an empathy chat:")
 
 
-def _notify_edit(users, requester, requests):
+def _notify_edit(users, requester, requests_info):
   for other_user in users:
-    n.notify_requests(other_user, requester, requests, "empathy request", " has changed their empathy chat request to:")
+    n.notify_requests(other_user, requester, requests_info, "empathy request", " has changed their empathy chat request to:")
 
 
 def _notify_cancel(users, requester):

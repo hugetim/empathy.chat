@@ -357,10 +357,6 @@ class Proposal():
     return str(self.__dict__)  
 
   @property
-  def times_notify_info(self):
-    return {(time.start_now, time.start_date, time.duration) for time in self.times}
-
-  @property
   def eligibility_desc(self):
     items = []
     if self.eligible_invites:
