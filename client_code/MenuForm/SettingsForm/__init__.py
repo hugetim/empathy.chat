@@ -24,7 +24,7 @@ class SettingsForm(SettingsFormTemplate):
     self.essential_drop_down.selected_value = notif_settings.get('essential')
     self.message_drop_down.items = [("text/SMS", "sms"),
                                     ("email (default)", "email"),
-                                    ("don't notify", None),
+                                    ("don't notify me", None),
                                    ]
     if not phone: #order of these lines relative to those above and below matters
       self.essential_flow_panel.visible = False
@@ -42,8 +42,8 @@ class SettingsForm(SettingsFormTemplate):
     pseudo_props = {}
     for medium in ['sms', 'email']:
       pseudo_props[medium] = port.Proposal(**{k: self.elig_items[medium][k] for k in Eligibility.export_item_keys})
-    self.sms_desc_label.text = pseudo_props['sms'].eligibility_desc
-    self.email_desc_label.text = pseudo_props['email'].eligibility_desc 
+    self.sms_desc_label.text = pseudo_props['sms'].eligibility_desc if pseudo_props['sms'].eligibility_desc else "(no one)"
+    self.email_desc_label.text = pseudo_props['email'].eligibility_desc if pseudo_props['email'].eligibility_desc else "(no one)"
     
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""

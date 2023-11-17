@@ -83,7 +83,7 @@ components:
         visible: true
         font_size: null
         font: ''
-        spacing_above: none
+        spacing_above: small
         spacing_below: small
         italic: false
         background: ''
@@ -93,18 +93,21 @@ components:
       name: essential_drop_down
       layout_properties: {width: null, expand: false}
       event_bindings: {change: set_notif_settings}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'me for essential notifications (when someone accepts
-          my empathy chat request, cancels an already scheduled empathy chat, is waiting
-          for me because I''m late for a scheduled chat, etc.)', font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
-      name: label_5
-      layout_properties: {expand: true, width: null}
+    - name: rich_text_1
+      properties: {content: '{main} (when someone accepts my empathy chat request,
+          cancels an already scheduled empathy chat, is waiting for me because I''m
+          late, etc.)', spacing_above: none, spacing_below: none}
+      type: RichText
+      layout_properties: {expand: true}
+      components:
+      - name: label_2
+        properties: {text: essential notifications, bold: true, font_size: 16, spacing_above: none,
+          spacing_below: none, icon: 'fa:asterisk', icon_align: left}
+        type: Label
+        layout_properties: {slot: main}
   - type: FlowPanel
     properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+      foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
     name: flow_panel_3
     layout_properties: {}
     components:
@@ -122,7 +125,7 @@ components:
         font_size: null
         font: ''
         spacing_above: none
-        spacing_below: small
+        spacing_below: none
         italic: false
         background: ''
         bold: false
@@ -131,13 +134,15 @@ components:
       name: message_drop_down
       layout_properties: {}
       event_bindings: {change: set_notif_settings}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: me when someone sends me a message, font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
-      name: label_6
-      layout_properties: {expand: true, width: null}
+    - name: label_4
+      properties: {icon: 'fa:comment', spacing_above: medium}
+      type: Label
+      layout_properties: {}
+    - name: rich_text_2
+      properties: {content: when someone sends me a **message**, font_size: 16, spacing_below: none,
+        spacing_above: none}
+      type: RichText
+      layout_properties: {}
   - type: FlowPanel
     properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
       foreground: '', visible: false, spacing_above: small, spacing_below: small,
@@ -175,6 +180,17 @@ components:
         italic: false, background: '', bold: false, underline: false, icon: ''}
       name: label_6_copy
       layout_properties: {expand: true, width: null}
+  - name: horizontal_rule_1
+    properties: {}
+    type: form:HorizontalRule
+  - name: label_7
+    properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: Chat request notifications, font_size: null, font: '',
+      spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
+      bold: true, underline: false, icon: 'fa:child'}
+    type: Label
+    layout_properties: {}
+    event_bindings: {}
   - type: LinearPanel
     properties: {spacing_above: medium, spacing_below: small, background: '', foreground: '',
       border: '', visible: true, role: null, tooltip: ''}
@@ -183,8 +199,8 @@ components:
     components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'Text/SMS me regarding empathy requests from: ', font_size: 16,
-        font: '', spacing_above: medium, icon_align: left, spacing_below: none, italic: false,
+        visible: true, text: '- Text/SMS me for chats proposed/initiated by: ', font_size: null,
+        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
         background: '', bold: false, underline: false, icon: ''}
       name: sms_label
       layout_properties: {}
@@ -221,12 +237,12 @@ components:
     layout_properties: {grid_position: 'GZAWOG,EWWOJN'}
     components:
     - type: Label
-      properties: {role: null, align: left, tooltip: 'If you are already being notified
-          by text/SMS for a given request, you will not be notified by email as well.',
-        border: '', foreground: '', visible: true, text: 'Email me (otherwise) regarding
-          empathy requests from: ', font_size: 16, font: '', spacing_above: small,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+      properties: {role: null, align: left, tooltip: 'If already notified by text/SMS
+          for a given chat request, you will not be notified by email as well.', border: '',
+        foreground: '', visible: true, text: '- Email me (if not already notified
+          by Text/SMS) for chats proposed/initiated by: ', font_size: null, font: '',
+        spacing_above: small, icon_align: left, spacing_below: none, italic: false,
+        background: '', bold: false, underline: false, icon: ''}
       name: email_label
       layout_properties: {grid_position: 'IBYDUG,AOQYFK'}
     - type: FlowPanel
