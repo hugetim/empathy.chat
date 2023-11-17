@@ -53,7 +53,7 @@ def _from_name_for_email(name=""):
   return f"empathy.chat (for {name})" if name else "empathy.chat"
 
 
-def _email_unsubscribe(detail='click the pencil button beneath "Email me (otherwise) regarding empathy requests from:", uncheck all boxes, and click "OK"'):
+def _email_unsubscribe(detail='click the pencil button beneath "Email me (if not already notified by Text/SMS) for chats proposed/initiated by:", uncheck all boxes, and click "OK"'):
   return f'To unsubscribe: Login to empathy.chat, go to Settings, {detail}.'
 
 
@@ -243,6 +243,6 @@ def notify_message(user, from_name=""):
 
 {content}
 
-{_email_unsubscribe("and select 'don't notify' in the drop-down next to 'me when someone sends me a message'")}
+{_email_unsubscribe("and select 'don't notify me' in the drop-down next to 'when someone sends me a message'")}
 '''
     )
