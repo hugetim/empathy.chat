@@ -1,8 +1,9 @@
 from anvil import app
+from anvil.designer import in_designer
 
 
 BUFFER_SECONDS = 7
-DEBUG_MODE = (app.environment.name[0:5] == "Debug") if app.environment.name else False
+DEBUG_MODE = in_designer or ((app.environment.name[0:5] == "Debug") if app.environment.name else False)
 CONFIRM_MATCH_SECONDS = 15 if DEBUG_MODE else 60
 WAIT_SECONDS = 55
 ASSUME_INACTIVE_DAYS = 60 # 30 day persistent login + 30 days
