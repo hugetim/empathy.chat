@@ -92,52 +92,59 @@ def _pre_fetch_relevant_rows(requests, user, now):
 class RequestManager:
   def __init__(self):
     self.now = sm.now()
+
+  def _init_check_and_save(self, user):
+    user.update()
+    self._user = user
+    self._user_id = user.get_id()
+    self.exchange = None
+
+  def _load_relevant_request_records(self, requests):
+    self._related_prev_request_records, self._unrelated_prev_requests = _user_prev_requests(self._user, requests)
+    self._related_prev_requests = Requests([rr.entity for rr in self._related_prev_request_records])
+    self._other_request_records = _potential_matching_request_records(requests, self._user, self.now)
   
   @tables.in_transaction
   def check_and_save(self, user, requests):
     with TimerLogger("check_and_save", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
-      user.update()
-      (self.user, requests) = (user, Requests(deepcopy(requests)))
-      self.exchange = None
-      self.related_prev_request_records, unrelated_prev_requests = _user_prev_requests(self.user, requests)
-      self.related_prev_requests = Requests([rr.entity for rr in self.related_prev_request_records])
-      timer.check("_user_prev_requests")
-      _check_requests_valid(self.user, requests, unrelated_prev_requests)
-      other_request_records = _potential_matching_request_records(requests, self.user, self.now)
-      timer.check("_potential_matching_request_records")
-      _prune_request_records(other_request_records, self.now)
-      exchange_prospects = _potential_matches(self.user, requests, other_request_records)
+      self._init_check_and_save(user)
+      requests = Requests(deepcopy(requests))
+      self._load_relevant_request_records(requests)
+      timer.check("_load_relevant_request_records")
+      _check_requests_valid(self._user, requests, self._unrelated_prev_requests)
+      _prune_request_records(self._other_request_records, self.now)
+      timer.check("_prune_request_records")
+      exchange_prospects = _potential_matches(self._user, requests, self._other_request_records)
       has_enough_exchanges = [ep for ep in exchange_prospects if ep.has_enough]
       timer.check("exchange_prospects")
       if has_enough_exchanges:
         exchange_to_be = selected_exchange(has_enough_exchanges)
         _process_exchange_requests(exchange_to_be)
-        requests_matched = [r for r in exchange_to_be if r.user != requests.user]
+        requests_matched = exchange_to_be.their_requests(self._user_id)
         _cancel_other_or_group_requests(requests_matched)
         timer.check("_cancel_other_or_group_requests")
-        matching_request = next((r for r in exchange_to_be if r.user==requests.user))
-        requests = Requests([matching_request]) # save matching request only
-        _cancel_missing_or_group_requests(requests, self.related_prev_request_records)
+        requests = Requests([exchange_to_be.my_request(self._user_id)]) # save matching request only
+        _cancel_missing_or_group_requests(requests, self._related_prev_request_records)
         self._save_requests(requests)
         timer.check("_save_requests")
-        self.exchange = Exchange.from_exchange_prospect(exchange_to_be, self.now)
-        self._save_exchange(requests_matched)
+        self._save_exchange(exchange_to_be)
         timer.check("_save_exchange")
         self._update_exchange_user_statuses()
       else:
-        _cancel_missing_or_group_requests(requests, self.related_prev_request_records)
+        _cancel_missing_or_group_requests(requests, self._related_prev_request_records)
         timer.check("_cancel_missing_or_group_requests")
         if requests.start_now:
-          self.user['status'] = "requesting"
+          self._user['status'] = "requesting"
         timer.check("update requesting status")
         self._save_requests(requests)
         self._save_exchange_prospects(exchange_prospects)
-      self.requests = requests
+      self._requests = requests
   
-  def _save_exchange(self, requests_matched):
+  def _save_exchange(self, exchange_to_be):
+    self.exchange = Exchange.from_exchange_prospect(exchange_to_be, self.now)
     with TimerLogger("  _save_exchange", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
       request_records_matched = []
-      for r in requests_matched:
+      for r in exchange_to_be.their_requests(self._user_id):
         rr = repo.RequestRecord(r, r.request_id)
         rr.save()
         request_records_matched.append(rr)
@@ -147,14 +154,14 @@ class RequestManager:
       timer.check("  exchange_record_with_any_request_records")
       if existing_exchange_record:
         self.exchange.exchange_id = existing_exchange_record.record_id
-      self.exchange_record = exchange_repo.ExchangeRecord(self.exchange, self.exchange.exchange_id)
-      self.exchange_record.save()
-      self.exchange.exchange_id = self.exchange_record.record_id # for the new record case
+      self._exchange_record = exchange_repo.ExchangeRecord(self.exchange, self.exchange.exchange_id)
+      self._exchange_record.save()
+      self.exchange.exchange_id = self._exchange_record.record_id # for the new record case
   
   def _save_requests(self, requests):
     for request in requests:
       #print(f"_save_requests request_id: {request.request_id}")
-      matching_prev_records = [rr for rr in self.related_prev_request_records if rr.record_id == request.request_id]
+      matching_prev_records = [rr for rr in self._related_prev_request_records if rr.record_id == request.request_id]
       if matching_prev_records:
         request_record = matching_prev_records[0]
         request.create_dt = request_record.entity.create_dt
@@ -167,30 +174,30 @@ class RequestManager:
       repo.cache_request_record_rows([request_record])
 
   def _save_exchange_prospects(self, exchange_prospects):
-    repo.clear_eprs_for_rrs(self.related_prev_request_records)
+    repo.clear_eprs_for_rrs(self._related_prev_request_records)
     for ep in exchange_prospects:
       repo.ExchangeProspectRecord(exchange_prospect).save()
   
   def _update_exchange_user_statuses(self):
     if self.exchange.start_now:
-      users = self.exchange_record.users
+      users = self._exchange_record.users
       if self.exchange.participants[0]['entered_dt']:
         with tables.batch_update:
           for u in users:
             u['status'] = "matched"
       else:
         with tables.batch_update:
-          self.user['status'] = "pinging"
+          self._user['status'] = "pinging"
           for u in users:
-            if u != self.user:
+            if u != self._user:
               u['status'] = "pinged"
   
   def notify_edit(self):
     anvil.server.launch_background_task(
       'notify_edit_bg',
-      user=self.user,
-      requests=self.requests,
-      related_prev_requests=self.related_prev_requests,
+      user=self._user,
+      requests=self._requests,
+      related_prev_requests=self._related_prev_requests,
     )  
 
 
@@ -201,10 +208,10 @@ def _user_prev_requests(user, requests):
     rr.entity for rr in user_prev_request_records
     if rr.entity.request_id not in requests_ids and rr.entity.or_group_id not in or_group_ids
   ])
-  related_prev_request_records = Requests([
+  related_prev_request_records = [
     rr for rr in user_prev_request_records
     if rr.entity.request_id in requests_ids or rr.entity.or_group_id in or_group_ids
-  ])
+  ]
   return related_prev_request_records, unrelated_prev_requests
 
 

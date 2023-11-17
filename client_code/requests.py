@@ -200,6 +200,12 @@ class ExchangeProspect:
   def __getitem__(self, index):
     return self.requests[index]
 
+  def my_request(self, user_id):
+    return next((r for r in self if r.user==user_id))
+
+  def their_requests(self, user_id):
+    return Requests([r for r in self if r.user != user_id])
+  
   @property
   def is_possible_to_satisfy_all_with_users(self):
     users_set = set(self.users)
