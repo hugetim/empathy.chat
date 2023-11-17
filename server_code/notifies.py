@@ -243,6 +243,6 @@ def notify_message(user, from_name=""):
 
 {content}
 
-{_email_unsubscribe("and select 'don't notify me' in the drop-down next to 'when someone sends me a message'")}
+{_email_unsubscribe("and select 'none' in the drop-down next to 'when someone sends me a message'")}
 '''
     ) #dup01

@@ -142,11 +142,10 @@ components:
       properties: {content: when someone sends me a **message**, font_size: 16, spacing_below: none,
         spacing_above: none}
       type: RichText
-      layout_properties: {}
+      layout_properties: {expand: true}
   - type: FlowPanel
     properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: false, spacing_above: small, spacing_below: small,
-      background: ''}
+      foreground: '', visible: false, spacing_above: small, spacing_below: none, background: ''}
     name: specific_flow_panel
     layout_properties: {}
     components:
@@ -164,7 +163,7 @@ components:
         font_size: null
         font: ''
         spacing_above: none
-        spacing_below: small
+        spacing_below: none
         italic: false
         background: ''
         bold: false
@@ -176,7 +175,7 @@ components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
         visible: true, text: me about empathy chat requests specifically directed to just me,
-        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
         italic: false, background: '', bold: false, underline: false, icon: ''}
       name: label_6_copy
       layout_properties: {expand: true, width: null}
@@ -184,15 +183,15 @@ components:
     properties: {}
     type: form:HorizontalRule
   - name: label_7
-    properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Chat request notifications, font_size: null, font: '',
-      spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
-      bold: true, underline: false, icon: 'fa:child'}
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: Chat request notifications, font_size: 16, font: '', spacing_above: none,
+      icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
+      underline: false, icon: 'fa:child'}
     type: Label
     layout_properties: {}
     event_bindings: {}
   - type: LinearPanel
-    properties: {spacing_above: medium, spacing_below: small, background: '', foreground: '',
+    properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
       border: '', visible: true, role: null, tooltip: ''}
     name: sms_panel
     layout_properties: {}
