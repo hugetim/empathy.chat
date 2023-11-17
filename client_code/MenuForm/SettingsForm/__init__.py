@@ -25,7 +25,7 @@ class SettingsForm(SettingsFormTemplate):
     self.message_drop_down.items = [("text/SMS", "sms"),
                                     ("email (default)", "email"),
                                     ("don't notify me", None),
-                                   ]
+                                   ] #dup01
     if not phone: #order of these lines relative to those above and below matters
       self.essential_flow_panel.visible = False
       self.specific_flow_panel.visible = False
