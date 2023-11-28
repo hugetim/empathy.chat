@@ -369,7 +369,9 @@ def _distances_update(old_distances, ep_rels, user_id):
   return out
 
 
-def current_visible_requests(user, request_records=None):
+def current_visible_requests(user, request_records):
+  if not request_records:
+    return []
   # group_memberships = 
   # starred_by_list =
   all_requesters = {rr.user for rr in request_records}

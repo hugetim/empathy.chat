@@ -11,7 +11,7 @@ from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
 
 
-quick_c_fetch = q.fetch_only('distance', user1=q.fetch_only('first_name'), user2=q.fetch_only('first_name'))
+quick_c_fetch = q.fetch_only('distance', 'date', 'relationship2to1', 'date_described', 'user2', user1=q.fetch_only('first_name'))
 
 
 def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_list=False):
@@ -133,7 +133,7 @@ def init_connections(user=None):
 
 def _get_records_and_c_users(logged_in_user, dset, up_to_degree):
   from . import network_gateway as ng
-  records = [_connection_record(logged_in_user, logged_in_user)]
+  records = [_connection_record(logged_in_user, logged_in_user, 0, 0)]
   starred_users = set(ng.starred_users(logged_in_user))
   connected_users = set()
   for d in range(1, up_to_degree+1):
@@ -218,8 +218,9 @@ def _connection_record(user2, user1, _distance=None, degree=None, starred=None):
 
 
 def _get_invite_dict(user):
-  return dict(users_inviting={row['user2'] for row in app_tables.invites.search(user1=user, origin=True, current=True)},
-              users_invited_by={row['user1'] for row in app_tables.invites.search(user2=user, origin=True, current=True)},
+  user_related_invites = list(app_tables.invites.search(q.any_of(user1=user, user2=user), origin=True, current=True))
+  return dict(users_inviting={row['user2'] for row in user_related_invites if row['user1'] == user},
+              users_invited_by={row['user1'] for row in user_related_invites if row['user2'] == user},
              )
 
 

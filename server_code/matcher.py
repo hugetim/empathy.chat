@@ -79,7 +79,8 @@ def _get_proposals_upcomings(user):
 def propagate_update_needed(user=None):
   from anvil.tables import app_tables
   import anvil.tables
-  all_users = app_tables.users.search(update_needed=False)
+  import anvil.tables.query as q
+  all_users = app_tables.users.search(q.fetch_only('update_needed'), update_needed=False)
   with anvil.tables.batch_update:
     for u in all_users:
       if u != user:
