@@ -133,7 +133,7 @@ def init_connections(user=None):
 
 def _get_records_and_c_users(logged_in_user, dset, up_to_degree):
   from . import network_gateway as ng
-  records = [_connection_record(logged_in_user, logged_in_user)]
+  records = [_connection_record(logged_in_user, logged_in_user, 0, 0)]
   starred_users = set(ng.starred_users(logged_in_user))
   connected_users = set()
   for d in range(1, up_to_degree+1):
