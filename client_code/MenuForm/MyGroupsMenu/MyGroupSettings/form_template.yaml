@@ -56,7 +56,7 @@ components:
     properties:
       role: null
       columns:
-      - {id: KXBOMI, title: Invite Link, data_key: url, expand: false, width: '205'}
+      - {id: KXBOMI, title: Invite Link, data_key: url, expand: false, width: 250.33331298828125}
       - {id: YBZLJH, title: Date Created, data_key: create_date_str, width: '105'}
       - {id: SQRIZT, title: Expire Date, data_key: expire_date}
       auto_header: true
