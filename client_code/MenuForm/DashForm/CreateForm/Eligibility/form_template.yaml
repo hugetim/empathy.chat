@@ -6,11 +6,11 @@ container:
     background: ''}
 components:
 - name: radio_button_1
-  properties: {text: My whole network, spacing_below: none, spacing_above: none}
+  properties: {text: My whole network, spacing_below: none, spacing_above: none, selected: true}
   type: RadioButton
   layout_properties: {grid_position: 'YWXYZF,GJJWPA'}
 - name: radio_button_2
-  properties: {text: 'Limited:', spacing_above: none, spacing_below: none}
+  properties: {text: 'Limited to:', spacing_above: none, spacing_below: none}
   type: RadioButton
   layout_properties: {grid_position: 'DTXEVE,MNSIRN'}
 - name: flow_panel_1
