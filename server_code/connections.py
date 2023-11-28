@@ -11,7 +11,7 @@ from anvil_extras.server_utils import timed
 from anvil_extras.logging import TimerLogger
 
 
-quick_c_fetch = q.fetch_only('distance', user1=q.fetch_only('first_name'), user2=q.fetch_only('first_name'))
+quick_c_fetch = q.fetch_only('distance', 'date', 'relationship2to1', 'date_described', 'user2', user1=q.fetch_only('first_name'))
 
 
 def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_list=False):
