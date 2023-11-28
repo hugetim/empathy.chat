@@ -36,7 +36,7 @@ class Profile(ProfileTemplate):
                                                    or self.seeking_switch.visible 
                                                    or self.seeking_label.visible)
     self.last_active_label.text = f"  Last Active: {self.item.last_active_str},"
-    self.connections_button.text = "My Network" if self.item['me'] else "Buddies"
+    self.connections_button.text = "My Network" if self.item['me'] else "Connections"
     self.column_panel_1.row_spacing = 0
     if self.item['url_confirmed']:
       self.web_page_link.tooltip = (
