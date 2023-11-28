@@ -176,7 +176,7 @@ def all_members_from_group_row(group_row):
 
 def member_dicts_from_group_row(group_row):
   """Returns dicts for members (excluding hosts) with non-missing trust_level"""
-  member_rows = [m for m in app_tables.group_members.search(q.fetch_only('guest_allowed', user=q.fetch_only('first_name')), group=group_row) if m['user']['trust_level']]
+  member_rows = [m for m in app_tables.group_members.search(q.fetch_only('guest_allowed', user=q.fetch_only('first_name', 'trust_level')), group=group_row) if m['user']['trust_level']]
   member_ids = [m['user'].get_id() for m in member_rows]
   group_id = group_row.get_id()
   for i, member_id in enumerate(member_ids):
