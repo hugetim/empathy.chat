@@ -185,31 +185,32 @@ def member_dicts_from_group_row(group_row):
 
 def user_groups(user):
   """Returns all groups for which user in all_members_from_group_row"""
-  memberships = {m['group'] for m in app_tables.group_members.search(q.fetch_only(group=q.fetch_only('name')), user=user)}
-  hosteds = {group for group in app_tables.groups.search(q.fetch_only('name'), hosts=[user], current=True)}
+  group_fetch = q.fetch_only('name', 'hosts')
+  memberships = {m['group'] for m in app_tables.group_members.search(q.fetch_only(group=group_fetch), user=user)}
+  hosteds = {group for group in app_tables.groups.search(group_fetch, hosts=[user], current=True)}
   return memberships.union(hosteds)
 
 
 @lru_cache(maxsize=None)
 def allowed_members_from_group_row(group_row, user):
   """Returns group members allowed to interact with `user`"""
-  group_hosts = group_row['hosts']
-  if user in group_hosts:
+  group_hosts_set = set(group_row['hosts'])
+  if user in group_hosts_set:
     member_set = (
-      {m['user'] for m in app_tables.group_members.search(q.fetch_only(user=q.fetch_only('trust_level')), group=group_row) 
+      {m['user'] for m in app_tables.group_members.search(q.fetch_only('user'), group=group_row) 
        if m['user']['trust_level'] and m['user']['trust_level'] >= 1}
     )
-    member_set.update(set(group_row['hosts']))
+    member_set.update(group_hosts_set)
   elif user_allowed_in_group(user, group_row):
     member_set = (
-      {m['user'] for m in app_tables.group_members.search(q.fetch_only('guest_allowed', user=q.fetch_only('trust_level')), group=group_row) 
+      {m['user'] for m in app_tables.group_members.search(q.fetch_only('guest_allowed', 'user'), group=group_row) 
        if m['user']['trust_level'] and (m['user']['trust_level'] >= 2 or (m['user']['trust_level'] >= 1 and m['guest_allowed']))}
     )
-    member_set.update(set(group_row['hosts']))
+    member_set.update(group_hosts_set)
   else:
     member_set = {user}
     if user['trust_level'] and user['trust_level'] >= 1:
-      member_set.update(set(group_hosts))
+      member_set.update(group_hosts_set)
   return list(member_set)
 
 

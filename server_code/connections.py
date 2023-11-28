@@ -218,8 +218,9 @@ def _connection_record(user2, user1, _distance=None, degree=None, starred=None):
 
 
 def _get_invite_dict(user):
-  return dict(users_inviting={row['user2'] for row in app_tables.invites.search(user1=user, origin=True, current=True)},
-              users_invited_by={row['user1'] for row in app_tables.invites.search(user2=user, origin=True, current=True)},
+  user_related_invites = list(app_tables.invites.search(q.any_of(user1=user, user2=user), origin=True, current=True))
+  return dict(users_inviting={row['user2'] for row in user_related_invites if row['user1'] == user},
+              users_invited_by={row['user1'] for row in user_related_invites if row['user2'] == user},
              )
 
 
