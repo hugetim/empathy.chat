@@ -128,8 +128,13 @@ components:
         event_bindings: {change: drop_down_eligible_change}
         data_bindings: []
     - name: no_one_label
-      properties: {text: (no one), visible: false, spacing_above: none, spacing_below: none}
+      properties: {text: 'No one: choose this to create a test request that no one
+          else will see
+
+          (Note: Once you have more than one user in your network, options for limiting
+          your request to only some of them will appear here.)', visible: false, spacing_above: none,
+        spacing_below: none}
       type: Label
       layout_properties: {}
-    layout_properties: {expand: false}
+    layout_properties: {expand: true}
 is_package: true
