@@ -45,18 +45,18 @@ class Eligibility(EligibilityTemplate):
       else:
         self.starred_check_box.text = 'My Starred list (to add users, go to "My Network" and click the stars by their names)'
     has_phone_buddy = self.item['user_items'] and self.item['user_items'][0]['value'].distance == 1
-    self.network_flow_panel.visible = self.trust_level >= 2 and has_phone_buddy
-    self.network_check_box.checked = self.item['eligible']
+    self.network_check_box.checked = self.item.get('eligible')
+    self.network_flow_panel.visible = self.trust_level >= 2 and has_phone_buddy and self.network_check_box.checked
     if self.trust_level >= 3:
       self.drop_down_eligible.items = [("all buddies (up to 3 degrees)", 3),
                                        ('"buddies of buddies" (up to 2 degrees)', 2),
                                       ]
     else: 
       self.drop_down_eligible.items = []
-      self.item['eligible'] = min(self.item['eligible'], 1)
+      self.item['eligible'] = min(self.item.get('eligible', 0), 1)
     self.drop_down_eligible.items += [("close connections (1st degree only)", 1),
                                      ]
-    self.drop_down_eligible.selected_value = self.item['eligible'] if self.item['eligible'] else 1
+    self.drop_down_eligible.selected_value = self.item.get('eligible') if self.item.get('eligible') else 1
     self.groups_check_box.checked = self.item['eligible_groups']
     self.group_multi_select_drop_down.enable_select_all = len(self.item['group_items']) >= 4
     self.group_multi_select_drop_down.enable_filtering = len(self.item['group_items']) >= 8

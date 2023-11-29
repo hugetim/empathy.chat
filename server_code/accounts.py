@@ -49,13 +49,13 @@ def init_user_info(user, time_zone=""):
     notif_settings = {
       "essential": "sms",
       "message": "email",
-      "email": {"eligible": 1, "eligible_users": [], "eligible_groups": [], "eligible_starred": True},
-      "sms": {"eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False},
+      "email": {"eligible_all": True, "eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": True},
+      "sms": {"eligible_all": False, "eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False},
     }
     default_request = {
       "prop_time": dict(start_now=False, duration=port.DURATION_DEFAULT_MINUTES, 
                         cancel_buffer=port.CANCEL_DEFAULT_MINUTES),
-      "eligible": {"eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": True}
+      "eligible": {"eligible_all": True, "eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False}
     }
     user.update(notif_settings=notif_settings, default_request=default_request,
                 first_name="", last_name="", how_empathy="", profile="", phone="", profile_url="")
@@ -358,7 +358,7 @@ def set_notif_settings(notif_settings, elig_items, user_id=""):
   from . import groups
   user = sm.get_acting_user(user_id)
   for medium in ['sms', 'email']:
-    notif_settings[medium] = {k: elig_items[medium][k] for k in ['eligible', 'eligible_starred']}
+    notif_settings[medium] = {k: elig_items[medium].get(k) for k in ['eligible_all', 'eligible', 'eligible_starred']}
     notif_settings[medium]['eligible_users'] = [port_user.user_id for port_user in elig_items[medium]['eligible_users']]
     notif_settings[medium]['eligible_groups'] = [group.group_id for group in elig_items[medium]['eligible_groups']]
   user['notif_settings'] = notif_settings
@@ -369,7 +369,7 @@ def get_eligibility_specs(user):
   notif_settings = user['notif_settings']
   for medium in ['sms', 'email']:
     if notif_settings.get(medium):
-      specs[medium] = {k: notif_settings[medium][k] for k in ['eligible', 'eligible_starred']}
+      specs[medium] = {k: notif_settings[medium].get(k) for k in ['eligible_all', 'eligible', 'eligible_starred']}
       specs[medium]['user'] = user
       specs[medium]['eligible_users'] = [sm.get_other_user(u_id) for u_id in notif_settings[medium]['eligible_users']]
       specs[medium]['eligible_groups'] = [app_tables.groups.get_by_id(g_id) for g_id in notif_settings[medium]['eligible_groups']]

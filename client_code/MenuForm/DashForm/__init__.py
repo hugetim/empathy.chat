@@ -134,7 +134,7 @@ class DashForm(DashFormTemplate):
     
   def propose(self, specified_users=[], link_key="", start_now=None):
     if link_key:
-      new_prop = t.Proposal(eligible=0, eligible_users=[], eligible_groups=[], eligible_starred=False)
+      new_prop = t.Proposal(eligible_all=False, eligible=0, eligible_users=[], eligible_groups=[], eligible_starred=False)
       form_item = new_prop.create_form_item("now not allowed",
                                             self.get_conflict_checks())
       form_item['user_items'] = []
@@ -145,6 +145,7 @@ class DashForm(DashFormTemplate):
       form_item = new_prop.create_form_item(self.item['status'],
                                             self.get_conflict_checks())
     if specified_users:
+      form_item['eligible_all'] = False
       form_item['eligible'] = 0
       form_item['eligible_users'] = specified_users
       form_item['eligible_groups'] = []
