@@ -23,6 +23,7 @@ class Request:
     start_dt=None, exchange_format=None, expire_dt=None,
     create_dt=None, edit_dt=None,
     min_size=2, max_size=2, with_users=None,
+    eligible_all=False,
     eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
     eligible_invites=None,
     pref_order=None,
@@ -39,6 +40,7 @@ class Request:
     self.min_size = min_size
     self.max_size = max_size
     self.with_users = list(with_users) if with_users else []
+    self.eligible_all = eligible_all
     self.eligible = eligible if eligible else 0
     self.eligible_users = eligible_users if eligible_users else []
     self.eligible_groups = eligible_groups if eligible_groups else []
@@ -69,12 +71,13 @@ class Request:
   
   @property
   def elig_with_dict(self):
-    return {key: getattr(self, key) for key in ['with_users', 'eligible', 'eligible_users', 'eligible_groups', 'eligible_starred', 'eligible_invites']}
+    return {key: getattr(self, key) for key in ['with_users', 'eligible_all', 'eligible', 'eligible_users', 'eligible_groups', 'eligible_starred', 'eligible_invites']}
   
   def __repr__(self):
     return (
       f"Request({self.request_id!r}, {self.or_group_id!r}, {self.user!r}, {self.start_dt!r}, {self.exchange_format!r}, {self.expire_dt!r}, "
       f"{self.create_dt!r}, {self.edit_dt!r}, {self.min_size!r}, {self.max_size!r}, "
+      f"{self.eligible_all!r}, "
       f"{self.eligible!r}, {self.eligible_users!r}, {self.eligible_groups!r}, {self.eligible_starred!r}, "
       f"{self.eligible_invites!r}, {self.pref_order!r}), {self.current!r})"
     )
@@ -83,6 +86,7 @@ class Request:
     return (
       f"Request({self.request_id!s}, {self.or_group_id!s}, {self.user!s}, {self.start_dt!s}, {self.exchange_format!s}, {self.expire_dt!s}, "
       f"{self.create_dt!s}, {self.edit_dt!s}, {self.min_size!s}, {self.max_size!s}, "
+      f"{self.eligible_all!s}, "
       f"{self.eligible!s}, {self.eligible_users!s}, {self.eligible_groups!s}, {self.eligible_starred!s}, "
       f"{self.eligible_invites!s}, {self.pref_order!s}), {self.current!s})"
     )
@@ -368,6 +372,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   min_size=port_prop.min_size,
                   max_size=port_prop.max_size,
                   with_users=with_users if with_users else [],
+                  eligible_all=port_prop.eligible_all,
                   eligible=port_prop.eligible,
                   eligible_users=[port_user.user_id for port_user in port_prop.eligible_users],
                   eligible_groups=port_prop.eligible_groups,

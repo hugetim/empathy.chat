@@ -305,7 +305,7 @@ class ProposalTime():
 @anvil.server.portable_class 
 class Proposal():
   def __init__(self, prop_id=None, own=True, user=None, times=None, min_size=2, max_size=2,
-               eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
+               eligible_all=None, eligible=None, eligible_users=None, eligible_groups=None, eligible_starred=None,
                eligible_invites=None, note=""):
     from .glob import default_request
     self.prop_id = prop_id
@@ -319,10 +319,14 @@ class Proposal():
       self.times = [ProposalTime()]
     self.min_size = min_size
     self.max_size = max_size
+    if eligible_all is not None:
+      self.eligible_all = eligible_all
+    else:
+      self.eligible_all = default_request['eligible'].get('eligible_all') if default_request else True
     if eligible is not None:
       self.eligible = eligible
     else:
-      self.eligible = default_request['eligible']['eligible'] if default_request else 0
+      self.eligible = default_request['eligible'].get('eligible', 0) if default_request else 0
     if eligible_users is not None:
       self.eligible_users = eligible_users
     else:
@@ -359,6 +363,8 @@ class Proposal():
   @property
   def eligibility_desc(self):
     items = []
+    if self.eligible_all:
+      return "My whole network"
     if self.eligible_invites:
       items.append(", ".join([str(i) for i in self.eligible_invites]))
     if self.eligible_starred:
@@ -394,7 +400,7 @@ class Proposal():
     if not item['start_now']:
       t0 = self.times[0]
       out['prop_time']['cancel_buffer'] = round((t0.start_date - t0.expire_date).total_seconds()/60)      
-    out['eligible'] = {k: item[k] for k in ['eligible', 'eligible_starred']}
+    out['eligible'] = {k: item.get(k) for k in ['eligible_all', 'eligible', 'eligible_starred']}
     out['eligible']['eligible_users'] = [port_user.user_id for port_user in item['eligible_users']]
     out['eligible']['eligible_groups'] = [group.group_id for group in item['eligible_groups']]
     return out
@@ -404,6 +410,7 @@ class Proposal():
     item = {'prop_id': self.prop_id,
             'min_size': self.min_size,
             'max_size': self.max_size,
+            'eligible_all': self.eligible_all,
             'eligible': self.eligible, 
             'eligible_users': self.eligible_users, 
             'eligible_groups': self.eligible_groups,
@@ -426,6 +433,7 @@ class Proposal():
                     times=[first_time] + alts,
                     min_size = item['min_size'],
                     max_size = item['max_size'],
+                    eligible_all=item['eligible_all'],
                     eligible=item['eligible'],
                     eligible_users=item['eligible_users'],
                     eligible_groups=item['eligible_groups'],

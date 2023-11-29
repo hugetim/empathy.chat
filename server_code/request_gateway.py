@@ -30,6 +30,7 @@ def _row_to_request(row):
     'edit_dt',
     'min_size',
     'max_size',
+    'eligible_all',
     'eligible',
     'eligible_starred',
     'pref_order',
@@ -60,6 +61,7 @@ def _request_to_fields(request):
     'edit_dt',
     'min_size',
     'max_size',
+    'eligible_all',
     'eligible',
     'eligible_starred',
     'pref_order',
@@ -111,6 +113,7 @@ class RequestRecord(sm.SimpleRecord):
   def eligibility_spec(self):
     spec = {}
     spec['user'] = self.user
+    spec['eligible_all'] = self.entity.eligible_all
     spec['eligible'] = self.entity.eligible
     spec['eligible_starred'] = self.entity.eligible_starred
     if self._row_id:
@@ -151,6 +154,7 @@ class ExchangeProspectRecord(sm.SimpleRecord):
 def eligibility_spec(request, user=None):
   spec = {}
   spec['user'] = user if user else get_user_row_by_id(request.user)
+  spec['eligible_all'] = request.eligible_all
   spec['eligible'] = request.eligible
   spec['eligible_starred'] = request.eligible_starred
   spec['eligible_users'] = [get_user_row_by_id(user_id) for user_id in request.eligible_users]
@@ -203,7 +207,7 @@ def get_request_row_by_id(request_id):
 
 
 basic_requests_fields = ['or_group_id', 'pref_order', 'current', 'exchange_format', 'start_dt', 'expire_dt',
-                         'create_dt', 'edit_dt', 'min_size', 'max_size', 'eligible', 'eligible_starred']
+                         'create_dt', 'edit_dt', 'min_size', 'max_size', 'eligible_all', 'eligible', 'eligible_starred']
 requests_fetch = q.fetch_only(*basic_requests_fields,
                               user=q.fetch_only('first_name', 'trust_level'), 
                               with_users=q.fetch_only('first_name', 'trust_level'), 

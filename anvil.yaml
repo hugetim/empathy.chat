@@ -637,6 +637,9 @@ db_schema:
       admin_ui: {width: 200}
       type: link_multiple
       target: invites
+    - name: eligible_all
+      admin_ui: {order: 7.75, width: 81}
+      type: bool
   connections:
     title: Connections
     client: none
