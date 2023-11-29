@@ -122,6 +122,8 @@ def round_up_datetime(dt, minutes_res=15):
 
 
 def series_str(str_list):
+  if not str_list:
+    return ""
   out = str_list[0]
   if len(str_list) >= 3:
     out += ", "

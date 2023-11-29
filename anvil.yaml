@@ -315,10 +315,10 @@ db_schema:
       admin_ui: {width: 1368.2}
       type: simpleObject
     - name: default_request
-      admin_ui: {width: 200}
+      admin_ui: {order: 7.4375, width: 822}
       type: simpleObject
     - name: seeking_buddy
-      admin_ui: {width: 133}
+      admin_ui: {order: 7.625, width: 96}
       type: bool
     - name: how_empathy
       admin_ui: {width: 115}
