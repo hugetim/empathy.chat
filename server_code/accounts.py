@@ -49,7 +49,7 @@ def init_user_info(user, time_zone=""):
     notif_settings = {
       "essential": "sms",
       "message": "email",
-      "email": {"eligible_all": True, "eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": True},
+      "email": {"eligible_all": True, "eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False},
       "sms": {"eligible_all": False, "eligible": 0, "eligible_users": [], "eligible_groups": [], "eligible_starred": False},
     }
     default_request = {
