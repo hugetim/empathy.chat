@@ -238,10 +238,10 @@ components:
     - type: Label
       properties: {role: null, align: left, tooltip: 'If already notified by text/SMS
           for a given chat request, you will not be notified by email as well.', border: '',
-        foreground: '', visible: true, text: '- Email me (if not already notified
-          by Text/SMS) for empathy chats proposed by: ', font_size: null, font: '',
-        spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+        foreground: '', visible: true, text: '- Email me for empathy chats proposed
+          by: ', font_size: null, font: '', spacing_above: small, icon_align: left,
+        spacing_below: none, italic: false, background: '', bold: false, underline: false,
+        icon: ''}
       name: email_label
       layout_properties: {grid_position: 'IBYDUG,AOQYFK'}
     - type: FlowPanel

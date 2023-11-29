@@ -60,7 +60,7 @@ def get(spec_dict):
       top_form = get_open_form()
       top_form.content.propose(specified_users=spec_dict["members"])
     return {"markdown": ("To become a full empathy.chat Member, which allows you to chat "
-                         "with a broader network beyond your direct buddies, "
+                         "with a broader network beyond your direct connections, "
                          "please complete an empathy chat with a current Member like: "
                          f"{', '.join([portu.name for portu in spec_dict['members']])}"), 
             "tooltip": "We require this to verify identity and foster trust. Click to propose an empathy exchange.",

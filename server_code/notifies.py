@@ -165,7 +165,7 @@ def notify_requests_cancel(user, requester, title):
   eligibility_specs = accounts.get_eligibility_specs(user)
   if user['phone'] and eligibility_specs.get('sms') and is_included(eligibility_specs['sms'], requester):
     _notify_requests_cancel_by(user, requester, title, 'sms')
-  elif eligibility_specs.get('email') and is_included(eligibility_specs['email'], requester):
+  if eligibility_specs.get('email') and is_included(eligibility_specs['email'], requester):
     _notify_requests_cancel_by(user, requester, title, 'email')
 
 
@@ -195,7 +195,7 @@ def notify_requests(user, requester, requests_info, title, desc):
   eligibility_specs = accounts.get_eligibility_specs(user)
   if user['phone'] and eligibility_specs.get('sms') and is_included(eligibility_specs['sms'], requester):
     _notify_requests_by(user, requester, requests_info, title, desc, 'sms')
-  elif eligibility_specs.get('email') and is_included(eligibility_specs['email'], requester):
+  if eligibility_specs.get('email') and is_included(eligibility_specs['email'], requester):
     _notify_requests_by(user, requester, requests_info, title, desc, 'email')
 
 

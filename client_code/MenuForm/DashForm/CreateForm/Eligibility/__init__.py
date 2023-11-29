@@ -48,8 +48,8 @@ class Eligibility(EligibilityTemplate):
     self.network_check_box.checked = self.item.get('eligible')
     self.network_flow_panel.visible = self.trust_level >= 2 and has_phone_buddy and self.network_check_box.checked
     if self.trust_level >= 3:
-      self.drop_down_eligible.items = [("all buddies (up to 3 degrees)", 3),
-                                       ('"buddies of buddies" (up to 2 degrees)', 2),
+      self.drop_down_eligible.items = [("all connections (up to 3 degrees)", 3),
+                                       ('"friends of friends" (up to 2 degrees)', 2),
                                       ]
     else: 
       self.drop_down_eligible.items = []
