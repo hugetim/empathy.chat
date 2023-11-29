@@ -24,13 +24,20 @@ class Eligibility(EligibilityTemplate):
     self.init()
     
   def init(self):
+    network_size = len(self.item['user_items'])
+    all_names_str = h.series_str([item['key'] for item in self.item['user_items']])
+    if network_size <= 2 or len(all_names_str) < 30:
+      self.all_radio_button.text += f" (currently: {all_names_str})"
+    else:
+      self.all_radio_button.text += f" (currently: {network_size} users)"
+      self.all_radio_button.tooltip = all_names_str
     self.all_radio_button.selected = self.item.get('eligible_all')
     self.limited_radio_button.selected = not self.all_radio_button.selected
     self.limited_flow_panel.visible = self.limited_radio_button.selected
     self.specific_users_check_box.checked = self.item['eligible_users']
-    self.user_multi_select_drop_down.enable_select_all = len(self.item['user_items']) >= 4
-    self.user_multi_select_drop_down.enable_filtering = len(self.item['user_items']) >= 8
-    if not self.item['eligible_users'] and len(self.item['user_items']) == 1:
+    self.user_multi_select_drop_down.enable_select_all = network_size >= 4
+    self.user_multi_select_drop_down.enable_filtering = network_size >= 8
+    if not self.item['eligible_users'] and network_size == 1:
       self.user_multi_select_drop_down.selected = [self.item['user_items'][0]['value']]
     else:
       self.user_multi_select_drop_down.selected = self.item['eligible_users']
