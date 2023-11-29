@@ -5,15 +5,19 @@ container:
     wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none,
     background: ''}
 components:
-- name: radio_button_1
-  properties: {text: My whole network, spacing_below: none, spacing_above: none, selected: true}
+- name: all_radio_button
+  properties: {text: My whole network, spacing_below: none, spacing_above: none, selected: true,
+    value: '1', group_name: all_radio_group}
   type: RadioButton
   layout_properties: {grid_position: 'YWXYZF,GJJWPA'}
-- name: radio_button_2
-  properties: {text: 'Limited to:', spacing_above: none, spacing_below: none}
+  event_bindings: {change: all_radio_button_change}
+- name: limited_radio_button
+  properties: {text: Limited to..., spacing_above: none, spacing_below: none, group_name: all_radio_group,
+    value: '0'}
   type: RadioButton
   layout_properties: {grid_position: 'DTXEVE,MNSIRN'}
-- name: flow_panel_1
+  event_bindings: {change: all_radio_button_change}
+- name: limited_flow_panel
   properties: {spacing_above: none, spacing_below: none}
   type: FlowPanel
   layout_properties: {grid_position: 'MHSLSZ,RZLGXI'}

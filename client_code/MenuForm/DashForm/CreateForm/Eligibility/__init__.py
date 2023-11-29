@@ -5,7 +5,7 @@ from ..... import helper as h
 
 
 class Eligibility(EligibilityTemplate):
-  export_item_keys = ['eligible', 'eligible_users', 'eligible_groups', 'eligible_starred']
+  export_item_keys = ['eligible_all', 'eligible', 'eligible_users', 'eligible_groups', 'eligible_starred']
   
   def __init__(self, item, **properties):
     # Set Form properties and Data Bindings.
@@ -24,6 +24,9 @@ class Eligibility(EligibilityTemplate):
     self.init()
     
   def init(self):
+    self.all_radio_button.selected = self.item.get('eligible_all')
+    self.limited_radio_button.selected = not self.all_radio_button.selected
+    self.limited_flow_panel.visible = self.limited_radio_button.selected
     self.specific_users_check_box.checked = self.item['eligible_users']
     self.user_multi_select_drop_down.enable_select_all = len(self.item['user_items']) >= 4
     self.user_multi_select_drop_down.enable_filtering = len(self.item['user_items']) >= 8
@@ -107,3 +110,8 @@ class Eligibility(EligibilityTemplate):
     """This method is called when the selected values change"""
     self.groups_check_box.checked = self.group_multi_select_drop_down.selected
     self.item['eligible_groups'] = self.group_multi_select_drop_down.selected
+
+  def all_radio_button_change(self, **event_args):
+    """This method is called when this radio button is selected (but not deselected)"""
+    self.item['eligible_all'] = self.all_radio_button.selected
+    self.limited_flow_panel.visible = not self.item['eligible_all']
