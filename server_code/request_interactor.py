@@ -492,7 +492,7 @@ def all_eligible_users(request, eligibility_spec):
   included_users = _all_included_users(eligibility_spec)
   rels = relationships(included_users, user)
   eligible_users = set()
-  for user2 in _all_included_users(eligibility_spec):
+  for user2 in included_users:
     if _is_eligible(request, user2, rels[user2], included=True):
       eligible_users.add(user2)
   return eligible_users
