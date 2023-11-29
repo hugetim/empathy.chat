@@ -30,9 +30,13 @@ components:
           underline: false, icon: ''}
         name: start_label
         layout_properties: {grid_position: 'SJMSJV,QPOZGU'}
+      - name: now_label
+        properties: {spacing_below: none, spacing_above: none, text: Now, font_size: 16}
+        type: Label
+        layout_properties: {grid_position: 'JABLBX,YJXKJY'}
       - type: RadioButton
         properties: {role: null, selected: false, align: left, tooltip: '', border: '',
-          enabled: true, foreground: 'theme:Black', value: '1', visible: true, text: Now,
+          enabled: true, foreground: 'theme:Black', value: '1', visible: false, text: Now,
           font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false,
           background: '', bold: false, group_name: start_now, underline: false}
         name: now_radio_button
@@ -41,7 +45,7 @@ components:
         data_bindings: []
       - type: RadioButton
         properties: {role: null, selected: true, align: left, tooltip: '', border: '',
-          enabled: true, foreground: 'theme:Black', value: '0', visible: true, text: Later at...,
+          enabled: true, foreground: 'theme:Black', value: '0', visible: false, text: Later at...,
           font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false,
           background: '', bold: false, group_name: start_now, underline: false}
         name: later_radio_button

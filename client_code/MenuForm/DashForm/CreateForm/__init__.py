@@ -30,8 +30,8 @@ class CreateForm(CreateFormTemplate):
       self.item['start_now'] = False
       self.now_radio_button.visible = False
       self.later_radio_button.visible = False
-      self.start_label.spacing_below = "small"
-      self.date_picker_start.spacing_above = "small"
+    self.start_label.spacing_below = "small"
+    self.date_picker_start.spacing_above = "small"
     self.drop_down_duration.items = list(zip(t.DURATION_TEXT.values(), t.DURATION_TEXT.keys()))
     self.drop_down_cancel.items = list(zip(t.CANCEL_TEXT.values(), t.CANCEL_TEXT.keys()))
     self.normalize_initial_state()
@@ -90,6 +90,7 @@ class CreateForm(CreateFormTemplate):
         self.drop_down_cancel.visible = False
         self.date_picker_cancel.visible = False      
     else: # Later...
+      self.now_label.visible = False
       self.save_button.text = "SAVE"
       self.save_button.icon = ""
       if not self.date_picker_start_initialized:
