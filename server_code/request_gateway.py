@@ -177,12 +177,12 @@ def get_exchange_format_row(exchange_format):
 
 @lru_cache(maxsize=None)
 def get_user_row_by_id(user_id):
-  return app_tables.users.get_by_id(user_id, q.fetch_only('first_name', 'last_name', 'trust_level', 'status', 'notif_settings'))
+  return app_tables.users.get_by_id(user_id) #, q.fetch_only('first_name', 'last_name', 'trust_level', 'status', 'notif_settings', 'phone'))
 
 
 @lru_cache(maxsize=None)
 def get_group_row_by_id(group_id):
-  return app_tables.groups.get_by_id(group_id, q.fetch_only('name'))
+  return app_tables.groups.get_by_id(group_id) #, q.fetch_only('name'))
 
 
 @lru_cache(maxsize=None)
