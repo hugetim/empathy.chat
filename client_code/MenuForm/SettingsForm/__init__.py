@@ -41,7 +41,7 @@ class SettingsForm(SettingsFormTemplate):
   def update_eligibility_descs(self):
     pseudo_props = {}
     for medium in ['sms', 'email']:
-      pseudo_props[medium] = port.Proposal(**{k: self.elig_items[medium][k] for k in Eligibility.export_item_keys})
+      pseudo_props[medium] = port.Proposal(**{k: self.elig_items[medium].get(k) for k in Eligibility.export_item_keys})
     self.sms_desc_label.text = pseudo_props['sms'].eligibility_desc if pseudo_props['sms'].eligibility_desc else "(no one)"
     self.email_desc_label.text = pseudo_props['email'].eligibility_desc if pseudo_props['email'].eligibility_desc else "(no one)"
     
