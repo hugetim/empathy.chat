@@ -10,6 +10,7 @@ class Relationship:
                     "Otherwise, only 2nd degree connections (that is, close connections of close connections, or equivalent) will be able to see your last initial."
                    )
   PROFILE_URL_NOTE = "Only close connections are allowed to see this profile URL, aside from the empathy.chat admin."
+  MAX_PAIR_ELIGIBLE_DISTANCE = 3
   
   def __init__(self, distance=UNLINKED, degree=UNLINKED, min_trust_level=0, group_host_to_member=False, group_authorized=False, group_authorized_pair=False):
     self.distance = distance
@@ -40,7 +41,7 @@ class Relationship:
   def pair_eligible(self):
     return (
       self.group_authorized_pair
-      or (self.min_trust_level >= 3 and self.distance <= 3)
+      or (self.min_trust_level >= 3 and self.distance <= self.MAX_PAIR_ELIGIBLE_DISTANCE)
       or (self.min_trust_level >= 2 and self.distance <= 2 and self.degree <= 1)
     )
 

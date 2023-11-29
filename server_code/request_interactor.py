@@ -451,6 +451,8 @@ def _is_eligible(request, other_user, rel, included):
 
 def is_included(eligibility_spec, other_user, distance=None):
   from . import groups_server as g
+  if eligibility_spec['eligible_all']:
+    return True
   if other_user in eligibility_spec['eligible_users']:
     return True
   if (eligibility_spec['eligible_starred'] and repo.star_row(other_user, eligibility_spec['user'])):
@@ -469,6 +471,11 @@ def _all_included_users(eligibility_spec):
   from . import groups_server as g
   user = eligibility_spec['user']
   all_eligible = set()
+  if eligibility_spec['eligible_all']:
+    all_eligible.update(set(c.get_connected_users(user, up_to_degree=Relationship.MAX_PAIR_ELIGIBLE_DISTANCE)))
+    for group in g.user_groups(user):
+      all_eligible.update(set(g.allowed_members_from_group_row(group, user))-{user})
+    return all_eligible
   if eligibility_spec['eligible']:
     all_eligible.update(set(c.get_connected_users(user, up_to_degree=eligibility_spec['eligible'])))
   if eligibility_spec['eligible_starred']:
