@@ -372,11 +372,11 @@ class Proposal():
     if self.eligible_users:
       items.append(", ".join([str(u) for u in self.eligible_users]))
     if self.eligible:
-      desc = {1: "1st degree connections", 2: "connections up to 2 degrees", 3: "connection up to 3 degrees"}
+      desc = {1: "1st degree connections", 2: "connections up to 2 degrees", 3: "connections up to 3 degrees"}
       items.append(desc[self.eligible])
     if self.eligible_groups:
       items.append(", ".join([str(g) for g in self.eligible_groups]))
-    return "; ".join(items)
+    return "; ".join(items) if items else "(no one)"
   
   # @property
   # def specific_user_eligible(self):

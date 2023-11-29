@@ -42,8 +42,8 @@ class SettingsForm(SettingsFormTemplate):
     pseudo_props = {}
     for medium in ['sms', 'email']:
       pseudo_props[medium] = port.Proposal(**{k: self.elig_items[medium].get(k) for k in Eligibility.export_item_keys})
-    self.sms_desc_label.text = pseudo_props['sms'].eligibility_desc if pseudo_props['sms'].eligibility_desc else "(no one)"
-    self.email_desc_label.text = pseudo_props['email'].eligibility_desc if pseudo_props['email'].eligibility_desc else "(no one)"
+    self.sms_desc_label.text = pseudo_props['sms'].eligibility_desc
+    self.email_desc_label.text = pseudo_props['email'].eligibility_desc
     
   def form_show(self, **event_args):
     """This method is called when the HTML panel is shown on the screen"""
