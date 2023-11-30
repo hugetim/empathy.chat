@@ -140,7 +140,7 @@ components:
   name: alternate_spacer
   layout_properties: {grid_position: 'MGXSNE,CGULSX'}
 - name: advanced_link
-  properties: {text: Show advanced settings..., spacing_above: none, spacing_below: none,
+  properties: {text: Show advanced options..., spacing_above: none, spacing_below: none,
     font_size: -1}
   type: Link
   layout_properties: {grid_position: 'FBWNVK,ZXHTGK'}

@@ -41,7 +41,7 @@ class CreateForm(CreateFormTemplate):
     self.eligibility_form = Eligibility(item=item)
     self.eligibility_linear_panel.add_component(self.eligibility_form)
     self.eligible_label.visible = self.eligibility_form.any_visible()
-    if self.item['note']:
+    if self.item['note'] or self.item['cancel_buffer'] != 15:
       self.reveal_advanced()
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
 
