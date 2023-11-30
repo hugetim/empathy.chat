@@ -47,7 +47,7 @@ components:
       - type: CheckBox
         properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
           foreground: '', allow_indeterminate: false, visible: true, text: 'These
-            specific users:', font_size: null, font: '', spacing_above: small, spacing_below: small,
+            users:', font_size: null, font: '', spacing_above: small, spacing_below: small,
           italic: false, background: '', bold: false, checked: false, underline: false}
         name: specific_users_check_box
         layout_properties: {}
@@ -72,8 +72,8 @@ components:
       components:
       - type: CheckBox
         properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
-          foreground: '', allow_indeterminate: false, visible: true, text: 'Everyone
-            in these groups:', font_size: null, font: '', spacing_above: small, spacing_below: small,
+          foreground: '', allow_indeterminate: false, visible: true, text: 'These
+            groups:', font_size: null, font: '', spacing_above: small, spacing_below: small,
           italic: false, background: '', bold: false, checked: false, underline: false}
         name: groups_check_box
         layout_properties: {grid_position: 'AXLKKX,QXOJGY'}
