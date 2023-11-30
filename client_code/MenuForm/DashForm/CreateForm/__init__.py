@@ -133,6 +133,11 @@ class CreateForm(CreateFormTemplate):
 
   def drop_down_cancel_change(self, **event_args):
     """This method is called when an item is selected"""
+    if self.item['alt']:
+      for alt_item in self.item['alt']:
+        alt_item['cancel_buffer'] = self.item['cancel_buffer']
+      for time_component in self.repeating_panel_1.get_components():
+        time_component.update()
     self.update()
     
   def date_picker_start_change(self, **event_args):
@@ -141,10 +146,20 @@ class CreateForm(CreateFormTemplate):
 
   def date_picker_cancel_change(self, **event_args):
     """This method is called when the selected date changes"""
+    if self.item['alt']:
+      for alt_item in self.item['alt']:
+        alt_item['cancel_date'] = self.item['cancel_date']
+      for time_component in self.repeating_panel_1.get_components():
+        time_component.update()
     self.update()    
 
   def drop_down_duration_change(self, **event_args):
     """This method is called when an item is selected"""
+    if self.item['alt']:
+      for alt_item in self.item['alt']:
+        alt_item['duration'] = self.item['duration']
+      for time_component in self.repeating_panel_1.get_components():
+        time_component.check_times()
     self.check_times()
   
   def check_times(self):
@@ -195,7 +210,7 @@ class CreateForm(CreateFormTemplate):
                                            + t.DEFAULT_NEXT_DELTA),
                             'duration': previous_item['duration'],
                             'cancel_buffer': previous_item['cancel_buffer'],
-                            'cancel_date': self.item.get('cancel_date'),
+                            'cancel_date': previous_item.get('cancel_date'),
                             'time_id': None,
                             'conflict_checks': self.item['conflict_checks'],
                             'save_ready': True,
