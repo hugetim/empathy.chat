@@ -81,6 +81,7 @@ class CreateForm(CreateFormTemplate):
       self.save_button.icon = "fa:child"
       self.date_picker_start.visible = False
       self.button_add_alternate.visible = False
+      self.alternate_spacer.visible = False
       if not self.item['alt']:
         self.column_panel_cancel.visible = False
       else:

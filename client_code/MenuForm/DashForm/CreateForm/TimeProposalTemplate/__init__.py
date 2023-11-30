@@ -45,7 +45,7 @@ class TimeProposalTemplate(TimeProposalTemplateTemplate):
         self.label_start.visible = True
       elif 'cancel_buffer' in messages:
         self.alert_form.label_cancel.text = messages['cancel_buffer']
-        self.label_cancel.visible = True
+        self.alert_form.label_cancel.visible = True
     else:
       self.update_save_ready(True)
 
