@@ -13,19 +13,19 @@ components:
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{"OAWYPD":46,"GAQIHR":14}',
-      spacing_below: small, background: ''}
+      spacing_below: none, background: ''}
     name: column_panel_2
     layout_properties: {grid_position: 'AEOVYA,YYKYCC'}
     components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'When?', font_size: null, font: '', spacing_above: small,
+        visible: true, text: 'When?', font_size: null, font: '', spacing_above: none,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
         underline: false, icon: ''}
       name: start_label
       layout_properties: {grid_position: 'SJMSJV,QPOZGU'}
     - name: now_label
-      properties: {spacing_below: none, spacing_above: none, text: Now (starting when someone joins),
+      properties: {spacing_below: none, spacing_above: none, text: Now (or whenever someone joins you),
         font_size: 16}
       type: Label
       layout_properties: {grid_position: 'JABLBX,YJXKJY'}
@@ -97,14 +97,14 @@ components:
   - type: ColumnPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
       wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: small, background: ''}
+      spacing_below: none, background: ''}
     name: column_panel_3
     layout_properties: {grid_position: 'AEOVYA,NRVHVU'}
     components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'For how long?', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
+        visible: true, text: 'For how long?', font_size: null, font: '', spacing_above: none,
+        icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
         underline: false, icon: ''}
       name: label_2
       layout_properties: {grid_position: 'BUYRWB,YJMNFL'}
@@ -123,7 +123,7 @@ components:
         font_size: null
         font: ''
         spacing_above: small
-        spacing_below: small
+        spacing_below: none
         italic: false
         background: theme:Gray 200
         bold: false
