@@ -136,9 +136,15 @@ components:
       - {property: selected_value, code: 'self.item[''duration'']', writeback: true}
     event_bindings: {}
 - type: Spacer
-  properties: {height: 22}
+  properties: {height: 15.199981689453125, spacing_above: none, spacing_below: none}
   name: alternate_spacer
   layout_properties: {grid_position: 'MGXSNE,CGULSX'}
+- name: advanced_link
+  properties: {text: Show advanced settings..., spacing_above: none, spacing_below: none,
+    font_size: -1}
+  type: Link
+  layout_properties: {grid_position: 'FBWNVK,ZXHTGK'}
+  event_bindings: {click: advanced_link_click}
 - type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
     wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
@@ -191,7 +197,7 @@ components:
     data_bindings:
     - {property: date, code: 'self.item[''cancel_date'']', writeback: true}
   - name: spacer_2
-    properties: {height: 32}
+    properties: {height: '0'}
     type: Spacer
     layout_properties: {grid_position: 'HCXLQQ,JUPMPF'}
   - type: Label
@@ -244,9 +250,9 @@ components:
     data_bindings:
     - {property: selected_value, code: '(self.item[''min_size''], self.item[''max_size''])',
       writeback: true}
-- name: flow_panel_4
+- name: note_flow_panel
   properties: {spacing_below: medium, tooltip: You can attach a brief note to your request,
-    spacing: small}
+    spacing: small, visible: false}
   type: FlowPanel
   layout_properties: {grid_position: 'KBMNTR,RBYOCK'}
   components:
@@ -274,7 +280,7 @@ components:
   layout_properties: {grid_position: 'YYMEXI,XTNOOT'}
   data_bindings: []
 - type: LinearPanel
-  properties: {spacing_above: none, spacing_below: medium, background: '', foreground: '',
+  properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
     border: '', visible: true, role: null, tooltip: ''}
   name: eligibility_linear_panel
   layout_properties: {grid_position: 'FCKSLW,FVXABD'}

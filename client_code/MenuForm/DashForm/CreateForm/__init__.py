@@ -41,6 +41,8 @@ class CreateForm(CreateFormTemplate):
     self.eligibility_form = Eligibility(item=item)
     self.eligibility_linear_panel.add_component(self.eligibility_form)
     self.eligible_label.visible = self.eligibility_form.any_visible()
+    if self.item['note']:
+      self.reveal_advanced()
     self.repeating_panel_1.set_event_handler('x-remove', self.remove_alternate)
 
   def normalize_initial_state(self):
@@ -87,7 +89,7 @@ class CreateForm(CreateFormTemplate):
       else:
         # this keeps the "Cancel" column heading for the alternatives
         h.warning(f"alts should no longer be allowed for start_now")
-        self.column_panel_cancel.visible = True
+        #self.column_panel_cancel.visible = True
         self.drop_down_cancel.visible = False
         self.date_picker_cancel.visible = False      
     else: # Later...
@@ -98,7 +100,7 @@ class CreateForm(CreateFormTemplate):
         self.init_date_picker_start()
       self.date_picker_start.visible = True
       self.button_add_alternate.visible = len(self.item['alt']) < t.MAX_ALT_TIMES
-      self.column_panel_cancel.visible = True
+      #self.column_panel_cancel.visible = True
       self.drop_down_cancel.visible = True
       if self.item['cancel_buffer'] == "custom":
         if not self.date_picker_cancel_initialized:
@@ -186,6 +188,8 @@ class CreateForm(CreateFormTemplate):
   def update_save_enable(self):
     enabled = all([self.item['save_ready']]
                    + [item['save_ready'] for item in self.item['alt']])
+    if not enabled and not self.item['start_now']:
+      self.reveal_advanced()
     self.save_button.enabled = enabled
     
   def button_add_alternate_click(self, **event_args):
@@ -229,3 +233,12 @@ class CreateForm(CreateFormTemplate):
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     self.raise_event("x-close-alert", value=False)
+
+  def advanced_link_click(self, **event_args):
+    """This method is called when the link is clicked"""
+    self.reveal_advanced()
+
+  def reveal_advanced(self):
+    self.column_panel_cancel.visible = not self.item['start_now']
+    self.note_flow_panel.visible = True
+    self.advanced_link.visible = False
