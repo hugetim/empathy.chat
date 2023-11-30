@@ -25,7 +25,7 @@ components:
       components:
       - type: Label
         properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: Start Time, font_size: null, font: '', spacing_above: small,
+          visible: true, text: 'When?', font_size: null, font: '', spacing_above: small,
           icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
           underline: false, icon: ''}
         name: start_label
@@ -74,108 +74,6 @@ components:
         layout_properties: {grid_position: 'MAANVK,NUGJLS'}
         event_bindings: {}
       event_bindings: {}
-    - type: ColumnPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-        wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-        spacing_below: small, background: ''}
-      name: column_panel_3
-      layout_properties: {width: 200, expand: false}
-      components:
-      - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: Duration, font_size: null, font: '', spacing_above: small,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
-          underline: false, icon: ''}
-        name: label_2
-        layout_properties: {grid_position: 'BUYRWB,YJMNFL'}
-      - type: DropDown
-        properties:
-          role: null
-          align: full
-          tooltip: ''
-          placeholder: ''
-          border: ''
-          enabled: true
-          foreground: ''
-          items: [15 min. (5 & 5) (items set at runtime), 25 min. (10 & 10), 35 min. (15 & 15),
-            45 min. (20 & 20), 55 min. (25 & 25), 65 min. (30 & 30)]
-          visible: true
-          font_size: null
-          font: ''
-          spacing_above: small
-          spacing_below: small
-          italic: false
-          background: theme:Gray 200
-          bold: false
-          underline: false
-          include_placeholder: false
-        name: drop_down_duration
-        layout_properties: {grid_position: 'RPAKJT,YAYJAQ'}
-        event_bindings: {change: drop_down_duration_change}
-        data_bindings:
-        - {property: selected_value, code: 'self.item[''duration'']', writeback: true}
-      event_bindings: {}
-    - type: ColumnPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
-        wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-        spacing_below: small, background: ''}
-      name: column_panel_cancel
-      layout_properties: {width: 240}
-      components:
-      - type: Label
-        properties: {role: null, align: left, tooltip: 'How much notice do you need?',
-          border: '', foreground: '', visible: true, text: 'Cancel if not accepted
-            by:', font_size: null, font: '', spacing_above: small, icon_align: left,
-          spacing_below: small, italic: false, background: '', bold: true, underline: false,
-          icon: ''}
-        name: label_3
-        layout_properties: {grid_position: 'WBOYUJ,FOOOUW'}
-      - type: DropDown
-        properties:
-          role: null
-          align: full
-          tooltip: ''
-          placeholder: ''
-          border: ''
-          enabled: true
-          foreground: ''
-          items: [5 min. prior, 15 min. prior, 30 min. prior, 1 hr. prior, 2 hrs. prior,
-            8 hrs. prior, 24 hrs. prior, 48 hrs. prior, a specific time...]
-          visible: false
-          font_size: null
-          font: ''
-          spacing_above: small
-          spacing_below: none
-          italic: false
-          background: theme:Gray 200
-          bold: false
-          underline: false
-          include_placeholder: false
-        name: drop_down_cancel
-        layout_properties: {grid_position: 'TPMAHC,OPGHSH'}
-        event_bindings: {change: drop_down_cancel_change}
-        data_bindings:
-        - {property: selected_value, code: 'self.item[''cancel_buffer'']', writeback: true}
-      - type: DatePicker
-        properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
-          placeholder: '', border: '', enabled: true, foreground: '', visible: false,
-          font_size: null, font: '', spacing_above: none, spacing_below: small, italic: false,
-          date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
-          format: ''}
-        name: date_picker_cancel
-        layout_properties: {grid_position: 'HCXLQQ,LVQEHO'}
-        event_bindings: {change: date_picker_cancel_change}
-        data_bindings:
-        - {property: date, code: 'self.item[''cancel_date'']', writeback: true}
-      - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
-          visible: false, text: '', font_size: null, font: '', spacing_above: small,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: ''}
-        name: label_cancel
-        layout_properties: {grid_position: 'MOAYGD,PBHCBD'}
-        event_bindings: {}
-      event_bindings: {}
     event_bindings: {}
   - type: RepeatingPanel
     properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
@@ -202,6 +100,47 @@ components:
   properties: {height: 22}
   name: spacer_1
   layout_properties: {grid_position: 'MGXSNE,CGULSX'}
+- type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
+    background: ''}
+  name: column_panel_3
+  layout_properties: {grid_position: 'WHMCHT,ALGRTJ'}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'For how long?', font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
+      underline: false, icon: ''}
+    name: label_2
+    layout_properties: {grid_position: 'BUYRWB,YJMNFL'}
+  - type: DropDown
+    properties:
+      role: null
+      align: full
+      tooltip: ''
+      placeholder: ''
+      border: ''
+      enabled: true
+      foreground: ''
+      items: [15 min. (5 & 5) (items set at runtime), 25 min. (10 & 10), 35 min. (15 & 15),
+        45 min. (20 & 20), 55 min. (25 & 25), 65 min. (30 & 30)]
+      visible: true
+      font_size: null
+      font: ''
+      spacing_above: small
+      spacing_below: small
+      italic: false
+      background: theme:Gray 200
+      bold: false
+      underline: false
+      include_placeholder: false
+    name: drop_down_duration
+    layout_properties: {grid_position: 'RPAKJT,YAYJAQ'}
+    event_bindings: {change: drop_down_duration_change}
+    data_bindings:
+    - {property: selected_value, code: 'self.item[''duration'']', writeback: true}
+  event_bindings: {}
 - type: FlowPanel
   properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
     foreground: '', visible: false, spacing_above: none, spacing_below: medium, background: ''}
@@ -243,6 +182,66 @@ components:
     data_bindings:
     - {property: selected_value, code: '(self.item[''min_size''], self.item[''max_size''])',
       writeback: true}
+- type: ColumnPanel
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
+    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
+    background: ''}
+  name: column_panel_cancel
+  layout_properties: {grid_position: 'XREOHS,ZHFGBT'}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: 'How much notice do you need?',
+      border: '', foreground: '', visible: true, text: 'Cancel if not accepted by:',
+      font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
+      italic: false, background: '', bold: true, underline: false, icon: ''}
+    name: label_3
+    layout_properties: {grid_position: 'WBOYUJ,FOOOUW'}
+  - type: DropDown
+    properties:
+      role: null
+      align: full
+      tooltip: ''
+      placeholder: ''
+      border: ''
+      enabled: true
+      foreground: ''
+      items: [5 min. prior, 15 min. prior, 30 min. prior, 1 hr. prior, 2 hrs. prior,
+        8 hrs. prior, 24 hrs. prior, 48 hrs. prior, a specific time...]
+      visible: false
+      font_size: null
+      font: ''
+      spacing_above: small
+      spacing_below: none
+      italic: false
+      background: theme:Gray 200
+      bold: false
+      underline: false
+      include_placeholder: false
+    name: drop_down_cancel
+    layout_properties: {grid_position: 'TPMAHC,OPGHSH'}
+    event_bindings: {change: drop_down_cancel_change}
+    data_bindings:
+    - {property: selected_value, code: 'self.item[''cancel_buffer'']', writeback: true}
+  - type: DatePicker
+    properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
+      placeholder: '', border: '', enabled: true, foreground: '', visible: false,
+      font_size: null, font: '', spacing_above: none, spacing_below: small, italic: false,
+      date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
+      format: ''}
+    name: date_picker_cancel
+    layout_properties: {grid_position: 'HCXLQQ,LVQEHO'}
+    event_bindings: {change: date_picker_cancel_change}
+    data_bindings:
+    - {property: date, code: 'self.item[''cancel_date'']', writeback: true}
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
+      visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
+      spacing_below: small, italic: false, background: '', bold: false, underline: false,
+      icon: ''}
+    name: label_cancel
+    layout_properties: {grid_position: 'MOAYGD,PBHCBD'}
+    event_bindings: {}
+  event_bindings: {}
 - name: flow_panel_4
   properties: {spacing_below: medium, tooltip: You can attach a brief note to your request,
     spacing: small}
