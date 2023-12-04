@@ -130,7 +130,7 @@ class Request:
 @anvil.server.portable_class 
 class Requests:
   def __init__(self, requests):
-    self.requests = tuple(requests)
+    self.requests = tuple(sorted(requests, key=lambda x: x.pref_order))
 
   def __len__(self):
     return len(self.requests)
