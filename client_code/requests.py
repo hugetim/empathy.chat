@@ -149,6 +149,7 @@ class Requests:
       start_now=self.start_now,
       times=[r.start_dt for r in self.requests],
       duration=self.exchange_format.duration,
+      note=self.exchange_format.note,
     )
 
   def _attribute(self, attr_name):
