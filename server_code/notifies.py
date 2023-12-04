@@ -214,19 +214,15 @@ def _notify_requests_by(user, requester, requests_info, title, desc, medium):
 
 
 def _times_str(requests_info, user):
+  beginning = "\n" + port.DURATION_TEXT[requests_info['duration']] + ","
   if len(requests_info['times']) > 1:
-    return "\n" + "either " + "\n or ".join([_duration_start_str(requests_info['start_now'], start_dt, requests_info['duration'], user) for start_dt in requests_info['times']])
+    return beginning + "\n" + "either " + "\n or ".join([_start_str(requests_info['start_now'], start_dt, user) for start_dt in requests_info['times']])
   else:
-    return "\n " + _duration_start_str(requests_info['start_now'], next(iter(requests_info['times'])), requests_info['duration'], user)
+    return beginning + " " + _start_str(requests_info['start_now'], next(iter(requests_info['times'])), user)
 
 
-def _duration_start_str(start_now, start_dt, duration, user):
-  out = port.DURATION_TEXT[duration]
-  if start_now:
-    out += ", starting now"
-  else:
-    out += f", {when_str(start_dt, user)}"
-  return out
+def _start_str(start_now, start_dt, user):
+  return "starting now" if start_now else when_str(start_dt, user)
 
 
 def notify_message(user, from_name=""):

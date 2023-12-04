@@ -143,6 +143,8 @@ class Requests:
   
   @property
   def notify_info(self):
+    if not self.requests:
+      return {}
     return dict(
       start_now=self.start_now,
       times=[r.start_dt for r in self.requests],
