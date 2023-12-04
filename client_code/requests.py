@@ -127,9 +127,6 @@ class Request:
     return 1 + len(self.with_users) + (0 if other_user in self.with_users else 1) <= self.max_size
 
 
-NotifyInfo = namedtuple('NotifyInfo', ['start_now', 'start_dt', 'duration'])
-
-
 @anvil.server.portable_class 
 class Requests:
   def __init__(self, requests):
@@ -146,7 +143,11 @@ class Requests:
   
   @property
   def notify_info(self):
-    return {NotifyInfo(start_now=r.start_now, start_dt=r.start_dt, duration=r.exchange_format.duration) for r in self.requests}
+    return dict(
+      start_now=self.start_now,
+      times=[r.start_dt for r in self.requests],
+      duration=self.exchange_format.duration,
+    )
 
   def _attribute(self, attr_name):
     if not self.requests:
@@ -170,6 +171,10 @@ class Requests:
     out = self._attribute('start_now')
     h.my_assert(not (out and len(self)>1), "multiple start_now requests?")
     return out
+
+  @property
+  def exchange_format(self):
+    return self._attribute('exchange_format')
 
   @property
   def elig_with_dict(self):

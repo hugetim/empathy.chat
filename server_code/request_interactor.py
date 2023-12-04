@@ -197,7 +197,7 @@ class RequestManager:
       'notify_edit_bg',
       user=self._user,
       requests=self._requests,
-      related_prev_requests=self._related_prev_requests,
+      related_prev_requests=sorted(self._related_prev_requests, key=lambda x: x.pref_order),
     )  
 
 

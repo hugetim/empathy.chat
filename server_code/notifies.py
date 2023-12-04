@@ -191,10 +191,10 @@ def notify_requests(user, requester, requests_info, title, desc):
 
 
 def _notify_requests_by(user, requester, requests_info, title, desc, medium):
-  print(f"'_notify_requests_by', {user['email']}, {next(iter(requests_info)).start_dt}, {title}, {desc}, {medium}")
+  print(f"'_notify_requests_by', {user['email']}, {next(iter(requests_info.times)).start_dt}, {title}, {desc}, {medium}")
   requester_name = sm.name(requester, to_user=user)
   subject = f"empathy.chat - {title}"
-  content1 = f"{_other_name(requester_name)}{desc}{_times_str(request_info, user)}."
+  content1 = f"{_other_name(requester_name)}{desc}{_times_str(requests_info, user)}."
   content2 = f"Login to {p.URL} to accept."
   if medium == 'sms':
     send_sms(sm.phone(user), f"empathy.chat: {content1}\n{content2}")
@@ -213,15 +213,15 @@ def _notify_requests_by(user, requester, requests_info, title, desc, medium):
 ''')
 
 
-def _times_str(request_info, user):
-  if len(requests_info) > 1:
-    return "\n" + "either " + "\n or ".join([_duration_start_str(info, user) for info in requests_info])
+def _times_str(requests_info, user):
+  if len(requests_info.times) > 1:
+    return "\n" + "either " + "\n or ".join([_duration_start_str(start_dt, requests_info.duration, user) for start_dt in requests_info.times])
   else:
     return "\n " + _duration_start_str(next(iter(requests_info)), user)
 
 
-def _duration_start_str(request_info, user):
-  out = port.DURATION_TEXT[request_info.duration]
+def _duration_start_str(start_now, start_dt, duration, user):
+  out = port.DURATION_TEXT[duration]
   if request_info.start_now:
     out += ", starting now"
   else:
