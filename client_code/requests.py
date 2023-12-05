@@ -1,6 +1,6 @@
 import anvil.server
 from .cluegen import Datum
-from .portable import User
+from .portable import User, CANCEL_TEXT
 from .groups import Group
 from . import helper as h
 from . import parameters as p
@@ -99,6 +99,11 @@ class Request:
   def end_dt(self):
     return self.start_dt + timedelta(minutes=self.exchange_format.duration)
 
+  @property
+  def cancel_text(self):
+    cancel_buffer = round((self.start_dt-self.expire_dt).total_seconds()/60)
+    return CANCEL_TEXT.get(cancel_buffer)
+  
   def is_expired(self, now):
     return self.expire_dt < now
   
@@ -150,6 +155,8 @@ class Requests:
       times=[r.start_dt for r in self.requests],
       duration=self.exchange_format.duration,
       note=self.exchange_format.note,
+      cancel_text=self._cancel_text,
+      expire_dt=self._expire_dt,
     )
 
   def _attribute(self, attr_name):
@@ -175,6 +182,20 @@ class Requests:
     h.my_assert(not (out and len(self)>1), "multiple start_now requests?")
     return out
 
+  @property
+  def _cancel_text(self):
+    try:
+      return self._attribute('cancel_text')
+    except RuntimeError as err:
+      return None
+
+  @property
+  def _expire_dt(self):
+    try:
+      return self._attribute('expire_dt')
+    except RuntimeError as err:
+      return None
+      
   @property
   def exchange_format(self):
     return self._attribute('exchange_format')

@@ -625,12 +625,12 @@ def _get_old_eligible_users(related_prev_requests):
 
 def _notify_add(users, requester, requests_info):
   for other_user in users:
-    n.notify_requests(other_user, requester, requests_info, f"empathy request", " has requested an empathy chat:")
+    n.notify_requests(other_user, requester, requests_info, f"empathy request", " has requested an empathy chat")
 
 
 def _notify_edit(users, requester, requests_info):
   for other_user in users:
-    n.notify_requests(other_user, requester, requests_info, "empathy request", " has changed their empathy chat request to:")
+    n.notify_requests(other_user, requester, requests_info, "empathy request", " has changed their request for an empathy chat")
 
 
 def _notify_cancel(users, requester):
