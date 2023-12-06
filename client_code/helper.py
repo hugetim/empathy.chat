@@ -196,6 +196,10 @@ def random_code(num_chars=5, digits_only=False):
   random.seed()
   return "".join([random.choice(charset) for i in range(num_chars)])
 
+
+def all_equal(lst):
+  return lst[:-1] == lst[1:] # https://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
+
     
 class reverse_compare:
     def __init__(self, obj):

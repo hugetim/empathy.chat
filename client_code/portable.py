@@ -428,6 +428,7 @@ class Proposal():
     item['now_allowed'] = not(status and first.start_now == False)
     item.update(first.create_form_item())
     item['alt'] = [time.create_form_item() for time in alts]
+    if not all_equal
     return item
 
   @staticmethod

@@ -37,6 +37,7 @@ class CreateForm(CreateFormTemplate):
     self.normalize_initial_state()
     self.date_picker_start_initialized = False
     self.date_picker_cancel_initialized = False
+    self.update_state()
     self.update()
     self.eligibility_form = Eligibility(item=item)
     self.eligibility_linear_panel.add_component(self.eligibility_form)
@@ -67,8 +68,16 @@ class CreateForm(CreateFormTemplate):
     self.date_picker_cancel.max_date = self.date_picker_start.max_date
     if not self.item['cancel_date']:
       self.item['cancel_date'] = t.default_cancel_date(now, self.item['start_date'])
+      self.date_picker_cancel_change()
     self.date_picker_cancel_initialized = True
 
+  def update_state(self):
+    if not self.item['start_now']:
+      if not self.date_picker_start_initialized:
+        self.init_date_picker_start()
+      if self.item['cancel_buffer'] == "custom" and not self.date_picker_cancel_initialized:
+        self.init_date_picker_cancel()
+  
   def update_times(self):
     if self.item['alt']:
       self.now_radio_button.enabled = False
@@ -96,15 +105,11 @@ class CreateForm(CreateFormTemplate):
       self.now_label.visible = False
       self.save_button.text = "SAVE"
       self.save_button.icon = ""
-      if not self.date_picker_start_initialized:
-        self.init_date_picker_start()
       self.date_picker_start.visible = True
       self.button_add_alternate.visible = len(self.item['alt']) < t.MAX_ALT_TIMES
       #self.column_panel_cancel.visible = True
       self.drop_down_cancel.visible = True
       if self.item['cancel_buffer'] == "custom":
-        if not self.date_picker_cancel_initialized:
-          self.init_date_picker_cancel()
         self.date_picker_cancel.visible = True
       else:
         self.date_picker_cancel.visible = False
@@ -131,6 +136,7 @@ class CreateForm(CreateFormTemplate):
     sender = event_args.get('sender')
     if sender:
       self.item['start_now'] = bool(int(sender.get_group_value()))
+    self.update_state()
     self.update_times()
 
   def drop_down_cancel_change(self, **event_args):
@@ -140,6 +146,7 @@ class CreateForm(CreateFormTemplate):
         alt_item['cancel_buffer'] = self.item['cancel_buffer']
       for time_component in self.repeating_panel_1.get_components():
         time_component.update()
+    self.update_state()
     self.update()
     
   def date_picker_start_change(self, **event_args):
@@ -153,7 +160,7 @@ class CreateForm(CreateFormTemplate):
         alt_item['cancel_date'] = self.item['cancel_date']
       for time_component in self.repeating_panel_1.get_components():
         time_component.update()
-    self.update()    
+    self.update()
 
   def drop_down_duration_change(self, **event_args):
     """This method is called when an item is selected"""
