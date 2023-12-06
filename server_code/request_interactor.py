@@ -11,6 +11,7 @@ from . import server_misc as sm
 from . import exchange_interactor as ei
 from . import connections as c
 from . import notifies as n
+from . import helper as h
 from .exceptions import InvalidRequestError
 from anvil_extras.logging import TimerLogger
 import time
@@ -47,7 +48,7 @@ def edit_requests(user, requests):
   
   Side effects: Update proposal tables with revision, if valid; match if appropriate; notify
   """
-  sm.my_assert(_all_equal([r.or_group_id for r in requests]), "same or_group")
+  sm.my_assert(h.all_equal([r.or_group_id for r in requests]), "same or_group")
   request_editor = RequestManager()
   _pre_fetch_relevant_rows(requests, user, request_editor.now)
   request_editor.check_and_save(user, requests)
@@ -498,16 +499,12 @@ def all_eligible_users(request, eligibility_spec):
   return eligible_users
 
 
-def _all_equal(lst):
-  return lst[:-1] == lst[1:] # https://stackoverflow.com/questions/3844801/check-if-all-elements-in-a-list-are-identical
-
-
 def requests_to_props(requests, user):
   or_groups = [[r for r in requests if r.or_group_id == or_group_id]
                 for or_group_id in {r.or_group_id for r in requests}]
   for this_or_group in or_groups:
-    sm.my_assert(_all_equal([r.elig_with_dict for r in this_or_group]), "same eligibility")
-    sm.my_assert(_all_equal([(r.user, r.min_size, r.max_size) for r in this_or_group]), "same proposer, sizes")
+    sm.my_assert(h.all_equal([r.elig_with_dict for r in this_or_group]), "same eligibility")
+    sm.my_assert(h.all_equal([(r.user, r.min_size, r.max_size) for r in this_or_group]), "same proposer, sizes")
     times = []
     for r in sorted(this_or_group, key=lambda x: x.pref_order):
       sm.my_assert(not r.with_users, "no with_users")

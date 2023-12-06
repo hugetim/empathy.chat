@@ -428,7 +428,16 @@ class Proposal():
     item['now_allowed'] = not(status and first.start_now == False)
     item.update(first.create_form_item())
     item['alt'] = [time.create_form_item() for time in alts]
-    if not all_equal
+    if not h.all_equal([item['cancel_buffer']] + [alt_item['cancel_buffer'] for alt_item in item['alt']]):
+      if not item['cancel_date'] or item['cancel_buffer'] != "custom":
+        item['cancel_date'] = item['start_date'] - datetime.timedelta(minutes=item['cancel_buffer'])
+        item['cancel_buffer'] = "custom"
+      for alt_item in item['alt']:
+        if not alt_item['cancel_date'] or alt_item['cancel_buffer'] != "custom":
+          alt_item['cancel_date'] = alt_item['start_date'] - datetime.timedelta(minutes=alt_item['cancel_buffer'])
+          alt_item['cancel_buffer'] = "custom"
+        h.my_assert(alt_item['cancel_date'] == item['cancel_date'], "all custom cancel_dates same")
+                                                                              
     return item
 
   @staticmethod
