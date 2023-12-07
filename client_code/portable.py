@@ -18,7 +18,7 @@ DURATION_TEXT = {15: "5 & 5 (~15 min. total)",
                  65: "30 & 30 (~65 min. total)"}
 CANCEL_MIN_MINUTES = 5
 CANCEL_DEFAULT_MINUTES = 15
-CANCEL_TEXT = {0: 'At t=0, becomes "Now" request',
+CANCEL_TEXT = {0: "Don't cancel. I'll be there anyway.",
                5: "5 min. prior",
                15: "15 min. prior",
                30: "30 min. prior",
@@ -228,35 +228,37 @@ class ProposalTime():
   def get_errors(self, conflict_checks=None):
     """Return a dictionary of errors
     >>>(ProposalTime(start_now=False, start_date=h.now()).get_errors()
-        == {'start_date': ("The Start Time must be at least " 
-                          + str(CANCEL_MIN_MINUTES) + " minutes away.")}
+        == {'start_date': ("Start time must be at least " 
+                           + str(CANCEL_MIN_MINUTES) + " minutes away "
+                           + '(unless "Cancel if not accepted by" Advanced option set to "{CANCEL_TEXT[0]}")')
     True
     """
     now = h.now()
     messages = {}
     if not self.start_now:
       if self.start_date < now:
-        messages['start_date'] = ("Start Time must be in the future.")
+        messages['start_date'] = ("Start time must be in the future.")
       elif (self.start_date != self.expire_date 
             and self.start_date < (now + datetime.timedelta(minutes=CANCEL_MIN_MINUTES))):
-        messages['start_date'] = ("Start Time must be at least " 
-                                  + str(CANCEL_MIN_MINUTES) + " minutes away.")
+        messages['start_date'] = ("Start time must be at least " 
+                                  + str(CANCEL_MIN_MINUTES) + " minutes away "
+                                  + f'(unless "Cancel if not accepted by" Advanced option set to "{CANCEL_TEXT[0]}")')
       else:
         if self.expire_date < now:
           cancel_buffer = round((self.start_date-self.expire_date).total_seconds()/60)
           if cancel_buffer in CANCEL_TEXT.keys():
-            messages['start_date'] = ("Start Time must be at least " 
-                                      + h.seconds_to_words(cancel_buffer*60) + " away (due to the 'Cancel if not accepted by' Advanced setting below).")
+            messages['start_date'] = ("Start time must be at least " 
+                                      + h.seconds_to_words(cancel_buffer*60) + ' away (due to the "Cancel if not accepted by" Advanced setting below).')
           else:
             messages['cancel_buffer'] = 'The specified "Cancel" time has already passed.'
         elif self.expire_date > self.start_date:
-          messages['cancel_buffer'] = ('The "Cancel" time must be prior to all Start Times (by at least '
+          messages['cancel_buffer'] = ('The "Cancel" time must be prior to all start times (by at least '
                                       + str(CANCEL_MIN_MINUTES) + ' minutes).')
         elif (self.start_date != self.expire_date
               and self.expire_date > (self.start_date
                                       - datetime.timedelta(minutes=CANCEL_MIN_MINUTES))):
           messages['cancel_buffer'] = ('The "Cancel" time must be at least ' 
-                                      + str(CANCEL_MIN_MINUTES) + ' minutes prior to all Start Times.')
+                                      + str(CANCEL_MIN_MINUTES) + ' minutes prior to all start times.')
     if self.has_conflict(conflict_checks):
       messages['start_date'] = ("Time/duration overlaps with one of your existing requests.")
     return messages

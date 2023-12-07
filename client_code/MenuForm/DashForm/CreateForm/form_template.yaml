@@ -19,7 +19,7 @@ components:
     components:
     - type: Label
       properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'When?', font_size: null, font: '', spacing_above: none,
+        visible: true, text: ' When? (start time)', font_size: null, font: '', spacing_above: none,
         icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
         underline: false, icon: ''}
       name: start_label
