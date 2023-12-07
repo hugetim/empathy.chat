@@ -106,8 +106,19 @@ class CreateForm(CreateFormTemplate):
       self.save_button.text = "SAVE"
       self.save_button.icon = ""
       self.date_picker_start.visible = True
-      self.button_add_alternate.visible = len(self.item['alt']) < t.MAX_ALT_TIMES
-      #self.column_panel_cancel.visible = True
+      self.button_add_alternate.visible = True
+      self.button_add_alternate.enabled = (self.item['cancel_buffer'] != 0 
+                                           and len(self.item['alt']) < t.MAX_ALT_TIMES)
+      if self.button_add_alternate.enabled:
+        self.button_add_alternate.tooltip = ""
+      else:
+        self.button_add_alternate.tooltip = (
+          f'Alternate start times not allowed with "Cancel if not accepted by" Advanced option set to "{t.CANCEL_TEXT[0]}")'
+          if self.item['cancel_buffer'] == 0
+          else 'Maximum alternate start times reached.'
+        )
+      self.drop_down_cancel.items = [(t.CANCEL_TEXT[key], key) for key in t.CANCEL_TEXT.keys()
+                                     if key != 0 or not self.item['alt']]
       self.drop_down_cancel.visible = True
       if self.item['cancel_buffer'] == "custom":
         self.date_picker_cancel.visible = True
