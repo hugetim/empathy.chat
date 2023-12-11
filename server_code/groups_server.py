@@ -46,14 +46,32 @@ def get_names_taken():
   return [row['name'] for row in app_tables.groups.search(q.fetch_only('name'), current=True)]
 
 
+my_group_members_fetch = q.fetch_only('guest_allowed', user=q.fetch_only('first_name', 'trust_level'), group=q.fetch_only())
+my_group_invites_fetch = q.fetch_only('link_key', 'spec', 'created', 'expire_date', group=q.fetch_only())
+
+
 @sm.authenticated_callable
 @anvil.tables.in_transaction(relaxed=True)
 def load_my_groups(user_id="", user=None):
   print(f"load_my_groups({user_id})")
   if not user:
     user = sm.get_acting_user(user_id)
-  rows = app_tables.groups.search(q.fetch_only('name', hosts=q.fetch_only('first_name')), hosts=[user], current=True)
-  _groups = [MyGroup.from_group_row(row, portable=True, user=user) for row in rows]
+  rows = list(app_tables.groups.search(q.fetch_only('name', hosts=q.fetch_only('first_name')), hosts=[user], current=True))
+  combined_group_members_search = list(app_tables.group_members.search(
+    my_group_members_fetch,
+    group=q.any_of(*rows),
+  ))
+  combined_group_invites_search = list(app_tables.group_invites.search(
+    my_group_invites_fetch,
+    anvil.tables.order_by('expire_date', ascending=False),
+    group=q.any_of(*rows), 
+    current=True,
+  ))
+  _groups = []
+  for group_row in rows:
+    group_invites_search = [invite_row for invite_row in combined_group_invites_search if invite_row['group'] == group_row]
+    group_members_search = [member_row for member_row in combined_group_members_search if member_row['group'] == group_row]
+    _groups.append(MyGroup.from_group_row(group_row, portable=True, user=user, group_invites_search=group_invites_search, group_members_search=group_members_search))
   return groups.MyGroups(_groups, get_names_taken())
 
 
@@ -92,15 +110,18 @@ class MyGroup(groups.MyGroup):
     return app_tables.groups.get_by_id(self.group_id) if self.group_id else None
   
   @staticmethod
-  def from_group_row(group_row, portable=False, user=None):
+  def from_group_row(group_row, portable=False, user=None, group_invites_search=False, group_members_search=False):
     if not user:
       user = sm.get_acting_user()
+    if group_invites_search is False:
+      group_invites_search = app_tables.group_invites.search(my_group_invites_fetch,
+                                                             anvil.tables.order_by('expire_date', ascending=False),
+                                                             group=group_row, current=True)
     port_invites = [Invite.from_invite_row(i_row, portable=True, user=user)
-                    for i_row in app_tables.group_invites.search(q.fetch_only('link_key', 'spec', 'created', 'expire_date'), anvil.tables.order_by('expire_date', ascending=False), 
-                                                                 group=group_row, current=True)]
+                    for i_row in group_invites_search]
     port_my_group = groups.MyGroup(name=group_row['name'],
                                    group_id=group_row.get_id(),
-                                   members=list(member_dicts_from_group_row(group_row)),
+                                   members=list(member_dicts_from_group_row(group_row, group_members_search)),
                                    invites=port_invites,
                                   )
     return port_my_group if portable else MyGroup(port_my_group)
@@ -174,9 +195,11 @@ def all_members_from_group_row(group_row):
   return list(member_set)
 
 
-def member_dicts_from_group_row(group_row):
+def member_dicts_from_group_row(group_row, group_members_search=False):
   """Returns dicts for members (excluding hosts) with non-missing trust_level"""
-  member_rows = [m for m in app_tables.group_members.search(q.fetch_only('guest_allowed', user=q.fetch_only('first_name', 'trust_level')), group=group_row) if m['user']['trust_level']]
+  if group_members_search is False:
+    group_members_search = app_tables.group_members.search(my_group_members_fetch, group=group_row)
+  member_rows = [m for m in group_members_search if m['user']['trust_level']]
   member_ids = [m['user'].get_id() for m in member_rows]
   group_id = group_row.get_id()
   for i, member_id in enumerate(member_ids):
