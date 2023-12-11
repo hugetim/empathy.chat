@@ -193,17 +193,23 @@ def user_groups(user):
 
 @lru_cache(maxsize=None)
 def allowed_members_from_group_row(group_row, user):
+  return _allowed_members_from_group_row(group_row, user)
+
+
+def _allowed_members_from_group_row(group_row, user, group_members_search=False):
   """Returns group members allowed to interact with `user`"""
   group_hosts_set = set(group_row['hosts'])
+  if group_members_search is False:
+    group_members_search = app_tables.group_members.search(q.fetch_only('guest_allowed', 'user'), group=group_row)
   if user in group_hosts_set:
     member_set = (
-      {m['user'] for m in app_tables.group_members.search(q.fetch_only('user'), group=group_row) 
+      {m['user'] for m in group_members_search
        if m['user']['trust_level'] and m['user']['trust_level'] >= 1}
     )
     member_set.update(group_hosts_set)
   elif user_allowed_in_group(user, group_row):
     member_set = (
-      {m['user'] for m in app_tables.group_members.search(q.fetch_only('guest_allowed', 'user'), group=group_row) 
+      {m['user'] for m in group_members_search
        if m['user']['trust_level'] and (m['user']['trust_level'] >= 2 or (m['user']['trust_level'] >= 1 and m['guest_allowed']))}
     )
     member_set.update(group_hosts_set)
@@ -268,8 +274,11 @@ def _group_info(other_users, user):
 
 
 def _group_and_allowed_members(user):
-  for group_row in user_groups(user):
-    group_members = {u for u in allowed_members_from_group_row(group_row, user)}
+  _user_groups = list(user_groups(user))
+  combined_group_members_search = list(app_tables.group_members.search(q.fetch_only('guest_allowed', 'user', group=q.fetch_only()), group=q.any_of(*_user_groups)))
+  for group_row in _user_groups:
+    group_members_search = [member_row for member_row in combined_group_members_search if member_row['group'] == group_row]
+    group_members = {u for u in _allowed_members_from_group_row(group_row, user, group_members_search)}
     yield (group_row, group_members)
   
 # @sm.authenticated_callable
