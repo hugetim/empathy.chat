@@ -84,7 +84,7 @@ def _pre_fetch_relevant_rows(requests, user, now):
                               for port_group in request.eligible_groups]
     out['eligible_invites'] = [repo.get_invite_row_by_id(port_invite.invite_id)
                               for port_invite in request.eligible_invites]
-  other_request_records = _potential_matching_request_records(requests, user, now)
+  other_request_records, related_prev, unrelated_prev = _potential_matching_request_records(requests, user, now)
   _prune_request_records(other_request_records, now)
   if other_request_records:
     current_visible_requests(user, other_request_records)
@@ -101,9 +101,10 @@ class RequestManager:
     self.exchange = None
 
   def _load_relevant_request_records(self, requests):
-    self._related_prev_request_records, self._unrelated_prev_requests = _user_prev_requests(self._user, requests)
+    self._other_request_records, self._related_prev_request_records, self._unrelated_prev_requests = (
+      _potential_matching_request_records(requests, self._user, self.now)
+    )
     self._related_prev_requests = Requests([rr.entity for rr in self._related_prev_request_records])
-    self._other_request_records = _potential_matching_request_records(requests, self._user, self.now)
   
   @tables.in_transaction
   def check_and_save(self, user, requests):
@@ -202,20 +203,6 @@ class RequestManager:
     )  
 
 
-def _user_prev_requests(user, requests):
-  user_prev_request_records = list(repo.requests_by_user(user, records=True))
-  requests_ids, or_group_ids = _requests_ids(requests)
-  unrelated_prev_requests = Requests([
-    rr.entity for rr in user_prev_request_records
-    if rr.entity.request_id not in requests_ids and rr.entity.or_group_id not in or_group_ids
-  ])
-  related_prev_request_records = [
-    rr for rr in user_prev_request_records
-    if rr.entity.request_id in requests_ids or rr.entity.or_group_id in or_group_ids
-  ]
-  return related_prev_request_records, unrelated_prev_requests
-
-
 def _requests_ids(requests):
   return {r.request_id for r in requests}, {r.or_group_id for r in requests}
 
@@ -232,7 +219,19 @@ def _potential_matching_request_records(requests, user, now):
     dict(start_now=r.start_now, start_dt=r.start_dt, exchange_format=r.exchange_format)
     for r in requests
   ]
-  return list(repo.partially_matching_requests(user, partial_request_dicts, now, records=True))
+  retrieved = list(repo.user_and_partially_matching_requests(user, partial_request_dicts, now, records=True))
+  other_request_records = [rr for rr in retrieved if rr.user != user]
+  user_prev_request_records = [rr for rr in retrieved if rr.user == user]
+  requests_ids, or_group_ids = _requests_ids(requests)
+  unrelated_prev_requests = Requests([
+    rr.entity for rr in user_prev_request_records
+    if rr.entity.request_id not in requests_ids and rr.entity.or_group_id not in or_group_ids
+  ])
+  related_prev_request_records = [
+    rr for rr in user_prev_request_records
+    if rr.entity.request_id in requests_ids or rr.entity.or_group_id in or_group_ids
+  ]
+  return other_request_records, related_prev_request_records, unrelated_prev_requests
 
 
 def _potential_matches(user, requests, other_request_records):

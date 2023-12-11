@@ -259,14 +259,15 @@ def clear_eprs_for_rrs(request_records):
       ep_row.delete()
 
 
-def partially_matching_requests(user, partial_request_dicts, now, records=False):
+def user_and_partially_matching_requests(user, partial_request_dicts, now, records=False):
   q_expressions = [
     q.all_of(exchange_format=get_exchange_format_row(prd['exchange_format']),
              **(dict(start_dt=q.less_than(now)) if prd['start_now'] else dict(start_dt=prd['start_dt']))
             )
     for prd in partial_request_dicts
   ]
-  rows = app_tables.requests.search(requests_fetch, q.any_of(*q_expressions), user=q.not_(user), current=True)
+  query = q.any_of(*q_expressions, user=user)
+  rows = app_tables.requests.search(requests_fetch, query, current=True)
   for request_row in rows:
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
