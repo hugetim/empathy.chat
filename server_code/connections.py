@@ -154,21 +154,15 @@ def _profiles_and_their_groups(user, c_users, records, starred_users):
 
 def _group_info(user):
   import collections
+  from . import groups_server as g
   members_to_group_names = collections.defaultdict(list)
   their_groups_dict = {}
-  for group_row, group_members in _group_and_members(user):
+  for group_row, group_members in g.groups_and_allowed_members(user):
     for user2 in group_members:
       members_to_group_names[user2].append(group_row['name'])
     if user not in group_row['hosts']:
       their_groups_dict[group_row.get_id()] = _port_group(group_row, group_members)
   return members_to_group_names, their_groups_dict
-
-
-def _group_and_members(user):
-  from . import groups_server as g
-  for group_row in g.user_groups(user):
-    group_members = {u for u in g.allowed_members_from_group_row(group_row, user)}
-    yield (group_row, group_members)
     
 
 def _port_group(group_row, group_members):

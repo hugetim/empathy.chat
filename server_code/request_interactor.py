@@ -473,8 +473,8 @@ def _all_included_users(eligibility_spec):
   all_eligible = set()
   if eligibility_spec['eligible_all']:
     all_eligible.update(set(c.get_connected_users(user, up_to_degree=Relationship.MAX_PAIR_ELIGIBLE_DISTANCE)))
-    for group in g.user_groups(user):
-      all_eligible.update(set(g.allowed_members_from_group_row(group, user))-{user})
+    for group, members in g.groups_and_allowed_members(user):
+      all_eligible.update(set(members)-{user})
     return all_eligible
   if eligibility_spec['eligible']:
     all_eligible.update(set(c.get_connected_users(user, up_to_degree=eligibility_spec['eligible'])))

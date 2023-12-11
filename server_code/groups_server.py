@@ -183,7 +183,7 @@ def member_dicts_from_group_row(group_row):
     yield dict(member_id=member_id, group_id=group_id, guest_allowed=member_rows[i]['guest_allowed'])
   
 
-def user_groups(user):
+def _user_groups(user):
   """Returns all groups for which user in all_members_from_group_row"""
   group_fetch = q.fetch_only('name', 'hosts')
   memberships = {m['group'] for m in app_tables.group_members.search(q.fetch_only(group=group_fetch), user=user)}
@@ -261,14 +261,14 @@ def _group_tie_level_to_relationship(group_tie_level):
 def _group_info(other_users, user):
   import collections
   allowed_members_to_groups = collections.defaultdict(list)
-  for group_row, group_members in _group_and_allowed_members(user):
+  for group_row, group_members in groups_and_allowed_members(user):
     for user2 in set(group_members) & set(other_users):
       allowed_members_to_groups[user2].append(group_row)
   return allowed_members_to_groups
 
 
-def _group_and_allowed_members(user):
-  for group_row in user_groups(user):
+def groups_and_allowed_members(user):
+  for group_row in _user_groups(user):
     group_members = {u for u in allowed_members_from_group_row(group_row, user)}
     yield (group_row, group_members)
   
