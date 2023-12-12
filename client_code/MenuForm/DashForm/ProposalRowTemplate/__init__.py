@@ -70,7 +70,8 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.background = "theme:Light Yellow"
     else:
       self.users_flow_panel.add_component(Name(item=glob.users[prop.user]))
-    for port_user in time.users_accepting:
+    for u_id in time.users_accepting:
+      port_user = glob.users[u_id]
       if port_user.distance == 0:
         self.users_flow_panel.add_component(Label(text="me,", spacing_above="none", spacing_below="none"), index=0)
         self.item['me_accepting'] = True
