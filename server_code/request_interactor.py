@@ -135,11 +135,12 @@ class RequestManager:
       else:
         _cancel_missing_or_group_requests(requests, self._related_prev_request_records)
         timer.check("_cancel_missing_or_group_requests")
+        self._save_requests(requests)
+        timer.check("_save_requests")
+        self._save_exchange_prospects(exchange_prospects)
+        timer.check("_save_exchange_prospects")
         if requests.start_now:
           self._user['status'] = "requesting"
-        timer.check("update requesting status")
-        self._save_requests(requests)
-        self._save_exchange_prospects(exchange_prospects)
       self._requests = requests
   
   def _save_exchange(self, exchange_to_be):
