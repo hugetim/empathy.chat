@@ -183,10 +183,12 @@ class RequestManager:
   def _update_exchange_user_statuses(self):
     if self.exchange.start_now:
       users = self._exchange_record.users
-      if self.exchange.participants[0]['entered_dt']:
+      entered_user_ids = self.exchange.currently_matched_user_ids
+      if entered_user_ids:
         with tables.batch_update:
           for u in users:
-            u['status'] = "matched"
+            if u.get_id() in entered_user_ids:
+              u['status'] = "matched"
       else:
         with tables.batch_update:
           self._user['status'] = "pinging"
