@@ -7,6 +7,7 @@ from .... import portable as t
 from .... import helper as h
 from ....parameters import WAIT_SECONDS, BUFFER_SECONDS
 from ....Name import Name
+from .... import glob
 
 
 def own_label(prop, item):
@@ -68,7 +69,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       self.users_flow_panel.add_component(own_label(prop, self.item))
       self.background = "theme:Light Yellow"
     else:
-      self.users_flow_panel.add_component(Name(item=prop.user))
+      self.users_flow_panel.add_component(Name(item=glob.users[prop.user]))
     for port_user in time.users_accepting:
       if port_user.distance == 0:
         self.users_flow_panel.add_component(Label(text="me,", spacing_above="none", spacing_below="none"), index=0)

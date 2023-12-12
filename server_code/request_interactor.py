@@ -517,12 +517,12 @@ def requests_to_props(requests, user):
         expire_date=r.expire_dt,
         duration=r.exchange_format.duration,
       ))
-    user2 = repo.get_user_row_by_id(this_or_group[0].user)
+    user2_id = this_or_group[0].user
     or_group_id = this_or_group[0].or_group_id
     yield port.Proposal(
       prop_id=or_group_id,
-      user=sm.get_simple_port_user(user2, user1=user),
-      own=user2==user,
+      user=user2_id,
+      own=user2_id==user.get_id(),
       min_size=r.min_size,
       max_size=r.max_size,
       eligible_all=r.eligible_all,
@@ -549,10 +549,10 @@ def eps_to_props(exchange_prospects, user):
         expire_date=this_ep.expire_dt,
         duration=this_ep.exchange_format.duration,
     )]
-    user2 = user if own else repo.get_user_row_by_id(rep_request.user)
+    user2_id = user_id if own else rep_request.user
     yield port.Proposal(
       prop_id=this_ep.prospect_id,
-      user=sm.get_simple_port_user(user2, user1=user),
+      user=user2_id,
       own=own,
       min_size=this_ep.min_size,
       max_size=this_ep.max_size,
