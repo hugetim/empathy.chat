@@ -5,9 +5,10 @@ import anvil.tz
 import datetime
 from ... import helper as h
 from ... import parameters as p
-from ...portable import DURATION_TEXT
+from ...portable import DURATION_TEXT, User
 from ...Name import Name
 from ... import exchange_controller as ec
+from ... import glob
 
 
 class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
@@ -19,9 +20,10 @@ class UpcomingRowTemplate(UpcomingRowTemplateTemplate):
     self.init()
 
   def init(self):
-    # assumes only dyads allowed
-    port_users = self.item.pop('port_users')
-    self.users_flow_panel.add_component(Name(item=port_users[0]))
+    other_user_ids = self.item.pop('other_user_ids')
+    for u_id in other_user_ids:
+      port_u = glob.users[u_id]
+      self.users_flow_panel.add_component(Name(item=User(user_id=u_id, name=port_u.name)))
     self.item['duration'] = DURATION_TEXT[self.item.pop('duration_minutes')]
     self.start_dt = self.item.pop('start_date')
     self.item['start_time'] = h.day_time_str(h.as_local_tz(self.start_dt))
