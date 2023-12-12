@@ -20,22 +20,21 @@ def init(time_zone):
                 clears cached session['state']
   """
   user = anvil.users.get_user()
-  task = anvil.server.launch_background_task('_init_bg', time_zone, user)
   anvil.server.session['state'] = None
-  return task
+  return _init(time_zone, user)
 
 
-@sm.background_task_with_reporting
 @timed
-def _init_bg(time_zone, user):
-  import anvil.users
+def _init(time_zone, user):
   from . import network_interactor as ni
-  user['confirmed_email'] = True # because login (either Google or via password reset email) required to get here
-  anvil.users.force_login(user)
+  if not user['confirmed_email']:
+    user['confirmed_email'] = True # because login (either Google or via password reset email) required to get here
   trust_level = accounts.initialize_session(time_zone, user)
-  anvil.server.task_state['init_dict'] = _init_matcher(user, trust_level)
+  result = {}
+  result['init_dict'] = _init_matcher(user, trust_level)
   propagate_update_needed(user)
-  anvil.server.task_state['out'] = ni.init_cache(user)
+  result['out'] = ni.init_cache(user)
+  return result
 
 
 def _init_matcher(user, trust_level):

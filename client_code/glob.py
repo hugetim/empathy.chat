@@ -52,12 +52,12 @@ def _get_cached(name):
 def _trial_get(name):
   trial_get = _lazy_dict.get(name)
   if trial_get is None and cache_task and cache_task.is_completed():
-    _set_lazy_vars(cache_task.get_state()['out'])
+    set_lazy_vars(cache_task.get_state()['out'])
     trial_get = _lazy_dict.get(name)
   return trial_get
 
   
-def _set_lazy_vars(out):
+def set_lazy_vars(out):
   from . import network_controller as nc
   global _lazy_dict
   global lazy_loaded
@@ -87,7 +87,7 @@ def populate_lazy_vars(spinner=True):
     out = anvil.server.call('init_cache')
   else:
     out = anvil.server.call_s('init_cache')
-  _set_lazy_vars(out)
+  set_lazy_vars(out)
 
 
 def update_lazy_vars(spinner=True):
