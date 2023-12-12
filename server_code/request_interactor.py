@@ -542,14 +542,15 @@ def eps_to_props(exchange_prospects, user):
     my_requests = [r for r in this_ep if user_id == r.user]
     own = bool(my_requests)
     rep_request = my_requests[0] if own else this_ep[0]
+    user2_id = user_id if own else rep_request.user
     times = [port.ProposalTime(
         time_id=rep_request.request_id, ### problem
         start_now=this_ep.start_now,
         start_date = None if this_ep.start_now else this_ep.start_dt,
         expire_date=this_ep.expire_dt,
         duration=this_ep.exchange_format.duration,
+        users_accepting=[r.user for r in this_ep if r.user != user2_id],
     )]
-    user2_id = user_id if own else rep_request.user
     yield port.Proposal(
       prop_id=this_ep.prospect_id,
       user=user2_id,
