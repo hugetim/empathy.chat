@@ -342,7 +342,6 @@ def get_settings(user_id=""):
   elig_items = {}
   for medium in ['sms', 'email']:
     elig_items[medium] = notif_settings.pop(medium) if notif_settings.get(medium) else dict(eligible=0, eligible_starred=False, eligible_users=[], eligible_groups=[])
-    elig_items[medium]['eligible_users'] = [sm.get_port_user(sm.get_other_user(u_id), user1=user, simple=True) for u_id in elig_items[medium]['eligible_users']]
     eligible_group_rows = [app_tables.groups.get_by_id(g_id) for g_id in elig_items[medium]['eligible_groups']]
     elig_items[medium]['eligible_groups'] = [groups.Group(group_row['name'], group_row.get_id()) for group_row in eligible_group_rows]
   time_zone = user['time_zone']
@@ -358,8 +357,7 @@ def set_notif_settings(notif_settings, elig_items, user_id=""):
   from . import groups
   user = sm.get_acting_user(user_id)
   for medium in ['sms', 'email']:
-    notif_settings[medium] = {k: elig_items[medium].get(k) for k in ['eligible_all', 'eligible', 'eligible_starred']}
-    notif_settings[medium]['eligible_users'] = [port_user.user_id for port_user in elig_items[medium]['eligible_users']]
+    notif_settings[medium] = {k: elig_items[medium].get(k) for k in ['eligible_all', 'eligible', 'eligible_starred', 'eligible_users']}
     notif_settings[medium]['eligible_groups'] = [group.group_id for group in elig_items[medium]['eligible_groups']]
   user['notif_settings'] = notif_settings
 

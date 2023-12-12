@@ -105,7 +105,7 @@ def get_create_user_items():
   user_id = glob.logged_in_user_id
   up_to_degree = 3 if glob.trust_level >= 3 else 1
   name_items = _get_sorted_name_items(user_id, up_to_degree)
-  starred_name_list = [item['key'] for item in name_items if item['value'].starred] # ensures sort order
+  starred_name_list = [item['key'] for item in name_items if glob.users[item['value']].starred] # ensures sort order
   return name_items, starred_name_list
 
 

@@ -527,7 +527,7 @@ def requests_to_props(requests, user):
       max_size=r.max_size,
       eligible_all=r.eligible_all,
       eligible=r.eligible,
-      eligible_users=[sm.get_simple_port_user(repo.get_user_row_by_id(user_id), user1=user) for user_id in r.eligible_users],
+      eligible_users=r.eligible_users,
       eligible_groups=r.eligible_groups,
       eligible_starred=r.eligible_starred,
       eligible_invites=r.eligible_invites,
@@ -558,7 +558,7 @@ def eps_to_props(exchange_prospects, user):
       max_size=this_ep.max_size,
       eligible_all=rep_request.eligible_all, ### problem
       eligible=rep_request.eligible, ### problem
-      eligible_users=[sm.get_simple_port_user(repo.get_user_row_by_id(user_id), user1=user) for user_id in rep_request.eligible_users], ### problem
+      eligible_users=rep_request.eligible_users, ### problem
       eligible_groups=rep_request.eligible_groups, ### problem
       eligible_starred=rep_request.eligible_starred, ### problem
       eligible_invites=rep_request.eligible_invites, ### problem

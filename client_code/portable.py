@@ -82,10 +82,6 @@ class User(h.AttributeToKey):
     from . import glob
     self.starred = not self.starred
     glob.reset_get_create_user_items()
-
-  @staticmethod
-  def from_name_item(item):
-    return item['value']
   
   @staticmethod
   def from_logged_in():
@@ -125,7 +121,7 @@ class UserFull(User):
     self.relationship = rel.Relationship(distance=self.distance, degree=self.degree)
 
   def name_item(self):
-    return dict(key=self.name, value=self, subtext=self.distance_str_or_groups, title=self.first if self.first else self.name)
+    return dict(key=self.name, value=self.user_id, subtext=self.distance_str_or_groups, title=self.first if self.first else self.name)
 
   @property
   def distance_str(self):
@@ -338,7 +334,7 @@ class Proposal():
       self.eligible_users = eligible_users
     else:
       from . import glob
-      self.eligible_users = [glob.users[id] for id in default_request['eligible']['eligible_users'] if id in glob.users] if default_request else []
+      self.eligible_users = [id for id in default_request['eligible']['eligible_users'] if id in glob.users] if default_request else []
     if eligible_groups is not None:
       self.eligible_groups = eligible_groups
     else:
@@ -369,6 +365,7 @@ class Proposal():
 
   @property
   def eligibility_desc(self):
+    from . import glob
     items = []
     if self.eligible_all:
       return "My whole network"
@@ -377,21 +374,13 @@ class Proposal():
     if self.eligible_starred:
       items.append('Starred')
     if self.eligible_users:
-      items.append(", ".join([str(u) for u in self.eligible_users]))
+      items.append(", ".join([str(glob.users[u]) for u in self.eligible_users]))
     if self.eligible:
       desc = {1: "1st degree connections", 2: "connections up to 2 degrees", 3: "connections up to 3 degrees"}
       items.append(desc[self.eligible])
     if self.eligible_groups:
       items.append(", ".join([str(g) for g in self.eligible_groups]))
     return "; ".join(items) if items else "(no one)"
-  
-  # @property
-  # def specific_user_eligible(self):
-  #   if (self.eligible == 0 and len(self.eligible_users) == 1 
-  #       and not self.eligible_groups and not self.eligible_starred):
-  #     return self.eligible_users[0]
-  #   else:
-  #     return None
    
   def get_check_items(self):
     items = []
@@ -407,8 +396,7 @@ class Proposal():
     if not item['start_now']:
       t0 = self.times[0]
       out['prop_time']['cancel_buffer'] = round((t0.start_date - t0.expire_date).total_seconds()/60)      
-    out['eligible'] = {k: item.get(k) for k in ['eligible_all', 'eligible', 'eligible_starred']}
-    out['eligible']['eligible_users'] = [port_user.user_id for port_user in item['eligible_users']]
+    out['eligible'] = {k: item.get(k) for k in ['eligible_all', 'eligible', 'eligible_starred', 'eligible_users']}
     out['eligible']['eligible_groups'] = [group.group_id for group in item['eligible_groups']]
     return out
   

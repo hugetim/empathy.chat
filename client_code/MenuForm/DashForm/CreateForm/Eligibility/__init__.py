@@ -52,7 +52,7 @@ class Eligibility(EligibilityTemplate):
         self.starred_check_box.text = 'My Starred list (to add users, go to "My Network" and click the stars by their names)'
     else:
       self.item['eligible_starred'] = False
-    has_connections = self.item['user_items'] and self.item['user_items'][0]['value'].distance < rel.UNLINKED
+    has_connections = self.item['user_items'] and glob.users[self.item['user_items'][0]['value']].distance < rel.UNLINKED
     self.network_check_box.checked = self.item.get('eligible')
     self.network_flow_panel.visible = self.trust_level >= 2 and has_connections and self.network_check_box.checked 
     if self.trust_level >= 3:

@@ -403,7 +403,7 @@ def prop_to_requests(port_prop, with_users=None, create_dt=None, edit_dt=None, c
                   with_users=with_users if with_users else [],
                   eligible_all=port_prop.eligible_all,
                   eligible=port_prop.eligible,
-                  eligible_users=[port_user.user_id for port_user in port_prop.eligible_users],
+                  eligible_users=port_prop.eligible_users,
                   eligible_groups=port_prop.eligible_groups,
                   eligible_starred=port_prop.eligible_starred,
                   eligible_invites=port_prop.eligible_invites,
