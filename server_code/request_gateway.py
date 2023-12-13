@@ -239,9 +239,9 @@ def requests_by_or_group(or_group_ids, records=False):
 
 
 def request_records_prospects(request_records, records=False):
-  request_row_set = {rr._row for rr in request_records}
-  if not request_row_set:
+  if not request_records:
     return []
+  request_row_set = {rr._row for rr in request_records}
   for ep_row in app_tables.exchange_prospects.search(q.fetch_only('distances', requests=q.fetch_only())):
     if request_row_set.issuperset(set(ep_row['requests'])):
       if records:

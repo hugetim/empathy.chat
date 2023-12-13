@@ -373,25 +373,33 @@ def _distances_update(old_distances, ep_rels, user_id):
 
 
 def current_visible_requests(user, request_records):
+  return [ep[0] for ep in current_visible_prospects(user, [], request_records)]
+  # if not request_records:
+  #   return []
+  # # group_memberships = 
+  # # starred_by_list =
+  # all_requesters = {rr.user for rr in request_records}
+  # # max_eligible_dict = {user_id: max((r.eligible for r in all_requests if r.user=user_id))
+  # #                      for user_id in all_requester_ids}
+  # rels = relationships(all_requesters, user)
+  # out_requests = []
+  # for rr in request_records:
+  #   if is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec):
+  #     out_requests.append(rr.entity)
+  # return out_requests
+
+
+def current_visible_prospects(user, exchange_prospects, request_records):
   if not request_records:
     return []
-  # group_memberships = 
-  # starred_by_list =
   all_requesters = {rr.user for rr in request_records}
-  # max_eligible_dict = {user_id: max((r.eligible for r in all_requests if r.user=user_id))
-  #                      for user_id in all_requester_ids}
   rels = relationships(all_requesters, user)
-  out_requests = []
-  for rr in request_records:
-    if is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec):
-      out_requests.append(rr.entity)
-  return out_requests
-
-
-def current_visible_prospects(user, exchange_prospects):
+  single_exchange_prospects = [ExchangeProspect([rr.entity], temp=True) for rr in request_records if not _request_in_eps(rr.entity, exchange_prospects)]
   out_prospects = []
-  for ep in exchange_prospects:
-    if is_eligible_for_prospect(user, ep):
+  for ep in (exchange_prospects + single_exchange_prospects):
+    ep_request_records = [rr for rr in request_records if rr.entity in ep]
+    ep_rels = {rr.user: rels[rr.user] for rr in ep_request_records}
+    if is_eligible_for_prospect(user, ep, ep_rels, ep_request_records):
       out_prospects.append(ep)
   return out_prospects
 
@@ -409,15 +417,15 @@ def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, e
   return True
 
 
-def is_eligible_for_prospect(user, ep):
-  other_users = [repo.get_user_row_by_id(r.user) for r in ep]
-  rels = relationships(other_users, user)
+def is_eligible_for_prospect(user, ep, rels, request_records):
+  other_users = [rr.user for rr in request_records]
+  # rels = relationships(other_users, user)
   ep_rels = _extend_relationships(rels, ep.distances)
   for request in ep:
-    other_user = next([u for u in other_users if u.get_id() == request.user])
+    other_user = next((u for u in other_users if u.get_id() == request.user))
     rel = ep_rels[other_user]
-    eligibility_spec = repo.eligibility_spec(request)
-    if not is_eligible(ep, other_user, rel, eligibility_spec):
+    eligibility_spec = next((rr.eligibility_spec for rr in request_records if rr.user == other_user))
+    if not is_eligible(ep, user, rel, eligibility_spec):
       return False
   return True
 
@@ -433,7 +441,7 @@ def _extend_relationships(rels, ep_distances):
 def _new_rel(other_user_id, rel, pair_eligible_distances, ep_distances):
   alt_distances = [pair_eligible_distances[u_id] + ep_distances[u_id][other_user_id]
                    for u_id in pair_eligible_distances.keys()
-                   if u_id in ep_distances.keys() and other_user_id in ep_distances[u_id].keys()]
+                   if ep_distances and u_id in ep_distances.keys() and other_user_id in ep_distances[u_id].keys()]
   if alt_distances:
     return rel.update_distance(min(rel.distance, *alt_distances))
   else:
@@ -581,11 +589,11 @@ def get_visible_requests_as_port_view_items(user):
   still_current_rrs = [rr for rr in current_rrs if rr.entity.current]
   exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
   user_requests = [rr.entity for rr in still_current_rrs if rr.user == user] # just display user_requests simply, whether or not part of exchange_prospects
-  others_request_records = [rr for rr in still_current_rrs if rr.user != user and not _request_in_eps(rr.entity, exchange_prospects)]
-  visible_requests = list(current_visible_requests(user, others_request_records))
+  others_request_records = [rr for rr in still_current_rrs if rr.user != user] # and not _request_in_eps(rr.entity, exchange_prospects)]
+  # visible_requests = list(current_visible_requests(user, others_request_records))
   other_exchange_prospects = [ep for ep in exchange_prospects if user_id not in ep.users]
-  visible_exchange_prospects = list(current_visible_prospects(user, other_exchange_prospects))
-  port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(visible_requests + user_requests, user))
+  visible_exchange_prospects = list(current_visible_prospects(user, other_exchange_prospects, others_request_records))
+  port_proposals = list(eps_to_props(visible_exchange_prospects, user)) + list(requests_to_props(user_requests, user)) # visible_requests + 
   return port.Proposal.create_view_items(port_proposals)
 
 
