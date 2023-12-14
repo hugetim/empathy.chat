@@ -146,11 +146,11 @@ class RequestManager:
   def _save_exchange(self, exchange_to_be):
     self.exchange = Exchange.from_exchange_prospect(exchange_to_be, self.now)
     with TimerLogger("  _save_exchange", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
-      request_records_matched = []
-      for r in exchange_to_be.their_requests(self._user_id):
-        rr = repo.RequestRecord(r, r.request_id)
+      their_request_ids = exchange_to_be.their_requests(self._user_id).request_ids
+      request_records_matched = [rr for rr in self._other_request_records if rr.record_id in their_request_ids]
+      for rr in request_records_matched:
+        rr.entity = next((r for r in exchange_to_be if r.request_id == rr.record_id))
         rr.save()
-        request_records_matched.append(rr)
       repo.cache_request_record_rows(request_records_matched)
       timer.check("  requests_matched saved")
       existing_exchange_record = exchange_repo.exchange_record_with_any_request_records(request_records_matched)
@@ -454,7 +454,6 @@ def is_eligible(request, other_user, rel, eligibility_spec):
 
 
 def _is_eligible(request, other_user, rel, included):
-  print(((rel.pair_eligible or (request.max_size >= 3 and rel.eligible)), included, request.has_room_for(other_user.get_id())))
   return (
     (rel.pair_eligible or (request.max_size >= 3 and rel.eligible))
     and included

@@ -204,6 +204,10 @@ class Requests:
   def elig_with_dict(self):
     return self._attribute('elig_with_dict')
 
+  @property
+  def request_ids(self):
+    return tuple((r.request_id for r in self))
+
 
 @anvil.server.portable_class 
 class ExchangeProspect:
