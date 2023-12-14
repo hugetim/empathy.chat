@@ -358,6 +358,8 @@ def get_new_prospects(user, requests, other_request_records, other_exchange_pros
     ep_rels = _extend_relationships(rels, ep.distances)
     if prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, ep_rels, ep, other_request_especs, other_users):
       new_ep_distances = _distances_update(ep.distances, ep_rels, user_id)
+      print(ep.distances)
+      print(new_ep_distances)
       out.extend(_get_new_prospects(ep, requests, new_ep_distances))
   return out
 
