@@ -207,7 +207,7 @@ class Requests:
 
 @anvil.server.portable_class 
 class ExchangeProspect:
-  def __init__(self, requests, distances=None, prospect_id=None, temp=False, create_dt=None):
+  def __init__(self, requests, distances=None, prospect_id=None, temp=False):
     if not requests or len(requests) < 1 or not isinstance(next(iter(requests)), Request):
       raise ValueError("Input 'requests' must contain at least one Request")
     self.requests = tuple(requests)
@@ -216,7 +216,6 @@ class ExchangeProspect:
       distances = {self.requests[0].user: {}}
     self.distances = distances
     self.prospect_id = prospect_id
-    self.create_dt = create_dt if create_dt else h.now()
     self._min_size = None
 
   def __eq__(self, other):
@@ -315,7 +314,7 @@ class ExchangeProspect:
 
   @property
   def create_dt(self):
-    return min([r.create_dt for r in self.requests])    
+    return max([r.create_dt for r in self.requests])    
 
 
 def have_conflicts(requests):

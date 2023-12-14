@@ -179,7 +179,7 @@ class RequestManager:
   def _save_exchange_prospects(self, exchange_prospects):
     repo.clear_eprs_for_rrs(self._related_prev_request_records)
     for ep in exchange_prospects:
-      repo.ExchangeProspectRecord(exchange_prospect).save()
+      repo.ExchangeProspectRecord(ep).save()
   
   def _update_exchange_user_statuses(self):
     if self.exchange.start_now:
@@ -243,7 +243,7 @@ def _potential_matches(user, requests, other_request_records):
   # if viable_other_rrs:
   #   repo.cache_request_record_rows(still_current_other_request_records)
   # return viable_other_rrs, rels
-  other_exchange_prospect_records = repo.request_records_prospects(still_current_other_request_records)
+  other_exchange_prospect_records = repo.request_records_prospects(still_current_other_request_records, records=True)
   other_exchange_prospects = (
     [epr.entity for epr in other_exchange_prospect_records] 
     + [ExchangeProspect([rr.entity]) for rr in still_current_other_request_records]
