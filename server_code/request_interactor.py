@@ -454,6 +454,7 @@ def is_eligible(request, other_user, rel, eligibility_spec):
 
 
 def _is_eligible(request, other_user, rel, included):
+  print(((rel.pair_eligible or (request.max_size >= 3 and rel.eligible)), included, request.has_room_for(other_user.get_id())))
   return (
     (rel.pair_eligible or (request.max_size >= 3 and rel.eligible))
     and included
