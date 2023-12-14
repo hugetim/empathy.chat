@@ -510,6 +510,9 @@ db_schema:
     - name: distances
       type: simpleObject
       admin_ui: {width: 200, order: 1}
+    - name: create_dt
+      admin_ui: {width: 200, order: 2}
+      type: datetime
   exchange_formats:
     title: Exchange Formats
     client: none

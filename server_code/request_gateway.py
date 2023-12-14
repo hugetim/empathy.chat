@@ -128,7 +128,7 @@ class RequestRecord(sm.SimpleRecord):
 
 def _row_to_ep(ep_row):
   requests = [_row_to_request(rr) for rr in ep_row['requests']]
-  return ExchangeProspect(requests, ep_row['distances'], ep_row.get_id())
+  return ExchangeProspect(requests, ep_row['distances'], ep_row.get_id(), create_dt=ep_row['create_dt'])
 
 
 def _ep_to_fields(ep):
@@ -136,6 +136,7 @@ def _ep_to_fields(ep):
   return dict(
     requests=[get_request_row_by_id(r.request_id) for r in ep.requests],
     distances=ep.distances,
+    create_dt=ep.create_dt,
   )
   
 
