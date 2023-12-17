@@ -149,10 +149,14 @@ class ExchangeRecord(sm.SimpleRecord):
     return _exchange_to_fields(entity)
 
   def _update_participants(self):
+    p_records = [ParticipantRecord(p, record_id=p.get('participant_id')) for p in self.entity.participants]
+    if len(p_records) > 1 and not any((p['appearances'] for p in self.entity.participants)):
+      ParticipantRecord.batch_save_simple_records(p_records)
+    else:
+      for p_record in p_records:
+        p_record.save()
     self._participant_rows = []
-    for p in self.entity.participants:
-      p_record = ParticipantRecord(p, record_id=p.get('participant_id'))
-      p_record.save()
+    for p_record in p_records:
       self._participant_rows.append(p_record._row)
   
   # @property
@@ -290,7 +294,8 @@ def _row_to_participant(participant_row):
 
 def _participant_to_fields(participant):
   fields = participant.copy()
-  fields.pop('appearances', []) # appearances handled separately
+  if fields.get('appearances'):
+    fields.pop('appearances') # appearances handled separately
   fields.pop('participant_id', None)
   fields['user'] = get_user_row_by_id(fields.pop('user_id'))
   fields['request'] = get_request_row_by_id(fields.pop('request_id'))

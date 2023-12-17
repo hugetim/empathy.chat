@@ -1,6 +1,6 @@
 import anvil.users
 import anvil.server
-import anvil.tables
+import anvil.tables as tables
 from anvil.tables import app_tables, order_by
 import anvil.tables.query as q
 from abc import ABC, abstractproperty, abstractmethod
@@ -186,7 +186,7 @@ def inviteds(user):
   return app_tables.invites.search(order_by("date", ascending=False), origin=True, user2=user, current=True)
 
 
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def get_prompts(user):
   print("                      get_prompts")
   import datetime
@@ -371,6 +371,25 @@ class SimpleRecord(Record):
   def from_id(cls, record_id):
     row = getattr(app_tables, cls._table_name).get_by_id(record_id)
     return cls.from_row(row)
+
+  @classmethod
+  def batch_save_simple_records(cls, records):
+    new_records = []
+    old_records = []
+    for record in records:
+      if record._row_id is None:
+        new_records.append(record)
+      else:
+        old_records.append(record)
+    if new_records:
+      row_dicts = [cls._entity_to_fields(record.entity) for record in new_records]
+      new_rows = getattr(app_tables, cls._table_name).add_rows(row_dicts)
+      for record, row in zip(new_records, new_rows):
+        record._row_id = row.get_id()
+    if old_records:
+      with tables.batch_update:
+        for record in old_records:
+          record.save()
 
 
 @anvil.server.callable
