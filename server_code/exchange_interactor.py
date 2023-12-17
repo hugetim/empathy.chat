@@ -142,8 +142,10 @@ def _init_match_form_already_matched(user_id):
   exchange = exchange_record.entity
   exchange.start_appearance(sm.now())
   exchange_record.save()
-  other_user = sm.get_other_user(exchange.their['user_id'])
-  other_user['update_needed'] = True
+  other_users = [u for u in exchange_record.users if u != user]
+  with tables.batch_update:
+    for u in other_users:
+      u['update_needed'] = True
   return None, exchange.room_code, exchange.exchange_format.duration, exchange.my['slider_value']
 
 
@@ -168,40 +170,55 @@ def update_match_form(user_id=""):
   
   Side effects: Update match['present'], late notifications, confirm_wait"""
   user = sm.get_acting_user(user_id)
-  exchange = current_user_exchange(user, to_join=True)
-  if exchange:
-    return _update_match_form_already_matched(user, exchange)
+  exchange_record = current_user_exchange(user, to_join=True, record=True)
+  if exchange_record:
+    return _update_match_form_already_matched(user, exchange_record)
   else:
     return _update_match_form_not_matched(user)
   
 
-def _update_match_form_already_matched(user, exchange):
+def _update_match_form_already_matched(user, exchange_record):
+  exchange = exchange_record.entity
   changed = bool(not exchange.my['appearances'])
   exchange.continue_appearance(sm.now())
   #this_match, i = repo.exchange_i()
-  other_user = sm.get_other_user(exchange.their['user_id'])
-  if exchange.late_notify_needed(sm.now()):
-    from . import notifies as n
-    n.notify_late_for_chat(other_user, exchange.start_dt, [user])
+  other_users = [u for u in exchange_record.users if u != user]
+  user_ids_to_late_notify = exchange.user_ids_to_late_notify(sm.now())
+  if user_ids_to_late_notify:
+    _notify_late_for_chat(user_ids_to_late_notify, exchange_record, user)
     changed = True
-    exchange.their['late_notified'] = True
+    for u_id in user_ids_to_late_notify:
+      exchange.participant_by_id(u_id)['late_notified'] = True
   if changed:
     er = repo.ExchangeRecord(exchange, exchange.exchange_id)
     er.save()
-    other_user['update_needed'] = True
-  how_empathy_list = [user['how_empathy'], other_user['how_empathy']]
-  messages_out = ni.get_messages(other_user, user)
-  their_name = other_user['first_name']
+    with tables.batch_update:
+      for u in other_users:
+        u['update_needed'] = True
+  messages_out = ni.get_messages(other_users[0], user) if len(other_users) == 1 else repo.get_exchange_messages(exchange_record, user)
+  them = [dict(
+    name=u['first_name'],
+    how_empathy=u['how_empathy'],
+    slider_value=exchange.participant_by_id(u.get_id())['slider_value'],
+    external=exchange.participant_by_id(u.get_id())['video_external'],
+    complete=exchange.participant_by_id(u.get_id())['complete_dt'],
+  ) for u in other_users]
   return dict(
     status=user['status'],
-    how_empathy_list=how_empathy_list,
-    their_name=their_name,
-    message_items=messages_out,
+    my_how_empathy = user['how_empathy'],
     my_slider_value=exchange.my['slider_value'],
-    their_slider_value=exchange.their['slider_value'],
-    their_external=exchange.their['video_external'],
-    their_complete=exchange.their['complete_dt'],
+    them = them,
+    message_items=messages_out,
     jitsi_code=exchange.room_code,
+  )
+
+
+def _notify_late_for_chat(user_ids_to_late_notify, exchange_record, user):
+  anvil.server.launch_background_task(
+    'late_notify',
+    [u for u in exchange_record.users if u.get_id() in user_ids_to_late_notify],
+    exchange_record.entity.start_dt,
+    [u for u in exchange_record.users if u.get_id() not in user_ids_to_late_notify],
   )
 
   
@@ -246,8 +263,7 @@ class ExchangeManager:
     exchange_record = current_user_exchange(user, record=True)
     exchange = exchange_record.entity
     self.start_dt = exchange.start_dt
-    sm.my_assert(exchange.size <= 2, "code below and _complete_exchange assumes dyads")
-    self.user_ids_not_yet_entered = [exchange.their['user_id']] if not exchange.their['entered_dt'] else []
+    self.user_ids_not_yet_entered = [p['user_id'] for p in exchange.others if not p['entered_dt']]
     _complete_exchange(exchange_record, user)
 
   @tables.in_transaction(relaxed=True)
@@ -288,7 +304,7 @@ def _complete_exchange(exchange_record, user):
   exchange = exchange_record.entity
   reset_my_status = exchange.current and exchange.my['entered_dt'] and not exchange.my['complete_dt']
   exchange.my['complete_dt'] = sm.now()
-  if exchange.their['complete_dt'] or not exchange.their['entered_dt']:
+  if all([(p['complete_dt'] or not p['entered_dt']) for p in exchange.others]):
     exchange.current = False
   _save_complete_exchange(exchange_record, user, reset_my_status)
 
@@ -319,13 +335,21 @@ def add_chat_message(message="[blank test message]", user_id=""):
   print(f"add_chat_message, {user_id}, '[redacted]'")
   user = sm.get_other_user(user_id)
   exchange_record = current_user_exchange(user, record=True)
-  repo.add_chat(
-    from_user=user,
-    message=anvil.secrets.encrypt_with_key("new_key", message),
-    now=sm.now(),
-    users=exchange_record.users,
-  )
-  return _update_match_form_already_matched(user, exchange_record.entity)
+  if exchange_record.users <= 2:
+    repo.add_chat(
+      from_user=user,
+      message=anvil.secrets.encrypt_with_key("new_key", message),
+      now=sm.now(),
+      users=exchange_record.users,
+    )
+  else:
+    repo.add_exchange_message(
+      from_user=user,
+      message=anvil.secrets.encrypt_with_key("new_key", message),
+      now=sm.now(),
+      exchange_record=exchange_record,
+    )
+  return _update_match_form_already_matched(user, exchange_record)
 
 
 @authenticated_callable

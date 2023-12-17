@@ -107,7 +107,7 @@ class Exchange:
     other_participants = [p for p in self.participants]
     del other_participants[self._my_i]
     if len(other_participants) > 1:
-      h.warning(f"len(temp_values) > 1, but this function assumes dyads only")
+      h.warning(f"len(other_participants) > 1, but this function assumes dyads only")
     if other_participants:
       return other_participants[0]
 
@@ -121,11 +121,15 @@ class Exchange:
     else:
       return []
   
-  def late_notify_needed(self, now):
-    if self.their['appearances'] or self.their['late_notified']:
-      return False
+  def user_ids_to_late_notify(self, now):
     past_start_time = self.start_dt < now
-    return (not self.start_now) and past_start_time
+    if self.start_now or not past_start_time:
+      return []
+    results = []
+    for p in self.others:
+      if not p['appearances'] and not p['late_notified']:
+        results.append(p['user_id'])
+    return results
 
   
 # class Participant:

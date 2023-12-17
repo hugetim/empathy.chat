@@ -94,7 +94,20 @@ def add_chat(from_user, message, now, users):
                               to_user=to_user,
                               message=message,
                               time_stamp=now)
-    
+
+
+def add_exchange_message(from_user, message, now, exchange_record):
+  app_tables.exchange_messages.add_row(user=from_user,
+                                       exchange=exchange_record._row,
+                                       message=message,
+                                       time_stamp=now)
+
+
+def get_exchange_messages(exchange_record, user):
+  chat_rows = app_tables.exchange_messages.search(tables.order_by("time_stamp", ascending=True), q.fetch_only('user', 'message', 'time_stamp'), exchange=exchange_record._row)
+  return [dict(from_user=chat_row['user'], message=chat_row['message'], time_stamp=chat_row['time_stamp']) for chat_row in chat_rows]
+
+
 # def get_chat_messages(exchange):
 #   match_row = _match_row(exchange)
 #   return app_tables.chat.search(tables.order_by("time_stamp", ascending=True), match=match_row)

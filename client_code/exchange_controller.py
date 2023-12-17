@@ -29,14 +29,14 @@ def update_my_external(value):
 
   
 class PendingState(h.AttributeToKey):
-  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value=None, jitsi_domain="8x8.vc", how_empathy_list=None):
+  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value=None, jitsi_domain="8x8.vc", my_how_empathy=""):
     self.status = status
     self.proptime_id = proptime_id
     self.jitsi_code = jitsi_code
     self.jitsi_domain = jitsi_domain
     self.duration = duration
     self.my_slider_value = my_slider_value
-    self.how_empathy_list = how_empathy_list if how_empathy_list else []
+    self.my_how_empathy = my_how_empathy
 
   @property
   def default_timer_minutes(self):
@@ -67,12 +67,17 @@ class PendingState(h.AttributeToKey):
 class ExchangeState(PendingState):
   channels = ["match.status", "match.slider", "match.messages", "match.external", "match.complete"]
   
-  def __init__(self, message_items=None, their_slider_value=None, their_external=None, their_complete=None, their_name="", **kwargs):
+  def __init__(self, message_items=None, them=None, **kwargs):
     super().__init__(**kwargs)
-    self.their_slider_value = their_slider_value
-    self.their_external = their_external
-    self.their_complete = their_complete
-    self.their_name = their_name
+    if them is None:
+      them = [dict(slider_value=None, external=None, complete=None, name=None)]
+    self.them = them
+    if len(them) > 1:
+      h.warning(f"len(them) > 1, but this function assumes dyads only")
+    self.their_slider_value = them[0]['slider_value']
+    self.their_external = them[0]['external']
+    self.their_complete = them[0]['complete']
+    self.their_name = them[0]['name']
     self.message_items = message_items if message_items else []
 
   @property
@@ -111,9 +116,9 @@ class ExchangeState(PendingState):
 
   @property
   def how_empathy_items(self):
-    if self.how_empathy_list and (self.how_empathy_list[0] or self.how_empathy_list[1]):
-      return [(self.their_name, self.how_empathy_list[1]),
-              (f"{glob.name} (me)", self.how_empathy_list[0])]
+    if self.my_how_empathy or any([o_dict['how_empathy'] for o_dict in self.them]):
+      return ([(o_dict['name'], o_dict['how_empathy']) for o_dict in self.them]
+              + [(f"{glob.name} (me)", self.my_how_empathy)])
     else:
       return []
   

@@ -126,7 +126,13 @@ def notify_match_cancel(user, start, canceler_name=""):
 {content}
 ''')
 
-    
+
+@sm.background_task_with_reporting
+def late_notify(late_users, start, waiting_users):
+  for late_user in late_users:
+    notify_late_for_chat(late_user, start, waiting_users)
+
+
 def notify_late_for_chat(user, start, waiting_users=[]):
   """Notify late user"""
   print(f"'notify_late_for_chat', {start}")
