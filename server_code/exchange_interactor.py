@@ -34,9 +34,7 @@ def upcoming_match_dicts(user):
 
 
 def _match_dict(user_id, exchange):
-  other_user_ids = [p['user_id'] for p in exchange.participants
-                    if p['user_id'] != user_id]
-  return {'other_user_ids': other_user_ids,
+  return {'other_user_ids': exchange.theirs['user_id'],
           'start_date': exchange.start_dt,
           'duration_minutes': exchange.exchange_format.duration,
           'note': exchange.exchange_format.note,

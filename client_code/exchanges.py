@@ -23,11 +23,9 @@ class Exchange:
   def set_my(self, user_id=None, my_i=None):
     if my_i:
       self._my_i = my_i
-      self._their_i = self.participants.index(self._their())
     elif user_id:
       [participant] = [p for p in self.participants if p['user_id'] == user_id]
       self._my_i = self.participants.index(participant)
-      self._their_i = self.participants.index(self._their())
   
   @staticmethod
   def from_exchange_prospect(ep: ExchangeProspect, now=None):
@@ -89,8 +87,21 @@ class Exchange:
     return self.participants[self._my_i]
 
   @property
+  def others(self):
+    return [p for (i, p) in enumerate(self.participants) if i != self._my_i]
+
+  @property
+  def theirs(self):
+    _others = self.others
+    return {key: [p[key] for p in _others] for key in _others[0]}
+  
+  @property
   def their(self):
     return self.participants[self._their_i]
+
+  @property
+  def _their_i(self):
+    return self.participants.index(self._their())
   
   def _their(self):
     other_participants = [p for p in self.participants]
