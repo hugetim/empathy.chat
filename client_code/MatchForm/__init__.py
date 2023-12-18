@@ -136,7 +136,7 @@ class MatchForm(MatchFormTemplate):
       self.how_empathy_drop_down.items = how_empathy_items
       self.update_how_empathy_label()
       self.info_button.visible = True
-      if how_empathy_items[0][1]: # whether they have how_empathy
+      if any([item[1] for item in how_empathy_items[:-1]]): # whether they have how_empathy
         if not self.info_flow_panel.visible:
           self.info_button_click()
   

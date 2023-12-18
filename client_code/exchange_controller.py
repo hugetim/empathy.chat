@@ -29,14 +29,13 @@ def update_my_external(value):
 
   
 class PendingState(h.AttributeToKey):
-  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value=None, jitsi_domain="8x8.vc", how_empathy_list=None):
+  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value=None, jitsi_domain="8x8.vc"):
     self.status = status
     self.proptime_id = proptime_id
     self.jitsi_code = jitsi_code
     self.jitsi_domain = jitsi_domain
     self.duration = duration
     self.my_slider_value = my_slider_value
-    self.how_empathy_list = how_empathy_list if how_empathy_list else []
 
   @property
   def default_timer_minutes(self):
@@ -67,12 +66,13 @@ class PendingState(h.AttributeToKey):
 class ExchangeState(PendingState):
   channels = ["match.status", "match.slider", "match.messages", "match.external", "match.complete"]
   
-  def __init__(self, message_items=None, their_slider_value=None, their_external=None, their_complete=None, their_name="", **kwargs):
+  def __init__(self, message_items=None, their_slider_value=None, their_external=None, their_complete=None, their_name="", how_empathy_list=None, **kwargs):
     super().__init__(**kwargs)
     self.their_slider_value = their_slider_value
     self.their_external = their_external
     self.their_complete = their_complete
     self.their_name = their_name
+    self.how_empathy_list = how_empathy_list if how_empathy_list else []
     self.message_items = message_items if message_items else []
 
   @property
@@ -104,7 +104,7 @@ class ExchangeState(PendingState):
 
   @property
   def messages_plus(self):
-    out = [] #self._format_how_empathy_as_messages()
+    out = []
     self._label_first_messages_with_name()
     out += self.message_items
     return h.add_new_day_to_message_list(out)
@@ -114,25 +114,13 @@ class ExchangeState(PendingState):
     # if self.my_how_empathy or any([o_dict['how_empathy'] for o_dict in self.them]):
     #   return ([(o_dict['name'], o_dict['how_empathy']) for o_dict in self.them]
     #           + [(f"{glob.name} (me)", self.my_how_empathy)])
-    if self.how_empathy_list and (self.how_empathy_list[0] or self.how_empathy_list[1]):
+    if self.how_empathy_list and any(self.how_empathy_list):
+      h.my_assert(len(self.how_empathy_list) <= 2, "More than 2 in how_empathy_list not displayed")
       return [(self.their_name, self.how_empathy_list[1]),
               (f"{glob.name} (me)", self.how_empathy_list[0])]
     else:
       return []
   
-  def _format_how_empathy_as_messages(self):
-    out = []
-    for i, how_empathy in enumerate(self.how_empathy_list):
-      if how_empathy:
-        mine = i == 0
-        who = glob.name if mine else self.their_name
-        out.append({
-          "label": f"[from {who}'s profile]",
-          "message": f"How {who} likes to receive empathy:\n{how_empathy}",
-          "me": mine,
-        })
-    return out
-
   def _label_first_messages_with_name(self):
     first_message = {True: True, False: True}
     for message in self.message_items:
