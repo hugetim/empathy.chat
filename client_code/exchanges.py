@@ -95,22 +95,6 @@ class Exchange:
     _others = self.others
     return {key: [p[key] for p in _others] for key in _others[0]}
   
-  @property
-  def their(self):
-    return self.participants[self._their_i]
-
-  @property
-  def _their_i(self):
-    return self.participants.index(self._their())
-  
-  def _their(self):
-    other_participants = [p for p in self.participants]
-    del other_participants[self._my_i]
-    if len(other_participants) > 1:
-      h.warning(f"len(other_participants) > 1, but this function assumes dyads only")
-    if other_participants:
-      return other_participants[0]
-
   def participant_by_id(self, user_id):
     return next((p for p in self.participants if p['user_id'] == user_id))
 

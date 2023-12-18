@@ -377,4 +377,7 @@ def submit_slider(value, user_id=""):
   exchange_record = current_user_exchange(user, record=True)
   exchange_record.entity.my['slider_value'] = value
   exchange_record.save()
-  return exchange_record.entity.their['slider_value']
+  their_slider_values = exchange_record.entity.theirs['slider_value']
+  if len(their_slider_values) > 1:
+    h.warning(f"len(their_slider_values) > 1, but this function assumes dyads only")
+  return their_slider_values[0]
