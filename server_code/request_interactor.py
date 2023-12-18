@@ -84,10 +84,9 @@ def _pre_fetch_relevant_rows(requests, user, now):
                               for port_group in request.eligible_groups]
     out['eligible_invites'] = [repo.get_invite_row_by_id(port_invite.invite_id)
                               for port_invite in request.eligible_invites]
-  other_request_records, related_prev, unrelated_prev = _potential_matching_request_records(requests, user, now)
+  other_request_records, related_prev, unrelated_prev = _relevant_request_records(requests, user, now)
   _prune_request_records(other_request_records, now)
-  if other_request_records:
-    current_visible_requests(user, other_request_records)
+  current_visible_requests(user, other_request_records)
 
 
 class RequestManager:
@@ -102,7 +101,7 @@ class RequestManager:
 
   def _load_relevant_request_records(self, requests):
     self._other_request_records, self._related_prev_request_records, self._unrelated_prev_requests = (
-      _potential_matching_request_records(requests, self._user, self.now)
+      _relevant_request_records(requests, self._user, self.now)
     )
     self._related_prev_requests = Requests([rr.entity for rr in self._related_prev_request_records])
   
@@ -217,7 +216,7 @@ def _cancel_missing_or_group_requests(requests, related_prev_request_records):
       rr.cancel()
 
 
-def _potential_matching_request_records(requests, user, now):
+def _relevant_request_records(requests, user, now):
   partial_request_dicts = [
     dict(start_now=r.start_now, start_dt=r.start_dt, exchange_format=r.exchange_format)
     for r in requests
@@ -239,10 +238,6 @@ def _potential_matching_request_records(requests, user, now):
 
 def _potential_matches(user, requests, other_request_records):
   still_current_other_request_records = [rr for rr in other_request_records if rr.entity.current]
-  # viable_other_rrs, rels = eligible_visible_requests(user, requests, still_current_other_request_records)
-  # if viable_other_rrs:
-  #   repo.cache_request_record_rows(still_current_other_request_records)
-  # return viable_other_rrs, rels
   other_exchange_prospect_records = repo.request_records_prospects(still_current_other_request_records, records=True)
   other_exchange_prospects = (
     [epr.entity for epr in other_exchange_prospect_records] 
@@ -374,19 +369,6 @@ def _distances_update(old_distances, ep_rels, user_id):
 
 def current_visible_requests(user, request_records):
   return [ep[0] for ep in current_visible_prospects(user, [], request_records)]
-  # if not request_records:
-  #   return []
-  # # group_memberships = 
-  # # starred_by_list =
-  # all_requesters = {rr.user for rr in request_records}
-  # # max_eligible_dict = {user_id: max((r.eligible for r in all_requests if r.user=user_id))
-  # #                      for user_id in all_requester_ids}
-  # rels = relationships(all_requesters, user)
-  # out_requests = []
-  # for rr in request_records:
-  #   if is_eligible(rr.entity, user, rels[rr.user], rr.eligibility_spec):
-  #     out_requests.append(rr.entity)
-  # return out_requests
 
 
 def current_visible_prospects(user, exchange_prospects, request_records):

@@ -181,7 +181,6 @@ def _update_match_form_already_matched(user, exchange_record):
   exchange = exchange_record.entity
   changed = bool(not exchange.my['appearances'])
   exchange.continue_appearance(sm.now())
-  #this_match, i = repo.exchange_i()
   other_users = [u for u in exchange_record.users if u != user]
   user_ids_to_late_notify = exchange.user_ids_to_late_notify(sm.now())
   if user_ids_to_late_notify:
@@ -236,22 +235,6 @@ def _update_match_form_not_matched(user):
   return dict(
     status=user['status'],
   )
-
-
-# def create_new_match_from_proptime(proptime, user, present):
-#   room_code, duration = proptime.get_match_info()
-#   match_start = sm.now() if proptime['start_now'] else proptime['start_date']
-#   participants = [dict(user_id=u.get_id(),
-#                        present=int(present), # if result of a start_now request, go directly in
-#                        complete=0,
-#                        slider_value="", # see exchange_controller._slider_value_missing()
-#                        late_notified=0,
-#                        external=0,
-#                       ) for u in proptime.all_users()]
-#   # Note: 0 used for 'complete' b/c False not allowed in SimpleObjects
-#   exchange = Exchange(None, room_code, participants, proptime['start_now'], match_start, ExchangeFormat(duration), user.get_id())
-#   #exchange.my['present'] = int(present)
-#   repo.create_exchange(exchange, proptime)
 
 
 def ping_cancel(user):
