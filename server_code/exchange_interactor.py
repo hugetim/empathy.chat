@@ -203,11 +203,16 @@ def _update_match_form_already_matched(user, exchange_record):
     external=exchange.participant_by_id(u.get_id())['video_external'],
     complete=exchange.participant_by_id(u.get_id())['complete_dt'],
   ) for u in other_users]
+  if len(them) > 1:
+    h.warning(f"len(them) > 1, but this function assumes dyads only")
   return dict(
     status=user['status'],
-    my_how_empathy = user['how_empathy'],
+    how_empathy_list=[user['how_empathy']] + [o_dict['how_empathy'] for o_dict in them],
+    their_name=them[0]['name'],
+    their_slider_value=them[0]['slider_value'],
+    their_external=them[0]['external'],
+    their_complete=them[0]['complete'],
     my_slider_value=exchange.my['slider_value'],
-    them = them,
     message_items=messages_out,
     jitsi_code=exchange.room_code,
   )
@@ -335,7 +340,7 @@ def add_chat_message(message="[blank test message]", user_id=""):
   print(f"add_chat_message, {user_id}, '[redacted]'")
   user = sm.get_other_user(user_id)
   exchange_record = current_user_exchange(user, record=True)
-  if exchange_record.users <= 2:
+  if len(exchange_record.users) <= 2:
     repo.add_chat(
       from_user=user,
       message=anvil.secrets.encrypt_with_key("new_key", message),
