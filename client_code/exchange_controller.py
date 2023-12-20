@@ -21,7 +21,9 @@ def slider_value_missing(value):
 
 
 def submit_slider(value):
-  return server.call('submit_slider', value)
+  their_slider_values = server.call('submit_slider', value)
+  h.my_assert(len(their_slider_values) == 1, f"ec.submit_slider assumes dyads only")
+  return their_slider_values[0]
 
 
 def update_my_external(value):   
@@ -66,14 +68,38 @@ class PendingState(h.AttributeToKey):
 class ExchangeState(PendingState):
   channels = ["match.status", "match.slider", "match.messages", "match.external", "match.complete"]
   
-  def __init__(self, message_items=None, their_slider_value=None, their_external=None, their_complete=None, their_name="", how_empathy_list=None, **kwargs):
+  def __init__(self, message_items=None, them=None, how_empathy_list=None, **kwargs):
     super().__init__(**kwargs)
-    self.their_slider_value = their_slider_value
-    self.their_external = their_external
-    self.their_complete = their_complete
-    self.their_name = their_name
+    if them is None:
+      them = [dict(slider_value=None, external=None, complete=None, name="")]
+    self.them = them
     self.how_empathy_list = how_empathy_list if how_empathy_list else []
     self.message_items = message_items if message_items else []
+
+  @property
+  def _their(self):
+    h.my_assert(len(self.them) == 1, "'their' assumes a dyad")
+    return self.them[0]
+  
+  @property
+  def their_slider_value(self):
+    return self._their['slider_value']
+
+  @their_slider_value.setter
+  def their_slider_value(self, value):
+    self._their['slider_value'] = value
+
+  @property
+  def their_name(self):
+    return self._their['name']    
+
+  @property
+  def their_external(self):   
+    return self._their['external']
+    
+  @property
+  def their_complete(self):   
+    return self._their['complete']
 
   @property
   def slider_status(self):

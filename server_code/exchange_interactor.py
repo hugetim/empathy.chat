@@ -202,15 +202,10 @@ def _update_match_form_already_matched(user, exchange_record):
     external=exchange.participant_by_id(u.get_id())['video_external'],
     complete=exchange.participant_by_id(u.get_id())['complete_dt'],
   ) for u in other_users]
-  if len(them) > 1:
-    h.warning(f"len(them) > 1, but this function assumes dyads only")
   return dict(
     status=user['status'],
     how_empathy_list=[user['how_empathy']] + [o_dict['how_empathy'] for o_dict in them],
-    their_name=them[0]['name'],
-    their_slider_value=them[0]['slider_value'],
-    their_external=them[0]['external'],
-    their_complete=them[0]['complete'],
+    them=them,
     my_slider_value=exchange.my['slider_value'],
     message_items=messages_out,
     jitsi_code=exchange.room_code,
@@ -361,6 +356,4 @@ def submit_slider(value, user_id=""):
   exchange_record.entity.my['slider_value'] = value
   exchange_record.save()
   their_slider_values = exchange_record.entity.theirs['slider_value']
-  if len(their_slider_values) > 1:
-    h.warning(f"len(their_slider_values) > 1, but this function assumes dyads only")
-  return their_slider_values[0]
+  return their_slider_values
