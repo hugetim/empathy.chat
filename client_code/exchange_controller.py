@@ -31,13 +31,14 @@ def update_my_external(value):
 
   
 class PendingState(h.AttributeToKey):
-  def __init__(self, status, proptime_id, jitsi_code, duration, my_slider_value=None, jitsi_domain="8x8.vc"):
+  def __init__(self, status, request_id=None, jitsi_code="", duration=None, my_slider_value=None, jitsi_domain="8x8.vc", my_how_empathy=""):
     self.status = status
-    self.proptime_id = proptime_id
+    self.request_id = request_id
     self.jitsi_code = jitsi_code
     self.jitsi_domain = jitsi_domain
     self.duration = duration
     self.my_slider_value = my_slider_value
+    self.my_how_empathy = ""
 
   @property
   def default_timer_minutes(self):
@@ -68,12 +69,11 @@ class PendingState(h.AttributeToKey):
 class ExchangeState(PendingState):
   channels = ["match.status", "match.slider", "match.messages", "match.external", "match.complete"]
   
-  def __init__(self, message_items=None, them=None, how_empathy_list=None, **kwargs):
+  def __init__(self, message_items=None, them=None, **kwargs):
     super().__init__(**kwargs)
     if them is None:
-      them = [dict(slider_value=None, external=None, complete=None, name="")]
+      them = [dict(slider_value=None, external=None, complete=None, name="", how_empathy="")]
     self.them = them
-    self.how_empathy_list = how_empathy_list if how_empathy_list else []
     self.message_items = message_items if message_items else []
 
   @property
@@ -114,7 +114,7 @@ class ExchangeState(PendingState):
     if self.status == "matched":
       server.call('match_complete')
     elif self.status == "requesting":
-      server.call('cancel_now', self.proptime_id)
+      server.call('cancel_now', self.request_id)
     else:
       h.my_assert(self.status == "pinged", "ec.ExchangeState.exit status else")
       server.call('ping_cancel')
@@ -137,13 +137,9 @@ class ExchangeState(PendingState):
 
   @property
   def how_empathy_items(self):
-    # if self.my_how_empathy or any([o_dict['how_empathy'] for o_dict in self.them]):
-    #   return ([(o_dict['name'], o_dict['how_empathy']) for o_dict in self.them]
-    #           + [(f"{glob.name} (me)", self.my_how_empathy)])
-    if self.how_empathy_list and any(self.how_empathy_list):
-      h.my_assert(len(self.how_empathy_list) <= 2, "More than 2 in how_empathy_list not displayed")
-      return [(self.their_name, self.how_empathy_list[1]),
-              (f"{glob.name} (me)", self.how_empathy_list[0])]
+    if self.my_how_empathy or any([o_dict['how_empathy'] for o_dict in self.them]):
+      return ([(o_dict['name'], o_dict['how_empathy']) for o_dict in self.them]
+              + [(f"{glob.name} (me)", self.my_how_empathy)])
     else:
       return []
   
@@ -170,18 +166,11 @@ class ExchangeState(PendingState):
       glob.publisher.publish("match.external", "their_external_change")
     if bool(self.their_complete) != bool(prev.their_complete):
       glob.publisher.publish("match.complete", "their_complete_change")
-    if self.how_empathy_list != prev.how_empathy_list:
+    if self.how_empathy_items != prev.how_empathy_items:
       glob.publisher.publish("match.update_how", "new_how_empathy")
 
   @staticmethod
   def initialized_state(status):
-    proptime_id, jitsi_code, duration, my_slider_value = (
-      server.call('init_match_form')
-    )
-    return ExchangeState(status=status,
-                         proptime_id=proptime_id,
-                         jitsi_code=jitsi_code,
-                         duration=duration,
-                         my_slider_value=my_slider_value,
-                        )
+    init_dict = server.call('init_match_form')
+    return ExchangeState(status=status, **init_dict)
   

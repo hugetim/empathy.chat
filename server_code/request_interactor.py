@@ -305,8 +305,8 @@ class CancelManager:
     self.request_record = request_record
 
 
-def cancel_request(user, proptime_id):
-  rr = repo.RequestRecord.from_id(proptime_id)
+def cancel_request(user, request_id):
+  rr = repo.RequestRecord.from_id(request_id)
   other_or_group_requests = _other_or_group_requests(user, rr)
   if other_or_group_requests:
     _notify_edit(all_eligible_users(rr.entity, rr.eligibility_spec), user, other_or_group_requests.notify_info)

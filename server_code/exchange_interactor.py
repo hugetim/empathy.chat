@@ -146,7 +146,12 @@ def _init_match_form_already_matched(user_id):
   with tables.batch_update:
     for u in other_users:
       u['update_needed'] = True
-  return None, exchange.room_code, exchange.exchange_format.duration, exchange.my['slider_value']
+  return dict(request_id=None,
+              jitsi_code=exchange.room_code,
+              duration=exchange.exchange_format.duration,
+              my_slider_value=exchange.my['slider_value'],
+              my_how_empathy=user['how_empathy'],
+             )
 
 
 def _init_match_form_not_matched(user_id):
@@ -156,12 +161,15 @@ def _init_match_form_not_matched(user_id):
     return _init_match_form_requesting(current_request)
   else:
     sm.warning(f"_init_match_form_not_matched request not found for {user_id}")
-    return None, None, None, ""
+    return dict()
 
 
 def _init_match_form_requesting(current_request):
   jitsi_code = h.new_jitsi_code()
-  return current_request.request_id, jitsi_code, current_request.exchange_format.duration, ""
+  return dict(request_id=current_request.request_id,
+              jitsi_code=jitsi_code,
+              duration=current_request.exchange_format.duration,
+             )
 
 
 @authenticated_callable
@@ -204,7 +212,6 @@ def _update_match_form_already_matched(user, exchange_record):
   ) for u in other_users]
   return dict(
     status=user['status'],
-    how_empathy_list=[user['how_empathy']] + [o_dict['how_empathy'] for o_dict in them],
     them=them,
     my_slider_value=exchange.my['slider_value'],
     message_items=messages_out,

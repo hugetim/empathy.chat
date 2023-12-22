@@ -135,14 +135,14 @@ def _get_upcomings(user):
 
 
 @authenticated_callable
-def accept_proposal(proptime_id, user_id=""):
+def accept_proposal(request_id, user_id=""):
   """Add user_accepting
   
   Side effect: update proptime table with acceptance, if available
   """
-  print(f"accept_proposal, {proptime_id}, {user_id}")
+  print(f"accept_proposal, {request_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  ri.accept_pair_request(user, request_id=proptime_id)
+  ri.accept_pair_request(user, request_id=request_id)
   propagate_update_needed(user)
   return _get_state(user)
 
@@ -178,21 +178,21 @@ def edit_proposal(port_prop, user_id=""):
 
   
 @authenticated_callable
-def cancel_time(proptime_id, user_id=""):
+def cancel_time(request_id, user_id=""):
   """Remove proptime"""
-  print(f"cancel_time, {proptime_id}, {user_id}")
+  print(f"cancel_time, {request_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  ri.cancel_request(user, proptime_id)
+  ri.cancel_request(user, request_id)
   propagate_update_needed(user)
   return _get_state(user)
 
 
 @authenticated_callable
-def cancel_now(proptime_id=None, user_id=""):
+def cancel_now(request_id=None, user_id=""):
   """Cancel now request (including accept)"""
-  print(f"cancel_now, {proptime_id}, {user_id}")
+  print(f"cancel_now, {request_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  ri.cancel_now(user, proptime_id)
+  ri.cancel_now(user, request_id)
   propagate_update_needed()
   return _get_state(user)
 
@@ -208,12 +208,12 @@ def ping_cancel(user_id=""):
 
 
 @authenticated_callable
-def match_commence(proptime_id=None, user_id=""):
+def match_commence(request_id=None, user_id=""):
   """
   Upon first commence of 'now', copy row over and delete 'matching' row.
   Should not cause error if already commenced
   """
-  print(f"match_commence, {proptime_id}, {user_id}")
+  print(f"match_commence, {request_id}, {user_id}")
   user = sm.get_acting_user(user_id)
   ei.commence_user_exchange_in_transaction(user)
   propagate_update_needed(user)
