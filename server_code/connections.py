@@ -26,8 +26,11 @@ def _get_connections(user, up_to_degree=3, cache_override=False, output_conn_lis
   out = {0: {user}, 1: degree1s}
   prev = {user}
   for d in range(1, up_to_degree):
-    prev.update(out[d])
-    conn_rows[d] = app_tables.connections.search(quick_c_fetch, user1=q.any_of(*out[d]), current=True)
+    if out[d]:
+      prev.update(out[d])
+      conn_rows[d] = app_tables.connections.search(quick_c_fetch, user1=q.any_of(*out[d]), current=True)
+    else:
+      conn_rows[d] = []
     current = {row['user2'] for row in conn_rows[d]}
     out[d+1] = current - prev
   if not output_conn_list:
