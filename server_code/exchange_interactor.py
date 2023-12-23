@@ -202,7 +202,7 @@ def _update_match_form_already_matched(user, exchange_record):
     with tables.batch_update:
       for u in other_users:
         u['update_needed'] = True
-  messages_out = ni.get_messages(other_users[0], user) if len(other_users) == 1 else repo.get_exchange_messages(exchange_record, user)
+  messages_out = ni.get_message_dicts(user, other_users[0]) if len(other_users) == 1 else ni.get_message_dicts(user, messages=repo.get_exchange_messages(exchange_record, user))
   them = [dict(
     name=u['first_name'],
     how_empathy=u['how_empathy'],

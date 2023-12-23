@@ -35,7 +35,7 @@ def add_message(user2_id, user_id="", message="[blank test message]"):
                    message=secrets.encrypt_with_key("new_key", message),
                    time_stamp=sm.now())
   launch_background_task('add_message_prompt', user2, user)
-  return get_messages(user2, user)
+  return get_message_dicts(user, user2)
 
 
 @authenticated_callable
@@ -45,18 +45,17 @@ def update_history_form(user2_id, user_id=""):
   """
   user = sm.get_acting_user(user_id)
   user2 = sm.get_other_user(user2_id)
-  return get_messages(user2, user)
+  return get_message_dicts(user, user2)
   
 
-def get_messages(user2, user1):
-  messages = repo.get_messages(user2, user1)
-  if messages:
-    return [{'me': (user1 == m['from_user']),
-             'message': secrets.decrypt_with_key("new_key", m['message']),
-             'time_stamp': m['time_stamp'],
-            } for m in messages]
-  else:
-    return []
+def get_message_dicts(user1, user2=None, messages=None):
+  if messages is None:
+    messages = repo.get_messages(user2, user1)
+  return [{'me': (user1 == m['from_user']),
+           'label': "" if user1 == m['from_user'] else m['from_user']['first_name'],
+           'message': secrets.decrypt_with_key("new_key", m['message']),
+           'time_stamp': m['time_stamp'],
+          } for m in messages]
 
 
 @background_task_with_reporting

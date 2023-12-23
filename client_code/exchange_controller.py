@@ -131,9 +131,15 @@ class ExchangeState(PendingState):
   @property
   def messages_plus(self):
     out = []
-    self._label_first_messages_with_name()
+    self._label_my_first_message_with_name()
     out += self.message_items
     return h.add_new_day_to_message_list(out)
+  
+  def _label_my_first_message_with_name(self):
+    for message in self.message_items:
+      if message['me']:
+        message['label'] = glob.name
+        return
 
   @property
   def how_empathy_items(self):
@@ -142,14 +148,6 @@ class ExchangeState(PendingState):
               + [(f"{glob.name} (me)", self.my_how_empathy)])
     else:
       return []
-  
-  def _label_first_messages_with_name(self):
-    first_message = {True: True, False: True}
-    for message in self.message_items:
-      mine = message['me']
-      if first_message[mine]:
-        message['label'] = glob.name if mine else self.their_name
-        first_message[mine] = False
 
   def update(self):
     state_dict = self.__dict__
