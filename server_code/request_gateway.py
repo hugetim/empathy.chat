@@ -239,11 +239,15 @@ def requests_by_or_group(or_group_ids, records=False):
     yield RequestRecord.from_row(request_row) if records else _row_to_request(request_row)
 
 
+def _all_exchange_prospect_rows():
+ return app_tables.exchange_prospects.search(q.fetch_only('distances', requests=q.fetch_only()))
+
+
 def request_records_prospects(request_records, records=False):
   if not request_records:
     return []
   request_row_set = {rr._row for rr in request_records}
-  for ep_row in app_tables.exchange_prospects.search(q.fetch_only('distances', requests=q.fetch_only())):
+  for ep_row in _all_exchange_prospect_rows():
     if request_row_set.issuperset(set(ep_row['requests'])):
       if records:
         yield ExchangeProspectRecord.from_row(ep_row)
@@ -257,7 +261,7 @@ def clear_eprs_for_rrs(request_records):
   if not request_records:
     return
   request_row_set = {rr._row for rr in request_records}
-  for ep_row in app_tables.exchange_prospects.search(q.fetch_only('distances', requests=q.fetch_only())):
+  for ep_row in _all_exchange_prospect_rows():
     if request_row_set.intersection(set(ep_row['requests'])):
       ep_row.delete()
 
