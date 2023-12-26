@@ -220,6 +220,7 @@ class ExchangeRecord(sm.SimpleRecord):
     self.end()
   
   def end(self):
+    print(f"Ending {self.entity.room_code} exchange")
     currently_matched_users = [get_user_row_by_id(u_id) for u_id in self.entity.currently_matched_user_ids]
     if self._row_id:
       _row = self._row
