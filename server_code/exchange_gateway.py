@@ -172,10 +172,6 @@ class ExchangeRecord(sm.SimpleRecord):
     for p_record in p_records:
       self._participant_rows.append(p_record._row)
   
-  # @property
-  # def _my_participant_record(self):
-  #   raise NotImplementedError("ExchangeRecord._my_participant_record")
-
   def _add(self):
     self.__row = self._table.add_row(participants=self._participant_rows, **self._entity_to_fields(self.entity))
     self._row_id = self.__row.get_id()
@@ -196,21 +192,6 @@ class ExchangeRecord(sm.SimpleRecord):
       return self._row['users']
     else:
       return [get_user_row_by_id(p['user_id']) for p in self.entity.participants]
-
-  @tables.in_transaction(relaxed=True)
-  def end_in_transaction(self):
-    self.end()
-  
-  def end(self):
-    currently_matched_users = [get_user_row_by_id(u_id) for u_id in self.entity.currently_matched_user_ids]
-    if self._row_id:
-      _row = self._row
-    with tables.batch_update:
-      for u in currently_matched_users:
-        u['status'] = None
-      if self._row_id:
-        _row['current'] = False
-    self.entity.current = False
 
   def ping_cancel(self, users):
     if self._row_id:
@@ -233,6 +214,21 @@ class ExchangeRecord(sm.SimpleRecord):
     with tables.batch_update:
       for user in users:
         user['status'] = "matched"
+  
+  @tables.in_transaction(relaxed=True)
+  def end_in_transaction(self):
+    self.end()
+  
+  def end(self):
+    currently_matched_users = [get_user_row_by_id(u_id) for u_id in self.entity.currently_matched_user_ids]
+    if self._row_id:
+      _row = self._row
+    with tables.batch_update:
+      for u in currently_matched_users:
+        u['status'] = None
+      if self._row_id:
+        _row['current'] = False
+    self.entity.current = False
 
 
 def _row_to_exchange(row):
