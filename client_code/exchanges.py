@@ -61,6 +61,10 @@ class Exchange:
     return len(self.participants)
 
   @property
+  def already_commenced(self):
+    return any([p['entered_dt'] for p in self.participants])
+  
+  @property
   def any_appeared(self):
     return bool([p for p in self.participants if p['appearances']])
 

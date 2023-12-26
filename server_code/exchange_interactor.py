@@ -59,6 +59,7 @@ def current_user_exchange(user, to_join=False, record=False):
 
 def commence_user_exchange(user):
   exchange_record = current_user_exchange(user, to_join=True, record=True)
+  sm.my_assert(not exchange_record.entity.already_commenced, "exchange should not be already commenced")
   exchange_record.commence()
   user.update()
 
