@@ -249,13 +249,14 @@ def ping_cancel(user):
 
 class ExchangeManager:
   @tables.in_transaction
-  def complete_exchange(self, user):
-    exchange_record = current_user_exchange(user, record=True)
-    exchange = exchange_record.entity
-    self.start_dt = exchange.start_dt
-    self.user_ids_not_yet_entered = [p['user_id'] for p in exchange.others if not p['entered_dt']]
-    _complete_exchange(exchange_record, user)
-
+  def ping_cancel(self, user):
+    exchange_record = current_user_exchange(user, to_join=True, record=True)
+    if sm.DEBUG:
+      print(f"ping_cancel, {exchange_record.record_id}")
+    self.users_to_notify = [u for u in exchange_record.users if u != user]
+    exchange_record.ping_cancel(exchange_record.users)
+    self.start_dt = exchange_record.entity.start_dt
+  
   @tables.in_transaction(relaxed=True)
   def cancel_exchange(self, user, exchange_id):
     if sm.DEBUG:
@@ -266,28 +267,12 @@ class ExchangeManager:
     self.start_dt = exchange_record.entity.start_dt
 
   @tables.in_transaction
-  def ping_cancel(self, user):
-    exchange_record = current_user_exchange(user, to_join=True, record=True)
-    if sm.DEBUG:
-      print(f"ping_cancel, {exchange_record.record_id}")
-    self.users_to_notify = [u for u in exchange_record.users if u != user]
-    exchange_record.ping_cancel(exchange_record.users)
-    self.start_dt = exchange_record.entity.start_dt
-
-
-@authenticated_callable
-def match_complete(user_id=""):
-  """Switch 'complete' to true in matches table for user"""
-  print(f"match_complete, {user_id}")
-  from . import matcher
-  from . import notifies as n
-  user = sm.get_acting_user(user_id)
-  exchange_manager = ExchangeManager()
-  exchange_manager.complete_exchange(user)
-  for other_user_id in exchange_manager.user_ids_not_yet_entered:
-    other_user = sm.get_other_user(other_user_id)
-    n.notify_match_cancel_bg(other_user, exchange_manager.start_dt, canceler_name=sm.name(user, to_user=other_user))
-  matcher.propagate_update_needed()
+  def complete_exchange(self, user):
+    exchange_record = current_user_exchange(user, record=True)
+    exchange = exchange_record.entity
+    self.start_dt = exchange.start_dt
+    self.user_ids_not_yet_entered = [p['user_id'] for p in exchange.others if not p['entered_dt']]
+    _complete_exchange(exchange_record, user)
 
 
 def _complete_exchange(exchange_record, user):
@@ -303,6 +288,21 @@ def _save_complete_exchange(exchange_record, user, reset_my_status):
   if reset_my_status:
     user['status'] = None
   exchange_record.save()
+
+
+@authenticated_callable
+def match_complete(user_id=""):
+  """Switch 'complete' to true in matches table for user"""
+  print(f"match_complete, {user_id}")
+  from . import matcher
+  from . import notifies as n
+  user = sm.get_acting_user(user_id)
+  exchange_manager = ExchangeManager()
+  exchange_manager.complete_exchange(user)
+  for other_user_id in exchange_manager.user_ids_not_yet_entered:
+    other_user = sm.get_other_user(other_user_id)
+    n.notify_match_cancel_bg(other_user, exchange_manager.start_dt, canceler_name=sm.name(user, to_user=other_user))
+  matcher.propagate_update_needed()
 
 
 @authenticated_callable
