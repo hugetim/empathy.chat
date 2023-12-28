@@ -57,7 +57,7 @@ class SliderPanel(SliderPanelTemplate):
 
   def receive_them(self, them):
     self.them_repeating_panel.items = them
-    if not any([ec.slider_value_missing(o_dict['slider_value']) for o_dict in them]):
+    if not ec.any_slider_values_missing(them):
       self.item['status'] = "received"
       self.update_status()
       self.them_repeating_panel.scroll_into_view()

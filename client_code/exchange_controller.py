@@ -16,8 +16,12 @@ def get_urls():
                                    ])
 
   
-def slider_value_missing(value):
+def _slider_value_missing(value):
   return value is None
+
+
+def any_slider_values_missing(them):
+  return any([_slider_value_missing(o_dict['slider_value']) for o_dict in them])
 
 
 def submit_slider(value):
@@ -55,7 +59,7 @@ class PendingState(h.AttributeToKey):
     return "waiting"
 
   def my_initial_slider_value(self):
-    return 5 if slider_value_missing(self.my_slider_value) else self.my_slider_value
+    return 5 if _slider_value_missing(self.my_slider_value) else self.my_slider_value
   
   def start_exchange(self):
     prev_status = self.status
@@ -100,11 +104,11 @@ class ExchangeState(PendingState):
   def slider_status(self):
     if self.status != "matched":
       return super().slider_status
-    elif slider_value_missing(self.my_slider_value):
+    elif _slider_value_missing(self.my_slider_value):
       return None
     else:
-      return "submitted" if any([ec.slider_value_missing(o_dict['slider_value']) for o_dict in them]) else "received"
-
+      return "submitted" if any_slider_values_missing(self.them) else "received"
+  
   def exit(self):
     if self.status == "matched":
       server.call('match_complete')
