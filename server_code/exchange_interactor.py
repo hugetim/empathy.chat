@@ -144,9 +144,7 @@ def _init_match_form_already_matched(user_id):
   exchange.start_appearance(sm.now())
   exchange_record.save()
   other_users = [u for u in exchange_record.users if u != user]
-  with tables.batch_update:
-    for u in other_users:
-      u['update_needed'] = True
+  _update_other_users(other_users)
   return dict(request_id=None,
               jitsi_code=exchange.room_code,
               duration=exchange.exchange_format.duration,
@@ -200,24 +198,30 @@ def _update_match_form_already_matched(user, exchange_record):
   if changed:
     er = repo.ExchangeRecord(exchange, exchange.exchange_id)
     er.save()
-    with tables.batch_update:
-      for u in other_users:
-        u['update_needed'] = True
+    _update_other_users(other_users)
   messages_out = ni.get_message_dicts(user, other_users[0]) if len(other_users) == 1 else ni.get_message_dicts(user, messages=repo.get_exchange_messages(exchange_record, user))
-  them = [dict(
+  return dict(
+    status=user['status'],
+    them=_them(exchange, other_users),
+    my_slider_value=exchange.my['slider_value'],
+    message_items=messages_out,
+    jitsi_code=exchange.room_code,
+  )
+
+
+def _update_other_users(other_users):
+  with tables.batch_update:
+    for u in other_users:
+      u['update_needed'] = True
+        
+def _them(exchange, other_users):
+  return [dict(
     name=u['first_name'],
     how_empathy=u['how_empathy'],
     slider_value=exchange.participant_by_id(u.get_id())['slider_value'],
     external=exchange.participant_by_id(u.get_id())['video_external'],
     complete=exchange.participant_by_id(u.get_id())['complete_dt'],
   ) for u in other_users]
-  return dict(
-    status=user['status'],
-    them=them,
-    my_slider_value=exchange.my['slider_value'],
-    message_items=messages_out,
-    jitsi_code=exchange.room_code,
-  )
 
 
 def _notify_late_for_chat(user_ids_to_late_notify, exchange_record, user):
@@ -363,5 +367,7 @@ def submit_slider(value, user_id=""):
   exchange_record = current_user_exchange(user, record=True)
   exchange_record.entity.my['slider_value'] = value
   exchange_record.save()
-  their_slider_values = exchange_record.entity.theirs['slider_value']
-  return their_slider_values
+  exchange = exchange_record.entity
+  other_users = [u for u in exchange_record.users if u != user]
+  _update_other_users(other_users)
+  return _them(exchange, other_users)

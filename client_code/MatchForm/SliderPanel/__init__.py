@@ -15,28 +15,28 @@ class SliderPanel(SliderPanelTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run when the form opens.
-    self.their_name = ""
-    if self.item.get('their_name'):
-      self.update_name(self.item.get('their_name'))
+    them = self.item.get('them')
+    if them:
+      self.them_repeating_panel.items = them
     self.update_status()
 
   def update_status(self, new_status="not provided"):
     if new_status != "not provided":
       self.item['status'] = new_status
     if self.item['status'] in [None, 'waiting']:
-      self.title_label.text = 'How full is your "empathy tank"? (Empty: angry/distant, Full: content/open)'                              
+      self.title_label.text = 'How full is your "empathy tank"? (Empty: distant/upset, Full: content/open)'                              
       self.title_label.bold = True
-      self.left_column_panel.tooltip = ("After you both submit, you can compare positions to help you decide who gives empathy first. "
-                                        "More full usually means it's easier to be curious about what the other is feeling and needing.")
+      self.left_column_panel.tooltip = ("Once each of you submits, you can compare positions to help decide who receives empathy first. "
+                                        "More full usually means it's easier to be curious about what another is feeling and needing.")
     elif self.item['status'] == 'submitted':
-      self.title_label.text = 'Status: Submitted, waiting for other to submit... (Empty: angry/distant, Full: content/open)'                              
+      self.title_label.text = 'Status: Submitted, waiting for other to submit... (Empty: distant/upset, Full: content/open)'                              
       self.title_label.bold = False
-      self.left_column_panel.tooltip = ("After you both submit, you can compare positions to help you decide who gives empathy first. "
-                                        "More full usually means it's easier to be curious about what the other is feeling and needing.")
+      self.left_column_panel.tooltip = ("Once each of you submits, you can compare positions to help decide who receives empathy first. "
+                                        "More full usually means it's easier to be curious about what another is feeling and needing.")
     elif self.item['status'] == 'received':
-      self.title_label.text = 'You can compare to help decide who gives empathy first (Empty: angry/distant, Full: content/open)'
+      self.title_label.text = 'You can compare to help decide who receives empathy first (Empty: distant/upset, Full: content/open)'
       self.title_label.bold = True
-      self.left_column_panel.tooltip = ('It may be that neither of you is "full" enough to feel willing/able to give empathy first. '
+      self.left_column_panel.tooltip = ('It may be that no one is "full" enough to feel willing/able to give empathy first. '
                                         'If so, consider cancelling or rescheduling.')
     else:
       h.warning(f"Unexpected SliderPanel status: {self.item['status']}")
@@ -44,10 +44,6 @@ class SliderPanel(SliderPanelTemplate):
                                '(Empty: angry/distant, Full: content/open)')
       self.title_label.bold = False
     self.refresh_data_bindings()
-      
-  def update_name(self, their_name):
-    self.their_name = their_name
-    self.their_label.text = f"{their_name}:"
       
   def hide_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -57,12 +53,11 @@ class SliderPanel(SliderPanelTemplate):
     """This method is called when the button is clicked"""
     self.item['status'] = "submitted"
     self.update_status()
-    their_value = ec.submit_slider(self.my_slider.value)
-    if not ec.slider_value_missing(their_value):
-      self.receive_value(their_value)
+    them = ec.submit_slider(self.my_slider.value)
 
-  def receive_value(self, their_value):
-    self.item['their_value'] = their_value
-    self.item['status'] = "received"
-    self.update_status()
-    self.their_slider.scroll_into_view()
+  def receive_them(self, them):
+    self.them_repeating_panel.items = them
+    if not any([ec.slider_value_missing(o_dict['slider_value']) for o_dict in them]):
+      self.item['status'] = "received"
+      self.update_status()
+      self.them_repeating_panel.scroll_into_view()

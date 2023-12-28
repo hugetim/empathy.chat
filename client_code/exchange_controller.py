@@ -21,9 +21,8 @@ def slider_value_missing(value):
 
 
 def submit_slider(value):
-  their_slider_values = server.call('submit_slider', value)
-  h.my_assert(len(their_slider_values) == 1, f"ec.submit_slider assumes dyads only")
-  return their_slider_values[0]
+  them = server.call('submit_slider', value)
+  return them
 
 
 def update_my_external(value):   
@@ -80,19 +79,13 @@ class ExchangeState(PendingState):
   def _their(self):
     h.my_assert(len(self.them) == 1, "'their' assumes a dyad")
     return self.them[0]
-  
-  @property
-  def their_slider_value(self):
-    return self._their['slider_value']
-
-  @their_slider_value.setter
-  def their_slider_value(self, value):
-    self._their['slider_value'] = value
 
   @property
   def their_name(self):
     return self._their['name']    
 
+
+  
   @property
   def their_external(self):   
     return self._their['external']
@@ -108,7 +101,7 @@ class ExchangeState(PendingState):
     elif slider_value_missing(self.my_slider_value):
       return None
     else:
-      return "submitted" if slider_value_missing(self.their_slider_value) else "received"
+      return "submitted" if any([ec.slider_value_missing(o_dict['slider_value']) for o_dict in them]) else "received"
 
   def exit(self):
     if self.status == "matched":

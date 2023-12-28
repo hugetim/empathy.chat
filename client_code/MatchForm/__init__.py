@@ -95,7 +95,7 @@ class MatchForm(MatchFormTemplate):
       ui.init_load()  
     
   def init_slider_panel(self):
-    slider_item = {'their_name': "", 'status': self.item.slider_status, 
+    slider_item = {'them': self.item.them, 'status': self.item.slider_status, 
                    'my_value': self.item.my_initial_slider_value(), 'their_value': 5}
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
@@ -103,9 +103,8 @@ class MatchForm(MatchFormTemplate):
     self.slider_button_click()
 
   def update_slider_panel(self, dispatch=None):
-    self.slider_panel.update_name(self.item.their_name)
     if self.item.slider_status == "received":
-      self.slider_panel.receive_value(self.item.their_slider_value)
+      self.slider_panel.receive_them(self.item.them)
     else:
       self.slider_panel.update_status(self.item.slider_status)
 
