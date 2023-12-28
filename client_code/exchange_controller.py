@@ -84,7 +84,9 @@ class ExchangeState(PendingState):
   def their_name(self):
     return self._their['name']    
 
-
+  @property
+  def other_names(self):
+    return [o_dict['name'] for o_dict in self.them]
   
   @property
   def their_external(self):   
@@ -149,7 +151,7 @@ class ExchangeState(PendingState):
     self = ExchangeState(**state_dict)
     if self.status != prev.status:
       glob.publisher.publish("match.status", "new_status")
-    if (self.slider_status != prev.slider_status or self.their_name != prev.their_name):
+    if (self.slider_status != prev.slider_status or self.other_names != prev.other_names):
       glob.publisher.publish("match.slider", "slider_update")
     if len(self.messages_plus) > len(prev.messages_plus):
       glob.publisher.publish("match.messages", "messages_update")
