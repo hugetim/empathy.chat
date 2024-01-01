@@ -80,29 +80,12 @@ class ExchangeState(PendingState):
     self.message_items = message_items if message_items else []
 
   @property
-  def _their(self):
-    h.my_assert(len(self.them) == 1, "'their' assumes a dyad")
-    return self.them[0]
-
-  @property
   def _theirs(self):
     return {key: [o_dict[key] for o_dict in self.them] for key in self.them[0]}
   
   @property
-  def their_name(self):
-    return self._their['name']    
-
-  @property
   def other_names(self):
-    return [o_dict['name'] for o_dict in self.them]
-  
-  @property
-  def their_external(self):   
-    return self._their['external']
-    
-  @property
-  def their_complete(self):   
-    return self._their['complete']
+    return self._theirs['name']
 
   @property
   def slider_status(self):
@@ -165,9 +148,9 @@ class ExchangeState(PendingState):
       glob.publisher.publish("match.slider", "slider_update")
     if len(self.messages_plus) > len(prev.messages_plus):
       glob.publisher.publish("match.messages", "messages_update")
-    if diff_external_i:
+    if diff_external_i is not None:
       glob.publisher.publish("match.external", "other_external_change", content=diff_external_i)
-    if diff_complete_i:
+    if diff_complete_i is not None:
       glob.publisher.publish("match.complete", "other_complete_change", content=diff_complete_i)
     if self.how_empathy_items != prev.how_empathy_items:
       glob.publisher.publish("match.update_how", "new_how_empathy")
