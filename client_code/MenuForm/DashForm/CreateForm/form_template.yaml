@@ -140,6 +140,47 @@ components:
   properties: {height: 10.6666259765625, spacing_above: none, spacing_below: none}
   name: alternate_spacer
   layout_properties: {grid_position: 'MGXSNE,CGULSX'}
+- type: FlowPanel
+  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
+    foreground: '', visible: true, spacing_above: none, spacing_below: medium, background: ''}
+  name: flow_panel_3
+  layout_properties: {grid_position: 'ODKDKH,VIHSEW'}
+  components:
+  - type: Label
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
+      visible: true, text: 'What size empathy chat?', font_size: null, font: '', spacing_above: small,
+      icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
+      underline: false, icon: ''}
+    name: size_label
+    layout_properties:
+      col_widths: {}
+      grid_position: GBFPUO,BOQWZR
+    data_bindings: []
+  - type: DropDown
+    properties:
+      role: null
+      align: left
+      tooltip: ''
+      placeholder: ''
+      border: ''
+      enabled: true
+      foreground: ''
+      items: []
+      visible: true
+      font_size: null
+      font: ''
+      spacing_above: small
+      spacing_below: small
+      italic: false
+      background: ''
+      bold: false
+      underline: false
+      include_placeholder: false
+    name: size_drop_down
+    layout_properties: {grid_position: 'FZLHTD,JXVDVI'}
+    data_bindings:
+    - {property: selected_value, code: '(self.item[''min_size''], self.item[''max_size''])',
+      writeback: true}
 - name: advanced_link
   properties: {text: Show advanced options..., spacing_above: none, spacing_below: none,
     font_size: -1}
@@ -210,47 +251,6 @@ components:
     layout_properties: {grid_position: 'MOAYGD,PBHCBD'}
     event_bindings: {}
   event_bindings: {}
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: false, spacing_above: none, spacing_below: medium, background: ''}
-  name: flow_panel_3
-  layout_properties: {grid_position: 'PCFTTJ,SBORPM'}
-  components:
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'What size empathy chat?', font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
-      underline: false, icon: ''}
-    name: size_label
-    layout_properties:
-      col_widths: {}
-      grid_position: GBFPUO,BOQWZR
-    data_bindings: []
-  - type: DropDown
-    properties:
-      role: null
-      align: left
-      tooltip: ''
-      placeholder: ''
-      border: ''
-      enabled: true
-      foreground: ''
-      items: []
-      visible: true
-      font_size: null
-      font: ''
-      spacing_above: small
-      spacing_below: small
-      italic: false
-      background: ''
-      bold: false
-      underline: false
-      include_placeholder: false
-    name: size_drop_down
-    layout_properties: {grid_position: 'FZLHTD,JXVDVI'}
-    data_bindings:
-    - {property: selected_value, code: '(self.item[''min_size''], self.item[''max_size''])',
-      writeback: true}
 - name: note_flow_panel
   properties: {spacing_below: medium, tooltip: You can attach a brief note to your request,
     spacing: small, visible: false}
