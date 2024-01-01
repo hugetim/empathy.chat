@@ -96,7 +96,7 @@ class MatchForm(MatchFormTemplate):
     
   def init_slider_panel(self):
     slider_item = {'them': self.item.them, 'status': self.item.slider_status, 
-                   'my_value': self.item.my_initial_slider_value(), 'their_value': 5}
+                   'my_value': self.item.my_initial_slider_value()}
     self.slider_panel = SliderPanel(item=slider_item)
     self.slider_column_panel.add_component(self.slider_panel)
     self.slider_panel.set_event_handler('x-hide', self.slider_button_click)
@@ -112,8 +112,8 @@ class MatchForm(MatchFormTemplate):
     glob.publisher.subscribe("match.status", self, self.update_status)
     glob.publisher.subscribe("match.slider", self, self.update_slider_panel)
     glob.publisher.subscribe("match.messages", self, self.update_messages)
-    glob.publisher.subscribe("match.external", self, self.update_their_external)
-    glob.publisher.subscribe("match.complete", self, self.update_their_complete)
+    glob.publisher.subscribe("match.external", self, self.update_other_external)
+    glob.publisher.subscribe("match.complete", self, self.update_other_complete)
     glob.publisher.subscribe("match.update_how", self, self.update_how_empathy_items)
   
   def base_status_reset(self):
@@ -179,18 +179,20 @@ class MatchForm(MatchFormTemplate):
     if not self.first_messages_update:
       self.chat_display_card.scroll_into_view()
   
-  def update_their_external(self, dispatch=None):
-    if self.item.their_external:
-      message = (f"{self.item.their_name} has left the empathy.chat window "
+  def update_other_external(self, dispatch=None):
+    index_changed = dispatch.content
+    if self.item.them[index_changed]['external']:
+      message = (f"{self.item.them[index_changed]['name']} has left the empathy.chat window "
                   'to continue the video/audio chat in a separate, "popped-out" window. '
                   "You should see/hear them again shortly, if not already. "
                   "(Note: This means they may not see Text Chat messages you send from here--or likewise the Slider.)"
                 )
       Notification(message, timeout=None).show()
 
-  def update_their_complete(self, dispatch=None):
-    if self.item.their_complete:
-      message = f"{self.item.their_name} has left this empathy chat."
+  def update_other_complete(self, dispatch=None):
+    index_changed = dispatch.content
+    if self.item.them[index_changed]['complete']:
+      message = f"{self.item.them[index_changed]['name']} has left this empathy chat."
       Notification(message, timeout=None).show()
     
   def timer_2_tick(self, **event_args):

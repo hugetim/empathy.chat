@@ -85,6 +85,10 @@ class ExchangeState(PendingState):
     return self.them[0]
 
   @property
+  def _theirs(self):
+    return {key: [o_dict[key] for o_dict in self.them] for key in self.them[0]}
+  
+  @property
   def their_name(self):
     return self._their['name']    
 
@@ -153,16 +157,18 @@ class ExchangeState(PendingState):
     prev = ExchangeState(**state_dict)
     state_dict.update(server.call_s('update_match_form'))
     self = ExchangeState(**state_dict)
+    diff_external_i = _i_of_first_diff(self._theirs['external'], prev._theirs['external'])
+    diff_complete_i = _i_of_first_diff(self._theirs['complete'], prev._theirs['complete'])
     if self.status != prev.status:
       glob.publisher.publish("match.status", "new_status")
     if (self.slider_status != prev.slider_status or self.other_names != prev.other_names):
       glob.publisher.publish("match.slider", "slider_update")
     if len(self.messages_plus) > len(prev.messages_plus):
       glob.publisher.publish("match.messages", "messages_update")
-    if bool(self.their_external) != bool(prev.their_external):
-      glob.publisher.publish("match.external", "their_external_change")
-    if bool(self.their_complete) != bool(prev.their_complete):
-      glob.publisher.publish("match.complete", "their_complete_change")
+    if diff_external_i:
+      glob.publisher.publish("match.external", "other_external_change", content=diff_external_i)
+    if diff_complete_i:
+      glob.publisher.publish("match.complete", "other_complete_change", content=diff_complete_i)
     if self.how_empathy_items != prev.how_empathy_items:
       glob.publisher.publish("match.update_how", "new_how_empathy")
 
@@ -170,4 +176,11 @@ class ExchangeState(PendingState):
   def initialized_state(status):
     init_dict = server.call('init_match_form')
     return ExchangeState(status=status, **init_dict)
-  
+
+
+def _i_of_first_diff(new_list, prev_list):
+  """Compare bool of elements of equal-length list, returning index of first diff."""
+  for i, (x, y) in enumerate(zip(new_list, prev_list)):
+    if bool(x) != bool(y):
+      return i
+  return None

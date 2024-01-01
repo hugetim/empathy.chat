@@ -7,7 +7,7 @@ from ... import helper as h
 class SliderPanel(SliderPanelTemplate):
   def __init__(self, **properties):
     """self.item assumed to have these keys: 
-    'their_value', default 5
+    'them',
     'my_value', default 5
     'status' in [None, 'submitted', 'received', 'waiting']
     """

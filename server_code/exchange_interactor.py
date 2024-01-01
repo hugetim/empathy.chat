@@ -361,7 +361,6 @@ def update_my_external(my_external, user_id=""):
 
 @authenticated_callable
 def submit_slider(value, user_id=""):
-  """Return their_value"""
   print(f"submit_slider, '[redacted]', {user_id}")
   user = sm.get_acting_user(user_id)
   exchange_record = current_user_exchange(user, record=True)

@@ -40,9 +40,6 @@ def add_message(user2_id, user_id="", message="[blank test message]"):
 
 @authenticated_callable
 def update_history_form(user2_id, user_id=""):
-  """
-  Return (iterable of dictionaries with keys: 'me', 'message'), their_value
-  """
   user = sm.get_acting_user(user_id)
   user2 = sm.get_other_user(user2_id)
   return get_message_dicts(user, user2)
