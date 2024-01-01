@@ -253,7 +253,7 @@ def _process_exchange_requests(exchange_prospect):
       request.current = False
     else:
       other_ep_users = set(exchange_prospect.users) - set(request.user)
-      request.with_users.update(other_ep_users)
+      request.with_users.extend(other_ep_users)
 
 
 def _cancel_other_or_group_requests(requests_matched):
