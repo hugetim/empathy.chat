@@ -50,9 +50,10 @@ class Request:
     self.current = current
 
   @staticmethod
-  def to_accept_pair_request(user_id, accepted_request):
+  def to_accept_almost_full_request(user_id, accepted_request, user_ids_accepting):
     now = h.now()
     or_group_id = str(uuid.uuid4())
+    other_user_ids = [accepted_request.user] + user_ids_accepting
     return Request(
       or_group_id=or_group_id,
       user=user_id,
@@ -63,8 +64,8 @@ class Request:
       edit_dt=now,
       min_size=accepted_request.min_size,
       max_size=accepted_request.max_size,
-      with_users=[accepted_request.user],
-      eligible_users=[accepted_request.user],
+      with_users=other_user_ids,
+      eligible_users=other_user_ids,
       pref_order=0,
       current=True
     )

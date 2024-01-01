@@ -45,7 +45,7 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
     self.update()
 
   def init(self):    
-    prop = self.item.pop('prop')
+    prop = self.item['prop']
     self.item.update({'prop_id': prop.prop_id,
                       'own': prop.own,
                       'note': prop.note,
@@ -135,8 +135,13 @@ class ProposalRowTemplate(ProposalRowTemplateTemplate):
       
   def accept_button_click(self, **event_args):
     """This method is called when the button is clicked"""
-    self.update_dash(anvil.server.call('accept_proposal', 
-                                       self.item['prop_time'].time_id))
+    prop = self.item['prop']
+    time = self.item['prop_time']
+    if len(time.users_accepting) + 2 == prop.max_size: # e.g., pair request
+      self.update_dash(anvil.server.call('accept_proposal',
+                                         time.time_id, time.users_accepting))
+    else:
+      self.top_form.content.accept_proposal(self.item['prop_id'], time.time_id)
 
   def cancel_button_click(self, **event_args):
     """This method is called when the button is clicked"""

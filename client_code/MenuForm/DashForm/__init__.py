@@ -166,6 +166,22 @@ class DashForm(DashFormTemplate):
       Notification("Matching you with another user ready to start an empathy chat now...",timeout=5).show()
     self.update_status(state)
 
+  def accept_proposal(self, prop_id, time_id):
+    """This method is called when the button is clicked"""
+    prop_to_accept = self._accept_prop_from_id(prop_id, time_id)
+    form_item = prop_to_accept.create_form_item(self.item['status'],
+                                                self.get_conflict_checks())
+    content = CreateForm(item=form_item)
+    self.top_form.proposal_alert = content
+    out = alert(content=self.top_form.proposal_alert,
+                title="Accept Empathy Chat Request",
+                large=True,
+                dismissible=False,
+                buttons=[])
+    if out is True:
+      proposal = content.proposal()
+      self._handle_prop_call(*anvil.server.call('add_proposal', proposal))
+  
   def edit_proposal(self, prop_id):
     """This method is called when the button is clicked"""
     prop_to_edit = self._prop_from_id(prop_id)
@@ -192,6 +208,13 @@ class DashForm(DashFormTemplate):
     props_to_edit = [prop_item['prop'] for prop_item in self.item['proposals'] 
                      if prop_item['prop'].prop_id == prop_id]
     return props_to_edit[0]
+
+  def _accept_prop_from_id(self, prop_id, time_id):
+    props = [prop_item['prop'] for prop_item in self.item['proposals']
+             if prop_item['prop'].prop_id == prop_id]
+    new_prop = deepcopy(props[0])
+    new_prop.times = [time for time in new_prop.times if time.time_id == time_id]
+    return new_prop
   
   def prompts_open_link_click(self, **event_args):
     """This method is called when the link is clicked"""

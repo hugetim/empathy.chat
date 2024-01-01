@@ -135,14 +135,14 @@ def _get_upcomings(user):
 
 
 @authenticated_callable
-def accept_proposal(request_id, user_id=""):
+def accept_proposal(request_id, user_ids_accepting, user_id=""):
   """Add user_accepting
   
   Side effect: update proptime table with acceptance, if available
   """
   print(f"accept_proposal, {request_id}, {user_id}")
   user = sm.get_acting_user(user_id)
-  ri.accept_pair_request(user, request_id=request_id)
+  ri.accept_almost_full_request(user, request_id=request_id, user_ids_accepting=user_ids_accepting)
   propagate_update_needed(user)
   return _get_state(user)
 

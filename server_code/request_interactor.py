@@ -27,9 +27,9 @@ def reset_repo():
   exchange_repo = exchange_gateway
 
 
-def accept_pair_request(user, request_id):
+def accept_almost_full_request(user, request_id, user_ids_accepting):
   accepted_request_record = repo.RequestRecord.from_id(request_id)
-  accept_request = Request.to_accept_pair_request(user.get_id(), accepted_request_record.entity)
+  accept_request = Request.to_accept_almost_full_request(user.get_id(), accepted_request_record.entity, user_ids_accepting)
   add_requests(user, Requests([accept_request]))
 
 
