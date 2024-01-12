@@ -566,7 +566,7 @@ def _request_in_eps(request, exchange_prospects):
 
 def get_proposals_upcomings(user):
   user_exchanges = ei.user_exchanges(user)
-  proposals = ri.visible_requests_as_port_view_items(user)
+  proposals = visible_requests_as_port_view_items(user)
   upcomings = ei.upcoming_match_dicts(user, user_exchanges)
   return proposals, upcomings
 
