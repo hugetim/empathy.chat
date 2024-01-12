@@ -32,7 +32,9 @@ def user_exchanges(user):
   return results
 
 
-def upcoming_match_dicts(user, _user_exchanges):
+def upcoming_match_dicts(user, _user_exchanges=None):
+  if _user_exchanges is None:
+    _user_exchanges = user_exchanges(user)
   # can shift to just returning exchanges
   user_id = user.get_id()
   return [_match_dict(user_id, exchange) for exchange in _user_exchanges]
