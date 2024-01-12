@@ -70,9 +70,7 @@ def _init_user_status(user):
 @anvil.tables.in_transaction(relaxed=True)
 def _get_proposals_upcomings(user):
   print("                      _get_proposals_upcomings")
-  proposals = ri.get_visible_requests_as_port_view_items(user)
-  upcomings = _get_upcomings(user)
-  return proposals, upcomings
+  return ri.get_proposals_upcomings(user)
 
 
 def propagate_update_needed(user=None):
@@ -127,11 +125,6 @@ def get_partial_state(user):
   status = user['status']
   return {'status': status, 
          }
-
-
-def _get_upcomings(user):
-  """Return list of user's upcoming matches"""
-  return ei.upcoming_match_dicts(user)
 
 
 @authenticated_callable

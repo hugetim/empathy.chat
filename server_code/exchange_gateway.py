@@ -132,12 +132,12 @@ def exchanges_by_user(user, records=False):
 def exchanges_by_user_starting_prior_to(user, cutoff_dt, records=False):
   rows = app_tables.exchanges.search(exchanges_fetch, users=[user], start_dt=q.less_than(cutoff_dt), current=True)
   for exchange_row in rows:
-    yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
+    yield ExchangeRecord.from_row(exchange_row) if records else change(exchange_row)
 
 
 def exchanges_starting_prior_to(cutoff_dt, records=False):
   for exchange_row in app_tables.exchanges.search(exchanges_fetch, start_dt=q.less_than(cutoff_dt), current=True):
-    yield ExchangeRecord.from_row(exchange_row) if records else _row_to_exchange(exchange_row)
+    yield ExchangeRecord.from_row(exchange_row) if records else change(exchange_row)
 
 
 def exchange_record_with_any_request_records(request_records):
@@ -155,7 +155,7 @@ class ExchangeRecord(sm.SimpleRecord):
 
   @staticmethod
   def _row_to_entity(row):
-    return _row_to_exchange(row)
+    return change(row)
   
   @staticmethod
   def _entity_to_fields(entity):

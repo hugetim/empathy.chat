@@ -22,15 +22,20 @@ def reset_repo():
   repo = exchange_gateway
 
 
-def upcoming_match_dicts(user):
-  # can shift to just returning exchanges
-  out = []
+def user_exchanges(user):
+  results = []
   user_id = user.get_id()
   for exchange in repo.exchanges_by_user(user):
     exchange.set_my(user_id)
     if not exchange.my['complete_dt']:
-      out.append(_match_dict(user_id, exchange))
-  return out
+      results.append(exchange)
+  return results
+
+
+def upcoming_match_dicts(user, _user_exchanges):
+  # can shift to just returning exchanges
+  user_id = user.get_id()
+  return [_match_dict(user_id, exchange) for exchange in _user_exchanges]
 
 
 def _match_dict(user_id, exchange):
