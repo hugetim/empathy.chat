@@ -214,6 +214,8 @@ class DashForm(DashFormTemplate):
              if prop_item['prop'].prop_id == prop_id]
     new_prop = deepcopy(props[0])
     new_prop.times = [time for time in new_prop.times if time.time_id == time_id]
+    new_prop.prop_id = None
+    new_prop.times[0].time_id = None
     new_prop.eligible_all = True
     return new_prop
   
