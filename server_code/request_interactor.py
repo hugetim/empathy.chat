@@ -351,7 +351,7 @@ def get_new_prospects(user, requests, other_request_records, other_exchange_pros
   out = []
   for ep in other_exchange_prospects:
     ep_rels = _extend_relationships(rels, ep.distances)
-    if prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, ep_rels, ep, other_request_especs, other_users):
+    if _prospect_mutually_eligible(user, requests[0], requests_eligibility_spec, ep_rels, ep, other_request_especs, other_users):
       new_ep_distances = _distances_update(ep.distances, ep_rels, user_id)
       out.extend(_get_new_prospects(ep, requests, new_ep_distances))
   return out
@@ -386,14 +386,14 @@ def current_visible_prospects(user, exchange_prospects, request_records):
   return out_prospects
 
 
-def prospect_mutually_eligible(user, request, requests_eligibility_spec, rels, ep, other_request_especs, other_users):
-  new_ep = ExchangeProspect(list(ep.requests)+[request], temp=True)
-  for request in ep:
-    other_user = other_users.get(request.user, repo.get_user_row_by_id(request.user))
+def _prospect_mutually_eligible(user, rep_request, requests_eligibility_spec, rels, ep, other_request_especs, other_users):
+  new_ep = ExchangeProspect(list(ep.requests)+[rep_request], temp=True)
+  for other_request in ep:
+    other_user = other_users.get(other_request.user, repo.get_user_row_by_id(other_request.user))
     rel = rels[other_user]
     if not is_eligible(new_ep, other_user, rel, requests_eligibility_spec):
       return False
-    eligibility_spec = other_request_especs.get(request.request_id, repo.eligibility_spec(request))
+    eligibility_spec = other_request_especs.get(other_request.request_id, repo.eligibility_spec(other_request))
     if not is_eligible(new_ep, user, rel, eligibility_spec):
       return False
   return True
