@@ -566,23 +566,24 @@ def _request_in_eps(request, exchange_prospects):
 
 def get_proposals_upcomings(user):
   user_exchanges = ei.user_exchanges(user)
-  proposals = visible_requests_as_port_view_items(user)
+  proposals = visible_requests_as_port_view_items(user, user_exchanges)
   upcomings = ei.upcoming_match_dicts(user, user_exchanges)
   return proposals, upcomings
 
 
-def visible_requests_as_port_view_items(user):
+def visible_requests_as_port_view_items(user, user_exchanges):
+  user_exchange_request_ids = [id for exchange in user_exchanges for id in exchange.request_ids]
   current_rrs = list(repo.current_requests(records=True))
   _prune_request_records(current_rrs, sm.now())
-  still_current_rrs = [rr for rr in current_rrs if rr.entity.current]
-  exchange_prospects = list(repo.request_records_prospects(still_current_rrs))
-  return _proposal_view_items(user, still_current_rrs, exchange_prospects)
+  viable_rrs = [rr for rr in current_rrs if rr.entity.current and rr.record_id not in user_exchange_request_ids]
+  exchange_prospects = list(repo.request_records_prospects(viable_rrs))
+  return _proposal_view_items(user, viable_rrs, exchange_prospects)
 
 
-def _proposal_view_items(user, still_current_rrs, exchange_prospects):
+def _proposal_view_items(user, viable_rrs, exchange_prospects):
   user_id = user.get_id()
-  user_requests = [rr.entity for rr in still_current_rrs if rr.user == user] # just display user_requests simply, whether or not part of exchange_prospects
-  others_request_records = [rr for rr in still_current_rrs if rr.user != user]
+  user_requests = [rr.entity for rr in viable_rrs if rr.user == user] # just display user_requests simply, whether or not part of exchange_prospects
+  others_request_records = [rr for rr in viable_rrs if rr.user != user]
   others_exchange_prospects = [ep for ep in exchange_prospects if user_id not in ep.users]
   visible_exchange_prospects = list(current_visible_prospects(user, others_exchange_prospects, others_request_records))
   return _to_view_items(user, user_requests, visible_exchange_prospects)
