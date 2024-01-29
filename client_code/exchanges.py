@@ -4,10 +4,6 @@ from . import parameters as p
 from .requests import Request, ExchangeProspect, ExchangeFormat
 
 
-# Participant = namedtuple('Participant', ['user_id', 'present', 'complete', 'slider_value', 'late_notified', 'external'])
-# Format = namedtuple('Format', ['duration'])
-
-
 class Exchange:
   def __init__(self, exchange_id, room_code, participants, # list of dicts
                start_now, start_dt, exchange_format, user_id=None, my_i=None, current=None):
