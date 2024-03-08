@@ -6,14 +6,12 @@ scheduled_tasks:
     at: {minute: 53}
   job_id: CTIKZHRE
 dependencies:
-- app_id: MFQJNLWQIOGGXL4W
-  version: {dev: false}
 - app_id: C6ZZPAPN4YYF5NVJ
   version: {version_tag: v2.5.3}
-- app_id: WAF7GWYZ3PTOPDNF
+- dep_id: dep_tpbr2wuc5j9cs
   version: {dev: false}
-- app_id: TCL6O5RVEDFRHRMV
-  version: {dev: false}
+  resolution_hints: {app_id: SNNSU6JZBA72CQQ3, name: 'EmpathyChat: my slider_text_ticks',
+    package_name: SliderDemo}
 services:
 - source: /runtime/services/tables.yml
   client_config: {enable_v2: true}
