@@ -12,6 +12,9 @@ dependencies:
   version: {dev: false}
   resolution_hints: {app_id: SNNSU6JZBA72CQQ3, name: 'EmpathyChat: my slider_text_ticks',
     package_name: SliderDemo}
+- dep_id: dep_yqi6lm4h3b2uk9
+  version: {dev: false}
+  resolution_hints: {app_id: TCSVRMAFOCFUDWCE, name: 'EmpathyChat: pdf_viewer', package_name: pdf_viewer}
 services:
 - source: /runtime/services/tables.yml
   client_config: {enable_v2: true}
