@@ -60,8 +60,8 @@ components:
         layout_properties: {width: null, expand: true}
         components:
         - name: slider_1
-          properties: {start: '5', max: 10, step: 0.2, pips: true, pips_mode: values,
-            pips_values: '[''Empty'', '''', ''Full'']'}
+          properties: {start: '5', max: 10, step: 0.2, pips: true, pips_mode: count,
+            pips_values: '3', pips_stepped: false}
           type: form:C6ZZPAPN4YYF5NVJ:Slider
           layout_properties: {}
       data_bindings: []

@@ -41,14 +41,14 @@ services:
           me"  box when requesting this login link, you should only need to login
           this way once per month (per device). For more info:</em>  https://anvil.works/blog/magic-link-sign-in</p>',
         subject: empathy.chat - Login}
-startup: {type: module, module: startup}
+startup: {type: form, module: ATestForm}
 package_name: empathy_chat
 allow_embedding: false
 name: empathy.chat
 runtime_options: {version: 2, server_version: python3-full, client_version: '3', server_spec: null}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:child-large.PNG',
   title: empathy.chat}
-startup_form: MenuForm
+startup_form: null
 native_deps: {head_html: "<script src='https://8x8.vc/external_api.js'></script>\n\
     <style>\n#loadingSpinner {\n  display: none;\n}\n</style>"}
 db_schema:
