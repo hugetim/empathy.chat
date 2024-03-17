@@ -8,13 +8,6 @@ scheduled_tasks:
 dependencies:
 - app_id: C6ZZPAPN4YYF5NVJ
   version: {version_tag: v2.5.3}
-- dep_id: dep_tpbr2wuc5j9cs
-  version: {dev: false}
-  resolution_hints: {app_id: SNNSU6JZBA72CQQ3, name: 'EmpathyChat: my slider_text_ticks',
-    package_name: SliderDemo}
-- dep_id: dep_zxo4tus5guar2a
-  version: {dev: false}
-  resolution_hints: {app_id: SZR7Q4HBW3QPUXO3, name: 'EmpathyChat: MyTimer', package_name: MyTimer}
 services:
 - source: /runtime/services/tables.yml
   client_config: {enable_v2: true}
