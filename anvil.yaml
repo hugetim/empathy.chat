@@ -41,7 +41,7 @@ services:
           me"  box when requesting this login link, you should only need to login
           this way once per month (per device). For more info:</em>  https://anvil.works/blog/magic-link-sign-in</p>',
         subject: empathy.chat - Login}
-startup: {type: form, module: ATestForm}
+startup: {type: module, module: startup}
 package_name: empathy_chat
 allow_embedding: false
 name: empathy.chat

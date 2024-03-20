@@ -64,6 +64,9 @@ components:
             pips_values: '3', pips_stepped: false}
           type: form:C6ZZPAPN4YYF5NVJ:Slider
           layout_properties: {}
+          data_bindings:
+          - {property: value, code: 'self.item[''my_value'']', writeback: true}
+          - {property: enabled, code: 'self.item[''status'']', writeback: false}
       data_bindings: []
     - name: them_repeating_panel
       properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
