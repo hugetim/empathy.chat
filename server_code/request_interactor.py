@@ -252,7 +252,7 @@ def _process_exchange_requests(exchange_prospect):
     if is_full:
       request.current = False
     else:
-      other_ep_users = set(exchange_prospect.users) - set(request.user)
+      other_ep_users = set(exchange_prospect.users) - set(request.user + request.with_users)
       request.with_users.extend(other_ep_users)
 
 
