@@ -32,7 +32,7 @@ def add_message(user2_id, user_id="", message="[blank test message]"):
   user2 = sm.get_other_user(user2_id)
   repo.add_message(from_user=user,
                    to_user=user2,
-                   message=secrets.encrypt_with_key("new_key", message),
+                   message=secrets.encrypt_with_key("encryption_key", message),
                    time_stamp=sm.now())
   launch_background_task('add_message_prompt', user2, user)
   return get_message_dicts(user, user2)
@@ -50,7 +50,7 @@ def get_message_dicts(user1, user2=None, messages=None):
     messages = repo.get_messages(user2, user1)
   return [{'me': (user1 == m['from_user']),
            'label': "" if user1 == m['from_user'] else m['from_user']['first_name'],
-           'message': secrets.decrypt_with_key("new_key", m['message']),
+           'message': secrets.decrypt_with_key("encryption_key", m['message']),
            'time_stamp': m['time_stamp'],
           } for m in messages]
 

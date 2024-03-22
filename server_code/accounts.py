@@ -246,7 +246,7 @@ def send_verification_sms(number, user_id=""):
     else:
       app_tables.codes.add_row(
         type="phone",
-        address=secrets.encrypt_with_key("new_key", number),
+        address=secrets.encrypt_with_key("encryption_key", number),
         code=code,
         user=user,
         date=sm.now()

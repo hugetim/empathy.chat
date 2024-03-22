@@ -691,22 +691,19 @@ db_schema:
       admin_ui: {width: 200}
       type: bool
 secrets:
-  new_key:
-    value: {? '' : owBRTMfdGiFcg6OrOwAFHxPUqiPdepcLs5NxphK+FaMTvAlm10Ve9ei9/rAwTOa2dHqUtiqBOuaI34DSz0VM1x4jN2nL89oYeuAFHU6yxxPbAvUaf6D6q8vc0t9lT5Enr42Nm8G1MV2qdn1l2A0fUACeoaoaj00=}
-    type: key
-  account_sid:
-    value: {? '' : bWq00BbgXmb0c/iJxuHL+RX8fZP98HELTlq64XzGktqCtF3y1QUti6urAcCeueTpiPC5Cyyn89pHCryXrPKqXdnCsmK2ESPLzylH9MEvfQJhV5iFsnYGiUj6MbazoYdDyBIyIAfvTYO8kdq9v2JQGDvIE2AsMydw9hiexQh1Jclk}
-    type: secret
-  auth_token:
-    value: {? '' : vVlLhTVrGHiNzj7nigFhvn0W+1z4cm/256c1I0ZPJJf6ZXRcvXLQaKqbWUA/Ej4t1p1uXyFFBD5FKWaIf9j+iQzd8oThVTvV4BhQi3j5GRHFqTz0zi9HKBf/aPkmDYWV/F/yWSw1OEVwbSaojhuHkuvKydSUq6dye0JLDqBJzA==}
-    type: secret
   admin_email:
     value: {? '' : BaoOfWcRFCExgZgnpZo6Q1myXzC8OZttbYZlDm72n8sdiEWiEHt9QcpphUYClBnVAc71E3dV66KUcXjuwLviqv3b3lq2Q7LRoa/V2tbgSaEEi4q4tzBVHu5hTNXAriwCobmYr5F7IZIGOeQPmbxDSQ==}
     type: secret
   test_user_email:
     value: {? '' : KRmISsoT+2dK0u/8K3fsrPUGHVeZmp9ebh/JAQW/kg1UITdnMVxlJwM07wyGRdUuwAz2DiUUJ7dh8mavtiIrfgFUTWSeChYDkGXzQ2nTJNtJx5rNeM0q5Rd8USdUsi/YmXgro0A5r8BNgbdzc0zdlPn2tXX5nw==}
     type: secret
-  test_user2_email:
-    value: {? '' : m5ubMa6FHJZE0fjuiPPa5MjbXVkfXE/ilhVzi4JBbhn3zdraCMzMg1lqdhXWS7tEIuascWyll2zp3irNFb+0d9r4/Uzvvwjk3cPqkRuYL5z89dXcvi2oO4sp5kUyj3SSuHMMuhG4VZs+YDph233QZA==}
+  twilio_account_sid:
+    value: {? '' : bWq00BbgXmb0c/iJxuHL+RX8fZP98HELTlq64XzGktqCtF3y1QUti6urAcCeueTpiPC5Cyyn89pHCryXrPKqXdnCsmK2ESPLzylH9MEvfQJhV5iFsnYGiUj6MbazoYdDyBIyIAfvTYO8kdq9v2JQGDvIE2AsMydw9hiexQh1Jclk}
     type: secret
+  twilio_auth_token:
+    value: {? '' : vVlLhTVrGHiNzj7nigFhvn0W+1z4cm/256c1I0ZPJJf6ZXRcvXLQaKqbWUA/Ej4t1p1uXyFFBD5FKWaIf9j+iQzd8oThVTvV4BhQi3j5GRHFqTz0zi9HKBf/aPkmDYWV/F/yWSw1OEVwbSaojhuHkuvKydSUq6dye0JLDqBJzA==}
+    type: secret
+  encryption_key:
+    value: {? '' : owBRTMfdGiFcg6OrOwAFHxPUqiPdepcLs5NxphK+FaMTvAlm10Ve9ei9/rAwTOa2dHqUtiqBOuaI34DSz0VM1x4jN2nL89oYeuAFHU6yxxPbAvUaf6D6q8vc0t9lT5Enr42Nm8G1MV2qdn1l2A0fUACeoaoaj00=}
+    type: key
 renamed: true

@@ -333,14 +333,14 @@ def add_chat_message(message="[blank test message]", user_id=""):
   if len(exchange_record.users) <= 2:
     repo.add_chat(
       from_user=user,
-      message=anvil.secrets.encrypt_with_key("new_key", message),
+      message=anvil.secrets.encrypt_with_key("encryption_key", message),
       now=sm.now(),
       users=exchange_record.users,
     )
   else:
     repo.add_exchange_message(
       from_user=user,
-      message=anvil.secrets.encrypt_with_key("new_key", message),
+      message=anvil.secrets.encrypt_with_key("encryption_key", message),
       now=sm.now(),
       exchange_record=exchange_record,
     )
