@@ -6,14 +6,8 @@ scheduled_tasks:
     at: {minute: 53}
   job_id: CTIKZHRE
 dependencies:
-- app_id: MFQJNLWQIOGGXL4W
-  version: {dev: false}
 - app_id: C6ZZPAPN4YYF5NVJ
   version: {version_tag: v2.5.3}
-- app_id: WAF7GWYZ3PTOPDNF
-  version: {dev: false}
-- app_id: TCL6O5RVEDFRHRMV
-  version: {dev: false}
 services:
 - source: /runtime/services/tables.yml
   client_config: {enable_v2: true}
@@ -54,7 +48,7 @@ name: empathy.chat
 runtime_options: {version: 2, server_version: python3-full, client_version: '3', server_spec: null}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:child-large.PNG',
   title: empathy.chat}
-startup_form: MenuForm
+startup_form: null
 native_deps: {head_html: "<script src='https://8x8.vc/external_api.js'></script>\n\
     <style>\n#loadingSpinner {\n  display: none;\n}\n</style>"}
 db_schema:
