@@ -1,55 +1,47 @@
+is_package: true
+container:
+  type: HtmlTemplate
+  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true, role: null, html: ''}
+  event_bindings: {show: form_show}
 components:
 - type: ColumnPanel
   properties: {col_widths: '{}'}
-  name: content_panel
   layout_properties: {slot: default}
+  event_bindings: {}
+  name: content_panel
   components:
   - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
-    name: card_3
+    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
     layout_properties: {grid_position: 'HNWJUS,EPSEGJ'}
+    name: card_3
     components:
     - type: Label
-      properties: {role: headline, align: center, tooltip: '', border: '', foreground: '',
-        visible: true, text: Welcome!, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: welcome_label
+      properties: {role: headline, align: center, tooltip: '', border: '', foreground: '', visible: true, text: Welcome!, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
       layout_properties: {grid_position: 'HXYVYL,LBTWCT'}
       event_bindings: {}
+      name: welcome_label
   - type: ColumnPanel
-    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: 'theme:Light Yellow'}
-    name: upcoming_card
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: 'theme:Light Yellow'}
     layout_properties: {grid_position: 'APRVOR,LSQCPI'}
+    event_bindings: {}
+    name: upcoming_card
     components:
     - type: ColumnPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-        wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-        spacing_below: small, background: ''}
-      name: upcoming_column_panel
+      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
       layout_properties: {grid_position: 'QVQAEG,VUVXHV'}
+      name: upcoming_column_panel
       components:
       - type: RichText
-        properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
-          foreground: '', visible: true, font_size: null, content: '**Your upcoming
-            empathy chats:**  (A "Join" button will appear five minutes prior to the
-            Start Time.)', font: '', spacing_above: small, spacing_below: none, data: null,
-          background: '', format: markdown}
-        name: rich_text_1
+        properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '', foreground: '', visible: true, font_size: null, content: '**Your upcoming empathy chats:**  (A "Join" button will appear five minutes prior to the Start Time.)', font: '', spacing_above: small, spacing_below: none, data: null, background: '', format: markdown}
         layout_properties: {grid_position: 'GMWQMT,DSFTKN'}
+        name: rich_text_1
       - type: DataGrid
         properties:
           role: null
           columns:
           - {title: User(s), id: LRZCRL, data_key: users, $$hashKey: 'object:398'}
-          - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false,
-            $$hashKey: 'object:399'}
-          - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false,
-            $$hashKey: 'object:400'}
+          - {width: '', title: Start Time, id: ABFKML, data_key: start_time, expand: false, $$hashKey: 'object:399'}
+          - {width: '', title: Duration, id: YUYJUP, data_key: duration, expand: false, $$hashKey: 'object:400'}
           - {title: '', id: PHQQNP, data_key: buttons, expand: true, $$hashKey: 'object:401'}
           auto_header: false
           tooltip: ''
@@ -62,89 +54,64 @@ components:
           spacing_above: none
           spacing_below: small
           background: theme:White
-        name: upcoming_data_grid
         layout_properties: {grid_position: 'XHNHPO,HSRHLO'}
+        name: upcoming_data_grid
         components:
         - type: DataRowPanel
-          properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:White',
-            auto_display_data: true, visible: true, item: null, font_size: null, font: '',
-            spacing_above: none, spacing_below: none, italic: false, background: 'theme:Primary
-              500', bold: false, underline: false}
-          name: upcoming_title_row
+          properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:White', auto_display_data: true, visible: true, item: null, font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false, background: 'theme:Primary 500', bold: false, underline: false}
           layout_properties: {pinned: true}
+          event_bindings: {}
+          name: upcoming_title_row
           components:
           - type: Label
-            properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-              visible: true, text: Who, font_size: null, font: '', spacing_above: small,
-              icon_align: left, spacing_below: small, italic: false, background: '',
-              bold: true, underline: false, icon: ''}
-            name: label_1
+            properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: Who, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: true, underline: false, icon: ''}
             layout_properties: {column: LRZCRL}
+            name: label_1
           - type: Label
-            properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-              visible: true, text: Start Time, font_size: null, font: '', spacing_above: small,
-              icon_align: left, spacing_below: small, italic: false, background: '',
-              bold: true, underline: false, icon: ''}
-            name: label_2
+            properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: Start Time, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: true, underline: false, icon: ''}
             layout_properties: {grid_position: 'VRLLDD,PKQISO', column: ABFKML}
+            name: label_2
           - type: Label
-            properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-              visible: true, text: Duration, font_size: null, font: '', spacing_above: small,
-              icon_align: left, spacing_below: small, italic: false, background: '',
-              bold: true, underline: false, icon: ''}
-            name: label_3
+            properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: Duration, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: true, underline: false, icon: ''}
             layout_properties: {column: YUYJUP}
-          event_bindings: {}
-          data_bindings: []
+            name: label_3
         - type: RepeatingPanel
-          properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
-            visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.DashForm.UpcomingRowTemplate,
-            background: ''}
-          name: upcoming_repeating_panel
+          properties: {role: null, tooltip: '', border: '', foreground: '', items: null, visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.DashForm.UpcomingRowTemplate, background: ''}
           layout_properties: {}
           event_bindings: {}
-        data_bindings: []
-    event_bindings: {}
+          name: upcoming_repeating_panel
   - type: ColumnPanel
     properties: {role: card, col_widths: '{}'}
-    name: prompts_card
     layout_properties: {grid_position: 'AXXUEY,CRCZWZ'}
+    data_bindings:
+    - {code: 'self.item[''prompts'']', property: visible}
+    name: prompts_card
     components:
     - type: Link
-      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Gray
-          800', visible: true, text: prompts & notices, font_size: null, wrap_on: mobile,
-        font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '',
-        spacing_below: small, italic: true, background: '', bold: false, underline: false,
-        icon: 'fa:chevron-down'}
-      name: prompts_open_link
+      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Gray 800', visible: true, text: prompts & notices, font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '', spacing_below: small, italic: true, background: '', bold: false, underline: false, icon: 'fa:chevron-down'}
       layout_properties: {grid_position: 'LOLRDI,RYZDXG'}
       event_bindings: {click: prompts_open_link_click}
+      name: prompts_open_link
     - type: RepeatingPanel
       properties: {item_template: MenuForm.DashForm.PromptTemplate}
-      name: prompts_repeating_panel
       layout_properties: {grid_position: 'XUQQLH,UMLUMQ'}
       data_bindings:
-      - {property: items, code: 'self.item[''prompts'']'}
-    data_bindings:
-    - {property: visible, code: 'self.item[''prompts'']'}
-  event_bindings: {}
-- name: timer_2
-  type: Timer
+      - {code: 'self.item[''prompts'']', property: items}
+      name: prompts_repeating_panel
+- type: Timer
   properties: {interval: 0}
   event_bindings: {tick: timer_2_tick}
+  name: timer_2
 - type: ColumnPanel
   properties: {role: card, col_widths: '{}'}
-  name: proposals_card
   layout_properties: {slot: default}
+  name: proposals_card
   components:
   - type: Label
-    properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: You can accept an existing empathy chat request or create your own.,
-      font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: ''}
-    name: status_label
+    properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '', visible: true, text: You can accept an existing empathy chat request or create your own., font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
     layout_properties: {grid_position: 'KHFOCH,ANSQVO'}
     event_bindings: {}
+    name: status_label
   - type: DataGrid
     properties:
       role: null
@@ -165,89 +132,56 @@ components:
       spacing_above: small
       spacing_below: small
       background: ''
-    name: data_grid_1
     layout_properties: {grid_position: 'UMBGDH,WRIGBA'}
+    event_bindings: {}
+    name: data_grid_1
     components:
     - type: DataRowPanel
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:White',
-        auto_display_data: true, visible: true, item: null, font_size: null, font: '',
-        spacing_above: none, spacing_below: none, italic: false, background: 'theme:Primary
-          500', bold: false, underline: false}
-      name: data_row_panel_1
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:White', auto_display_data: true, visible: true, item: null, font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false, background: 'theme:Primary 500', bold: false, underline: false}
       layout_properties: {pinned: true}
+      event_bindings: {}
+      name: data_row_panel_1
       components:
       - type: Link
-        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White',
-          visible: true, text: Who, font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
-          spacing_above: small, icon_align: right, col_widths: '', spacing_below: small,
-          italic: false, background: '', bold: true, underline: false, icon: ''}
-        name: link_users
+        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White', visible: true, text: Who, font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: right, col_widths: '', spacing_below: small, italic: false, background: '', bold: true, underline: false, icon: ''}
         layout_properties: {column: LRZCRL}
         event_bindings: {}
+        name: link_users
       - type: Link
-        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White',
-          visible: true, text: Start Time, font_size: null, wrap_on: mobile, font: '',
-          col_spacing: medium, spacing_above: small, icon_align: right, col_widths: '',
-          spacing_below: small, italic: false, background: '', bold: true, underline: false,
-          icon: ''}
-        name: link_start_time
+        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White', visible: true, text: Start Time, font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: right, col_widths: '', spacing_below: small, italic: false, background: '', bold: true, underline: false, icon: ''}
         layout_properties: {column: ABFKML}
         event_bindings: {}
+        name: link_start_time
       - type: Link
-        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White',
-          visible: true, text: Duration, font_size: null, wrap_on: mobile, font: '',
-          col_spacing: medium, spacing_above: small, icon_align: right, col_widths: '',
-          spacing_below: small, italic: false, background: '', bold: true, underline: false,
-          icon: ''}
-        name: link_duration
+        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White', visible: true, text: Duration, font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: right, col_widths: '', spacing_below: small, italic: false, background: '', bold: true, underline: false, icon: ''}
         layout_properties: {column: YUYJUP}
         event_bindings: {}
+        name: link_duration
       - type: Link
-        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White',
-          visible: true, text: Expires in..., font_size: null, wrap_on: mobile, font: '',
-          col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '',
-          spacing_below: small, italic: false, background: '', bold: true, underline: false,
-          icon: ''}
-        name: link_expires_in
+        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:White', visible: true, text: Expires in..., font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '', spacing_below: small, italic: false, background: '', bold: true, underline: false, icon: ''}
         layout_properties: {column: QGSDIT}
-      event_bindings: {}
-      data_bindings: []
+        name: link_expires_in
     - type: RepeatingPanel
       properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.DashForm.ProposalRowTemplate}
-      name: repeating_panel_1
       layout_properties: {}
       event_bindings: {}
-    event_bindings: {}
-    data_bindings: []
+      name: repeating_panel_1
   - type: FlowPanel
-    properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-    name: flow_panel_1
+    properties: {role: null, spacing: medium, align: center, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
     layout_properties: {grid_position: 'JIMYHZ,YLBSYG'}
+    name: flow_panel_1
     components:
     - type: Button
-      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time,
-        border: '', enabled: true, foreground: '', visible: true, text: Propose time(s) to chat later,
-        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-        italic: false, background: '', bold: false, underline: false, icon: 'fa:calendar-plus-o'}
-      name: propose_later_button
+      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time, border: '', enabled: true, foreground: '', visible: true, text: Propose time(s) to chat later, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:calendar-plus-o'}
       layout_properties: {grid_position: 'JIMYHZ,AWLNZN'}
       event_bindings: {click: propose_button_click}
+      name: propose_later_button
     - type: Button
-      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time,
-        border: '', enabled: true, foreground: '', visible: true, text: Initiate a Chat Now,
-        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-        italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
-      name: propose_button
+      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat either now or at a scheduled future time, border: '', enabled: true, foreground: '', visible: true, text: Initiate a Chat Now, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
       layout_properties: {grid_position: 'CDRPGT,AFJOMV'}
       event_bindings: {click: propose_button_click}
-- name: timer_1
-  type: Timer
+      name: propose_button
+- type: Timer
   properties: {interval: 0}
   event_bindings: {tick: timer_1_tick}
-container:
-  type: HtmlTemplate
-  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
-    role: null, html: ''}
-  event_bindings: {show: form_show}
-is_package: true
+  name: timer_1

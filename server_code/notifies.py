@@ -19,8 +19,8 @@ def email_send(to_user, subject, text, from_name="", from_address="no-reply"):
 
 
 def send_sms(to_number, text):
-  account_sid = secrets.get_secret('account_sid')
-  auth_token = secrets.get_secret('auth_token')
+  account_sid = secrets.get_secret('twilio_account_sid')
+  auth_token = secrets.get_secret('twilio_auth_token')
   from twilio.rest import Client
   client = Client(account_sid, auth_token)
   try:

@@ -1,4 +1,5 @@
 import anvil.server
+import anvil.tables as tables
 from . import parameters as p
 from . import notifies as n
 from . import accounts
@@ -48,7 +49,7 @@ def _init_matcher(user, trust_level):
          }
 
 
-@anvil.tables.in_transaction
+@tables.in_transaction
 def _init_user_status(user):
   with TimerLogger("  _init_user_status", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
     ei.prune_no_show_exchanges()
@@ -67,7 +68,7 @@ def _init_user_status(user):
         ri.confirm_wait(request_record)
 
 
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def _get_proposals_upcomings(user):
   print("                      _get_proposals_upcomings")
   return ri.get_proposals_upcomings(user)
@@ -75,10 +76,9 @@ def _get_proposals_upcomings(user):
 
 def propagate_update_needed(user=None):
   from anvil.tables import app_tables
-  import anvil.tables
   import anvil.tables.query as q
   all_users = app_tables.users.search(q.fetch_only('update_needed'), update_needed=False)
-  with anvil.tables.batch_update:
+  with tables.batch_update:
     for u in all_users:
       if u != user:
         u['update_needed'] = True

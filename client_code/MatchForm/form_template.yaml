@@ -1,23 +1,14 @@
 is_package: true
 container:
   type: HtmlTemplate
-  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
-    role: null, html: "<script>\n function loadClips(doorbellMp3SrcUrl, doorbellWavSrcUrl,\
-      \ dingWavSrcUrl){\n    var doorbellMp3=document.getElementById('doorbellMp3');\n\
-      \    var doorbellWav=document.getElementById('doorbellWav');\n    var dingWav=document.getElementById('dingWav');\n\
-      \    doorbellMp3.src=doorbellMp3SrcUrl;\n    doorbellWav.src=doorbellWavSrcUrl;\n\
-      \    dingWav.src=dingWavSrcUrl;\n    var doorbell=document.getElementById('doorbell');\n\
-      \    var ding=document.getElementById('ding');\n    doorbell.load();\n    ding.load();\n\
-      \  }\n</script>\n\n<script>\nfunction playSound(audio_id) {\n  var volume =\
-      \ {\"ding\": 0.4,\n                \"doorbell\": 0.7,\n               };\n \
-      \ var sound = document.getElementById(audio_id);\n  sound.pause();\n  sound.currentTime\
-      \ = 0;\n  sound.volume = volume[audio_id];\n  sound.play();\n}\n</script>\n\n\
-      <script>\nfunction initSound(audio_id) {\n  var sound = document.getElementById(audio_id);\n\
-      \  sound.volume = 0.0;\n  sound.play();\n}\n</script>\n\n<audio id=\"doorbell\"\
-      \ preload=\"auto\" autostart=\"false\">\n  <source id=\"doorbellMp3\" src=\"\
-      \" type=\"audio/mp3\" />\n  <source id=\"doorbellWav\" src=\"\" type=\"audio/wav\"\
-      \ />  \n</audio>\n\n<audio id=\"ding\" preload=\"auto\" autostart=\"false\"\
-      >\n  <source id=\"dingWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n"}
+  properties:
+    tooltip: ''
+    background: ''
+    foreground: ''
+    border: ''
+    visible: true
+    role: null
+    html: "<script>\n function loadClips(doorbellMp3SrcUrl, doorbellWavSrcUrl, dingWavSrcUrl){\n    var doorbellMp3=document.getElementById('doorbellMp3');\n    var doorbellWav=document.getElementById('doorbellWav');\n    var dingWav=document.getElementById('dingWav');\n    doorbellMp3.src=doorbellMp3SrcUrl;\n    doorbellWav.src=doorbellWavSrcUrl;\n    dingWav.src=dingWavSrcUrl;\n    var doorbell=document.getElementById('doorbell');\n    var ding=document.getElementById('ding');\n    doorbell.load();\n    ding.load();\n  }\n</script>\n\n<script>\nfunction playSound(audio_id) {\n  var volume = {\"ding\": 0.4,\n                \"doorbell\": 0.7,\n               };\n  var sound = document.getElementById(audio_id);\n  sound.pause();\n  sound.currentTime = 0;\n  sound.volume = volume[audio_id];\n  sound.play();\n}\n</script>\n\n<script>\nfunction initSound(audio_id) {\n  var sound = document.getElementById(audio_id);\n  sound.volume = 0.0;\n  sound.play();\n}\n</script>\n\n<audio id=\"doorbell\" preload=\"auto\" autostart=\"false\">\n  <source id=\"doorbellMp3\" src=\"\" type=\"audio/mp3\" />\n  <source id=\"doorbellWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n\n<audio id=\"ding\" preload=\"auto\" autostart=\"false\">\n  <source id=\"dingWav\" src=\"\" type=\"audio/wav\" />  \n</audio>\n"
   event_bindings: {show: form_show}
 components:
 - type: ColumnPanel
@@ -27,157 +18,103 @@ components:
   name: content_panel
   components:
   - type: ColumnPanel
-    properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: small, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: small, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
     layout_properties: {grid_position: 'APRVOR,LSQCPI'}
     event_bindings: {}
     name: card_1
     components:
     - type: Label
-      properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-        visible: false, text: Waiting for someone else to join..., font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+      properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '', visible: false, text: Waiting for someone else to join..., font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
       layout_properties: {grid_position: 'YOJCEM,HURPQL'}
       event_bindings: {}
       name: status_label
     - type: Link
-      properties: {role: text, url: '', align: center, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: false, text: doorbell muted (click to play sound upon arrival),
-        font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none,
-        icon_align: left, col_widths: '', spacing_below: none, italic: false, background: '',
-        bold: false, underline: false, icon: 'fa:bell-slash'}
+      properties: {role: text, url: '', align: center, tooltip: '', border: '', foreground: 'theme:Primary 500', visible: false, text: doorbell muted (click to play sound upon arrival), font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '', spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:bell-slash'}
       name: mute_doorbell_link
       layout_properties: {grid_position: 'GRCATF,VPJYTW'}
       event_bindings: {click: mute_doorbell_link_click}
     - type: Label
-      properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-        visible: false, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+      properties: {role: null, align: center, tooltip: '', border: '', foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       layout_properties: {grid_position: 'HHXUVE,NPWRYW'}
       event_bindings: {}
       name: timer_label
     - type: FlowPanel
-      properties: {role: null, spacing: none, align: justify, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: small, spacing_below: none,
-        background: ''}
+      properties: {role: null, spacing: none, align: justify, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
       layout_properties: {grid_position: 'HLRERV,BACULC', full_width_row: false}
       name: flow_panel_1
       components:
       - type: Button
-        properties: {role: raised, align: center, tooltip: Toggle "how they like to receive empathy" info,
-          border: '', enabled: true, foreground: '', visible: false, text: '', font_size: 13,
-          font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: 'fa:info-circle'}
+        properties: {role: raised, align: center, tooltip: Toggle "how they like to receive empathy" info, border: '', enabled: true, foreground: '', visible: false, text: '', font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:info-circle'}
         layout_properties: {}
         event_bindings: {click: info_button_click}
         name: info_button
       - type: Button
-        properties: {role: raised, align: center, tooltip: Toggle private timer, border: '',
-          enabled: true, foreground: '', visible: true, text: Timer, font_size: 13,
-          font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: 'fa:hourglass-start'}
+        properties: {role: raised, align: center, tooltip: Toggle private timer, border: '', enabled: true, foreground: '', visible: true, text: Timer, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:hourglass-start'}
         layout_properties: {slot: default}
         event_bindings: {click: timer_button_click}
         name: timer_button
       - type: Button
-        properties: {role: raised, align: center, tooltip: Toggle text chat card,
-          border: '', enabled: true, foreground: '', visible: true, text: Messages,
-          font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: 'fa:comment'}
+        properties: {role: raised, align: center, tooltip: Toggle text chat card, border: '', enabled: true, foreground: '', visible: true, text: Messages, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:comment'}
         layout_properties: {}
         event_bindings: {click: message_button_click}
         name: message_button
       - type: Button
-        properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first,
-          border: '', enabled: true, foreground: '', visible: true, text: Slider,
-          font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: 'fa:sliders'}
+        properties: {role: raised, align: center, tooltip: Toggle "empathy bucket" slider to help decide who should go first, border: '', enabled: true, foreground: '', visible: true, text: Slider, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:sliders'}
         layout_properties: {}
         event_bindings: {click: slider_button_click}
         name: slider_button
       - type: Button
-        properties: {role: raised, align: center, tooltip: Toggle feelings and needs list display,
-          border: '', enabled: true, foreground: '', visible: true, text: Lists, font_size: 13,
-          font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: 'fa:map-o'}
+        properties: {role: raised, align: center, tooltip: Toggle feelings and needs list display, border: '', enabled: true, foreground: '', visible: true, text: Lists, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:map-o'}
         layout_properties: {}
         event_bindings: {click: lists_button_click}
         name: lists_button
       - type: Spacer
-        properties: {visible: true, spacing_above: small, spacing_below: small, height: 6,
-          tooltip: ''}
+        properties: {visible: true, spacing_above: small, spacing_below: small, height: 6, tooltip: ''}
         name: spacer_3
         layout_properties: {width: 14, expand: false}
       - type: Button
-        properties: {role: raised, align: center, tooltip: Toggle full-screen mode (not just the video chat),
-          border: '', enabled: true, foreground: '', visible: true, text: Full Screen,
-          font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: 'fa:arrows-alt'}
+        properties: {role: raised, align: center, tooltip: Toggle full-screen mode (not just the video chat), border: '', enabled: true, foreground: '', visible: true, text: Full Screen, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:arrows-alt'}
         layout_properties: {}
         event_bindings: {click: full_screen_button_click}
         name: full_screen_button
       - type: Link
-        properties: {role: null, url: '', align: left, tooltip: Open video/audio chat in new window (or mobile app),
-          border: '', foreground: '', visible: false, text: '', font_size: 12, wrap_on: mobile,
-          font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '{}',
-          spacing_below: none, italic: false, background: '', bold: false, underline: false,
-          icon: ''}
+        properties: {role: null, url: '', align: left, tooltip: Open video/audio chat in new window (or mobile app), border: '', foreground: '', visible: false, text: '', font_size: 12, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '{}', spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
         layout_properties: {grid_position: 'WOLXYM,LIOMWJ', width: null, expand: false}
         event_bindings: {click: jitsi_link_click}
         name: jitsi_link
         components:
         - type: Button
-          properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-            foreground: '', visible: true, text: Pop-Out Video, font_size: 13, font: '',
-            spacing_above: small, icon_align: left, spacing_below: none, italic: false,
-            background: '', bold: false, underline: false, icon: 'fa:external-link'}
+          properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Pop-Out Video, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:external-link'}
           layout_properties: {grid_position: 'ADNINT,BAITJS', full_width_row: true}
           name: button_1
           event_bindings: {click: jitsi_link_click}
       - type: FlowPanel
-        properties: {role: null, spacing: medium, align: right, tooltip: '', border: '',
-          foreground: '', visible: true, spacing_above: none, spacing_below: none,
-          background: ''}
+        properties: {role: null, spacing: medium, align: right, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
         name: flow_panel_2
         layout_properties: {expand: true, width: null}
         components:
         - type: Button
-          properties: {role: secondary-color, align: right, tooltip: '', border: '',
-            enabled: true, foreground: '', visible: false, text: Cancel, font_size: 13,
-            font: '', spacing_above: small, icon_align: left, spacing_below: small,
-            italic: false, background: '', bold: false, underline: false, icon: ''}
+          properties: {role: secondary-color, align: right, tooltip: '', border: '', enabled: true, foreground: '', visible: false, text: Cancel, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
           layout_properties: {grid_position: 'NLWDED,PWPLEY'}
           event_bindings: {click: complete_button_click}
           name: complete_button
     - type: LinearPanel
-      properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
-        border: '', visible: true, role: null, tooltip: ''}
+      properties: {spacing_above: small, spacing_below: small, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
       layout_properties: {expand: true, width: null, grid_position: 'DUEWCW,KTQWOP'}
       name: jitsi_column_panel
       components:
       - type: Button
-        properties: {role: primary-color, align: center, tooltip: '', border: '',
-          enabled: true, foreground: '', visible: false, text: Restore video here,
-          font_size: null, font: '', spacing_above: large, icon_align: left, spacing_below: large,
-          italic: false, background: '', bold: false, underline: false, icon: ''}
+        properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: false, text: Restore video here, font_size: null, font: '', spacing_above: large, icon_align: left, spacing_below: large, italic: false, background: '', bold: false, underline: false, icon: ''}
         layout_properties: {}
         event_bindings: {click: restore_button_click}
         name: restore_button
     - type: FlowPanel
-      properties: {role: null, spacing: small, align: center, tooltip: '', border: '',
-        foreground: '', visible: false, spacing_above: none, spacing_below: none,
-        background: ''}
+      properties: {role: null, spacing: small, align: center, tooltip: '', border: '', foreground: '', visible: false, spacing_above: none, spacing_below: none, background: ''}
       layout_properties: {grid_position: 'WOLXYM,KTDUPL'}
       name: info_flow_panel
       components:
       - type: RichText
-        properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
-          foreground: '', visible: true, font_size: null, content: 'How {name} likes
-            to receive empathy: {how_empathy}', font: '', spacing_above: none, spacing_below: none,
-          data: null, background: '', format: markdown}
+        properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '', foreground: '', visible: true, font_size: null, content: 'How {name} likes to receive empathy: {how_empathy}', font: '', spacing_above: none, spacing_below: none, data: null, background: '', format: markdown}
         name: rich_text_1
         layout_properties: {grid_position: 'WOLXYM,VNOAZY', expand: true, width: null}
         components:
@@ -205,59 +142,40 @@ components:
           layout_properties: {slot: name}
           event_bindings: {change: update_how_empathy_label}
         - type: Label
-          properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-            visible: true, text: '', font_size: null, font: '', spacing_above: none,
-            icon_align: left, spacing_below: none, italic: false, background: '',
-            bold: false, underline: false, icon: ''}
+          properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
           name: how_empathy_label
           layout_properties: {slot: how_empathy}
   - type: ColumnPanel
-    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
     layout_properties: {grid_position: 'MUNTHE,RRZPVI'}
     name: slider_card
     components:
     - type: ColumnPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-        wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-        spacing_below: none, background: ''}
+      properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none, background: ''}
       layout_properties: {grid_position: 'UATIWX,QHMTDV'}
       name: slider_column_panel
       components: []
   - type: ColumnPanel
-    properties: {role: card, tooltip: 'This is a private timer, not shown to the other
-        user. Note: If you hide a running timer, it will reappear when the time elapses.',
-      border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium,
-      spacing_above: small, col_widths: '{"NSDHUI":28,"FTMBCC":32}', spacing_below: small,
-      background: ''}
+    properties: {role: card, tooltip: 'This is a private timer, not shown to the other user. Note: If you hide a running timer, it will reappear when the time elapses.', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"NSDHUI":28,"FTMBCC":32}', spacing_below: small, background: ''}
     layout_properties: {grid_position: 'ODNWIY,XMNGNB'}
     name: timer_card
     components:
     - type: Label
-      properties: {role: subheading, align: right, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'My (private) timer:', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+      properties: {role: subheading, align: right, tooltip: '', border: '', foreground: '', visible: true, text: 'My (private) timer:', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: label_2
       layout_properties: {grid_position: 'PGYFGE,NSDHUI'}
     - type: form:WAF7GWYZ3PTOPDNF:MyTimer
-      properties: {minutes: 10, seconds: 0, paused: true, visible: true, enabled: true,
-        align: left}
+      properties: {minutes: 10, seconds: 0, paused: true, visible: true, enabled: true, align: left}
       layout_properties: {grid_position: 'PGYFGE,FTMBCC'}
       event_bindings: {elapsed: my_timer_1_elapsed, started: my_timer_1_started}
       name: my_timer_1
   - type: ColumnPanel
-    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
     layout_properties: {grid_position: 'DMNLEV,YIZNLS'}
     name: message_card
     components:
     - type: ColumnPanel
-      properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true,
-        wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-        spacing_below: none, background: 'theme:Gray 100'}
+      properties: {role: card-scroll, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: none, background: 'theme:Gray 100'}
       layout_properties: {grid_position: 'XFYUCJ,NLVKYN'}
       event_bindings: {}
       name: chat_display_card
@@ -268,39 +186,27 @@ components:
         event_bindings: {}
         name: chat_repeating_panel
       - type: Label
-        properties: {role: null, align: center, tooltip: 'Note: Text chat here is
-            distinct from chat messages within the Jitsi video chat client', border: '',
-          foreground: '', visible: false, text: Messages / History, font_size: null,
-          font: '', spacing_above: small, icon_align: left, spacing_below: small,
-          italic: false, background: '', bold: false, underline: false, icon: ''}
+        properties: {role: null, align: center, tooltip: 'Note: Text chat here is distinct from chat messages within the Jitsi video chat client', border: '', foreground: '', visible: false, text: Messages / History, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
         layout_properties: {grid_position: 'UMGWST,YDXSKA'}
         name: label_1
     - type: ColumnPanel
-      properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-        wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-        spacing_below: small, background: ''}
+      properties: {role: card, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
       layout_properties: {grid_position: 'JKFCWM,NASNYH'}
       event_bindings: {}
       name: chat_send_card
       components:
       - type: TextBox
-        properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Send a message,
-          border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-          font: '', spacing_above: none, type: text, spacing_below: none, italic: false,
-          background: '', bold: false, underline: false}
+        properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Send a message, border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none, type: text, spacing_below: none, italic: false, background: '', bold: false, underline: false}
         layout_properties: {grid_position: 'IXQTHC,HCFYRM'}
         event_bindings: {pressed_enter: message_textbox_pressed_enter}
         name: message_textbox
   - type: ColumnPanel
-    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '',
-      spacing_below: small, background: ''}
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '', spacing_below: small, background: ''}
     layout_properties: {grid_position: 'QIDPXD,MVNECY'}
     event_bindings: {}
     name: lists_card
   - type: Spacer
-    properties: {visible: true, spacing_above: small, spacing_below: small, height: 1059,
-      tooltip: ''}
+    properties: {visible: true, spacing_above: small, spacing_below: small, height: 1059, tooltip: ''}
     layout_properties: {slot: default, grid_position: 'JKHTEY,CRXPXJ'}
     name: spacer_1
 - type: Timer
