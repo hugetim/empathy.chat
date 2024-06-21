@@ -9,62 +9,56 @@ components:
   layout_properties: {slot: default}
   components:
   - type: FlowPanel
-    properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+    properties: {role: null, spacing: medium, align: center, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
     name: flow_panel_1
     layout_properties: {grid_position: 'GNMTMC,DJTRFZ'}
     components:
     - type: RichText
-      properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '',
-        foreground: '', visible: false, font_size: null, content: 'empathy.chat is...
+      properties:
+        role: null
+        align: left
+        tooltip: ''
+        enable_slots: true
+        border: ''
+        foreground: ''
+        visible: false
+        font_size: null
+        content: |-
+          empathy.chat is...
 
-
-          * a **network** of [NVC](https://www.nycnvc.org/what-is-nonviolent-communication)
-          empathy buddies
-
+          * a **network** of [NVC](https://www.nycnvc.org/what-is-nonviolent-communication) empathy buddies
           * a **platform** leaders can use to foster empathy buddy chats within groups
-
 
           To learn more, visit the [empathy.chat community forum](https://www.loomio.org/empathy-chat).
 
-
-          If you have an empathy.chat account, {login}.', font: '', spacing_above: small,
-        spacing_below: small, data: null, background: '', format: markdown}
+          If you have an empathy.chat account, {login}.
+        font: ''
+        spacing_above: small
+        spacing_below: small
+        data: null
+        background: ''
+        format: markdown
       name: rich_text_1
       layout_properties: {grid_position: 'CQBDSD,YDLVUQ'}
       components:
       - type: Link
-        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: click here to log in, font_size: null, wrap_on: mobile,
-          font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '',
-          spacing_below: small, italic: false, background: '', bold: false, underline: false,
-          icon: ''}
+        properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '', visible: true, text: click here to log in, font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '', spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
         name: link_2
         layout_properties: {slot: login}
         event_bindings: {click: login_button_click}
   - type: ColumnPanel
-    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
+    properties: {role: card, tooltip: '', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
     name: card_1
     layout_properties:
       col_widths: {}
       grid_position: QDXEEB,WIIDCI
     components:
     - type: Label
-      properties: {role: subheading, align: center, tooltip: Quote of the Day, border: '',
-        foreground: '', visible: true, text: '"We need to receive empathy to give
-          empathy."', font_size: null, font: '', spacing_above: small, icon_align: left,
-        spacing_below: none, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
+      properties: {role: subheading, align: center, tooltip: Quote of the Day, border: '', foreground: '', visible: true, text: '"We need to receive empathy to give empathy."', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: quote_label
       layout_properties: {grid_position: 'KBAKGL,GWZEXS'}
     - type: Link
-      properties: {role: null, url: 'https://www.nycnvc.org/who-is-marshall-rosenberg',
-        align: center, tooltip: '', border: '', foreground: '', visible: true, text: '-
-          Marshall B. Rosenberg', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
-        spacing_above: none, icon_align: left, col_widths: '', spacing_below: small,
-        italic: false, background: '', bold: false, underline: false, icon: ''}
+      properties: {role: null, url: 'https://www.nycnvc.org/who-is-marshall-rosenberg', align: center, tooltip: '', border: '', foreground: '', visible: true, text: '- Marshall B. Rosenberg', font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '', spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: link_1
       layout_properties: {grid_position: 'KGRFAT,YJQLIH'}
   - type: Spacer
@@ -72,10 +66,7 @@ components:
     name: spacer_1
     layout_properties: {grid_position: 'SYRRHE,XHWVQJ'}
   - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: false, text: Continue, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: false, text: Continue, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
     name: enter_button
     layout_properties: {grid_position: 'CCEZIT,DOXCQJ'}
     event_bindings: {click: enter_button_click}
@@ -85,18 +76,12 @@ components:
   layout_properties: {slot: nav-right}
   components:
   - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: 'theme:White', visible: false, text: '', font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:sign-in'}
+    properties: {role: null, align: center, tooltip: '', border: '', enabled: true, foreground: 'theme:White', visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:sign-in'}
     name: login_button
     layout_properties: {}
     event_bindings: {click: login_button_click}
 - type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: empathy.chat, font_size: null, font: '', spacing_above: small, icon_align: left,
-    spacing_below: small, italic: false, background: '', bold: false, underline: false,
-    icon: ''}
+  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: empathy.chat, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
   name: label_1
   layout_properties: {slot: title}
   event_bindings: {}

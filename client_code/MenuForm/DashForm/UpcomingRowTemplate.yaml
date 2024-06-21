@@ -1,23 +1,16 @@
 components:
 - type: FlowPanel
-  properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '',
-    visible: true, spacing_above: none, spacing_below: none, background: ''}
+  properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: flow_panel_1
   layout_properties: {column: PHQQNP}
   components:
   - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: false, text: Join, font_size: 10, font: '', spacing_above: small,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:child'}
+    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: false, text: Join, font_size: 10, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
     name: join_button
     layout_properties: {}
     event_bindings: {click: join_button_click}
   - type: Button
-    properties: {role: null, align: center, tooltip: Cancel this proposal time, border: '',
-      enabled: true, foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null,
-      font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:trash'}
+    properties: {role: null, align: center, tooltip: Cancel this proposal time, border: '', enabled: true, foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:trash'}
     name: cancel_button
     layout_properties: {grid_position: 'LKJQFF,DBDZKE'}
     event_bindings: {click: cancel_button_click}
@@ -26,9 +19,7 @@ components:
   name: users_flow_panel
   layout_properties: {column: LRZCRL}
 - type: FlowPanel
-  properties: {role: null, vertical_align: full, spacing: medium, align: justify,
-    tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none,
-    background: ''}
+  properties: {role: null, vertical_align: full, spacing: medium, align: justify, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
   name: flow_panel_2
   layout_properties: {column: YUYJUP}
   components:
@@ -46,6 +37,4 @@ components:
 container:
   type: DataRowPanel
   event_bindings: {}
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', auto_display_data: true,
-    visible: true, font_size: null, font: '', spacing_above: none, spacing_below: none,
-    italic: false, background: '', bold: false, underline: false}
+  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', auto_display_data: true, visible: true, font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false, background: '', bold: false, underline: false}

@@ -1,8 +1,6 @@
 components:
 - type: ColumnPanel
-  properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
+  properties: {role: card, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
   name: content_column_panel
   layout_properties: {grid_position: 'QZKEDX,JHASIM'}
   event_bindings: {}
@@ -35,16 +33,12 @@ components:
       grid_position: PLFXZS,NAEYWZ
     components:
     - type: RepeatingPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
-        visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.MyGroupsMenu.MyGroupMembers.MyGroupMembersRow,
-        background: ''}
+      properties: {role: null, tooltip: '', border: '', foreground: '', items: null, visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.MyGroupsMenu.MyGroupMembers.MyGroupMembersRow, background: ''}
       name: repeating_panel_1
       layout_properties: {}
       data_bindings: []
 container:
   type: ColumnPanel
   event_bindings: {}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
 is_package: true

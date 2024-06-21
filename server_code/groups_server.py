@@ -1,5 +1,5 @@
 import anvil.users
-import anvil.tables
+import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
@@ -51,7 +51,7 @@ my_group_invites_fetch = q.fetch_only('link_key', 'spec', 'created', 'expire_dat
 
 
 @sm.authenticated_callable
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def load_my_groups(user_id="", user=None):
   print(f"load_my_groups({user_id})")
   if not user:
@@ -63,7 +63,7 @@ def load_my_groups(user_id="", user=None):
   ))
   combined_group_invites_search = list(app_tables.group_invites.search(
     my_group_invites_fetch,
-    anvil.tables.order_by('expire_date', ascending=False),
+    tables.order_by('expire_date', ascending=False),
     group=q.any_of(*rows), 
     current=True,
   ))
@@ -76,7 +76,7 @@ def load_my_groups(user_id="", user=None):
 
 
 @sm.authenticated_callable
-@anvil.tables.in_transaction
+@tables.in_transaction
 def add_my_group(port_my_groups, user_id=""):
   print(f"add_my_group(port_my_groups, {user_id})")
   check_my_group_auth()
@@ -115,7 +115,7 @@ class MyGroup(groups.MyGroup):
       user = sm.get_acting_user()
     if group_invites_search is False:
       group_invites_search = app_tables.group_invites.search(my_group_invites_fetch,
-                                                             anvil.tables.order_by('expire_date', ascending=False),
+                                                             tables.order_by('expire_date', ascending=False),
                                                              group=group_row, current=True)
     port_invites = [Invite.from_invite_row(i_row, portable=True, user=user)
                     for i_row in group_invites_search]
@@ -144,7 +144,7 @@ class MyGroup(groups.MyGroup):
 
 
 @sm.authenticated_callable
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def save_my_group_settings(group_id, name, user_id=""):
   print(f"save_my_group_settings({group_id}, {name}, {user_id})")
   check_my_group_auth(group_id)
@@ -153,7 +153,7 @@ def save_my_group_settings(group_id, name, user_id=""):
 
 
 @sm.authenticated_callable
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def create_group_invite(port_my_group):
   print(f"create_group_invite({port_my_group!r})")
   check_my_group_auth(port_my_group.group_id)
@@ -415,7 +415,7 @@ class Invite(sm.ServerItem, groups.Invite):
     return self._group_name_and_host(invite_row)
 
   @staticmethod
-  @anvil.tables.in_transaction
+  @tables.in_transaction
   def _add_visitor(user, invite_row):
     if user in invite_row['group']['hosts']:
       this_group = invite_row['group']
@@ -438,7 +438,7 @@ class Invite(sm.ServerItem, groups.Invite):
 
   
   @staticmethod
-  @anvil.tables.in_transaction(relaxed=True)
+  @tables.in_transaction(relaxed=True)
   def _register_user(user):
     accounts.init_user_info(user)
       

@@ -1,6 +1,6 @@
 import anvil.users
 import anvil.server
-import anvil.tables
+import anvil.tables as tables
 from anvil.tables import app_tables, order_by
 import anvil.google.auth
 import anvil.tables.query as q
@@ -35,7 +35,7 @@ def initialize_session(time_zone, user):
     return trust_level
 
 
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def _init_user_info_transaction(user, time_zone):
   print(f"                    {user['email']}")
   return init_user_info(user, time_zone)
@@ -133,7 +133,7 @@ def do_signup(email, port_invite):
   return user
 
 
-@anvil.tables.in_transaction
+@tables.in_transaction
 def _create_user_if_needed_and_return_whether_created(email):
   user = _get_user_by_email(email)
   if user:
@@ -204,7 +204,7 @@ def in_email_list(email_str, list_of_email_strs):
   return False
   
 # @anvil.server.callable
-# @anvil.tables.in_transaction
+# @tables.in_transaction
 # def do_google_signup(email):
 #   if anvil.google.auth.get_user_email() == email:
 #     user = app_tables.users.get(email=email)
@@ -215,7 +215,7 @@ def in_email_list(email_str, list_of_email_strs):
 
 
 @anvil.server.callable
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def remove_user(user):
   """Remove new user created via Google sign-in"""
   sm.warning(f"Removing user {user['email']}")
@@ -264,7 +264,7 @@ def check_phone_code(code, user_id=""):
   return code_matches, any_failed
 
 
-@anvil.tables.in_transaction
+@tables.in_transaction
 def _check_phone_code(code, user):
   current_code_rows = app_tables.codes.search(order_by("date", ascending=False), user=user, type="phone")
   any_failed = False
@@ -351,7 +351,7 @@ def get_settings(user_id=""):
 
 
 @authenticated_callable
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def set_notif_settings(notif_settings, elig_items, user_id=""):
   print(f"set_notif_settings, {notif_settings}")
   from . import groups

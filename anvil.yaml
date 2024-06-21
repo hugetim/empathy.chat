@@ -26,37 +26,30 @@ services:
   server_config: {}
 - source: /runtime/services/google.yml
   client_config: {}
-  server_config: {client_id: 241428580212-4q2brrbaghlmsgq4brfn9ulnp7tmlnlj.apps.googleusercontent.com,
-    client_secret: null, app_origin_redirect: true, client_secret_enc: mQQmzSBf12Qu+dxUHfy4VEqjfsBKTcnF9rRRag7Qklxtm6sfnKRYx0znOt7Ly04WEaGwC3cJJmG5TCqHW0pw9V1zG/1my6IqiyYgRZ/BAXeczm2Z4i9zb4/cFOOHLtWWqx4+hC5QLfEYEAmB1khJiAPIbtQ2FlYDXZ5XUsR881Mj+yv8f+MTLxIsDWL0l5BBbIiGr/R+B19xk67c9A==}
+  server_config: {client_id: 241428580212-4q2brrbaghlmsgq4brfn9ulnp7tmlnlj.apps.googleusercontent.com, client_secret: null, app_origin_redirect: true, client_secret_enc: mQQmzSBf12Qu+dxUHfy4VEqjfsBKTcnF9rRRag7Qklxtm6sfnKRYx0znOt7Ly04WEaGwC3cJJmG5TCqHW0pw9V1zG/1my6IqiyYgRZ/BAXeczm2Z4i9zb4/cFOOHLtWWqx4+hC5QLfEYEAmB1khJiAPIbtQ2FlYDXZ5XUsR881Mj+yv8f+MTLxIsDWL0l5BBbIiGr/R+B19xk67c9A==}
 - source: /runtime/services/anvil/users.yml
-  client_config: {require_secure_passwords: true, use_token: false, use_email: true,
-    allow_remember_me: true, allow_signup: true, enable_automatically: true, confirm_email: false,
-    remember_me_days: 30, use_google: true}
+  client_config: {require_secure_passwords: true, use_token: false, use_email: true, allow_remember_me: true, allow_signup: true, enable_automatically: true, confirm_email: false, remember_me_days: 30, use_google: true}
   server_config:
     user_table: users
     email_content:
-      confirm_address: {html: '<p>Thanks for registering your account with empathy.chat.
-          Please click the following link to confirm that this is your account:</p><p><br></p><p>{{confirm_link}}</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>',
-        subject: empathy.chat - Confirm your email address}
-      reset_password: {html: '<p>To set (or reset) the password for your empathy.chat
-          account {{email}}, click the link below:</p><p>{{reset_link}}</p><p>This
-          link will expire in ten minutes.</p>', subject: empathy.chat - (re)set your password}
-      token_login: {html: '<p>To log in to empathy.chat, click the link below:</p><p>{{login_link}}</p><p>This
-          link will expire in ten minutes.</p><p><em>p.s. Logging in this way can
-          save you from having to manage yet another password. If you check the "Remember
-          me"  box when requesting this login link, you should only need to login
-          this way once per month (per device). For more info:</em>  https://anvil.works/blog/magic-link-sign-in</p>',
-        subject: empathy.chat - Login}
+      confirm_address: {html: '<p>Thanks for registering your account with empathy.chat. Please click the following link to confirm that this is your account:</p><p><br></p><p>{{confirm_link}}</p><p><br></p><p>Thanks,</p><p>Tim</p><p>empathy.chat</p>', subject: empathy.chat - Confirm your email address}
+      reset_password: {html: '<p>To set (or reset) the password for your empathy.chat account {{email}}, click the link below:</p><p>{{reset_link}}</p><p>This link will expire in ten minutes.</p>', subject: empathy.chat - (re)set your password}
+      token_login: {html: '<p>To log in to empathy.chat, click the link below:</p><p>{{login_link}}</p><p>This link will expire in ten minutes.</p><p><em>p.s. Logging in this way can save you from having to manage yet another password. If you check the "Remember me"  box when requesting this login link, you should only need to login this way once per month (per device). For more info:</em>  https://anvil.works/blog/magic-link-sign-in</p>', subject: empathy.chat - Login}
 startup: {type: module, module: startup}
 package_name: empathy_chat
 allow_embedding: false
 name: empathy.chat
 runtime_options: {version: 2, server_version: python3-full, client_version: '3', server_spec: null}
-metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:child-large.PNG',
-  title: empathy.chat}
+metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:child-large.PNG', title: empathy.chat}
 startup_form: MenuForm
-native_deps: {head_html: "<script src='https://8x8.vc/external_api.js'></script>\n\
-    <style>\n#loadingSpinner {\n  display: none;\n}\n</style>"}
+native_deps:
+  head_html: |-
+    <script src='https://8x8.vc/external_api.js'></script>
+    <style>
+    #loadingSpinner {
+      display: none;
+    }
+    </style>
 db_schema:
   group_members:
     title: Group Members

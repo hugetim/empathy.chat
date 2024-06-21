@@ -1,61 +1,60 @@
 container:
   type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none,
-    background: ''}
+  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none, background: ''}
   event_bindings: {show: form_show}
 components:
 - type: LinearPanel
-  properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
-    border: '', visible: true, role: null, tooltip: ''}
+  properties: {spacing_above: small, spacing_below: small, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
   name: linear_panel_1
   layout_properties:
     col_widths: {}
     grid_position: ISYVRT,TSGBQG
   components:
   - type: Label
-    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Imagine they were about to exchange empathy with another
-        close connection at an NVC meetup.
-
-        Who would you introduce them as?', font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+    properties:
+      role: null
+      align: center
+      tooltip: ''
+      border: ''
+      foreground: ''
+      visible: true
+      text: |-
+        Imagine they were about to exchange empathy with another close connection at an NVC meetup.
+        Who would you introduce them as?
+      font_size: null
+      font: ''
+      spacing_above: none
+      icon_align: left
+      spacing_below: none
+      italic: false
+      background: ''
+      bold: false
+      underline: false
+      icon: ''
     name: label_1
     layout_properties: {grid_position: 'OXRGOZ,JHFFDF'}
   - type: FlowPanel
-    properties: {role: null, spacing: small, align: center, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
+    properties: {role: null, spacing: small, align: center, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
     name: flow_panel_1
     layout_properties: {grid_position: 'HCIURU,CURCQW'}
     components:
     - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: my, font_size: null, font: '', spacing_above: none, icon_align: left,
-        spacing_below: none, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: my, font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: label_2
       layout_properties: {}
     - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: e.g. weekly empathy buddy; sister-in-law with a regular empathy buddy; friend who recently read Marshall's NVC book,
-        placeholder: '', border: '', enabled: true, foreground: '', visible: true,
-        text: '', font_size: 14, font: '', spacing_above: none, type: text, spacing_below: none,
-        italic: false, background: '', bold: false, underline: false}
+      properties: {role: null, align: left, hide_text: false, tooltip: e.g. weekly empathy buddy; sister-in-law with a regular empathy buddy; friend who recently read Marshall's NVC book, placeholder: '', border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14, font: '', spacing_above: none, type: text, spacing_below: none, italic: false, background: '', bold: false, underline: false}
       name: relationship_text_box
       layout_properties: {width: 491.4}
       event_bindings: {pressed_enter: relationship_text_box_pressed_enter}
       data_bindings:
       - {property: text, code: 'self.item[''relationship'']', writeback: true}
     - type: form:Why
-      properties: {tooltip: e.g. weekly empathy buddy; sister-in-law with a regular empathy buddy; or friend who recently read Marshall's NVC book,
-        text: (examples)}
+      properties: {tooltip: e.g. weekly empathy buddy; sister-in-law with a regular empathy buddy; or friend who recently read Marshall's NVC book, text: (examples)}
       name: why_1
       layout_properties: {}
   - type: Label
-    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: (This introduction/description will only be visible to your other close connections.),
-      font_size: 12, font: '', spacing_above: none, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: ''}
+    properties: {role: null, align: center, tooltip: '', border: '', foreground: '', visible: true, text: (This introduction/description will only be visible to your other close connections.), font_size: 12, font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
     name: label_6
     layout_properties: {}
 - type: Spacer
@@ -65,36 +64,24 @@ components:
     col_widths: {}
     grid_position: ZPSIWZ,VWJAHA
 - type: Label
-  properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-    visible: true, text: 'Please also provide the last 4 digits of their phone number
-      (so that your close connection may be automatically verified once they confirm
-      ownership of the number):', font_size: null, font: '', spacing_above: small,
-    icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-    underline: false, icon: ''}
+  properties: {role: null, align: center, tooltip: '', border: '', foreground: '', visible: true, text: 'Please also provide the last 4 digits of their phone number (so that your close connection may be automatically verified once they confirm ownership of the number):', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
   name: label_4
   layout_properties:
     col_widths: {}
     grid_position: NACBXV,JNZJOE
 - type: FlowPanel
-  properties: {role: null, spacing: none, align: center, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
+  properties: {role: null, spacing: none, align: center, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
   name: flow_panel_2
   layout_properties:
     col_widths: {}
     grid_position: CCYELS,HYJONB
   components:
   - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Mobile: (XXX)XXX-', font_size: 14, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: 'Mobile: (XXX)XXX-', font_size: 14, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
     name: label_5
     layout_properties: {}
   - type: TextBox
-    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-      border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14,
-      font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false}
+    properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '', border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14, font: '', spacing_above: small, type: text, spacing_below: small, italic: false, background: '', bold: false, underline: false}
     name: phone_last4_text_box
     layout_properties: {width: 38.400000000000006}
     event_bindings: {pressed_enter: phone_last4_text_box_pressed_enter}
