@@ -30,9 +30,9 @@ components:
       name: status_label
     - type: Link
       properties: {role: text, url: '', align: center, tooltip: '', border: '', foreground: 'theme:Primary 500', visible: false, text: doorbell muted (click to play sound upon arrival), font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '', spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:bell-slash'}
-      name: mute_doorbell_link
       layout_properties: {grid_position: 'GRCATF,VPJYTW'}
       event_bindings: {click: mute_doorbell_link_click}
+      name: mute_doorbell_link
     - type: Label
       properties: {role: null, align: center, tooltip: '', border: '', foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       layout_properties: {grid_position: 'HHXUVE,NPWRYW'}
@@ -70,8 +70,8 @@ components:
         name: lists_button
       - type: Spacer
         properties: {visible: true, spacing_above: small, spacing_below: small, height: 6, tooltip: ''}
-        name: spacer_3
         layout_properties: {width: 14, expand: false}
+        name: spacer_3
       - type: Button
         properties: {role: raised, align: center, tooltip: Toggle full-screen mode (not just the video chat), border: '', enabled: true, foreground: '', visible: true, text: Full Screen, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:arrows-alt'}
         layout_properties: {}
@@ -86,12 +86,12 @@ components:
         - type: Button
           properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Pop-Out Video, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:external-link'}
           layout_properties: {grid_position: 'ADNINT,BAITJS', full_width_row: true}
-          name: button_1
           event_bindings: {click: jitsi_link_click}
+          name: button_1
       - type: FlowPanel
         properties: {role: null, spacing: medium, align: right, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-        name: flow_panel_2
         layout_properties: {expand: true, width: null}
+        name: flow_panel_2
         components:
         - type: Button
           properties: {role: secondary-color, align: right, tooltip: '', border: '', enabled: true, foreground: '', visible: false, text: Cancel, font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
@@ -115,8 +115,8 @@ components:
       components:
       - type: RichText
         properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '', foreground: '', visible: true, font_size: null, content: 'How {name} likes to receive empathy: {how_empathy}', font: '', spacing_above: none, spacing_below: none, data: null, background: '', format: markdown}
-        name: rich_text_1
         layout_properties: {grid_position: 'WOLXYM,VNOAZY', expand: true, width: null}
+        name: rich_text_1
         components:
         - type: DropDown
           properties:
@@ -138,13 +138,13 @@ components:
             bold: false
             underline: false
             include_placeholder: false
-          name: how_empathy_drop_down
           layout_properties: {slot: name}
           event_bindings: {change: update_how_empathy_label}
+          name: how_empathy_drop_down
         - type: Label
           properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
-          name: how_empathy_label
           layout_properties: {slot: how_empathy}
+          name: how_empathy_label
   - type: ColumnPanel
     properties: {role: card, tooltip: '', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
     layout_properties: {grid_position: 'MUNTHE,RRZPVI'}
@@ -154,7 +154,6 @@ components:
       properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none, background: ''}
       layout_properties: {grid_position: 'UATIWX,QHMTDV'}
       name: slider_column_panel
-      components: []
   - type: ColumnPanel
     properties: {role: card, tooltip: 'This is a private timer, not shown to the other user. Note: If you hide a running timer, it will reappear when the time elapses.', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"NSDHUI":28,"FTMBCC":32}', spacing_below: small, background: ''}
     layout_properties: {grid_position: 'ODNWIY,XMNGNB'}
@@ -162,11 +161,11 @@ components:
     components:
     - type: Label
       properties: {role: subheading, align: right, tooltip: '', border: '', foreground: '', visible: true, text: 'My (private) timer:', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
-      name: label_2
       layout_properties: {grid_position: 'PGYFGE,NSDHUI'}
-    - type: form:WAF7GWYZ3PTOPDNF:MyTimer
-      properties: {minutes: 10, seconds: 0, paused: true, visible: true, enabled: true, align: left}
-      layout_properties: {grid_position: 'PGYFGE,FTMBCC'}
+      name: label_2
+    - properties: {}
+      type: form:Utilities.MyTimer
+      layout_properties: {grid_position: 'PGYFGE,CWSTMJ'}
       event_bindings: {elapsed: my_timer_1_elapsed, started: my_timer_1_started}
       name: my_timer_1
   - type: ColumnPanel

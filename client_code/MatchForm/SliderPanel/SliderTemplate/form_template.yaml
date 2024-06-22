@@ -3,39 +3,28 @@ container:
   type: ColumnPanel
   properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '', spacing_below: none, background: ''}
 components:
-- name: flow_panel_1
-  properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
+- properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
   type: FlowPanel
   layout_properties: {grid_position: 'MWGTFR,NVRGBY'}
-  data_bindings: []
+  name: flow_panel_1
   components:
-  - name: linear_panel_1
-    properties: {spacing_above: small, spacing_below: small, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
+  - properties: {spacing_above: small, spacing_below: small, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
     type: LinearPanel
     layout_properties: {width: 100, expand: false}
-    data_bindings: []
+    name: linear_panel_1
     components:
-    - name: their_label
-      properties: {role: null, align: right, tooltip: '', border: '', foreground: '', visible: true, text: 'them:', font_size: null, font: '', spacing_above: medium, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+    - properties: {role: null, align: right, tooltip: '', border: '', foreground: '', visible: true, text: 'them:', font_size: null, font: '', spacing_above: medium, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       type: Label
       layout_properties: {width: null, expand: false}
-      data_bindings: []
-  - name: linear_panel_2
-    properties: {spacing_above: none, spacing_below: none, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
+      name: their_label
+  - properties: {spacing_above: none, spacing_below: none, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
     type: LinearPanel
     layout_properties: {width: null, expand: true}
+    name: linear_panel_2
     components:
-    - name: their_slider
-      properties:
-        value: -2
-        minval: 0
-        maxval: 10
-        step: 0.2
-        labels: ['']
-        is_visible: true
-        enabled: false
-      type: form:MFQJNLWQIOGGXL4W:slider
-      layout_properties: {grid_position: 'QXZSDK,RMGHHG', expand: true, width: null}
+    - properties: {enabled: false, max: 10, start: '-2', step: 0.2}
+      type: form:C6ZZPAPN4YYF5NVJ:Slider
       data_bindings:
-      - {property: value, code: 'self.item[''slider_value'']', writeback: true}
-      event_bindings: {}
+      - {code: 'self.item[''slider_value'']', writeback: false, property: value}
+      layout_properties: {}
+      name: slider_1
