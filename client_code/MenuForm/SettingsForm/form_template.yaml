@@ -9,25 +9,18 @@ components:
   layout_properties: {grid_position: 'DCVDVD,KLXRVJ'}
   components:
   - type: FlowPanel
-    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
+    properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
     name: flow_panel_1
     layout_properties: {grid_position: 'NLPJFM,ULQYTA'}
     components:
     - type: Label
-      properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'Current Time Zone:', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+      properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '', visible: true, text: 'Current Time Zone:', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: label_3_copy
       layout_properties:
         col_widths: {}
         grid_position: JOQBWQ,PEUNQK
     - type: Label
-      properties: {role: subheading, align: left, tooltip: Time zone detected automatically from browser,
-        border: '', foreground: '', visible: true, text: '', font_size: null, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: true,
-        background: '', bold: false, underline: false, icon: ''}
+      properties: {role: subheading, align: left, tooltip: Time zone detected automatically from browser, border: '', foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: true, background: '', bold: false, underline: false, icon: ''}
       name: time_zone_label
       layout_properties: {grid_position: 'RKKJMQ,WHILFA'}
 - type: ColumnPanel
@@ -36,37 +29,27 @@ components:
   layout_properties: {grid_position: 'KRZCGE,HLLDAD'}
   components:
   - type: Label
-    properties: {role: headline, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Phone, font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+    properties: {role: headline, align: left, tooltip: '', border: '', foreground: '', visible: true, text: Phone, font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
     name: label_1
     layout_properties: {grid_position: 'YJWFAB,MOEJWU'}
   - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '', spacing_below: none,
-      background: ''}
+    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '', spacing_below: none, background: ''}
     name: phone_panel
     layout_properties: {grid_position: 'BNEEUD,YQPUTN'}
 - type: LinearPanel
-  properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
-    border: '', visible: true, role: card, tooltip: ''}
+  properties: {spacing_above: small, spacing_below: small, background: '', foreground: '', border: '', visible: true, role: card, tooltip: ''}
   name: notifications_panel
   layout_properties: {grid_position: 'WLNJQT,TCUMHW'}
   components:
   - type: Label
-    properties: {role: headline, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Notifications, font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+    properties: {role: headline, align: left, tooltip: '', border: '', foreground: '', visible: true, text: Notifications, font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
     name: label_3
     layout_properties:
       col_widths: {}
       grid_position: DJBSEF,KHMJVY
     event_bindings: {}
   - type: FlowPanel
-    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+    properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
     name: essential_flow_panel
     layout_properties: {}
     components:
@@ -94,20 +77,16 @@ components:
       layout_properties: {width: null, expand: false}
       event_bindings: {change: set_notif_settings}
     - name: rich_text_1
-      properties: {content: '{main} (when someone accepts my empathy chat request,
-          cancels an already scheduled empathy chat, is waiting for me because I''m
-          late, etc.)', spacing_above: none, spacing_below: none}
+      properties: {content: '{main} (when someone accepts my empathy chat request, cancels an already scheduled empathy chat, is waiting for me because I''m late, etc.)', spacing_above: none, spacing_below: none}
       type: RichText
       layout_properties: {expand: true}
       components:
       - name: label_2
-        properties: {text: essential notifications, bold: true, font_size: 16, spacing_above: none,
-          spacing_below: none, icon: 'fa:asterisk', icon_align: left}
+        properties: {text: essential notifications, bold: true, font_size: 16, spacing_above: none, spacing_below: none, icon: 'fa:asterisk', icon_align: left}
         type: Label
         layout_properties: {slot: main}
   - type: FlowPanel
-    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
+    properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
     name: flow_panel_3
     layout_properties: {}
     components:
@@ -139,13 +118,11 @@ components:
       type: Label
       layout_properties: {}
     - name: rich_text_2
-      properties: {content: when someone sends me a **message**, font_size: 16, spacing_below: none,
-        spacing_above: none}
+      properties: {content: when someone sends me a **message**, font_size: 16, spacing_below: none, spacing_above: none}
       type: RichText
       layout_properties: {expand: true}
   - type: FlowPanel
-    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: false, spacing_above: small, spacing_below: none, background: ''}
+    properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: false, spacing_above: small, spacing_below: none, background: ''}
     name: specific_flow_panel
     layout_properties: {}
     components:
@@ -173,61 +150,42 @@ components:
       layout_properties: {}
       event_bindings: {change: set_notif_settings}
     - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: me about empathy chat requests specifically directed to just me,
-        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
-        italic: false, background: '', bold: false, underline: false, icon: ''}
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: me about empathy chat requests specifically directed to just me, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: label_6_copy
       layout_properties: {expand: true, width: null}
   - name: horizontal_rule_1
     properties: {}
     type: form:HorizontalRule
   - name: label_7
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: Chat request notifications, font_size: 16, font: '', spacing_above: none,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
-      underline: false, icon: 'fa:child'}
+    properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: Chat request notifications, font_size: 16, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: true, underline: false, icon: 'fa:child'}
     type: Label
     layout_properties: {}
     event_bindings: {}
   - type: LinearPanel
-    properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
-      border: '', visible: true, role: null, tooltip: ''}
+    properties: {spacing_above: none, spacing_below: small, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
     name: sms_panel
     layout_properties: {}
     components:
     - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '- Text/SMS me for empathy chats proposed by: ', font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '- Text/SMS me for empathy chats proposed by: ', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: sms_label
       layout_properties: {}
     - type: FlowPanel
-      properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: none, spacing_below: small,
-        background: ''}
+      properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
       name: sms_flow_panel
       layout_properties: {}
       components:
       - type: Spacer
-        properties: {visible: true, spacing_above: small, spacing_below: small, height: 32,
-          tooltip: ''}
+        properties: {visible: true, spacing_above: small, spacing_below: small, height: 32, tooltip: ''}
         name: spacer_1
         layout_properties: {width: 20, expand: false}
       - type: Button
-        properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-          foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: 'fa:pencil'}
+        properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:pencil'}
         name: sms_edit_button
         layout_properties: {}
         event_bindings: {click: sms_edit_button_click}
       - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: '', font_size: null, font: '', spacing_above: none,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: ''}
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
         name: sms_desc_label
         layout_properties: {expand: true, width: null}
   - type: LinearPanel
@@ -236,46 +194,29 @@ components:
     layout_properties: {grid_position: 'GZAWOG,EWWOJN'}
     components:
     - type: Label
-      properties: {role: null, align: left, tooltip: 'If already notified by text/SMS
-          for a given chat request, you will not be notified by email as well.', border: '',
-        foreground: '', visible: true, text: '- Email me for empathy chats proposed
-          by: ', font_size: null, font: '', spacing_above: small, icon_align: left,
-        spacing_below: none, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
+      properties: {role: null, align: left, tooltip: 'If already notified by text/SMS for a given chat request, you will not be notified by email as well.', border: '', foreground: '', visible: true, text: '- Email me for empathy chats proposed by: ', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: email_label
       layout_properties: {grid_position: 'IBYDUG,AOQYFK'}
     - type: FlowPanel
-      properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: none, spacing_below: small,
-        background: ''}
+      properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
       name: sms_flow_panel_copy
       layout_properties: {grid_position: 'ZNZNDK,DEHVVX'}
       components:
       - type: Spacer
-        properties: {visible: true, spacing_above: small, spacing_below: small, height: 32,
-          tooltip: ''}
+        properties: {visible: true, spacing_above: small, spacing_below: small, height: 32, tooltip: ''}
         name: spacer_1_copy
         layout_properties: {width: 20, expand: false}
       - type: Button
-        properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-          foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: 'fa:pencil'}
+        properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:pencil'}
         name: email_edit_button
         layout_properties: {}
         event_bindings: {click: email_edit_button_click}
       - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: '', font_size: null, font: '', spacing_above: none,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: ''}
+        properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
         name: email_desc_label
         layout_properties: {expand: true, width: null}
 - type: TextBox
-  properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-    border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-    font: '', spacing_above: small, type: email, spacing_below: small, italic: false,
-    background: '', bold: false, underline: false}
+  properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '', border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: small, type: email, spacing_below: small, italic: false, background: '', bold: false, underline: false}
   name: email_text_box
   layout_properties: {grid_position: 'ZEPIXP,ZCDLYH'}
 is_package: true

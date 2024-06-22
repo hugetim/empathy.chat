@@ -5,30 +5,22 @@ components:
   layout_properties: {grid_position: 'WEWSPK,HUNSCT'}
   components:
   - type: LinearPanel
-    properties: {spacing_above: none, spacing_below: none, background: '', foreground: '',
-      border: '', visible: true, role: null, tooltip: ''}
+    properties: {spacing_above: none, spacing_below: none, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
     name: linear_panel_1
     layout_properties: {grid_position: 'POCPYY,APPIVW'}
   - type: FlowPanel
-    properties: {role: null, spacing: medium, align: right, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+    properties: {role: null, spacing: medium, align: right, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
     name: flow_panel_1
     layout_properties: {grid_position: 'XPVPEK,DNUDLL'}
     components:
     - type: Button
-      properties: {role: primary-color, align: right, tooltip: '', border: '', enabled: false,
-        foreground: '', visible: true, text: Save, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+      properties: {role: primary-color, align: right, tooltip: '', border: '', enabled: false, foreground: '', visible: true, text: Save, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: save_button
       layout_properties: {grid_position: 'XRBJDR,ALGLVH'}
       event_bindings: {click: save_button_click}
       data_bindings: []
     - type: Button
-      properties: {role: secondary-color, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+      properties: {role: secondary-color, align: left, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: cancel_button
       layout_properties: {grid_position: 'XRBJDR,XNJAIR'}
       data_bindings: []

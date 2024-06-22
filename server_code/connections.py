@@ -1,4 +1,4 @@
-import anvil.tables
+import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from . import server_misc as sm
@@ -121,7 +121,7 @@ def get_connected_users(user, up_to_degree):
   return c_users
 
 
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def init_connections(user=None):
   with TimerLogger("  init_connections", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
     logged_in_user = user if user else sm.get_acting_user()
@@ -309,7 +309,7 @@ def _connected_prompt(invite, invite_reply):
 
 
 @authenticated_callable
-@anvil.tables.in_transaction(relaxed=True)
+@tables.in_transaction(relaxed=True)
 def save_relationship(item, user_id=""):
   user1 = sm.get_acting_user(user_id)
   user2 = sm.get_other_user(item['user2_id'])
@@ -329,13 +329,13 @@ def disconnect(user2_id, user1_id=""):
   return out
 
 
-@anvil.tables.in_transaction
+@tables.in_transaction
 def _disconnect(user2, user1):
   if user2:
     r1to2 = app_tables.connections.get(user1=user1, user2=user2, current=True)
     r2to1 = app_tables.connections.get(user1=user2, user2=user1, current=True)
     if r1to2 and r2to1:
-      with anvil.tables.batch_update:
+      with tables.batch_update:
         r1to2['current'] = False
         r2to1['current'] = False
       _clear_cached_connections()
@@ -347,7 +347,7 @@ def _disconnect(user2, user1):
 def _remove_connection_prompts(user1, user2):
   prompts1 = app_tables.prompts.search(q.fetch_only('dismissed'), user=user1, spec={'name': 'connected', 'to_id': user2.get_id()})
   prompts2 = app_tables.prompts.search(q.fetch_only('dismissed'), user=user2, spec={'name': 'connected', 'to_id': user1.get_id()})
-  with anvil.tables.batch_delete:
+  with tables.batch_delete:
     for prompt in prompts1:
       prompt.delete()
     for prompt in prompts2:

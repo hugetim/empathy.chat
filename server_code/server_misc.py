@@ -120,7 +120,7 @@ def as_user_tz(dt, user):
 
 
 def phone(user):
-  return secrets.decrypt_with_key("new_key", user['phone']) if user['phone'] else ""
+  return secrets.decrypt_with_key("encryption_key", user['phone']) if user['phone'] else ""
   
 
 def name(user, to_user=None, distance=None, rel=None):
