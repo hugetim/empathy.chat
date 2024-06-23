@@ -1,14 +1,10 @@
 properties:
-- {name: minutes, type: number, important: false, default_binding_prop: true, default_value: 10,
-  priority: 100}
+- {name: minutes, type: number, important: false, default_binding_prop: true, default_value: 10, priority: 100}
 - {name: seconds, type: number, important: false, default_value: 0, priority: 20}
 - {name: paused, type: boolean, default_value: true, important: false}
-- {name: visible, type: boolean, default_value: true, important: true, priority: 7,
-  group: Appearance}
-- {name: enabled, type: boolean, default_value: true, important: false, priority: -10,
-  group: Interaction}
-- {name: align, type: string, default_value: center, important: false, group: Appearance,
-  priority: -30}
+- {name: visible, type: boolean, default_value: true, important: true, priority: 7, group: Appearance}
+- {name: enabled, type: boolean, default_value: true, important: false, priority: -10, group: Interaction}
+- {name: align, type: string, default_value: center, important: false, group: Appearance, priority: -30}
 is_package: true
 events:
 - {name: elapsed, default_event: true}
@@ -24,14 +20,12 @@ components:
     properties: {spacing_above: none, type: number, text: '00', tooltip: minutes}
     type: TextBox
     layout_properties: {width: 36}
-    event_bindings: {focus: _text_box_focus, lost_focus: _minutes_text_box_lost_focus,
-      pressed_enter: _minutes_text_box_lost_focus}
+    event_bindings: {focus: _text_box_focus, lost_focus: _minutes_text_box_lost_focus, pressed_enter: _minutes_text_box_lost_focus}
   - name: seconds_text_box
     properties: {spacing_above: none, type: number, text: '00', tooltip: seconds}
     type: TextBox
     layout_properties: {width: 36}
-    event_bindings: {pressed_enter: _seconds_text_box_lost_focus, lost_focus: _seconds_text_box_lost_focus,
-      focus: _text_box_focus}
+    event_bindings: {pressed_enter: _seconds_text_box_lost_focus, lost_focus: _seconds_text_box_lost_focus, focus: _text_box_focus}
   - name: play_button
     properties: {text: '', icon: 'fa:pause', role: raised}
     type: Button
