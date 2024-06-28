@@ -17,10 +17,14 @@ components:
   layout_properties: {slot: default}
   components:
   - name: minutes_text_box
-    properties: {spacing_above: none, type: number, text: '00', tooltip: minutes}
+    properties: {spacing_above: none, type: number, text: '00', tooltip: minutes, align: right}
     type: TextBox
     layout_properties: {width: 36}
     event_bindings: {focus: _text_box_focus, lost_focus: _minutes_text_box_lost_focus, pressed_enter: _minutes_text_box_lost_focus}
+  - name: label_1
+    properties: {text: ':'}
+    type: Label
+    layout_properties: {}
   - name: seconds_text_box
     properties: {spacing_above: none, type: number, text: '00', tooltip: seconds}
     type: TextBox
