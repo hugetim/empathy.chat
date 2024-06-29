@@ -6,14 +6,8 @@ scheduled_tasks:
     at: {minute: 53}
   job_id: CTIKZHRE
 dependencies:
-- app_id: MFQJNLWQIOGGXL4W
-  version: {dev: false}
 - app_id: C6ZZPAPN4YYF5NVJ
   version: {version_tag: v2.5.3}
-- app_id: WAF7GWYZ3PTOPDNF
-  version: {dev: false}
-- app_id: TCL6O5RVEDFRHRMV
-  version: {dev: false}
 services:
 - source: /runtime/services/tables.yml
   client_config: {enable_v2: true}
@@ -41,7 +35,7 @@ allow_embedding: false
 name: empathy.chat
 runtime_options: {version: 2, server_version: python3-full, client_version: '3', server_spec: null}
 metadata: {description: A place to exchange NVC empathy., logo_img: 'asset:child-large.PNG', title: empathy.chat}
-startup_form: MenuForm
+startup_form: null
 native_deps:
   head_html: |-
     <script src='https://8x8.vc/external_api.js'></script>
@@ -685,18 +679,18 @@ db_schema:
       type: bool
 secrets:
   admin_email:
-    value: {? '' : BaoOfWcRFCExgZgnpZo6Q1myXzC8OZttbYZlDm72n8sdiEWiEHt9QcpphUYClBnVAc71E3dV66KUcXjuwLviqv3b3lq2Q7LRoa/V2tbgSaEEi4q4tzBVHu5hTNXAriwCobmYr5F7IZIGOeQPmbxDSQ==}
+    value: {? '' : BaoOfWcRFCExgZgnpZo6Q1myXzC8OZttbYZlDm72n8sdiEWiEHt9QcpphUYClBnVAc71E3dV66KUcXjuwLviqv3b3lq2Q7LRoa/V2tbgSaEEi4q4tzBVHu5hTNXAriwCobmYr5F7IZIGOeQPmbxDSQ==, RADLAS5MQEOV4K2C: fVY8pLuWZp8T+41jtaOP15qjfjGwEw6W3MDa/1XnaKaH+AsxTNjpSD7ov8NYSprx+XPwM1QiTDkIi9ig6LmMNVWUMIhGLYN9HnTcMNCc2GAYFYZL0zU9X3TbbplrFImqCe1ESqEYUZUzjBWKKe+XabyX47A=}
     type: secret
   test_user_email:
-    value: {? '' : KRmISsoT+2dK0u/8K3fsrPUGHVeZmp9ebh/JAQW/kg1UITdnMVxlJwM07wyGRdUuwAz2DiUUJ7dh8mavtiIrfgFUTWSeChYDkGXzQ2nTJNtJx5rNeM0q5Rd8USdUsi/YmXgro0A5r8BNgbdzc0zdlPn2tXX5nw==}
+    value: {? '' : KRmISsoT+2dK0u/8K3fsrPUGHVeZmp9ebh/JAQW/kg1UITdnMVxlJwM07wyGRdUuwAz2DiUUJ7dh8mavtiIrfgFUTWSeChYDkGXzQ2nTJNtJx5rNeM0q5Rd8USdUsi/YmXgro0A5r8BNgbdzc0zdlPn2tXX5nw==, RADLAS5MQEOV4K2C: wb+KUxYaQXiVgMx4TrsIxRe5Zltgh5mKWL20tf3NOXWRxKKqQeeffAzxf//XDGgzaVFRleqZxvKtOqQX8Mv45ASGJVpqmPACS5ba9zLGitrYyauBShVvlTs6Pl3jTCIuNpmSwuBYgPWqKfHfQ9U41OSwbkrPqw==}
     type: secret
   twilio_account_sid:
     value: {? '' : bWq00BbgXmb0c/iJxuHL+RX8fZP98HELTlq64XzGktqCtF3y1QUti6urAcCeueTpiPC5Cyyn89pHCryXrPKqXdnCsmK2ESPLzylH9MEvfQJhV5iFsnYGiUj6MbazoYdDyBIyIAfvTYO8kdq9v2JQGDvIE2AsMydw9hiexQh1Jclk}
     type: secret
-  twilio_auth_token:
-    value: {? '' : vVlLhTVrGHiNzj7nigFhvn0W+1z4cm/256c1I0ZPJJf6ZXRcvXLQaKqbWUA/Ej4t1p1uXyFFBD5FKWaIf9j+iQzd8oThVTvV4BhQi3j5GRHFqTz0zi9HKBf/aPkmDYWV/F/yWSw1OEVwbSaojhuHkuvKydSUq6dye0JLDqBJzA==}
-    type: secret
   encryption_key:
     value: {? '' : owBRTMfdGiFcg6OrOwAFHxPUqiPdepcLs5NxphK+FaMTvAlm10Ve9ei9/rAwTOa2dHqUtiqBOuaI34DSz0VM1x4jN2nL89oYeuAFHU6yxxPbAvUaf6D6q8vc0t9lT5Enr42Nm8G1MV2qdn1l2A0fUACeoaoaj00=}
     type: key
+  twilio_auth_token:
+    value: {? '' : vVlLhTVrGHiNzj7nigFhvn0W+1z4cm/256c1I0ZPJJf6ZXRcvXLQaKqbWUA/Ej4t1p1uXyFFBD5FKWaIf9j+iQzd8oThVTvV4BhQi3j5GRHFqTz0zi9HKBf/aPkmDYWV/F/yWSw1OEVwbSaojhuHkuvKydSUq6dye0JLDqBJzA==}
+    type: secret
 renamed: true

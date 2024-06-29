@@ -1,0 +1,27 @@
+properties:
+- name: value
+  type: number
+  important: true
+  default_binding_prop: true
+  allow_binding_writeback: true
+  binding_writeback_events: [change]
+- {name: minval, type: number, important: true, default_value: 0}
+- {name: maxval, type: number, important: true, default_value: 10}
+- {name: step, type: number, important: true, default_value: 1}
+- name: labels
+  type: text[]
+  default_value: [strongly disagree, neutral, strongly agree]
+  important: true
+- {name: visible, type: boolean, default_value: true, important: true}
+- {name: enabled, type: boolean, default_value: true, important: true}
+is_package: true
+events:
+- {name: change, default_event: true}
+custom_component: true
+components:
+- name: slider_1
+  properties: {max: 10, start: '5', step: 0.2, pips_mode: count, pips_values: '3', pips_stepped: false, pips: true}
+  type: form:C6ZZPAPN4YYF5NVJ:Slider
+  layout_properties: {grid_position: 'ZJDRFM,DAVHQQ'}
+  event_bindings: {change: slider_1_change}
+container: {type: ColumnPanel}
