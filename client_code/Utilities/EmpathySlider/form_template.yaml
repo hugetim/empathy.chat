@@ -20,7 +20,7 @@ events:
 custom_component: true
 components:
 - name: slider_1
-  properties: {max: 10, start: '5', step: 0.2, pips_mode: count, pips_values: '3', pips_stepped: false, pips: true}
+  properties: {max: 10, start: '5', step: 0.2, pips_mode: count, pips_values: '3', pips_stepped: false, pips: false}
   type: form:C6ZZPAPN4YYF5NVJ:Slider
   layout_properties: {grid_position: 'ZJDRFM,DAVHQQ'}
   event_bindings: {change: slider_1_change}

@@ -85,5 +85,5 @@ class SliderPanel(SliderPanelTemplate):
             "from": lambda desc: desc_to_num[desc],
         }
 
-        ### it's also possible to provide a custom formatter to tooltips - only to is required
-        self.slider_1.tooltips = {"to": lambda num: format(num, ".0f")}
+        # ### it's also possible to provide a custom formatter to tooltips - only to is required
+        # self.slider_1.tooltips = {"to": lambda num: format(num, ".0f")}
