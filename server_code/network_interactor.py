@@ -58,7 +58,7 @@ def get_message_dicts(user1, user2=None, messages=None):
 @background_task_with_reporting
 def prune_chat_messages():
   """Prune messages from fully completed matches"""
-  from anvil.tables import app_tables
+  from auto_batch.tables import app_tables
   if sm.DEBUG:
     print("prune_chat_messages()")
   all_messages = app_tables.chat.search()
@@ -71,7 +71,7 @@ def prune_chat_messages():
     
 @authenticated_callable
 def save_starred(new_starred, user2_id, user_id=""):
-  from anvil.tables import app_tables
+  from auto_batch.tables import app_tables
   from . import matcher
   user = sm.get_acting_user(user_id)
   user2 = sm.get_other_user(user2_id)

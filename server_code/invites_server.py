@@ -1,4 +1,4 @@
-from anvil.tables import in_transaction
+from auto_batch.tables import in_transaction
 import anvil.server
 from . import invites
 from . import server_misc as sm

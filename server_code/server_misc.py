@@ -1,8 +1,8 @@
 import anvil.users
 import anvil.server
-import anvil.tables as tables
-from anvil.tables import app_tables, order_by
-import anvil.tables.query as q
+import auto_batch.tables as tables
+from auto_batch.tables import app_tables, order_by
+import auto_batch.tables.query as q
 from abc import ABC, abstractproperty, abstractmethod
 from anvil import secrets
 from . import parameters as p

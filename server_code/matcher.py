@@ -1,5 +1,5 @@
 import anvil.server
-import anvil.tables as tables
+import auto_batch.tables as tables
 from . import parameters as p
 from . import notifies as n
 from . import accounts
@@ -75,8 +75,8 @@ def _get_proposals_upcomings(user):
 
 
 def propagate_update_needed(user=None):
-  from anvil.tables import app_tables
-  import anvil.tables.query as q
+  from auto_batch.tables import app_tables
+  import auto_batch.tables.query as q
   all_users = app_tables.users.search(q.fetch_only('update_needed'), update_needed=False)
   with tables.batch_update:
     for u in all_users:

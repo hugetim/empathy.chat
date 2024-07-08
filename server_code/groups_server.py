@@ -1,7 +1,7 @@
 import anvil.users
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
+import auto_batch.tables as tables
+import auto_batch.tables.query as q
+from auto_batch.tables import app_tables
 import anvil.server
 from . import groups
 from . import server_misc as sm

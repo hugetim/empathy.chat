@@ -1,6 +1,6 @@
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
+import auto_batch.tables as tables
+import auto_batch.tables.query as q
+from auto_batch.tables import app_tables
 
 
 def add_message(from_user, to_user, message, time_stamp):

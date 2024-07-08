@@ -1,6 +1,6 @@
 import anvil.server
 import anvil.secrets
-from anvil import tables
+from auto_batch import tables
 from .server_misc import authenticated_callable
 from . import server_misc as sm
 from . import network_interactor as ni

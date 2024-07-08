@@ -1,6 +1,6 @@
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
+import auto_batch.tables as tables
+import auto_batch.tables.query as q
+from auto_batch.tables import app_tables
 from .requests import Request, ExchangeFormat, ExchangeProspect
 from . import server_misc as sm
 from . import groups

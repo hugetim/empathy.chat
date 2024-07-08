@@ -1,5 +1,5 @@
 import anvil.server
-from anvil import tables
+from auto_batch import tables
 from .requests import Request, Requests, ExchangeFormat, ExchangeProspect, have_conflicts, prop_to_requests, selected_exchange
 from .exchanges import Exchange
 from .relationship import Relationship

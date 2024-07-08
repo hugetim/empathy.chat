@@ -1,6 +1,5 @@
 import anvil.users
-import anvil.tables
-from anvil.tables import app_tables
+from auto_batch.tables import app_tables
 import anvil.server
 import anvil.secrets as secrets
 from . import server_misc as sm
