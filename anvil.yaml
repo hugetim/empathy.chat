@@ -14,6 +14,9 @@ dependencies:
   version: {dev: false}
 - app_id: TCL6O5RVEDFRHRMV
   version: {dev: false}
+- dep_id: dep_6tn7w7d4vs6qf4
+  version: {dev: false}
+  resolution_hints: {app_id: PKF2MZRQMPCXFWNE, name: AutoBatch, package_name: Forum_Transaction_Bug}
 services:
 - source: /runtime/services/tables.yml
   client_config: {enable_v2: true}
