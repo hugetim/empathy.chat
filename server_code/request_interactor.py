@@ -380,6 +380,7 @@ def current_visible_prospects(user, exchange_prospects, request_records):
   out_prospects = []
   for ep in (exchange_prospects + single_exchange_prospects):
     ep_request_records = [rr for rr in request_records if rr.entity in ep]
+    print([repr(key) for key in rels])
     ep_rels = {rr.user: rels[rr.user] for rr in ep_request_records}
     if is_eligible_for_prospect(user, ep, ep_rels, ep_request_records):
       out_prospects.append(ep)
