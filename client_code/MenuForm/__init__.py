@@ -1,6 +1,6 @@
 from ._anvil_designer import MenuFormTemplate
 from anvil import *
-import anvil.users
+import auto_batch.users as users
 import anvil.server
 import anvil.js
 from .DashForm import DashForm
@@ -198,7 +198,7 @@ class MenuForm(MenuFormTemplate):
     
   def logout_user(self):
     print("logout")
-    anvil.users.logout()
+    users.logout()
     glob.logout()
     open_form('LoginForm')
 

@@ -1,6 +1,6 @@
 from anvil import *
 import anvil.server
-import anvil.users
+import auto_batch.users as users
 from anvil.js import window, ExternalError, call_js
 from . import glob
 from anvil_extras.utils import timed
@@ -14,9 +14,9 @@ def get_user_and_id():
 
 
 def login(with_id=False):
-  user = anvil.users.login_with_form(show_signup_option=False, allow_cancel=True)
+  user = users.login_with_form(show_signup_option=False, allow_cancel=True)
   if user and (not user['init_date']):
-    anvil.users.logout()
+    users.logout()
     with Notification(f"Sorry, there is no account for {user['email']} (and empathy.chat is currently invite-only). "
                       "Creating a new account requires an invite link."):
       anvil.server.call_s('remove_user', user)

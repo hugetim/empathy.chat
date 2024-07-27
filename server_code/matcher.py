@@ -1,4 +1,5 @@
 import anvil.server
+import auto_batch.users as users
 import auto_batch.tables as tables
 from . import parameters as p
 from . import notifies as n
@@ -20,7 +21,7 @@ def init(time_zone):
                 updates expire_date if currently requesting/ping
                 clears cached session['state']
   """
-  user = anvil.users.get_user()
+  user = users.get_user()
   anvil.server.session['state'] = None
   return _init(time_zone, user)
 

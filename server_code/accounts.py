@@ -1,4 +1,4 @@
-import anvil.users
+import auto_batch.users as users
 import anvil.server
 import auto_batch.tables as tables
 from auto_batch.tables import app_tables, order_by
@@ -18,15 +18,15 @@ from anvil_extras.logging import TimerLogger
 @anvil.server.callable
 def get_user(allow_remembered=True, with_id=False):
   if with_id:
-    user = anvil.users.get_user(allow_remembered)
+    user = users.get_user(allow_remembered)
     return user, user.get_id() if user else ""
   else:
-    return anvil.users.get_user(allow_remembered)
+    return users.get_user(allow_remembered)
 
 def initialize_session(time_zone, user):
   """initialize session state: user_id, user, and current_row"""
   with TimerLogger("initialize_session", format="{name}: {elapsed:6.3f} s | {msg}") as timer:
-    timer.check("anvil.users.get_user")
+    timer.check("users.get_user")
     starting_trust_level = _init_user_info_transaction(user, time_zone)
     timer.check("_init_user_info_transaction")
     trust_level = _new_trust_level(user, starting_trust_level)
@@ -127,9 +127,9 @@ def do_signup(email, port_invite):
     raise InvalidInviteError(invite.not_authorized_message)
   user, newly_created = _create_user_if_needed_and_return_whether_created(email)
   if newly_created:
-    anvil.users.send_password_reset_email(email) # This can also raise AuthenticationFailed, but shouldn't
+    users.send_password_reset_email(email) # This can also raise AuthenticationFailed, but shouldn't
   else:
-    raise anvil.users.UserExists(f"An account already exists for this email address.")
+    raise users.UserExists(f"An account already exists for this email address.")
   return user
 
 
@@ -149,7 +149,7 @@ def _get_user_by_email(email):
   if not user:
     if _email_invalid(email):
       print(f"Invalid email: {email}")
-      raise anvil.users.AuthenticationFailed("Invalid email")
+      raise users.AuthenticationFailed("Invalid email")
     all_users = app_tables.users.search()
     for u in all_users:
       if _emails_equal(email, u['email']):
@@ -210,7 +210,7 @@ def in_email_list(email_str, list_of_email_strs):
 #     user = app_tables.users.get(email=email)
 #     if not user:
 #       user = app_tables.users.add_row(email=email, enabled=True, signed_up=sm.now())
-#       anvil.users.force_login(user)
+#       users.force_login(user)
 #     return user
 
 

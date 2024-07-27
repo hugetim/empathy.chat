@@ -6,23 +6,23 @@ components:
 - type: RichText
   properties:
     role: null
+    format: markdown
     align: center
-    tooltip: ''
-    enable_slots: true
-    border: ''
-    foreground: ''
-    visible: true
-    font_size: null
+    spacing_above: small
     content: |-
       ### Welcome!
       To verify that {inviter} is your close connection,
       we ask each of you to demonstrate you know the other's personal phone number.
-    font: ''
-    spacing_above: small
-    spacing_below: none
-    data: null
     background: ''
-    format: markdown
+    font: ''
+    foreground: ''
+    spacing_below: none
+    visible: true
+    border: ''
+    enable_slots: true
+    font_size: null
+    tooltip: ''
+    data: null
   name: welcome_rich_text
   layout_properties: {grid_position: 'NBHBNT,RCQAHT'}
   data_bindings: []
@@ -32,24 +32,24 @@ components:
   layout_properties: {grid_position: 'QLZNBW,VYQTAB'}
   components:
   - type: Label
-    properties: {role: null, align: center, tooltip: '', border: '', foreground: '', visible: true, text: 'Please provide the last 4 digits of their phone number:', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
+    properties: {role: null, bold: false, align: center, spacing_above: small, background: '', icon: '', underline: false, font: '', icon_align: left, foreground: '', spacing_below: none, visible: true, border: '', italic: false, font_size: null, tooltip: '', text: 'Please provide the last 4 digits of their phone number:'}
     name: phone_request_label
     layout_properties:
       col_widths: {}
       grid_position: NACBXV,JNZJOE
   - type: FlowPanel
-    properties: {role: null, spacing: none, align: center, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
+    properties: {role: null, align: center, spacing_above: none, background: '', foreground: '', spacing_below: small, visible: true, border: '', tooltip: '', spacing: none}
     name: flow_panel_2
     layout_properties:
       col_widths: {}
       grid_position: CCYELS,HYJONB
     components:
     - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: 'Mobile: (XXX)XXX-', font_size: 14, font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+      properties: {role: null, bold: false, align: left, spacing_above: none, background: '', icon: '', underline: false, font: '', icon_align: left, foreground: '', spacing_below: small, visible: true, border: '', italic: false, font_size: 14, tooltip: '', text: 'Mobile: (XXX)XXX-'}
       name: label_5
       layout_properties: {}
     - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '', border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14, font: '', spacing_above: none, type: text, spacing_below: small, italic: false, background: '', bold: false, underline: false}
+      properties: {role: null, bold: false, align: left, placeholder: '', spacing_above: none, background: '', type: text, underline: false, font: '', hide_text: false, foreground: '', spacing_below: small, visible: true, border: '', italic: false, enabled: true, font_size: 14, tooltip: '', text: ''}
       name: phone_last4_text_box
       layout_properties: {width: 38.400000000000006}
       event_bindings: {pressed_enter: phone_last4_text_box_pressed_enter}
@@ -58,20 +58,20 @@ components:
 - type: RichText
   properties:
     role: richtext-text
-    align: center
-    tooltip: ''
-    enable_slots: true
-    border: ''
-    foreground: ''
-    visible: true
-    font_size: null
-    content: "We also ask members to virtually introduce their close connections to each other.\nFor example, {inviter} describes you as their *{rel_to_inviter}*. "
-    font: ''
-    spacing_above: small
-    spacing_below: none
-    data: null
-    background: ''
     format: markdown
+    align: center
+    spacing_above: small
+    content: "We also ask members to virtually introduce their close connections to each other.\nFor example, {inviter} describes you as their *{rel_to_inviter}*. "
+    background: ''
+    font: ''
+    foreground: ''
+    spacing_below: none
+    visible: true
+    border: ''
+    enable_slots: true
+    font_size: null
+    tooltip: ''
+    data: null
   name: rich_text_1_copy
   layout_properties: {grid_position: 'DTOLPY,RZYZCT'}
   data_bindings: []
@@ -80,23 +80,23 @@ components:
   name: linear_panel_2
   layout_properties: {grid_position: 'XKWMFP,PHKPIT'}
 - type: Label
-  properties: {role: null, align: center, tooltip: '', border: '', foreground: 'theme:Red', visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+  properties: {role: null, bold: false, align: center, spacing_above: small, background: '', icon: '', underline: false, font: '', icon_align: left, foreground: 'theme:Red', spacing_below: small, visible: false, border: '', italic: false, font_size: null, tooltip: '', text: ''}
   name: error_label
   layout_properties: {grid_position: 'OONUCY,KEQRHK'}
 - type: FlowPanel
-  properties: {role: null, spacing: medium, align: right, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
+  properties: {role: null, align: right, spacing_above: small, background: '', foreground: '', spacing_below: small, visible: true, border: '', tooltip: '', spacing: medium}
   name: flow_panel_1
   layout_properties: {grid_position: 'LLFKIB,HUWYPI'}
   components:
   - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Continue, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+    properties: {role: primary-color, bold: false, align: center, spacing_above: small, background: '', icon: '', underline: false, font: '', icon_align: left, foreground: '', spacing_below: small, visible: true, border: '', italic: false, enabled: true, font_size: null, tooltip: '', text: Continue}
     name: continue_button
     layout_properties:
       col_widths: {}
       grid_position: XYHSBP,NRUTHG
     event_bindings: {click: continue_button_click}
   - type: Button
-    properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+    properties: {role: secondary-color, bold: false, align: center, spacing_above: small, background: '', icon: '', underline: false, font: '', icon_align: left, foreground: '', spacing_below: small, visible: true, border: '', italic: false, enabled: true, font_size: null, tooltip: '', text: Cancel}
     name: cancel_button
     layout_properties: {}
     data_bindings: []

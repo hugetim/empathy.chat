@@ -1,4 +1,4 @@
-import anvil.users
+import auto_batch.users as users
 import anvil.server
 import auto_batch.tables as tables
 from auto_batch.tables import app_tables, order_by
@@ -48,7 +48,7 @@ def now():
 def get_acting_user(user_id="", require_auth=True):
   if DEBUG:
     print("get_acting_user", user_id)
-  logged_in_user = anvil.users.get_user()
+  logged_in_user = users.get_user()
   if user_id == "" or (logged_in_user and logged_in_user.get_id() == user_id):
     return logged_in_user
   elif (require_auth and (not logged_in_user or logged_in_user['trust_level'] < TEST_TRUST_LEVEL)):
@@ -61,14 +61,14 @@ def get_other_user(user_id):
   if user_id:
     return app_tables.users.get_by_id(user_id)
   else:
-    return anvil.users.get_user()
+    return users.get_user()
 
 
 @anvil.server.callable
 def report_error(err_repr, app_info_dict, context_str):
   from . import notifies as n
   admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
-  current_user = anvil.users.get_user()
+  current_user = users.get_user()
   if admin != current_user:
     current_user_email = current_user['email'] if current_user else ""
     content = (
@@ -88,7 +88,7 @@ def warning(warning_str, app_info_dict=None, from_client=False):
   from . import notifies as n
   from anvil import app
   admin = app_tables.users.get(email=secrets.get_secret('admin_email'))
-  current_user = anvil.users.get_user()
+  current_user = users.get_user()
   if admin != current_user:
     current_user_email = current_user['email'] if current_user else ""
     content = (

@@ -1,6 +1,6 @@
 from ._anvil_designer import SignupTemplate
 from anvil import *
-import anvil.users
+import auto_batch.users as users
 from ... import ui_procedures as ui
 from ...glob import publisher
 
@@ -20,14 +20,14 @@ class Signup(SignupTemplate):
 
   def google_link_click(self, **event_args):
     """This method is called when the link is clicked"""
-#     new_user = anvil.users.signup_with_google()
+#     new_user = users.signup_with_google()
     try:
-      self.new_user = anvil.users.signup_with_google()
-    except anvil.users.UserExists:
+      self.new_user = users.signup_with_google()
+    except users.UserExists:
       print("UserExists: Calling login_with_google")
       self.signup_err_lbl.text = "That Google account is already registered, so sign up is unnecessary. Instead, please login now."
       self.signup_err_lbl.visible = True
-      self.new_user = anvil.users.login_with_google()
+      self.new_user = users.login_with_google()
     if self.new_user:
       self.raise_event('x-close-alert', value="google")
 

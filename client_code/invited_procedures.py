@@ -1,5 +1,5 @@
 import anvil.server as server
-import anvil.users
+import auto_batch.users as users
 from anvil import *
 from . import invites
 from . import parameters as p
@@ -62,7 +62,7 @@ def _complete_close_invited_process(invite):
 
 def _close_invited_signup(invite):
   try:
-    user = anvil.users.get_user()
+    user = users.get_user()
     if not user:
       user, method = invited_signup(invite)
     if user['phone']:
@@ -76,7 +76,7 @@ def _close_invited_signup(invite):
 
 def _handle_group_invite(link_key):
   print(f"_handle_group_invite: {link_key}")
-  user = anvil.users.get_user()
+  user = users.get_user()
   _process_group_invite_visit(link_key, user)
   ui.clear_hash_and_open_form('LoginForm')
 
@@ -127,7 +127,7 @@ def _handle_response_guess_error(err):
 
   
 def _handle_successful_response(invite):    
-  user = anvil.users.get_user()
+  user = users.get_user()
   has_phone = user['phone'] if user else None
   h.my_assert(has_phone or invite.from_invite_link, "either Confirmed or link invite")
   if not user:
@@ -174,10 +174,10 @@ def _submit_signup_email_to_server(email_address, invite):
   """
   try:
     return anvil.server.call('do_signup', email_address, invite)
-  except anvil.users.AuthenticationFailed:
+  except users.AuthenticationFailed:
     publisher.publish("signup_error", 
                       "Email address missing or invalid. Please enter a valid email address.")
-  except anvil.users.UserExists as err:
+  except users.UserExists as err:
     publisher.publish("signup_error", 
                       f"{err.args[0]}\nPlease login to your account normally and then try this invite link again.")
   except InvalidInviteError as err:

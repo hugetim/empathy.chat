@@ -1,4 +1,4 @@
-import anvil.users
+import auto_batch.users as users
 import auto_batch.tables as tables
 import auto_batch.tables.query as q
 from auto_batch.tables import app_tables
@@ -17,9 +17,9 @@ from functools import lru_cache
 def check_my_group_auth(group_id=None):
   user = sm.get_acting_user()
   if not user or user['trust_level'] < 4:
-    raise anvil.users.AuthenticationFailed("User not authorized to manage own groups.")
+    raise users.AuthenticationFailed("User not authorized to manage own groups.")
   if group_id and user not in app_tables.groups.get_by_id(group_id)['hosts']:
-    raise anvil.users.AuthenticationFailed("User not authorized to manage this group.")
+    raise users.AuthenticationFailed("User not authorized to manage this group.")
 
     
 @anvil.server.callable

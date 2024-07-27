@@ -1,4 +1,4 @@
-import anvil.users
+import auto_batch.users as users
 from auto_batch.tables import app_tables
 import anvil.server
 import anvil.secrets as secrets
@@ -12,7 +12,7 @@ from . import portable
 
 @authenticated_callable
 def get_test_user_id():
-  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     test_user = app_tables.users.get(email=secrets.get_secret('test_user_email'))
     return test_user.get_id()
 
@@ -20,7 +20,7 @@ def get_test_user_id():
 @authenticated_callable
 def add_now_proposal_old():
   print("add_now_proposal")
-  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     tester = sm.get_acting_user()
     anvil.server.call('add_proposal', portable.Proposal(times=[portable.ProposalTime(start_now=True)], eligible=1), user_id=tester.get_id())
     matcher.propagate_update_needed()
@@ -32,7 +32,7 @@ def add_now_proposal_old():
 @authenticated_callable
 def accept_now_proposal_old(user_id):
   print("accept_now_proposal", user_id)
-  if anvil.users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
+  if users.get_user()['trust_level'] >= sm.TEST_TRUST_LEVEL:
     tester = sm.get_acting_user()
     tester_now_request = ri.now_request(tester)
     if tester_now_request:
