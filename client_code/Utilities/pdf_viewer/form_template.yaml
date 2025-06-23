@@ -1,7 +1,7 @@
+components: []
 container:
-  type: HtmlTemplate
+  event_bindings: {show: form_show}
   properties:
     html: "<div id=\"pdf_div\">\n  <object id='pdf_view' data=\"\" type=\"application/pdf\" width=\"100%\" height=\"100%\"> \n    <p>It appears you don't have a PDF plugin for this browser.\n     You can <a id='pdf_link' href=\"\">click here to\n    download the PDF file.</a></p>  \n  </object>\n</div>\n  \n<script>\nfunction display_pdf(url){\n\t$('#pdf_view').attr('data', url)\n  \t$('#pdf_link').attr('href', url)\n}\n</script>\n<style>\n  #pdf_div {\n    padding: 0px 10px 10px 0px;\n    border: thin ridge;\n    height: 300px;\n    resize: vertical;\n    overflow: hidden;\n    min-height: 50px;\n    max-height: 2000px;\n  }\n</style>"
-  event_bindings: {show: form_show}
-components: []
+  type: HtmlTemplate
 is_package: true

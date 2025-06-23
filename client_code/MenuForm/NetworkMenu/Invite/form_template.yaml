@@ -1,11 +1,11 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
 components:
-- type: form:MenuForm.NetworkMenu.Invite.InviteA
-  properties: {}
-  name: custom_1
+- data_bindings:
+  - {code: self.item, property: item}
   layout_properties: {grid_position: 'KREOZF,CYVPBJ'}
-  data_bindings:
-  - {property: item, code: self.item}
+  name: custom_1
+  properties: {}
+  type: form:MenuForm.NetworkMenu.Invite.InviteA
+container:
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
 is_package: true

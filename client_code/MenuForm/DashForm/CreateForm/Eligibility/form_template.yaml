@@ -1,114 +1,114 @@
-container:
-  type: ColumnPanel
-  event_bindings: {show: form_show}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none, background: ''}
 components:
-- name: all_radio_button
-  properties: {text: My whole network, spacing_below: none, spacing_above: none, selected: true, value: '1', group_name: all_radio_group}
-  type: RadioButton
+- event_bindings: {change: all_radio_button_change}
   layout_properties: {grid_position: 'YWXYZF,GJJWPA'}
-  event_bindings: {change: all_radio_button_change}
-- name: limited_radio_button
-  properties: {text: Limited to..., spacing_above: none, spacing_below: none, group_name: all_radio_group, value: '0'}
+  name: all_radio_button
+  properties: {group_name: all_radio_group, selected: true, spacing_above: none, spacing_below: none, text: My whole network, value: '1'}
   type: RadioButton
+- event_bindings: {change: all_radio_button_change}
   layout_properties: {grid_position: 'DTXEVE,MNSIRN'}
-  event_bindings: {change: all_radio_button_change}
-- name: limited_flow_panel
-  properties: {spacing_above: none, spacing_below: none}
-  type: FlowPanel
-  layout_properties: {grid_position: 'MHSLSZ,RZLGXI'}
-  components:
-  - name: spacer_1
+  name: limited_radio_button
+  properties: {group_name: all_radio_group, spacing_above: none, spacing_below: none, text: Limited to..., value: '0'}
+  type: RadioButton
+- components:
+  - layout_properties: {width: 5.79998779296875}
+    name: spacer_1
     properties: {height: 32, spacing_above: none, spacing_below: none}
     type: Spacer
-    layout_properties: {width: 5.79998779296875}
-  - name: linear_panel_1
-    properties: {spacing_above: none, spacing_below: none}
-    type: LinearPanel
-    components:
-    - type: CheckBox
-      properties: {role: null, align: left, tooltip: '', border: '', enabled: true, foreground: '', allow_indeterminate: false, visible: true, text: My Starred users, font_size: 16, font: '', spacing_above: none, spacing_below: none, italic: false, background: '', bold: false, checked: false, underline: false}
+  - components:
+    - data_bindings:
+      - {code: 'self.item[''eligible_starred'']', property: checked, writeback: true}
       name: starred_check_box
-      data_bindings:
-      - {property: checked, code: 'self.item[''eligible_starred'']', writeback: true}
-    - type: FlowPanel
-      properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '', foreground: '', visible: false, spacing_above: none, spacing_below: none, background: ''}
-      name: specific_users_flow_panel
-      components:
-      - type: CheckBox
-        properties: {role: null, align: left, tooltip: '', border: '', enabled: true, foreground: '', allow_indeterminate: false, visible: true, text: 'These users:', font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false, background: '', bold: false, checked: false, underline: false}
-        name: specific_users_check_box
+      properties: {align: left, allow_indeterminate: false, background: '', bold: false, border: '', checked: false, enabled: true, font: '', font_size: 16, foreground: '', italic: false, role: null, spacing_above: none, spacing_below: none, text: My Starred users, tooltip: '', underline: false, visible: true}
+      type: CheckBox
+    - components:
+      - event_bindings: {change: specific_users_check_box_change}
         layout_properties: {}
-        event_bindings: {change: specific_users_check_box_change}
-      - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
-        properties: {width: '', align: full, enable_filtering: true, placeholder: None Selected, enabled: true, enable_select_all: true, items: null, visible: true, spacing_above: small, spacing_below: small, multiple: true}
+        name: specific_users_check_box
+        properties: {align: left, allow_indeterminate: false, background: '', bold: false, border: '', checked: false, enabled: true, font: '', font_size: null, foreground: '', italic: false, role: null, spacing_above: small, spacing_below: small, text: 'These users:', tooltip: '', underline: false, visible: true}
+        type: CheckBox
+      - data_bindings:
+        - {code: 'self.item[''user_items'']', property: items}
+        event_bindings: {}
+        layout_properties: {expand: false, full_width_row: false, grid_position: 'ZOGPKZ,GNUIJB PGYIAA,VZADMQ', width: null}
         name: user_multi_select_drop_down
-        layout_properties: {grid_position: 'ZOGPKZ,GNUIJB PGYIAA,VZADMQ', full_width_row: false, expand: false, width: null}
-        data_bindings:
-        - {property: items, code: 'self.item[''user_items'']'}
-        event_bindings: {}
+        properties: {align: full, enable_filtering: true, enable_select_all: true, enabled: true, items: null, multiple: true, placeholder: None Selected, spacing_above: small, spacing_below: small, visible: true, width: ''}
+        type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
       data_bindings: []
-    - type: FlowPanel
-      properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '', foreground: '', visible: false, spacing_above: none, spacing_below: none, background: ''}
-      name: groups_flow_panel
-      layout_properties: {}
-      components:
-      - type: CheckBox
-        properties: {role: null, align: left, tooltip: '', border: '', enabled: true, foreground: '', allow_indeterminate: false, visible: true, text: 'These groups:', font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false, background: '', bold: false, checked: false, underline: false}
-        name: groups_check_box
+      name: specific_users_flow_panel
+      properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: tiny, spacing_above: none, spacing_below: none, tooltip: '', visible: false}
+      type: FlowPanel
+    - components:
+      - event_bindings: {change: groups_check_box_change}
         layout_properties: {grid_position: 'AXLKKX,QXOJGY'}
-        event_bindings: {change: groups_check_box_change}
-      - type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
-        properties: {align: full, enable_filtering: false, placeholder: None Selected, enabled: true, enable_select_all: true, items: null, visible: true, spacing_above: small, spacing_below: small, multiple: true}
-        name: group_multi_select_drop_down
-        layout_properties: {grid_position: 'JWIJWQ,TNFAHU', expand: false, width: null}
-        data_bindings:
-        - {property: items, code: 'self.item[''group_items'']'}
+        name: groups_check_box
+        properties: {align: left, allow_indeterminate: false, background: '', bold: false, border: '', checked: false, enabled: true, font: '', font_size: null, foreground: '', italic: false, role: null, spacing_above: small, spacing_below: small, text: 'These groups:', tooltip: '', underline: false, visible: true}
+        type: CheckBox
+      - data_bindings:
+        - {code: 'self.item[''group_items'']', property: items}
         event_bindings: {}
+        layout_properties: {expand: false, grid_position: 'JWIJWQ,TNFAHU', width: null}
+        name: group_multi_select_drop_down
+        properties: {align: full, enable_filtering: false, enable_select_all: true, enabled: true, items: null, multiple: true, placeholder: None Selected, spacing_above: small, spacing_below: small, visible: true}
+        type: form:C6ZZPAPN4YYF5NVJ:MultiSelectDropDown
       data_bindings: []
-    - type: FlowPanel
-      properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '', visible: false, spacing_above: none, spacing_below: none, background: ''}
-      name: network_flow_panel
       layout_properties: {}
-      components:
-      - type: CheckBox
-        properties: {role: null, align: left, tooltip: '', border: '', enabled: true, foreground: '', allow_indeterminate: false, visible: true, text: All, font_size: null, font: '', spacing_above: small, spacing_below: small, italic: false, background: '', bold: false, checked: false, underline: false}
-        name: network_check_box
+      name: groups_flow_panel
+      properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: tiny, spacing_above: none, spacing_below: none, tooltip: '', visible: false}
+      type: FlowPanel
+    - components:
+      - event_bindings: {change: network_check_box_change}
         layout_properties: {grid_position: 'EWMGJM,CFTNRT'}
-        event_bindings: {change: network_check_box_change}
-      - type: DropDown
+        name: network_check_box
+        properties: {align: left, allow_indeterminate: false, background: '', bold: false, border: '', checked: false, enabled: true, font: '', font_size: null, foreground: '', italic: false, role: null, spacing_above: small, spacing_below: small, text: All, tooltip: '', underline: false, visible: true}
+        type: CheckBox
+      - data_bindings: []
+        event_bindings: {change: drop_down_eligible_change}
+        layout_properties: {full_width_row: false, grid_position: 'ZOGPKZ,GNUIJB'}
+        name: drop_down_eligible
         properties:
-          role: null
           align: full
-          tooltip: ''
-          placeholder: ''
-          border: ''
-          enabled: true
-          foreground: ''
-          items: [drop_down_eligible (items set at runtime)]
-          visible: true
-          font_size: null
-          font: ''
-          spacing_above: small
-          spacing_below: small
-          italic: false
           background: theme:Gray 200
           bold: false
-          underline: false
+          border: ''
+          enabled: true
+          font: ''
+          font_size: null
+          foreground: ''
           include_placeholder: false
-        name: drop_down_eligible
-        layout_properties: {grid_position: 'ZOGPKZ,GNUIJB', full_width_row: false}
-        event_bindings: {change: drop_down_eligible_change}
-        data_bindings: []
-    - name: no_one_label
+          italic: false
+          items: [drop_down_eligible (items set at runtime)]
+          placeholder: ''
+          role: null
+          spacing_above: small
+          spacing_below: small
+          tooltip: ''
+          underline: false
+          visible: true
+        type: DropDown
+      layout_properties: {}
+      name: network_flow_panel
+      properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: none, spacing_above: none, spacing_below: none, tooltip: '', visible: false}
+      type: FlowPanel
+    - layout_properties: {}
+      name: no_one_label
       properties:
+        spacing_above: none
+        spacing_below: none
         text: |-
           No one: choose this to create a test request that no one else will see
           (Note: Once you have more than one user in your network, options for limiting your request to only some of them will appear here.)
         visible: false
-        spacing_above: none
-        spacing_below: none
       type: Label
-      layout_properties: {}
     layout_properties: {expand: true}
+    name: linear_panel_1
+    properties: {spacing_above: none, spacing_below: none}
+    type: LinearPanel
+  layout_properties: {grid_position: 'MHSLSZ,RZLGXI'}
+  name: limited_flow_panel
+  properties: {spacing_above: none, spacing_below: none}
+  type: FlowPanel
+container:
+  event_bindings: {show: form_show}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true

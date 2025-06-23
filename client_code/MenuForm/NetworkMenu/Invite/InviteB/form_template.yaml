@@ -1,82 +1,82 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
 components:
-- type: LinearPanel
-  properties: {spacing_above: small, spacing_below: small, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
-  name: linear_panel_1
-  layout_properties: {grid_position: 'EQUXEF,YOTSSF'}
-  components:
-  - type: FlowPanel
-    properties: {role: null, spacing: none, align: center, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-    name: flow_panel_1
-    layout_properties: {grid_position: 'HCIURU,CURCQW'}
-    components:
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: 'Send the following link to your ', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+- components:
+  - components:
+    - layout_properties: {}
       name: label_2
-      layout_properties: {}
-    - type: Label
-      properties: {}
-      name: label_3
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: 'Send the following link to your ', tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings:
+      - {code: 'self.item[''rel_to_inviter'']', property: text}
       layout_properties: {grid_position: 'PIHYNA,FCOPRG'}
-      data_bindings:
-      - {property: text, code: 'self.item[''rel_to_inviter'']'}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: ':', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+      name: label_3
+      properties: {}
+      type: Label
+    - layout_properties: {}
       name: label_1
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: ':', tooltip: '', underline: false, visible: true}
+      type: Label
+    layout_properties: {grid_position: 'HCIURU,CURCQW'}
+    name: flow_panel_1
+    properties: {align: center, background: '', border: '', foreground: '', role: null, spacing: none, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+    type: FlowPanel
+  - components:
+    - components: []
+      data_bindings:
+      - {code: 'self.item[''url'']', property: text}
+      - {code: 'self.item[''url'']', property: url}
       layout_properties: {}
-  - type: FlowPanel
-    properties: {role: null, spacing: medium, align: center, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
-    name: flow_panel_2
-    layout_properties: {}
-    components:
-    - type: Link
-      properties: {role: null, url: '', align: center, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}', spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: link_1
-      layout_properties: {}
-      data_bindings:
-      - {property: text, code: 'self.item[''url'']'}
-      - {property: url, code: 'self.item[''url'']'}
-      components: []
-    - type: Button
-      properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Copy Link, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:copy'}
-      name: copy_button
+      properties: {align: center, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+      type: Link
+    - event_bindings: {click: copy_button_click}
       layout_properties: {grid_position: 'EQUXEF,LSHXUI'}
-      event_bindings: {click: copy_button_click}
-  - type: RichText
-    properties: {role: null, align: left, tooltip: '', enable_slots: true, border: '', foreground: '', visible: true, font_size: null, content: 'Once they register using this link and confirm ownership of a phone number ending in {last4_label}, you will be connected.', font: '', spacing_above: none, spacing_below: none, data: null, background: '', format: markdown}
-    name: rich_text_1
+      name: copy_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:copy', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: small, text: Copy Link, tooltip: '', underline: false, visible: true}
+      type: Button
     layout_properties: {}
-    components:
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
-      name: label_7
+    name: flow_panel_2
+    properties: {align: center, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: small, spacing_below: none, tooltip: '', visible: true}
+    type: FlowPanel
+  - components:
+    - data_bindings:
+      - {code: 'self.item[''inviter_guess'']', property: text}
       layout_properties: {slot: last4_label}
-      data_bindings:
-      - {property: text, code: 'self.item[''inviter_guess'']'}
-- type: Spacer
-  properties: {height: 7}
+      name: label_7
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
+    layout_properties: {}
+    name: rich_text_1
+    properties: {align: left, background: '', border: '', content: 'Once they register using this link and confirm ownership of a phone number ending in {last4_label}, you will be connected.', data: null, enable_slots: true, font: '', font_size: null, foreground: '', format: markdown, role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+    type: RichText
+  layout_properties: {grid_position: 'EQUXEF,YOTSSF'}
+  name: linear_panel_1
+  properties: {background: '', border: '', foreground: '', role: null, spacing_above: small, spacing_below: small, tooltip: '', visible: true}
+  type: LinearPanel
+- layout_properties: {grid_position: 'NLEJVM,PDQRTP'}
   name: spacer_1
-  layout_properties: {grid_position: 'NLEJVM,PDQRTP'}
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: right, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
-  name: flow_panel_3
-  layout_properties: {grid_position: 'GEJKQC,UGNTPF'}
-  components:
-  - type: Button
-    properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Back, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+  properties: {height: 7}
+  type: Spacer
+- components:
+  - event_bindings: {click: back_button_click}
+    layout_properties: {}
     name: back_button
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: small, text: Back, tooltip: '', underline: false, visible: true}
+    type: Button
+  - event_bindings: {click: ok_button_click}
     layout_properties: {}
-    event_bindings: {click: back_button_click}
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: OK, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
     name: ok_button
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: small, text: OK, tooltip: '', underline: false, visible: true}
+    type: Button
+  - event_bindings: {click: cancel_button_click}
     layout_properties: {}
-    event_bindings: {click: ok_button_click}
-  - type: Button
-    properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
     name: cancel_button
-    layout_properties: {}
-    event_bindings: {click: cancel_button_click}
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: secondary-color, spacing_above: small, spacing_below: small, text: Cancel, tooltip: '', underline: false, visible: true}
+    type: Button
+  layout_properties: {grid_position: 'GEJKQC,UGNTPF'}
+  name: flow_panel_3
+  properties: {align: right, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: small, spacing_below: small, tooltip: '', visible: true}
+  type: FlowPanel
+container:
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
 is_package: true

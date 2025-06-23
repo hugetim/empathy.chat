@@ -1,54 +1,54 @@
-properties:
-- {name: minutes, type: number, important: false, default_binding_prop: true, default_value: 10, priority: 100}
-- {name: seconds, type: number, important: false, default_value: 0, priority: 20}
-- {name: paused, type: boolean, default_value: true, important: false}
-- {name: visible, type: boolean, default_value: true, important: true, priority: 7, group: Appearance}
-- {name: enabled, type: boolean, default_value: true, important: false, priority: -10, group: Interaction}
-- {name: align, type: string, default_value: center, important: false, group: Appearance, priority: -30}
-is_package: true
-events:
-- {name: elapsed, default_event: true}
-- {name: started}
-custom_component: true
 components:
-- properties: {align: center, spacing: none}
-  type: FlowPanel
-  layout_properties: {slot: default}
-  name: flow_panel_1
-  components:
-  - properties: {spacing_above: none, type: number, text: '00', tooltip: minutes, align: right}
-    type: TextBox
+- components:
+  - event_bindings: {focus: _text_box_focus, lost_focus: _minutes_text_box_lost_focus, pressed_enter: _minutes_text_box_lost_focus}
     layout_properties: {width: 36}
-    event_bindings: {focus: _text_box_focus, lost_focus: _minutes_text_box_lost_focus, pressed_enter: _minutes_text_box_lost_focus}
     name: minutes_text_box
-  - properties: {text: ':', spacing_above: none}
-    type: Label
-    layout_properties: {}
-    name: label_1
-  - properties: {spacing_above: none, type: number, text: '00', tooltip: seconds}
+    properties: {align: right, spacing_above: none, text: '00', tooltip: minutes, type: number}
     type: TextBox
+  - layout_properties: {}
+    name: label_1
+    properties: {spacing_above: none, text: ':'}
+    type: Label
+  - event_bindings: {focus: _text_box_focus, lost_focus: _seconds_text_box_lost_focus, pressed_enter: _seconds_text_box_lost_focus}
     layout_properties: {width: 36}
-    event_bindings: {pressed_enter: _seconds_text_box_lost_focus, lost_focus: _seconds_text_box_lost_focus, focus: _text_box_focus}
     name: seconds_text_box
-  - name: spacer_1
+    properties: {spacing_above: none, text: '00', tooltip: seconds, type: number}
+    type: TextBox
+  - layout_properties: {width: 11}
+    name: spacer_1
     properties: {height: 32}
     type: Spacer
-    layout_properties: {width: 11}
-  - properties: {text: '', icon: 'fa:pause', role: raised}
-    type: Button
-    event_bindings: {click: _play_button_click}
+  - event_bindings: {click: _play_button_click}
     layout_properties: {}
     name: play_button
-  - properties: {text: '', role: raised, icon: 'fa:repeat', enabled: false}
+    properties: {icon: 'fa:pause', role: raised, text: ''}
     type: Button
-    event_bindings: {click: reset_button_click}
+  - event_bindings: {click: reset_button_click}
     layout_properties: {}
     name: reset_button
-  - properties: {interval: 0}
-    type: Timer
+    properties: {enabled: false, icon: 'fa:repeat', role: raised, text: ''}
+    type: Button
+  - event_bindings: {tick: _timer_1_tick}
     layout_properties: {}
-    event_bindings: {tick: _timer_1_tick}
     name: timer_1
+    properties: {interval: 0}
+    type: Timer
+  layout_properties: {slot: default}
+  name: flow_panel_1
+  properties: {align: center, spacing: none}
+  type: FlowPanel
 container:
-  type: HtmlTemplate
   properties: {html: ''}
+  type: HtmlTemplate
+custom_component: true
+events:
+- {default_event: true, name: elapsed}
+- {name: started}
+is_package: true
+properties:
+- {default_binding_prop: true, default_value: 10, important: false, name: minutes, priority: 100, type: number}
+- {default_value: 0, important: false, name: seconds, priority: 20, type: number}
+- {default_value: true, important: false, name: paused, type: boolean}
+- {default_value: true, group: Appearance, important: true, name: visible, priority: 7, type: boolean}
+- {default_value: true, group: Interaction, important: false, name: enabled, priority: -10, type: boolean}
+- {default_value: center, group: Appearance, important: false, name: align, priority: -30, type: string}

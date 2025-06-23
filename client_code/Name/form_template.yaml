@@ -1,51 +1,51 @@
-container:
-  type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none, background: ''}
-  event_bindings: {}
 components:
-- type: FlowPanel
-  properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-  name: flow_panel_1
+- components:
+  - data_bindings:
+    - {code: '"fa:star" if self.item.get(''starred'') else "fa:star-o"', property: icon}
+    - {code: self.item.get('starred') is not None, property: visible}
+    event_bindings: {click: star_button_click}
+    layout_properties: {column: TCRDJP, grid_position: 'AGBMOO,XUVFMH'}
+    name: star_button
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: 'theme:Gold', icon: 'fa:star-o', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+    type: Button
+  - data_bindings:
+    - {code: self.item.get('starred') is None, property: visible}
+    layout_properties: {grid_position: 'GWGBWQ,JEPWYA', width: 43}
+    name: spacer_1
+    properties: {height: 21, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+    type: Spacer
+  - components: []
+    data_bindings:
+    - {code: 'self.item[''name'']', property: text}
+    event_bindings: {click: link_1_click}
+    layout_properties: {column: TCRDJP}
+    name: link_1
+    properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+    type: Link
+  - data_bindings:
+    - {code: self.item, property: item}
+    layout_properties: {}
+    name: partner_check
+    properties: {visible: false}
+    type: form:Name.PartnerCheck
+  - layout_properties: {grid_position: 'GWGBWQ,HKCCMZ'}
+    name: degree_label
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: small, text: '', tooltip: '', underline: false, visible: false}
+    type: Label
+  - data_bindings:
+    - {code: self.item.get('seeking'), property: visible}
+    layout_properties: {column: PGULWY}
+    name: seeking_label
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: 'fa:hand-paper-o', icon_align: left, italic: false, role: null, spacing_above: medium, spacing_below: small, text: '', tooltip: This user is currently seeking a regular empathy buddy, underline: false, visible: true}
+    type: Label
   layout_properties:
     col_widths: {}
     grid_position: GWGBWQ,MQOSIW
-  components:
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true, foreground: 'theme:Gold', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:star-o'}
-    name: star_button
-    layout_properties: {column: TCRDJP, grid_position: 'AGBMOO,XUVFMH'}
-    data_bindings:
-    - {property: icon, code: '"fa:star" if self.item.get(''starred'') else "fa:star-o"'}
-    - {property: visible, code: self.item.get('starred') is not None}
-    event_bindings: {click: star_button_click}
-  - type: Spacer
-    properties: {visible: true, spacing_above: none, spacing_below: none, height: 21, tooltip: ''}
-    name: spacer_1
-    layout_properties: {grid_position: 'GWGBWQ,JEPWYA', width: 43}
-    data_bindings:
-    - {property: visible, code: self.item.get('starred') is None}
-  - type: Link
-    properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '{}', spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
-    name: link_1
-    layout_properties: {column: TCRDJP}
-    data_bindings:
-    - {property: text, code: 'self.item[''name'']'}
-    event_bindings: {click: link_1_click}
-    components: []
-  - type: form:Name.PartnerCheck
-    properties: {visible: false}
-    name: partner_check
-    layout_properties: {}
-    data_bindings:
-    - {property: item, code: self.item}
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
-    name: degree_label
-    layout_properties: {grid_position: 'GWGBWQ,HKCCMZ'}
-  - type: Label
-    properties: {role: null, align: left, tooltip: This user is currently seeking a regular empathy buddy, border: '', foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: medium, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:hand-paper-o'}
-    name: seeking_label
-    layout_properties: {column: PGULWY}
-    data_bindings:
-    - {property: visible, code: self.item.get('seeking')}
+  name: flow_panel_1
+  properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: tiny, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+  type: FlowPanel
+container:
+  event_bindings: {}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true

@@ -1,8 +1,8 @@
-container: {type: DataRowPanel}
 components:
-- type: Button
-  properties: {role: null, align: center, tooltip: Leave group, border: '', enabled: true, foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:user-times'}
-  name: leave_button
+- event_bindings: {click: leave_button_click}
   layout_properties: {column: DSYVQA}
-  event_bindings: {click: leave_button_click}
+  name: leave_button
+  properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: 'theme:Secondary 500', icon: 'fa:user-times', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: Leave group, underline: false, visible: true}
+  type: Button
+container: {type: DataRowPanel}
 is_package: true

@@ -1,44 +1,44 @@
 components:
-- type: ColumnPanel
-  properties: {role: card, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
-  name: content_column_panel
-  layout_properties: {grid_position: 'QZKEDX,JHASIM'}
-  event_bindings: {}
-  components:
-  - type: DataGrid
-    properties:
-      role: null
-      columns:
-      - {title: '', id: RKBTGY, data_key: host, width: '40'}
-      - {title: Name, id: TCRDJP, data_key: name}
-      - {id: KANGHW, title: Role, data_key: trust_label, width: '90'}
-      - {id: BMRGGD, title: No Phone Req., data_key: no_phone_required}
-      - {title: Degree, id: CKNKJL, data_key: degree, width: '90'}
-      - {title: Last Active, id: VWXCEI, data_key: last_active, width: '90'}
-      - {title: '', id: NBEGGD, data_key: buttons}
-      auto_header: true
-      tooltip: ''
-      border: ''
-      foreground: ''
-      rows_per_page: 20
-      visible: true
-      wrap_on: never
-      show_page_controls: true
-      spacing_above: small
-      spacing_below: small
-      background: ''
-    name: data_grid_1
+- components:
+  - components:
+    - data_bindings: []
+      layout_properties: {}
+      name: repeating_panel_1
+      properties: {background: '', border: '', foreground: '', item_template: MenuForm.MyGroupsMenu.MyGroupMembers.MyGroupMembersRow, items: null, role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: RepeatingPanel
     layout_properties:
       col_widths: {}
       grid_position: PLFXZS,NAEYWZ
-    components:
-    - type: RepeatingPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', items: null, visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.MyGroupsMenu.MyGroupMembers.MyGroupMembersRow, background: ''}
-      name: repeating_panel_1
-      layout_properties: {}
-      data_bindings: []
-container:
-  type: ColumnPanel
+    name: data_grid_1
+    properties:
+      auto_header: true
+      background: ''
+      border: ''
+      columns:
+      - {data_key: host, id: RKBTGY, title: '', width: '40'}
+      - {data_key: name, id: TCRDJP, title: Name}
+      - {data_key: trust_label, id: KANGHW, title: Role, width: '90'}
+      - {data_key: no_phone_required, id: BMRGGD, title: No Phone Req.}
+      - {data_key: degree, id: CKNKJL, title: Degree, width: '90'}
+      - {data_key: last_active, id: VWXCEI, title: Last Active, width: '90'}
+      - {data_key: buttons, id: NBEGGD, title: ''}
+      foreground: ''
+      role: null
+      rows_per_page: 20
+      show_page_controls: true
+      spacing_above: small
+      spacing_below: small
+      tooltip: ''
+      visible: true
+      wrap_on: never
+    type: DataGrid
   event_bindings: {}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
+  layout_properties: {grid_position: 'QZKEDX,JHASIM'}
+  name: content_column_panel
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: card, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
+container:
+  event_bindings: {}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true

@@ -1,86 +1,86 @@
 components:
-- type: LinearPanel
-  properties: {spacing_above: none, spacing_below: small, background: '', foreground: '', border: '', visible: true, role: null, tooltip: ''}
-  name: phone_linear_panel
-  layout_properties: {grid_position: 'OUXQPZ,GSYNHG'}
-  components:
-  - type: FlowPanel
-    properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-    name: flow_panel_2
-    layout_properties: {grid_position: 'KTKKYI,IMCAQV'}
-    components:
-    - type: DropDown
+- components:
+  - components:
+    - layout_properties: {}
+      name: drop_down_1
       properties:
-        role: null
         align: center
-        tooltip: Sorry, only U.S. numbers supported at this time.
-        placeholder: ''
-        border: ''
-        enabled: false
-        foreground: ''
-        items: ['+1']
-        visible: true
-        font_size: null
-        font: ''
-        spacing_above: small
-        spacing_below: small
-        italic: false
         background: ''
         bold: false
-        underline: false
+        border: ''
+        enabled: false
+        font: ''
+        font_size: null
+        foreground: ''
         include_placeholder: false
-      name: drop_down_1
-      layout_properties: {}
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: (212)555-1234, border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small, type: tel, spacing_below: small, italic: false, background: '', bold: false, underline: false}
-      name: phone_text_box
-      layout_properties: {grid_position: 'KTKKYI,YLZSSI', width: 114.4}
-      data_bindings:
-      - {property: text, code: 'self.item[''phone'']', writeback: false}
+        italic: false
+        items: ['+1']
+        placeholder: ''
+        role: null
+        spacing_above: small
+        spacing_below: small
+        tooltip: Sorry, only U.S. numbers supported at this time.
+        underline: false
+        visible: true
+      type: DropDown
+    - data_bindings:
+      - {code: 'self.item[''phone'']', property: text, writeback: false}
       event_bindings: {change: phone_text_box_change, pressed_enter: phone_button_click}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Add, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
-      name: phone_button
-      layout_properties: {}
+      layout_properties: {grid_position: 'KTKKYI,YLZSSI', width: 114.4}
+      name: phone_text_box
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', hide_text: false, italic: false, placeholder: (212)555-1234, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', type: tel, underline: false, visible: true}
+      type: TextBox
+    - data_bindings: []
       event_bindings: {click: phone_button_click}
-      data_bindings: []
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: Your contact info will only be used for purposes directly related to empathy.chat (and will not be displayed to other users), font_size: 10, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
-    name: label_2
+      layout_properties: {}
+      name: phone_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: small, text: Add, tooltip: '', underline: false, visible: true}
+      type: Button
+    layout_properties: {grid_position: 'KTKKYI,IMCAQV'}
+    name: flow_panel_2
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: small, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+    type: FlowPanel
+  - data_bindings:
+    - {code: 'not self.item[''phone'']', property: visible}
     layout_properties: {grid_position: 'EXSGYR,AZZAID'}
-    data_bindings:
-    - {property: visible, code: 'not self.item[''phone'']'}
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+    name: label_2
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: 10, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: Your contact info will only be used for purposes directly related to empathy.chat (and will not be displayed to other users), tooltip: '', underline: false, visible: true}
+    type: Label
+  - data_bindings: []
+    layout_properties: {}
     name: phone_instructions_label
-    layout_properties: {}
-    data_bindings: []
-  - type: FlowPanel
-    properties: {role: null, spacing: medium, align: left, tooltip: '', border: '', foreground: '', visible: false, spacing_above: small, spacing_below: small, background: ''}
-    name: phone_code_panel
-    layout_properties: {}
-    components:
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: verification code, border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small, type: text, spacing_below: small, italic: false, background: '', bold: false, underline: false}
-      name: phone_code_text_box
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: false}
+    type: Label
+  - components:
+    - event_bindings: {change: phone_code_text_box_change, pressed_enter: phone_code_submit_button_click}
       layout_properties: {width: 121.4}
-      event_bindings: {change: phone_code_text_box_change, pressed_enter: phone_code_submit_button_click}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
+      name: phone_code_text_box
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', hide_text: false, italic: false, placeholder: verification code, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', type: text, underline: false, visible: true}
+      type: TextBox
+    - event_bindings: {click: phone_code_submit_button_click}
+      layout_properties: {}
       name: phone_code_submit_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: small, text: Submit, tooltip: '', underline: false, visible: true}
+      type: Button
+    - event_bindings: {click: cancel_button_click}
       layout_properties: {}
-      event_bindings: {click: phone_code_submit_button_click}
-    - type: Button
-      properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
       name: cancel_button
-      layout_properties: {}
-      event_bindings: {click: cancel_button_click}
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: secondary-color, spacing_above: small, spacing_below: small, text: Cancel, tooltip: '', underline: false, visible: true}
+      type: Button
     data_bindings: []
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red', visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
-    name: phone_error_label
     layout_properties: {}
+    name: phone_code_panel
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: small, spacing_below: small, tooltip: '', visible: false}
+    type: FlowPanel
+  - layout_properties: {}
+    name: phone_error_label
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: 'theme:Red', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: false}
+    type: Label
+  layout_properties: {grid_position: 'OUXQPZ,GSYNHG'}
+  name: phone_linear_panel
+  properties: {background: '', border: '', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true}
+  type: LinearPanel
 container:
-  type: ColumnPanel
   event_bindings: {}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel

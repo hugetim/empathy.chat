@@ -1,42 +1,42 @@
-container:
-  type: ColumnPanel
-  event_bindings: {show: form_show}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none, background: ''}
 components:
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-  name: flow_panel_2
-  layout_properties: {grid_position: 'SEMLKO,LCQVAG'}
-  components:
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: or, font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
+- components:
+  - layout_properties: {grid_position: 'ZNTNCR,WOACUU'}
     name: label_1
-    layout_properties: {grid_position: 'ZNTNCR,WOACUU'}
-  - type: form:HorizontalRule
-    properties: {}
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: or, tooltip: '', underline: false, visible: true}
+    type: Label
+  - layout_properties: {expand: true, grid_position: 'ZNTNCR,ITSOXK', width: null}
     name: horizontal_rule_1
-    layout_properties: {grid_position: 'ZNTNCR,ITSOXK', expand: true, width: null}
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-  name: flow_panel_1
-  layout_properties: {grid_position: 'GUKKSE,SZBAPF'}
-  components:
-  - type: DatePicker
-    properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '', placeholder: '', border: '', enabled: true, foreground: '', visible: true, font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false, date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false, format: ''}
-    name: date_picker_start
-    layout_properties: {width: 240}
+    properties: {}
+    type: form:HorizontalRule
+  layout_properties: {grid_position: 'SEMLKO,LCQVAG'}
+  name: flow_panel_2
+  properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+  type: FlowPanel
+- components:
+  - data_bindings:
+    - {code: 'self.item[''start_date'']', property: date, writeback: true}
     event_bindings: {change: date_picker_start_change}
-    data_bindings:
-    - {property: date, code: 'self.item[''start_date'']', writeback: true}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true, foreground: 'theme:Secondary 500', visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:trash'}
+    layout_properties: {width: 240}
+    name: date_picker_start
+    properties: {align: left, background: 'theme:Gray 200', bold: false, border: '', date: '', enabled: true, font: '', font_size: null, foreground: '', format: '', italic: false, max_date: '', min_date: '', pick_time: true, placeholder: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', underline: false, visible: true}
+    type: DatePicker
+  - event_bindings: {click: remove_button_click}
     name: remove_button
-    event_bindings: {click: remove_button_click}
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: 'theme:Secondary 500', icon: 'fa:trash', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+    type: Button
   event_bindings: {}
-- type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red', visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: ''}
-  name: label_start
+  layout_properties: {grid_position: 'GUKKSE,SZBAPF'}
+  name: flow_panel_1
+  properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+  type: FlowPanel
+- event_bindings: {}
   layout_properties: {grid_position: 'YVDVBP,BZEQBT'}
-  event_bindings: {}
+  name: label_start
+  properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: 'theme:Red', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: false}
+  type: Label
+container:
+  event_bindings: {show: form_show}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true
 item_type: {table_id: null}

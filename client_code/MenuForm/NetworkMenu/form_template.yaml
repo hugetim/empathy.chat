@@ -1,39 +1,39 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
-  event_bindings: {}
 components:
-- type: FlowPanel
-  properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
-  name: tabs_flow_panel
-  layout_properties: {grid_position: 'BAZVOP,XWOJFJ', full_width_row: true}
-  components:
-  - type: Button
-    properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Network, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: 'theme:White', bold: false, underline: false, icon: ''}
+- components:
+  - event_bindings: {click: network_tab_button_click}
+    layout_properties: {}
     name: network_tab_button
+    properties: {align: center, background: 'theme:White', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: none, text: Network, tooltip: '', underline: false, visible: true}
+    type: Button
+  - event_bindings: {click: invites_tab_button_click}
     layout_properties: {}
-    event_bindings: {click: network_tab_button_click}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Invites, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray 200', bold: false, underline: false, icon: ''}
     name: invites_tab_button
+    properties: {align: center, background: 'theme:Gray 200', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: none, text: Invites, tooltip: '', underline: false, visible: true}
+    type: Button
+  - event_bindings: {click: blocks_tab_button_click}
     layout_properties: {}
-    event_bindings: {click: invites_tab_button_click}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: false, text: Blocks, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray 200', bold: false, underline: false, icon: ''}
     name: blocks_tab_button
-    layout_properties: {}
-    event_bindings: {click: blocks_tab_button_click}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Groups, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray 200', bold: false, underline: false, icon: ''}
-    name: groups_tab_button
+    properties: {align: center, background: 'theme:Gray 200', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: none, text: Blocks, tooltip: '', underline: false, visible: false}
+    type: Button
+  - event_bindings: {click: groups_tab_button_click}
     layout_properties:
       col_widths: {}
       grid_position: OYNEUS,AQGCZL
-    event_bindings: {click: groups_tab_button_click}
+    name: groups_tab_button
+    properties: {align: center, background: 'theme:Gray 200', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: none, text: Groups, tooltip: '', underline: false, visible: true}
+    type: Button
   event_bindings: {}
-- type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
-  name: content_column_panel
+  layout_properties: {full_width_row: true, grid_position: 'BAZVOP,XWOJFJ'}
+  name: tabs_flow_panel
+  properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: none, spacing_above: small, spacing_below: none, tooltip: '', visible: true}
+  type: FlowPanel
+- components: []
   layout_properties: {grid_position: 'SHVAYQ,JCVUYG'}
-  components: []
+  name: content_column_panel
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
+container:
+  event_bindings: {}
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
 is_package: true

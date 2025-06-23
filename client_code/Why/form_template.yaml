@@ -1,15 +1,15 @@
-container:
-  type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '', spacing_below: none, background: ''}
 components:
-- type: Link
-  properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Gray 600', visible: true, text: '(Why?)', font_size: 10, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '', spacing_below: small, italic: false, background: '', bold: true, underline: true, icon: ''}
-  name: link_1
-  layout_properties:
+- layout_properties:
     col_widths: {}
     grid_position: TMAIRN,RIWYWO
-is_package: true
+  name: link_1
+  properties: {align: left, background: '', bold: true, border: '', col_spacing: medium, col_widths: '', font: '', font_size: 10, foreground: 'theme:Gray 600', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '(Why?)', tooltip: '', underline: true, url: '', visible: true, wrap_on: mobile}
+  type: Link
+container:
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 custom_component: true
+is_package: true
 properties:
-- {name: tooltip, type: string, default_value: 'At empathy.chat, we want "connection" to really mean something, to foster trust.', default_binding_prop: true}
-- {name: text, type: string, default_value: '(Why?)', default_binding_prop: false}
+- {default_binding_prop: true, default_value: 'At empathy.chat, we want "connection" to really mean something, to foster trust.', name: tooltip, type: string}
+- {default_binding_prop: false, default_value: '(Why?)', name: text, type: string}

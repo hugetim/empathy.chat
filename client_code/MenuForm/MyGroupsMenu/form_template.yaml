@@ -1,152 +1,152 @@
 components:
-- type: ColumnPanel
-  properties: {role: card, tooltip: '', border: '', foreground: '', visible: false, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: medium, background: ''}
-  name: partner_criteria_panel
-  layout_properties: {grid_position: 'CXKDEJ,OVLUHO'}
-  components:
-  - type: RichText
+- components:
+  - components:
+    - components:
+      - event_bindings: {change: url_text_box_change}
+        layout_properties: {grid_position: 'SGFTYA,WJGHFE', width: 389.14300000000003}
+        name: url_text_box
+        properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: 14, foreground: '', hide_text: false, italic: false, placeholder: 'https://', role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', type: url, underline: false, visible: true}
+        type: TextBox
+      - event_bindings: {click: submit_url_button_click}
+        layout_properties: {}
+        name: submit_url_button
+        properties: {align: center, background: '', bold: false, border: '', enabled: false, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: primary-color, spacing_above: none, spacing_below: none, text: submit profile link for review, tooltip: '', underline: false, visible: true}
+        type: Button
+      - layout_properties: {}
+        name: profile_url_note_label
+        properties: {align: left, background: '', bold: false, border: '', font: '', font_size: 12, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+        type: Label
+      layout_properties: {grid_position: 'LPLZKL,JCYJNZ', slot: url_panel}
+      name: flow_panel_2
+      properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: small, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: FlowPanel
+    - layout_properties: {grid_position: 'IARHXF,HFHMGE', slot: check_box_1}
+      name: identity_check_label
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: 15, foreground: '', icon: 'fa:square-o', icon_align: right, italic: false, role: null, spacing_above: medium, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
+    - layout_properties:
+        col_widths: {}
+        grid_position: GKPKSH,AQAXDZ
+        slot: check_box_2
+      name: contributor_check_label
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: 15, foreground: '', icon: 'fa:square-o', icon_align: right, italic: false, role: null, spacing_above: medium, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
+    - layout_properties: {slot: how_contribute_link}
+      name: how_contribute_link
+      properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '', font: '', font_size: 14, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: in some way, tooltip: '', underline: false, url: 'https://www.loomio.org/d/CTLG3zqb/ways-to-contribute/0', visible: true, wrap_on: mobile}
+      type: Link
+    - event_bindings: {click: explain_contribution_button_click}
+      layout_properties: {slot: explain}
+      name: explain_contribution_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: raised, spacing_above: none, spacing_below: none, text: ' If you''ve already contributed, please click here', tooltip: '', underline: false, visible: true}
+      type: Button
+    - layout_properties: {slot: reputable_link}
+      name: reputable_web_site_link
+      properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: reputable external web site, tooltip: '', underline: false, url: 'https://www.loomio.org/d/w6fHgyJ1/reputable-external-web-sites-list-for-profiles-verifying-identity-/0', visible: true, wrap_on: mobile}
+      type: Link
+    layout_properties: {grid_position: 'METHFR,YNUHZV'}
+    name: rich_text_1
     properties:
-      role: null
       align: left
-      tooltip: ''
-      enable_slots: true
+      background: ''
       border: ''
-      foreground: ''
-      visible: true
-      font_size: null
       content: |-
         To become an empathy.chat "Partner," eligible to create and host your own groups, there are two requirements:
 
         {check_box_1} Use your real first and last name, verifying your identity by demonstrating ownership of an online profile (including your picture) on a {reputable_link}: {url_panel}
 
         {check_box_2} Contribute {how_contribute_link} to empathy.chat.  {explain}
+      data: null
+      enable_slots: true
       font: ''
+      font_size: null
+      foreground: ''
+      format: markdown
+      role: null
       spacing_above: none
       spacing_below: none
-      data: null
-      background: ''
-      format: markdown
-    name: rich_text_1
-    layout_properties: {grid_position: 'METHFR,YNUHZV'}
-    components:
-    - type: FlowPanel
-      properties: {role: null, spacing: small, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-      name: flow_panel_2
-      layout_properties: {grid_position: 'LPLZKL,JCYJNZ', slot: url_panel}
-      components:
-      - type: TextBox
-        properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: 'https://', border: '', enabled: true, foreground: '', visible: true, text: '', font_size: 14, font: '', spacing_above: none, type: url, spacing_below: none, italic: false, background: '', bold: false, underline: false}
-        name: url_text_box
-        layout_properties: {grid_position: 'SGFTYA,WJGHFE', width: 389.14300000000003}
-        event_bindings: {change: url_text_box_change}
-      - type: Button
-        properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: false, foreground: '', visible: true, text: submit profile link for review, font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
-        name: submit_url_button
-        layout_properties: {}
-        event_bindings: {click: submit_url_button_click}
-      - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: 12, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
-        name: profile_url_note_label
-        layout_properties: {}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: 15, font: '', spacing_above: medium, icon_align: right, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:square-o'}
-      name: identity_check_label
-      layout_properties: {grid_position: 'IARHXF,HFHMGE', slot: check_box_1}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: 15, font: '', spacing_above: medium, icon_align: right, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: 'fa:square-o'}
-      name: contributor_check_label
-      layout_properties:
-        col_widths: {}
-        grid_position: GKPKSH,AQAXDZ
-        slot: check_box_2
-    - type: Link
-      properties: {role: null, url: 'https://www.loomio.org/d/CTLG3zqb/ways-to-contribute/0', align: left, tooltip: '', border: '', foreground: '', visible: true, text: in some way, font_size: 14, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '', spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
-      name: how_contribute_link
-      layout_properties: {slot: how_contribute_link}
-    - type: Button
-      properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: ' If you''ve already contributed, please click here', font_size: null, font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
-      name: explain_contribution_button
-      layout_properties: {slot: explain}
-      event_bindings: {click: explain_contribution_button_click}
-    - type: Link
-      properties: {role: null, url: 'https://www.loomio.org/d/w6fHgyJ1/reputable-external-web-sites-list-for-profiles-verifying-identity-/0', align: left, tooltip: '', border: '', foreground: '', visible: true, text: reputable external web site, font_size: null, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '', spacing_below: none, italic: false, background: '', bold: false, underline: false, icon: ''}
-      name: reputable_web_site_link
-      layout_properties: {slot: reputable_link}
-- type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
-  name: my_groups_panel
-  layout_properties: {grid_position: 'HZKCPM,TVKJKW'}
-  components:
-  - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
-    name: card_1
-    layout_properties: {grid_position: 'HFCYGO,HVTCEI'}
-    components:
-    - type: FlowPanel
-      properties: {role: null, spacing: huge, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-      name: flow_panel_1
-      layout_properties: {grid_position: 'QNABFA,ZNHECW'}
-      components:
-      - type: DropDown
-        properties:
-          role: null
-          align: left
-          tooltip: ''
-          placeholder: ''
-          border: ''
-          enabled: true
-          foreground: ''
-          items: ['']
-          visible: true
-          font_size: 18
-          font: ''
-          spacing_above: none
-          spacing_below: small
-          italic: false
-          background: ''
-          bold: false
-          underline: false
-          include_placeholder: false
-        name: groups_drop_down
+      tooltip: ''
+      visible: true
+    type: RichText
+  layout_properties: {grid_position: 'CXKDEJ,OVLUHO'}
+  name: partner_criteria_panel
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: card, spacing_above: none, spacing_below: medium, tooltip: '', visible: false, wrap_on: mobile}
+  type: ColumnPanel
+- components:
+  - components:
+    - components:
+      - event_bindings: {change: groups_drop_down_change}
         layout_properties:
           col_widths: {}
           grid_position: RGPSEB,BMPPFJ
-        event_bindings: {change: groups_drop_down_change}
-      - type: Button
-        properties: {role: primary-color, align: left, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Create New Group, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false, background: '', bold: false, underline: false, icon: 'fa:plus'}
-        name: create_button
+        name: groups_drop_down
+        properties:
+          align: left
+          background: ''
+          bold: false
+          border: ''
+          enabled: true
+          font: ''
+          font_size: 18
+          foreground: ''
+          include_placeholder: false
+          italic: false
+          items: ['']
+          placeholder: ''
+          role: null
+          spacing_above: none
+          spacing_below: small
+          tooltip: ''
+          underline: false
+          visible: true
+        type: DropDown
+      - event_bindings: {click: create_button_click}
         layout_properties:
           col_widths: {}
           grid_position: RGPSEB,OEDFTS
-        event_bindings: {click: create_button_click}
-  - type: FlowPanel
-    properties: {role: null, spacing: none, align: left, tooltip: '', border: '', foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
-    name: tabs_flow_panel
-    layout_properties: {grid_position: 'RNJNET,DCUILD', full_width_row: true}
-    components:
-    - type: Button
-      properties: {role: raised, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Settings, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: 'theme:White', bold: false, underline: false, icon: ''}
+        name: create_button
+        properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:plus', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: small, text: Create New Group, tooltip: '', underline: false, visible: true}
+        type: Button
+      layout_properties: {grid_position: 'QNABFA,ZNHECW'}
+      name: flow_panel_1
+      properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: huge, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: FlowPanel
+    layout_properties: {grid_position: 'HFCYGO,HVTCEI'}
+    name: card_1
+    properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: small, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+    type: ColumnPanel
+  - components:
+    - event_bindings: {click: group_settings_tab_button_click}
+      layout_properties: {}
       name: group_settings_tab_button
+      properties: {align: center, background: 'theme:White', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: none, text: Settings, tooltip: '', underline: false, visible: true}
+      type: Button
+    - event_bindings: {click: members_tab_button_click}
       layout_properties: {}
-      event_bindings: {click: group_settings_tab_button_click}
-    - type: Button
-      properties: {role: null, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: true, text: Members, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray 200', bold: false, underline: false, icon: ''}
       name: members_tab_button
+      properties: {align: center, background: 'theme:Gray 200', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: none, text: Members, tooltip: '', underline: false, visible: true}
+      type: Button
+    - event_bindings: {click: invites_tab_button_click}
       layout_properties: {}
-      event_bindings: {click: members_tab_button_click}
-    - type: Button
-      properties: {role: null, align: center, tooltip: '', border: '', enabled: true, foreground: '', visible: false, text: Invite Links, font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none, italic: false, background: 'theme:Gray 200', bold: false, underline: false, icon: ''}
       name: invites_tab_button
-      layout_properties: {}
-      event_bindings: {click: invites_tab_button_click}
+      properties: {align: center, background: 'theme:Gray 200', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: none, text: Invite Links, tooltip: '', underline: false, visible: false}
+      type: Button
     event_bindings: {}
-  - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small, background: ''}
-    name: content_column_panel
+    layout_properties: {full_width_row: true, grid_position: 'RNJNET,DCUILD'}
+    name: tabs_flow_panel
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: none, spacing_above: small, spacing_below: none, tooltip: '', visible: true}
+    type: FlowPanel
+  - components: []
     layout_properties: {grid_position: 'QOCPGF,LVXTNA'}
-    components: []
-container:
+    name: content_column_panel
+    properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+    type: ColumnPanel
+  layout_properties: {grid_position: 'HZKCPM,TVKJKW'}
+  name: my_groups_panel
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
   type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}', spacing_below: small, background: ''}
+container:
   event_bindings: {}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: small, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true
