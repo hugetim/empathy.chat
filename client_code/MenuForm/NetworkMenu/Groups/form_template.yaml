@@ -1,42 +1,38 @@
 components:
-- type: ColumnPanel
-  properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
-  name: column_panel_1
-  layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
-  event_bindings: {}
-  components:
-  - type: DataGrid
+- components:
+  - components:
+    - layout_properties: {}
+      name: repeating_panel_1
+      properties: {item_template: MenuForm.NetworkMenu.Groups.GroupTemplate, spacing_above: none, spacing_below: none}
+      type: RepeatingPanel
+    layout_properties: {grid_position: 'UQOUSI,ZIEVQP'}
+    name: data_grid_1
     properties:
-      role: null
-      columns:
-      - {id: FNAQAK, title: Group Name, data_key: name, $$hashKey: 'object:1026'}
-      - {id: URLFTJ, title: Host, data_key: host, $$hashKey: 'object:1027'}
-      - {id: BGOAIR, title: Members, data_key: member_count, $$hashKey: 'object:1028'}
-      - {id: DSYVQA, title: '', data_key: buttons, $$hashKey: 'object:1029'}
       auto_header: true
-      tooltip: ''
+      background: ''
       border: ''
+      columns:
+      - {$$hashKey: 'object:1026', data_key: name, id: FNAQAK, title: Group Name}
+      - {$$hashKey: 'object:1027', data_key: host, id: URLFTJ, title: Host}
+      - {$$hashKey: 'object:1028', data_key: member_count, id: BGOAIR, title: Members}
+      - {$$hashKey: 'object:1029', data_key: buttons, id: DSYVQA, title: ''}
       foreground: ''
+      role: null
       rows_per_page: 20
-      visible: true
-      wrap_on: never
       show_page_controls: true
       spacing_above: small
       spacing_below: small
-      background: ''
-    name: data_grid_1
-    layout_properties: {grid_position: 'UQOUSI,ZIEVQP'}
-    components:
-    - type: RepeatingPanel
-      properties: {spacing_above: none, spacing_below: none, item_template: MenuForm.NetworkMenu.Groups.GroupTemplate}
-      name: repeating_panel_1
-      layout_properties: {}
-container:
-  type: ColumnPanel
+      tooltip: ''
+      visible: true
+      wrap_on: never
+    type: DataGrid
   event_bindings: {}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
+  layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
+  name: column_panel_1
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: card, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
+container:
+  event_bindings: {}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true

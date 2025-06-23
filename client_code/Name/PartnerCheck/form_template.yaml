@@ -1,21 +1,16 @@
-container:
-  type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: none,
-    background: ''}
 components:
-- type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: '', font_size: null, font: '', spacing_above: medium, icon_align: left,
-    spacing_below: small, italic: false, background: '', bold: true, underline: false,
-    icon: 'fa:check-circle-o'}
-  name: label_1
+- data_bindings:
+  - {code: 'self.item[''url_confirmed'']', property: visible}
   layout_properties:
     col_widths: {}
     grid_position: PQUDLZ,JKGFAJ
-  data_bindings:
-  - {property: visible, code: 'self.item[''url_confirmed'']'}
-is_package: true
+  name: label_1
+  properties: {align: left, background: '', bold: true, border: '', font: '', font_size: null, foreground: '', icon: 'fa:check-circle-o', icon_align: left, italic: false, role: null, spacing_above: medium, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+  type: Label
+container:
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 custom_component: true
+is_package: true
 properties:
-- {name: visible, type: boolean, default_value: null, default_binding_prop: true}
+- {default_binding_prop: true, default_value: null, name: visible, type: boolean}

@@ -1,203 +1,136 @@
-is_package: true
-container:
-  type: HtmlTemplate
-  properties: {html: '@theme:standard-page.html'}
-  event_bindings: {show: form_show}
 components:
-- type: FlowPanel
-  properties: {}
+- components:
+  - event_bindings: {click: profile_link_click}
+    layout_properties: {grid_position: 'SALJFJ,RBJCOA'}
+    name: link_bar_profile
+    properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: '', icon: 'fa:user', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, url: '', visible: false, wrap_on: mobile}
+    type: Link
+  - event_bindings: {click: home_link_click}
+    layout_properties: {}
+    name: link_bar_home
+    properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: '', icon: 'fa:home', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+    type: Link
+  - event_bindings: {}
+    layout_properties: {}
+    name: link_bar_help
+    properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '', font: '', font_size: null, foreground: '', icon: 'fa:question-circle', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: Help, underline: false, url: 'https://www.loomio.org/empathy-chat/', visible: true, wrap_on: mobile}
+    type: Link
   layout_properties: {slot: nav-right}
   name: navbar_links
-  components:
-  - type: Link
-    properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
-      visible: false, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
-      spacing_above: small, icon_align: left, col_widths: '{}', spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: 'fa:user'}
-    layout_properties: {grid_position: 'SALJFJ,RBJCOA'}
-    event_bindings: {click: profile_link_click}
-    name: link_bar_profile
-  - type: Link
-    properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
-      spacing_above: small, icon_align: left, col_widths: '{}', spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: 'fa:home'}
-    layout_properties: {}
-    event_bindings: {click: home_link_click}
-    name: link_bar_home
-  - type: Link
-    properties: {role: null, url: 'https://www.loomio.org/empathy-chat/', align: left,
-      tooltip: Help, border: '', foreground: '', visible: true, text: '', font_size: null,
-      wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left,
-      col_widths: '', spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:question-circle'}
-    layout_properties: {}
-    event_bindings: {}
-    name: link_bar_help
-- type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: Dashboard, font_size: null, font: '', spacing_above: small, icon_align: left,
-    spacing_below: small, italic: false, background: '', bold: false, underline: false,
-    icon: ''}
-  layout_properties: {slot: title}
-  event_bindings: {}
-  name: title_label
-- type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: never, col_spacing: none, spacing_above: small, col_widths: '{}', spacing_below: small,
-    background: ''}
-  layout_properties: {slot: left-nav}
-  event_bindings: {}
-  name: column_panel_1
-  components:
-  - type: LinearPanel
-    properties: {}
-    layout_properties: {grid_position: 'EFBXVF,MRRYHX'}
-    event_bindings: {}
-    name: nav_panel
-    components:
-    - type: Link
-      properties: {role: selected, url: '', align: left, tooltip: '', border: '',
-        foreground: 'theme:Primary 500', visible: true, text: Home, font_size: null,
-        wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left,
-        col_widths: '{}', spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:home'}
-      layout_properties: {}
-      event_bindings: {click: home_link_click}
-      name: home_link
-    - type: Link
-      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: My Network, font_size: null, wrap_on: mobile,
-        font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
-        icon: 'fa:users'}
-      layout_properties: {}
-      event_bindings: {click: connections_link_click}
-      name: connections_link
-    - type: Link
-      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: false, text: My Groups, font_size: null, wrap_on: mobile,
-        font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
-        icon: 'fa:shield'}
-      layout_properties: {}
-      event_bindings: {click: my_groups_link_click}
-      name: my_groups_link
-    - type: Link
-      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: My Profile, font_size: null, wrap_on: mobile,
-        font: '', col_spacing: medium, spacing_above: small, icon_align: left, col_widths: '{}',
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
-        icon: 'fa:user'}
-      layout_properties: {}
-      event_bindings: {click: profile_link_click}
-      name: profile_link
-    - type: Link
-      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: 'theme:Primary
-          500', visible: true, text: Settings, font_size: null, wrap_on: mobile, font: '',
-        col_spacing: medium, spacing_above: medium, icon_align: left, col_widths: '',
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
-        icon: 'fa:cog'}
-      layout_properties: {grid_position: 'PDJMTG,OXCOPY'}
-      event_bindings: {click: settings_link_click}
-      name: settings_link
-  - type: Spacer
-    properties: {visible: true, spacing_above: small, spacing_below: small, height: '4',
-      tooltip: ''}
-    layout_properties: {grid_position: 'XPPKQQ,PZHGFH'}
-    event_bindings: {}
-    name: spacer_1
-  - type: Link
-    properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: '', font_size: null, wrap_on: mobile, font: '', col_spacing: medium,
-      spacing_above: small, icon_align: left, col_widths: '{}', spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: ''}
-    layout_properties: {grid_position: 'YCFHBL,DVQUMX'}
-    event_bindings: {}
-    name: test_link
-    components:
-    - type: Button
-      properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Test Mic/Camera, font_size: 13, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:video-camera'}
-      layout_properties: {grid_position: 'MBMKLJ,NHMXHE'}
-      event_bindings: {}
-      name: test_button
-  - type: Link
-    properties: {role: null, url: 'https://www.empathyspot.org/contact.html', align: left,
-      tooltip: '', border: '', foreground: '', visible: false, text: '', font_size: null,
-      wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left,
-      col_widths: '{}', spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    layout_properties: {grid_position: 'MSXJWE,JWGQUV'}
-    event_bindings: {}
-    name: side_feedback_link
-    components:
-    - type: Button
-      properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: 'Send Feedback    ', font_size: 13, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:comment-o'}
-      layout_properties: {grid_position: 'DMWLIO,YPJRKM'}
-      event_bindings: {}
-      name: feedback_button
-  - type: Link
-    properties: {role: null, url: 'https://www.loomio.org/empathy-chat/', align: left,
-      tooltip: '', border: '', foreground: '', visible: true, text: '', font_size: null,
-      wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small, icon_align: left,
-      col_widths: '{}', spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    layout_properties: {grid_position: 'CJJMND,GLGDSX'}
-    event_bindings: {}
-    name: side_help_link
-    components:
-    - type: Button
-      properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: 'Help / Feedback  ', font_size: 13, font: '',
-        spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:external-link'}
-      layout_properties: {grid_position: 'SRQCCK,EEKFMZ'}
-      event_bindings: {}
-      name: help_button
-  - type: Button
-    properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: 'theme:Secondary 500', visible: true, text: 'Log out                   ',
-      font_size: 13, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: 'fa:sign-out'}
-    layout_properties: {grid_position: 'ASDYYZ,SAIRCP'}
-    event_bindings: {click: logout_button_click}
-    name: logout_button
-  - type: Label
-    properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Version 0.9.35, last updated 1/1/2024', font_size: 10,
-      font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: ''}
-    layout_properties: {grid_position: 'NMZJYT,IVZQMC'}
-    event_bindings: {}
-    name: version_label
-  - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
-      wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: small, background: ''}
-    layout_properties: {grid_position: 'JEWRYW,EWFQHO'}
-    event_bindings: {}
-    name: test_column_panel
-    components:
-    - type: Button
-      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Auto end-to-end tests, font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
-      layout_properties: {grid_position: 'PANECG,VMUSSI'}
-      event_bindings: {click: autotest_butten_click}
-      name: autotest_butten
-- type: ColumnPanel
   properties: {}
-  layout_properties: {slot: default}
+  type: FlowPanel
+- event_bindings: {}
+  layout_properties: {slot: title}
+  name: title_label
+  properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: Dashboard, tooltip: '', underline: false, visible: true}
+  type: Label
+- components:
+  - components:
+    - event_bindings: {click: home_link_click}
+      layout_properties: {}
+      name: home_link
+      properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: 'theme:Primary 500', icon: 'fa:home', icon_align: left, italic: false, role: selected, spacing_above: small, spacing_below: small, text: Home, tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+      type: Link
+    - event_bindings: {click: connections_link_click}
+      layout_properties: {}
+      name: connections_link
+      properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: 'theme:Primary 500', icon: 'fa:users', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: My Network, tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+      type: Link
+    - event_bindings: {click: my_groups_link_click}
+      layout_properties: {}
+      name: my_groups_link
+      properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: 'theme:Primary 500', icon: 'fa:shield', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: My Groups, tooltip: '', underline: false, url: '', visible: false, wrap_on: mobile}
+      type: Link
+    - event_bindings: {click: profile_link_click}
+      layout_properties: {}
+      name: profile_link
+      properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: 'theme:Primary 500', icon: 'fa:user', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: My Profile, tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+      type: Link
+    - event_bindings: {click: settings_link_click}
+      layout_properties: {grid_position: 'PDJMTG,OXCOPY'}
+      name: settings_link
+      properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '', font: '', font_size: null, foreground: 'theme:Primary 500', icon: 'fa:cog', icon_align: left, italic: false, role: null, spacing_above: medium, spacing_below: small, text: Settings, tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+      type: Link
+    event_bindings: {}
+    layout_properties: {grid_position: 'EFBXVF,MRRYHX'}
+    name: nav_panel
+    properties: {}
+    type: LinearPanel
+  - event_bindings: {}
+    layout_properties: {grid_position: 'XPPKQQ,PZHGFH'}
+    name: spacer_1
+    properties: {height: '4', spacing_above: small, spacing_below: small, tooltip: '', visible: true}
+    type: Spacer
+  - components:
+    - event_bindings: {}
+      layout_properties: {grid_position: 'MBMKLJ,NHMXHE'}
+      name: test_button
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: 13, foreground: '', icon: 'fa:video-camera', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: small, text: Test Mic/Camera, tooltip: '', underline: false, visible: true}
+      type: Button
+    event_bindings: {}
+    layout_properties: {grid_position: 'YCFHBL,DVQUMX'}
+    name: test_link
+    properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+    type: Link
+  - components:
+    - event_bindings: {}
+      layout_properties: {grid_position: 'DMWLIO,YPJRKM'}
+      name: feedback_button
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: 13, foreground: '', icon: 'fa:comment-o', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: small, text: 'Send Feedback    ', tooltip: '', underline: false, visible: true}
+      type: Button
+    event_bindings: {}
+    layout_properties: {grid_position: 'MSXJWE,JWGQUV'}
+    name: side_feedback_link
+    properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, url: 'https://www.empathyspot.org/contact.html', visible: false, wrap_on: mobile}
+    type: Link
+  - components:
+    - event_bindings: {}
+      layout_properties: {grid_position: 'SRQCCK,EEKFMZ'}
+      name: help_button
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: 13, foreground: '', icon: 'fa:external-link', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: small, text: 'Help / Feedback  ', tooltip: '', underline: false, visible: true}
+      type: Button
+    event_bindings: {}
+    layout_properties: {grid_position: 'CJJMND,GLGDSX'}
+    name: side_help_link
+    properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '{}', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, url: 'https://www.loomio.org/empathy-chat/', visible: true, wrap_on: mobile}
+    type: Link
+  - event_bindings: {click: logout_button_click}
+    layout_properties: {grid_position: 'ASDYYZ,SAIRCP'}
+    name: logout_button
+    properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: 13, foreground: 'theme:Secondary 500', icon: 'fa:sign-out', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: small, text: 'Log out                   ', tooltip: '', underline: false, visible: true}
+    type: Button
+  - event_bindings: {}
+    layout_properties: {grid_position: 'NMZJYT,IVZQMC'}
+    name: version_label
+    properties: {align: center, background: '', bold: false, border: '', font: '', font_size: 10, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: 'Version 0.9.36, last updated 6/23/2025', tooltip: '', underline: false, visible: true}
+    type: Label
+  - components:
+    - event_bindings: {click: autotest_butten_click}
+      layout_properties: {grid_position: 'PANECG,VMUSSI'}
+      name: autotest_butten
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: Auto end-to-end tests, tooltip: '', underline: false, visible: true}
+      type: Button
+    event_bindings: {}
+    layout_properties: {grid_position: 'JEWRYW,EWFQHO'}
+    name: test_column_panel
+    properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: small, spacing_below: small, tooltip: '', visible: false, wrap_on: mobile}
+    type: ColumnPanel
   event_bindings: {}
+  layout_properties: {slot: left-nav}
+  name: column_panel_1
+  properties: {background: '', border: '', col_spacing: none, col_widths: '{}', foreground: '', role: null, spacing_above: small, spacing_below: small, tooltip: '', visible: true, wrap_on: never}
+  type: ColumnPanel
+- event_bindings: {}
+  layout_properties: {slot: default}
   name: content_column_panel
-- type: Timer
-  properties: {interval: 0.1}
+  properties: {}
+  type: ColumnPanel
+- event_bindings: {tick: timer_1_tick}
   name: timer_1
-  event_bindings: {tick: timer_1_tick}
+  properties: {interval: 0.1}
+  type: Timer
+container:
+  event_bindings: {show: form_show}
+  properties: {html: '@theme:standard-page.html'}
+  type: HtmlTemplate
+is_package: true

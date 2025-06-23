@@ -1,383 +1,278 @@
 components:
-- type: ColumnPanel
-  properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: small, spacing_above: none, col_widths: '{"DGCFZA":93,"ECVXEI":13,"WAVKUR":73,"OYFYEC":10,"AUBWFW":58}',
-    spacing_below: small, background: ''}
-  name: column_panel_1
-  layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
-  event_bindings: {}
-  components:
-  - type: FlowPanel
-    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
-    name: flow_panel_1
-    layout_properties: {grid_position: 'CWBUWZ,TBTGME'}
-    components:
-    - type: Button
-      properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-        foreground: 'theme:Gold', visible: true, text: '', font_size: null, font: '',
-        spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:star-o'}
-      name: star_button
-      layout_properties: {column: NBEGGD, grid_position: 'CWBUWZ,JUFLNG'}
-      data_bindings:
-      - {property: icon, code: '"fa:star" if self.item.get(''starred'') else "fa:star-o"'}
-      - {property: visible, code: 'not self.item[''me'']'}
+- components:
+  - components:
+    - data_bindings:
+      - {code: '"fa:star" if self.item.get(''starred'') else "fa:star-o"', property: icon}
+      - {code: 'not self.item[''me'']', property: visible}
       event_bindings: {click: star_button_click}
-    - type: Label
-      properties: {role: subheading, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
-        underline: false, icon: ''}
-      name: name_label
+      layout_properties: {column: NBEGGD, grid_position: 'CWBUWZ,JUFLNG'}
+      name: star_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: 'theme:Gold', icon: 'fa:star-o', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+      type: Button
+    - data_bindings:
+      - {code: '"Name cannot be changed after it is confirmed" if (self.item[''me''] and self.item[''confirmed_url'']) else ""', property: tooltip}
       layout_properties: {grid_position: 'LXCNAQ,JUHEKB'}
-      data_bindings:
-      - {property: tooltip, code: '"Name cannot be changed after it is confirmed"
-          if (self.item[''me''] and self.item[''confirmed_url'']) else ""'}
-    - type: Button
-      properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:pencil'}
-      name: edit_name_button
-      layout_properties: {grid_position: 'LXCNAQ,YBPYBY'}
-      data_bindings:
-      - {property: visible, code: 'self.item[''me''] and not self.item[''url_confirmed'']'}
+      name: name_label
+      properties: {align: left, background: '', bold: true, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: subheading, spacing_above: small, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings:
+      - {code: 'self.item[''me''] and not self.item[''url_confirmed'']', property: visible}
       event_bindings: {click: edit_name_button_click}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: false, text: '', font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: degree_label
+      layout_properties: {grid_position: 'LXCNAQ,YBPYBY'}
+      name: edit_name_button
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:pencil', icon_align: left, italic: false, role: raised, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+      type: Button
+    - data_bindings:
+      - {code: 'not self.item[''me'']', property: visible}
       layout_properties: {grid_position: 'CWBUWZ,PZTEKG'}
-      data_bindings:
-      - {property: visible, code: 'not self.item[''me'']'}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: Messages, border: '',
-        enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:comment'}
-      name: message_button
-      layout_properties: {}
+      name: degree_label
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, visible: false}
+      type: Label
+    - data_bindings:
+      - {code: '(not self.item[''me''])', property: visible}
       event_bindings: {click: message_button_click}
-      data_bindings:
-      - {property: visible, code: '(not self.item[''me''])'}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: Request empathy chat,
-        border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:child'}
-      name: propose_button
       layout_properties: {}
-      data_bindings:
-      - {property: visible, code: 'not self.item[''me'']'}
+      name: message_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:comment', icon_align: left, italic: false, role: primary-color, spacing_above: none, spacing_below: none, text: '', tooltip: Messages, underline: false, visible: false}
+      type: Button
+    - data_bindings:
+      - {code: 'not self.item[''me'']', property: visible}
       event_bindings: {click: propose_button_click}
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: 'This user has invited
-          you to link, awaiting your confirmation', border: '', enabled: true, foreground: '',
-        visible: false, text: 'Confirm?', font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:link'}
-      name: confirm_button
       layout_properties: {}
-      data_bindings:
-      - {property: visible, code: 'self.item[''status''] == "invited"'}
+      name: propose_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:child', icon_align: left, italic: false, role: primary-color, spacing_above: none, spacing_below: none, text: '', tooltip: Request empathy chat, underline: false, visible: false}
+      type: Button
+    - data_bindings:
+      - {code: 'self.item[''status''] == "invited"', property: visible}
       event_bindings: {click: confirm_button_click}
-    - type: Button
-      properties: {role: null, align: center, tooltip: Invite this user to be a "close connection",
-        border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:link'}
-      name: connect_button
       layout_properties: {}
-      data_bindings:
-      - {property: visible, code: 'self.item[''degree''] > 1 and self.trust_level
-          >= 2 and not self.item[''status'']'}
+      name: confirm_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:link', icon_align: left, italic: false, role: primary-color, spacing_above: none, spacing_below: none, text: 'Confirm?', tooltip: 'This user has invited you to link, awaiting your confirmation', underline: false, visible: false}
+      type: Button
+    - data_bindings:
+      - {code: 'self.item[''degree''] > 1 and self.trust_level >= 2 and not self.item[''status'']', property: visible}
       event_bindings: {click: connect_button_click}
-    - type: Button
-      properties: {role: null, align: center, tooltip: Remove your connection to this user,
-        border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:chain-broken'}
-      name: unconnect_button
       layout_properties: {}
-      data_bindings:
-      - {property: visible, code: 'self.item[''degree''] == 1'}
+      name: connect_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:link', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: Invite this user to be a "close connection", underline: false, visible: false}
+      type: Button
+    - data_bindings:
+      - {code: 'self.item[''degree''] == 1', property: visible}
       event_bindings: {click: unconnect_button_click}
-    - type: Button
-      properties: {role: null, align: center, tooltip: Block this user, border: '',
-        enabled: true, foreground: '', visible: false, text: '', font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:ban'}
+      layout_properties: {}
+      name: unconnect_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:chain-broken', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: Remove your connection to this user, underline: false, visible: false}
+      type: Button
+    - layout_properties: {}
       name: block_button
-      layout_properties: {}
-  - type: FlowPanel
-    properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-    name: relationship_flow_panel
-    layout_properties: {grid_position: 'BVAHNH,TKZZYQ'}
-    components:
-    - type: Spacer
-      properties: {visible: true, spacing_above: none, spacing_below: small, height: 32,
-        tooltip: ''}
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:ban', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: Block this user, underline: false, visible: false}
+      type: Button
+    layout_properties: {grid_position: 'CWBUWZ,TBTGME'}
+    name: flow_panel_1
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: small, spacing_above: small, spacing_below: none, tooltip: '', visible: true}
+    type: FlowPanel
+  - components:
+    - layout_properties: {expand: false, width: 66}
       name: spacer_2
-      layout_properties: {width: 66, expand: false}
-    - type: RepeatingPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
-        visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.UserMenu.Profile.Relationship,
-        background: ''}
+      properties: {height: 32, spacing_above: none, spacing_below: small, tooltip: '', visible: true}
+      type: Spacer
+    - layout_properties: {expand: true, grid_position: 'UBZMDW,UKHAPU', width: null}
       name: relationship_repeating_panel
-      layout_properties: {grid_position: 'UBZMDW,UKHAPU', expand: true, width: null}
+      properties: {background: '', border: '', foreground: '', item_template: MenuForm.UserMenu.Profile.Relationship, items: null, role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: RepeatingPanel
     data_bindings: []
-  - type: FlowPanel
-    properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
-      foreground: '', visible: false, spacing_above: small, spacing_below: none, background: ''}
-    name: hosteds_flow_panel
-    layout_properties: {grid_position: 'VYUITI,RPKRDQ'}
-    components:
-    - type: Spacer
-      properties: {visible: true, spacing_above: none, spacing_below: none, height: 32,
-        tooltip: ''}
+    layout_properties: {grid_position: 'BVAHNH,TKZZYQ'}
+    name: relationship_flow_panel
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: none, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+    type: FlowPanel
+  - components:
+    - layout_properties: {expand: false, width: 54}
       name: spacer_2_copy_2
-      layout_properties: {width: 54, expand: false}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'Host of these groups: ', font_size: null, font: '',
-        spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+      properties: {height: 32, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: Spacer
+    - layout_properties: {}
       name: label_3_copy
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: 'Host of these groups: ', tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings: []
       layout_properties: {}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
-        spacing_below: none, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
       name: hosteds_label
-      layout_properties: {}
-      data_bindings: []
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
     data_bindings: []
-  - type: FlowPanel
-    properties: {role: null, spacing: none, align: left, tooltip: '', border: '',
-      foreground: '', visible: false, spacing_above: small, spacing_below: none, background: ''}
-    name: common_groups_flow_panel
-    layout_properties: {grid_position: 'JXADDC,HAPHQS'}
-    components:
-    - type: Spacer
-      properties: {visible: true, spacing_above: none, spacing_below: none, height: 32,
-        tooltip: ''}
+    layout_properties: {grid_position: 'VYUITI,RPKRDQ'}
+    name: hosteds_flow_panel
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: none, spacing_above: small, spacing_below: none, tooltip: '', visible: false}
+    type: FlowPanel
+  - components:
+    - layout_properties: {expand: false, width: 54}
       name: spacer_2_copy
-      layout_properties: {width: 54, expand: false}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'Member of these groups: ', font_size: null, font: '',
-        spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+      properties: {height: 32, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: Spacer
+    - layout_properties: {}
       name: label_3
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: 'Member of these groups: ', tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings: []
       layout_properties: {}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
-        spacing_below: none, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
       name: common_groups_label
-      layout_properties: {}
-      data_bindings: []
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
     data_bindings: []
-  - type: form:HorizontalRule
-    properties: {}
+    layout_properties: {grid_position: 'JXADDC,HAPHQS'}
+    name: common_groups_flow_panel
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: none, spacing_above: small, spacing_below: none, tooltip: '', visible: false}
+    type: FlowPanel
+  - layout_properties: {grid_position: 'SBGBZX,VNKWGR'}
     name: horizontal_rule_1
-    layout_properties: {grid_position: 'SBGBZX,VNKWGR'}
-  - type: FlowPanel
-    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: medium, background: ''}
-    name: flow_panel_3
-    layout_properties: {grid_position: 'RCVJIV,AUBWFW'}
-    components:
-    - type: Spacer
-      properties: {visible: true, spacing_above: small, spacing_below: small, height: 32,
-        tooltip: ''}
+    properties: {}
+    type: form:HorizontalRule
+  - components:
+    - layout_properties: {expand: false, grid_position: 'RCVJIV,WPDNPX', width: -4}
       name: spacer_4
-      layout_properties: {grid_position: 'RCVJIV,WPDNPX', width: -4, expand: false}
-    - type: Link
-      properties: {role: null, url: '', align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: External Web Site Profile, font_size: null, wrap_on: mobile,
-        font: '', col_spacing: medium, spacing_above: none, icon_align: left, col_widths: '',
-        spacing_below: small, italic: false, background: '', bold: false, underline: true,
-        icon: ''}
-      name: web_page_link
+      properties: {height: 32, spacing_above: small, spacing_below: small, tooltip: '', visible: true}
+      type: Spacer
+    - data_bindings:
+      - {code: 'self.item[''profile_url'']', property: url}
+      - {code: 'self.item[''profile_url'']', property: visible}
       layout_properties: {grid_position: 'RCVJIV,SXYBYN'}
-      data_bindings:
-      - {property: url, code: 'self.item[''profile_url'']'}
-      - {property: visible, code: 'self.item[''profile_url'']'}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: false, text: External Web Site Profile Confirmed, font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
+      name: web_page_link
+      properties: {align: left, background: '', bold: false, border: '', col_spacing: medium, col_widths: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: small, text: External Web Site Profile, tooltip: '', underline: true, url: '', visible: true, wrap_on: mobile}
+      type: Link
+    - data_bindings:
+      - {code: 'not self.item[''profile_url'']', property: visible}
+      layout_properties: {}
       name: web_page_alt_label
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: small, text: External Web Site Profile Confirmed, tooltip: '', underline: false, visible: false}
+      type: Label
+    - data_bindings:
+      - {code: self.item, property: item}
       layout_properties: {}
-      data_bindings:
-      - {property: visible, code: 'not self.item[''profile_url'']'}
-    - type: form:Name.PartnerCheck
-      properties: {}
       name: partner_check_1
-      layout_properties: {}
-      data_bindings:
-      - {property: item, code: self.item}
+      properties: {}
+      type: form:Name.PartnerCheck
     data_bindings:
-    - {property: visible, code: 'self.item[''url_confirmed'']'}
-  - type: FlowPanel
-    properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-    name: flow_panel_4
-    layout_properties: {grid_position: 'IBGVDS,QXUMBH'}
-    components:
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
-      name: last_active_label
+    - {code: 'self.item[''url_confirmed'']', property: visible}
+    layout_properties: {grid_position: 'RCVJIV,AUBWFW'}
+    name: flow_panel_3
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: small, spacing_above: none, spacing_below: medium, tooltip: '', visible: true}
+    type: FlowPanel
+  - components:
+    - data_bindings: []
       layout_properties: {grid_position: 'IBGVDS,ZRRCBX'}
-      data_bindings: []
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: none, icon_align: left,
-        spacing_below: small, italic: false, background: '', bold: false, underline: false,
-        icon: ''}
-      name: trust_label
+      name: last_active_label
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings:
+      - {code: 'f"Role: {self.item[''trust_label'']}"', property: text}
+      - {code: 'self.trust_tooltip[self.item[''trust_label'']]', property: tooltip}
       layout_properties:
         col_widths: {}
         grid_position: IBGVDS,QXUMBH EXKOPS,PUHOSB
-      data_bindings:
-      - {property: text, code: 'f"Role: {self.item[''trust_label'']}"'}
-      - {property: tooltip, code: 'self.trust_tooltip[self.item[''trust_label'']]'}
-  - type: FlowPanel
-    properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: large, spacing_below: large, background: ''}
-    name: connections_seeking_flow_panel
-    layout_properties: {grid_position: 'MVEQVS,BFRRSM'}
-    components:
-    - type: FlowPanel
-      properties: {role: null, spacing: tiny, align: left, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-      name: connections_flow_panel
-      layout_properties: {}
-      components:
-      - type: Button
-        properties: {role: primary-color, align: left, tooltip: '', border: '', enabled: true,
-          foreground: '', visible: true, text: Links, font_size: null, font: '', spacing_above: small,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: 'fa:users'}
-        name: connections_button
-        layout_properties: {grid_position: 'NNIROM,EQPMHG'}
+      name: trust_label
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
+    layout_properties: {grid_position: 'IBGVDS,QXUMBH'}
+    name: flow_panel_4
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: small, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+    type: FlowPanel
+  - components:
+    - components:
+      - data_bindings: []
         event_bindings: {click: connections_button_click}
-        data_bindings: []
-      - type: Spacer
-        properties: {height: 32}
+        layout_properties: {grid_position: 'NNIROM,EQPMHG'}
+        name: connections_button
+        properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:users', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: small, text: Links, tooltip: '', underline: false, visible: true}
+        type: Button
+      - layout_properties: {width: 41}
         name: spacer_1
-        layout_properties: {width: 41}
+        properties: {height: 32}
+        type: Spacer
       data_bindings:
-      - {property: visible, code: 'self.item[''degree''] <= 2'}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: '', font_size: null, font: '', spacing_above: medium,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: 'fa:hand-paper-o'}
+      - {code: 'self.item[''degree''] <= 2', property: visible}
+      layout_properties: {}
+      name: connections_flow_panel
+      properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: tiny, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: FlowPanel
+    - data_bindings:
+      - {code: 'self.item[''seeking''] and self.item[''me'']', property: visible}
+      layout_properties: {}
       name: hand_label
-      layout_properties: {}
-      data_bindings:
-      - {property: visible, code: 'self.item[''seeking''] and self.item[''me'']'}
-    - type: form:C6ZZPAPN4YYF5NVJ:Switch
-      properties: {tooltip: '', enabled: true, foreground: null, text_post: Currently seeking a regular empathy buddy,
-        visible: true, font_size: 14, spacing_above: small, checked_color: null, spacing_below: small,
-        italic: null, text_pre: '', background: null, bold: null, checked: false}
-      name: seeking_switch
-      layout_properties: {}
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: 'fa:hand-paper-o', icon_align: left, italic: false, role: null, spacing_above: medium, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings:
+      - {code: 'self.item[''seeking'']', property: checked, writeback: true}
+      - {code: 'self.item[''me'']', property: visible}
       event_bindings: {change: seeking_toggleswitch_change}
-      data_bindings:
-      - {property: checked, code: 'self.item[''seeking'']', writeback: true}
-      - {property: visible, code: 'self.item[''me'']'}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: false, text: Currently seeking a regular empathy buddy, font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:hand-paper-o'}
-      name: seeking_label
       layout_properties: {}
-      data_bindings:
-      - {property: visible, code: '(not self.item[''me'']) and self.item[''seeking'']'}
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'How I like to receive empathy:', font_size: null, font: '',
-      spacing_above: medium, icon_align: left, spacing_below: none, italic: false,
-      background: '', bold: false, underline: false, icon: ''}
-    name: how_empathy_label
-    layout_properties:
+      name: seeking_switch
+      properties: {background: null, bold: null, checked: false, checked_color: null, enabled: true, font_size: 14, foreground: null, italic: null, spacing_above: small, spacing_below: small, text_post: Currently seeking a regular empathy buddy, text_pre: '', tooltip: '', visible: true}
+      type: form:C6ZZPAPN4YYF5NVJ:Switch
+    - data_bindings:
+      - {code: '(not self.item[''me'']) and self.item[''seeking'']', property: visible}
+      layout_properties: {}
+      name: seeking_label
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: 'fa:hand-paper-o', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: Currently seeking a regular empathy buddy, tooltip: '', underline: false, visible: false}
+      type: Label
+    layout_properties: {grid_position: 'MVEQVS,BFRRSM'}
+    name: connections_seeking_flow_panel
+    properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: tiny, spacing_above: large, spacing_below: large, tooltip: '', visible: true}
+    type: FlowPanel
+  - layout_properties:
       col_widths: {}
       grid_position: DJJUBS,IAXBJF
-  - type: TextArea
-    properties: {role: null, align: left, height: 60, tooltip: '', placeholder: '',
-      border: '', enabled: false, foreground: '', visible: true, text: '', font_size: null,
-      auto_expand: false, font: '', spacing_above: none, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false}
-    name: how_empathy_text_area
+    name: how_empathy_label
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: medium, spacing_below: none, text: 'How I like to receive empathy:', tooltip: '', underline: false, visible: true}
+    type: Label
+  - data_bindings:
+    - {code: 'self.item[''how_empathy'']', property: text, writeback: true}
+    - {code: self.item.profile_text_tooltip, property: tooltip}
     layout_properties: {grid_position: 'XDKGUH,DGCFZA'}
-    data_bindings:
-    - {property: text, code: 'self.item[''how_empathy'']', writeback: true}
-    - {property: tooltip, code: self.item.profile_text_tooltip}
-  - type: Button
-    properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:pencil'}
-    name: edit_how_empathy_button
+    name: how_empathy_text_area
+    properties: {align: left, auto_expand: false, background: '', bold: false, border: '', enabled: false, font: '', font_size: null, foreground: '', height: 60, italic: false, placeholder: '', role: null, spacing_above: none, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+    type: TextArea
+  - data_bindings:
+    - {code: 'self.item[''me'']', property: visible}
+    event_bindings: {click: edit_how_empathy_button_click}
     layout_properties:
       col_widths: {}
       grid_position: XDKGUH,ECVXEI
-    data_bindings:
-    - {property: visible, code: 'self.item[''me'']'}
-    event_bindings: {click: edit_how_empathy_button_click}
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Profile:', font_size: null, font: '', spacing_above: large,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
+    name: edit_how_empathy_button
+    properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:pencil', icon_align: left, italic: false, role: raised, spacing_above: none, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+    type: Button
+  - layout_properties: {grid_position: 'IOMIIU,RYTBPJ'}
     name: label_2
-    layout_properties: {grid_position: 'IOMIIU,RYTBPJ'}
-  - type: TextArea
-    properties: {role: null, align: left, height: 190, tooltip: '', placeholder: '',
-      border: '', enabled: false, foreground: '', visible: true, text: '', font_size: null,
-      auto_expand: false, font: '', spacing_above: none, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false}
-    name: profile_text_area
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: large, spacing_below: none, text: 'Profile:', tooltip: '', underline: false, visible: true}
+    type: Label
+  - data_bindings:
+    - {code: 'self.item[''profile'']', property: text, writeback: true}
+    - {code: self.item.profile_text_tooltip, property: tooltip}
     layout_properties:
       col_widths: {}
       grid_position: LYKAUF,WAVKUR
-    data_bindings:
-    - {property: text, code: 'self.item[''profile'']', writeback: true}
-    - {property: tooltip, code: self.item.profile_text_tooltip}
-  - type: Button
-    properties: {role: raised, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:pencil'}
-    name: edit_profile_button
+    name: profile_text_area
+    properties: {align: left, auto_expand: false, background: '', bold: false, border: '', enabled: false, font: '', font_size: null, foreground: '', height: 190, italic: false, placeholder: '', role: null, spacing_above: none, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+    type: TextArea
+  - data_bindings:
+    - {code: 'self.item[''me'']', property: visible}
+    event_bindings: {click: edit_profile_button_click}
     layout_properties:
       col_widths: {}
       grid_position: LYKAUF,OYFYEC
-    data_bindings:
-    - {property: visible, code: 'self.item[''me'']'}
-    event_bindings: {click: edit_profile_button_click}
-  - type: Spacer
-    properties: {height: 32}
+    name: edit_profile_button
+    properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:pencil', icon_align: left, italic: false, role: raised, spacing_above: none, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+    type: Button
+  - layout_properties: {grid_position: 'VXRAXC,YQGAYT'}
     name: spacer_3
-    layout_properties: {grid_position: 'VXRAXC,YQGAYT'}
-container:
+    properties: {height: 32}
+    type: Spacer
+  event_bindings: {}
+  layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
+  name: column_panel_1
+  properties: {background: '', border: '', col_spacing: small, col_widths: '{"DGCFZA":93,"ECVXEI":13,"WAVKUR":73,"OYFYEC":10,"AUBWFW":58}', foreground: '', role: card, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
   type: ColumnPanel
+container:
   event_bindings: {show: form_show}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true

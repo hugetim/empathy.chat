@@ -1,39 +1,32 @@
 components:
-- type: ColumnPanel
-  properties: {col_widths: '{}'}
-  name: content_panel
-  layout_properties: {slot: default}
-  components:
-  - type: ColumnPanel
-    properties: {role: card, col_widths: '{}'}
-    name: card_1
-    layout_properties: {grid_position: 'APRVOR,LSQCPI'}
-    components:
-    - type: Label
-      properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-        visible: true, text: Requesting to join empathy chat. Waiting for them to confirm they're ready...,
-        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-        italic: false, background: '', bold: false, underline: false, icon: ''}
-      name: status_label
+- components:
+  - components:
+    - event_bindings: {}
       layout_properties: {grid_position: 'YOJCEM,HURPQL'}
-      event_bindings: {}
-    - type: Button
-      properties: {role: secondary-color, align: center, tooltip: '', border: '',
-        enabled: true, foreground: '', visible: true, text: Cancel, font_size: null,
-        font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: 'fa:times'}
-      name: cancel_button
+      name: status_label
+      properties: {align: center, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: subheading, spacing_above: small, spacing_below: small, text: Requesting to join empathy chat. Waiting for them to confirm they're ready..., tooltip: '', underline: false, visible: true}
+      type: Label
+    - event_bindings: {click: cancel_button_click}
       layout_properties: {grid_position: 'TZDHKG,MGNYKZ'}
-      event_bindings: {click: cancel_button_click}
+      name: cancel_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:times', icon_align: left, italic: false, role: secondary-color, spacing_above: small, spacing_below: small, text: Cancel, tooltip: '', underline: false, visible: true}
+      type: Button
     event_bindings: {}
+    layout_properties: {grid_position: 'APRVOR,LSQCPI'}
+    name: card_1
+    properties: {col_widths: '{}', role: card}
+    type: ColumnPanel
   event_bindings: {}
-- name: timer_2
-  type: Timer
+  layout_properties: {slot: default}
+  name: content_panel
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
+- event_bindings: {tick: timer_2_tick}
+  name: timer_2
   properties: {interval: 0}
-  event_bindings: {tick: timer_2_tick}
+  type: Timer
 container:
-  type: HtmlTemplate
-  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
-    role: null, html: ''}
   event_bindings: {show: form_show}
+  properties: {background: '', border: '', foreground: '', html: '', role: null, tooltip: '', visible: true}
+  type: HtmlTemplate
 is_package: true

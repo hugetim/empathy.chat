@@ -1,69 +1,47 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
 components:
-- type: Link
-  properties: {col_widths: '{}'}
-  name: google_link
-  layout_properties: {grid_position: 'XICZIF,IUJIOA'}
-  components:
-  - type: Image
-    properties: {role: null, vertical_align: center, height: '200', tooltip: '', border: '',
-      foreground: '', visible: true, display_mode: original_size, spacing_above: small,
-      source: 'data:image/png;base64,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',
-      spacing_below: small, background: '', horizontal_align: center}
+- components:
+  - layout_properties: {grid_position: 'IRNTOH,PGMISA'}
     name: image_1
-    layout_properties: {grid_position: 'IRNTOH,PGMISA'}
+    properties: {background: '', border: '', display_mode: original_size, foreground: '', height: '200', horizontal_align: center, role: null, source: 'data:image/png;base64,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', spacing_above: small, spacing_below: small, tooltip: '', vertical_align: center, visible: true}
+    type: Image
   event_bindings: {click: google_link_click}
-- type: Label
-  properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-    visible: true, text: or enter any..., font_size: null, font: '', spacing_above: small,
-    icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-    underline: false, icon: ''}
+  layout_properties: {grid_position: 'XICZIF,IUJIOA'}
+  name: google_link
+  properties: {col_widths: '{}'}
+  type: Link
+- layout_properties: {grid_position: 'FAEDCN,XELUDC'}
   name: label_1
-  layout_properties: {grid_position: 'FAEDCN,XELUDC'}
-- type: Label
-  properties: {role: null, width: default, align: left, border: '', foreground: '',
-    visible: true, text: 'Email address:', font_size: null, font: '', spacing_above: small,
-    icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-    underline: false, icon: ''}
-  name: label_3
-  layout_properties:
+  properties: {align: center, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: or enter any..., tooltip: '', underline: false, visible: true}
+  type: Label
+- layout_properties:
     col_widths: {}
     grid_position: TINNPM,WQOUFT
-- type: TextBox
-  properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: email@address.com,
-    border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-    font: '', spacing_above: none, type: email, spacing_below: small, italic: false,
-    background: '', bold: false, underline: false}
-  name: email_box
+  name: label_3
+  properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: none, text: 'Email address:', underline: false, visible: true, width: default}
+  type: Label
+- event_bindings: {pressed_enter: email_box_pressed_enter}
   layout_properties:
     col_widths: {}
     grid_position: UPNNAC,OUXBMC
-  event_bindings: {pressed_enter: email_box_pressed_enter}
-- type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: red,
-    visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
-    spacing_below: small, italic: false, background: '', bold: true, underline: false,
-    icon: ''}
-  name: signup_err_lbl
-  layout_properties:
+  name: email_box
+  properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', hide_text: false, italic: false, placeholder: email@address.com, role: null, spacing_above: none, spacing_below: small, text: '', tooltip: '', type: email, underline: false, visible: true}
+  type: TextBox
+- layout_properties:
     col_widths: {}
     grid_position: NWKYCI,DMDDPA
-- type: Label
-  properties: {role: null, align: center, tooltip: '', border: '', foreground: '',
-    visible: true, text: Your contact info will only be used for purposes directly related to empathy.chat (and will not be displayed to other users),
-    font_size: 10, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-    italic: false, background: '', bold: false, underline: false, icon: ''}
+  name: signup_err_lbl
+  properties: {align: left, background: '', bold: true, border: '', font: '', font_size: null, foreground: red, icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: false}
+  type: Label
+- layout_properties: {grid_position: 'EXSGYR,AZZAID'}
   name: label_2
-  layout_properties: {grid_position: 'EXSGYR,AZZAID'}
-- type: Link
-  properties: {role: null, url: '', align: center, tooltip: '', border: '', foreground: '',
-    visible: true, text: 'Already have an empathy.chat account? Click here to login.',
-    font_size: 12, wrap_on: mobile, font: '', col_spacing: medium, spacing_above: small,
-    icon_align: left, col_widths: '', spacing_below: none, italic: false, background: '',
-    bold: false, underline: false, icon: ''}
-  name: login_link
+  properties: {align: center, background: '', bold: false, border: '', font: '', font_size: 10, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: Your contact info will only be used for purposes directly related to empathy.chat (and will not be displayed to other users), tooltip: '', underline: false, visible: true}
+  type: Label
+- event_bindings: {click: login_link_click}
   layout_properties: {grid_position: 'VADNMJ,JUMFHX'}
-  event_bindings: {click: login_link_click}
+  name: login_link
+  properties: {align: center, background: '', bold: false, border: '', col_spacing: medium, col_widths: '', font: '', font_size: 12, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: none, text: 'Already have an empathy.chat account? Click here to login.', tooltip: '', underline: false, url: '', visible: true, wrap_on: mobile}
+  type: Link
+container:
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
 is_package: true

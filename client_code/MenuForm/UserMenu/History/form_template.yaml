@@ -1,49 +1,39 @@
-container:
-  type: HtmlTemplate
-  properties: {tooltip: '', background: '', foreground: '', border: '', visible: true,
-    role: null, html: ''}
-  event_bindings: {show: form_show}
 components:
-- type: Timer
-  properties: {interval: 30}
+- event_bindings: {tick: timer_2_tick}
   name: timer_2
-  event_bindings: {tick: timer_2_tick}
-- type: ColumnPanel
-  properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
-  name: column_panel_1
-  layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
-  components:
-  - type: ColumnPanel
-    properties: {role: card-scroll-long, tooltip: '', border: '', foreground: '',
-      visible: true, wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{}',
-      spacing_below: none, background: 'theme:Gray 100'}
-    name: chat_display_card
+  properties: {interval: 30}
+  type: Timer
+- components:
+  - components:
+    - event_bindings: {}
+      layout_properties: {grid_position: 'NOKAIK,HLVTUU'}
+      name: chat_repeating_panel
+      properties: {item_template: MatchForm.ChatTemplate}
+      type: RepeatingPanel
     layout_properties:
       col_widths: {}
       grid_position: TSEJNG,UMHZGV
-    components:
-    - type: RepeatingPanel
-      properties: {item_template: MatchForm.ChatTemplate}
-      name: chat_repeating_panel
-      layout_properties: {grid_position: 'NOKAIK,HLVTUU'}
-      event_bindings: {}
-  - type: ColumnPanel
-    properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: small, background: ''}
-    name: chat_send_card
+    name: chat_display_card
+    properties: {background: 'theme:Gray 100', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: card-scroll-long, spacing_above: small, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+    type: ColumnPanel
+  - components:
+    - event_bindings: {pressed_enter: message_textbox_pressed_enter}
+      layout_properties: {grid_position: 'IXQTHC,HCFYRM'}
+      name: message_textbox
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', hide_text: false, italic: false, placeholder: Send a message, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: '', type: text, underline: false, visible: true}
+      type: TextBox
     layout_properties:
       col_widths: {}
       grid_position: SZWDSV,HOIFFR
-    components:
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: Send a message,
-        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-        font: '', spacing_above: none, type: text, spacing_below: none, italic: false,
-        background: '', bold: false, underline: false}
-      name: message_textbox
-      layout_properties: {grid_position: 'IXQTHC,HCFYRM'}
-      event_bindings: {pressed_enter: message_textbox_pressed_enter}
+    name: chat_send_card
+    properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: card, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+    type: ColumnPanel
+  layout_properties: {grid_position: 'QZKEDX,DDVEDY'}
+  name: column_panel_1
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: card, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
+container:
+  event_bindings: {show: form_show}
+  properties: {background: '', border: '', foreground: '', html: '', role: null, tooltip: '', visible: true}
+  type: HtmlTemplate
 is_package: true

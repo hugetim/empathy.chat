@@ -1,89 +1,64 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
-  event_bindings: {show: form_show}
 components:
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
-  name: flow_panel_1
-  layout_properties: {grid_position: 'QUHCBI,UIJBXQ'}
-  components:
-  - type: LinearPanel
-    properties: {spacing_above: none, spacing_below: medium, background: '', foreground: '',
-      border: '', visible: true, role: null, tooltip: ''}
-    name: first_name_panel
-    layout_properties: {grid_position: 'QUHCBI,THQIKJ', width: 195}
-    components:
-    - type: Label
-      properties: {role: input-prompt, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: First Name, font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+- components:
+  - components:
+    - layout_properties: {grid_position: 'QUHCBI,OVVWVN'}
       name: label_1
-      layout_properties: {grid_position: 'QUHCBI,OVVWVN'}
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-        font: '', spacing_above: none, type: text, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false}
-      name: first_name_text_box
-      layout_properties: {}
-      data_bindings:
-      - {property: text, code: 'self.item[''first'']', writeback: false}
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: input-prompt, spacing_above: none, spacing_below: none, text: First Name, tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings:
+      - {code: 'self.item[''first'']', property: text, writeback: false}
       event_bindings: {change: text_box_change}
-  - type: LinearPanel
-    properties: {spacing_above: none, spacing_below: medium, background: '', foreground: '',
-      border: '', visible: true, role: null, tooltip: ''}
-    name: last_name_panel
-    layout_properties: {grid_position: 'QUHCBI,THQIKJ', width: 195}
-    components:
-    - type: Label
-      properties: {role: input-prompt, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: Last Name (optional), font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: label_1_copy
-      layout_properties: {grid_position: 'QUHCBI,OVVWVN'}
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-        border: '', enabled: true, foreground: '', visible: true, text: '', font_size: null,
-        font: '', spacing_above: none, type: text, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false}
-      name: last_name_text_box
       layout_properties: {}
-      data_bindings:
-      - {property: text, code: 'self.item[''last'']', writeback: false}
+      name: first_name_text_box
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', hide_text: false, italic: false, placeholder: '', role: null, spacing_above: none, spacing_below: small, text: '', tooltip: '', type: text, underline: false, visible: true}
+      type: TextBox
+    layout_properties: {grid_position: 'QUHCBI,THQIKJ', width: 195}
+    name: first_name_panel
+    properties: {background: '', border: '', foreground: '', role: null, spacing_above: none, spacing_below: medium, tooltip: '', visible: true}
+    type: LinearPanel
+  - components:
+    - layout_properties: {grid_position: 'QUHCBI,OVVWVN'}
+      name: label_1_copy
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: input-prompt, spacing_above: none, spacing_below: none, text: Last Name (optional), tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings:
+      - {code: 'self.item[''last'']', property: text, writeback: false}
       event_bindings: {change: text_box_change, pressed_enter: save_button_click}
-  - type: Label
-    properties: {role: text, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: '', font_size: null, font: '', spacing_above: medium, icon_align: left,
-      spacing_below: small, italic: false, background: '', bold: false, underline: false,
-      icon: ''}
+      layout_properties: {}
+      name: last_name_text_box
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', hide_text: false, italic: false, placeholder: '', role: null, spacing_above: none, spacing_below: small, text: '', tooltip: '', type: text, underline: false, visible: true}
+      type: TextBox
+    layout_properties: {grid_position: 'QUHCBI,THQIKJ', width: 195}
+    name: last_name_panel
+    properties: {background: '', border: '', foreground: '', role: null, spacing_above: none, spacing_below: medium, tooltip: '', visible: true}
+    type: LinearPanel
+  - layout_properties: {}
     name: note_label
-    layout_properties: {}
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: right, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: small, background: ''}
-  name: flow_panel_2
-  layout_properties: {grid_position: 'IAYRXI,WKKFUD'}
-  components:
-  - type: Button
-    properties: {role: primary-color, align: right, tooltip: '', border: '', enabled: false,
-      foreground: '', visible: true, text: Save, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: save_button
-    layout_properties: {grid_position: 'PADPVZ,YLAXAI'}
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: text, spacing_above: medium, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+    type: Label
+  layout_properties: {grid_position: 'QUHCBI,UIJBXQ'}
+  name: flow_panel_1
+  properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: small, spacing_below: small, tooltip: '', visible: true}
+  type: FlowPanel
+- components:
+  - data_bindings: []
     event_bindings: {click: save_button_click}
-    data_bindings: []
-  - type: Button
-    properties: {role: secondary-color, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Cancel, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: cancel_button
-    layout_properties: {grid_position: 'PADPVZ,OHRWPB'}
-    data_bindings: []
+    layout_properties: {grid_position: 'PADPVZ,YLAXAI'}
+    name: save_button
+    properties: {align: right, background: '', bold: false, border: '', enabled: false, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: small, text: Save, tooltip: '', underline: false, visible: true}
+    type: Button
+  - data_bindings: []
     event_bindings: {click: cancel_button_click}
+    layout_properties: {grid_position: 'PADPVZ,OHRWPB'}
+    name: cancel_button
+    properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: secondary-color, spacing_above: small, spacing_below: small, text: Cancel, tooltip: '', underline: false, visible: true}
+    type: Button
+  layout_properties: {grid_position: 'IAYRXI,WKKFUD'}
+  name: flow_panel_2
+  properties: {align: right, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: small, spacing_below: small, tooltip: '', visible: true}
+  type: FlowPanel
+container:
+  event_bindings: {show: form_show}
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
 is_package: true

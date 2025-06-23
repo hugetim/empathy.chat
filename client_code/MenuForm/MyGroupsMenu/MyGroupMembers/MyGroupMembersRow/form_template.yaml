@@ -1,101 +1,69 @@
-container:
-  type: DataRowPanel
-  data_bindings:
-  - {property: background, code: '"theme:Light Yellow" if self.item[''status''] else
-      None'}
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', auto_display_data: true,
-    visible: true, font_size: null, font: '', spacing_above: none, spacing_below: none,
-    italic: false, background: '', bold: false, underline: false}
 components:
-- type: form:Name
-  properties: {}
-  name: name
+- data_bindings:
+  - {code: self.item, property: item}
   layout_properties: {column: TCRDJP}
-  data_bindings:
-  - {property: item, code: self.item}
-- type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: '', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
-    italic: false, background: '', bold: false, underline: false, icon: ''}
-  name: degree_label
+  name: name
+  properties: {}
+  type: form:Name
+- data_bindings: []
   layout_properties: {column: CKNKJL}
-  data_bindings: []
-- type: FlowPanel
-  properties: {role: null, spacing: tiny, align: center, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
-  name: flow_panel_2
-  layout_properties: {column: NBEGGD}
-  components:
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: Messages, border: '',
-      enabled: true, foreground: '', visible: false, text: '', font_size: null, font: '',
-      spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
-      bold: false, underline: false, icon: 'fa:comment'}
+  name: degree_label
+  properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: none, text: '', tooltip: '', underline: false, visible: true}
+  type: Label
+- components:
+  - data_bindings: []
+    layout_properties: {}
     name: unread_button
-    layout_properties: {}
-    data_bindings: []
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: 'This user has invited
-        you to connect, awaiting your confirmation', border: '', enabled: true, foreground: '',
-      visible: false, text: 'Confirm?', font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:link'}
-    name: confirm_button
-    layout_properties: {}
-    data_bindings:
-    - {property: visible, code: 'self.item[''status''] == "invited"'}
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:comment', icon_align: left, italic: false, role: primary-color, spacing_above: none, spacing_below: none, text: '', tooltip: Messages, underline: false, visible: false}
+    type: Button
+  - data_bindings:
+    - {code: 'self.item[''status''] == "invited"', property: visible}
     event_bindings: {click: confirm_button_click}
-  - type: Button
-    properties: {role: null, align: center, tooltip: Invite this user to be a "close connection",
-      border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-      font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:link'}
-    name: connect_button
     layout_properties: {}
+    name: confirm_button
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:link', icon_align: left, italic: false, role: primary-color, spacing_above: none, spacing_below: none, text: 'Confirm?', tooltip: 'This user has invited you to connect, awaiting your confirmation', underline: false, visible: false}
+    type: Button
+  - data_bindings:
+    - {code: 'self.item[''degree''] > 1 and self.trust_level >= 2 and not self.item[''status'']', property: visible}
     event_bindings: {click: connect_button_click}
-    data_bindings:
-    - {property: visible, code: 'self.item[''degree''] > 1 and self.trust_level >=
-        2 and not self.item[''status'']'}
-  - type: Button
-    properties: {role: null, align: center, tooltip: Remove your connection to this user,
-      border: '', enabled: true, foreground: '', visible: false, text: '', font_size: null,
-      font: '', spacing_above: none, icon_align: left, spacing_below: none, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:chain-broken'}
-    name: unconnect_button
     layout_properties: {}
-    data_bindings:
-    - {property: visible, code: 'self.item[''degree''] == 1'}
+    name: connect_button
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:link', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: Invite this user to be a "close connection", underline: false, visible: false}
+    type: Button
+  - data_bindings:
+    - {code: 'self.item[''degree''] == 1', property: visible}
     event_bindings: {click: unconnect_button_click}
-  - type: Button
-    properties: {role: null, align: center, tooltip: Block this user, border: '',
-      enabled: true, foreground: '', visible: false, text: '', font_size: null, font: '',
-      spacing_above: none, icon_align: left, spacing_below: none, italic: false, background: '',
-      bold: false, underline: false, icon: 'fa:ban'}
+    layout_properties: {}
+    name: unconnect_button
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:chain-broken', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: Remove your connection to this user, underline: false, visible: false}
+    type: Button
+  - layout_properties: {}
     name: block_button
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:ban', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: '', tooltip: Block this user, underline: false, visible: false}
+    type: Button
+  - event_bindings: {click: remove_button_click}
     layout_properties: {}
-  - type: Button
-    properties: {role: secondary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: 'fa:user-times'}
     name: remove_button
-    layout_properties: {}
-    event_bindings: {click: remove_button_click}
-- type: Label
-  properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
-    visible: true, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
-    spacing_below: small, italic: false, background: '', bold: false, underline: false,
-    icon: ''}
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:user-times', icon_align: left, italic: false, role: secondary-color, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+    type: Button
+  layout_properties: {column: NBEGGD}
+  name: flow_panel_2
+  properties: {align: center, background: '', border: '', foreground: '', role: null, spacing: tiny, spacing_above: small, spacing_below: none, tooltip: '', visible: true}
+  type: FlowPanel
+- layout_properties: {column: VWXCEI}
   name: last_active_label
-  layout_properties: {column: VWXCEI}
-- type: CheckBox
-  properties: {role: null, align: center, tooltip: '', border: '', enabled: false,
-    foreground: '', allow_indeterminate: false, visible: true, text: '', font_size: null,
-    font: '', spacing_above: small, spacing_below: small, italic: false, background: '',
-    bold: false, checked: false, underline: false}
-  name: guest_allowed_check_box
-  layout_properties: {column: BMRGGD}
-  data_bindings:
-  - {property: checked, code: self.item.guest_allowed, writeback: true}
+  properties: {align: right, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+  type: Label
+- data_bindings:
+  - {code: self.item.guest_allowed, property: checked, writeback: true}
   event_bindings: {}
+  layout_properties: {column: BMRGGD}
+  name: guest_allowed_check_box
+  properties: {align: center, allow_indeterminate: false, background: '', bold: false, border: '', checked: false, enabled: false, font: '', font_size: null, foreground: '', italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+  type: CheckBox
+container:
+  data_bindings:
+  - {code: '"theme:Light Yellow" if self.item[''status''] else None', property: background}
+  properties: {align: left, auto_display_data: true, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', italic: false, role: null, spacing_above: none, spacing_below: none, tooltip: '', underline: false, visible: true}
+  type: DataRowPanel
 is_package: true

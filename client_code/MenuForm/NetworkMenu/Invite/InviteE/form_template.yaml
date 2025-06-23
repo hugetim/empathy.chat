@@ -1,70 +1,49 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
 components:
-- type: LinearPanel
-  properties: {}
-  name: linear_panel_1
-  layout_properties: {grid_position: 'OKNTWI,DGYOXJ'}
-  components:
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Your new close connection will, at first, be able to chat
-        only with you. In order to become a full Member and be able to chat with others,
-        they will need to first participate in an empathy chat with you (or another
-        Member). To help them along, you may propose some times to chat with them
-        now, enabling them to hit the ground running as soon as your connection is
-        confirmed.', font_size: null, font: '', spacing_above: small, icon_align: left,
-      spacing_below: small, italic: false, background: '', bold: false, underline: false,
-      icon: ''}
+- components:
+  - layout_properties: {grid_position: 'YBAGYL,ALDORO'}
     name: label_1
-    layout_properties: {grid_position: 'YBAGYL,ALDORO'}
-  - type: FlowPanel
-    properties: {role: null, spacing: small, align: center, tooltip: '', border: '',
-      foreground: '', visible: true, spacing_above: none, spacing_below: small, background: ''}
-    name: flow_panel_1
-    layout_properties: {grid_position: 'XZVHWQ,WPZXNU'}
-    components:
-    - type: Button
-      properties: {role: primary-color, align: center, tooltip: Propose an empathy chat at a scheduled future time,
-        border: '', enabled: true, foreground: '', visible: true, text: Request an Empathy Chat,
-        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: none,
-        italic: false, background: '', bold: false, underline: false, icon: 'fa:child'}
-      name: propose_button
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: 'Your new close connection will, at first, be able to chat only with you. In order to become a full Member and be able to chat with others, they will need to first participate in an empathy chat with you (or another Member). To help them along, you may propose some times to chat with them now, enabling them to hit the ground running as soon as your connection is confirmed.', tooltip: '', underline: false, visible: true}
+    type: Label
+  - components:
+    - event_bindings: {click: propose_button_click}
       layout_properties:
         col_widths: {}
         grid_position: VPXCJV,DJOKOM
-      event_bindings: {click: propose_button_click}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: with your, font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
+      name: propose_button
+      properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:child', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: none, text: Request an Empathy Chat, tooltip: Propose an empathy chat at a scheduled future time, underline: false, visible: true}
+      type: Button
+    - layout_properties: {}
       name: label_2
-      layout_properties: {}
-    - type: TextBox
-      properties: {role: null, align: left, hide_text: false, tooltip: '', placeholder: '',
-        border: '', enabled: false, foreground: '', visible: true, text: '', font_size: 14,
-        font: '', spacing_above: small, type: text, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false}
-      name: relationship_text_box
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: with your, tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings:
+      - {code: 'self.item[''rel_to_inviter'']', property: text, writeback: true}
       layout_properties:
         col_widths: {}
+        expand: false
         grid_position: ITGASP,WNEYXQ
         width: 438
-        expand: false
-      data_bindings:
-      - {property: text, code: 'self.item[''rel_to_inviter'']', writeback: true}
-  - type: Spacer
-    properties: {height: 32}
+      name: relationship_text_box
+      properties: {align: left, background: '', bold: false, border: '', enabled: false, font: '', font_size: 14, foreground: '', hide_text: false, italic: false, placeholder: '', role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', type: text, underline: false, visible: true}
+      type: TextBox
+    layout_properties: {grid_position: 'XZVHWQ,WPZXNU'}
+    name: flow_panel_1
+    properties: {align: center, background: '', border: '', foreground: '', role: null, spacing: small, spacing_above: none, spacing_below: small, tooltip: '', visible: true}
+    type: FlowPanel
+  - layout_properties: {grid_position: 'ZXRRRO,YWCCOW'}
     name: spacer_1
-    layout_properties: {grid_position: 'ZXRRRO,YWCCOW'}
-  - type: Button
-    properties: {role: primary-color, align: right, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Not Now, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: not_now_button
+    properties: {height: 32}
+    type: Spacer
+  - event_bindings: {click: not_now_button_click}
     layout_properties: {grid_position: 'NIRKMP,ANSBKA'}
-    event_bindings: {click: not_now_button_click}
+    name: not_now_button
+    properties: {align: right, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: small, text: Not Now, tooltip: '', underline: false, visible: true}
+    type: Button
+  layout_properties: {grid_position: 'OKNTWI,DGYOXJ'}
+  name: linear_panel_1
+  properties: {}
+  type: LinearPanel
+container:
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
 is_package: true

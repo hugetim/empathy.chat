@@ -1,128 +1,115 @@
-container:
-  type: ColumnPanel
-  event_bindings: {}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{"HWTLHD":10}',
-    spacing_below: none, background: ''}
 components:
-- type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: small, col_widths: '{"CYJTDJ":50,"KSEAJH":10}',
-    spacing_below: none, background: ''}
-  name: slider_column_panel
+- components:
+  - components:
+    - data_bindings: []
+      layout_properties: {grid_position: 'WTCGOB,HQDPBG'}
+      name: title_label
+      properties: {align: center, background: '', bold: true, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: subheading, spacing_above: small, spacing_below: small, text: 'How full is your "empathy tank"? (Empty: angry/distant, Full: content/open)', tooltip: '', underline: false, visible: true}
+      type: Label
+    - components:
+      - components:
+        - data_bindings: []
+          layout_properties: {grid_position: 'QXZSDK,KQZMAO'}
+          name: label_2
+          properties: {align: right, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: large, spacing_below: large, text: '   me:', tooltip: '', underline: false, visible: true}
+          type: Label
+        data_bindings:
+        - {code: 'self.item[''status''] != "waiting"', property: visible}
+        layout_properties: {expand: false, width: 100}
+        name: linear_panel_1
+        properties: {background: '', border: '', foreground: '', role: null, spacing_above: small, spacing_below: small, tooltip: '', visible: true}
+        type: LinearPanel
+      - components:
+        - data_bindings:
+          - {code: 'self.item[''my_value'']', property: value, writeback: true}
+          - {code: 'self.item[''status''] in [None, "waiting"]', property: enabled}
+          event_bindings: {}
+          layout_properties: {expand: true, grid_position: 'MJQSPQ,NXGKFS', width: null}
+          name: my_slider
+          properties:
+            enabled: true
+            is_visible: true
+            labels: [Empty, '', Full]
+            maxval: 10
+            minval: 0
+            step: 0.2
+            value: 5
+          type: form:MFQJNLWQIOGGXL4W:slider
+        layout_properties: {expand: true, width: null}
+        name: linear_panel_2
+        properties: {background: '', border: '', foreground: '', role: null, spacing_above: small, spacing_below: none, tooltip: '', visible: true}
+        type: LinearPanel
+      data_bindings: []
+      layout_properties: {grid_position: 'XAZDVY,TFCBJU'}
+      name: flow_panel_1
+      properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: small, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: FlowPanel
+    - data_bindings:
+      - {code: 'self.item[''status''] == "received"', property: visible}
+      layout_properties: {grid_position: 'GDLFOR,IVRQTY'}
+      name: them_repeating_panel
+      properties: {background: '', border: '', foreground: '', item_template: MatchForm.SliderPanel.SliderTemplate, items: null, role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: RepeatingPanel
+    - data_bindings:
+      - {code: 'self.item[''status''] not in ["waiting", "received"]', property: visible}
+      layout_properties: {grid_position: 'AARWIB,NXDFDJ'}
+      name: placeholder_label
+      properties: {align: center, background: '', bold: false, border: '', font: '', font_size: null, foreground: 'theme:Gray 600', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: (their slider will appear here once you have both submitted), tooltip: '', underline: false, visible: true}
+      type: Label
+    event_bindings: {}
+    layout_properties: {grid_position: 'AAYMHE,CYJTDJ'}
+    name: left_column_panel
+    properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+    type: ColumnPanel
+  - data_bindings:
+    - {code: 'not self.item[''status'']', property: enabled}
+    - {code: 'self.item[''status''] != "received"', property: visible}
+    - {code: '"You will be able to submit once another user has joined" if self.item[''status''] == "waiting" else ""', property: tooltip}
+    event_bindings: {click: submit_button_click}
+    layout_properties: {grid_position: 'AAYMHE,KSEAJH IKKFWJ,IDOYES'}
+    name: submit_button
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: small, text: Submit, tooltip: '', underline: false, visible: true}
+    type: Button
+  - data_bindings:
+    - {code: 'self.item[''status''] == "submitted"', property: visible}
+    layout_properties: {grid_position: 'AAYMHE,KSEAJH PTNKEK,AXYRDO'}
+    name: label_1
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: waiting for other to submit..., tooltip: '', underline: false, visible: true}
+    type: Label
+  - event_bindings: {click: hide_button_click}
+    layout_properties: {grid_position: 'AAYMHE,KSEAJH GLODAL,FOMWST'}
+    name: hide_button
+    properties:
+      align: center
+      background: ''
+      bold: false
+      border: ''
+      enabled: true
+      font: ''
+      font_size: null
+      foreground: ''
+      icon: ''
+      icon_align: left
+      italic: false
+      role: null
+      spacing_above: small
+      spacing_below: small
+      text: |
+        Hide Slider
+      tooltip: ''
+      underline: false
+      visible: true
+    type: Button
+  data_bindings: []
+  event_bindings: {}
   layout_properties:
     col_widths: {}
     grid_position: QBSBSY,HWTLHD
-  components:
-  - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: none, background: ''}
-    name: left_column_panel
-    layout_properties: {grid_position: 'AAYMHE,CYJTDJ'}
-    event_bindings: {}
-    components:
-    - type: Label
-      properties: {role: subheading, align: center, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'How full is your "empathy tank"? (Empty: angry/distant,
-          Full: content/open)', font_size: null, font: '', spacing_above: small, icon_align: left,
-        spacing_below: small, italic: false, background: '', bold: true, underline: false,
-        icon: ''}
-      name: title_label
-      layout_properties: {grid_position: 'WTCGOB,HQDPBG'}
-      data_bindings: []
-    - type: FlowPanel
-      properties: {role: null, spacing: small, align: left, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-      name: flow_panel_1
-      layout_properties: {grid_position: 'XAZDVY,TFCBJU'}
-      components:
-      - type: LinearPanel
-        properties: {spacing_above: small, spacing_below: small, background: '', foreground: '',
-          border: '', visible: true, role: null, tooltip: ''}
-        name: linear_panel_1
-        layout_properties: {width: 100, expand: false}
-        components:
-        - type: Label
-          properties: {role: null, align: right, tooltip: '', border: '', foreground: '',
-            visible: true, text: '   me:', font_size: null, font: '', spacing_above: large,
-            icon_align: left, spacing_below: large, italic: false, background: '',
-            bold: false, underline: false, icon: ''}
-          name: label_2
-          layout_properties: {grid_position: 'QXZSDK,KQZMAO'}
-          data_bindings: []
-        data_bindings:
-        - {property: visible, code: 'self.item[''status''] != "waiting"'}
-      - type: LinearPanel
-        properties: {spacing_above: small, spacing_below: none, background: '', foreground: '',
-          border: '', visible: true, role: null, tooltip: ''}
-        name: linear_panel_2
-        layout_properties: {width: null, expand: true}
-        components:
-        - type: form:MFQJNLWQIOGGXL4W:slider
-          properties:
-            value: 5
-            minval: 0
-            maxval: 10
-            step: 0.2
-            labels: [Empty, '', Full]
-            is_visible: true
-            enabled: true
-          name: my_slider
-          layout_properties: {grid_position: 'MJQSPQ,NXGKFS', expand: true, width: null}
-          event_bindings: {}
-          data_bindings:
-          - {property: value, code: 'self.item[''my_value'']', writeback: true}
-          - {property: enabled, code: 'self.item[''status''] in [None, "waiting"]'}
-      data_bindings: []
-    - name: them_repeating_panel
-      properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
-        visible: true, spacing_above: none, spacing_below: none, item_template: MatchForm.SliderPanel.SliderTemplate,
-        background: ''}
-      type: RepeatingPanel
-      layout_properties: {grid_position: 'GDLFOR,IVRQTY'}
-      data_bindings:
-      - {property: visible, code: 'self.item[''status''] == "received"'}
-    - type: Label
-      properties: {role: null, align: center, tooltip: '', border: '', foreground: 'theme:Gray
-          600', visible: true, text: (their slider will appear here once you have both submitted),
-        font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-        italic: false, background: '', bold: false, underline: false, icon: ''}
-      name: placeholder_label
-      layout_properties: {grid_position: 'AARWIB,NXDFDJ'}
-      data_bindings:
-      - {property: visible, code: 'self.item[''status''] not in ["waiting", "received"]'}
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Submit, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: submit_button
-    layout_properties: {grid_position: 'AAYMHE,KSEAJH IKKFWJ,IDOYES'}
-    event_bindings: {click: submit_button_click}
-    data_bindings:
-    - {property: enabled, code: 'not self.item[''status'']'}
-    - {property: visible, code: 'self.item[''status''] != "received"'}
-    - {property: tooltip, code: '"You will be able to submit once another user has
-        joined" if self.item[''status''] == "waiting" else ""'}
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: waiting for other to submit..., font_size: null, font: '',
-      spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: ''}
-    name: label_1
-    layout_properties: {grid_position: 'AAYMHE,KSEAJH PTNKEK,AXYRDO'}
-    data_bindings:
-    - {property: visible, code: 'self.item[''status''] == "submitted"'}
-  - type: Button
-    properties: {role: null, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: 'Hide Slider
-
-        ', font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: false, underline: false, icon: ''}
-    name: hide_button
-    layout_properties: {grid_position: 'AAYMHE,KSEAJH GLODAL,FOMWST'}
-    event_bindings: {click: hide_button_click}
-  data_bindings: []
+  name: slider_column_panel
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{"CYJTDJ":50,"KSEAJH":10}', foreground: '', role: null, spacing_above: small, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
+container:
   event_bindings: {}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{"HWTLHD":10}', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true

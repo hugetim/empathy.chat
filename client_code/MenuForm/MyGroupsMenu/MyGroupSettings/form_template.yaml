@@ -1,94 +1,74 @@
 components:
-- type: ColumnPanel
-  properties: {role: card, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
-  name: content_column_panel
-  layout_properties: {grid_position: 'QZKEDX,UFTIPG'}
-  event_bindings: {}
-  components:
-  - type: LinearPanel
-    properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
-      border: '', visible: true, role: null, tooltip: ''}
-    name: group_panel
-    layout_properties: {grid_position: 'ONEXYN,FNESPV'}
-    components:
-    - type: FlowPanel
-      properties: {role: null, spacing: small, align: center, tooltip: '', border: '',
-        foreground: '', visible: true, spacing_above: none, spacing_below: none, background: ''}
-      name: flow_panel_1
-      layout_properties: {grid_position: 'WCCNDC,OJMIIL'}
-      components:
-      - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: 'Group Name:', font_size: null, font: '', spacing_above: small,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: ''}
-        name: label_1
+- components:
+  - components:
+    - components:
+      - event_bindings: {}
         layout_properties: {grid_position: 'NBQJMT,LQCUQV'}
-        event_bindings: {}
-      - type: Label
-        properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-          visible: true, text: '', font_size: null, font: '', spacing_above: small,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: ''}
-        name: group_name_label
+        name: label_1
+        properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: 'Group Name:', tooltip: '', underline: false, visible: true}
+        type: Label
+      - data_bindings:
+        - {code: 'self.group[''name'']', property: text}
         layout_properties: {}
-        data_bindings:
-        - {property: text, code: 'self.group[''name'']'}
-      - type: Button
-        properties: {role: raised, align: center, tooltip: '', border: '', enabled: true,
-          foreground: '', visible: true, text: '', font_size: null, font: '', spacing_above: small,
-          icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-          underline: false, icon: 'fa:pencil'}
-        name: edit_name_button
+        name: group_name_label
+        properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+        type: Label
+      - event_bindings: {click: edit_name_button_click}
         layout_properties: {grid_position: 'KTTXPP,TGIBIN'}
-        event_bindings: {click: edit_name_button_click}
-  - type: Button
-    properties: {role: primary-color, align: center, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: Create Invite Link, font_size: null, font: '',
-      spacing_above: medium, icon_align: left, spacing_below: small, italic: false,
-      background: '', bold: false, underline: false, icon: 'fa:plus'}
-    name: button_invite
+        name: edit_name_button
+        properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:pencil', icon_align: left, italic: false, role: raised, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: true}
+        type: Button
+      layout_properties: {grid_position: 'WCCNDC,OJMIIL'}
+      name: flow_panel_1
+      properties: {align: center, background: '', border: '', foreground: '', role: null, spacing: small, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: FlowPanel
+    layout_properties: {grid_position: 'ONEXYN,FNESPV'}
+    name: group_panel
+    properties: {background: '', border: '', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true}
+    type: LinearPanel
+  - event_bindings: {click: button_invite_click}
     layout_properties: {grid_position: 'FAVDFW,DXBXWY'}
-    event_bindings: {click: button_invite_click}
-  - type: DataGrid
-    properties:
-      role: null
-      columns:
-      - {id: KXBOMI, title: Invite Link, data_key: url, expand: false, width: 250.33331298828125}
-      - {id: YBZLJH, title: Date Created, data_key: create_date_str, width: '105'}
-      - {id: SQRIZT, title: Expire Date, data_key: expire_date}
-      auto_header: true
-      tooltip: ''
-      border: ''
-      foreground: ''
-      rows_per_page: 20
-      visible: true
-      wrap_on: never
-      show_page_controls: true
-      spacing_above: small
-      spacing_below: small
-      background: ''
-    name: invites_data_grid
+    name: button_invite
+    properties: {align: center, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: 'fa:plus', icon_align: left, italic: false, role: primary-color, spacing_above: medium, spacing_below: small, text: Create Invite Link, tooltip: '', underline: false, visible: true}
+    type: Button
+  - components:
+    - data_bindings:
+      - {code: self.group.invites, property: items}
+      layout_properties: {}
+      name: invites_repeating_panel
+      properties: {background: '', border: '', foreground: '', item_template: MenuForm.MyGroupsMenu.MyGroupSettings.GroupInviteRow, items: null, role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: RepeatingPanel
+    data_bindings:
+    - {code: self.group.invites, property: visible}
     layout_properties:
       col_widths: {}
       grid_position: SAMPVL,WWRMQK
-    components:
-    - type: RepeatingPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
-        visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.MyGroupsMenu.MyGroupSettings.GroupInviteRow,
-        background: ''}
-      name: invites_repeating_panel
-      layout_properties: {}
-      data_bindings:
-      - {property: items, code: self.group.invites}
-    data_bindings:
-    - {property: visible, code: self.group.invites}
-container:
+    name: invites_data_grid
+    properties:
+      auto_header: true
+      background: ''
+      border: ''
+      columns:
+      - {data_key: url, expand: false, id: KXBOMI, title: Invite Link, width: 250.33331298828125}
+      - {data_key: create_date_str, id: YBZLJH, title: Date Created, width: '105'}
+      - {data_key: expire_date, id: SQRIZT, title: Expire Date}
+      foreground: ''
+      role: null
+      rows_per_page: 20
+      show_page_controls: true
+      spacing_above: small
+      spacing_below: small
+      tooltip: ''
+      visible: true
+      wrap_on: never
+    type: DataGrid
+  event_bindings: {}
+  layout_properties: {grid_position: 'QZKEDX,UFTIPG'}
+  name: content_column_panel
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: card, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
   type: ColumnPanel
+container:
   event_bindings: {show: form_show}
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
 is_package: true

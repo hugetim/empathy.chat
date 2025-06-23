@@ -18,7 +18,8 @@ def login(with_id=False):
   if user and (not user['init_date']):
     anvil.users.logout()
     with Notification(f"Sorry, there is no account for {user['email']} (and empathy.chat is currently invite-only). "
-                      "Creating a new account requires an invite link."):
+                      "Creating a new account requires an invite link. Contact tim@empathy.chat to discuss "
+                      "hosting a group you can invite others to."):
       anvil.server.call_s('remove_user', user)
       import time
       time.sleep(4)

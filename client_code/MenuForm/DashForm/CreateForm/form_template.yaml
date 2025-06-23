@@ -1,310 +1,243 @@
-container:
-  type: ColumnPanel
-  event_bindings: {}
-  properties: {col_widths: '{}', spacing_below: none, spacing_above: none}
 components:
-- type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{"YYKYCC":26,"NRVHVU":34}',
-    spacing_below: none, background: ''}
-  name: column_panel_1
-  layout_properties: {grid_position: 'HYVJID,XFGHDE'}
-  components:
-  - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: small, background: ''}
-    name: column_panel_2
-    layout_properties: {grid_position: 'AEOVYA,YYKYCC'}
-    components:
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: ' When? (start time)', font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
-        underline: false, icon: ''}
+- components:
+  - components:
+    - layout_properties: {grid_position: 'SJMSJV,QPOZGU'}
       name: start_label
-      layout_properties: {grid_position: 'SJMSJV,QPOZGU'}
-    - name: now_label
-      properties: {spacing_below: none, spacing_above: none, text: Now (or whenever someone joins you),
-        font_size: 16}
+      properties: {align: left, background: '', bold: true, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: ' When? (start time)', tooltip: '', underline: false, visible: true}
       type: Label
-      layout_properties: {grid_position: 'JABLBX,YJXKJY'}
-    - type: RadioButton
-      properties: {role: null, selected: false, align: left, tooltip: '', border: '',
-        enabled: true, foreground: 'theme:Black', value: '1', visible: false, text: Now,
-        font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false,
-        background: '', bold: false, group_name: start_now, underline: false}
-      name: now_radio_button
-      layout_properties: {grid_position: 'XLLNSU,XTUNDE'}
+    - layout_properties: {grid_position: 'JABLBX,YJXKJY'}
+      name: now_label
+      properties: {font_size: 16, spacing_above: none, spacing_below: none, text: Now (or whenever someone joins you)}
+      type: Label
+    - data_bindings: []
       event_bindings: {clicked: radio_start_change}
-      data_bindings: []
-    - type: RadioButton
-      properties: {role: null, selected: true, align: left, tooltip: '', border: '',
-        enabled: true, foreground: 'theme:Black', value: '0', visible: false, text: Later at...,
-        font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false,
-        background: '', bold: false, group_name: start_now, underline: false}
-      name: later_radio_button
+      layout_properties: {grid_position: 'XLLNSU,XTUNDE'}
+      name: now_radio_button
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: 'theme:Black', group_name: start_now, italic: false, role: null, selected: false, spacing_above: none, spacing_below: none, text: Now, tooltip: '', underline: false, value: '1', visible: false}
+      type: RadioButton
+    - data_bindings: []
+      event_bindings: {clicked: radio_start_change}
       layout_properties:
         col_widths: {}
         grid_position: EQSBEP,QJKLWL
-      event_bindings: {clicked: radio_start_change}
-      data_bindings: []
-    - name: flow_panel_1
+      name: later_radio_button
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: 'theme:Black', group_name: start_now, italic: false, role: null, selected: true, spacing_above: none, spacing_below: none, text: Later at..., tooltip: '', underline: false, value: '0', visible: false}
+      type: RadioButton
+    - components:
+      - data_bindings:
+        - {code: 'self.item[''start_date'']', property: date, writeback: true}
+        event_bindings: {change: date_picker_start_change}
+        layout_properties: {width: 240}
+        name: date_picker_start
+        properties: {align: left, background: 'theme:Gray 200', bold: false, border: '', date: '', enabled: true, font: '', font_size: null, foreground: '', format: '', italic: false, max_date: '', min_date: '', pick_time: true, placeholder: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', underline: false, visible: false}
+        type: DatePicker
+      layout_properties: {grid_position: 'UIQYTX,UWKNKV'}
+      name: flow_panel_1
       properties: {spacing_above: none, spacing_below: none}
       type: FlowPanel
-      layout_properties: {grid_position: 'UIQYTX,UWKNKV'}
-      components:
-      - type: DatePicker
-        properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
-          placeholder: '', border: '', enabled: true, foreground: '', visible: false,
-          font_size: null, font: '', spacing_above: none, spacing_below: none, italic: false,
-          date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
-          format: ''}
-        name: date_picker_start
-        layout_properties: {width: 240}
-        event_bindings: {change: date_picker_start_change}
-        data_bindings:
-        - {property: date, code: 'self.item[''start_date'']', writeback: true}
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
-        visible: false, text: '', font_size: null, font: '', spacing_above: small,
-        icon_align: left, spacing_below: small, italic: false, background: '', bold: false,
-        underline: false, icon: ''}
-      name: label_start
+    - event_bindings: {}
       layout_properties: {grid_position: 'MAANVK,NUGJLS'}
+      name: label_start
+      properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: 'theme:Red', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: false}
+      type: Label
+    - data_bindings:
+      - {code: 'self.item[''alt'']', property: items}
       event_bindings: {}
-    - type: RepeatingPanel
-      properties: {role: null, tooltip: '', border: '', foreground: '', items: null,
-        visible: true, spacing_above: none, spacing_below: none, item_template: MenuForm.DashForm.CreateForm.TimeProposalTemplate,
-        background: ''}
-      name: repeating_panel_1
       layout_properties: {grid_position: 'WTWGRU,SEOHNN'}
-      event_bindings: {}
-      data_bindings:
-      - {property: items, code: 'self.item[''alt'']'}
-    - type: form:HorizontalRule
-      properties: {}
+      name: repeating_panel_1
+      properties: {background: '', border: '', foreground: '', item_template: MenuForm.DashForm.CreateForm.TimeProposalTemplate, items: null, role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true}
+      type: RepeatingPanel
+    - layout_properties: {grid_position: 'QEQKER,OBCUGA'}
       name: horizontal_rule_1
-      layout_properties: {grid_position: 'QEQKER,OBCUGA'}
-    - type: Button
-      properties: {role: null, align: left, tooltip: '', border: '', enabled: true,
-        foreground: '', visible: true, text: Add Alternate Time, font_size: null,
-        font: '', spacing_above: none, icon_align: left, spacing_below: small, italic: false,
-        background: '', bold: false, underline: false, icon: ''}
-      name: button_add_alternate
+      properties: {}
+      type: form:HorizontalRule
+    - event_bindings: {click: button_add_alternate_click}
       layout_properties: {grid_position: 'ZAICWP,KBHSOR'}
-      event_bindings: {click: button_add_alternate_click}
+      name: button_add_alternate
+      properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: small, text: Add Alternate Time, tooltip: '', underline: false, visible: true}
+      type: Button
     event_bindings: {}
-  - type: ColumnPanel
-    properties: {role: null, tooltip: '', border: '', foreground: '', visible: true,
-      wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}',
-      spacing_below: none, background: ''}
-    name: column_panel_3
-    layout_properties: {grid_position: 'AEOVYA,NRVHVU'}
-    components:
-    - type: Label
-      properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-        visible: true, text: 'For how long?', font_size: null, font: '', spacing_above: none,
-        icon_align: left, spacing_below: none, italic: false, background: '', bold: true,
-        underline: false, icon: ''}
+    layout_properties: {grid_position: 'AEOVYA,YYKYCC'}
+    name: column_panel_2
+    properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true, wrap_on: mobile}
+    type: ColumnPanel
+  - components:
+    - layout_properties: {grid_position: 'BUYRWB,YJMNFL'}
       name: label_2
-      layout_properties: {grid_position: 'BUYRWB,YJMNFL'}
-    - type: DropDown
+      properties: {align: left, background: '', bold: true, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: 'For how long?', tooltip: '', underline: false, visible: true}
+      type: Label
+    - data_bindings:
+      - {code: 'self.item[''duration'']', property: selected_value, writeback: true}
+      event_bindings: {change: drop_down_duration_change}
+      layout_properties: {grid_position: 'RPAKJT,YAYJAQ'}
+      name: drop_down_duration
       properties:
-        role: null
         align: left
-        tooltip: ''
-        placeholder: ''
-        border: ''
-        enabled: true
-        foreground: ''
-        items: [15 min. (5 & 5) (items set at runtime), 25 min. (10 & 10), 35 min. (15 & 15),
-          45 min. (20 & 20), 55 min. (25 & 25), 65 min. (30 & 30)]
-        visible: true
-        font_size: null
-        font: ''
-        spacing_above: small
-        spacing_below: none
-        italic: false
         background: theme:Gray 200
         bold: false
-        underline: false
+        border: ''
+        enabled: true
+        font: ''
+        font_size: null
+        foreground: ''
         include_placeholder: false
-      name: drop_down_duration
-      layout_properties: {grid_position: 'RPAKJT,YAYJAQ'}
-      event_bindings: {change: drop_down_duration_change}
-      data_bindings:
-      - {property: selected_value, code: 'self.item[''duration'']', writeback: true}
+        italic: false
+        items: [15 min. (5 & 5) (items set at runtime), 25 min. (10 & 10), 35 min. (15 & 15), 45 min. (20 & 20), 55 min. (25 & 25), 65 min. (30 & 30)]
+        placeholder: ''
+        role: null
+        spacing_above: small
+        spacing_below: none
+        tooltip: ''
+        underline: false
+        visible: true
+      type: DropDown
     event_bindings: {}
-- type: Spacer
-  properties: {height: 10.6666259765625, spacing_above: none, spacing_below: none}
+    layout_properties: {grid_position: 'AEOVYA,NRVHVU'}
+    name: column_panel_3
+    properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+    type: ColumnPanel
+  layout_properties: {grid_position: 'HYVJID,XFGHDE'}
+  name: column_panel_1
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{"YYKYCC":26,"NRVHVU":34}', foreground: '', role: null, spacing_above: none, spacing_below: none, tooltip: '', visible: true, wrap_on: mobile}
+  type: ColumnPanel
+- layout_properties: {grid_position: 'MGXSNE,CGULSX'}
   name: alternate_spacer
-  layout_properties: {grid_position: 'MGXSNE,CGULSX'}
-- name: advanced_link
-  properties: {text: Show advanced options..., spacing_above: none, spacing_below: none,
-    font_size: -1}
-  type: Link
+  properties: {height: 10.6666259765625, spacing_above: none, spacing_below: none}
+  type: Spacer
+- event_bindings: {click: advanced_link_click}
   layout_properties: {grid_position: 'FBWNVK,ZXHTGK'}
-  event_bindings: {click: advanced_link_click}
-- type: ColumnPanel
-  properties: {role: null, tooltip: '', border: '', foreground: '', visible: false,
-    wrap_on: mobile, col_spacing: medium, spacing_above: none, col_widths: '{}', spacing_below: small,
-    background: ''}
-  name: column_panel_cancel
-  layout_properties: {grid_position: 'XREOHS,ZHFGBT'}
-  components:
-  - type: Label
-    properties: {role: null, align: left, tooltip: 'How much notice do you need?',
-      border: '', foreground: '', visible: true, text: 'Cancel if not accepted by:',
-      font_size: null, font: '', spacing_above: small, icon_align: left, spacing_below: small,
-      italic: false, background: '', bold: true, underline: false, icon: ''}
+  name: advanced_link
+  properties: {font_size: -1, spacing_above: none, spacing_below: none, text: Show advanced options...}
+  type: Link
+- components:
+  - layout_properties: {grid_position: 'WBOYUJ,FOOOUW'}
     name: label_3
-    layout_properties: {grid_position: 'WBOYUJ,FOOOUW'}
-  - type: DropDown
+    properties: {align: left, background: '', bold: true, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: 'Cancel if not accepted by:', tooltip: 'How much notice do you need?', underline: false, visible: true}
+    type: Label
+  - data_bindings:
+    - {code: 'self.item[''cancel_buffer'']', property: selected_value, writeback: true}
+    event_bindings: {change: drop_down_cancel_change}
+    layout_properties: {grid_position: 'TPMAHC,OPGHSH'}
+    name: drop_down_cancel
     properties:
-      role: null
       align: left
-      tooltip: ''
-      placeholder: ''
-      border: ''
-      enabled: true
-      foreground: ''
-      items: [5 min. prior, 15 min. prior, 30 min. prior, 1 hr. prior, 2 hrs. prior,
-        8 hrs. prior, 24 hrs. prior, 48 hrs. prior, a specific time...]
-      visible: false
-      font_size: null
-      font: ''
-      spacing_above: small
-      spacing_below: none
-      italic: false
       background: theme:Gray 200
       bold: false
-      underline: false
+      border: ''
+      enabled: true
+      font: ''
+      font_size: null
+      foreground: ''
       include_placeholder: false
-    name: drop_down_cancel
-    layout_properties: {grid_position: 'TPMAHC,OPGHSH'}
-    event_bindings: {change: drop_down_cancel_change}
-    data_bindings:
-    - {property: selected_value, code: 'self.item[''cancel_buffer'']', writeback: true}
-  - type: DatePicker
-    properties: {role: null, align: left, max_date: '', pick_time: true, tooltip: '',
-      placeholder: '', border: '', enabled: true, foreground: '', visible: false,
-      font_size: null, font: '', spacing_above: none, spacing_below: small, italic: false,
-      date: '', min_date: '', background: 'theme:Gray 200', bold: false, underline: false,
-      format: ''}
-    name: date_picker_cancel
-    layout_properties: {grid_position: 'HCXLQQ,LVQEHO'}
+      italic: false
+      items: [5 min. prior, 15 min. prior, 30 min. prior, 1 hr. prior, 2 hrs. prior, 8 hrs. prior, 24 hrs. prior, 48 hrs. prior, a specific time...]
+      placeholder: ''
+      role: null
+      spacing_above: small
+      spacing_below: none
+      tooltip: ''
+      underline: false
+      visible: false
+    type: DropDown
+  - data_bindings:
+    - {code: 'self.item[''cancel_date'']', property: date, writeback: true}
     event_bindings: {change: date_picker_cancel_change}
-    data_bindings:
-    - {property: date, code: 'self.item[''cancel_date'']', writeback: true}
-  - name: spacer_2
+    layout_properties: {grid_position: 'HCXLQQ,LVQEHO'}
+    name: date_picker_cancel
+    properties: {align: left, background: 'theme:Gray 200', bold: false, border: '', date: '', enabled: true, font: '', font_size: null, foreground: '', format: '', italic: false, max_date: '', min_date: '', pick_time: true, placeholder: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', underline: false, visible: false}
+    type: DatePicker
+  - layout_properties: {grid_position: 'HCXLQQ,JUPMPF'}
+    name: spacer_2
     properties: {height: '0'}
     type: Spacer
-    layout_properties: {grid_position: 'HCXLQQ,JUPMPF'}
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: 'theme:Red',
-      visible: false, text: '', font_size: null, font: '', spacing_above: small, icon_align: left,
-      spacing_below: small, italic: false, background: '', bold: false, underline: false,
-      icon: ''}
-    name: label_cancel
+  - event_bindings: {}
     layout_properties: {grid_position: 'MOAYGD,PBHCBD'}
-    event_bindings: {}
+    name: label_cancel
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: 'theme:Red', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: '', tooltip: '', underline: false, visible: false}
+    type: Label
   event_bindings: {}
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: left, tooltip: '', border: '',
-    foreground: '', visible: false, spacing_above: none, spacing_below: medium, background: ''}
-  name: flow_panel_3
-  layout_properties: {grid_position: 'PCFTTJ,SBORPM'}
-  components:
-  - type: Label
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'What size empathy chat?', font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: small, italic: false, background: '', bold: true,
-      underline: false, icon: ''}
-    name: size_label
+  layout_properties: {grid_position: 'XREOHS,ZHFGBT'}
+  name: column_panel_cancel
+  properties: {background: '', border: '', col_spacing: medium, col_widths: '{}', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: false, wrap_on: mobile}
+  type: ColumnPanel
+- components:
+  - data_bindings: []
     layout_properties:
       col_widths: {}
       grid_position: GBFPUO,BOQWZR
-    data_bindings: []
-  - type: DropDown
+    name: size_label
+    properties: {align: left, background: '', bold: true, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: 'What size empathy chat?', tooltip: '', underline: false, visible: true}
+    type: Label
+  - data_bindings:
+    - {code: '(self.item[''min_size''], self.item[''max_size''])', property: selected_value, writeback: true}
+    layout_properties: {grid_position: 'FZLHTD,JXVDVI'}
+    name: size_drop_down
     properties:
-      role: null
       align: left
-      tooltip: ''
-      placeholder: ''
-      border: ''
-      enabled: true
-      foreground: ''
-      items: []
-      visible: true
-      font_size: null
-      font: ''
-      spacing_above: small
-      spacing_below: small
-      italic: false
       background: ''
       bold: false
-      underline: false
+      border: ''
+      enabled: true
+      font: ''
+      font_size: null
+      foreground: ''
       include_placeholder: false
-    name: size_drop_down
-    layout_properties: {grid_position: 'FZLHTD,JXVDVI'}
-    data_bindings:
-    - {property: selected_value, code: '(self.item[''min_size''], self.item[''max_size''])',
-      writeback: true}
-- name: note_flow_panel
-  properties: {spacing_below: medium, tooltip: You can attach a brief note to your request,
-    spacing: small, visible: false}
+      italic: false
+      items: []
+      placeholder: ''
+      role: null
+      spacing_above: small
+      spacing_below: small
+      tooltip: ''
+      underline: false
+      visible: true
+    type: DropDown
+  layout_properties: {grid_position: 'PCFTTJ,SBORPM'}
+  name: flow_panel_3
+  properties: {align: left, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: none, spacing_below: medium, tooltip: '', visible: false}
   type: FlowPanel
-  layout_properties: {grid_position: 'KBMNTR,RBYOCK'}
-  components:
-  - name: note_label_copy_1
-    properties: {role: null, align: left, tooltip: '', border: '', foreground: '',
-      visible: true, text: 'Note (optional):', font_size: null, font: '', spacing_above: none,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    type: Label
+- components:
+  - data_bindings: []
     layout_properties: {}
-    data_bindings: []
-  - name: text_box_1
-    properties: {spacing_above: none, spacing_below: none, role: dense, placeholder: 'Anything
-        else you want invitees to know?', font_size: 14}
-    type: TextBox
+    name: note_label_copy_1
+    properties: {align: left, background: '', bold: false, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: none, spacing_below: none, text: 'Note (optional):', tooltip: '', underline: false, visible: true}
+    type: Label
+  - data_bindings:
+    - {code: 'self.item[''note'']', property: text, writeback: true}
     layout_properties: {expand: true}
-    data_bindings:
-    - {property: text, code: 'self.item[''note'']', writeback: true}
-- type: Label
-  properties: {role: null, align: left, tooltip: '', border: '', foreground: '', visible: true,
-    text: 'Who would you like to be able to see and accept this request?', font_size: null,
-    font: '', spacing_above: small, icon_align: left, spacing_below: small, italic: false,
-    background: '', bold: true, underline: false, icon: ''}
-  name: eligible_label
+    name: text_box_1
+    properties: {font_size: 14, placeholder: 'Anything else you want invitees to know?', role: dense, spacing_above: none, spacing_below: none}
+    type: TextBox
+  layout_properties: {grid_position: 'KBMNTR,RBYOCK'}
+  name: note_flow_panel
+  properties: {spacing: small, spacing_below: medium, tooltip: You can attach a brief note to your request, visible: false}
+  type: FlowPanel
+- data_bindings: []
   layout_properties: {grid_position: 'YYMEXI,XTNOOT'}
-  data_bindings: []
-- type: LinearPanel
-  properties: {spacing_above: none, spacing_below: small, background: '', foreground: '',
-    border: '', visible: true, role: null, tooltip: ''}
+  name: eligible_label
+  properties: {align: left, background: '', bold: true, border: '', font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: null, spacing_above: small, spacing_below: small, text: 'Who would you like to be able to see and accept this request?', tooltip: '', underline: false, visible: true}
+  type: Label
+- layout_properties: {grid_position: 'FCKSLW,FVXABD'}
   name: eligibility_linear_panel
-  layout_properties: {grid_position: 'FCKSLW,FVXABD'}
-- type: FlowPanel
-  properties: {role: null, spacing: medium, align: center, tooltip: '', border: '',
-    foreground: '', visible: true, spacing_above: small, spacing_below: none, background: ''}
-  name: flow_panel_2
-  layout_properties: {grid_position: 'LSJGGE,ZGXZRT'}
-  components:
-  - type: Button
-    properties: {role: primary-color, align: right, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: SAVE, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: save_button
+  properties: {background: '', border: '', foreground: '', role: null, spacing_above: none, spacing_below: small, tooltip: '', visible: true}
+  type: LinearPanel
+- components:
+  - event_bindings: {click: save_button_click}
     layout_properties: {grid_position: 'MKSGPG,BGZIZC'}
-    event_bindings: {click: save_button_click}
-  - type: Button
-    properties: {role: secondary-color, align: left, tooltip: '', border: '', enabled: true,
-      foreground: '', visible: true, text: CANCEL, font_size: null, font: '', spacing_above: small,
-      icon_align: left, spacing_below: none, italic: false, background: '', bold: false,
-      underline: false, icon: ''}
-    name: cancel_button
+    name: save_button
+    properties: {align: right, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: primary-color, spacing_above: small, spacing_below: none, text: SAVE, tooltip: '', underline: false, visible: true}
+    type: Button
+  - event_bindings: {click: cancel_button_click}
     layout_properties: {grid_position: 'MKSGPG,WWJCIE'}
-    event_bindings: {click: cancel_button_click}
+    name: cancel_button
+    properties: {align: left, background: '', bold: false, border: '', enabled: true, font: '', font_size: null, foreground: '', icon: '', icon_align: left, italic: false, role: secondary-color, spacing_above: small, spacing_below: none, text: CANCEL, tooltip: '', underline: false, visible: true}
+    type: Button
+  layout_properties: {grid_position: 'LSJGGE,ZGXZRT'}
+  name: flow_panel_2
+  properties: {align: center, background: '', border: '', foreground: '', role: null, spacing: medium, spacing_above: small, spacing_below: none, tooltip: '', visible: true}
+  type: FlowPanel
+container:
+  event_bindings: {}
+  properties: {col_widths: '{}', spacing_above: none, spacing_below: none}
+  type: ColumnPanel
 is_package: true
