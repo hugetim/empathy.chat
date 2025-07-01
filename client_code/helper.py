@@ -179,7 +179,7 @@ def _robust_server_call(n, call_fn, fn_name, *args, **kwargs):
       return call_fn(fn_name, *args, **kwargs)
     except anvil.server.TimeoutError:
       from . import helper as h
-      warning("Re-trying {fn_name} server call due to TimeoutError")
+      warning(f"Re-trying {fn_name} server call due to TimeoutError")
       return _robust_server_call(n-1, call_fn, fn_name, *args, **kwargs)
 
 
